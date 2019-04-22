@@ -45,9 +45,9 @@
 <div class="col-md-12">
         <div class="tabbable tabbable-custom tabbable-full-width">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="javascript:void(0)" class="menuVersion" data-page="version_data" data-toggle="tab"><i class="fa fa-industry"></i> List Version Information </a></li>
-                <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_groupmodule" data-toggle="tab"><i class="fa fa-object-group"></i> List Group Module</a></li>
-                <!-- <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratasatu" data-toggle="tab"><i class="fa fa-university"></i>  Academic S1</a></li> --> 
+                <li class="active"><a href="javascript:void(0)" class="menuVersion" data-page="version_data" data-toggle="tab"><i class="fa fa-industry"></i> List data Version </a></li>
+                <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_groupmodule" data-toggle="tab"><i class="fa fa-object-group"></i> List data Module</a></li>
+                <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_module" data-toggle="tab"><i class="fa fa-object-group"></i>  List data Group </a></li> 
             </ul>
             <div class="tab-content">
                 <hr/>
@@ -137,6 +137,57 @@
         }
     });
 </script>
+
+<script>
+    $(document).on('click','.btneditsavegroups',function () {
+        saveeditgroups();
+    });
+
+    function saveeditgroups() {
+        
+        var iddivision = $('#filterDivisiom option:selected').attr('id');
+        var Namegroup = $('#editNameGroups').val();
+        var IDGroupedit = $('#IDGroupedit').val();
+        
+        if(iddivision!=null && iddivision!=''
+            && Namegroup!='' && Namegroup!=null
+            && IDGroupedit!='' && IDGroupedit!=null
+            )
+        { 
+    
+            var data = {
+                action : 'EditGroups',
+                formInsert : {
+                    iddivision : iddivision,
+                    IDGroupedit : IDGroupedit,
+                    Namegroup : Namegroup
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudGroupModule';
+            $.post(url,{token:token},function (result) {
+                    
+                if(result==0 || result=='0'){
+            
+                } else { 
+                    toastr.success('Edit Group Module Saved','Success');
+                    setTimeout(function () {
+                    $('#GlobalModal').modal('hide');
+                        window.location.href = '';
+                    },1000);
+                }
+            });
+        }
+        else {
+            toastr.error('The form is still empty!','Error');
+            $('#GlobalModal').modal('show');
+            return;
+        }
+     }
+</script>
+
+
 
 <script>
     $(document).on('click','.btneditsavegroupmod',function () {
