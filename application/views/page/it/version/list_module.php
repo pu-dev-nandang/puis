@@ -32,7 +32,6 @@
 
 <script>
     $(document).ready(function () {
-        //loadSelectOptionDivision('#filterStatusDivision','');
         loadDataModule('');
     });
 

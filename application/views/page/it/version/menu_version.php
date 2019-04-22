@@ -65,14 +65,12 @@
         };
         var token = jwt_encode(data,'UAP)(*');
         loadPage(token);
-        //window.Lecturer_NIP = 0;
 
     });
 
     $(document).on('click','.menuVersion',function () {
         var page = $(this).attr('data-page');
         var data = {
-            //NIP : NIP,
             page : page
         };
         var token = jwt_encode(data,'UAP)(*');
