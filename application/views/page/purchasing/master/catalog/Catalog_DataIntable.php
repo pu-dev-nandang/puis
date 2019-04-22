@@ -87,9 +87,12 @@
 		$('#datatablesServer tbody').on('click', '.btn-edit-catalog', function () {
 			$('.pageAnchor[page="DataIntable"]').trigger('click');
 			var ID = $(this).attr('code');
-	      	if (CountColapses == 0) {
-	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
-	      		$('#FormInput').show();
+	      	// if (CountColapses == 0) {
+	      	if ($('#FormInput').attr('class') == 'collapse') {
+	      		$('.pageAnchor[page="FormInput"]').trigger('click');
+	      		//$('#FormInput').show();
+	      		// $('#FormInput').attr('class','in');
+	      		// $('#FormInput').attr('display: block; height: auto;');
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
 	      		var url = base_url_js+'purchasing/page/catalog/'+page;

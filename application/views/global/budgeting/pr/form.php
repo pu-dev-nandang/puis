@@ -7,8 +7,10 @@
 		PRCodeVal : "<?php echo $PRCodeVal ?>",
 		Year : "<?php echo $Year ?>",
 		Departement : "<?php echo $Departement ?>",
+		NmDepartement_Existing : '',
 		RuleAccess : [],
 		PostBudgetDepartment : [],
+		DtExisting : [],
 	};
 
 	var S_Table_example_budget = '';
@@ -62,9 +64,35 @@
 			    PRCode : PRCode,
 			};
 			var token = jwt_encode(data,"UAP)(*");
-			$.post(url,{ token:token },function (data_json) {
+			$.post(url,{ token:token },function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
-				console.log(response);
+				ClassDt.DtExisting = response;
+				// Get Budget
+
+				// Load Budget Department
+				var arr_pr_create = response['pr_create'];
+				var Year = arr_pr_create[0]['Year'];
+				ClassDt.NmDepartement_Existing =  arr_pr_create[0]['NameDepartement'];
+				var Departement = arr_pr_create[0]['Departement'];
+				var url = base_url_js+"budgeting/detail_budgeting_remaining";
+				var data = {
+						    Year : Year,
+							Departement : Departement,
+						};
+				var token = jwt_encode(data,'UAP)(*');
+				$.post(url,{token:token},function (resultJson) {
+					var response2 = jQuery.parseJSON(resultJson);
+					Make_PostBudgetDepartment_existing(response2.data);
+					// ClassDt.PostBudgetDepartment = response.data;
+					// localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+					// new
+					makeDomExisting();
+				}).fail(function() {
+				  toastr.info('No Result Data'); 
+				}).always(function() {
+				                
+				});
+
 			}).fail(function() {
 			  toastr.info('No Result Data'); 
 			}).always(function() {
@@ -95,6 +123,302 @@
 			});
 			
 		}
+	}
+
+	function Make_PostBudgetDepartment_existing(arr_budget_departement)
+	{
+		/*
+			Note : 
+			Pengembalian Post Budget using ke awal sebelum pr tercreate
+		*/
+		var arr = [];
+		var DtExisting = ClassDt.DtExisting;
+		var arr_pr_detail = DtExisting['pr_detail'];
+		for (var i = 0; i < arr_budget_departement.length; i++) {
+			var CodePostRealisasi = arr_budget_departement[i]['CodePostRealisasi'];
+			var Using = arr_budget_departement[i]['Using'];
+			var Value = arr_budget_departement[i]['Value'];
+
+			for (var j = 0; j < arr_pr_detail.length; j++) {
+				var CodePostRealisasi_ = arr_pr_detail[j].CodePostRealisasi;
+				if (CodePostRealisasi_ == CodePostRealisasi) {
+					var SubTotal = parseInt(arr_pr_detail[j].SubTotal);
+					var Cost1 = SubTotal;
+					// console.log(Cost1 + ' -- '+CodePostRealisasi);
+					// check combine
+						var arr_Combine = arr_pr_detail[j].Combine;
+						if (arr_Combine.length > 0) {
+							for (var k = 0; k < arr_Combine.length; k++) {
+								var Cost_Combine = parseInt(arr_Combine[k].Cost_Combine);
+								Cost1 = Cost1 - Cost_Combine;
+								var CodePostBudget_Combine = arr_Combine[k].CodePostBudget_Combine;
+								for (var l = 0; l < arr_budget_departement.length; l++) {
+									var CodePostBudget_Combine_ = arr_budget_departement[l]['CodePostRealisasi'];
+									if (CodePostBudget_Combine == CodePostBudget_Combine_) {
+										// update
+										var Using2 = parseInt(arr_budget_departement[l]['Using']);
+										Using2 = Using2 - Cost_Combine;
+										arr_budget_departement[l]['Using'] = Using2;
+										break;
+									}
+								}
+							}
+
+						}
+
+					Using = parseInt(Using) - Cost1;
+					arr_budget_departement[i]['Using'] = Using;
+
+					break;
+				}
+			}
+
+		}
+
+		ClassDt.PostBudgetDepartment = arr_budget_departement;
+		localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+	}
+
+	function makeDomExisting()
+	{
+		// console.log(ClassDt);
+		var DtExisting = ClassDt.DtExisting;
+		var pr_create = DtExisting.pr_create;
+		var pr_detail = DtExisting.pr_detail;
+		var StatusName = pr_create[0]['StatusName'];
+		var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
+		html += '<div class="col-md-4">'+
+					'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
+					'<p id = "labelDepartment">Department : '+ClassDt.NmDepartement_Existing+'</p>'+
+					'<p id = "labelPrcode">PR Code : '+ClassDt.PRCodeVal+'</p>'+
+					'<p id = "Status">Status : '+StatusName+'<br>'+btn_see_pass+'</p>'+
+				'</div>'+
+				'<div class="col-md-4">'+
+					'<div class="well">'+
+						'<div style="margin-top: -15px">'+
+							'<label>Budget Remaining</label>'+
+						'</div>'+
+						'<div id = "Page_Budget_Remaining">'+
+							''+
+						'</div>'+
+					'</div>'+
+				'</div>';
+		html += '</div>';
+
+		var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
+							'<div class = "col-md-3">'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+							'</div>'+
+						'</div>';
+
+		var IsiInputPR = AddingTable_existing();
+
+		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
+							'<div class = "col-md-12">'+
+								'<div class="table-responsive">'+
+									'<table class="table table-bordered tableData" id ="table_input_pr">'+
+									'<thead>'+
+									'<tr>'+
+										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Budget</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
+			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
+			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Combine Budget</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Action</th>'+
+									'</tr></thead>'+
+									'<tbody>'+IsiInputPR+'</tbody></table>'+
+								'</div>'+
+							'</div>'+
+						  '</div>';
+		var Notes = 	'<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+							'<div class = "col-md-6">'+
+								'<div class = "form-group">'+
+									'<label>Note</label>'+
+									'<textarea id= "Notes" class = "form-control" rows = "4">'+pr_create[0]['Notes']+'</textarea>'+
+								'</div>'+
+							'</div>'+
+							'<div class = "col-md-6">'+
+								'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
+							'</div>'+
+						'</div>';
+
+		var Supporting_documents = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+							'<div class = "col-md-6">'+
+								'<div class = "form-group">'+
+									'<label>Supporting documents</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
+								'</div>'+
+							'</div>'+
+						'</div>';					  
+
+		var htmlInputFooter = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Footer">'+
+							Notes+Supporting_documents+
+						  '</div>';
+
+		var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
+						  '</div>';	
+
+		var htmlButton = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Button">'+
+						  '</div>';
+
+		$('#dtContent').html(html+htmlBtnAdd+htmlInputPR+htmlInputFooter+htmlApproval+htmlButton);
+		$(".SubTotal").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+		$(".SubTotal").maskMoney('mask', '9894');
+		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+		$(".UnitCost").maskMoney('mask', '9894');
+		__BudgetRemaining();
+
+		// Show Supporting_documents if exist
+			var Supporting_documents = jQuery.parseJSON(pr_create[0]['Supporting_documents']);
+			// console.log(Supporting_documents);
+			var htmlSupporting_documents = '';
+			if (Supporting_documents != null) {
+				if (Supporting_documents.length > 0) {
+					for (var i = 0; i < Supporting_documents.length; i++) {
+						htmlSupporting_documents += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a></li>';
+					}
+				}
+			}
+
+			$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
+
+			// disabled tr kecuali last tergantung status, status 3 = reject
+				if (pr_create[0]['Status'] == 3) {
+					var row = $('#table_input_pr tbody tr:not(:last)');
+					row.find('td').find('input,select,button:not(.Detail),textarea').prop('disabled',true);
+				}
+				else
+				{
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea').prop('disabled',true);
+				}
+				
+
+		// make kolom approval
+			makeApproval();	
+		MakeButton();
+	}
+
+	function AddingTable_existing()
+	{
+		var DtExisting = ClassDt.DtExisting;
+		var pr_create = DtExisting.pr_create;
+		var pr_detail = DtExisting.pr_detail;
+		var Budget =  JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
+		var html = '';
+		for (var i = 0; i < pr_detail.length; i++) {
+			var ID_budget_left = pr_detail[i]['ID_budget_left'];
+			var remaining = 0;
+			for (var j = 0; j < Budget.length; j++) {
+				var ID_budget_left_ = Budget[j].ID;
+				if (ID_budget_left == ID_budget_left_) {
+					remaining = parseInt(Budget[j].Value) - parseInt(Budget[j].Using);
+					break;
+				}
+			}
+
+			// for detail catalog
+				var Desc = pr_detail[i]['Desc'];
+				var EstimaValue = pr_detail[i]['UnitCost'];
+				var arr_Photo = pr_detail[i]['Photo'];
+				arr_Photo = arr_Photo.split(',');
+				htmlPhoto = '<ul>';
+				for (var j = 0; j < arr_Photo.length; j++) {
+					htmlPhoto += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+arr_Photo[j]+'" target="_blank">'+
+										arr_Photo[j]+'</a></li>';
+				}
+				htmlPhoto += '</ul>';
+				var DetailCatalog = jQuery.parseJSON(pr_detail[i]['DetailCatalog']);
+				var htmlDetailCatalog = '';
+				for (var prop in DetailCatalog) {
+					htmlDetailCatalog += prop + ' :  '+DetailCatalog[prop]+'<br>';
+				}
+				var Item = pr_detail[i]['Item'];
+				var arr = Item+'@@'+Desc+'@@'+EstimaValue+'@@'+htmlPhoto+'@@'+htmlDetailCatalog;
+				arr = findAndReplace(arr, "\"","'");
+
+			var SpecAdd = (pr_detail[i]['Spec_add'] == '' || pr_detail[i]['Spec_add'] == null || pr_detail[i]['Spec_add'] == 'null') ? '' : pr_detail[i]['Spec_add'];
+			var Need = (pr_detail[i]['Need'] == '' || pr_detail[i]['Need'] == null || pr_detail[i]['Need'] == 'null') ? '' : pr_detail[i]['Need'];
+
+			var htmlUploadFile = '';
+			UploadFile = jQuery.parseJSON(pr_detail[i]['UploadFile']);
+			if (UploadFile != null) {
+				if (UploadFile.length > 0) {
+					for (var j = 0; j < UploadFile.length; j++) {
+						htmlUploadFile += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+UploadFile[j]+'" target="_blank" class = "Fileexist">File '+(j+1)+'</a></li>';
+					}
+				}
+			}
+
+			var Combine = pr_detail[i]['Combine'];
+			var HtmlCombine = 'No';
+			if (Combine.length > 0) {
+				var less = parseInt(remaining) - parseInt(pr_detail[i]['SubTotal']); 
+				HtmlCombine = '<button class="btn btn-default SearchPostBudget_Combine" type="button" less="'+less+'"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+						'<ul class="liCombine" style="margin-left : -21px;">';
+
+					for (var j = 0; j < Combine.length; j++) {
+							HtmlCombine += '<li id_budget_left = "'+Combine[j].ID_budget_left_Combine+'" money = "'+Combine[j].Cost_Combine+'" subsidi = "'+Combine[j].Cost_Combine+'">'+Combine[j].RealisasiPostName_Combine+'</li>';
+					}
+
+				HtmlCombine += '</ul>';	
+
+			}
+
+
+			html += '<tr>'+
+						'<td>'+(i+1)+'</td>'+
+						'<td>'+
+							'<div class="input-group">'+
+								'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" remaining = "'+remaining+'" value = "'+pr_detail[i]['RealisasiPostName']+'">'+
+								'<span class="input-group-btn">'+
+									'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+								'</span>'+
+							'</div>'+
+							'<label class = "lblBudget">'+pr_detail[i]['RealisasiPostName']+'</label>'+
+						'</td>'+
+						'<td>'+
+							'<div class="input-group">'+
+								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['UnitCost']+'" value = "'+pr_detail[i]['Item']+'">'+
+								'<span class="input-group-btn">'+
+									'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+								'</span>'+
+							'</div>'+
+							'<label class = "lblCatalog">'+pr_detail[i]['Item']+'</label>'+
+						'</td>'+
+						'<td><button class = "btn btn-primary Detail" data = "'+arr+'">Detail</button></td>'+
+						'<td>'+
+							'<textarea class = "form-control SpecAdd" rows = "2">'+SpecAdd+'</textarea>'+
+						'</td>'+
+						'<td>'+
+							'<textarea class = "form-control Need" rows = "2">'+Need+'</textarea>'+
+						'</td>'+
+						'<td><input type="number" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
+						'<td><input type="text" class="form-control UnitCost" value="'+parseInt(pr_detail[i]['UnitCost'])+'" disabled></td>'+
+						'<td><input type="number" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
+						'<td><input type="text" class="form-control SubTotal" disabled value = "'+parseInt(pr_detail[i]['SubTotal'])+'"></td>'+
+						'<td>'+
+							'<div class="input-group input-append date datetimepicker">'+
+	                            '<input data-format="yyyy-MM-dd" class="form-control" type=" text" readonly="" value = "'+pr_detail[i]['DateNeeded']+'">'+
+	                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+	                		'</div>'+
+	                	'</td>'+
+	                	'<td><input type="file" data-style="fileinput" class = "BrowseFile" multiple accept="image/*,application/pdf" style = "width : 97px;">'+htmlUploadFile+'</td>'+
+	                	'<td>'+HtmlCombine+'</td>'+
+	                	action
+	                '</tr>';
+		}
+		
+        return html;
 	}
 
 	function makeDomAwal()
@@ -183,11 +507,151 @@
 		MakeButton();
 	}
 
+	function makeApproval()
+	{
+		var DtExisting = ClassDt.DtExisting;
+		var pr_create = DtExisting['pr_create'];
+		var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
+		/* Page_Approval */
+		// only admin & Finance to custom approval
+			// console.log(JsonStatus);
+			var html_add_approver = '';
+			var bool = false;
+			if (pr_create[0].CreatedBy == NIP) {
+				bool = true;
+			}
+
+			if (bool || DivSession == 'NA.9') { // NA.9 Finance
+				html_add_approver = '<a href = "javascript:void(0)"  class="btn btn-default btn-default-success" type="button" id = "add_approver" prcode = "'+pr_create[0].PRCode+'">'+
+                        			'<i class="fa fa-plus-circle" aria-hidden="true"></i>'+
+                    		'</a>';
+			}
+
+			var html = '<div class = "col-md-4 col-md-offset-8"><div class = "table-responsive">'+
+		    				html_add_approver+
+							'<table class = "table table-striped table-bordered table-hover table-checkable tableApproval" style = "margin-top : 5px">'+
+								'<thead><tr>';
+
+				// html += '<th>'+'Created by'+'</th>';
+				for (var i = 0; i < JsonStatus.length; i++) {
+					html += '<th>'+JsonStatus[i].NameTypeDesc+'</th>';
+				}
+				html +=	'</th></thead>'+'<tbody><tr style = "height : 51px">';
+
+				// html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>'
+				for (var i = 0; i < JsonStatus.length; i++) {
+					var v = '-';
+					if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+						v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+					}
+					else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+					{
+						v = '<i class="fa fa-check" style="color: green;"></i>';
+					}
+					else
+					{
+						v = '-';
+					}
+					html += '<td>'+v+'</td>';		
+				}
+				html += '</tr><tr>';
+				// html += '<td>'+pr_create[0].NameCreatedBy+'</td>';
+				for (var i = 0; i < JsonStatus.length; i++) {
+					html += '<td>'+JsonStatus[i].NameAprrovedBy+'</td>';		
+				}
+				html +=	'</tr></tbody>'+'</table></div></div>';
+
+				$('#Page_Approval').html(html);
+
+	}
+
 	function MakeButton()
 	{
 		var dt = ClassDt.RuleAccess;
 		if (ClassDt.PRCodeVal != '') { 
-			// edit
+			var DtExisting = ClassDt.DtExisting;
+			var pr_create = DtExisting.pr_create;
+			if (pr_create[0].Status == 3) {
+				var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+							'<button class = "btn btn-success" id = "SaveSubmit" prcode = "'+ClassDt.PRCodeVal+'" action = "1">Submit</button>'+
+						   '</div>';
+				var r_access = dt['access'];
+				var rule = dt['rule'];
+				// allow access dengan ID_m_userrole: "1"
+				var bool = false;
+				for (var i = 0; i < r_access.length; i++) {
+					var ID_m_userrole = r_access[i].ID_m_userrole;
+					// search rule Entry = 1
+					for (var j = 0; j < rule.length; j++) {
+						var ID_m_userrole_ = rule[j].ID_m_userrole;
+						if (ID_m_userrole == ID_m_userrole_) {
+							var Entry = rule[j].Entry
+							if (Entry == 1) {
+								bool = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (bool) {
+					$('#Page_Button').html(html);
+				}
+				else
+				{
+					// check rule entry
+					$('.btn-add-pr,input[type="file"]').prop('disabled',true);
+				}
+			}
+			else if(pr_create[0].Status == 1)
+			{
+				var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
+				var bool = false;
+				var HierarkiApproval = 0; // for check hierarki approval;
+				var NumberOfApproval = 0; // for check hierarki approval;
+				for (var i = 0; i < JsonStatus.length; i++) {
+					NumberOfApproval++;
+					if (JsonStatus[i]['Status'] == 0) {
+						// check status before
+						if (i > 0) {
+							var ii = i - 1;
+							if (JsonStatus[ii]['Status'] == 1) {
+								HierarkiApproval++;
+							}
+
+							// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
+							// 	HierarkiApproval++;
+							// }
+							// HierarkiApproval++;
+						}
+						else
+						{
+							HierarkiApproval++;
+						}
+						
+						// if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+						if (NIP == JsonStatus[i]['NIP']) {
+							bool = true;
+							break;
+						}
+					}
+					else
+					{
+						HierarkiApproval++;
+					}
+				}
+
+				if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+					var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+									'<button class = "btn btn-primary" id = "Approve" action = "approve" prcode = "'+ClassDt.PRCodeVal+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
+									'&nbsp'+
+									'<button class = "btn btn-inverse" id = "Reject" action = "reject" prcode = "'+ClassDt.PRCodeVal+'" approval_number = "'+NumberOfApproval+'">Reject</button>'+
+								'</div>';
+					$("#Page_Button").html(html);
+				}
+
+			}
+
 		}
 		else
 		{
@@ -583,6 +1047,10 @@
 		tr.find('.SubTotal').val(hitung);
 		tr.find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		tr.find('.SubTotal').maskMoney('mask', '9894');
+		// check jika Combine maka remove li
+			if (tr.find('.liCombine').length) {
+				tr.find('.liCombine').remove();
+			}
 		__BudgetRemaining(); 
 	}
 
@@ -1263,40 +1731,23 @@
 		       		else
 		       		{
 		       			if (data['BudgetChange'] == 1) { // alert Budget Remaining telah di update oleh transaksi lain
-		       				toastr.info('Budget Remaining already have by another');
+		       				toastr.info('Budget Remaining already have by another,Please Reload');
 		       			}
-		       			// success
-		       			$('#labelPrcode').html('PR Code : '+data['PRCode']);
-		       			var Status = NameStatus(data['StatusPR']);
-		       			$('#Status').html('Status : '+Status);
-		       			// Update Variable ClassDt
-		       			ClassDt.PRCodeVal = data['PRCode'];
-		       			LoadFirstLoad();
+		       			else
+		       			{
+		       				// success
+		       				$('#labelPrcode').html('PR Code : '+data['PRCode']);
+		       				var Status = NameStatus(data['StatusPR']);
+		       				$('#Status').html('Status : '+Status);
+		       				// Update Variable ClassDt
+		       				ClassDt.PRCodeVal = data['PRCode'];
+		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Log</a>';
+		       				LoadFirstLoad();
+		       			}
+		       			
+
 		       		}
 		       		$('#SaveSubmit').prop('disabled',false).html('Submit');
-		       		// if ($("#p_prcode").length) {
-		       		// 	$("#p_prcode").html('PRCode : '+data['PRCode']);
-		       		// }
-		       		// else
-		       		// {
-		       		// 	$(".thumbnail").find('.row:first').before('<p style = "color : red" id = "p_prcode">PRCode : '+data['PRCode']+'</p>');
-		       		// }
-		       		
-		       		// var rowPullright = $(ID_element).closest('.pull-right');
-		       		// rowPullright.empty();
-		       		// rowPullright.append('<button class="btn btn-default" id="pdfprint" PRCode = "'+data['PRCode']+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+ '&nbsp&nbsp'+'<!--<button class="btn btn-default" id="excelprint" PRCode = "'+data['PRCode']+'"><i class = "fa fa-file-excel-o"></i> Print Excel</button>-->');
-
-		       		// $('button:not([id="pdfprint"]):not([id="excelprint"]):not([id="btnBackToHome"])').prop('disabled', true);
-		       		// $(".Detail").prop('disabled', false);
-		       		// $("input").prop('disabled', true);
-		       		// $("select").prop('disabled', true);
-		       		// $("textarea").prop('disabled', true);
-		       		// $(".input-group-addon").remove();
-
-		       		// update tableData_selected
-		       			// var js = jQuery.parseJSON(data['JsonStatus']);
-		       			// JsonStatus = js;
-		       			// Get_tableData_selected(JsonStatus);
 
 		       		break;
 		       case "larry": 
@@ -1343,5 +1794,39 @@
 	    }
 
 	    return Status;
-	} 
+	}
+
+	$(document).off('click', '#Approve').on('click', '#Approve',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve');
+			var PRCode = $(this).attr('prcode');
+			var approval_number = $(this).attr('approval_number');
+			var url = base_url_js + 'rest/__approve_pr';
+			var data = {
+				PRCode : PRCode,
+				approval_number : approval_number,
+				NIP : NIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				if (resultJson == '') {
+					LoadFirstLoad();
+				}
+				else
+				{
+					$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				}
+			}).fail(function() {
+
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+
+	}) 
 </script>

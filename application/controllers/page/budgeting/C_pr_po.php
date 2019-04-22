@@ -282,11 +282,11 @@ class C_pr_po extends Budgeting_Controler {
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
             // circulation sheet
-            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-default btn_circulation_sheet" prcode = "'.$row['PRCode'].'">See</a>';
+            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'">Log</a>';
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
             $arr = array();
             if (count($JsonStatus) > 0) {
-                for ($j=0; $j < count($JsonStatus); $j++) {
+                for ($j=1; $j < count($JsonStatus); $j++) {
                     $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
                     $Name = $getName[0]['Name'];
                     $StatusInJson = $JsonStatus[$j]['Status'];
