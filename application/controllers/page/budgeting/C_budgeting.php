@@ -1858,6 +1858,7 @@ class C_budgeting extends Budgeting_Controler {
     public function detail_budgeting_remaining()
     {
         $this->auth_ajax();
+        // header('Content-Type: application/json');
         $arr_result = array('data' =>'');
         $Input = $this->getInputToken();
         $Year = $Input['Year'];

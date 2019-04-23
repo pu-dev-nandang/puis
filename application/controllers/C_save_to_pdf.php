@@ -5377,6 +5377,7 @@ Phone: (021) 29200456';
         try {
           $token = $this->input->post('token');
           $this->load->model('budgeting/m_budgeting');
+          $this->load->model('budgeting/m_pr_po');
           $this->load->model('master/m_master');
 
           $input = $this->getInputToken($token);
@@ -5384,8 +5385,8 @@ Phone: (021) 29200456';
           $PRCodeReplace = str_replace('/', '-', $PRCode);
           $filename = '__'.$PRCodeReplace.'.pdf';  
 
-          $pr_create = $this->m_budgeting->GetPR_CreateByPRCode($PRCode);
-          $pr_detail = $this->m_budgeting->GetPR_DetailByPRCode($PRCode);
+          $pr_create = $this->m_pr_po->GetPR_CreateByPRCode($PRCode);
+          $pr_detail = $this->m_pr_po->GetPR_DetailByPRCode($PRCode);
 
           $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
           $fpdf->SetMargins(10,10,10,10);
@@ -5468,7 +5469,8 @@ Phone: (021) 29200456';
             $w_smt = 8;
             $w_desc = 55;
             $w_spec = 65;
-            $w_date_needed = 50;
+            $w_date_needed = 25;
+            $w_pph = 25;
             $w_qty = 22;
             $w_pricest = 35;
             $w_totalammount = 35;
@@ -5479,8 +5481,9 @@ Phone: (021) 29200456';
              $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
              $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
              $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
-             $fpdf->Cell($w_date_needed,$h,'Need',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Date Need',$border,0,'C',true);
              $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
+             $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
              $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
              $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
 
@@ -5488,9 +5491,9 @@ Phone: (021) 29200456';
               $no = 1;
               $fpdf->SetFont('Arial','',$FontIsian);
               $total = 0;
-              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_totalammount));
+              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pph,$w_pricest,$w_totalammount));
               $fpdf->SetLineHeight(5);
-              $fpdf->SetAligns(array('C','L','L','L','C','C','C'));
+              $fpdf->SetAligns(array('C','L','L','C','C','C','C','C'));
              for ($i=0; $i < count($pr_detail); $i++) {
 
                 $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
@@ -5506,7 +5509,7 @@ Phone: (021) 29200456';
                 }
                 
                 
-                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
                 if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
                     $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
                 }
@@ -5519,6 +5522,7 @@ Phone: (021) 29200456';
                    $Spec,
                    $DateNeeded,
                    $pr_detail[$i]['Qty'],
+                   (int)$pr_detail[$i]['PPH'].'%',
                    $UnitCost,
                    $Subtotal,
 
@@ -5529,7 +5533,7 @@ Phone: (021) 29200456';
                 $y += $h; 
              }
 
-             $Max = 10;
+             $Max = 15;
              $h=4.4;
              for ($i=0; $i <$Max - count($pr_detail) ; $i++) { 
                  $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
@@ -5537,40 +5541,33 @@ Phone: (021) 29200456';
                  $fpdf->Cell($w_spec,$h,'',$border,0,'L',true);
                  $fpdf->Cell($w_date_needed,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_qty,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_pph,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_pricest,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_totalammount,$h,'',$border,1,'C',true);
                  $y += $h;
              }
 
              $y = $fpdf->GetY();
-             $x = $x +$w_no+$w_desc+$w_spec;
-             $rsPPN = ($pr_create[0]['PPN'] / 100) * $total;
-             $totAfterPPN = $total + $rsPPN;
+             $x = $x +$w_no+$w_desc+$w_pph+$w_spec;
+             $totAfterPPN = $total;
              $totAfterPPN= 'Rp '.number_format($totAfterPPN,2,',','.');
-             $rsPPN= 'Rp '.number_format($rsPPN,2,',','.');
              $total= 'Rp '.number_format($total,2,',','.');
              $fpdf->SetXY($x,$y);
              $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total',$border,0,'C',true);
              $fpdf->Cell($w_totalammount,$h,$total,$border,1,'C',true);
-             // PPN
-             $y += $h;
-             $fpdf->SetXY($x,$y);
-             $fpdf->SetFillColor(226, 226, 226);
-             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'PPN '.(int)$pr_create[0]['PPN'].'%',$border,0,'C',true);
-             $fpdf->Cell($w_totalammount,$h,$rsPPN,$border,1,'C',true);
              // total setelah ppn
-             $y += $h;
-             $fpdf->SetXY($x,$y);
-             $fpdf->SetFillColor(255, 255, 255);
-             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total setelah PPN ',$border,0,'C',true);
-             $fpdf->Cell($w_totalammount,$h,$totAfterPPN,$border,1,'C',true);
+             // $y += $h;
+             // $fpdf->SetXY($x,$y);
+             // $fpdf->SetFillColor(255, 255, 255);
+             // $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total setelah PPN ',$border,0,'C',true);
+             // $fpdf->Cell($w_totalammount,$h,$totAfterPPN,$border,1,'C',true);
 
              // Notes
              $y += 10;
              $x = 10;
              $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
              $maxWrec = 130;
-             $Wrec = $maxWrec - ( (count($JsonStatus) - 1) * 20 );
+             $Wrec = $maxWrec - ( (count($JsonStatus)) * 5 );
              $fpdf->Rect($x,$y,$Wrec,$rect_h);
              $fpdf->SetXY(($x+2),($y+2) );
              $fpdf->SetFont('Arial','b',$FontIsianHeader);
@@ -5580,27 +5577,31 @@ Phone: (021) 29200456';
              $fpdf->SetFont('Arial','',$FontIsian);
              $fpdf->MultiCell(($Wrec - 10), 3, $pr_create[0]['Notes'], 0, 1, 'L', 0);
 
-
              // signature
              $x = $Wrec + 20;
              $w_requested = 20;
-             $w_approved = 35;
+             $w_approved = 30;
              $h_signature = 15;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','',$FontIsian);
              $fpdf->SetFillColor(226, 226, 226);
-             $fpdf->Cell($w_requested,$h,'Requested By',$border,0,'C',true);
+             // $fpdf->Cell($w_requested,$h,'Requested By',$border,0,'C',true);
 
-             for ($i=0; $i < count($JsonStatus); $i++) { 
-                 $fpdf->Cell($w_approved,$h,'Approved By',$border,0,'C',true);
+             for ($i=0; $i < count($JsonStatus); $i++) {
+                 if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                      $fpdf->Cell($w_approved,$h,$JsonStatus[$i]['NameTypeDesc'],$border,0,'C',true);
+                  } 
+                
              }
 
              $y += $h;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFillColor(255, 255, 255);
-             $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
+             // $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
              for ($i=0; $i < count($JsonStatus); $i++) {    
+                if ($JsonStatus[$i]['Visible'] == 'Yes') {
                  $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                } 
              }
 
              $CreatedBy = $pr_create[0]['CreatedBy'];
@@ -5609,21 +5610,27 @@ Phone: (021) 29200456';
              $y += $h_signature;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFillColor(255, 255, 255);
-             $fpdf->Cell($w_requested,$h,$NameRequester,$border,0,'C',true);
+             // $fpdf->Cell($w_requested,$h,$NameRequester,$border,0,'C',true);
              for ($i=0; $i < count($JsonStatus); $i++) {
-                 $Approver = $JsonStatus[$i]['ApprovedBy'];
+                if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                 $Approver = $JsonStatus[$i]['NIP'];
                  $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
                  $NameApprover = $G_CreatedBy[0]['Name'];    
                  $fpdf->Cell($w_approved,$h,$NameApprover,$border,0,'C',true);
+                } 
              }
 
              $y += $h;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','b',$FontIsianHeader);
              $fpdf->SetFillColor(255, 255, 255);
-             $fpdf->Cell($w_requested,$h,'Date : ',$border,0,'L',true);
+             // $fpdf->Cell($w_requested,$h,'Date : ',$border,0,'L',true);
              for ($i=0; $i < count($JsonStatus); $i++) {
-                 $fpdf->Cell($w_approved,$h,'Date : ',$border,0,'L',true);
+                if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                 $ApproveAt = $JsonStatus[$i]['ApproveAt'];
+                  $ApproveAt = date("d M Y", strtotime($ApproveAt));
+                 $fpdf->Cell($w_approved,$h,'Date : '.$ApproveAt,$border,0,'L',true);
+                } 
              }
 
 

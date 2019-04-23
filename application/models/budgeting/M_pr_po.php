@@ -213,10 +213,11 @@ class M_pr_po extends CI_Model {
             // }
             if ($ID_m_userrole <= $ID_m_userrole_limit) {
                 $Status = ($ID_m_userrole == 1) ? 1 : 0;
+                $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
                 $rs[] = array(
                     'NIP' => $G[$i]['NIP'],
                     'Status' => $Status,
-                    'ApproveAt' => '',
+                    'ApproveAt' => $ApproveAt,
                     'Representedby' => '',
                     'Visible' => $G[$i]['Visible'],
                     'NameTypeDesc' => $G[$i]['NameTypeDesc'],
@@ -427,12 +428,11 @@ class M_pr_po extends CI_Model {
         return $query;
     }
 
-    public function Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$dt_arr)
+    public function checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining)
     {
-        $BudgetChange = 0;
+        $bool = true;
         for ($i=0; $i < count($BudgetRemaining); $i++) { 
             $ID_budget_left = $BudgetRemaining[$i]['ID'];
-            $bool = false; // true => update data langsung dari Budget Remaining ; false hitung dari Subtotal dan dt_arr
             // search in db
                 $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
                 $Value = $G[0]['Value'];
@@ -443,30 +443,114 @@ class M_pr_po extends CI_Model {
                     if ($ID_budget_left == $ID_budget_left_) {
                         $Value_ = $BudgetLeft_awal[$j]['Value'];
                         $Using_ = $BudgetLeft_awal[$j]['Using'];
-                       if ($Value == $Value_ && $Using == $Using_) {
-                            $bool = true;
+                       if ($Value != $Value_ || $Using != $Using_) {
+                            $bool = false;
                         } 
                        break;
                     }
                 }
 
-            if ($bool) {
-               $data_arr = array(
-                'Using' => $BudgetRemaining[$i]['Using'],
-               );
-
-               $this->db->where('ID',$ID_budget_left);
-               $this->db->update('db_budgeting.budget_left', $data_arr);
+            if (!$bool) {
+               break;
             }
-            else{
-                // hitung dari subtotal riweh :)
-                if ($BudgetChange == 0) {
-                    $BudgetChange = 1;
-                }
-            }        
         }
 
-        return $BudgetChange;
+        return $bool;
+    }
+
+    public function BackBudgetToBeforeCreate($PRCode,$Year,$Departement)
+    {
+        $G_data = $this->GetPR_DetailByPRCode($PRCode);
+        $getData = $this->m_budgeting->get_budget_remaining($Year,$Departement);
+        $temp = array();
+        for ($i=0; $i < count($getData); $i++) { 
+            $CodePostRealisasi = $getData[$i]['CodePostRealisasi'];
+            $Using = $getData[$i]['Using'];
+            $Value = $getData[$i]['Value'];
+            for ($j=0; $j < count($G_data); $j++) { 
+               $CodePostRealisasi_ = $G_data[$j]['CodePostRealisasi'];
+               if ($CodePostRealisasi == $CodePostRealisasi_) {
+                   $SubTotal = $G_data[$j]['SubTotal'];
+                   $Cost1 = $SubTotal;
+                   $arr_Combine =  $G_data[$j]['Combine'];
+                   if (count($arr_Combine) > 0) {
+                       for ($k=0; $k < count($arr_Combine); $k++) { 
+                          $Cost_Combine = $arr_Combine[$k]['Cost_Combine'];
+                          $Cost1 = $Cost1 = $Cost_Combine;
+                          $CodePostBudget_Combine = $arr_Combine[$k]['CodePostBudget_Combine'];
+
+                          for ($l=0; $l < count($getData); $l++) { 
+                              $CodePostBudget_Combine_ = $getData[$l]['CodePostRealisasi'];
+                              if ($CodePostBudget_Combine == $CodePostBudget_Combine_) {
+                                  $Using2 = $getData[$l]['Using'];
+                                  $Using2 = $Using2 - $Cost_Combine;
+                                  $getData[$l]['Using'] = $Using2;
+                                  $bool2 = false;
+                                  for ($m=0; $m < count($temp); $m++) { 
+                                      if ($temp[$m] == $getData[$l]['ID']) {
+                                          $bool2 = true;
+                                          break;
+                                      }
+                                  }
+
+                                  if (!$bool2) {
+                                      $temp[] = $getData[$l]['ID'];
+                                  }
+
+                                  break;
+                              }
+                          }
+                       }
+                   }
+
+                   $Using = $Using - $Cost1;
+                   $getData[$i]['Using'] = $Using;
+                   $bool2 = false;
+                   for ($m=0; $m < count($temp); $m++) { 
+                       if ($temp[$m] == $getData[$l]['ID']) {
+                           $bool2 = true;
+                           break;
+                       }
+                   }
+
+                   if (!$bool2) {
+                       $temp[] = $getData[$i]['ID'];
+                   }
+
+                   break;
+               }
+            }
+        }
+
+        // update to database
+            for ($i=0; $i < count($temp); $i++) { 
+                $ID = $temp[$i];    
+                for ($j=0; $j <count($getData); $j++) { 
+                    $ID_ = $getData[$j]['ID'];
+                    if ($ID == $ID_) {
+                       $dataSave = array(
+                        'Using' => $getData[$j]['Using'],
+                       );
+                       $this->db->where('ID',$ID);
+                       $this->db->update('db_budgeting.budget_left', $dataSave);
+                       break;
+                    }
+                }
+            }
+
+    }
+
+    public function Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$dt_arr)
+    {
+        for ($i=0; $i < count($BudgetRemaining); $i++) { 
+            $ID_budget_left = $BudgetRemaining[$i]['ID'];
+            $data_arr = array(
+                'Using' => $BudgetRemaining[$i]['Using'],
+            );
+
+           $this->db->where('ID',$ID_budget_left);
+           $this->db->update('db_budgeting.budget_left', $data_arr);        
+        }
     }
 
 }
