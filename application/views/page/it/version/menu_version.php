@@ -46,8 +46,8 @@
         <div class="tabbable tabbable-custom tabbable-full-width">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="javascript:void(0)" class="menuVersion" data-page="version_data" data-toggle="tab"><i class="fa fa-industry"></i> List data Version </a></li>
-                <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_groupmodule" data-toggle="tab"><i class="fa fa-object-group"></i> List data Module</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_module" data-toggle="tab"><i class="fa fa-object-group"></i>  List data Group </a></li> 
+                <li class=""><a href="javascript:void(0)" class="menuVersion" data-page="list_groupmodule" data-toggle="tab"><i class="fa fa-object-group"></i> List data Module</a></li>
             </ul>
             <div class="tab-content">
                 <hr/>
@@ -77,7 +77,6 @@
         loadPage(token);
     });
 
-
     function loadPage(token) {
         var url = base_url_js+'it/loadpageversion';
 
@@ -92,23 +91,60 @@
 </script>
 
 <script>
-     $(document).on('click','.btndeletegroup',function () {
-        if (window.confirm('Are you sure to delete module data ?')) {
+     $(document).on('click','.btndeletemodule',function () {
+        if (window.confirm('Are you sure to delete group data ?')) {
             
-            var versionid = $(this).attr('versionid');
-            
+            var versionid = $(this).attr('versionid'); 
             var data = {
-                action : 'deletegroupmod',
+                action : 'delegroups',
                 versionid : versionid
             };
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+"api/__deleteversion";
             $.post(url,{token:token},function (result) {
-                toastr.success('Success Delete Module Data!','Success'); 
-                setTimeout(function () {
-                    window.location.href = '';
-                },1000);
+
+                if(result==0 || result=='0'){
+                    toastr.error('Sorry, name groups are being used in other modules!','Error');
+                    loadDataModule('');
+                } else {
+                    toastr.success('Success Delete Group Data!','Success'); 
+                    setTimeout(function () {
+                        loadDataModule('');
+                       // window.location.href = '';
+                    },1000);
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+     $(document).on('click','.btndeletegroup',function () {
+        if (window.confirm('Are you sure to delete module data ?')) {
+            
+            var versionid = $(this).attr('versionid');
+            var idgroups = $(this).attr('idgroups');
+            var data = {
+                action : 'deletegroupmod',
+                idgroups : idgroups,
+                versionid : versionid
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__deleteversion";
+            $.post(url,{token:token},function (result) {
+                
+                if(result==0 || result=='0'){
+                    toastr.error('Sorry, name module are being used in other version!','Error');
+                    loadDataGroupModule('');
+                } else {
+                    toastr.success('Success Delete Module Data!','Success'); 
+                    setTimeout(function () {
+                        loadDataGroupModule('');
+                        //window.location.href = '';
+                    },1000);
+                }
             });
         }
     });

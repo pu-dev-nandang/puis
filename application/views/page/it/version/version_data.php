@@ -83,8 +83,6 @@
 
 </script>
 
-
-
 <script>
     $(document).on('click','.btneditversion', function () {
 
@@ -169,7 +167,6 @@
          //END IF
     });
 </script>
-
 
 <script>
     $(document).on('click','.btnviewversion', function () {
@@ -419,10 +416,6 @@
             }
         }
 </script>
-
-nameeditdivisiversion
-
-
 
 <script>
     $(document).on('change','#filaddivisi',function () {
