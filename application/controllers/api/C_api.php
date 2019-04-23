@@ -854,29 +854,36 @@ class C_api extends CI_Controller {
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         if($data_arr['action']=='deleteversion'){
-
             $versionid = $data_arr['versionid'];
             $dataCek = $this->m_api->deletelistversion($versionid);
             return print_r(1);
-
         } 
-        else if($data_arr['action']=='deletegroupmod'){
-            $versionid = $data_arr['versionid'];
+        else if($data_arr['action']=='deletegroupmod'){   //delete module
+            $IDModule = $data_arr['versionid'];
             $value = "0";
+            $check = $this->db->get_where('db_it.version_detail',array('IDModule'=>$data_arr['versionid']))->result_array();
 
-            $this->db->set('Active', $value);   
-            $this->db->where('IDModule', $versionid);  
-            $this->db->update('db_it.module');  
-            return print_r(1);
+            if(count($check)>0){
+                return print_r(0);
+            } else {
+                $this->db->where('IDModule', $IDModule); 
+                $this->db->delete('db_it.module'); 
+                return print_r(1);
+            }
         }
-        else if($data_arr['action']=='deletemodules'){
-            $versionid = $data_arr['versionid'];
+        else if($data_arr['action']=='delegroups'){   //delete group
+            
+            $groupid = $data_arr['versionid'];
             $value = "0";
-
-            $this->db->set('Active', $value);   
-            $this->db->where('IDGroup', $versionid);  
-            $this->db->update('db_it.group_module');  
-            return print_r(1);
+            $check = $this->db->get_where('db_it.module',array('IDGroup'=>$data_arr['versionid']))->result_array();
+         
+            if(count($check)>0){
+                return print_r(0);
+            } else {  
+                $this->db->where('IDGroup', $data_arr['versionid']);
+                $this->db->delete('db_it.group_module');
+                return print_r(1);
+            }
         }
     }
 
@@ -2236,7 +2243,7 @@ class C_api extends CI_Controller {
 
     }
 
-    public function getlistgroupmodule(){
+    public function getlistgroupmodule(){  //get data module
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
@@ -2281,7 +2288,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$row["NameGroup"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NameModule"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["Description"].'</div>';
-            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDGroup"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDModule"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDGroup"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
+            $nestedData[] = '<div style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewgroupmodule" versionid="'.$row["IDModule"].'" data-toggle="tooltip" data-placement="top" title="Details"><i class="glyphicon glyphicon-th-list"></i></button> <button class="btn btn-sm btn-circle btn-danger btndeletegroup" data-toggle="tooltip" versionid="'.$row["IDModule"].'" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle btneditgroupmodule" data-toggle="tooltip" groupid="'.$row["IDModule"].'" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button> </div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2404,18 +2411,18 @@ class C_api extends CI_Controller {
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
                     LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
-                    WHERE X.IDGroup = "'.$idgroup.'" ')->result_array();
+                    WHERE Y.IDModule = "'.$idgroup.'" ')->result_array();
             echo json_encode($details);   
 
         }
-        else if($data_arr['action']=='getedit') {
+        else if($data_arr['action']=='getedit') {  //get data module
 
-            $idgroup = $this->input->get('s');
+            $idmodules = $this->input->get('s');
             $details = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
                     FROM db_it.group_module AS X
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
                     LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
-                    WHERE X.IDGroup = "'.$idgroup.'" ')->result_array();
+                    WHERE Y.IDModule = "'.$idmodules.'" ')->result_array();
 
             echo json_encode($details);  
         }

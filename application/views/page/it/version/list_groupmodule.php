@@ -34,13 +34,11 @@
 <script>
 
     $(document).ready(function () {
-        //loadSelectOptionDivision('#filterStatusDivision','');
         loadDataGroupModule('');
     });
 
     $('#filterStatusEmployees').change(function () {
         var s = $(this).val();
-        //loadDataEmployees(s);
     });
 
     function loadDataGroupModule(status) {
@@ -51,7 +49,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getdatagroupmodule?s="+status, // json datasource
+                url : base_url_js+"api/__getdatagroupmodule?s="+status, // json datasource module
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
@@ -70,8 +68,7 @@
         var versionid = $(this).attr('versionid');
         var url = base_url_js+'api/__getdetailgroupmod?s='+versionid;                          
         var token = jwt_encode({
-                action:'getdetail'
-            },'UAP)(*');
+                action:'getdetail'},'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
             console.log(resultJson); 
@@ -125,8 +122,7 @@
                 action:'getedit'
             },'UAP)(*');
 
-        $.post(url,{token:token},function (resultJson) {
-            console.log(resultJson); 
+        $.post(url,{token:token},function (resultJson) { 
             var response = resultJson;
                 if(response.length>0){
                     var no = 1;

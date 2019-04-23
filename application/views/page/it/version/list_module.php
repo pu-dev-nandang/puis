@@ -16,7 +16,7 @@
 				        <tr style="background: #3968c6;color: #FFFFFF;">
 				            <th style="width: 1%;text-align: center;">No</th>
 				            <th style="width: 5%;text-align: center;">Name Division</th>
-                            <th style="width: 5%;text-align: center;">Name Module</th>
+                            <th style="width: 5%;text-align: center;">Name Group</th>
 				            <th style="width: 2%;text-align: center;">Status</th>
 				            <th style="width: 2%;text-align: center;">Action</th>
 				        </tr>
@@ -37,7 +37,6 @@
 
     $('#filterStatusEmployees').change(function () {
         var s = $(this).val();
-        //loadDataEmployees(s);
     });
 
     function loadDataModule(status) {
@@ -48,7 +47,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getdatamodule?s="+status, // json datasource
+                url : base_url_js+"api/__getdatamodule?s="+status, // json datasource group
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
@@ -59,29 +58,6 @@
             }
         } );
     }
-</script>
-
-<script>
-     $(document).on('click','.btndeletemodule',function () {
-        if (window.confirm('Are you sure to delete group data ?')) {
-            
-            var versionid = $(this).attr('versionid');
-            
-            var data = {
-                action : 'deletemodules',
-                versionid : versionid
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+"api/__deleteversion";
-            $.post(url,{token:token},function (result) {
-                toastr.success('Success Delete Group Data!','Success'); 
-                setTimeout(function () {
-                    window.location.href = '';
-                },1000);
-            });
-        }
-    });
 </script>
 
 <script>
