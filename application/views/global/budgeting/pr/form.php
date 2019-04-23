@@ -11,6 +11,7 @@
 		RuleAccess : [],
 		PostBudgetDepartment : [],
 		DtExisting : [],
+		//PostBudgetDepartment_awal : [],
 	};
 
 	var S_Table_example_budget = '';
@@ -67,7 +68,6 @@
 			$.post(url,{ token:token },function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
 				ClassDt.DtExisting = response;
-				// Get Budget
 
 				// Load Budget Department
 				var arr_pr_create = response['pr_create'];
@@ -82,9 +82,10 @@
 				var token = jwt_encode(data,'UAP)(*');
 				$.post(url,{token:token},function (resultJson) {
 					var response2 = jQuery.parseJSON(resultJson);
-					Make_PostBudgetDepartment_existing(response2.data);
-					// ClassDt.PostBudgetDepartment = response.data;
-					// localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+					var dt = response2.data;
+					ClassDt.PostBudgetDepartment_awal = dt;
+					localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
+					Make_PostBudgetDepartment_existing(dt);
 					// new
 					makeDomExisting();
 				}).fail(function() {
@@ -113,7 +114,9 @@
 			$.post(url,{token:token},function (resultJson) {
 				var response = jQuery.parseJSON(resultJson);
 				ClassDt.PostBudgetDepartment = response.data;
+				ClassDt.PostBudgetDepartment_awal = response.data;
 				localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+				localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
 				// new
 				makeDomAwal();
 			}).fail(function() {
@@ -174,14 +177,13 @@
 			}
 
 		}
-
 		ClassDt.PostBudgetDepartment = arr_budget_departement;
 		localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+		
 	}
 
 	function makeDomExisting()
 	{
-		// console.log(ClassDt);
 		var DtExisting = ClassDt.DtExisting;
 		var pr_create = DtExisting.pr_create;
 		var pr_detail = DtExisting.pr_detail;
@@ -650,6 +652,17 @@
 					$("#Page_Button").html(html);
 				}
 
+			}
+			else
+			{
+				if (pr_create[0].Status == 2) {
+					var html = '<div class = "col-md-12">'+
+				   							'<div class = "pull-right">'+
+				   								'<button class="btn btn-default" id="pdfprint" PRCode = "'+ClassDt.PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+
+				   							'</div>'+
+				   						'</div>';
+				   	$("#Page_Button").html(html);					
+				}
 			}
 
 		}
@@ -1645,18 +1658,7 @@
 			// get combine
 				fillItem.find('.liCombine').find('li').each(function(){
 					var ID_budget_left_com = $(this).attr('id_budget_left');
-					// Get Cost dari Arr BudgetRemaining field Using
-						// var dt = ClassDt.BudgetRemaining;
-						// var Cost = 0;
-						// for (var i = 0; i < dt.length; i++) {
-						// 	var ID_budget_left_com_ = dt[i].ID;
-						// 	if (ID_budget_left_com == ID_budget_left_com_) {
-						// 		Cost = dt[i].Using;
-						// 		break;
-						// 	}
-						// }
-
-						var Cost = $(this).attr('subsidi');
+					var Cost = $(this).attr('subsidi');
 
 					var temp = {
 						ID_budget_left : ID_budget_left_com,
@@ -1705,7 +1707,11 @@
 		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
 		form_data.append('BudgetRemaining',token);
 
-		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		// var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		// token = jwt_encode(BudgetLeft_awal,"UAP)(*");
+		// form_data.append('BudgetLeft_awal',token);
+
+		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
 		form_data.append('BudgetLeft_awal',token);
 
@@ -1731,7 +1737,80 @@
 		       		else
 		       		{
 		       			if (data['BudgetChange'] == 1) { // alert Budget Remaining telah di update oleh transaksi lain
-		       				toastr.info('Budget Remaining already have by another,Please Reload');
+		       				toastr.info('Budget Remaining already have updated by another person.The data will be reload in a few second, Please check !!!');
+		       				loadingStart();
+		       				if (ClassDt.PRCodeVal != '') {
+		       					// load lagi Budget remaining
+		       						var PRCode = ClassDt.PRCodeVal;
+		       						var url = base_url_js+'budgeting/GetDataPR';
+		       						var data = {
+		       						    PRCode : PRCode,
+		       						};
+		       						var token = jwt_encode(data,"UAP)(*");
+		       						$.post(url,{ token:token },function (resultJson) {
+		       							var response = jQuery.parseJSON(resultJson);
+		       							// Load Budget Department
+		       							var arr_pr_create = response['pr_create'];
+		       							var Year = arr_pr_create[0]['Year'];
+		       							ClassDt.NmDepartement_Existing =  arr_pr_create[0]['NameDepartement'];
+		       							var Departement = arr_pr_create[0]['Departement'];
+		       							var url = base_url_js+"budgeting/detail_budgeting_remaining";
+		       							var data = {
+		       									    Year : Year,
+		       										Departement : Departement,
+		       									};
+		       							var token = jwt_encode(data,'UAP)(*');
+		       							$.post(url,{token:token},function (resultJson) {
+		       								var response2 = jQuery.parseJSON(resultJson);
+		       								Make_PostBudgetDepartment_existing(response2.data);
+		       								ClassDt.PostBudgetDepartment_awal = response2.data;
+		       								localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
+		       								$(".qty").each(function(){
+		       									var tr = $(this).closest('tr');
+		       									CountSubTotal_table(tr);
+		       								})
+		       								loadingEnd(1500);
+		       							}).fail(function() {
+		       							  toastr.info('No Result Data'); 
+		       							}).always(function() {
+		       							                
+		       							});
+
+		       						}).fail(function() {
+		       						  toastr.info('No Result Data'); 
+		       						}).always(function() {
+		       						                
+		       						});			       					
+		       				}
+		       				else
+		       				{
+		       					// load lagi Budget remaining
+		       					var Year = ClassDt.Year;
+		       					var Departement = ClassDt.Departement;
+		       					var url = base_url_js+"budgeting/detail_budgeting_remaining";
+		       					var data = {
+		       							    Year : Year,
+		       								Departement : Departement,
+		       							};
+		       					var token = jwt_encode(data,'UAP)(*');
+		       					$.post(url,{token:token},function (resultJson) {
+		       						var response = jQuery.parseJSON(resultJson);
+		       						ClassDt.PostBudgetDepartment = response.data;
+		       						ClassDt.PostBudgetDepartment_awal = response.data;
+		       						localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+		       						localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
+		       						$(".qty").each(function(){
+		       							var tr = $(this).closest('tr');
+		       							CountSubTotal_table(tr);
+		       						})
+		       						loadingEnd(1500);
+		       					}).fail(function() {
+		       					  toastr.info('No Result Data'); 
+		       					}).always(function() {
+		       					                
+		       					});
+		       				}
+
 		       			}
 		       			else
 		       			{
@@ -1744,7 +1823,6 @@
 		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Log</a>';
 		       				LoadFirstLoad();
 		       			}
-		       			
 
 		       		}
 		       		$('#SaveSubmit').prop('disabled',false).html('Submit');
@@ -1828,5 +1906,76 @@
 			});
 		}
 
+	})
+
+	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
+		if (confirm('Are you sure ?')) {
+			var PRCode = $(this).attr('prcode');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest/__approve_pr';
+				var data = {
+					PRCode : PRCode,
+					approval_number : approval_number,
+					NIP : NIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					if (resultJson == '') {
+						LoadFirstLoad();
+					}
+					else
+					{
+						// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
+	})
+
+	$(document).off('click', '#pdfprint').on('click', '#pdfprint',function(e) {
+		var url = base_url_js+'save2pdf/print/prdeparment';
+		var PRCode = $(this).attr('prcode');
+		data = {
+		  PRCode : PRCode,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
 	}) 
 </script>
