@@ -853,9 +853,14 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        if($data_arr['action']=='deleteversion'){
+        if($data_arr['action']=='deleteversion'){ //delete version data
             $versionid = $data_arr['versionid'];
-            $dataCek = $this->m_api->deletelistversion($versionid);
+            //$dataCek = $this->m_api->deletelistversion($versionid);
+            $this->db->where('IDVersion', $versionid); 
+            $this->db->delete('db_it.version'); 
+
+            $this->db->where('IDVersion', $versionid); 
+            $this->db->delete('db_it.version_detail'); 
             return print_r(1);
         } 
         else if($data_arr['action']=='deletegroupmod'){   //delete module
