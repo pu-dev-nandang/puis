@@ -1422,7 +1422,7 @@ class C_budgeting extends Budgeting_Controler {
                         $JsonStatus[] = array(
                             'NIP' => $Approver,
                             'Status' => 0,
-                            'ApproveAt' => '',
+                            'ApproveAt' => date('Y-m-d H:i:s'),
                             'Representedby' => '',
                             'Visible' => $Visible,
                             'NameTypeDesc' => $NameTypeDesc,
@@ -1454,11 +1454,12 @@ class C_budgeting extends Budgeting_Controler {
                         $indexjson = $Input['indexjson'];
                         $Visible = $Input['Visible'];
                         $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
+                        $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
 
                         $JsonStatus[$indexjson] = array(
                             'NIP' => $Approver,
                             'Status' => 1,
-                            'ApproveAt' => '',
+                            'ApproveAt' => $ApproveAt,
                             'Representedby' => '',
                             'Visible' => $Visible,
                             'NameTypeDesc' => $NameTypeDesc,
@@ -1485,10 +1486,13 @@ class C_budgeting extends Budgeting_Controler {
                             $indexjson = $Input['indexjson'];
                             $Visible = $Input['Visible'];
                             $NameTypeDesc = $Input['NameTypeDesc'];
+
+                            $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
+
                             $JsonStatus[$indexjson] = array(
                                 'NIP' => $Approver,
                                 'Status' => 0,
-                                'ApproveAt' => '',
+                                'ApproveAt' =>  $ApproveAt,
                                 'Representedby' => '',
                                 'Visible' => $Visible,
                                 'NameTypeDesc' => $NameTypeDesc,
@@ -1515,11 +1519,12 @@ class C_budgeting extends Budgeting_Controler {
                             $Visible = $Input['Visible'];
                             $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
                             $Status = $JsonStatus[$indexjson]['Status'];
+                            $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
 
                             $JsonStatus[$indexjson] = array(
                                 'NIP' => $Approver,
                                 'Status' => $Status,
-                                'ApproveAt' => '',
+                                'ApproveAt' => $ApproveAt,
                                 'Representedby' => '',
                                 'Visible' => $Visible,
                                 'NameTypeDesc' => $NameTypeDesc,
@@ -1562,6 +1567,8 @@ class C_budgeting extends Budgeting_Controler {
                         $this->db->update('db_budgeting.creator_budget_approval',$dataSave);
                         $rs['msg'] = '';
                         $rs['data']= $JsonStatusSave;
+                        // save to log
+                        $this->m_budgeting->log_budget($id_creator_budget_approval,'Custom Approval',$By = $this->session->userdata('NIP')); 
                     }
                     else
                     {

@@ -7,6 +7,7 @@
 </div>
 <script type="text/javascript">
 	var G_Approver = <?php echo json_encode($G_Approver) ?>;
+	var m_type_user = <?php echo json_encode($m_type_user) ?>;
 	var G_ApproverLength = G_Approver.length + 4;
 	var JsonStatus = [];
 	var btn_see_pass = '';

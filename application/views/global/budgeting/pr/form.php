@@ -514,6 +514,7 @@
 		var DtExisting = ClassDt.DtExisting;
 		var pr_create = DtExisting['pr_create'];
 		var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
+
 		/* Page_Approval */
 		// only admin & Finance to custom approval
 			// console.log(JsonStatus);
@@ -1977,5 +1978,368 @@
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
+	})
+
+	$(document).off('click', '#add_approver').on('click', '#add_approver',function(e) {
+	   var prcode = $(this).attr('prcode');
+	   var DtExisting = ClassDt.DtExisting;
+	   var pr_create = DtExisting['pr_create'];
+	   var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
+	      var url = base_url_js+'rest/__getEmployees/aktif';
+	      var data = {
+	      		    auth : 's3Cr3T-G4N'
+	      		};
+	      var token = jwt_encode(data,'UAP)(*');
+	      $.post(url,{token:token},function (resultJson) {
+	   		var html = '<div class = "row"><div class="col-md-12">';
+	   			html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+	   	         '<thead>'+
+	   	             '<tr>'+
+	   	                 '<th style="width: 2%;">Approval</th>'+
+	   	                 '<th style="width: 55px;">Name</th>'+
+	   	                 '<th style="width: 55px;">Status</th>'+
+	   	                 '<th style="width: 55px;">Type User</th>'+
+	   	                 '<th style="width: 55px;">Visible</th>'+
+	   	                 '<th style="width: 55px;">Action</th>';
+	   	        html += '</tr>' ;
+	   	        html += '</thead>' ;
+	   	        html += '<tbody>' ;
+
+	   	    var ke = 0; 
+	   	    for (var i = 0; i < JsonStatus.length; i++) {
+	   	    	ke = i + 1;
+	   	    	// search Name
+	   	    		var Name = '';
+	   		    	for (var j = 0; j < resultJson.length; j++) {
+	   		    		if (JsonStatus[i].NIP == resultJson[j].NIP) {
+	   		    			Name = resultJson[j].Name;
+	   		    			break;
+	   		    		}
+	   		    	}
+	   	    	switch(JsonStatus[i]['Status']) {
+	   	    	  case 0:
+	   	    	  case '0':
+	   	    	   var stjson = 'Not Approve';
+	   	    	    break;
+	   	    	  case 1:
+	   	    	  case '1':
+	   	    	    var stjson = 'Approve<br>'+JsonStatus[i]['ApproveAt'];
+	   	    	    break;
+	   	    	  case 2:
+	   	    	  case '2':
+	   	    	    var stjson =  'Reject';
+	   	    	    break;  
+	   	    	  default:
+	   	    	    var stjson = '-';
+	   	    	}
+	   	    	var action = '';
+	   	    	if (i == 0) {
+	   	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+	   	    	}
+	   	    	else
+	   	    	{
+	   	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+	   	    		if (JsonStatus[i]['Status'] != 1) {
+	   	    			action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+	   	    		}
+	   	    	}
+	   	    	
+	   	    	html += '<tr>'+
+	   	    	      '<td>'+ ke + '</td>'+
+	   	    	      '<td NIP = "'+JsonStatus[i]['NIP']+'">'+ JsonStatus[i]['NIP'] +' || '+Name+ '</td>'+
+	   	    	      '<td>'+ stjson + '</td>'+
+	   	    	      '<td>'+ JsonStatus[i]['NameTypeDesc'] + '</td>'+
+	   	    	      '<td>'+ JsonStatus[i]['Visible'] + '</td>'+
+	   	    	      '<td>'+ action + '</td>'
+	   	    	    '<tr>';	
+	   	    }
+
+	   	    // add sisa
+	   	    ke = ke + 1;
+	   	    for (var i = 0; i < 10 - JsonStatus.length; i++) {
+	   	    	if (pr_create[0].Status == '1' || pr_create[0].Status == '3') {
+	   	    		var action = '<button class="btn btn-default btn-default-primary btn-classroom btn-edit-approver" data-action="add" indexjson="'+(ke-1)+'" prcode = "'+prcode+'"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i></button>';
+	   	    	}
+	   	    	else
+	   	    	{
+	   	    		var action = '';
+	   	    	}
+	   	    	
+	   	    	html += '<tr>'+
+	   	    	      '<td>'+ ke + '</td>'+
+	   	    	      '<td>'+ '-'+ '</td>'+
+	   	    	      '<td>'+ '-' + '</td>'+
+	   	    	      '<td>'+ '-' + '</td>'+
+	   	    	      '<td>'+ '-' + '</td>'+
+	   	    	      '<td>'+ action + '</td>'+
+	   	    	    '<tr>';
+	   	    	ke++;	    	
+	   	    }
+
+	   	    html += '</tbody>' ;
+	   	    html += '</table></div></div>' ;
+
+	   	    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+	   	        '';
+	   	    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Custom Approval'+'</h4>');
+	   	    $('#GlobalModalLarge .modal-body').html(html);
+	   	    $('#GlobalModalLarge .modal-footer').html(footer);
+	   	    $('#GlobalModalLarge').modal({
+	   	        'show' : true,
+	   	        'backdrop' : 'static'
+	   	    });
+	      })
+	});
+
+	$(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',function(e) {
+		var prcode = $(this).attr('prcode');
+		var action = $(this).attr('data-action');
+		var evtd = $(this).closest('td');
+		var evtr = $(this).closest('tr');
+		var indexjson = $(this).attr('indexjson');
+		var DtExisting = ClassDt.DtExisting;
+		var pr_create = DtExisting['pr_create'];
+		var dtApproval = pr_create;
+		switch(action) {
+		  case 'add':
+		  case 'edit':
+		    var url = base_url_js + 'api/__crudEmployees';
+		    var data = {
+		    	action : 'read',
+		    }
+		    var token = jwt_encode(data,"UAP)(*");
+		    $.post(url,{ token:token },function (data_json) {
+		    	var OP = '';
+		    		for (var i = 0; i < data_json.length; i++) {
+		    			OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
+		    		}
+		    	var OP2 = '';
+		    		for (var i = 0; i < m_type_user.length; i++) {
+		    			OP2 += '<option value="'+m_type_user[i].ID+'" '+''+'>'+m_type_user[i].Name+'</option>';
+		    		}
+		    	if (dtApproval[0].Status == '1' || dtApproval[0].Status == '3') {
+		    		if (indexjson == 0) {
+		    			evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+		    									'<option value = "Yes" selected >Yes</option>'+
+		    									'<option value = "No" selected >No</option>'+
+		    								'</select>');
+		    		}
+		    		else
+		    		{
+		    			evtr.find('td:eq(1)').attr('style','width : 30%');	
+		    			evtr.find('td:eq(1)').html('<select class=" form-control listemployees">'+
+		    									'   <option value = "0" selected>-- No Selected --</option>'+OP+
+		    								'</select>');
+		    			evtr.find('td:eq(3)').attr('style','width : 20%');	
+		    			evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
+		    								'</select>');
+		    			// evtr.find('td:eq(4)').attr('style','width : 10%');	
+		    			evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+		    									'<option value = "Yes" selected >Yes</option>'+
+		    									'<option value = "No" selected >No</option>'+
+		    								'</select>');
+		    		}		
+		    	}
+		    	else
+		    	{
+		    		evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+		    								'<option value = "Yes" selected >Yes</option>'+
+		    								'<option value = "No" selected >No</option>'+
+		    							'</select>');
+		    	}
+
+		    	evtd.html('<button class = "btn btn-primary saveapprover" prcode = "'+prcode+'" indexjson = "'+indexjson+'" action = "'+action+'">Save</button>'+
+		    					'');
+		    	$('.listemployees[tabindex!="-1"]').select2({
+		    	    //allowClear: true
+		    	});
+
+		    	$('.listTypeUser[tabindex!="-1"]').select2({
+		    	    //allowClear: true
+		    	});
+
+		    	$('.listVisible[tabindex!="-1"]').select2({
+		    	    //allowClear: true
+		    	});
+
+		    	evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
+		    });
+		    break;
+		  case 'delete':
+		  	 if (confirm('Are you sure ?')) {
+		  	 	loading_button('.btn-edit-approver[indexjson="'+indexjson+'"][action="'+action+'"]');
+		  	 	// var url = base_url_js + 'budgeting/update_approval_budgeting';
+		  	 	var url = base_url_js + 'budgeting/update_approval_pr';
+		 			var data = {
+		 				prcode : prcode,
+		 				action : action,
+		 				indexjson : indexjson,
+		 			}
+		  	 	var token = jwt_encode(data,"UAP)(*");
+		  	 	$.post(url,{ token:token },function (data_json) {
+		  	 		var response = jQuery.parseJSON(data_json);
+		  	 		if (response['msg'] == '') { // action success
+		  	 			var dt = JSON.stringify(response['data']);
+		  	 			var cc = pr_create;
+		  	 			cc[0].JsonStatus = dt;
+		  	 			ClassDt.DtExisting['pr_create'] = cc
+		  	 			makeApproval();
+
+		  	 			evtr.find('td:eq(1)').html('-');
+		  	 			evtr.find('td:eq(2)').html('-');
+		  	 			evtr.find('td:eq(3)').html('-');
+		  	 			evtr.find('td:eq(4)').html('-');
+		  	 			var action = '<button class="btn btn-default btn-default-primary btn-classroom btn-edit-approver" data-action="add" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-plus-circle fa-right" aria-hidden="true"></i></button>';
+		  	 			evtr.find('td:eq(5)').html(action);
+		  	 		}
+		  	 		else
+		  	 		{
+		  	 			toastr.error(response['msg'],'!!!Failed');
+		  	 		}
+		  	 	});
+		  	 }
+		     
+		    break;
+		  default:
+		    // code block
+		}
+			
+	})
+
+	$(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e) {
+		var evtd = $(this).closest('td');
+		var evtr = $(this).closest('tr');
+		var NIP_ = evtr.find('td:eq(1)').find('.listemployees').val();
+		var NameTypeDesc = evtr.find('td:eq(3)').find('.listTypeUser option:selected').text();
+		var Visible = evtr.find('td:eq(4)').find('.listVisible').val();
+		var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
+		var prcode = $(this).attr('prcode');
+		var action = $(this).attr('action');
+		var indexjson = $(this).attr('indexjson');
+		var DtExisting = ClassDt.DtExisting;
+		var pr_create = DtExisting['pr_create'];
+		var dtApproval = pr_create;
+		if (indexjson == 0) {
+			NIP_ = evtr.find('td:eq(1)').attr('nip');
+			loading_button('.saveapprover[indexjson="'+indexjson+'"]');
+			// var url = base_url_js + 'budgeting/update_approval_budgeting';
+			var url = base_url_js + 'budgeting/update_approval_pr';
+			var data = {
+				NIP : NIP_,
+				prcode : prcode,
+				Visible : Visible,
+				action : action,
+				indexjson : indexjson,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (data_json) {
+				var response = jQuery.parseJSON(data_json);
+				if (response['msg'] == '') { // action success
+					var dt = JSON.stringify(response['data']);
+					var cc = pr_create;
+					cc[0].JsonStatus = dt;
+					ClassDt.DtExisting['pr_create'] = cc;
+					makeApproval();
+					var st = 'Approve';
+					evtr.find('td:eq(2)').html(st);
+					evtr.find('td:eq(4)').html(vt);
+
+					action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+					evtr.find('td:eq(5)').html(action);
+				}
+				else
+				{
+					toastr.error(response['msg'],'!!!Failed');
+				}
+				$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
+			});
+		}
+		else
+		{
+			if (dtApproval[0].Status == '1' || dtApproval[0].Status == '3') {
+				if (NIP_ != '' && NIP_ != undefined && NIP_ != null && NIP_ != 0) {
+					loading_button('.saveapprover[indexjson="'+indexjson+'"]');
+					// var url = base_url_js + 'budgeting/update_approval_budgeting';
+					var url = base_url_js + 'budgeting/update_approval_pr';
+					var data = {
+						NIP : NIP_,
+						prcode : prcode,
+						NameTypeDesc : NameTypeDesc,
+						Visible : Visible,
+						action : action,
+						indexjson : indexjson,
+					}
+					var token = jwt_encode(data,"UAP)(*");
+					$.post(url,{ token:token },function (data_json) {
+						var response = jQuery.parseJSON(data_json);
+						if (response['msg'] == '') { // action success
+							var dt = JSON.stringify(response['data']);
+							var cc = pr_create;
+							cc[0].JsonStatus = dt;
+							ClassDt.DtExisting['pr_create'] = cc;
+							makeApproval();
+							var Nm = evtr.find('td:eq(1)').find('.listemployees option:selected').text();
+							var st = 'Not Approve';
+							var tu = NameTypeDesc;
+							var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
+							evtr.find('td:eq(1)').html(NIP_ + ' || '+Nm);
+							evtr.find('td:eq(2)').html(st);
+							evtr.find('td:eq(3)').html(tu);
+							evtr.find('td:eq(4)').html(vt);
+
+							action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+							action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+							evtr.find('td:eq(5)').html(action);
+						}
+						else
+						{
+							toastr.error(response['msg'],'!!!Failed');
+						}
+						$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
+					});
+				} else {
+					toastr.error('Please choose employees','!!!Failed');
+				}
+			}
+			else
+			{
+				NIP_ = evtr.find('td:eq(1)').attr('nip');
+				loading_button('.saveapprover[indexjson="'+indexjson+'"]');
+				// var url = base_url_js + 'budgeting/update_approval_budgeting';
+				var url = base_url_js + 'budgeting/update_approval_pr';
+				var data = {
+					NIP : NIP_,
+					prcode : prcode,
+					Visible : Visible,
+					action : action,
+					indexjson : indexjson,
+				}
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (data_json) {
+					var response = jQuery.parseJSON(data_json);
+					if (response['msg'] == '') { // action success
+						var dt = JSON.stringify(response['data']);
+						var cc = pr_create;
+						cc[0].JsonStatus = dt;
+						ClassDt.DtExisting['pr_create'] = cc;
+						makeApproval();
+						var st = 'Approve';
+						evtr.find('td:eq(2)').html(st);
+						evtr.find('td:eq(4)').html(vt);
+
+						action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
+						evtr.find('td:eq(5)').html(action);
+					}
+					else
+					{
+						toastr.error(response['msg'],'!!!Failed');
+					}
+					$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
+				});	
+			}
+			
+		} // exit if indexjson
+		
 	}) 
 </script>
