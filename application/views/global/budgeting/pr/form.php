@@ -1409,7 +1409,7 @@
 			var PRCode = $(this).attr('prcode');
 			var id_pr_create = $(this).attr('id_pr_create');
 			var action = $(this).attr('action');
-			if (validation) {
+			if (validation && CekBudgetRemaining) {
 				SubmitPR(PRCode,id_pr_create,action,'#SaveSubmit');
 				// $('#SaveSubmit').prop('disabled',false).html(htmltext);
 			}
