@@ -50,6 +50,7 @@ $(document).ready(function() {
         var data = {
             Action : action,
             CDID : ID,
+            Departement : "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>",
         };
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{ token:token }, function (html) {
