@@ -515,6 +515,9 @@ class C_budgeting extends Budgeting_Controler {
         $input = $this->getInputToken();
         $this->data['action'] = $input['Action'];
         $this->data['id'] = $input['CDID'];
+        if (array_key_exists('Departement', $input)) {
+            $this->data['Departement'] = $input['Departement'];
+        }
         if ($input['Action'] == 'edit') {
             $sql = 'select * from db_budgeting.cfg_postrealisasi where CodePostRealisasi = ? and Active = 1';
             $query=$this->db->query($sql, array($this->data['id']))->result_array();
