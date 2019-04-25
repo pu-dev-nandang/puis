@@ -917,89 +917,32 @@
                 formExcClassroom!='' && formExcClassroom!=null &&
                 formExcReason!='' && formExcReason!=null){
 
-                var ClassroomID = formExcClassroom.split('.')[0];
-
-                loading_buttonSm('#btnSubmitExch');
-                $('button[data-dismiss=modal],#btnDeleteExch').prop('disabled',true);
-
-                var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
-
-                var data = {
-                    action : 'updateExhange',
-                    EXID : dataExch.ID,
-                    dataUpdate : {
-                        DateOriginal : formExcDateOri,
-                        Date : formExcDate,
-                        DayID : dayID,
-                        StartSessions : formExcStart,
-                        EndSessions : formExcEnd,
-                        ClassroomID : ClassroomID,
-                        Reason : formExcReason,
-                        Status : '2'
-                    }
+                var url2 = base_url_js+'api2/__checkConflict_Vanue';
+                var textRoom = $('#formExcClassroom option:selected').text();
+                var RoomName = textRoom.split('|');
+                var data2 = {
+                    Start : formExcDate+' '+formExcStart,
+                    End : formExcDate+' '+formExcEnd,
+                    RoomName : RoomName[0].trim()
                 };
+                var token2 = jwt_encode(data2,"UAP)(*");
 
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api2/__crudAttendance2';
+                $.post(url2,{token:token2},function (result) {
 
-                $.post(url,{token:token},function (jsonResult) {
+                    var bool = result.bool;
 
-                    $('#viewVanueBentrok').addClass('hide');
-                    if(parseInt(jsonResult.Vanue)>0){
-                        $('#viewVanueBentrok').removeClass('hide');
-                        $.getJSON(base_url_js+'api/__checkBentrokScheduleAPI');
-                    }
-
-                    if(jsonResult.Status==1 || jsonResult.Status=='1'){
-                        toastr.success('Data updated','Success');
-                        loadAttendace();
-                        setTimeout(function () {
-                            $('#GlobalModal').modal('hide');
-                        },500);
+                    if (bool) {
+                        if(confirm('Conflict with Vanue, are you sure?')){
+                            post2Exchange(dataExch.ID);
+                        }
                     } else {
-                        $('#viewBentrolSc').addClass('hide');
-                        $('#viewBentrolExc').addClass('hide');
-
-                        var Schedule = jsonResult.Schedule;
-                        var Exchange = jsonResult.Exchange;
-
-                        if(Schedule.length>0){
-                            $('#viewBentrolSc').removeClass('hide');
-                            $('#viewBentrolSc').html('<ul id="ulBentrok"></ul>');
-                            $.each(Schedule,function (i, v) {
-
-                                var dC = v.DetailsCourse[0];
-
-                                $('#ulBentrok').append('<li>' +
-                                    '<b>'+dC.MKCode+' - '+dC.NameEng+'</b>' +
-                                    '<br/>Group : '+v.ClassGroup+
-                                    '<br/>'+v.DayEng+', '+v.StartSessions.substr(0,5)+' - ' +v.EndSessions.substr(0,5)+' | '+v.Room+
-                                    '</li>');
-                            });
-                        }
-
-                        if(Exchange.length>0){
-                            $('#viewBentrolExc').removeClass('hide');
-                            $('#viewBentrolExc').html('<ul id="ulBentrokExc"></ul>');
-                            $.each(Exchange,function (i, v) {
-                                $('#ulBentrokExc').append('<li>' +
-                                    '<b>'+v.MKCode+' - '+v.CourseEng+'</b>' +
-                                    '<br/>Group : '+v.ClassGroup+
-                                    '<br/>' +moment(v.Date).format('dddd, DD MMM YYYY')+
-                                    ' '+v.StartSessions.substr(0,5)+' - '+v.EndSessions.substr(0,5)+
-                                    ' | '+v.Room+
-                                    '</li>');
-                            });
-                        }
-
-                        setTimeout(function () {
-                            $('#btnSubmitExch').html('Submit');
-                            $('button[data-dismiss=modal],#btnDeleteExch,#btnSubmitExch').prop('disabled',false);
-                        },500);
+                        post2Exchange(dataExch.ID);
                     }
-
 
                 });
+
+
+
 
             }
             else {
@@ -1048,6 +991,123 @@
         });
 
     });
+
+    function post2Exchange(EXID) {
+
+        var formExcDateOri = $('#formExcDateOri').val();
+        var formExcDate = $('#formExcDate').val();
+        var formExcStart = $('#formExcStart').val();
+        var formExcEnd = $('#formExcEnd').val();
+        var formExcClassroom = $('#formExcClassroom').val();
+        var formExcReason = $('#formExcReason').val();
+
+        if(formExcDateOri!='' && formExcDateOri!=null &&
+            formExcDate!='' && formExcDate!=null &&
+            formExcStart!='' && formExcStart!=null &&
+            formExcEnd!='' && formExcEnd!=null &&
+            formExcClassroom!='' && formExcClassroom!=null &&
+            formExcReason!='' && formExcReason!=null){
+
+            var ClassroomID = formExcClassroom.split('.')[0];
+
+            loading_buttonSm('#btnSubmitExch');
+            $('button[data-dismiss=modal],#btnDeleteExch').prop('disabled',true);
+
+            var dayID = (moment(formExcDate).days()==0) ? 7 : moment(formExcDate).days();
+
+            var data = {
+                action : 'updateExhange',
+                EXID : EXID,
+                dataUpdate : {
+                    DateOriginal : formExcDateOri,
+                    Date : formExcDate,
+                    DayID : dayID,
+                    StartSessions : formExcStart,
+                    EndSessions : formExcEnd,
+                    ClassroomID : ClassroomID,
+                    Reason : formExcReason,
+                    Status : '2'
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudAttendance2';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#viewVanueBentrok').addClass('hide');
+                if(parseInt(jsonResult.Vanue)>0){
+                    $('#viewVanueBentrok').removeClass('hide');
+                    $.getJSON(base_url_js+'api/__checkBentrokScheduleAPI');
+                }
+
+                if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                    toastr.success('Data updated','Success');
+                    loadAttendace();
+
+                    var url3 = base_url_js+'api/__checkBentrokScheduleAPI';
+                    var data3 = {EXID : EXID};
+                    var token3 = jwt_encode(data3,'UAP)(*');
+                    
+                    $.post(url3,{token:token3},function (result) {
+                        setTimeout(function () {
+                            $('#GlobalModal').modal('hide');
+                        },500);
+                    });
+
+
+
+                }
+                else {
+                    $('#viewBentrolSc').addClass('hide');
+                    $('#viewBentrolExc').addClass('hide');
+
+                    var Schedule = jsonResult.Schedule;
+                    var Exchange = jsonResult.Exchange;
+
+                    if(Schedule.length>0){
+                        $('#viewBentrolSc').removeClass('hide');
+                        $('#viewBentrolSc').html('<ul id="ulBentrok"></ul>');
+                        $.each(Schedule,function (i, v) {
+
+                            var dC = v.DetailsCourse[0];
+
+                            $('#ulBentrok').append('<li>' +
+                                '<b>'+dC.MKCode+' - '+dC.NameEng+'</b>' +
+                                '<br/>Group : '+v.ClassGroup+
+                                '<br/>'+v.DayEng+', '+v.StartSessions.substr(0,5)+' - ' +v.EndSessions.substr(0,5)+' | '+v.Room+
+                                '</li>');
+                        });
+                    }
+
+                    if(Exchange.length>0){
+                        $('#viewBentrolExc').removeClass('hide');
+                        $('#viewBentrolExc').html('<ul id="ulBentrokExc"></ul>');
+                        $.each(Exchange,function (i, v) {
+                            $('#ulBentrokExc').append('<li>' +
+                                '<b>'+v.MKCode+' - '+v.CourseEng+'</b>' +
+                                '<br/>Group : '+v.ClassGroup+
+                                '<br/>' +moment(v.Date).format('dddd, DD MMM YYYY')+
+                                ' '+v.StartSessions.substr(0,5)+' - '+v.EndSessions.substr(0,5)+
+                                ' | '+v.Room+
+                                '</li>');
+                        });
+                    }
+
+                    setTimeout(function () {
+                        $('#btnSubmitExch').html('Submit');
+                        $('button[data-dismiss=modal],#btnDeleteExch,#btnSubmitExch').prop('disabled',false);
+                    },500);
+                }
+
+
+            });
+
+        }
+
+
+
+    }
 
 
 </script>

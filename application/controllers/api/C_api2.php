@@ -2029,6 +2029,7 @@ class C_api2 extends CI_Controller {
 
     public function crudSemesterAntara(){
         $data_arr = $this->getInputToken();
+        $dataTimeNow = $this->m_rest->getDateTimeNow();
 
         if($data_arr['action']=='readCourse'){
 
@@ -3053,6 +3054,179 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='SATimetablesLecturer'){
+
+            $NIP = $data_arr['NIP'];
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $q1 = 'SELECT ss.ID AS ScheduleIDSA, ss.ClassGroup, ss.Coordinator, ss.Start, ss.End,   
+                            mk.MKCode, mk.NameEng AS CourseEng, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room
+                            FROM db_academic.sa_schedule ss
+                            LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
+                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID) 
+                            LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
+                            LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
+                            LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
+                            WHERE ss.SASemesterID = "'.$SASemesterID.'"
+                            AND ss.Coordinator = "'.$NIP.'" GROUP BY ss.ID ';
+
+            $q2 = 'SELECT ss.ID AS ScheduleIDSA, ss.ClassGroup, ss.Coordinator, ss.Start, ss.End,   
+                              mk.MKCode, mk.NameEng AS CourseEng, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room
+                              FROM db_academic.sa_schedule ss
+                              LEFT JOIN db_academic.sa_schedule_team_teaching sstt ON (sstt.ScheduleIDSA = ss.ID)
+                              LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
+                              LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                              LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
+                              LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
+                              LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
+                              WHERE ss.SASemesterID = "'.$SASemesterID.'" 
+                              AND sstt.NIP = "'.$NIP.'"  GROUP BY ss.ID ';
+
+            $dataSchedule = $this->db->query($q1.' UNION '.$q2)->result_array();
+
+            if(count($dataSchedule)>0){
+                for ($i=0;$i<count($dataSchedule);$i++){
+                    $d = $dataSchedule[$i];
+
+                    $ScheduleIDSA = $d['ScheduleIDSA'];
+
+                    // Cek Teamteaching
+                    $dataSchedule[$i]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.sa_schedule_team_teaching sstt 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = sstt.NIP)
+                                                              WHERE sstt.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+
+                    // Cek Student
+                    $Student = [];
+                     $dataCD = $this->db->query('SELECT * FROM db_academic.sa_schedule_course ssc 
+                                                                                WHERE ssc.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+
+                     if(count($dataCD)>0){
+                         foreach ($dataCD AS $item){
+                             // Student
+                             $dataStd = $this->db->query('SELECT ssd.NPM, ats.Name, p1.Status AS StatusBPP, p2.Status AS StatusCredit FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
+                                                              LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
+                                                              WHERE ssd.CDID = "'.$item['CDID'].'" AND ssd.Status = "3" AND p1.Status = "1" AND p2.Status = "1"
+                                                              ORDER BY ssd.NPM ASC')->result_array();
+
+                             if(count($dataStd)>0){
+                                 foreach ($dataStd AS $itm){
+                                     array_push($Student,$itm);
+                                 }
+                             }
+                         }
+                     }
+
+                    usort($Student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
+
+                    $dataSchedule[$i]['Students'] = $Student;
+
+
+                }
+            }
+
+            return print_r(json_encode($dataSchedule));
+
+        }
+        else if($data_arr['action']=='inputAttendanceSA'){
+            $dataAttd = (array) $data_arr['dataAttd'];
+
+            for($i=0;$i<count($dataAttd);$i++){
+
+                $d = (array) $dataAttd[$i];
+
+                // Cek apakah sudah ada atau blm
+                $dataCk = $this->db->select('ID')->limit(1)
+                    ->get_where('db_academic.sa_attendance'
+                    ,array(
+                        'ScheduleIDSA' => $d['ScheduleIDSA'],
+                        'UserID' => $d['UserID'],
+                        'Meet' => $d['Meet']
+                    ))->result_array();
+
+                if(count($dataCk)>0){
+                    $IDAttd = $dataCk[0]['ID'];
+                    $this->db->where('ID', $IDAttd);
+                    $this->db->update('db_academic.sa_attendance',$d);
+                } else {
+                    $d['EntredAt'] = $dataTimeNow;
+                    $d['EntredBy'] = $d['UpdatedBy'];
+                    $this->db->insert('db_academic.sa_attendance', $d);
+                }
+
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='loadAttdStd'){
+
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+            $Meet = $data_arr['Meet'];
+            $Type = $data_arr['Type'];
+
+            $dataAttd = $this->db->get_where('db_academic.sa_attendance',array(
+                'ScheduleIDSA' => $ScheduleIDSA,
+                'Meet' => $Meet,
+                'Type' => $Type
+            ))->result_array();
+
+
+            $result = [];
+            if(count($dataAttd)>0){
+                foreach ($dataAttd AS $item){
+                    if($item['Status']=='1' || $item['Status']==1){
+                        array_push($result,$item['UserID']);
+                    }
+
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='checkLectAttd'){
+
+            $dataCk = $this->db->select('Meet')->order_by('Meet','DESC')->get_where('db_academic.sa_attendance',array(
+                'ScheduleIDSA' => $data_arr['ScheduleIDSA'],
+                'Type' => $data_arr['Type']
+            ))->result_array();
+
+            $result = [];
+
+            if(count($dataCk)>0){
+                foreach ($dataCk AS $item){
+                    array_push($result,$item['Meet']);
+                }
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if ($data_arr['action']=='inputAttendanceLecturerSA'){
+
+            $inputAttd = (array) $data_arr['inputAttd'];
+
+            // Cek apakah sudah input
+            $dataCk = $this->db->select('ID')->limit(1)->get_where('db_academic.sa_attendance',array(
+                'ScheduleIDSA' => $inputAttd['ScheduleIDSA'],
+                'Meet' => $inputAttd['Meet'],
+                'UserID' => $inputAttd['UserID']
+            ))->result_array();
+
+            if(count($dataCk)>0){
+                $this->db->where('ID', $dataCk[0]['ID']);
+                $this->db->update('db_academic.sa_attendance', $inputAttd);
+            } else {
+                $inputAttd['EntredAt'] = $dataTimeNow;
+                $inputAttd['EntredBy'] = $inputAttd['UpdatedBy'];
+                $this->db->insert('db_academic.sa_attendance', $inputAttd);
+            }
+
+            return print_r(1);
+
+        }
+
     }
 
     function createTagihanSemesterAntara($IDSAStudent){
@@ -3376,6 +3550,17 @@ class C_api2 extends CI_Controller {
         return print_r(json_encode($dataStd));
 
 
+    }
+
+    public function checkConflict_Vanue(){
+        // Start & End : datetime
+        $data_arr = $this->getInputToken();
+        $Start = $data_arr['Start'];
+        $End = $data_arr['End'];
+        $roomname = $data_arr['RoomName'];
+        $dataCheck = $this->m_reservation->checkBentrok2($Start,$End,'',$roomname);
+
+        return print_r($dataCheck);
     }
 
 

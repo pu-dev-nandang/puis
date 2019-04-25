@@ -947,6 +947,9 @@ $route['api2/__getTimetableSA'] = 'api/c_api2/getTimetableSA';
 $route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
 $route['api2/__getStudentList'] = 'api/c_api2/getStudentList';
 
+
+$route['api2/__checkConflict_Vanue'] = 'api/c_api2/checkConflict_Vanue';
+
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';
