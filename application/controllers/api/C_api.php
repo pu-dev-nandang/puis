@@ -6770,6 +6770,23 @@ class C_api extends CI_Controller {
     public function checkBentrokScheduleAPI()
     {
         $chk = $this->m_reservation->checkBentrokScheduleAPI();
+        $DeletedBy = 0;
+        $wrADDNotesDelete = '';
+        $NameApproved = '';
+        $wrADDNotesDelete_email = '';
+        if (array_key_exists('token', $_POST)) {
+            $input = $this->getInputToken();
+            if (array_key_exists('EXID', $input)) {
+                $EXID = $input['EXID'];
+                $DeletedBy = $this->session->userdata('NIP');
+                $G_EMP = $this->m_master->caribasedprimary('db_employees.employees','NIP',$DeletedBy);
+                $NameApproved = $G_EMP[0]['Name'];
+                $wrADDNotesDelete = 'Schedule Exchange';
+                $wrADDNotesDelete_email = 'by '.$wrADDNotesDelete.' that approved by '.$NameApproved;
+            }
+            
+        }
+        
         if (!$chk['bool']) {
             // insert table to t_booking_delete
             $this->load->model('m_sendemail');
@@ -6789,8 +6806,8 @@ class C_api extends CI_Controller {
                 'Req_date' => $get[0]['Req_date'],
                 'CreatedBy' => $get[0]['CreatedBy'],
                 'ID_t_booking' => $get[0]['ID'],
-                'Note_deleted' => 'Conflict',
-                'DeletedBy' => 0,
+                'Note_deleted' => 'Conflict'.'##'.$wrADDNotesDelete,
+                'DeletedBy' => $DeletedBy,
                 'Req_layout' => $get[0]['Req_layout'],
                 'Status' => $get[0]['Status'],
                 'MarcommSupport' => $get[0]['MarcommSupport'],
@@ -6853,7 +6870,7 @@ class C_api extends CI_Controller {
                 $Email = $getUser[0]['EmailPU'];
                 $text = 'Dear '.$getUser[0]['Name'].',<br><br>
 
-                            Your Venue Reservation was conflict,<br><br>
+                            Your Venue Reservation was conflict '.$wrADDNotesDelete_email.',<br><br>
                             <strong>Your schedule automated delete by System</strong>,<br><br>
                             Details Schedule : <br><ul>
                             <li>Start  : '.$StartNameDay.', '.$get[0]['Start'].'</li>

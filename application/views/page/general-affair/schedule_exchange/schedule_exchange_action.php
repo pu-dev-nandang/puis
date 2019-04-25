@@ -342,7 +342,11 @@
     							    		{
     							    			// action cancel auto schedule bentrok
     							    			var url = base_url_js+'api/__checkBentrokScheduleAPI';
-    							    			$.post(url,{token:token},function (data_json3) {
+    							    			var data2 = {
+    							    			    EXID : scheduleexchangeid,
+    							    			}
+    							    			var token2 = jwt_encode(data2,'UAP)(*');
+    							    			$.post(url,{token:token2},function (data_json3) {
     							    				if (data_json3 == 0 || data_json3 == 1) {
     							    					newtr.find('td:eq(9)').html('Already Set Room');
     							    					var st = newtr.find('td:eq(7)').html();
