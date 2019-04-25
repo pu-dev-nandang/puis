@@ -1959,6 +1959,8 @@ class C_rest extends CI_Controller {
                         $ScheduleExist = $data_arr_token['ScheduleExist'];
                         $ScheduleExchange = $data_arr_token['ScheduleExchange'];
                     }
+                    
+                    $ScheduleExchange = date("d M Y", strtotime($row['Date'])).' | '.substr($row['StartSessions'], 0,5).'-'.substr($row['EndSessions'],0,5);
 
                     $StatusTbl = '';
                     switch ($row['StatusTbl']) {
