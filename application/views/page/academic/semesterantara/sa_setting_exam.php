@@ -35,10 +35,13 @@
                     <td>:</td>
                     <td>
                         <div class="row">
-                            <div class="col-xs-3">
+                            <div class="col-xs-5">
                                 <select class="form-control" id="formType">
                                     <option value="uts">UTS</option>
                                     <option value="uas">UAS</option>
+                                    <option disabled>===========</option>
+                                    <option value="re_uts" style="color: orangered;">UTS (make-up)</option>
+                                    <option value="re_uas" style="color: orangered;">UAS (make-up)</option>
                                 </select>
                             </div>
                         </div>
@@ -208,12 +211,10 @@
 
     function loadDate() {
 
+        $( "#formDate" ).val('');
+        $( "#formDate" ).datepicker( "destroy" );
         var formType = $('#formType').val();
-        if(formType!='' && formType!=null){
-
-            $( "#formDate" ).val('');
-            $( "#formDate" ).datepicker( "destroy" );
-
+        if((formType!='' && formType!=null) && (formType=='uts' || formType=='uas')){
             var data = {
                 action : 'academicYear',
                 SASemesterID : '<?=$SASemesterID; ?>',
@@ -264,6 +265,23 @@
 
             });
 
+        }
+        else {
+            $('#btnSubmitExam').prop('disabled',false);
+            $("#formDate").datepicker({
+                    showOtherMonths:true,
+                    autoSize: true,
+                    dateFormat: 'dd MM yy',
+                    minDate: new Date(moment().year(),moment().month(),moment().date()),
+                    onSelect : function () {
+                        var data_date = $(this).val().split(' ');
+                        var momentDate = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]);
+                        // var CustomMoment = momentDate.day();
+                        // var day = (CustomMoment==0) ? 7 : CustomMoment;
+                        // $('#formDayID').val(day);
+                        $('#formInputDate').val(momentDate.format('YYYY-MM-DD'));
+                    }
+                });
         }
 
 

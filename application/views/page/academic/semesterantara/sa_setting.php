@@ -65,6 +65,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Show UTS Schedule</td>
+                    <td>:</td>
+                    <td>
+                        <input class="form-control form-date" id="ShowUTSSchedule">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
                     <td>Input Nilai UTS</td>
                     <td>:</td>
                     <td>
@@ -75,7 +83,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Show UTS</td>
+                    <td>Show Nilai UTS</td>
                     <td>:</td>
                     <td>
                         <input class="form-control form-date" id="ShowUTS">
@@ -101,6 +109,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Show UAS Schedule</td>
+                    <td>:</td>
+                    <td>
+                        <input class="form-control form-date" id="ShowUASSchedule">
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
                     <td>Input Nilai UAS</td>
                     <td>:</td>
                     <td>
@@ -111,7 +127,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Show UAS</td>
+                    <td>Show Nilai UAS</td>
                     <td>:</td>
                     <td>
                         <input class="form-control form-date" id="ShowUAS">
@@ -189,10 +205,14 @@
                     $('#End').datepicker('setDate',new Date(d.End));
                     $('#StartUTS').datepicker('setDate',new Date(d.StartUTS));
                     $('#EndUTS').datepicker('setDate',new Date(d.EndUTS));
+                    $('#ShowUTSSchedule').datepicker('setDate',new Date(d.ShowUTSSchedule));
                     $('#ShowUTS').datepicker('setDate',new Date(d.ShowUTS));
+
                     $('#StartUAS').datepicker('setDate',new Date(d.StartUAS));
                     $('#EndUAS').datepicker('setDate',new Date(d.EndUAS));
+                    $('#ShowUASSchedule').datepicker('setDate',new Date(d.ShowUASSchedule));
                     $('#ShowUAS').datepicker('setDate',new Date(d.ShowUAS));
+
                     $('#UpdateTranscript').datepicker('setDate',new Date(d.UpdateTranscript));
 
                     $('#StartInputUTS').datepicker('setDate',new Date(d.StartInputUTS));
@@ -227,12 +247,14 @@
         var EndUTS = $('#EndUTS').datepicker("getDate");
         var StartInputUTS = $('#StartInputUTS').datepicker("getDate");
         var EndInputUTS = $('#EndInputUTS').datepicker("getDate");
+        var ShowUTSSchedule = $('#ShowUTSSchedule').datepicker("getDate");
         var ShowUTS = $('#ShowUTS').datepicker("getDate");
         var MaxInputTugas = $('#MaxInputTugas').datepicker("getDate");
         var StartUAS = $('#StartUAS').datepicker("getDate");
         var EndUAS = $('#EndUAS').datepicker("getDate");
         var StartInputUAS = $('#StartInputUAS').datepicker("getDate");
         var EndInputUAS = $('#EndInputUAS').datepicker("getDate");
+        var ShowUASSchedule = $('#ShowUASSchedule').datepicker("getDate");
         var ShowUAS = $('#ShowUAS').datepicker("getDate");
         var UpdateTranscript = $('#UpdateTranscript').datepicker("getDate");
 
@@ -257,7 +279,9 @@
             EndInputUTS != '' && EndInputUTS!=null &&
             StartInputUAS !='' && StartInputUAS!=null &&
             EndInputUAS !='' && EndInputUAS!=null &&
-            MaxInputTugas !='' && MaxInputTugas!=null
+            MaxInputTugas !='' && MaxInputTugas!=null &&
+            ShowUTSSchedule !='' && ShowUTSSchedule!=null &&
+            ShowUASSchedule !='' && ShowUASSchedule!=null
         ){
 
             loading_button('#btnUpdateAY');
@@ -273,9 +297,11 @@
                 End : moment(End).format('YYYY-MM-DD'),
                 StartUTS : moment(StartUTS).format('YYYY-MM-DD'),
                 EndUTS : moment(EndUTS).format('YYYY-MM-DD'),
+                ShowUTSSchedule : moment(ShowUTSSchedule).format('YYYY-MM-DD'),
                 ShowUTS : moment(ShowUTS).format('YYYY-MM-DD'),
                 StartUAS : moment(StartUAS).format('YYYY-MM-DD'),
                 EndUAS : moment(EndUAS).format('YYYY-MM-DD'),
+                ShowUASSchedule : moment(ShowUASSchedule).format('YYYY-MM-DD'),
                 ShowUAS : moment(ShowUAS).format('YYYY-MM-DD'),
                 UpdateTranscript : moment(UpdateTranscript).format('YYYY-MM-DD'),
                 StartInputUTS : moment(StartInputUTS).format('YYYY-MM-DD'),

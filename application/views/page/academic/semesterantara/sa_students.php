@@ -556,6 +556,8 @@
         var formMentorNIP = $('#formMentorNIP').val();
         var formNPM = $('#formNPM').val();
 
+        var Type = (Grade!='' && Grade!=null) ? 'Ul' : 'Br';
+
         var data = {
             action : 'enteredCourseByAcademic',
             Mentor : formMentorNIP,
@@ -564,6 +566,7 @@
                 NPM : formNPM,
                 CDID : CDID,
                 MKID : MKID,
+                Type : Type,
                 Credit : Credit,
                 Grade : Grade,
                 Score : Score,
