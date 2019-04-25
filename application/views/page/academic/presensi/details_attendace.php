@@ -850,7 +850,7 @@
             '' +
             '<div class="alert alert-danger hide" id="viewBentrolSc"></div>' +
             '<div class="alert alert-warning hide" id="viewBentrolExc"></div>' +
-            '<div class="alert alert-info hide" id="viewVanueBentrok">Bentrok dengan venue (Tidak masalah)</div>' +
+            '<div class="alert alert-info hide" id="viewVanueBentrok">Bentrok dengan venue</div>' +
             '    </div>' +
             '</div>');
 
@@ -917,7 +917,7 @@
                 formExcClassroom!='' && formExcClassroom!=null &&
                 formExcReason!='' && formExcReason!=null){
 
-                var url2 = base_url_js+'api2/__checkConflict_Vanue';
+                var url2 = base_url_js+'api2/__checkConflict_Venue';
                 var textRoom = $('#formExcClassroom option:selected').text();
                 var RoomName = textRoom.split('|');
                 var data2 = {
@@ -932,11 +932,11 @@
                     var bool = result.bool;
 
                     if (bool) {
-                        if(confirm('Conflict with Vanue, are you sure?')){
+                        post2Exchange(dataExch.ID);
+                    } else {
+                        if(confirm('Conflict with Venue, are you sure?')){
                             post2Exchange(dataExch.ID);
                         }
-                    } else {
-                        post2Exchange(dataExch.ID);
                     }
 
                 });
