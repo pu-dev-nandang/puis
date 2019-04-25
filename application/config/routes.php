@@ -991,7 +991,7 @@ $route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
 $route['api2/__getStudentList'] = 'api/c_api2/getStudentList';
 
 
-$route['api2/__checkConflict_Vanue'] = 'api/c_api2/checkConflict_Vanue';
+$route['api2/__checkConflict_Venue'] = 'api/c_api2/checkConflict_Venue';
 
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';

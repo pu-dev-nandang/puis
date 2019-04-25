@@ -3668,7 +3668,7 @@ class C_api2 extends CI_Controller {
 
     }
 
-    public function checkConflict_Vanue(){
+    public function checkConflict_Venue(){
         // Start & End : datetime
         $data_arr = $this->getInputToken();
         $Start = $data_arr['Start'];
@@ -3676,7 +3676,7 @@ class C_api2 extends CI_Controller {
         $roomname = $data_arr['RoomName'];
         $dataCheck = $this->m_reservation->checkBentrok2($Start,$End,'',$roomname);
 
-        return print_r($dataCheck);
+        return print_r(json_encode($dataCheck));
     }
 
 
