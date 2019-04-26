@@ -220,10 +220,11 @@ class C_pr_po extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $PRCode = $input['PRCode'];
+        $G_Year = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+        $Year = $G_Year[0]['Year'];
         $Departement = $input['department'];
         $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        $Year = $get[0]['Year'];
         $this->data['Year'] = $Year;
         $this->data['PRCodeVal'] = $PRCode;
         $this->data['Departement'] = $Departement;

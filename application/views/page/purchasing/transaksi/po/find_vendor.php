@@ -47,6 +47,11 @@
 
 	function Get_data_pr(){
        var def = jQuery.Deferred();
+       var data = {
+           PurchasingStatus : '!=2',
+           auth : 's3Cr3T-G4N',
+       };
+       var token = jwt_encode(data,"UAP)(*");
        	var table = $('#tableData_pr').DataTable({
        		"fixedHeader": true,
        	    "processing": true,
@@ -58,7 +63,7 @@
        	        url : base_url_js+"rest/__get_data_pr/2", // json datasource
        	        ordering : false,
        	        type: "post",  // method  , by default get
-       	        data : {PurchasingStatus : '!=2'},
+       	        data : {token : token},
        	        error: function(){  // error handling
        	            $(".employee-grid-error").html("");
        	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -102,6 +107,54 @@
 	}
 
 	$(document).off('change', '.C_radio_pr:checked').on('change', '.C_radio_pr:checked',function(e) {
-		console.log($(this).attr('prcode'));
+		var PRCode = $(this).attr('prcode');
+		var url = base_url_js+'rest/__show_pr_detail';
+   		var data = {
+   		    PRCode : PRCode,
+   		    auth : 's3Cr3T-G4N',
+   		};
+   		var token = jwt_encode(data,"UAP)(*");
+   		$.post(url,{ token:token },function () {
+
+		}).done(function(data_json) {
+	    	MakeDom_page_pr_item_list(data_json);
+	    });
+
 	})
+
+	function MakeDom_page_pr_item_list(dt)
+	{
+		var pr_detail = dt.pr_detail;
+		var IsiInputPR = '';
+		for (var i = 0; i < pr_detail.length; i++) {
+			
+		}
+		var  htmlInputPR= 'div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
+							'<div class = "col-md-12">'+
+								'<div class="table-responsive">'+
+									'<table class="table table-bordered tableData" id ="table_data_pr_detail">'+
+										'<thead>'+
+										'<tr>'+
+											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Budget</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
+				                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
+				                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Combine Budget</th>'+
+										'</tr>'+
+										'</thead>'+
+										'<tbody>'+IsiInputPR+'</tbody></table>'+
+									'</div>'+
+								'</div>'+
+							'</div>';		
+
+
+	}
 </script>

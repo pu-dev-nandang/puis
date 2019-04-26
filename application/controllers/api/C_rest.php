@@ -2825,77 +2825,120 @@ class C_rest extends CI_Controller {
 
     public function get_data_pr($Status)
     {
-        $requestData= $_REQUEST;
-        $StatusQuery = ($Status != 'All') ? '' : 'where a.Status = '.$Status;
-        if (array_key_exists('PurchasingStatus', $_POST)) {
-            $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
-        }
-        $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a left join db_purchasing.pr_status as b on a.PRCode = b.PRCode '.$StatusQuery;
-        $querytotalData = $this->db->query($sqltotalData)->result_array();
-        $totalData = $querytotalData[0]['total'];
+        try {
+             $dataToken = $this->getInputToken2();
+             $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $requestData= $_REQUEST;
+                $StatusQuery = ($Status != 'All') ? '' : 'where a.Status = '.$Status;
+                if (array_key_exists('PurchasingStatus', $_POST)) {
+                    $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
+                }
+                $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a left join db_purchasing.pr_status as b on a.PRCode = b.PRCode '.$StatusQuery;
+                $querytotalData = $this->db->query($sqltotalData)->result_array();
+                $totalData = $querytotalData[0]['total'];
 
-        $sql = 'select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
-                (
-                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                    as StatusName, a.JsonStatus,a.PostingDate
-                                    from db_budgeting.pr_create as a 
-                    join (
-                    select * from (
-                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
-                    UNION
-                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
-                    UNION
-                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
-                    ) aa
-                    ) as b on a.Departement = b.ID
-                )a
-                    LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
-               ';
+                $sql = 'select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
+                        (
+                            select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
+                                            if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                            as StatusName, a.JsonStatus,a.PostingDate
+                                            from db_budgeting.pr_create as a 
+                            join (
+                            select * from (
+                            select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                            UNION
+                            select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                            UNION
+                            select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                            ) aa
+                            ) as b on a.Departement = b.ID
+                        )a
+                            LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
+                       ';
 
-        $sql.= ' where a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%"';
-        $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
-        $query = $this->db->query($sql)->result_array();
+                $sql.= ' where a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%"';
+                $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $query = $this->db->query($sql)->result_array();
 
-        $No = $requestData['start'] + 1;
-        $data = array();
-        
-        for($i=0;$i<count($query);$i++){
-            $row = $query[$i];
-            $query[$i]['No'] = $No;
-            $JsonStatus = (array)json_decode($row['JsonStatus'],true);
-            $arr = array();
-            if (count($JsonStatus) > 0) {
-                for ($j=1; $j < count($JsonStatus); $j++) {
-                    $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
-                    $Name = $getName[0]['Name'];
-                    $StatusInJson = $JsonStatus[$j]['Status'];
-                    switch ($StatusInJson) {
-                        case '1':
-                            $stjson = '<i class="fa fa-check" style="color: green;"></i>';
-                            break;
-                        case '2':
-                            $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
-                            break;
-                        default:
-                            $stjson = "-";
-                            break;
+                $No = $requestData['start'] + 1;
+                $data = array();
+                
+                for($i=0;$i<count($query);$i++){
+                    $row = $query[$i];
+                    $query[$i]['No'] = $No;
+                    $JsonStatus = (array)json_decode($row['JsonStatus'],true);
+                    $arr = array();
+                    if (count($JsonStatus) > 0) {
+                        for ($j=1; $j < count($JsonStatus); $j++) {
+                            $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                            $Name = $getName[0]['Name'];
+                            $StatusInJson = $JsonStatus[$j]['Status'];
+                            switch ($StatusInJson) {
+                                case '1':
+                                    $stjson = '<i class="fa fa-check" style="color: green;"></i>';
+                                    break;
+                                case '2':
+                                    $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+                                    break;
+                                default:
+                                    $stjson = "-";
+                                    break;
+                            }
+                            $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
+                        }
                     }
-                    $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
+                    $query[$i]['Approval'] = $arr;
+                    $No++;
+                }
+
+                $data = $query;
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval($totalData),
+                    "recordsFiltered" => intval($totalData ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+             // handling orang iseng
+             echo '{"status":"999","message":"Not Authorize"}';
+        }
+        
+    }
+
+    public function show_pr_detail()
+    {
+            try {
+                 $dataToken = $this->getInputToken2();
+                 $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $arr_result = array('pr_create' => array(),'pr_detail' => array());
+                    $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode($dataToken['PRCode']);
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
+                    echo json_encode($arr_result);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
                 }
             }
-            $query[$i]['Approval'] = $arr;
-            $No++;
-        }
-
-        $data = $query;
-
-        $json_data = array(
-            "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval($totalData),
-            "recordsFiltered" => intval($totalData ),
-            "data"            => $data
-        );
-        echo json_encode($json_data);
+            //catch exception
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
     }
 }
