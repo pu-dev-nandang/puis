@@ -36,6 +36,5 @@
     $(document).ready(function() {
         loadingStart();
         $("#container").attr('class','fixed-header sidebar-closed');
-        loadingEnd(1500);
     }); // exit document Function
 </script>

@@ -885,6 +885,7 @@ $route['rest/__log_budgeting'] = 'api/c_rest/log_budgeting';
 $route['rest/__approve_budget'] = 'api/c_rest/approve_budget';
 $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_PowerApps';
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
+$route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
