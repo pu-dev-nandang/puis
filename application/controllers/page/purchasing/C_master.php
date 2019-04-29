@@ -541,10 +541,40 @@ class C_master extends Purchasing_Controler {
         $this->auth_ajax();
         $Input = $this->getInputToken();
         $CategoryName = $Input['CategoryName'];
-        $dataSave = array(
-            'CategoryName' => trim(ucwords($CategoryName)),
-        );
-        $this->db->insert('db_purchasing.m_categorysupplier', $dataSave);
+        $action = $Input['action'];
+        switch ($action) {
+          case 'add':
+            $dataSave = array(
+                'CategoryName' => trim(ucwords($CategoryName)),
+            );
+            $this->db->insert('db_purchasing.m_categorysupplier', $dataSave);
+            break;
+          case 'edit':
+            $ID = $Input['id_data'];
+            $dataSave = array(
+                'CategoryName' => trim(ucwords($CategoryName)),
+            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_purchasing.m_categorysupplier', $dataSave);
+            break;
+          case 'delete':
+            $ID = $Input['id_data'];
+            $G = $this->m_master->caribasedprimary('db_purchasing.m_supplier','CategorySupplier',$ID);
+            if (count($G) > 0) {
+              echo json_encode(0);
+            }
+            else
+            {
+              $this->db->where('ID',$ID);
+              $this->db->delete('db_purchasing.m_categorysupplier');
+              echo json_encode(1);
+            }
+            break;  
+          default:
+            # code...
+            break;
+        }
+        
     }
 
     public function Supplier_DataIntable($action = "All_approval")

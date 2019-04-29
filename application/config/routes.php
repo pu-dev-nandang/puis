@@ -907,6 +907,9 @@ $route['rest/__log_budgeting'] = 'api/c_rest/log_budgeting';
 $route['rest/__approve_budget'] = 'api/c_rest/approve_budget';
 $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_PowerApps';
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
+$route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
+$route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
@@ -1333,6 +1336,7 @@ $route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import
 $route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/allow_division_catalog';
 $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
+$route['purchasing/transaction/po/find_vendor'] = 'page/purchasing/c_po/find_vendor';
 
 
 // IT

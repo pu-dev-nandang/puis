@@ -220,10 +220,11 @@ class C_pr_po extends Budgeting_Controler {
         $this->auth_ajax();
         $input = $this->getInputToken();
         $PRCode = $input['PRCode'];
+        $G_Year = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+        $Year = $G_Year[0]['Year'];
         $Departement = $input['department'];
         $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        $Year = $get[0]['Year'];
         $this->data['Year'] = $Year;
         $this->data['PRCodeVal'] = $PRCode;
         $this->data['Departement'] = $Departement;
@@ -684,107 +685,128 @@ class C_pr_po extends Budgeting_Controler {
         $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
         $JsonStatus = $G_data[0]['JsonStatus'];
         $JsonStatus = (array) json_decode($JsonStatus,true);
-        // update JsonStatus menjadi 0
-        for ($i=1; $i < count($JsonStatus); $i++) { // skip index 0 karena admin
-            $JsonStatus[$i]['Status'] = 0;
+
+        // jika Status sama dengan 1 #  untuk ketika submit masih bisa edit sebelum approval
+        $b = true;
+        if ($G_data[0]['Status'] == 1) {
+            for ($i=1; $i < count($JsonStatus); $i++) { // skip index 0 karena admin
+                if ($JsonStatus[$i]['Status'] == 1) {
+                    $b = false;
+                    break;
+                }
+            }
+
+            if (!$b) {
+                $St_error = 0;
+                $BudgetChange = 1;
+                $msg = 'The data has been approve and will do to reload';
+            }
         }
-        $dataSave['JsonStatus'] = json_encode($JsonStatus);
-            // RuleApproval
-                // check Subtotal
-                    $Amount = 0;
-                    for ($i=0; $i < count($input); $i++) {
-                        $data = $input[$i]; 
-                        $key = "UAP)(*";
-                        $data_arr = (array) $this->jwt->decode($data,$key);
-                        // print_r($data_arr);
-                        $SubTotal = $data_arr['SubTotal'];
-                        $Amount = $Amount + $SubTotal;
-                    }
-        $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
-            if (count($JsonStatus2) > 1) {
-                $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
-                if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
-                    $this->db->where('PRCode',$PRCode);
-                    $this->db->update('db_budgeting.pr_create',$dataSave);
-                    $StatusPR = 1;
-                    // passing show name JsonStatus
-                    for ($i=0; $i < count($JsonStatus); $i++) { 
-                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
-                        $Name = $Name[0]['Name'];
-                        $JsonStatus[$i]['NameApprovedBy'] = $Name;
-                    } 
 
-                    if ($this->db->affected_rows() > 0 )
-                    {
-                        /*
-                            Note : 
-                            Pengembalian Post Budget using ke awal sebelum pr tercreate
-                        */
-                         $BackBudgetToBeforeCreate = $this->m_pr_po->BackBudgetToBeforeCreate($PRCode,$Year,$Departement);  
-
-                        // remove PRCode in pr_detail
-                            $this->db->where(array('PRCode' => $PRCode));
-                            $this->db->delete('db_budgeting.pr_detail');
+        if ($G_data[0]['Status'] == 3 || $b) {
+            // update JsonStatus menjadi 0
+            for ($i=1; $i < count($JsonStatus); $i++) { // skip index 0 karena admin
+                $JsonStatus[$i]['Status'] = 0;
+            }
+            $dataSave['JsonStatus'] = json_encode($JsonStatus);
+                // RuleApproval
+                    // check Subtotal
+                        $Amount = 0;
                         for ($i=0; $i < count($input); $i++) {
                             $data = $input[$i]; 
                             $key = "UAP)(*";
                             $data_arr = (array) $this->jwt->decode($data,$key);
-                            $PassNumber = $data_arr['PassNumber'];
-                            // proses upload file
-                                if (array_key_exists('UploadFile'.$PassNumber, $_FILES)) {
-                                    // do upload file
-                                    $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$PassNumber);
-                                    $data_arr['UploadFile'] = json_encode($uploadFile); 
-                                }
-
-                                // exclude 
-                                    $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
-                                    if (count($Combine) > 0) {
-                                        $data_arr['CombineStatus'] = 1;
-                                    }
-                                    unset($data_arr['FormInsertCombine']);
-                                    unset($data_arr['PassNumber']);
-
-                                $data_arr['PRCode'] = $PRCode;    
-                                $this->db->insert('db_budgeting.pr_detail',$data_arr);
-                                // insert combine budgeting
-                                $getID = $this->db->insert_id();
-                                if (count($Combine) > 0) {
-                                    for ($j=0; $j <count($Combine) ; $j++) { 
-                                        $dataSave_combine = array(
-                                            'ID_pr_detail' => $getID,
-                                            'ID_budget_left' => $Combine[$j]['ID_budget_left'],
-                                            'Cost' => $Combine[$j]['Cost'],
-                                        );
-                                        $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
-                                    }
-                                    
-                                }
+                            // print_r($data_arr);
+                            $SubTotal = $data_arr['SubTotal'];
+                            $Amount = $Amount + $SubTotal;
                         }
+            $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+                if (count($JsonStatus2) > 1) {
+                    $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
+                    if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$dataSave);
+                        $StatusPR = 1;
+                        // passing show name JsonStatus
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                            $Name = $Name[0]['Name'];
+                            $JsonStatus[$i]['NameApprovedBy'] = $Name;
+                        } 
 
-                        // Update to budget_left
-                            $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
+                        if ($this->db->affected_rows() > 0 )
+                        {
+                            /*
+                                Note : 
+                                Pengembalian Post Budget using ke awal sebelum pr tercreate
+                            */
+                             $BackBudgetToBeforeCreate = $this->m_pr_po->BackBudgetToBeforeCreate($PRCode,$Year,$Departement);  
 
-                        // insert to pr_circulation_sheet
-                            $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued & Edited');
+                            // remove PRCode in pr_detail
+                                $this->db->where(array('PRCode' => $PRCode));
+                                $this->db->delete('db_budgeting.pr_detail');
+                            for ($i=0; $i < count($input); $i++) {
+                                $data = $input[$i]; 
+                                $key = "UAP)(*";
+                                $data_arr = (array) $this->jwt->decode($data,$key);
+                                $PassNumber = $data_arr['PassNumber'];
+                                // proses upload file
+                                    if (array_key_exists('UploadFile'.$PassNumber, $_FILES)) {
+                                        // do upload file
+                                        $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$PassNumber);
+                                        $data_arr['UploadFile'] = json_encode($uploadFile); 
+                                    }
+
+                                    // exclude 
+                                        $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);
+                                        if (count($Combine) > 0) {
+                                            $data_arr['CombineStatus'] = 1;
+                                        }
+                                        unset($data_arr['FormInsertCombine']);
+                                        unset($data_arr['PassNumber']);
+
+                                    $data_arr['PRCode'] = $PRCode;    
+                                    $this->db->insert('db_budgeting.pr_detail',$data_arr);
+                                    // insert combine budgeting
+                                    $getID = $this->db->insert_id();
+                                    if (count($Combine) > 0) {
+                                        for ($j=0; $j <count($Combine) ; $j++) { 
+                                            $dataSave_combine = array(
+                                                'ID_pr_detail' => $getID,
+                                                'ID_budget_left' => $Combine[$j]['ID_budget_left'],
+                                                'Cost' => $Combine[$j]['Cost'],
+                                            );
+                                            $this->db->insert('db_budgeting.pr_detail_combined',$dataSave_combine);
+                                        }
+                                        
+                                    }
+                            }
+
+                            // Update to budget_left
+                                $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
+
+                            // insert to pr_circulation_sheet
+                                $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued & Edited');
+                        }
+                        else
+                        {
+                            //return FALSE;
+                            $PRCode = '';
+                        }
                     }
                     else
                     {
-                        //return FALSE;
-                        $PRCode = '';
+                        $BudgetChange = 1;
                     }
+                    
                 }
                 else
                 {
-                    $BudgetChange = 1;
+                    $St_error = 0;
+                    $msg = 'Limit : '.$Amount.' not set in RAD';
                 }
-                
-            }
-            else
-            {
-                $St_error = 0;
-                $msg = 'Limit : '.$Amount.' not set in RAD';
-            }
+        }
+        
         
         echo json_encode(array('PRCode' => $PRCode,'JsonStatus' => json_encode($JsonStatus),'St_error' => $St_error,'msg'=>$msg,'StatusPR' => $StatusPR,'BudgetChange' => $BudgetChange));
         

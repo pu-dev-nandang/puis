@@ -224,9 +224,9 @@
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Budget</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Detail</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
 			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
@@ -276,6 +276,9 @@
 		$(".SubTotal").maskMoney('mask', '9894');
 		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$(".UnitCost").maskMoney('mask', '9894');
+		$('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
 		__BudgetRemaining();
 
 		// Show Supporting_documents if exist
@@ -608,6 +611,42 @@
 			}
 			else if(pr_create[0].Status == 1)
 			{
+				var btn_edit = '';
+				var html = '';
+				// after submit dan sebelum approval bisa melakukan edit
+					var booledit = false;
+					var r_access = dt['access'];
+					var rule = dt['rule'];
+					for (var i = 0; i < r_access.length; i++) {
+						var ID_m_userrole = r_access[i].ID_m_userrole;
+						// search rule Entry = 1
+						for (var j = 0; j < rule.length; j++) {
+							var ID_m_userrole_ = rule[j].ID_m_userrole;
+							if (ID_m_userrole == ID_m_userrole_) {
+								var Entry = rule[j].Entry
+								if (Entry == 1) {
+									booledit = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (booledit) {
+						var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
+						var booledit2 = false;
+						for (var i = 1; i < JsonStatus.length; i++) {
+							if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+								booledit2 = true;
+								break;
+							}
+						}
+
+						if (!booledit2) {
+							btn_edit = '<button class = "btn btn-success" id = "SaveSubmit" prcode = "'+ClassDt.PRCodeVal+'" action = "1">Submit</button>&nbsp';
+						}
+					}
+
 				var JsonStatus = jQuery.parseJSON(pr_create[0].JsonStatus);
 				var bool = false;
 				var HierarkiApproval = 0; // for check hierarki approval;
@@ -644,13 +683,22 @@
 					}
 				}
 
+				html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+btn_edit;
+
 				if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
-					var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
-									'<button class = "btn btn-primary" id = "Approve" action = "approve" prcode = "'+ClassDt.PRCodeVal+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
+					html += '<button class = "btn btn-primary" id = "Approve" action = "approve" prcode = "'+ClassDt.PRCodeVal+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
 									'&nbsp'+
 									'<button class = "btn btn-inverse" id = "Reject" action = "reject" prcode = "'+ClassDt.PRCodeVal+'" approval_number = "'+NumberOfApproval+'">Reject</button>'+
-								'</div>';
-					$("#Page_Button").html(html);
+							'</div>';
+					
+				}
+
+				$("#Page_Button").html(html);
+
+				if (btn_edit != '') {
+					var row = $('#table_input_pr tbody tr:not(:last)');
+					row.find('td').find('input,select,button:not(.Detail),textarea').prop('disabled',false);
+					$('input,textarea').prop('disabled',false);
 				}
 
 			}
@@ -766,7 +814,9 @@
                 	action
                 '</tr>';
         $('#table_input_pr tbody').append(html);
-
+        $('.datetimepicker').datetimepicker({
+        	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+        });
         MakeAutoNumbering();        	
 	}
 
@@ -929,12 +979,21 @@
 			    'backdrop' : 'static'
 			});
 
+			var dtGetCatalogChoice = [];
+			$('.Item').each(function(){
+				if ($(this).val() != '') {
+					var id_m_catalog = $(this).attr('id_m_catalog');
+					dtGetCatalogChoice.push(id_m_catalog);
+				}
+			})
+
 			var url = base_url_js+'rest/Catalog/__Get_Item';
 			var data = {
 				action : 'choices',
 				auth : 's3Cr3T-G4N',
 				department : DivSession,
 				approval : 1,
+				dtGetCatalogChoice : dtGetCatalogChoice,
 			};
 		    var token = jwt_encode(data,"UAP)(*");
 			var table = $('#example_catalog').DataTable({
@@ -1002,6 +1061,40 @@
 			$('#GlobalModalLarge').modal('hide');
 		} );    	
 	})
+
+
+	$(document).off('change', '.BrowseFile').on('change', '.BrowseFile',function(e) {
+		var ev = $(this);
+		var td = $(this).closest('td');
+		var ul = td.find('.ulUpload');
+		if (ul.length) {
+			ul.remove();
+		}
+		var files = ev[0].files;
+		var htmlLi = '';
+		for(var count = 0; count<files.length; count++){
+			htmlLi += '<li>'+files[count].name+'</li>'
+		}
+		td.append('<ul class = "ulUpload">'+htmlLi+'</ul>');
+
+	})
+
+	$(document).off('change', '.BrowseFileSD').on('change', '.BrowseFileSD',function(e) {
+		var ev = $(this);
+		var td = $(this).closest('.col-md-6');
+		var ul = td.find('.ulUpload');
+		if (ul.length) {
+			ul.remove();
+		}
+		var files = ev[0].files;
+		var htmlLi = '';
+		for(var count = 0; count<files.length; count++){
+			htmlLi += '<li>'+files[count].name+'</li>'
+		}
+		td.append('<ul class = "ulUpload">'+htmlLi+'</ul>');
+	})
+	
+
 
 	$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
 		var data = $(this).attr('data');
@@ -1733,6 +1826,10 @@
 		       		var St_error = data['St_error'];
 		       		var msg = data['msg'];
 		       		if (St_error == 0) {
+		       			if (data['BudgetChange'] == 1) {
+		       				ClassDt.PRCodeVal = data['PRCode'];
+		       				LoadFirstLoad();
+		       			}
 		       			toastr.error(msg,'!!!Failed');
 		       		}
 		       		else
@@ -1887,15 +1984,19 @@
 				NIP : NIP,
 				action : 'approve',
 				auth : 's3Cr3T-G4N',
+				DtExisting : ClassDt.DtExisting,
 			}
 
 			var token = jwt_encode(data,"UAP)(*");
 			$.post(url,{ token:token },function (resultJson) {
-				if (resultJson == '') {
+				if (resultJson['Reload'] == 1) {
+					toastr.info(resultJson['msg']);
 					LoadFirstLoad();
 				}
 				else
 				{
+					LoadFirstLoad();
+					toastr.success('Approve Successful');
 					$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 				}
 			}).fail(function() {
@@ -1943,16 +2044,27 @@
 					action : 'reject',
 					auth : 's3Cr3T-G4N',
 					NoteDel : NoteDel,
+					DtExisting : ClassDt.DtExisting,
 				}
 
 				var token = jwt_encode(data,"UAP)(*");
 				$.post(url,{ token:token },function (resultJson) {
-					if (resultJson == '') {
+					// if (resultJson == '') {
+					// 	LoadFirstLoad();
+					// }
+					// else
+					// {
+					// 	// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					// }
+					if (resultJson['Reload'] == 1) {
+						toastr.info(resultJson['msg']);
 						LoadFirstLoad();
 					}
 					else
 					{
-						// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+						LoadFirstLoad();
+						toastr.success('Reject Successful');
+						$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 					}
 					$('#NotificationModal').modal('hide');
 				}).fail(function() {

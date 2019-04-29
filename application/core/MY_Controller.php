@@ -634,6 +634,20 @@ abstract class Purchasing_Controler extends Globalclass{
 
 }
 
+class Transaksi_Controler extends Purchasing_Controler{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function page_po($page)
+    {
+      $page['department'] = parent::__getDepartement();
+      $content = $this->load->view('page/'.$page['department'].'/transaksi/po/page',$page,true);
+      $this->temp($content);
+    }
+}
+
 
 abstract class It_Controler extends Globalclass{
 
