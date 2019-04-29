@@ -3539,9 +3539,23 @@ class C_api2 extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">
                                 <a href="javascript:void(0);" class="showStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" 
                                 data-token="'.$tokenStd.'">'.count($Student).'</a></div>';
+
+            $nestedData[] = '<div style="text-align:center;">
+                                    <div class="btn-group">
+                                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-edit"></i> <span class="caret"></span>
+                                      </button>
+                                      <ul class="dropdown-menu">
+                                        <li><a href="#">Attendance</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#">Syllabus & RPS</a></li>
+                                        <li><a href="#">Score</a></li>
+                                      </ul>
+                                    </div>
+                                </div>';
             $nestedData[] = '<div style="text-align:right;">'.$showUTS.''.$showUTS_RE.'</div>';
             $nestedData[] = '<div style="text-align:right;">'.$showUAS.''.$showUAS_RE.'</div>';
-            $nestedData[] = '<div style="text-align:center;"><button class="btn btn-default btn-sm"><i class="fa fa-edit"></i></button></div>';
+
 
 
             $data[] = $nestedData;

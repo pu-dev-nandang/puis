@@ -66,9 +66,9 @@
             '        <th style="width: 12%;">Schedule</th>' +
             '        <th style="width: 15%;">Lecturers</th>' +
             '        <th style="width: 5%;">Students</th>' +
+            '        <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
             '        <th style="width: 12%;">UTS</th>' +
             '        <th style="width: 12%;">UAS</th>' +
-            '        <th style="width: 5%;">Score</th>' +
             '    </tr>' +
             '    </thead>' +
             '</table>');
