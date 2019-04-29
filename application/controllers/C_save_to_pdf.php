@@ -5889,6 +5889,11 @@ Phone: (021) 29200456';
 
             $pdf->SetFont('Arial','',11);
             $y = $pdf->GetY()+20;
+
+
+            $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
+            $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
             $pdf->SetXY(130,$y+5);
@@ -5898,7 +5903,7 @@ Phone: (021) 29200456';
 //            $logo = file_get_contents('uploads/signature/2617100.svg');
 //            $pdf->MemImage($logo, 50, 30);
 //            print_r($logo);die();
-            $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+
 
             $pdf->SetXY(130,$y+30);
             $pdf->Cell(60,5,$NamePHR,0,1,'L');
@@ -5922,6 +5927,116 @@ Phone: (021) 29200456';
             echo 'data not yet';
         }
 
+
+
+
+    }
+
+    public function suratTugasKeluar(){
+
+
+        $bln = 2;
+        $thn = 2019;
+        $dataNum = 001;
+
+        $pdf = new FPDF('P','mm','A4');
+
+        $pdf->AddPage();
+        $pdf->SetAutoPageBreak(true, 0);
+
+        $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+
+        $pdf->Ln(30);
+        $pdf->SetFont('Arial','B',13);
+        $pdf->Cell(0,5,'SURAT TUGAS',0,1,'C');
+        $pdf->SetFont('Arial','',10);
+        $pdf->Ln(1);
+
+        $blnRomawi = $this->m_master->romawiNumber($bln);
+        $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/WR1/SKU/'.$blnRomawi.'/'.$thn,0,1,'C');
+
+        $h = 5;
+        $pdf->Ln(10);
+        $pdf->Cell(0,$h,'Plt Wakil Rektor Akademik Universitas Agung Podomoro : ',0,1,'L');
+
+
+        $pdf->Ln(3);
+
+        $pdf->Cell(30,$h,'Nama',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'Nandang Mulyadi',0,1,'L');
+
+        $pdf->Cell(30,$h,'NIP',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'2017090',0,1,'L');
+
+        $pdf->SetFont('Arial','B',11);
+        $pdf->Ln(3);
+        $pdf->Cell(0,$h,'Menugaskan Kepada : ',0,1,'C');
+        $pdf->Ln(3);
+
+        $pdf->SetFont('Arial','',10);
+        $pdf->Cell(30,$h,'Nama',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'Nandang Mulyadi',0,1,'L');
+
+        $pdf->Cell(30,$h,'NIP',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'2017090',0,1,'L');
+
+        $pdf->Ln(3);
+        $pdf->Cell(0,$h,'Untuk menghadiri Sosialisasi Calon Sertifikasi Dosen bagi dosen Perguruan Tinggi  pada :',0,1,'L');
+
+        $pdf->Ln(3);
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Hari',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'Rabu',0,1,'L');
+
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Tanggal',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'27 Maret 2019',0,1,'L');
+
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Waktu',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,'08.00 WIB sampai selesai ',0,1,'L');
+
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Tempat',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+
+        $pdf->MultiCell(145,5,'Hotel Bidakara Jakarta, Ruang Birawa, Jl. Jend. Gatot Subroto Kav. 71-73, Pancoran, RT.8/RW.8, Menteng Dalam, Tebet, Kota Jakarta Selatan, DKI Jakarta 12870');
+//        $pdf->Cell(145,$h,'Hotel Bidakara Jakarta, Ruang Birawa, Jl. Jend. Gatot Subroto Kav. 71-73, Pancoran, RT.8/RW.8, Menteng Dalam, Tebet, Kota Jakarta Selatan, DKI Jakarta 12870',0,1,'L');
+
+
+        $pdf->Ln(7);
+        $pdf->Cell(0,$h,'Demikian surat tugas ini diberikan untuk dapat dilaksanakan sebagaimana mestinya.',0,1,'L');
+
+
+        $pdf->Ln(11);
+        $w = 115;
+        $w2 = 75;
+        $pdf->Cell($w,$h,'',0,0,'L');
+        $pdf->Cell($w2,$h,'Jakarta, 20 Maret 2019',0,1,'L');
+
+        $pdf->Cell($w,$h,'',0,0,'L');
+        $pdf->Cell($w2,$h,'Plt. Wakil Rektor',0,1,'L');
+
+        $pdf->Cell($w,$h,'',0,0,'L');
+        $pdf->Cell($w2,$h,'Bid. Akademik',0,1,'L');
+
+        $pdf->Ln(17);
+
+        $pdf->Cell($w,$h,'',0,0,'L');
+        $pdf->Cell($w2,$h,'Dr. rer. nat. Maria Prihandrijanti, S.T ',0,1,'L');
+
+        $pdf->Cell($w,$h,'',0,0,'L');
+        $pdf->Cell($w2,$h,'NIP : 2617100 ',0,1,'L');
+
+
+        $pdf->Output('I','Tugas_Mengajar.pdf');
 
 
 
