@@ -5467,8 +5467,9 @@ Phone: (021) 29200456';
             // header
             $w_no = 8;
             $w_smt = 8;
-            $w_desc = 55;
-            $w_spec = 65;
+            $w_desc = 35;
+            $w_spec = 55;
+            $w_need = 30;
             $w_date_needed = 25;
             $w_pph = 25;
             $w_qty = 22;
@@ -5479,9 +5480,10 @@ Phone: (021) 29200456';
             $fpdf->SetXY($x,$y);
             $fpdf->SetFillColor(255, 255, 255);
              $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
-             $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
+             $fpdf->Cell($w_desc,$h,'Item',$border,0,'C',true);
              $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
-             $fpdf->Cell($w_date_needed,$h,'Need',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Date Need',$border,0,'C',true);
+             $fpdf->Cell($w_need,$h,'Description',$border,0,'C',true);
              $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
              $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
              $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
@@ -5491,9 +5493,9 @@ Phone: (021) 29200456';
               $no = 1;
               $fpdf->SetFont('Arial','',$FontIsian);
               $total = 0;
-              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pph,$w_pricest,$w_totalammount));
+              $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_need,$w_qty,$w_pph,$w_pricest,$w_totalammount));
               $fpdf->SetLineHeight(5);
-              $fpdf->SetAligns(array('C','L','L','C','C','C','C','C'));
+              $fpdf->SetAligns(array('C','L','L','C','L','C','C','C','C'));
              for ($i=0; $i < count($pr_detail); $i++) {
 
                 $DetailCatalog = (array) json_decode($pr_detail[$i]['DetailCatalog']);
@@ -5509,10 +5511,10 @@ Phone: (021) 29200456';
                 }
                 
                 
-                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
-                if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
-                    $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
-                }
+                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                // if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
+                //     $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
+                // }
                 
                 $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
                 $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
@@ -5521,6 +5523,7 @@ Phone: (021) 29200456';
                    $pr_detail[$i]['Item'],
                    $Spec,
                    $DateNeeded,
+                   $pr_detail[$i]['Need'],
                    $pr_detail[$i]['Qty'],
                    (int)$pr_detail[$i]['PPH'].'%',
                    $UnitCost,
@@ -5540,6 +5543,7 @@ Phone: (021) 29200456';
                  $fpdf->Cell($w_desc,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_spec,$h,'',$border,0,'L',true);
                  $fpdf->Cell($w_date_needed,$h,'',$border,0,'C',true);
+                 $fpdf->Cell($w_need,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_qty,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_pph,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_pricest,$h,'',$border,0,'C',true);
@@ -5553,7 +5557,7 @@ Phone: (021) 29200456';
              $totAfterPPN= 'Rp '.number_format($totAfterPPN,2,',','.');
              $total= 'Rp '.number_format($total,2,',','.');
              $fpdf->SetXY($x,$y);
-             $fpdf->Cell(($w_date_needed+$w_qty+$w_pricest),$h,'Total',$border,0,'C',true);
+             $fpdf->Cell(($w_date_needed+$w_need+$w_qty+$w_pricest),$h,'Total',$border,0,'C',true);
              $fpdf->Cell($w_totalammount,$h,$total,$border,1,'C',true);
              // total setelah ppn
              // $y += $h;

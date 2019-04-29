@@ -2024,104 +2024,151 @@ class C_rest extends CI_Controller {
     public function approve_pr()
     {
         $msg = '';
+        $Reload = 0;
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
+                $BoolReload = false;
                 $this->load->model('budgeting/m_budgeting');
                 $this->load->model('budgeting/m_pr_po');
                 $PRCode = $dataToken['PRCode'];
                 $approval_number = $dataToken['approval_number'];
                 $NIP = $dataToken['NIP'];
                 $action = $dataToken['action'];
+                // check data telah berubah atau tidak
+                   $DtExisting = $dataToken['DtExisting'];
+                   $dt_pr_create = (array) json_decode(json_encode($DtExisting->pr_create),true); 
+                   $dt_pr_detail = (array) json_decode(json_encode($DtExisting->pr_detail),true);
 
-                // get data
-                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
-                $keyJson = $approval_number - 1; // get array index json
-                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
-                // get data update to approval
-                $arr_upd = $JsonStatus[$keyJson];
-                // print_r($keyJson);die();
-                if ($arr_upd['NIP'] == $NIP) {
-                    $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
-                    $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
-                    $JsonStatus[$keyJson] = $arr_upd;
-                    $datasave = array(
-                        'JsonStatus' => json_encode($JsonStatus),
-                    );
-
-                    // check all status for update data
-                    $boolApprove = true;
-                    for ($i=0; $i < count($JsonStatus); $i++) { 
-                        $arr = $JsonStatus[$i];
-                        $Status = $arr['Status'];
-                        if ($Status == 2 || $Status == 0) {
-                            $boolApprove = false;
-                            break;
+                   // get data
+                   $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                   $G_data_detail = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+                   // print_r($dt_pr_detail);die();
+                   // Notes
+                        $NotesClient = $G_data[0]['Notes'];
+                        if ($dt_pr_create[0]['Notes'] != $NotesClient || $dt_pr_create[0]['Supporting_documents'] != $G_data[0]['Supporting_documents']) {
+                            $BoolReload = true;
                         }
-                    }
 
-                    if ($boolApprove) {
-                        $datasave['Status'] = 2;
-                        $datasave['PostingDate'] = date('Y-m-d H:i:s');
-                    }
-                    else
-                    {
-                        $boolReject = false;
+                    // pr_detail
+                        if (!$BoolReload) {
+                            for ($i=0; $i < count($dt_pr_detail); $i++) { 
+                                $ID_dt_pr_detail = $dt_pr_detail[$i]['ID'];
+                                $boolFindPrDetail = false;
+                                for ($j=0; $j < count($G_data_detail); $j++) { 
+                                    $ID_G_data_detail = $G_data_detail[$j]['ID'];
+                                    if ($ID_dt_pr_detail == $ID_G_data_detail) {
+                                        $boolFindPrDetail = true;
+                                        if ($dt_pr_detail[$i]['ID_budget_left'] != $G_data_detail[$j]['ID_budget_left'] || $dt_pr_detail[$i]['ID_m_catalog'] != $G_data_detail[$j]['ID_m_catalog'] ||  $dt_pr_detail[$i]['Spec_add'] !=  $G_data_detail[$j]['Spec_add'] || $dt_pr_detail[$i]['Need'] !=  $G_data_detail[$j]['Need'] || $dt_pr_detail[$i]['SubTotal'] !=  $G_data_detail[$j]['SubTotal'] || $dt_pr_detail[$i]['UploadFile'] !=  $G_data_detail[$j]['UploadFile'] ) {
+                                           $BoolReload = true;
+                                        }
+                                        break;
+                                    }
+                                }
+
+                                if (!$boolFindPrDetail) {
+                                    $BoolReload = true;
+                                }
+
+                                if ($BoolReload) {
+                                    break;
+                                }
+                            } 
+                        }
+                       
+                if (!$BoolReload) {
+                    $keyJson = $approval_number - 1; // get array index json
+                    $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+                    // get data update to approval
+                    $arr_upd = $JsonStatus[$keyJson];
+                    // print_r($keyJson);die();
+                    if ($arr_upd['NIP'] == $NIP) {
+                        $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                        $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                        $JsonStatus[$keyJson] = $arr_upd;
+                        $datasave = array(
+                            'JsonStatus' => json_encode($JsonStatus),
+                        );
+
+                        // check all status for update data
+                        $boolApprove = true;
                         for ($i=0; $i < count($JsonStatus); $i++) { 
                             $arr = $JsonStatus[$i];
                             $Status = $arr['Status'];
-                            if ($Status == 2) {
-                                $boolReject = true;
+                            if ($Status == 2 || $Status == 0) {
+                                $boolApprove = false;
                                 break;
                             }
                         }
 
-                        if ($boolReject) {
-                            $NoteDel = $dataToken['NoteDel'];
-                            $Notes = $G_data[0]['Notes']."\n".$NoteDel;
-                            $datasave['Status'] = 3;
-                            // $datasave['Notes'] = $Notes;
+                        if ($boolApprove) {
+                            $datasave['Status'] = 2;
+                            $datasave['PostingDate'] = date('Y-m-d H:i:s');
                         }
+                        else
+                        {
+                            $boolReject = false;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2) {
+                                    $boolReject = true;
+                                    break;
+                                }
+                            }
+
+                            if ($boolReject) {
+                                $NoteDel = $dataToken['NoteDel'];
+                                $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                $datasave['Status'] = 3;
+                                // $datasave['Notes'] = $Notes;
+                            }
+                        }
+
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$datasave);
+
+                        // insert to pr_circulation_sheet
+                            $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                            if (array_key_exists('Status', $datasave)) {
+                                if ($datasave['Status'] == 2) {
+                                    $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                                    // save to db_purchasing pr_status
+                                    $dataSave = array(
+                                        'PRCode' => $PRCode,
+                                        'Item_proc' => 0,
+                                        'Item_done' => 0,
+                                        'Item_pending' => count($this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode)),
+                                        'Status' => 0,
+                                    );
+
+                                    $this->db->insert('db_purchasing.pr_status',$dataSave);
+
+                                }
+                            }
+
+                            if ($arr_upd['Status'] == 2) {
+                                if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                    $Desc .= '<br>{<br>'.$dataToken['NoteDel'].'<br>}';
+                                }
+                            }
+                            
+                            $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
                     }
-
-                    $this->db->where('PRCode',$PRCode);
-                    $this->db->update('db_budgeting.pr_create',$datasave);
-
-                    // insert to pr_circulation_sheet
-                        $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
-                        if (array_key_exists('Status', $datasave)) {
-                            if ($datasave['Status'] == 2) {
-                                $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
-                                // save to db_purchasing pr_status
-                                $dataSave = array(
-                                    'PRCode' => $PRCode,
-                                    'Item_proc' => 0,
-                                    'Item_done' => 0,
-                                    'Item_pending' => count($this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode)),
-                                    'Status' => 0,
-                                );
-
-                                $this->db->insert('db_purchasing.pr_status',$dataSave);
-
-                            }
-                        }
-
-                        if ($arr_upd['Status'] == 2) {
-                            if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
-                                $Desc .= '<br>{<br>'.$dataToken['NoteDel'].'<br>}';
-                            }
-                        }
-                        
-                        $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
-
+                    else
+                    {
+                        $msg = 'Not Authorize';
+                    }
                 }
-                else
-                {
-                    $msg = 'Not Authorize';
-                }
+                else{
+                    $Reload = 1;
+                    $msg = 'The data has been approve and will do to reload and resubmit';
+                }          
 
-                echo json_encode($msg);    
+                // echo json_encode($msg);
+                echo json_encode(array('Reload' => $Reload,'msg' => $msg));    
             }
             else
             {

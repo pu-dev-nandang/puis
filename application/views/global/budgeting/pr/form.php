@@ -224,9 +224,9 @@
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Budget</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Detail</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Need</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
 			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
@@ -1984,15 +1984,19 @@
 				NIP : NIP,
 				action : 'approve',
 				auth : 's3Cr3T-G4N',
+				DtExisting : ClassDt.DtExisting,
 			}
 
 			var token = jwt_encode(data,"UAP)(*");
 			$.post(url,{ token:token },function (resultJson) {
-				if (resultJson == '') {
+				if (resultJson['Reload'] == 1) {
+					toastr.info(resultJson['msg']);
 					LoadFirstLoad();
 				}
 				else
 				{
+					LoadFirstLoad();
+					toastr.success('Approve Successful');
 					$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 				}
 			}).fail(function() {
@@ -2040,16 +2044,27 @@
 					action : 'reject',
 					auth : 's3Cr3T-G4N',
 					NoteDel : NoteDel,
+					DtExisting : ClassDt.DtExisting,
 				}
 
 				var token = jwt_encode(data,"UAP)(*");
 				$.post(url,{ token:token },function (resultJson) {
-					if (resultJson == '') {
+					// if (resultJson == '') {
+					// 	LoadFirstLoad();
+					// }
+					// else
+					// {
+					// 	// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					// }
+					if (resultJson['Reload'] == 1) {
+						toastr.info(resultJson['msg']);
 						LoadFirstLoad();
 					}
 					else
 					{
-						// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+						LoadFirstLoad();
+						toastr.success('Reject Successful');
+						$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 					}
 					$('#NotificationModal').modal('hide');
 				}).fail(function() {
