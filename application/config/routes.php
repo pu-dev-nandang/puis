@@ -356,9 +356,6 @@ $route['admission/master-registration/jpok/table_jpok'] = 'page/admission/c_mast
 $route['admission/master-registration/modalform_jpok'] = 'page/admission/c_master/modalform_jpok';
 $route['admission/master-registration/submit_jpok'] = 'page/admission/c_master/submit_jpok';
 
-
-
-
 $route['admission/master/sales-koordinator-wilayah'] = 'page/admission/c_master/sales_koordinator_wilayah_page'; // db menu
 $route['admission/master-registration/modalform_sales_koordinator'] = 'page/admission/c_master/sales_koordinator_wilayah_modal_form';
 $route['admission/master-registration/modalform_sales_koordinator/save'] = 'page/admission/c_master/modalform_sales_koordinator_save';
@@ -378,7 +375,11 @@ $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
 $route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
 $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
+//Surat Tugas Keluar 
+$route['suratKeluar'] = 'api/c_global/suratKeluar';
+$route['requestsurat'] = 'api/c_global/getlistrequestdoc';
 
+$route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
 
 
 $route['admission/master-registration/biaya-kuliah'] = 'page/admission/c_master/biaya_kuliah';
@@ -712,7 +713,6 @@ $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
-$route['api/__getreqLecturer'] = 'api/c_api/getrequestLecturer';
 
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
@@ -937,6 +937,7 @@ $route['api/__dropdownlistmodule'] = 'api/c_api/dropdownlistmodule';
 $route['api/__getpicversion'] = 'api/c_api/getversionpic';
 $route['api/__dropdowneditgroupmod'] = 'api/c_api/dropeditgroupmodule';
 $route['api/__dropeditmodule'] = 'api/c_api/dropeditmodule';
+$route['api/__getloadtypedocument'] = 'api/c_api/getdocumenttype';
 
 
 $route['api/__crudKRSOnline'] = 'api/c_api/crudKRSOnline';
@@ -1123,13 +1124,17 @@ $route['api/vreservation/detailroom'] = 'api/c_global/detailroom';
 $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
-// Request Document
+// Request Document | Bismar
 $route['requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument/';
+$route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
 
+$route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
+$route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
+$route['api/__confirmrequest'] = 'api/c_api/confirm_requestdocument'; 
 
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
