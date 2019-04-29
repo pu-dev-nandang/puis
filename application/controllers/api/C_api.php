@@ -163,72 +163,62 @@ class C_api extends CI_Controller {
     }
 
 
-    public function getrequestLecturer(){
+    public function getreqdocument(){
         $requestData= $_REQUEST;
 
         $SemesterID = $this->input->get('s');
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+                FROM db_employees.request_document AS a
+                LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
+                LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                WHERE b.RequestDocument = 1 ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
+                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    WHERE b.RequestDocument = 1  AND ( ';
 
-            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ') ORDER BY em.PositionMain, NIP ASC';
+            $sql.= ' a.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
+            //$sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY a.IDRequest DESC ';
 
         }
         else {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
-            $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
+                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    WHERE b.RequestDocument = 1 ';
+            $sql.= 'ORDER BY a.IDRequest DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
 
         $query = $this->db->query($sql)->result_array();
+        $no = $requestData['start']+1;
 
         $data = array();
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
+            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
 
-            $jb = explode('.',$row["PositionMain"]);
-            $Division = '';
-            $Position = '';
-
-            if(count($jb)>1){
-                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
-                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
-                $Division = $dataDivision['Division'];
-                $Position = $dataPosition['Position'];
-            }
-            $imgEmp = url_img_employees.''.$row["Photo"];
-
-            $dataToken = array(
-                'SemesterID' => $SemesterID,
-                'NIP' => $row["NIP"]
-            );
-
-            $tokenPrint = $this->jwt->encode($dataToken,'UAP)(*');
-
-            $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
-            $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
-            $nestedData[] = $row["NIP"];
-            $nestedData[] = $row["NIDN"];
-            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
-            $nestedData[] = $Division.' - '.$Position;
-            $nestedData[] = $row["ProdiNameEng"];
-            $nestedData[] = '<a href="'.base_url('save2pdf/suratMengajar/'.$tokenPrint).'" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-download"></i> Download</a>';
-            //$nestedData[] = '<a href="http://pcam.podomorouniversity.ac.id/save2pdf/suratMengajar/'.$tokenPrint.'" target="_blank" class="btn btn-sm btn-primary "><i class="fa fa-download"></i> Download</a>';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = $row["NIP"].' - '.$row["Name"];
+            $nestedData[] = $row["NameFiles"];
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['RequestDate'])).'</div>';
+            $nestedData[] = $row["ForTask"] ;
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';;
+            $nestedData[] = $row["DescriptionAddress"];
+            $nestedData[] = '<center><div class="btn-group">
+              <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> 
+              <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
 
             $data[] = $nestedData;
+            $no++;
         }
 
         $json_data = array(
@@ -797,6 +787,14 @@ class C_api extends CI_Controller {
         echo json_encode($generate);
     }
 
+    public function getdocumenttype()
+    {
+        $generate = $this->db->query('SELECT * FROM db_employees.master_files WHERE RequestDocument = 1')->result_array();
+        echo json_encode($generate);
+    }
+
+
+
     public function getstatusversion()
     {
         $generate = $this->db->query('SELECT ID, Division FROM db_employees.division ORDER BY division ASC ')->result_array();
@@ -853,7 +851,7 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        if($data_arr['action']=='deleteversion'){ //delete version data
+        if($data_arr['action']=='deleteversion'){ //delete version data 
             $versionid = $data_arr['versionid'];
             //$dataCek = $this->m_api->deletelistversion($versionid);
             $this->db->where('IDVersion', $versionid); 
@@ -5615,6 +5613,45 @@ class C_api extends CI_Controller {
 
      }
 
+     public function confirm_requestdocument(){
+
+        $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
+
+        if($data_arr['action']=='Approved'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $requestID = $formInsert['requestID'];
+                $status = '1';
+                $dates = date("Y-m-d H:i:s");
+
+                $dataSave = array(
+                        'ConfirmStatus' => $status,
+                        'DateConfirm' => $dates,
+                        'UserConfirm' => $IDuser
+                );
+                $this->db->where('IDRequest', $requestID);
+                $this->db->update('db_employees.request_document',$dataSave);
+                return print_r(1);
+        }
+        if($data_arr['action']=='Rejected'){
+                $formInsert = (array) $data_arr['formInsert'];
+                $requestID = $formInsert['requestID'];
+                $status = '-1';
+                $dates = date("Y-m-d H:i:s");
+
+                $dataSave = array(
+                        'ConfirmStatus' => $status,
+                        'DateConfirm' => $dates,
+                        'UserConfirm' => $IDuser
+                );
+                $this->db->where('IDRequest', $requestID);
+                $this->db->update('db_employees.request_document',$dataSave1);
+                return print_r(1);
+        }
+
+
+     }
+
 
     public function crudversion(){
 
@@ -6443,6 +6480,13 @@ class C_api extends CI_Controller {
             }
         }
     }
+
+    public function getdatarequestdocument(){
+        $NIP = $this->session->userdata('NIP');
+        $viewfiles = $this->m_api->views_datarequestdoc($NIP);
+        echo json_encode($viewfiles);     
+
+     }
 
     public function getAgama()
     {

@@ -758,6 +758,19 @@ class M_api extends CI_Model {
 
     }
 
+    public function views_datarequestdoc($NIP) {
+        $sql = "SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
+                    WHERE a.NIP = '".$NIP."' AND a.Active = 1 AND b.RequestDocument = 1
+                    ORDER BY a.IDRequest DESC";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+    }
+
      // ====== Get Academic Employee =======
 
     public function views_academic($NIP) {
@@ -836,8 +849,11 @@ class M_api extends CI_Model {
 
     public function deletelistversion($versionid){
 
-        $sql = "UPDATE db_it.version SET Active='0' WHERE IDVersion = '".$versionid."' ";
-        $query=$this->db->query($sql);
+        $this->db->where('IDVersion', $versionid); 
+        $this->db->delete('db_it.module'); 
+
+        //$sql = "UPDATE db_it.version SET Active='0' WHERE IDVersion = '".$versionid."' ";
+        //$query=$this->db->query($sql);
 
      }
 

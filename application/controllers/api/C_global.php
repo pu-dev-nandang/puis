@@ -348,6 +348,8 @@ class C_global extends CI_Controller {
         
     }
 
+
+
     public function testInject5()
     {
         //Load Composer's autoloader
@@ -1585,6 +1587,40 @@ class C_global extends CI_Controller {
 //        exit;
         $this->load->view('global/academic/exam');
     }
+
+     public function suratKeluar(){
+
+        $token = '488a476ba583155fd274ffad3ae741408d357054';
+
+        $dataEmployees = $this->db->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
+            'Password' => $token
+        ))->result_array();
+
+
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['dataEmp'] = $dataEmployees;
+        $this->load->view('global/form/formTugasKeluar',$data);
+    }
+
+
+    public function menu_request($page){
+        $data['page'] = $page;
+        $content = $this->load->view('page/rektorat/menu_rektorat',$data,true);
+        //$this->temp($content);
+    }
+
+
+     public function getlistrequestdoc(){
+
+        $page = $this->load->view('page/rektorat/listrek_requestdoc','',true);
+        $this->menu_request($page);
+
+     }
+
+
+     
+
+    
 
 
 }
