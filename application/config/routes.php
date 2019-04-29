@@ -654,6 +654,7 @@ $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 
 $route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
 $route['save2pdf/suratMengajar/(:any)'] =  'c_save_to_pdf/suratMengajar/$1';
+$route['save2pdf/suratTugasKeluar'] =  'c_save_to_pdf/suratTugasKeluar';
 
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 
