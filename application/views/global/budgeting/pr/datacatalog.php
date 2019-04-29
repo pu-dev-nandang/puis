@@ -30,7 +30,7 @@
 
 	          	var url = base_url_js+'rest/Catalog/__Get_Item';
 	          	var data = {
-	          		action : 'choices',
+	          		action : 'forUser',
 	          		auth : 's3Cr3T-G4N',
 	          		department : sessIDDepartementPUBudget,
 	          	};

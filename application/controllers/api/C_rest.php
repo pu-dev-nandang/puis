@@ -1406,6 +1406,14 @@ class C_rest extends CI_Controller {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
+                if ($dataToken['action'] == 'forUser') {
+                    $Q_active = 'a.Active like "%%"';
+                }
+                else
+                {
+                    $Q_active = 'a.Active = 1';
+                }
+
                 $condition = ($dataToken['department'] == 'all') ? '' : ' and a.Departement = "'.$dataToken['department'].'"';
                 $add_approval = '';    
                 if (array_key_exists('approval', $dataToken)) {
@@ -1419,6 +1427,7 @@ class C_rest extends CI_Controller {
                        $condition .= ' and a.ID NOT IN ('.$implode.')';
                    }
                 }
+
                 $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
                         from db_purchasing.m_catalog as a 
                         join db_employees.employees as b on a.CreatedBy = b.NIP
@@ -1431,7 +1440,7 @@ class C_rest extends CI_Controller {
                         ) as c on a.Departement = c.ID
                        ';
 
-                $sql.= ' where a.Active = 1 '.$condition.$add_approval;
+                $sql.= ' where '.$Q_active.' '.$condition.$add_approval;
                 $query = $this->db->query($sql)->result_array();
                 $data = array();
                     for ($i=0; $i < count($query); $i++) { 
