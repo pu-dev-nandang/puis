@@ -289,11 +289,10 @@
 <!-- JWT Decode -->
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/');?>jwt/decode/build/jwt-decode.min.js"></script>
 
-<!--<script type="text/javascript" src="--><?php //echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?><!--"></script>-->
+<!-- <script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script> -->
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
-
+<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script> 
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js');?>"></script>
 
 <!-- Countdown -->
@@ -1495,5 +1494,4 @@
         var elmChild = $(classHeader).children(findTag)[indexAct];
         $(classHeader).find(elmChild).addClass(classActiveName);
     }
-
 </script>

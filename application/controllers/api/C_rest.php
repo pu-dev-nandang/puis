@@ -1411,6 +1411,14 @@ class C_rest extends CI_Controller {
                 if (array_key_exists('approval', $dataToken)) {
                     $add_approval = ' and a.Approval ='.$dataToken['approval']; 
                 }
+
+                if (array_key_exists('dtGetCatalogChoice', $dataToken)) {
+                   $dtGetCatalogChoice = (array) json_decode(json_encode($dataToken['dtGetCatalogChoice']),true);
+                   if (count($dtGetCatalogChoice) > 0) {
+                        $implode = implode(',', $dtGetCatalogChoice);
+                       $condition .= ' and a.ID NOT IN ('.$implode.')';
+                   }
+                }
                 $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
                         from db_purchasing.m_catalog as a 
                         join db_employees.employees as b on a.CreatedBy = b.NIP

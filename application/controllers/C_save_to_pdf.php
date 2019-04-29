@@ -5440,7 +5440,7 @@ Phone: (021) 29200456';
           // print_r($pr_detail);die();
           $arr_postName = [];
           for ($i=0; $i < count($pr_detail); $i++) { 
-                $PostName = $pr_detail[$i]['PostName'].'['.$pr_detail[$i]['NameDepartement'].']';
+                $PostName = $pr_detail[$i]['NameHeadAccount'].'['.$pr_detail[$i]['NameDepartement'].']';
                 $bool = true;
                 for ($j=0; $j < count($arr_postName); $j++) { 
                     if ($PostName == $arr_postName[$j]) {
@@ -5481,7 +5481,7 @@ Phone: (021) 29200456';
              $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
              $fpdf->Cell($w_desc,$h,'Description',$border,0,'C',true);
              $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
-             $fpdf->Cell($w_date_needed,$h,'Date Need',$border,0,'C',true);
+             $fpdf->Cell($w_date_needed,$h,'Need',$border,0,'C',true);
              $fpdf->Cell($w_qty,$h,'Quantity',$border,0,'C',true);
              $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
              $fpdf->Cell($w_pricest,$h,'Price Estimated',$border,0,'C',true);
@@ -5505,11 +5505,11 @@ Phone: (021) 29200456';
 
                 $Spec = implode(',', $arr);
                 if ($pr_detail[$i]['Spec_add'] != '' || $pr_detail[$i]['Spec_add'] != null) {
-                   $Spec = $pr_detail[$i]['Spec_add']."\n".implode(',', $arr);
+                   $Spec = implode(',', $arr)."\n".$pr_detail[$i]['Spec_add'];
                 }
                 
                 
-                $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
+                $DateNeeded = 'Date : '.date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
                 if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
                     $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
                 }

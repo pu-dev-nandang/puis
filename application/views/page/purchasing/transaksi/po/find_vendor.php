@@ -20,6 +20,7 @@
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
 					 '<div class col-md-12>'+
+					 	'<div class = "table-responsive">'+
 					 	'<table class="table table-bordered datatable2" id = "tableData_pr">'+
 					 		'<thead>'+
 					 			'<tr>'+
@@ -30,6 +31,7 @@
 					 		'<thead>'+
 					 		'<tbody id="dataRow"></tbody>'+
 		        		'</table>'+
+		        		'</div>'+
 		        	 '</div>'+
 		        	'</div>';
 

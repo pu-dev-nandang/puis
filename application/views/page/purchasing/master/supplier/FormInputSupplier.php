@@ -107,9 +107,15 @@
                         <option></option>
                     </select>
 				</div>
-				<div class="col-xs-2">
-				    <button class="btn btn-default btn-default-success btnAddCollapseCategory" type="button" data-toggle="collapse" data-target="#addCategory" aria-expanded="false" aria-controls="addCategory">
+				<div class="col-xs-6">
+				    <button class="btn btn-default btn-default-success btnAddCollapseCategory btn-custom" type="button">
 				        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+				    </button>
+				    <button class="btn btn-default btn-default-primary btnEditCollapseCategory btn-custom" type="button">
+				        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+				    </button>
+				    <button class="btn btn-default btn-default-warning btnDeleteCategory btn-custom" type="button">
+				        <i class="fa fa-trash" aria-hidden="true"></i>
 				    </button>
 				</div>
 			</div>
@@ -243,26 +249,112 @@
 		loadSelectCategory();
 		// save categoryName
 		$("#btnAddCategoryName").click(function(){
-			loading_button('#btnAddCategoryName');
 			var url = base_url_js+'purchasing/page/supplier/saveCategoryFormInput';
 			var CategoryName = $("#CategoryName").val();
-			var data = {
-			            CategoryName : CategoryName,
-			            };
-			var token = jwt_encode(data,"UAP)(*");          
-			$.post(url,{token:token},function (data_json) {
-			    // jsonData = data_json;
-			    // var obj = JSON.parse(data_json); 
-			    // console.log(obj);
-			}).done(function() {
-			   $(".btnAddCollapseCategory").click();
-			   loadSelectCategory();
-			   $('#CategoryName').val('');
-			}).fail(function() {
-			  toastr.error('The Database connection error, please try again', 'Failed!!');
-			}).always(function() {
-			 $('#btnAddCategoryName').prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i>');
-			});
+			var id_data = $('#CategoryName').attr('id_data');
+			var action = $(this).attr('action');
+			if (CategoryName == '' || CategoryName == null) {
+				toastr.error('Category is Required','!!!Failed');
+			}
+			else
+			{
+				loading_button('#btnAddCategoryName');
+				var data = {
+				            CategoryName : CategoryName,
+				            action : action,
+				            id_data : id_data,
+				            };
+				var token = jwt_encode(data,"UAP)(*");          
+				$.post(url,{token:token},function (data_json) {
+				    // jsonData = data_json;
+				    // var obj = JSON.parse(data_json); 
+				    // console.log(obj);
+				}).done(function() {
+				   $(".btnAddCollapseCategory").click();
+				   loadSelectCategory();
+				   $('#CategoryName').val('');
+				}).fail(function() {
+				  toastr.error('The Database connection error, please try again', '!!!Failed');
+				}).always(function() {
+				 $('#btnAddCategoryName').prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i>');
+				});
+			}
+		})
+
+		$('.btnDeleteCategory').click(function(){
+			var ID = $('#CategorySupplier option:selected').val();
+			if (confirm('Are you sure ?')) {
+				loading_button('.btnDeleteCategory');
+				var url = base_url_js+'purchasing/page/supplier/saveCategoryFormInput';
+				var data = {
+				            action : 'delete',
+				            id_data : ID,
+				            CategoryName : '',
+				            };
+				var token = jwt_encode(data,"UAP)(*");          
+				$.post(url,{token:token},function (data_json) {
+				    // jsonData = data_json;
+				    // var obj = JSON.parse(data_json); 
+				    // console.log(obj);
+				}).done(function(data_json) {
+					var obj = JSON.parse(data_json);
+					if (obj == 0) {
+						toastr.error('The data has been used for transaction, Cannot be action','!!!Failed');
+					}
+					else
+					{
+						loadSelectCategory();
+					}
+				   
+				}).fail(function() {
+				  toastr.error('The Database connection error, please try again', '!!!Failed');
+				}).always(function() {
+				 $('.btnDeleteCategory').prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i>');
+				});
+			}
+		})
+
+		$('.btnAddCollapseCategory').click(function(){
+			var t = $('#addCategory').attr('class');
+			if (t == 'collapse') {
+				$('#btnAddCategoryName').attr('action','add');
+				$('#CategoryName').val('');
+				$('#addCategory').attr('class','in');
+				$('#addCategory').attr('style','margin-top: 10px; height: auto;');
+			}
+			else
+			{
+				$('#addCategory').attr('class','collapse');
+				$('#addCategory').attr('style','margin-top: 10px; height: 0px;');
+			}
+
+		})
+
+		$(".btnEditCollapseCategory").click(function(){
+			var t = $('#addCategory').attr('class');
+			if (t == 'collapse') {
+				var ID = $('#CategorySupplier option:selected').val();
+				var Value = $('#CategorySupplier option:selected').text();
+				$('#CategoryName').attr('id_data',ID);
+				$('#CategoryName').val(Value);
+				$('#btnAddCategoryName').attr('action','edit');
+				$('#addCategory').attr('class','in');
+				$('#addCategory').attr('style','margin-top: 10px; height: auto;');
+			}
+			else
+			{
+				$('#addCategory').attr('class','collapse');
+				$('#addCategory').attr('style','margin-top: 10px; height: 0px;');
+			}
+		})
+
+		$("#CategorySupplier").change(function(){
+			var t = $('#addCategory').attr('class');
+			if (t == 'in') {
+				$('#addCategory').attr('class','collapse');
+				$('#addCategory').attr('style','margin-top: 10px; height: 0px;');
+				$('#CategoryName').val('');
+			}
 		})
 
 		$("#NamaSupplier").keyup(function(){
@@ -438,7 +530,7 @@
 				    }).done(function() {
 				      // loadTable();
 				    }).fail(function() {
-				      toastr.error('The Database connection error, please try again', 'Failed!!');
+				      toastr.error('The Database connection error, please try again', '!!!Failed');
 				    }).always(function() {
 				     $('#btnSaveForm').prop('disabled',false).html('Save');
 
@@ -476,7 +568,7 @@
 
 	  }
 	  if (toatString != "") {
-	    toastr.error(toatString, 'Failed!!');
+	    toastr.error(toatString, '!!!Failed');
 	    return false;
 	  }
 
