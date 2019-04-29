@@ -921,8 +921,8 @@
                 var textRoom = $('#formExcClassroom option:selected').text();
                 var RoomName = textRoom.split('|');
                 var data2 = {
-                    Start : formExcDate+' '+formExcStart,
-                    End : formExcDate+' '+formExcEnd,
+                    Start : formExcDate+' '+formExcStart+':00',
+                    End : formExcDate+' '+formExcEnd+':00',
                     RoomName : RoomName[0].trim()
                 };
                 var token2 = jwt_encode(data2,"UAP)(*");

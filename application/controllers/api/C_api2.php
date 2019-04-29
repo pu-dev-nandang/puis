@@ -3227,6 +3227,103 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='loadDocumentSA'){
+
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+
+            $dataDock = $this->db->get_where('db_academic.sa_schedule',array(
+                'ID' => $ScheduleIDSA
+            ))->result_array();
+
+            return print_r(json_encode($dataDock));
+
+        }
+
+        else if($data_arr['action']=='loadDocumentSA_Score'){
+
+
+
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+
+            $dataDock = $this->db->get_where('db_academic.sa_schedule',array(
+                'ID' => $ScheduleIDSA
+            ))->result_array();
+
+
+            if(count($dataDock)>0){
+                $Student = [];
+                $dataCD = $this->db->query('SELECT * FROM db_academic.sa_schedule_course ssc 
+                                                     WHERE ssc.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
+                if(count($dataCD)>0){
+                    foreach ($dataCD AS $item){
+                        $dataStd = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.NPM, ats.Name, ssd.Evaluasi, ssd.UTS, ssd.UAS, ssd.ScoreNew, ssd.GradeNew, ssd.GradeValueNew
+                                                               FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
+                                                              LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
+                                                              WHERE ssd.CDID = "'.$item['CDID'].'" AND ssd.Status = "3" AND p1.Status = "1" AND p2.Status = "1"
+                                                              ORDER BY ssd.NPM ASC')->result_array();
+
+                        if(count($dataStd)>0){
+                            foreach ($dataStd AS $itm){
+                                array_push($Student,$itm);
+                            }
+                        }
+                    }
+
+                }
+
+                $dataDock[0]['Students'] = $Student;
+
+                // Get Setting
+                $SASemesterID = $data_arr['SASemesterID'];
+                $dataAY = $this->db->get_where('db_academic.sa_academic_years',array(
+                    'ID' => $SASemesterID
+                ))->result_array();
+
+                $dateNow = $this->m_rest->getDateNow();
+
+                // Cek date UTS
+                $dataDock[0]['A_Evaluasi'] = ($dataAY[0]['MaxInputTugas'] >= $dateNow) ? 1 : 0;
+                $dataDock[0]['A_UTS'] = ($dataAY[0]['StartInputUTS'] <= $dateNow && $dataAY[0]['EndInputUTS'] >= $dateNow) ? 1 : 0;
+                $dataDock[0]['A_UAS'] = ($dataAY[0]['StartInputUAS'] <= $dateNow && $dataAY[0]['EndInputUAS'] >= $dateNow) ? 1 : 0;
+
+
+
+            }
+
+            return print_r(json_encode($dataDock));
+
+        }
+
+        else if($data_arr['action']=='updateWeightages'){
+
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+            $dataUpdt = (array) $data_arr['dataUpdt'];
+
+            $this->db->where('ID', $ScheduleIDSA);
+            $this->db->update('db_academic.sa_schedule',$dataUpdt);
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='updateScoreSA'){
+
+            $dataStd = (array) $data_arr['dataStd'];
+
+            for($i=0;$i<count($dataStd);$i++){
+                $d = (array) $dataStd[$i];
+                $IDSSD = $d['IDSSD'];
+                $Update = (array) $d['Update'];
+
+                $this->db->where('ID', $IDSSD);
+                $this->db->update('db_academic.sa_student_details',$Update);
+            }
+
+            return print_r(1);
+
+
+        }
+
     }
 
     function createTagihanSemesterAntara($IDSAStudent){
