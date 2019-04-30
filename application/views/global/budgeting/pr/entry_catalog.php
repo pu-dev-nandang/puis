@@ -109,6 +109,11 @@
 			$("#Desc").val("<?php echo $get[0]['Desc'] ?>");
 			$("#ItemName").val("<?php echo $get[0]['Item'] ?>");
 
+			<?php if ($arr_lock > 0): ?>
+				$("#Desc").prop('disabled',true);
+				$("#ItemName").prop('disabled',true);
+			<?php endif ?>
+
 			var ShowPhoto = "<?php echo $get[0]['Photo'] ?>";
 			var temp = '';
 			if(ShowPhoto != '')
