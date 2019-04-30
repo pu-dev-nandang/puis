@@ -53,8 +53,19 @@
 	          	      	'targets': 6,
 	          	      	'className': 'dt-body-center',
 	          	      	'render': function (data, type, full, meta){
-	          	      		 // console.log(full);
-	          	      		 var status = (full[8]== 1) ? 'Approve' : 'Not Approve';
+	          	      		 var btn = '';
+	          	      		 var status = '';
+	          	      		 if (full[8]== 1 || full[8]== 0) {
+	          	      		 	btn = '';
+	          	      		 	status = (full[8]== 1) ? 'Approve' : 'Not Approve';
+	          	      		 }
+	          	      		 else{
+	          	      		 	status = 'Reject';
+	          	      		 	btn = '<br><br><button type="button" class="btn btn-default btn-edit btn-reason" reason= "'+full[9]+'"> Reason</button>';
+	          	      		 }
+	          	      		
+	          	      		status = status+btn
+
 	          	      	    return status;
 	          	      	    // return no;
 	          	      	}
@@ -101,6 +112,19 @@
 			    },1000);
 			    
 			}); // exit spost
+		});
+
+		$('#example22 tbody').on('click', '.btn-reason', function () {
+			var Reason = $(this).attr('reason');
+			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+			    '';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Reason'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(Reason);
+			$('#GlobalModalLarge .modal-footer').html(footer);
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
 		});
 
 		$('#example22 tbody').on('click', '.btn-delete-catalog', function () {

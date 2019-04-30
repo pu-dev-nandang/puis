@@ -474,6 +474,12 @@ class C_master extends Purchasing_Controler {
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
             $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
+            $d = $this->data['get'];
+            $CodeSupplier = $d[0]['CodeSupplier'];
+            // lock beberapa field untuk tidak bisa diedit
+                $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+                $query=$this->db->query($sql, array($CodeSupplier))->result_array();
+                $this->data['arr_lock'] = count($query); 
         }
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/supplier/FormInputSupplier',$this->data,true);
@@ -559,7 +565,7 @@ class C_master extends Purchasing_Controler {
                 $this->db->where('ID', $ID);
                 $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
-            case 'delete':
+            case 'status':
                 $dataSave = array(
                     'Active' => 0,
                     'LastUpdateBy' => $this->session->userdata('NIP'),
@@ -568,6 +574,20 @@ class C_master extends Purchasing_Controler {
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
+            case 'delete':
+                $G_data = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
+                $CodeSupplier = $G_data[0]['CodeSupplier'];
+                $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+                $query=$this->db->query($sql, array($CodeSupplier))->result_array();
+                if (count($query) == 0) {
+                  $this->db->where('ID', $Input['ID']);
+                  $this->db->delete('db_purchasing.m_supplier');
+                }
+                else
+                {
+                  $msg = 'The data has been used for transaction, Cannot be action';
+                }
+                break;    
             case 'approve':
                 $dataSave = array(
                     'Approval' => 1,

@@ -244,6 +244,11 @@
 					})	
 				}
 			<?php endif ?>
+
+			<?php if ($arr_lock > 0): ?>
+				$('#CodeSupplier,#NamaSupplier').prop('disabled',true);
+			<?php endif ?>
+
 		<?php endif ?>
 
 		loadSelectCategory();
@@ -309,7 +314,7 @@
 				}).fail(function() {
 				  toastr.error('The Database connection error, please try again', '!!!Failed');
 				}).always(function() {
-				 $('.btnDeleteCategory').prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i>');
+				 $('.btnDeleteCategory').prop('disabled',false).html('<i class="fa fa-trash" aria-hidden="true"></i>');
 				});
 			}
 		})

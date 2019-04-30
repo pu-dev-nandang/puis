@@ -1481,6 +1481,7 @@ class C_rest extends CI_Controller {
                         $nestedData[] = $row['ID'];
                         $nestedData[] = $row['EstimaValue'];
                         $nestedData[] = $row['Approval'];
+                        $nestedData[] = $row['Reason'];
                         $data[] = $nestedData;
                     }
                    $json_data = array(
@@ -2725,22 +2726,16 @@ class C_rest extends CI_Controller {
                         
                         break;
                     case 'delete':
-                        $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
-                        $Status = $Get_Data[0]['Status'];
-                        if ($Status == 1)
-                        {
-                            $dataSave = array(
-                                'Active' => 0,
-                                'LastUpdateBy' => $user,
-                                'LastUpdateAt' => date('Y-m-d H:i:s'),
-                            );
-                            $this->db->where('ID', $Input['ID']);
-                            $this->db->update('db_purchasing.m_catalog', $dataSave);
-                            echo json_encode(array(''));
+                        $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
+                        $query=$this->db->query($sql, array($Input['ID']))->result_array();
+                        if (count($query) == 0) {
+                          $this->db->where('ID', $Input['ID']);
+                          $this->db->delete('db_purchasing.m_catalog');
+                          echo json_encode(array(''));
                         }
                         else
                         {
-                            echo json_encode(array('The data has been used for transaction, Cannot be action'));
+                          echo json_encode(array('The data has been used for transaction, Cannot be action'));
                         }
                         break;
                     case 'approve':
@@ -2748,11 +2743,33 @@ class C_rest extends CI_Controller {
                             'Approval' => 1,
                             'ApprovalBy' => $user,
                             'ApprovalAt' => date('Y-m-d H:i:s'),
+                            'Reason' => '',
                         );
                         $this->db->where('ID', $Input['ID']);
                         $this->db->update('db_purchasing.m_catalog', $dataSave);
                         echo json_encode(array(''));
-                        break;        
+                        break;
+                    case 'reject':
+                        $dataSave = array(
+                            'Approval' => -1,
+                            'ApprovalBy' => $this->session->userdata('NIP'),
+                            'ApprovalAt' => date('Y-m-d H:i:s'),
+                            'Reason' => $Input['Reason'],
+                        );
+                        $this->db->where('ID', $Input['ID']);
+                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+                        echo json_encode(array(''));
+                    break;
+                    case 'status':
+                        $dataSave = array(
+                            'Active' => 0,
+                            'LastUpdateBy' => $this->session->userdata('NIP'),
+                            'LastUpdateAt' => date('Y-m-d H:i:s'),
+                        );
+                        $this->db->where('ID', $Input['ID']);
+                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+                        echo json_encode(array(''));
+                        break;              
                     default:
                         # code...
                         break;

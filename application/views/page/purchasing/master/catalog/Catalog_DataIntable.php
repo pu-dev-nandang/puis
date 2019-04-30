@@ -90,10 +90,10 @@
 			var ID = $(this).attr('code');
 	      	// if (CountColapses == 0) {
 	      	if ($('#FormInput').attr('class') == 'collapse') {
-	      		$('.pageAnchor[page="FormInput"]').trigger('click');
+	      		//$('.pageAnchor[page="FormInput"]').trigger('click');
 	      		//$('#FormInput').show();
-	      		// $('#FormInput').attr('class','in');
-	      		// $('#FormInput').attr('display: block; height: auto;');
+	      		$('#FormInput').attr('class','in');
+	      		$('#FormInput').attr('style','height: auto;');
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
 	      		var url = base_url_js+'purchasing/page/catalog/'+page;

@@ -171,6 +171,10 @@ class C_pr_po extends Budgeting_Controler {
                     $this->data['action'] = $Input['action'];
                     if ($Input['action'] == 'edit') {
                         $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                        // lock beberapa field untuk tidak bisa diedit
+                            $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
+                            $query=$this->db->query($sql, array($Input['ID']))->result_array();
+                            $this->data['arr_lock'] = count($query);
                     }
                 }
                 $content = $this->load->view('global/budgeting/pr/'.$uri,$this->data,true);
