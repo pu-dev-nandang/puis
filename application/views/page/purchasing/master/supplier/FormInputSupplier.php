@@ -309,6 +309,10 @@
 					else
 					{
 						loadSelectCategory();
+						if($('#datatablesServer').length){
+							var page = 'DataIntable';
+							LoadPageSupplier(page);
+						}
 					}
 				   
 				}).fail(function() {
@@ -407,10 +411,15 @@
 		$('#CategorySupplier').empty()
 		$.post(url,function (data_json) {
 		    var obj = JSON.parse(data_json);
+		      var b = 0;
 		      for(var i=0;i<obj.length;i++){
-		          var selected = (i==0) ? 'selected' : '';
-		          //var selected = (data_json[i].RegionName=='Kota Jakarta Pusat') ? 'selected' : '';
-		          $('#CategorySupplier').append('<option value="'+obj[i].ID+'" '+selected+'>'+obj[i].CategoryName+'</option>');
+		      	if(obj[i].Active == 1){
+		      		var selected = (b==0) ? 'selected' : '';
+		      		//var selected = (data_json[i].RegionName=='Kota Jakarta Pusat') ? 'selected' : '';
+		      		$('#CategorySupplier').append('<option value="'+obj[i].ID+'" '+selected+'>'+obj[i].CategoryName+'</option>');
+		      		b++;
+		      	}
+		          
 		      }
 		      $('#CategorySupplier').select2({
 		         //allowClear: true

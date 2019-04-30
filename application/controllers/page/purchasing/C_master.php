@@ -565,7 +565,7 @@ class C_master extends Purchasing_Controler {
                 $this->db->where('ID', $ID);
                 $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
-            case 'status':
+            case 'delete':
                 $dataSave = array(
                     'Active' => 0,
                     'LastUpdateBy' => $this->session->userdata('NIP'),
@@ -574,20 +574,20 @@ class C_master extends Purchasing_Controler {
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
-            case 'delete':
-                $G_data = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
-                $CodeSupplier = $G_data[0]['CodeSupplier'];
-                $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
-                $query=$this->db->query($sql, array($CodeSupplier))->result_array();
-                if (count($query) == 0) {
-                  $this->db->where('ID', $Input['ID']);
-                  $this->db->delete('db_purchasing.m_supplier');
-                }
-                else
-                {
-                  $msg = 'The data has been used for transaction, Cannot be action';
-                }
-                break;    
+            // case 'delete':
+            //     $G_data = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
+            //     $CodeSupplier = $G_data[0]['CodeSupplier'];
+            //     $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+            //     $query=$this->db->query($sql, array($CodeSupplier))->result_array();
+            //     if (count($query) == 0) {
+            //       $this->db->where('ID', $Input['ID']);
+            //       $this->db->delete('db_purchasing.m_supplier');
+            //     }
+            //     else
+            //     {
+            //       $msg = 'The data has been used for transaction, Cannot be action';
+            //     }
+            //     break;    
             case 'approve':
                 $dataSave = array(
                     'Approval' => 1,
@@ -628,16 +628,22 @@ class C_master extends Purchasing_Controler {
             break;
           case 'delete':
             $ID = $Input['id_data'];
-            $G = $this->m_master->caribasedprimary('db_purchasing.m_supplier','CategorySupplier',$ID);
-            if (count($G) > 0) {
-              echo json_encode(0);
-            }
-            else
-            {
-              $this->db->where('ID',$ID);
-              $this->db->delete('db_purchasing.m_categorysupplier');
-              echo json_encode(1);
-            }
+            // $G = $this->m_master->caribasedprimary('db_purchasing.m_supplier','CategorySupplier',$ID);
+            // if (count($G) > 0) {
+            //   echo json_encode(0);
+            // }
+            // else
+            // {
+            //   $this->db->where('ID',$ID);
+            //   $this->db->delete('db_purchasing.m_categorysupplier');
+            //   echo json_encode(1);
+            // }
+            $dataSave = array(
+                'Active' => 0,
+            );
+            $this->db->where('ID', $ID);
+            $this->db->update('db_purchasing.m_categorysupplier', $dataSave);
+            echo json_encode(1);
             break;  
           default:
             # code...
@@ -680,7 +686,7 @@ class C_master extends Purchasing_Controler {
                ';
 
         $sql.= ' where ( a.CodeSupplier LIKE "'.$requestData['search']['value'].'%" or a.NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or a.PICName LIKE "'.$requestData['search']['value'].'%" or a.DetailInfo LIKE "%'.$requestData['search']['value'].'%" or c.CategoryName LIKE "'.$requestData['search']['value'].'%" or a.CategorySupplier LIKE "%'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or a.DetailItem LIKE "%'.$requestData['search']['value'].'%"
-                ) and a.Active = 1 '.$condition;
+                ) and a.Active = 1 and c.Active = 1'.$condition;
         $sql.= ' ORDER BY a.ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
 

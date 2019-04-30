@@ -179,6 +179,13 @@
         width : 110px !important;
     }
 
+    .toast-top-right {
+        top: 50% !important;
+        right: 50% !important;
+        left: 50% !important;
+        bottom: 50% !important;
+    }
+
 
 </style>
 
