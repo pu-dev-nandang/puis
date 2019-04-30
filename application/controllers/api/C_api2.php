@@ -3239,6 +3239,17 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='updateStatusDocument'){
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+            $DocumentStatus = $data_arr['DocumentStatus'];
+
+            $this->db->set('DocumentStatus', $DocumentStatus);
+            $this->db->where('ID', $ScheduleIDSA);
+            $this->db->update('db_academic.sa_schedule');
+
+            return print_r(1);
+        }
+
         else if($data_arr['action']=='loadDocumentSA_Score'){
 
 
@@ -3272,6 +3283,8 @@ class C_api2 extends CI_Controller {
                     }
 
                 }
+
+                usort($Student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
 
                 $dataDock[0]['Students'] = $Student;
 
@@ -3546,15 +3559,18 @@ class C_api2 extends CI_Controller {
                                         <i class="fa fa-edit"></i> <span class="caret"></span>
                                       </button>
                                       <ul class="dropdown-menu">
-                                        <li><a href="#">Attendance</a></li>
+                                        <li><a href="#">Lecturer Attendance</a></li>
+                                        <li><a href="javascript:void(0);" class="btnAttdStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" data-id="'.$ScheduleIDSA.'" data-std="'.$tokenStd.'">Student Attendance</a></li>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="#">Syllabus & RPS</a></li>
+                                        <li><a href="javascript:void(0);" class="loadSyllabusRPS" data-id="'.$ScheduleIDSA.'" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'">Syllabus & RPS</a></li>
                                         <li><a href="#">Score</a></li>
                                       </ul>
                                     </div>
                                 </div>';
             $nestedData[] = '<div style="text-align:right;">'.$showUTS.''.$showUTS_RE.'</div>';
             $nestedData[] = '<div style="text-align:right;">'.$showUAS.''.$showUAS_RE.'</div>';
+
+            // <li><a href="javascript:void(0);" class="btnAttendance" data-course="'+v.CourseEng+'" data-id="'+v.ScheduleIDSA+'" data-std="'+tokenStd+'">Student Attendance</a></li>
 
 
 

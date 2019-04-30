@@ -44,9 +44,8 @@
 
 <div id="viewTableTimetable"></div>
 
-
-
-
+<input id="tempScheduleIDSA" class="hide">
+<textarea id="tempStd" class="hide"></textarea>
 
 <script>
 
@@ -240,7 +239,6 @@
         });
     });
 
-
     function loadTimetableSA() {
 
         var data = {
@@ -278,6 +276,304 @@
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                     $("#employee-grid_processing").css("display","none");
                 }
+            }
+        });
+
+    }
+
+    $(document).on('click','.loadSyllabusRPS',function () {
+
+        var ScheduleIDSA = $(this).attr('data-id');
+        var Course = $(this).attr('data-course');
+
+        var data = {
+            action : 'loadDocumentSA',
+            ScheduleIDSA : ScheduleIDSA
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudSemesterAntara';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            console.log(jsonResult);
+
+            var d = jsonResult[0];
+
+            var bodyGrade = 'Syllabus & RPS not been sent';
+            if(d.DocumentStatus==1 || d.DocumentStatus=='1' || d.DocumentStatus==2 || d.DocumentStatus=='2'){
+
+                var btnSyllabus = (d.Syllabus!=null && d.Syllabus!='') ? '<button href="'+d.Syllabus+'" class="btn btn-sm btn-block btn-default">Download</button>' : '-';
+                var btnRPS = (d.RPS!=null && d.RPS!='') ? '<button href="'+d.RPS+'" class="btn btn-sm btn-block btn-default">Download</button>' : '-';
+
+                var Evaluation = (d.Evaluasi!=null && d.Evaluasi!='') ? d.Evaluasi : 0;
+                var UTS = (d.UTS!=null && d.UTS!='') ? d.UTS : 0;
+                var UAS = (d.UAS!=null && d.UAS!='') ? d.UAS : 0;
+
+                bodyGrade = '<table class="table">' +
+                    '    <tr>' +
+                    '        <td style="width: 50%;text-align: center;">'+btnSyllabus+'</td>' +
+                    '        <td style="width: 50%;text-align: center;">'+btnRPS+'</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td>Assignment</td>' +
+                    '        <td>'+Evaluation+' %</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td>Mid Exam</td>' +
+                    '        <td>'+UTS+' %</td>' +
+                    '    </tr>' +
+                    '    <tr>' +
+                    '        <td>Exam Exam</td>' +
+                    '        <td>'+UAS+' %</td>' +
+                    '    </tr>' +
+                    '</table>' +
+                    '<div id="statusDock"></div>';
+            }
+
+
+
+            var ds = (d.DocumentStatus==1 || d.DocumentStatus=='1') ? '' : 'disabled';
+
+            $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+Course+'</h4>');
+            $('#GlobalModal .modal-body').html(bodyGrade);
+
+            if(d.DocumentStatus==2 || d.DocumentStatus=='2'){
+                $('#statusDock').html('<div class="alert alert-success" style="margin-bottom: 0px;"><b>Approved</b></div>');
+            } else if(d.DocumentStatus==-2 || d.DocumentStatus=='-2'){
+                $('#statusDock').html('<div class="alert alert-danger" style="margin-bottom: 0px;"><b>Rejected</b></div>');
+            } else {
+                $('#statusDock').html('');
+            }
+
+            // $('#GlobalModal .modal-footer').addClass('hide');
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> | ' +
+                '<button type="button" class="btn btn-danger btnact" data-status="-2" '+ds+'>Rejected</button>' +
+                '<button type="button" class="btn btn-success btnact" data-status="2" '+ds+'>Approved</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+            $('.btnact').click(function () {
+
+                $('.btnact,button[data-dismiss=modal]').prop('disabled',true);
+
+                var status = $(this).attr('data-status');
+                var data = {
+                    action : 'updateStatusDocument',
+                    ScheduleIDSA : ScheduleIDSA,
+                    DocumentStatus : status
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudSemesterAntara';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Submited','Success');
+                    setTimeout(function () {
+                        $('button[data-dismiss=modal]').prop('disabled',false);
+                    },500);
+                });
+
+
+            });
+
+        });
+
+
+    });
+
+    $(document).on('click','.btnAttdStd',function () {
+
+        var ScheduleIDSA = $(this).attr('data-id');
+        var tokenStd = $(this).attr('data-std');
+        var Course = $(this).attr('data-course');
+        var dataToken = jwt_decode(tokenStd);
+
+        $('#tempScheduleIDSA').val(ScheduleIDSA);
+        $('#tempStd').val(tokenStd);
+
+        var dataCheck = {
+            action : 'checkLectAttd',
+            ScheduleIDSA : ScheduleIDSA,
+            Type : 'lec'
+        };
+
+        var tokenCheck = jwt_encode(dataCheck,'UAP)(*');
+        var url2 = base_url_js+'api2/__crudSemesterAntara';
+
+
+        $.post(url2,{token:tokenCheck},function (ArrMeet){
+
+
+
+            $('#GlobalModal .modal-header').html('<h4 class="modal-title">'+Course+'</h4>');
+
+            $('#GlobalModal .modal-footer').html(' <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button id="submitAttendance" class="btn btn-success">Submit</button> ');
+
+
+            var bodyModal = '<div class="row">' +
+                '    <div class="col-md-6 col-md-offset-3">' +
+                '        <div class="well">' +
+                '            <select class="form-control" id="filterSesion"></select>' +
+                '            <input class="hide" id="formScheduleIDSA" value="'+ScheduleIDSA+'" />' +
+                '        </div>' +
+                '           <hr/>' +
+                '    </div>' +
+                '</div>' +
+                '<div class="row">' +
+                '    <div class="col-md-12">' +
+                '        <table class="table">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th style="width: 1%;">No</th>' +
+                '                <th>Student</th>' +
+                '                <th style="width: 20%;">Action</th>' +
+                '                <th style="width:30%;" class="hide">Reason</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '            <tbody id="listStudent"></tbody>' +
+                '        </table>' +
+                '    </div>' +
+                '</div>';
+            $('#GlobalModal .modal-body').html(bodyModal);
+
+            for (var i = 1;i<=14;i++){
+                var dsb = ($.inArray(''+i,ArrMeet)!=-1) ? '' : 'disabled';
+                var selc = '';
+                if(ArrMeet.length>0){
+                    var idS = ArrMeet[0];
+                    selc = (parseInt(idS)==parseInt(i)) ? 'selected' : '';
+                }
+                $('#filterSesion').append('<option value="'+i+'" '+dsb+' '+selc+'>Sessions '+i+'</option>');
+            }
+
+            if(ArrMeet.length>0){
+                loadAttendanceStd(ArrMeet[0]);
+            }
+
+            $('#submitAttendance').click(function () {
+
+                if(dataToken.length>0){
+
+                    loading_buttonSm('#submitAttendance');
+                    $('.formAttdStd, .attd-reason').prop('disabled',true);
+
+                    var filterSesion = $('#filterSesion').val();
+                    var formScheduleIDSA = $('#formScheduleIDSA').val();
+
+                    var no = 1;
+                    var AttdStd = [];
+                    $.each(dataToken,function (v,i) {
+
+                        var UserID = $('#formNPM_'+no).val();
+
+                        var Status = ($('#formAttdStd_'+no).is(':checked')) ? '1' : '2';
+
+                        var arr = {
+                            ScheduleIDSA : formScheduleIDSA,
+                            UserID : UserID,
+                            Meet : filterSesion,
+                            Status : Status,
+                            Type : 'std',
+                            Reason : $('#formReason_'+no).val(),
+                            UpdatedAt : dateTimeNow(),
+                            UpdatedBy : sessionNIP
+                        };
+
+                        AttdStd.push(arr);
+
+                        no++;
+
+                    });
+
+
+                    var data = {
+                        action : 'inputAttendanceSA',
+                        dataAttd : AttdStd
+                    };
+
+                    var token = jwt_encode(data,'UAP)(*');
+                    var url = base_url_js+'api2/__crudSemesterAntara';
+
+                    $.post(url,{token:token},function (result) {
+                        toastr.success('Attendance Saved','Success');
+                        setTimeout(function () {
+                            $('#submitAttendance').html('Submit').prop('disabled',false);
+                            $('.formAttdStd, .attd-reason').prop('disabled',false);
+                        },500);
+
+                    })
+
+
+                }
+
+            });
+
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+        });
+
+    });
+
+    function loadAttendanceStd(Meet) {
+
+        var ScheduleIDSA = $('#tempScheduleIDSA').val();
+        var tempStd = $('#tempStd').val();
+
+        var dataToken = jwt_decode(tempStd);
+
+        var data = {
+            action : 'loadAttdStd',
+            ScheduleIDSA : ScheduleIDSA,
+            Meet : Meet,
+            Type : 'std'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudSemesterAntara';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#listStudent').empty();
+            // $('#studentSA').val(JSON.stringify(jsonResult));
+
+            if(dataToken.length>0){
+                var no = 1;
+                var dataStdCheckd = jsonResult;
+                $.each(dataToken,function (i,v) {
+
+                    var DefaultChecked = ($.inArray(''+v.NPM,dataStdCheckd)!=-1) ? 'checked' : '';
+                    var style_ = ($.inArray(''+v.NPM,dataStdCheckd)!=-1) ? '' : 'style="background:#ffebeb;color:red;"';
+
+                    $('#listStudent').append('<tr id="tr_'+no+'" '+style_+'>' +
+                        '<td>'+no+'</td>' +
+                        '<td>'+v.Name+'<br/>'+v.NPM+'' +
+                        '<input id="formNPM_'+no+'" class="hide" value="'+v.NPM+'" >' +
+                        '</td>' +
+                        '<td>' +
+                        '<label class="">' +
+                        '                                    <input type="checkbox" id="formAttdStd_'+no+'" data-no="'+no+'" '+DefaultChecked+' class="custom-control-input formAttdStd">' +
+                        '                                    <span class="custom-control-indicator"></span>' +
+                        '                                </label>' +
+                        '</td>' +
+                        '<td class="hide">' +
+                        '<textarea class="form-control attd-reason" id="formReason_'+no+'" rows="2"></textarea>' +
+                        '</td>' +
+                        '</tr>');
+
+                    no++;
+                });
+
+            }
+            else {
+                $('#listStudent').append('<tr>' +
+                    '<td colspan="4" style="text-align: center;color: #CCCCCC;">-- Student Not Yet --</td>' +
+                    '</tr>');
             }
         });
 
