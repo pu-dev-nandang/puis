@@ -2911,13 +2911,18 @@ class C_rest extends CI_Controller {
              $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $requestData= $_REQUEST;
-                $StatusQuery = ($Status != 'All') ? '' : 'where a.Status = '.$Status;
+                $StatusQuery = ($Status == 'All') ? '' : 'where a.Status = '.$Status;
                 if (array_key_exists('PurchasingStatus', $_POST)) {
                     $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
                 }
                 $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a left join db_purchasing.pr_status as b on a.PRCode = b.PRCode '.$StatusQuery;
                 $querytotalData = $this->db->query($sqltotalData)->result_array();
                 $totalData = $querytotalData[0]['total'];
+
+                $StatusQuery = ($Status == 'All') ? '' : 'and a.Status = '.$Status;
+                if (array_key_exists('PurchasingStatus', $_POST)) {
+                    $StatusQuery = ($StatusQuery == '') ? 'and b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
+                }
 
                 $sql = 'select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
                         (
@@ -2938,7 +2943,7 @@ class C_rest extends CI_Controller {
                             LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
                        ';
 
-                $sql.= ' where a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%"';
+                $sql.= ' where (a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%") '.$StatusQuery;
                 $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $query = $this->db->query($sql)->result_array();
 
