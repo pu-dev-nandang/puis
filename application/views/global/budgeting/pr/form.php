@@ -643,7 +643,7 @@
 						}
 
 						if (!booledit2) {
-							btn_edit = '<button class = "btn btn-success" id = "SaveSubmit" prcode = "'+ClassDt.PRCodeVal+'" action = "1">Submit</button>&nbsp';
+							btn_edit = '<button class = "btn btn-primary" id = "btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp<button class = "btn btn-success" id = "SaveSubmit" prcode = "'+ClassDt.PRCodeVal+'" action = "1" disabled>Submit</button>&nbsp';
 						}
 					}
 
@@ -694,13 +694,6 @@
 				}
 
 				$("#Page_Button").html(html);
-
-				if (btn_edit != '') {
-					var row = $('#table_input_pr tbody tr:not(:last)');
-					row.find('td').find('input,select,button:not(.Detail),textarea').prop('disabled',false);
-					$('input,textarea').prop('disabled',false);
-				}
-
 			}
 			else
 			{
@@ -750,6 +743,14 @@
 		}
 		
 	}
+
+	$(document).off('click', '#btnEditInput').on('click', '#btnEditInput',function(e) {
+			var row = $('#table_input_pr tbody tr:last');
+			row.find('td').find('input,select,button,textarea').prop('disabled',false);
+			$('input,textarea').prop('disabled',false);
+			$('#SaveSubmit').prop('disabled',false);
+			$(this).remove();
+	})	
 
 	$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
 		// before adding row lock all input in last tr
