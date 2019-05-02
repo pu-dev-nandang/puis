@@ -376,7 +376,7 @@ $route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
 $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
 //Surat Tugas Keluar 
-$route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
+// $route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
 $route['requestsurat'] = 'api/c_global/getlistrequestdoc';
 
 $route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
@@ -1125,7 +1125,7 @@ $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
 // Request Document | Bismar
-$route['requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument/';
+$route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
@@ -1401,3 +1401,9 @@ $route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
 
 // help
 $route['help'] =  'dashboard/C_dashboard/Help';
+
+
+// request document
+$route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
+
+$route['portal'] = 'c_login/portal';

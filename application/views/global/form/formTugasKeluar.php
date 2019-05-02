@@ -1,7 +1,3 @@
-
-<?= $include; ?>
-
-
 <?php 
 
 $d = $dataEmp[0];
@@ -9,21 +5,6 @@ $d = $dataEmp[0];
 
 ?>
 
-<style type="text/css">
-    @media screen and (min-width: 768px) {
-        .modal-content {
-          width: 785px; /* New width for default modal */
-        }
-        .modal-sm {
-          width: 350px; /* New width for small modal */
-        }
-    }
-    @media screen and (min-width: 992px) {
-        .modal-lg {
-          width: 950px; /* New width for large modal */
-        }
-    }
-</style>
 
 <style>
     .btn-circle.btn-xl {
@@ -62,16 +43,7 @@ $d = $dataEmp[0];
 }
 </style>
 
-<div class="thumbnail" style="padding: 10px; text-align: right;margin-bottom: 10px;">
-    <span style="color: #F44336;margin-right: 5px;margin-left: 5px;"><button id="btnedits1" class="btn btn-sm btn-danger btn-round" data-toggle="modal" data-target="#logoutModal" title="Logout"><i class="fa fa-power-off"></i> Log Out</button> </span>
-</div>
-
-
-
-
 <div class="container">
-
-
 	<div class="row">
 		<div class="widget-content col-md-6">
 			<div class="thumbnail">
@@ -184,6 +156,7 @@ $d = $dataEmp[0];
 <script>
     
     $(document).on('click','.btnsaverequest',function () {
+        loading_button('.btnsaverequest');
         savedatarequestdoc();
     });
 
@@ -202,34 +175,36 @@ $d = $dataEmp[0];
                 && DescriptionVenue!='' && DescriptionVenue!=null)
         { 
     
-        var data = {
-            action : 'AddRequest',
-            formInsert : {
-                typerequest : typerequest,
-                to_event : to_event,
-                startDate : startDate,
-                endDate : endDate,
-                DescriptionVenue : DescriptionVenue
-            }
-        };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api2/__crudrequestdoc';
-            $.post(url,{token:token},function (result) {
-                    
-                if(result==0 || result=='0'){
-                    //toastr.error('Name division or module already is exist!','Error');
-                } else {  
-                    toastr.success('Request Document Saved','Success');
-                    setTimeout(function () {
-                        window.location.href = '';
-                    },1000);
+            var data = {
+                action : 'AddRequest',
+                formInsert : {
+                    typerequest : typerequest,
+                    to_event : to_event,
+                    startDate : startDate,
+                    endDate : endDate,
+                    DescriptionVenue : DescriptionVenue
                 }
-            });
+            };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudrequestdoc';
+                $.post(url,{token:token},function (result) {
+                        
+                    if(result==0 || result=='0'){
+                        //toastr.error('Name division or module already is exist!','Error');
+                        $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                    } else {  
+                        toastr.success('Request Document Saved','Success');
+                        setTimeout(function () {
+                            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                            window.location.href = '';
+                        },1000);
+                    }
+                });
         }
         else {
             toastr.error('The form is still empty!','Error');
-            $('#GlobalModal').modal('show');
+            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
             return;
         }
      }
