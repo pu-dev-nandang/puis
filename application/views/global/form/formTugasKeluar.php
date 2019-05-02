@@ -179,10 +179,6 @@ $d = $dataEmp[0];
         var endTime = $('#endTime').val();
         var enddatetime = endDate+' '+endTime;
         var DescriptionVenue = $('#DescriptionVenue').val();
-        
-        alert(stardatetime);
-        alert(enddatetime);
-        
 
         if(typerequest!=null && typerequest!=''
                 && to_event!='' && to_event!=null
