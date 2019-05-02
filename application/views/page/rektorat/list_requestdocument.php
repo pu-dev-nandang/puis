@@ -49,7 +49,7 @@
                             <th class="th-center" style="width: 10%;">NIP & Name</th>
                             <th class="th-center" style="width: 10%;">Type Request</th>
                             <th class="th-center" style="width: 8%;">Date Request</th>
-                            <th class="th-center" style="width: 12%;">Name Event</th>
+                            <th class="th-center" style="width: 12%;">For Request</th>
                             <th class="th-center" style="width: 8%;">Start Date</th>
                             <th class="th-center" style="width: 8%;">End Date</th>
                             <th class="th-center" style="width: 20%;">Description Event</th>
