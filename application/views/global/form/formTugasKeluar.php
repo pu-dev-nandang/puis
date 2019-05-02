@@ -286,8 +286,11 @@ function loadlistrequestdocument() {
                         var token = jwt_encode({NIP : nip, IDRequest : idrequest },'UAP)(*');
                         var linksurat = base_url_js+"save2pdf/suratTugasKeluar/"+token; 
                         var buttonlink = ('<a href="'+linksurat+'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ');
+                    } else if(response[i]['ConfirmStatus'] == -1) {
+                        var buttonlink = '<p class="text-danger"> Rejected </p>';
                     } else {
-                        var buttonlink = '<p class="text-danger"> Waiting Approved </p>';
+
+                        var buttonlink = '<p class="text-primary"> Waiting Approved </p>';
                     }
 
                     if(response[i]['DateConfirm'] == '0000-00-00 00:00:00' ) {
@@ -371,6 +374,7 @@ $("#datetimepicker2").datetimepicker({
 $("#timepicker1").datetimepicker({
         pickDate: false,
         pickSeconds : false
+
     }).on('changeDate', function (selected) {
         var startDate = new Date(selected.date.valueOf());
         $('#timepicker2').datetimepicker('setStartDate', startDate);
