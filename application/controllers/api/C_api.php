@@ -167,14 +167,14 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
 
         $SemesterID = $this->input->get('s');
-        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                 LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
                 WHERE b.RequestDocument = 1 ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
@@ -187,7 +187,7 @@ class C_api extends CI_Controller {
 
         }
         else {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, B.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
@@ -687,7 +687,7 @@ class C_api extends CI_Controller {
             $getotfiles = 0;
             
             $StatusFiles = array();
-            $Get_MasterFiles = $this->m_master->showData_array('db_employees.master_files');
+            $Get_MasterFiles = $this->m_master->showDataFiles_array('db_employees.master_files');
             $StatusFiles = '';
             for ($j=0; $j < count($Get_MasterFiles); $j++) { 
                 //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
@@ -6524,10 +6524,8 @@ class C_api extends CI_Controller {
 
     public function getdatarequestdocument(){
          
-         $data_arr = $this->getInputToken();
-
-         $NIP = $data_arr['NIP'];
-
+        $data_arr = $this->getInputToken();
+        $NIP = $data_arr['NIP'];
         $viewfiles = $this->m_api->views_datarequestdoc($NIP);
         echo json_encode($viewfiles);     
 

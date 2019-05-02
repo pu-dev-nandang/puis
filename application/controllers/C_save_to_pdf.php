@@ -5954,7 +5954,6 @@ Phone: (021) 29200456';
             $pdf->SetFont('Arial','',11);
             $y = $pdf->GetY()+20;
 
-
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
             $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
 
@@ -5967,7 +5966,6 @@ Phone: (021) 29200456';
 //            $logo = file_get_contents('uploads/signature/2617100.svg');
 //            $pdf->MemImage($logo, 50, 30);
 //            print_r($logo);die();
-
 
             $pdf->SetXY(130,$y+30);
             $pdf->Cell(60,5,$NamePHR,0,1,'L');
@@ -6021,7 +6019,7 @@ Phone: (021) 29200456';
 
             $ForTask = trim($dataRequest[0]['ForTask']);
             $pada = ' Pada :';
-            $nametask = $ForTask.''.$pada;
+            $nametask = 'Untuk '.$ForTask.''.$pada;
 
             $dataEmploy = $this->db->limit(1)->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
                 'NIP' => $NIP
@@ -6071,10 +6069,12 @@ Phone: (021) 29200456';
 
         $pdf->Ln(3);
 
+        $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Nama',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         $pdf->Cell(145,$h,trim($NamePHR),0,1,'L');
 
+        $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'NIP',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         $pdf->Cell(145,$h,$NIPPHR,0,1,'L');
@@ -6085,10 +6085,12 @@ Phone: (021) 29200456';
         $pdf->Ln(3);
 
         $pdf->SetFont('Arial','',10);
+        $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Nama',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         $pdf->Cell(145,$h,trim($Name),0,1,'L');
 
+        $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'NIP',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         $pdf->Cell(145,$h,$NIP,0,1,'L');
@@ -6096,7 +6098,7 @@ Phone: (021) 29200456';
         $pdf->Ln(3);
         $pdf->Cell(0,$h,$nametask,0,1,'L');
 
-        //$pdf->Ln(3);
+        $pdf->Ln(3);
         //$pdf->Cell(10,$h,'',0,0,'L');
         //$pdf->Cell(30,$h,'Hari',0,0,'L');
         //$pdf->Cell(5,$h,':',0,0,'C');
@@ -6122,6 +6124,12 @@ Phone: (021) 29200456';
 
         $pdf->Ln(7);
         $pdf->Cell(0,$h,'Demikian surat tugas ini diberikan untuk dapat dilaksanakan sebagaimana mestinya.',0,1,'L');
+
+        $pdf->SetFont('Arial','',11);
+        $y = $pdf->GetY()+20;
+
+        $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
+        $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
 
 
         $pdf->Ln(11);
