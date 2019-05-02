@@ -213,9 +213,26 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';;
             $nestedData[] = $row["DescriptionAddress"];
-            $nestedData[] = '<center><div class="btn-group">
-              <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> 
-              <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
+
+            $NIP = $row["NIP"];
+            $IDRequest = $row["IDRequest"];
+
+            $tokenPDF = $this->jwt->encode(array('NIP' => $NIP, 'IDRequest' => $IDRequest),'UAP)(*');
+
+            if($row['ConfirmStatus'] == 0){
+                $status = '<button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button>';
+            } else if($row['ConfirmStatus'] == 1) {
+                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved"> <i class="fa fa-download" disabled></i> Download </a> ';
+            } else {
+
+                $status = '<label> Rejected</label>';
+            }
+
+
+            $nestedData[] = '<center><div class="btn-group">'.$status.'</div></center>';
+            //$nestedData[] = '<center><div class="btn-group">
+            //  <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> 
+            //  <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
 
             $data[] = $nestedData;
             $no++;
@@ -5669,7 +5686,7 @@ class C_api extends CI_Controller {
                         'UserConfirm' => $IDuser
                 );
                 $this->db->where('IDRequest', $requestID);
-                $this->db->update('db_employees.request_document',$dataSave1);
+                $this->db->update('db_employees.request_document',$dataSave);
                 return print_r(1);
         }
 
@@ -6506,7 +6523,11 @@ class C_api extends CI_Controller {
     }
 
     public function getdatarequestdocument(){
-        $NIP = $this->session->userdata('NIP');
+         
+         $data_arr = $this->getInputToken();
+
+         $NIP = $data_arr['NIP'];
+
         $viewfiles = $this->m_api->views_datarequestdoc($NIP);
         echo json_encode($viewfiles);     
 

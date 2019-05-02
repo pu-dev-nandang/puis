@@ -979,21 +979,26 @@ class C_api2 extends CI_Controller {
         $data_arr = $this->getInputToken();
         $IDuser = $this->session->userdata('NIP');
 
-            if($data_arr['action']=='saverequestdoc'){
+            if($data_arr['action']=='AddRequest') {
                 $formInsert = (array) $data_arr['formInsert'];
 
-                $selecttypedoc = $formInsert['selecttypedoc'];
-                $nametype = $formInsert['nametype'];
-                $FileDocument = $nametype;
-                $requestat = "Success";
+                $typerequest = $formInsert['typerequest'];
+                $to_event = $formInsert['to_event'];
+                $startDate = $formInsert['startDate'];
+                $endDate = $formInsert['endDate'];
+                $DescriptionVenue = $formInsert['DescriptionVenue'];
+                //$dates = date("Y-m-d H:i:s");
 
                 $dataSave = array(
-                        'IDType' => $selecttypedoc,
+                        'IDTypeFiles' => $typerequest,
+                        'ForTask' => $to_event,
                         'NIP' => $IDuser,
-                        'RequestStatus' => $requestat,
-                        'FileDocument' => $FileDocument
+                        'StartDate' => $startDate,
+                        'EndDate' => $endDate,
+                        'DescriptionAddress' => $DescriptionVenue
                 );
                 $this->db->insert('db_employees.request_document',$dataSave);
+                return print_r(1);
         }
 
     }

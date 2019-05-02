@@ -250,6 +250,22 @@ class C_global extends CI_Controller {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
         ini_set('max_execution_time', 0); // for infinite time of execution
 
+        // $sql = 'select * from db_employees.division';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $sql1 = 'select * from db_employees.rule_service where IDService = 5 and IDDivision = '.$query[$i]['ID'];
+        //     $query1=$this->db->query($sql1, array())->result_array();
+        //     if (count($query1) == 0) {
+        //         $datasave = array(
+        //             'IDDivision' => $query[$i]['ID'],
+        //             'IDService' => 5,
+        //             'Status' => '1',
+        //         );
+        //         $this->db->insert('db_employees.rule_service',$datasave);
+        //     }
+           
+        // }
+
         // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
         //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
         //              a.StatusEmployeeID
@@ -1587,21 +1603,6 @@ class C_global extends CI_Controller {
 //        exit;
         $this->load->view('global/academic/exam');
     }
-
-     public function suratKeluar(){
-
-        $token = '488a476ba583155fd274ffad3ae741408d357054';
-
-        $dataEmployees = $this->db->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
-            'Password' => $token
-        ))->result_array();
-
-
-        $data['include'] = $this->load->view('template/include','',true);
-        $data['dataEmp'] = $dataEmployees;
-        $this->load->view('global/form/formTugasKeluar',$data);
-    }
-
 
     public function menu_request($page){
         $data['page'] = $page;

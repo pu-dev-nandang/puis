@@ -5996,12 +5996,57 @@ Phone: (021) 29200456';
 
     }
 
-    public function suratTugasKeluar(){
+    public function suratTugasKeluar($token){
+
+        $data_arr = $this->getInputToken($token);
+
+        $NIP = $data_arr['NIP'];
+        $IDRequest = $data_arr['IDRequest'];
+
+        $dataRequest = $this->db->limit(1)->get_where('db_employees.request_document',array(
+            'IDRequest' => $IDRequest,
+            'NIP' => $NIP
+        ))->result_array();
 
 
-        $bln = 2;
-        $thn = 2019;
-        $dataNum = 001;
+        if(count($dataRequest)>0){
+
+            //$starthari = time(" hh:mm ", strtotime($dataRequest[0]['StartDate']));
+            $time1 = date('H:i', strtotime($dataRequest[0]['StartDate']));
+            $time2 = date('H:i', strtotime($dataRequest[0]['EndDate']));
+            $DateConfirm = date('dd M yy', strtotime($dataRequest[0]['DateConfirm']));
+            
+            $description = $dataRequest[0]['DescriptionAddress'];
+            
+
+            $ForTask = trim($dataRequest[0]['ForTask']);
+            $pada = ' Pada :';
+            $nametask = $ForTask.''.$pada;
+
+            $dataEmploy = $this->db->limit(1)->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
+                'NIP' => $NIP
+            ))->result_array();
+
+            $Name_a = (count($dataEmploy)>0) ? trim($dataEmploy[0]['TitleAhead']).' ' : '';
+            $Name_b = (count($dataEmploy)>0) ? ' '.trim($dataEmploy[0]['TitleBehind']) : '';
+            $Name = (count($dataEmploy)>0) ? $Name_a.''.trim($dataEmploy[0]['Name']).''.$Name_b : '';
+            $NIP = (count($dataEmploy)>0) ? $dataEmploy[0]['NIP'] : '';
+
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+
+            $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
+            $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
+            $NamePHR = (count($dataPHR)>0) ? $NamePHR_a.''.trim($dataPHR[0]['Name']).''.$NamePHR_b : '';
+            $NIPPHR = (count($dataPHR)>0) ? $dataPHR[0]['NIP'] : '';
+
+
+        $bln = date('m',strtotime($dataRequest[0]['RequestDate']));
+        $thn = date('Y',strtotime($dataRequest[0]['RequestDate']));
+
+        // Get Number
+        $dataNumbering = $this->db->query('SELECT count(*) as total FROM db_employees.request_document WHERE IDTypeFiles = 15 AND Year(RequestDate) = '.$thn .' and IDRequest <= '.$dataRequest[0]['IDRequest'])->result_array();
+        
+        $dataNum = $this->m_rest->genrateNumberingString($dataNumbering[0]['total'],3);
 
         $pdf = new FPDF('P','mm','A4');
 
@@ -6028,11 +6073,11 @@ Phone: (021) 29200456';
 
         $pdf->Cell(30,$h,'Nama',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'Nandang Mulyadi',0,1,'L');
+        $pdf->Cell(145,$h,trim($NamePHR),0,1,'L');
 
         $pdf->Cell(30,$h,'NIP',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'2017090',0,1,'L');
+        $pdf->Cell(145,$h,$NIPPHR,0,1,'L');
 
         $pdf->SetFont('Arial','B',11);
         $pdf->Ln(3);
@@ -6042,36 +6087,36 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',10);
         $pdf->Cell(30,$h,'Nama',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'Nandang Mulyadi',0,1,'L');
+        $pdf->Cell(145,$h,trim($Name),0,1,'L');
 
         $pdf->Cell(30,$h,'NIP',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'2017090',0,1,'L');
+        $pdf->Cell(145,$h,$NIP,0,1,'L');
 
         $pdf->Ln(3);
-        $pdf->Cell(0,$h,'Untuk menghadiri Sosialisasi Calon Sertifikasi Dosen bagi dosen Perguruan Tinggi  pada :',0,1,'L');
+        $pdf->Cell(0,$h,$nametask,0,1,'L');
 
-        $pdf->Ln(3);
-        $pdf->Cell(10,$h,'',0,0,'L');
-        $pdf->Cell(30,$h,'Hari',0,0,'L');
-        $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'Rabu',0,1,'L');
+        //$pdf->Ln(3);
+        //$pdf->Cell(10,$h,'',0,0,'L');
+        //$pdf->Cell(30,$h,'Hari',0,0,'L');
+        //$pdf->Cell(5,$h,':',0,0,'C');
+        //$pdf->Cell(145,$h,$starthari,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'27 Maret 2019',0,1,'L');
+        $pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,'08.00 WIB sampai selesai ',0,1,'L');
+        $pdf->Cell(145,$h,$time1.' - '.$time2.' WIB ',0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tempat',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
 
-        $pdf->MultiCell(145,5,'Hotel Bidakara Jakarta, Ruang Birawa, Jl. Jend. Gatot Subroto Kav. 71-73, Pancoran, RT.8/RW.8, Menteng Dalam, Tebet, Kota Jakarta Selatan, DKI Jakarta 12870');
+        $pdf->MultiCell(145,5,$description);
 //        $pdf->Cell(145,$h,'Hotel Bidakara Jakarta, Ruang Birawa, Jl. Jend. Gatot Subroto Kav. 71-73, Pancoran, RT.8/RW.8, Menteng Dalam, Tebet, Kota Jakarta Selatan, DKI Jakarta 12870',0,1,'L');
 
 
@@ -6083,7 +6128,7 @@ Phone: (021) 29200456';
         $w = 115;
         $w2 = 75;
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'Jakarta, 20 Maret 2019',0,1,'L');
+        $pdf->Cell($w2,$h,'Jakarta, '.$this->getDateIndonesian($dataRequest[0]['DateConfirm']),0,1,'L');
 
         $pdf->Cell($w,$h,'',0,0,'L');
         $pdf->Cell($w2,$h,'Plt. Wakil Rektor',0,1,'L');
@@ -6100,9 +6145,11 @@ Phone: (021) 29200456';
         $pdf->Cell($w2,$h,'NIP : 2617100 ',0,1,'L');
 
 
-        $pdf->Output('I','Tugas_Mengajar.pdf');
+        $pdf->Output('I','Tugas_Keluar.pdf');
 
-
+        } else {
+            echo 'data not yet';
+        }
 
     }
 

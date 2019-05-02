@@ -1,11 +1,11 @@
+<?php 
 
-<?= $include; ?>
+$d = $dataEmp[0];
+// print_r($dataEmp); 
 
-<!-- <pre>
+?>
 
-<?php //print_r($dataEmp); ?>
 
-</pre> -->
 <style>
     .btn-circle.btn-xl {
     width: 70px;
@@ -30,6 +30,10 @@
     border-radius: 17px;
 }
 
+#tableList tr td, #tableList tr th {
+    font-size: 13px;
+}
+
 
 </style> 
 
@@ -39,19 +43,12 @@
 }
 </style>
 
-<div class="thumbnail" style="padding: 10px; text-align: right;margin-bottom: 10px;">
-    <span style="color: #F44336;margin-right: 5px;margin-left: 5px;"><button id="btnedits1" class="btn btn-sm btn-danger btn-round" data-toggle="modal" data-target="#logoutModal" title="Logout"><i class="fa fa-power-off"></i> Log Out</button> </span>
-</div>
-
-
-
-
 <div class="container">
 	<div class="row">
 		<div class="widget-content col-md-6">
-			<div class="thumbnail" style="min-height: 100px;">
+			<div class="thumbnail">
 			
-			 <span id="loadtablerequest"></span>  
+			 <div id="loadtablerequest"></div>  
 			</div>
 		</div>
 
@@ -61,6 +58,14 @@
 					<div class="panel panel-default">
 					    <div class="panel-heading panel-heading-custom">Document Request Form</div>
 					    	<div class="panel-body">
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Name : <?= $d['TitleAhead']," ",$d['Name']," ",$d['TitleBehind']," -- ", $d['NIP']; ?> </label>
+                                        </div>
+                                    </div>
+                                </div>
 
 					    		<div class="row">
 				                    <div class="col-xs-12">
@@ -85,7 +90,7 @@
 					                <div class="col-xs-6 form-group">
 					                	<label>Start Date</label>
 			                            <div id="datetimepicker1" data-no="1" class="input-group input-append date datetimepicker">
-			                                <input data-format="yyyy-MM-dd hh:mm" type="text" class="form-control"/>
+			                                <input data-format="yyyy-MM-dd hh:mm" type="text" class="form-control" id="startDate" readonly>
 			                                <span class="add-on input-group-addon">
 			                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
 			                                </span>
@@ -94,7 +99,7 @@
 				                    <div class="col-xs-6 form-group">
 				                		<label>End Date</label>
 			                            <div id="datetimepicker2" data-no="1" class="input-group input-append date datetimepicker">
-			                                <input data-format="yyyy-MM-dd hh:mm" type="text" class="form-control"/>
+			                                <input data-format="yyyy-MM-dd hh:mm" type="text" class="form-control" id="endDate" readonly>
 			                                <span class="add-on input-group-addon">
 			                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
 			                                </span>
@@ -111,7 +116,7 @@
 
 				                <div class="row">
 				                	<div class="col-xs-12" style="text-align: right;">
-				                		<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Clear</button> <button type="button" class="btn btn-success btn-round btnsavrequest" dataid="'+response[i]['IDVersion']+'"><span class="glyphicon glyphicon-floppy-disk"></span>  Save
+				                		<button type="button" class="btn btn-success btn-round btnsaverequest" dataid="'+response[i]['IDVersion']+'"><span class="glyphicon glyphicon-floppy-disk"></span>  Save
 				                		</button>
 						            </div>
 						        </div>
@@ -125,8 +130,6 @@
 		</div>
 	</div>
 </div>
-
-
 
 <!-- Small modal -->
 <div class="modal" id="logoutModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -151,6 +154,65 @@
 <!-- Small modal -->
 
 <script>
+    
+    $(document).on('click','.btnsaverequest',function () {
+        loading_button('.btnsaverequest');
+        savedatarequestdoc();
+    });
+
+    function savedatarequestdoc() {
+
+        var typerequest = $('.filtertypedocument option:selected').attr('id');
+        var to_event = $('#to_event').val();
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+        var DescriptionVenue = $('#DescriptionVenue').val();
+
+        if(typerequest!=null && typerequest!=''
+                && to_event!='' && to_event!=null
+                && startDate!='' && startDate!=null
+                && endDate!='' && endDate!=null
+                && DescriptionVenue!='' && DescriptionVenue!=null)
+        { 
+    
+            var data = {
+                action : 'AddRequest',
+                formInsert : {
+                    typerequest : typerequest,
+                    to_event : to_event,
+                    startDate : startDate,
+                    endDate : endDate,
+                    DescriptionVenue : DescriptionVenue
+                }
+            };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudrequestdoc';
+                $.post(url,{token:token},function (result) {
+                        
+                    if(result==0 || result=='0'){
+                        //toastr.error('Name division or module already is exist!','Error');
+                        $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                    } else {  
+                        toastr.success('Request Document Saved','Success');
+                        setTimeout(function () {
+                            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                            window.location.href = '';
+                        },1000);
+                    }
+                });
+        }
+        else {
+            toastr.error('The form is still empty!','Error');
+            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+            return;
+        }
+     }
+
+</script>
+
+
+<script>
     function loadfilterdocument() {
         var url = base_url_js+'api/__getloadtypedocument';
         $.getJSON(url,function (jsonResult) {
@@ -171,24 +233,22 @@ $(document).ready(function () {
 function loadlistrequestdocument() {
         
         var url = base_url_js+'api/__getrequestnip';
-        var token = jwt_encode({
-            action:'read'},'UAP)(*');
+        var token = jwt_encode({NIP : <?= $d['NIP']; ?>},'UAP)(*');
 
         $.post(url,{token:token},function (resultJson) {
             var response = resultJson;
             console.log(response);
 
                 $("#loadtablerequest").append('<div>                                               '+
-                    '     <table class="table table-striped table-bordered">                        '+
+                    '     <table class="table table-striped table-responsive table-bordered" id="tableList">                        '+
                     '         <thead>                                                               '+
                     '         <tr style="background: #3968c6;color: #FFFFFF;">                      '+
                     '             <th style="width: 5%;text-align: center;">No.</th>           		'+
-                     '            <th style="width: 5%;text-align: center;">Name/ NIP</th>   		'+
-                    '             <th style="width: 5%;text-align: center;">Type Request</th>       '+
-                     '            <th style="width: 5%;text-align: center;">For Task</th>       	'+
-                    '             <th style="width: 5%;text-align: center;">Start & End Task</th>   '+
-                     '            <th style="width: 5%;text-align: center;">Description</th>        '+
-                    '             <th style="width: 5%;text-align: center;">Date Request</th>       '+
+                     '            <th style="width: 8%;text-align: center;">Name/ NIP</th>   		'+
+                    '             <th style="width: 8%;text-align: center;">Type Request</th>       '+
+                     '            <th style="width: 10%;text-align: center;">For Task</th>       	'+
+                    '             <th style="width: 10%;text-align: center;">Date Time</th>   '+
+                     '            <th style="width: 20%;text-align: center;">Description</th>        '+
                     '             <th style="text-align: center;width: 5%;">Action</th>             '+
                     '         </tr>                                                                 '+
                     '         </thead>                                                              '+
@@ -196,46 +256,60 @@ function loadlistrequestdocument() {
                     '    </table>                                                                   '+
                     '</div> ');  
 
-                var no = 1;
+                
                 var orbs=0;
                 for (var i = 0; i < response.length; i++) {
 
+                    var idrequest = response[i]['IDRequest'];
+                    var nip = response[i]['NIP'];
+                    var tgl1 = response[i]['StartDate'];
+                    var tgl2 = response[i]['EndDate'];
+
+                    var StartDate = moment(tgl1).format('DD MMM YYYY');
+                    var EndDate = moment(tgl2).format('DD MMM YYYY');
+
+                    var token = jwt_encode({NIP : nip, IDRequest : idrequest },'UAP)(*');
+                    var linksurat = base_url_js+"save2pdf/suratTugasKeluar/"+token; 
+                    var buttonlink = ('<a href="'+linksurat+'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ');
+
                    $("#dataRow").append('<tr>                                                       	'+
-                    '            <td>No</td>            												'+   
+                    '            <td>'+(i+1)+'</td>            												'+   
                     '            <td>'+response[i]['NIP']+' - '+response[i]['Name']+'</td>            	'+   
                     '            <td>'+response[i]['TypeFiles']+'</td>            						'+     
                     '            <td>'+response[i]['ForTask']+'</td>            						'+     
-                    '            <td>'+response[i]['StartDate']+' - '+response[i]['EndDate']+'</td>            '+     
+                    '            <td><b>'+StartDate+' s/d '+EndDate+'</b></td>            '+     
                     '            <td>'+response[i]['DescriptionAddress']+'</td>            '+   
-                    '            <td>'+response[i]['RequestDate']+'</td>            '+     
-                    '            <td style="text-align: center;"> <button class="btn btn-sm btn-primary btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Detail"><i class="icon-list icon-large"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Download File"><i class="fa fa-download"></i></button></td>      '+     
+                    '            <td style="text-align: center;"> '+buttonlink+'</td>      '+     
                     '   </tr>');
+
+                
                 }
         });
    };
 </script>
 
-
 <script>
-
-	$(document).ready(function () {
-
-        $('#DescriptionVenue').summernote({
-            placeholder: 'Text your Description Venue Event',
-            tabsize: 2,
-            height: 200,
-            toolbar: [
-                // [groupName, [list of button]]
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['strikethrough', 'superscript', 'subscript']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['height', ['height']]
-            ]
-        });
+    $(document).on('click','.btnviewlistsrata',function () {
+        var filesub = $(this).attr('filesub');
+       
+            $('#NotificationModal .modal-header').addClass('hide');
+            $('#NotificationModal .modal-body').html('<center> '+
+                '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
+                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary btn-round" data-dismiss="modal"><span class="fa fa-remove"></span> Close</button><button type="button" filesublix ="'+filesub+'" class="btn btn-primary btn-circle pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review"><span class="fa fa-external-link"></span></button>' +
+            '</center>');
+            $('#NotificationModal .modal-footer').addClass('hide');
+            $('#NotificationModal').modal({
+                'backdrop' : 'static',
+                'show' : true
+            });
     });
-	
+
+    $(document).on('click','.filesublink',function () {
+        var filesubx = $(this).attr('filesublix');
+        var url = base_url_js+'uploads/files/'+filesubx;
+        window.open(url, '_blank',);
+    });
+
 </script>
 
 <script>
