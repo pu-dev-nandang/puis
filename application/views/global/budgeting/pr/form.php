@@ -229,7 +229,7 @@
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
 			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPN(%)</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
@@ -276,6 +276,7 @@
 		$(".SubTotal").maskMoney('mask', '9894');
 		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$(".UnitCost").maskMoney('mask', '9894');
+
 		$('.datetimepicker').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
@@ -314,6 +315,7 @@
 
 	function AddingTable_existing()
 	{
+		// console.log(ClassDt);
 		var DtExisting = ClassDt.DtExisting;
 		var pr_create = DtExisting.pr_create;
 		var pr_detail = DtExisting.pr_detail;
@@ -393,7 +395,7 @@
 						'</td>'+
 						'<td>'+
 							'<div class="input-group">'+
-								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['UnitCost']+'" value = "'+pr_detail[i]['Item']+'">'+
+								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['EstimaValue']+'" value = "'+pr_detail[i]['Item']+'">'+
 								'<span class="input-group-btn">'+
 									'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
 								'</span>'+
@@ -466,7 +468,7 @@
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
 			                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPN(%)</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 			                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
@@ -533,7 +535,7 @@
                     		'</a>';
 			}
 
-			var html = '<div class = "col-md-4 col-md-offset-8"><div class = "table-responsive">'+
+			var html = '<div class = "col-md-6 col-md-offset-6"><div class = "table-responsive">'+
 		    				html_add_approver+
 							'<table class = "table table-striped table-bordered table-hover table-checkable tableApproval" style = "margin-top : 5px">'+
 								'<thead><tr>';
@@ -607,6 +609,8 @@
 				{
 					// check rule entry
 					$('.btn-add-pr,input[type="file"]').prop('disabled',true);
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea').prop('disabled',true);
 				}
 			}
 			else if(pr_create[0].Status == 1)
@@ -745,12 +749,24 @@
 	}
 
 	$(document).off('click', '#btnEditInput').on('click', '#btnEditInput',function(e) {
-			var row = $('#table_input_pr tbody tr:last');
-			row.find('td').find('input,select,button,textarea').prop('disabled',false);
-			$('input,textarea').prop('disabled',false);
-			$('#SaveSubmit').prop('disabled',false);
-			$(this).remove();
-	})	
+		var row = $('#table_input_pr tbody tr:last');
+		row.find('td').find('input:not(.UnitCost):not(.SubTotal),select,button,textarea').prop('disabled',false);
+		// if value estprice = 0 then can be edit unit cost
+		if (parseInt(row.find('.Item').attr('estprice')) == 0 ) {
+			row.find('input.UnitCost').prop('disabled',false);
+		}
+
+		$('textarea').prop('disabled',false);
+		$('#SaveSubmit').prop('disabled',false);
+		$('.btn-add-pr').prop('disabled',false);
+		$(this).remove();
+	})
+
+	$(document).off('keydown', '.qty,.PPH').on('keydown', '.qty,.PPH',function(e) {
+		if (e.keyCode === 190) {
+		    e.preventDefault();
+		}
+	})
 
 	$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {
 		// before adding row lock all input in last tr
