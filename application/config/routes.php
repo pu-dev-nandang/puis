@@ -376,7 +376,7 @@ $route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
 $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
 //Surat Tugas Keluar 
-$route['suratKeluar'] = 'api/c_global/suratKeluar';
+$route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
 $route['requestsurat'] = 'api/c_global/getlistrequestdoc';
 
 $route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
@@ -655,7 +655,7 @@ $route['save2pdf/monitoringStudent'] =  'c_save_to_pdf/monitoringStudent';
 
 $route['save2pdf/create_idCard'] =  'c_save_to_pdf/create_idCard';
 $route['save2pdf/suratMengajar/(:any)'] =  'c_save_to_pdf/suratMengajar/$1';
-$route['save2pdf/suratTugasKeluar'] =  'c_save_to_pdf/suratTugasKeluar';
+$route['save2pdf/suratTugasKeluar/(:any)'] =  'c_save_to_pdf/suratTugasKeluar/$1';
 
 $route['save2pdf/monitoringAttendanceByRangeDate'] =  'c_save_to_pdf/monitoringAttendanceByRangeDate';
 

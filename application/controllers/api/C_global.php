@@ -1588,9 +1588,9 @@ class C_global extends CI_Controller {
         $this->load->view('global/academic/exam');
     }
 
-     public function suratKeluar(){
+     public function suratKeluar($token){
 
-        $token = '488a476ba583155fd274ffad3ae741408d357054';
+        //$token = '488a476ba583155fd274ffad3ae741408d357054';
 
         $dataEmployees = $this->db->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
             'Password' => $token

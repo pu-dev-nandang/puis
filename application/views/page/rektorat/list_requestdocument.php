@@ -63,7 +63,6 @@
 </div>
 
 <script>
-
     $(document).ready(function () {
         load_documentrequestlist('');
     });
@@ -92,11 +91,7 @@
 <script>
     $(document).on('click','.btnapproved',function () {
         var requestID = $(this).attr('requestid'); 
-        saverequestapprove(requestID);
-    });
 
-    function saverequestapprove(requestID) {
-        
         if(requestID!=null && requestID!='') { 
             var data = {
                 action : 'Approved',
@@ -112,6 +107,7 @@
                 if(result==0 || result=='0'){
                 } else { 
                     toastr.success('Success Approved Request','Success');
+                    load_documentrequestlist();
                 }
             });
         }
@@ -119,25 +115,21 @@
             toastr.error('Confirmation Error!','Error');
             return;
         }
-     }
+    });
 </script>
 
 
 <script>
     $(document).on('click','.btnrejected',function () {
         var requestID = $(this).attr('requestid'); 
-        saverejected();
-    });
-
-    function saverejected(requestID) {
+        alert(requestID);
         
         if(requestID!=null && requestID!='') { 
     
             var data = {
-                action : 'EditGroupModule',
+                action : 'Rejected',
                 formInsert : {
                     requestID : requestID
-    
                 }
             };
 
@@ -150,13 +142,15 @@
                 } else { 
                     toastr.success('Success Rejected Request!','Success');
                 }
+                load_documentrequestlist();
             });
         }
         else {
             toastr.error('Confirmation Error!!','Error');
             return;
         }
-     }
+    });
+
 </script>
 
 
