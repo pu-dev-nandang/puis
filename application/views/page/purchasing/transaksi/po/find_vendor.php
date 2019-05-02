@@ -199,16 +199,16 @@
 									'<table class="table table-bordered tableData" id ="table_data_pr_detail">'+
 										'<thead>'+
 										'<tr>'+
-											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Detail</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-				                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
-				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
-				                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+											'<th width = "3%" style = "text-align: center;background: #607D8B;color: #FFFFFF;">No</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Catalog</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;">Detail</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;">Spec+</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;">Desc</th>'+
+				                            '<th width = "4%" style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">Qty</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Cost</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Sub Total</th>'+
+				                            '<th width = "150px" style = "text-align: center;background: #607D8B;color: #FFFFFF;">Date Needed</th>'+
 										'</tr>'+
 										'</thead>'+
 										'<tbody>'+IsiInputPR+'</tbody></table>'+
@@ -344,17 +344,17 @@
 					 	'<table class="table table-bordered datatable2" id = "tableData_pr_selected">'+
 					 		'<thead>'+
 								'<tr>'+
-									'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">PR Code</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Catalog</th>'+
-		                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;">Detail</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Spec+</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Desc</th>'+
-		                            '<th width = "4%" style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">Qty</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Cost</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
-		                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 150px;">Sub Total</th>'+
-		                            '<th width = "150px" style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
+									'<th width = "3%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">No</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">PR Code</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Catalog</th>'+
+		                            '<th width = "4%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Detail</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Spec+</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Desc</th>'+
+		                            '<th width = "4%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 78px;">Qty</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Cost</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Sub Total</th>'+
+		                            '<th width = "150px" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Date Needed</th>'+
 								'</tr>'+
 							'</thead>'+
 					 		'<tbody>'+IsiInputPR+'</tbody>'+
