@@ -249,7 +249,6 @@
           }
 
         }
-        // var ChangeStatus = $("#selectChangeStatus").val();
         $('#NotificationModal .modal-header').addClass('hide');
             $('#NotificationModal .modal-body').html('<center>' +
                 '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
@@ -272,7 +271,7 @@
                 StatusPayment : StatusPayment,
                 ChangeStatus : ChangeStatus,
             };
-            console.log(data);
+            // console.log(data);
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);
