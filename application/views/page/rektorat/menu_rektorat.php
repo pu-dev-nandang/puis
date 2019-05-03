@@ -5,7 +5,7 @@
         <div class="tabbable tabbable-custom tabbable-full-width">
             <?php $activeMenu = $this->uri->segment(1); ?>
             <ul class="nav nav-tabs">
-                <li class="<?php if($activeMenu=='requestdocument') { echo 'active';} ?>"><a href="<?php echo base_url('requestdocument'); ?>"><i class="fa fa-th-list right-margin" aria-hidden="true"></i> Request Document</a></li>
+                <!--- <li class="<?php //if($activeMenu=='requestdocument') { echo 'active';} ?>"><a href="<?php //echo base_url('requestdocument'); ?>"><i class="fa fa-th-list right-margin" aria-hidden="true"></i> Request Document</a></li> -->
                 <!-- <li class="<?php //if($this->uri->segment(1)=='add_request') { echo 'active'; } ?>">
                     <a href="<?php //echo base_url('add_request'); ?>">Add Request Document</a>
                 </li> -->

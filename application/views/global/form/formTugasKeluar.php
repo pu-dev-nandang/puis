@@ -61,7 +61,7 @@ $d = $dataEmp[0];
                                 </div>
 
 					    		<div class="row">
-				                    <div class="col-xs-12">
+				                    <div class="col-xs-6">
 				                        <div class="form-group">
 				                            <label>Type Form</label>
 				                            	<select class="form-control filtertypedocument" id="filaddivisi"><option id="" disabled selected> --- Select Type Form --- </option></select>
@@ -74,7 +74,7 @@ $d = $dataEmp[0];
 				                    <div class="col-xs-12">
 				                        <div class="form-group">
 				                            <label>For Request</label>
-				                            	<input class="form-control" id="to_event">
+                                                <textarea rows="2" cols="5" name="to_event" id="to_event" class="form-control"></textarea>
 				                        </div>
 				                    </div>
 				                </div>
@@ -124,7 +124,7 @@ $d = $dataEmp[0];
 				                <div class="row">
 				                	<div class="col-xs-12">
 				                		<label>Description Request Location </label>
-				                		<textarea rows="3" cols="5" name="DescriptionVenue" id="DescriptionVenue" class="form-control"></textarea>
+				                		<textarea rows="4" cols="5" name="DescriptionVenue" id="DescriptionVenue" class="form-control"></textarea>
 				                	</div>
 				                </div>
                                  <br />
