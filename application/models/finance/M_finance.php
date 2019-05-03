@@ -4596,18 +4596,30 @@ class M_finance extends CI_Model {
       $SemesterID = explode('.', $Semester);
       $SemesterID = $SemesterID[0];
       $this->load->model('master/m_master');
-      $sql = 'select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
-        ,e.Invoice as PaymentMhs,b.Year
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID
-              join db_finance.payment_students as e on a.ID = e.ID_payment
-              join db_academic.program_study as f on b.ProdiID = f.ID
-              where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
-              order by b.ProdiID asc,a.NPM asc,e.ID_payment asc,e.ID asc';
+      $sql = 'select * from (
+                  select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+              ,e.Invoice as PaymentMhs
+                    from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                    join db_academic.semester as c on a.SemesterID = c.ID
+                    join db_finance.payment_type as d on a.PTID = d.ID
+                    join db_finance.payment_students as e on a.ID = e.ID_payment
+                    join db_academic.program_study as f on b.ProdiID = f.ID
+                    where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+                    UNION
+                    select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+                            ,e.Invoice as PaymentMhs
+                                  from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
+                                  join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                                  join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                                  join db_finance.payment_type as d on a.PTID = d.ID
+                                  join db_finance.payment_students as e on a.ID = e.ID_payment
+                                  join db_academic.program_study as f on b.ProdiID = f.ID
+                                  where e.`Status` = 1  and sa.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+              ) aa
+              order by ProdiID asc,NPM asc,ID_payment asc,ID_payment_students asc';
       // print_r($sql);die();
               //and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
       $f_Pembayaranke = function($ID_payment,$ID_payment_students){
          $sql = 'select * from db_finance.payment_students where ID_payment = ?';
          $query=$this->db->query($sql, array($ID_payment))->result_array();
@@ -4657,7 +4669,17 @@ class M_finance extends CI_Model {
         $data = $arr['data'];
         $subtotal = $arr['subtotal'];
         $Pembayaranke = $f_Pembayaranke($query[$i]['ID_payment'],$query[$i]['ID_payment_students']); // query berdasarkan ID payment
-        $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
+        // jika Semester Antara
+        if ($query[$i]['PTID'] == 5 || $query[$i]['PTID'] == 6) {
+          $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$query[$i]['SemesterID']);
+          $SemesterID = $G_data[0]['SemesterID'];
+          $semesterCount = $f_findSemester($SemesterID,$query[$i]['Year']);
+        }
+        else
+        {
+          $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
+        }
+        
         $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
         $subtotal = $subtotal + $query[$i]['PaymentMhs'];
         $NPM1 = $query[$i]['NPM'];
@@ -4666,7 +4688,15 @@ class M_finance extends CI_Model {
           $ID_program_study2 = $query[$j]['ProdiID'];
           if ($ID_program_study1 == $ID_program_study2) {
             $Pembayaranke =  $f_Pembayaranke($query[$j]['ID_payment'],$query[$j]['ID_payment_students']); // query berdasarkan ID payment
-            $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
+            if ($query[$j]['PTID'] == 5 || $query[$j]['PTID'] == 6) {
+              $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$query[$j]['SemesterID']);
+              $SemesterID = $G_data[0]['SemesterID'];
+              $semesterCount = $f_findSemester($SemesterID,$query[$j]['Year']);
+            }
+            else
+            {
+              $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
+            }
             $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
             $subtotal = $subtotal + $query[$j]['PaymentMhs'];
 
