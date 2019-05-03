@@ -729,6 +729,7 @@ class C_finance extends Finnance_Controler {
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,
+        'total' => $count,
         );
         echo json_encode($output);
     }
@@ -833,7 +834,15 @@ class C_finance extends Finnance_Controler {
                     $payment = str_replace("Rp.","", $Input[$i]->Invoice);
                     $payment = trim(str_replace(",-","", $payment));
                     $payment = trim(str_replace(".","", $payment));
-                    $DeadLinePayment = $Input[$i]->Deadline.' 23:59:00';
+                    
+                    if ($Input[$i]->PTID == 5 || $Input[$i]->PTID == 6) {
+                       $G_data = $this->m_master->caribasedprimary('db_academic.sa_academic_years','SASemesterID',$Input[$i]->semester);
+                       $DeadLinePayment = $G_data[0]['EndPayment'].' 23:59:00';
+                    }
+                    else
+                    {
+                        $DeadLinePayment = $Input[$i]->Deadline.' 23:59:00';
+                    }
 
                     if ($payment == 0) {
                         $aa = $this->m_finance->insertaDataPayment($Input[$i]->PTID,$Input[$i]->semester,$Input[$i]->NPM,$payment,$Input[$i]->Discount,"1",0);
