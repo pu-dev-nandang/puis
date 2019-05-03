@@ -12,7 +12,7 @@ $btnListEmp = ($this->uri->segment(2)=='employees' && $this->uri->segment(3)==''
 
         <a href="<?php echo base_url('human-resources/employees'); ?>" class="btn btn-default <?php echo $btnListEmp; ?>">List Employees</a> |
         <a href="<?php echo base_url('human-resources/employees/input-employees'); ?>" class="btn <?php echo $btnInputEmp; ?>">Add Employees</a> |
-        <a href="<?php echo base_url('human-resources/employees/files'); ?>" class="btn btn-default <?php echo $btnFilesEmp; ?>">Files Employees</a>
+        <!--<a href="<?php //echo base_url('human-resources/employees/files'); ?>" class="btn btn-default <?php //echo $btnFilesEmp; ?>">Files Employees</a> -->
         <hr/>
     </div>
 </div>

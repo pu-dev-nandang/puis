@@ -962,6 +962,47 @@ class C_api2 extends CI_Controller {
         }
     }
 
+    
+    public function getmasterrequestdoc(){
+
+         $generate = $this->db->query('SELECT IDType, Type FROM db_employees.request_master ORDER BY IDType ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getlistypedocument(){
+
+        $generate = $this->db->query('SELECT IDType, Type FROM db_employees.request_master ORDER BY IDType ASC ')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function crudrequestdocument(){
+        $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
+
+            if($data_arr['action']=='AddRequest') {
+                $formInsert = (array) $data_arr['formInsert'];
+
+                $typerequest = $formInsert['typerequest'];
+                $to_event = $formInsert['to_event'];
+                $startDate = $formInsert['startDate'];
+                $endDate = $formInsert['endDate'];
+                $DescriptionVenue = $formInsert['DescriptionVenue'];
+                //$dates = date("Y-m-d H:i:s");
+
+                $dataSave = array(
+                        'IDTypeFiles' => $typerequest,
+                        'ForTask' => $to_event,
+                        'NIP' => $IDuser,
+                        'StartDate' => $startDate,
+                        'EndDate' => $endDate,
+                        'DescriptionAddress' => $DescriptionVenue
+                );
+                $this->db->insert('db_employees.request_document',$dataSave);
+                return print_r(1);
+        }
+
+    }
+
 
     public function getMonitoringAttendance(){
 
@@ -1960,6 +2001,86 @@ class C_api2 extends CI_Controller {
         return print_r(json_encode($dataSemester));
 
     }
+
+
+    public function getrequestdocument(){
+        $requestData= $_REQUEST;
+        $IDuser = $this->session->userdata('NIP');
+
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+
+            $search = $requestData['search']['value'];
+            $dataSearch = 'WHERE a.NIP = "'.$IDuser.'" ';
+            //$dataSearch = 'WHERE annc.Title LIKE "%'.$search.'%" OR annc.Message LIKE "%'.$search.'%" ';
+
+        }
+
+        $queryDefault = 'SELECT a.*, b.Type, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.request_master AS b ON (a.IDType = b.IDType)
+                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    '.$dataSearch.'
+                    ORDER BY a.RequestDate DESC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $approvedates = ($row['ApproveDate']!=null && $row['ApproveDate']!='')
+                ? '---' : ''.date('d M Y',strtotime($row['ApproveDate'])).'';
+
+            //$dataStd = $this->db->query('SELECT ann.*, auts.Name FROM db_notifikasi.announcement_student ann 
+            //                                      LEFT JOIN db_academic.auth_students auts ON (auts.NPM = ann.NPM)
+            //                                      WHERE IDAnnc = "'.$row['ID'].'" ')->result_array();
+
+            //$tkn_std = $this->jwt->encode($dataStd,'UAP)(*');
+           // $swStd = (count($dataStd)>0)
+            //    ? '<a href="javascript:void(0);" class="showUser" data-token="'.$tkn_std.'" data-user="std">'.count($dataStd).' Students</a><br/>' : '';
+
+            //$dataEmp = $this->db->query('SELECT ann.*, em.Name FROM db_notifikasi.announcement_employees ann 
+            //                                      LEFT JOIN db_employees.employees em ON (em.NIP = ann.NIP)
+            //                                      WHERE IDAnnc = "'.$row['ID'].'" ')->result_array();
+
+            //$tkn_em = $this->jwt->encode($dataEmp,'UAP)(*');
+            //$swEmp = (count($dataEmp)>0)
+            //    ? '<a href="javascript:void(0);" class="showUser" data-token="'.$tkn_em.'" data-user="emp">'.count($dataEmp).' Employees</a>' : '';
+
+
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>'; ///no 
+            $nestedData[] = '<div style="font-weight: bold;">'.$row['Type'].'</div>'; //type doc
+            $nestedData[] = '<div style="text-align:center;font-weight: bold;">'.$row['NIP'].' - '.$row['Name'].'</div>'; // nip
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['RequestDate'])).'</div>'; //Request Date
+            $nestedData[] = '<div style="text-align:center;">'.$row['RequestStatus'].'</div>'; //Request Status
+            $nestedData[] = '<div style="text-align:center;">'.$approvedates.'</div>'; //Approved Date
+            $nestedData[] = '<div style="text-align:center;"><a href="'.base_url('uploads/document/'.$row['FileDocument']).'" class="btn btn-sm btn-success"><i class="fa fa-download"></i></a></div>'; //Document
+            //$nestedData[] = '<div style="text-align:right;"><b>'.$row['Name'].'</b><br/>'.date('d M Y H:i',strtotime($row['CreatedAt'])).'</div>';
+
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+
+    }
+
+
 
     public function changePasswordStudent(){
         $data_arr = $this->getInputToken();

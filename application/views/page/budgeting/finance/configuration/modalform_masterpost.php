@@ -10,7 +10,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Code:</label>
+                    <label class="control-label">Budget Category Code:</label>
                 </div>
                 <?php if ($action == 'add'): ?>
                   <div class="col-sm-6">
@@ -30,14 +30,14 @@
             </div>
             <div class="row <?php echo $a = ($action == 'add') ? 'hide' :'' ?>" id = "rowCodePost">
               <div class="col-md-6 col-md-offset-4">
-                <input type="text" name="CodePost" id= "CodePost" placeholder="Code" class="form-control">
+                <input type="text" name="CodePost" id= "CodePost" placeholder="Code" class="form-control" maxlength="10">
               </div>
             </div>
         </div>
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Name:</label>
+                    <label class="control-label">Budget Category Name:</label>
                 </div>    
                 <div class="col-sm-6">
                    <input type="text" name="PostName" id= "PostName" placeholder="PostName" class="form-control">

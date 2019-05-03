@@ -263,7 +263,6 @@ class C_admission extends Admission_Controler {
         $input =  $this->getInputToken();
         $Nama = $input['Nama'];
         $FormulirCode = $input['FormulirCode'];
-
         $this->load->library('pagination');
         $config = $this->config_pagination_default_ajax(1000,5,6);
         $this->pagination->initialize($config);
@@ -359,12 +358,13 @@ class C_admission extends Admission_Controler {
        $Nama = $input['Nama'];
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
+       $No_Formulir = $input['No_Formulir'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah),25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah,$No_Formulir),25,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
-       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah);
+       $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah,$No_Formulir);
       $this->data['no'] = $start + 1;
       $this->data['chkActive'] = 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/table_calon_mahasiswa',$this->data,true);
@@ -397,15 +397,20 @@ class C_admission extends Admission_Controler {
        $FormulirCode = $input['FormulirCode'];
 
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody,$FormulirCode),10,5);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_daftar_set_nilai_rapor_load_data_paging($selectPrody,$FormulirCode),3,5);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
        $datadb = $this->m_admission->daftar_set_nilai_rapor_load_data_paging($config["per_page"], $start,$selectPrody,$FormulirCode);
        $this->data['datadb'] = $datadb['query'];
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($datadb['Prodi']);
-       $this->data['grade'] = json_encode($this->m_admission->showData('db_academic.grade'));
+       $this->data['grade'] = json_encode($this->m_admission->showData('db_admission.grade'));
       $this->data['no'] = $start + 1;
+
+      // get data nilai to finance
+      $this->data['G_Jurusan'] = $this->m_master->showData_array('db_admission.m_criteria_rapor_fin');
+      $this->data['G_Jurusan_sub'] = $this->m_master->showData_array('db_admission.m_sub_criteria_rfin');
+
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/daftar_nilai_rapor_load_data_paging',$this->data,true);
 
        $output = array(
@@ -420,6 +425,7 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->m_admission->saveDataNilaRapor($input);
       $this->m_admission->saveDataRangkingRapor($input);
+      $this->m_admission->saveDataRaporToFin($input['arr_fin']);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
     }
 
@@ -437,14 +443,14 @@ class C_admission extends Admission_Controler {
        $selectProgramStudy = $input['selectProgramStudy'];
        $Sekolah = $input['Sekolah'];
        $this->load->library('pagination');
-       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode),25,4);
+       $config = $this->config_pagination_default_ajax($this->m_admission->count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode),3,4);
        $this->pagination->initialize($config);
        $page = $this->uri->segment(4);
        $start = ($page - 1) * $config["per_page"];
        $this->data['url_registration'] = url_registration;
        $this->data['datadb'] = $this->m_admission->loadData_calon_mahasiswa_created($config["per_page"], $start,$Nama,$selectProgramStudy,$Sekolah,$FormulirCode);
        $this->data['mataujian'] = $this->m_admission->select_mataUjian($selectProgramStudy);
-       $this->data['grade'] = $this->m_admission->showData('db_academic.grade');
+       $this->data['grade'] = $this->m_admission->showData('db_admission.grade');
       $this->data['no'] = $start + 1;
       $this->data['chkActive'] = 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/table_nilai_calon_mahasiswa',$this->data,true);
@@ -461,6 +467,7 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $this->m_admission->submit_cancel_nilai_rapor($input['chkValue']);
       $this->m_admission->submit_cancel_nilai_rapor_rangking($input['chkValue']);
+      $this->m_admission->submit_cancel_nilai_rapor_finance($input['chkValue']);
       echo json_encode( array('msg' => 'Data berhasil disimpan') );
     }
 
@@ -1220,6 +1227,7 @@ class C_admission extends Admission_Controler {
     public function generate_to_be_mhs()
     {
       $input = $this->getInputToken();
+      $msg = '';
       //check existing db
           // get setting ta
           $taDB = $this->m_master->showData_array('db_admission.set_ta');
@@ -1237,7 +1245,7 @@ class C_admission extends Admission_Controler {
           $arrInputID = $input['checkboxArr'];
           $arr = array();
           $arr_insert_auth = array();
-          $arr_insert3 = array();
+          $arr_insert3 = array(); // for auth_parents
           $arr_insert4 = array();
           
           for ($i=0; $i < count($arrInputID); $i++) {
@@ -1257,8 +1265,8 @@ class C_admission extends Admission_Controler {
                     // search NPM dengan 2 Pertama kode Prodi CodeID
                     // 2 kedua tahun angkatan ambil 2 digit terakhir
                     if (count($Q_Prodi) == 0) {
-                      echo json_encode('Error');
-                      die();
+                      $msg = 'Error';
+                      break;
                     }
                     $CodeID = $Q_Prodi[0]['CodeID'];
                     $strLenTA = strlen($ta) - 2; // last 2 digit
@@ -1288,15 +1296,15 @@ class C_admission extends Admission_Controler {
             $HighSchoolID = $data2[0]['SchoolID'];
             $SchoolName = $this->m_master->caribasedprimary('db_admission.school','ID',$HighSchoolID);
             if (count($SchoolName) == 0) {
-              echo json_encode('Error');
-              die();
+               $msg = 'Error';
+              break;
             }
 
             $HighSchool = $SchoolName[0]['SchoolName'];
             $MajorsHighSchool = $this->m_master->caribasedprimary('db_admission.register_major_school','ID',$data[0]['ID_register_major_school']);
             if (count($MajorsHighSchool) == 0) {
-              echo json_encode('Error');
-              die();
+               $msg = 'Error';
+              break;
             }
             $MajorsHighSchool = $MajorsHighSchool[0]['SchoolMajor'];
             $Name = $data2[0]['Name'];
@@ -1305,20 +1313,20 @@ class C_admission extends Admission_Controler {
             $DistrictID = $data[0]['ID_districts'];
             $DistrictID = $this->m_master->caribasedprimary('db_admission.district','DistrictID',$DistrictID);
             if (count($DistrictID) == 0) {
-              echo json_encode('Error');
-              die();
+               $msg = 'Error';
+              break;
             }
             $DistrictID = ' Kecamatan : '.$DistrictID[0]['DistrictName'];
             $RegionID = $this->m_master->caribasedprimary('db_admission.region','RegionID',$data[0]['ID_region']);
             if (count($RegionID) == 0) {
-              echo 'Error';
-              die();
+               $msg = 'Error';
+              break;
             }
             $RegionID = $RegionID[0]['RegionName'];
             $ID_province = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$data[0]['ID_province']);
             if (count($ID_province) == 0) {
-              echo json_encode('Error');
-              die();
+               $msg = 'Error';
+              break;
             }
             $ID_province = $ID_province[0]['ProvinceName'];
 
@@ -1377,6 +1385,66 @@ class C_admission extends Admission_Controler {
             $EmailMother = '';
             $StatusStudentID = 3;
 
+            // copy document
+            $Photo = ''; // id foto 5
+            if (!file_exists('./uploads/document/'.$NPM)) {
+                mkdir('./uploads/document/'.$NPM, 0777, true);
+                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
+                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+            }
+
+            if (!file_exists('./uploads/students/'.$ta)) {
+                mkdir('./uploads/students/'.$ta, 0777, true);
+                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
+                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
+            }
+
+            $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
+            for ($z=0; $z < count($getDoc); $z++) {
+              if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
+                $explode = explode(',', $getDoc[$z]['Attachment']);
+                // asign variable foto
+                  if ($getDoc[$z]['ID_reg_doc_checklist'] == 5 && $getDoc[$z]['Status']== 'Done') {
+                    if (count($explode) > 0) {
+                      $G_FileName = $explode[0];
+                      $ff = explode('.', $G_FileName);
+                      $Photo = $NPM.'.'.$ff[1];
+                      copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                    }
+                  }
+
+                // if ($getDoc[$z]['Status'] == 'Done') {
+                  if (count($explode) > 0) {
+                    for ($ee=0; $ee < count($explode); $ee++) { 
+                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
+                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+                    }
+                  }
+                  else
+                  {
+                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  }
+                  
+                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
+                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                  // }
+                // }
+              } 
+
+              $dataSave = array(  
+                  'NPM' => $NPM,
+                  'ID_reg_doc_checklist' => $getDoc[$z]['ID_reg_doc_checklist'],
+                  'Status' => $getDoc[$z]['Status'],
+                  'Attachment' => $getDoc[$z]['Attachment'],
+                  'Description' => $getDoc[$z]['Description'],
+                  'VerificationBY' => $getDoc[$z]['VerificationBY'],
+                  'VerificationAT' => $getDoc[$z]['VerificationAT'],
+              );
+              $this->db->insert('db_admission.doc_mhs', $dataSave);
+            }
+
+
             $temp = array(
                         'ProdiID' => $ProdiID,
                         'ProgramID' => $ProgramID,
@@ -1419,6 +1487,7 @@ class C_admission extends Admission_Controler {
                         'EmailFather' => $EmailFather,
                         'EmailMother' => $EmailMother,
                         'StatusStudentID' => $StatusStudentID,
+                        'Photo' => $Photo
                       );
 
             $this->db->insert($ta.'.students', $temp);
@@ -1448,56 +1517,27 @@ class C_admission extends Admission_Controler {
 
             $arr_insert_auth[] = $temp2;
 
+            $temp3 = array(
+                'NPM' => $NPM,
+                'ProgramID' => 1,
+                'ProdiID' => $ProdiID,
+                'Year' => $YearAuth,
+                'Password' => $pass,
+                'Password_Old' => md5($pasword_old),
+                'FatherName' => $Father,
+                'MotherName' => $Mother,
+                'StatusStudentID' => 3,
+                'Status' => '-1',
+            );
+
+            $arr_insert3[] = $temp3;
+
             $dataSave = array(  
                 'NPM' => $NPM,
                 'FormulirCode' => $data2[0]['FormulirCode'],
                 'DateTime' => date('Y-m-d H:i:s'),
             );
             $this->db->insert('db_admission.to_be_mhs', $dataSave);
-
-
-            // copy document
-            if (!file_exists('./uploads/document/'.$NPM)) {
-                mkdir('./uploads/document/'.$NPM, 0777, true);
-                // copy("./document/index.html",'./document/'.$namaFolder.'/index.html');
-                // copy("./document/index.php",'./document/'.$namaFolder.'/index.php');
-            }
-
-            $getDoc = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$arrInputID[$i]);
-            for ($z=0; $z < count($getDoc); $z++) {
-              if ($getDoc[$z]['Attachment'] != '' || !empty($getDoc[$z]['Attachment'])) {
-                $explode = explode(',', $getDoc[$z]['Attachment']);
-                // if ($getDoc[$z]['Status'] == 'Done') {
-                  if (count($explode) > 0) {
-                    for ($ee=0; $ee < count($explode); $ee++) { 
-                      copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
-                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
-                    }
-                  }
-                  else
-                  {
-                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
-                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
-                  }
-                  
-                  // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
-                  //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
-                  // }
-                // }
-                
-              } 
-
-              $dataSave = array(  
-                  'NPM' => $NPM,
-                  'ID_reg_doc_checklist' => $getDoc[$z]['ID_reg_doc_checklist'],
-                  'Status' => $getDoc[$z]['Status'],
-                  'Attachment' => $getDoc[$z]['Attachment'],
-                  'Description' => $getDoc[$z]['Description'],
-                  'VerificationBY' => $getDoc[$z]['VerificationBY'],
-                  'VerificationAT' => $getDoc[$z]['VerificationAT'],
-              );
-              $this->db->insert('db_admission.doc_mhs', $dataSave);
-            }
 
             //move payment
               $Semester = $input['Semester'];
@@ -1528,6 +1568,10 @@ class C_admission extends Admission_Controler {
                      );
                      $this->db->insert('db_finance.payment', $dataSave);
                      $insert_id = $this->db->insert_id();
+
+                     // insert to m_tuition_fee
+                     $this->m_master->insert_m_tuition_fee($NPM,$getPaymentAdmisi[$z]['PTID'],$ProdiID,$YearAuth,$Invoice,$getPaymentAdmisi[$z]['Discount']);
+
 
                      // cek lunas atau tidak
                      if ($hitung >= $Invoice) {
@@ -1597,9 +1641,11 @@ class C_admission extends Admission_Controler {
 
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
-          $this->m_admission->insert_to_Library($arr_insert_auth);
-          echo json_encode('');
-
+          $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
+          if($_SERVER['SERVER_NAME']!='localhost') {
+            $this->m_admission->insert_to_Library($arr_insert_auth);
+          }
+          echo json_encode($msg);
     }
 
     public function importFormulirManual()

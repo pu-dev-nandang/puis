@@ -121,13 +121,14 @@ function loadTable()
 	    dataForTable = response;
 	    // console.log(dataForTable);
 	    for (var i = 0; i < dataForTable.length; i++) {
-	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-	    	var btn_del = '<button type="button" class="btn btn-danger btn-delete"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-check-circle" style="color: green;"></i> Activated</button>';
+	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-time" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+	    	var btn_del = '<button type="button" class="btn btn-danger btn-deleteTime"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-minus-circle" style="color: red;"></i> Deactivated</button>';
             var StActivated = '<i class="fa fa-check-circle" style="color: green;"></i>';
             if(dataForTable[i].Activated == 0)
             {
                 StActivated = '<i class="fa fa-minus-circle" style="color: red;"></i>';
+                Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-check-circle" style="color: green;"></i> Activated</button>';
             }
 	    	TableGenerate += '<tr>'+
 	    						'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
@@ -143,12 +144,14 @@ function loadTable()
 	    $("#loadTable").html(TableGenerate);
 	    LoaddataTableStandard("#tableData");
 
-        $(".btn-edit").click(function(){
+        // $(".btn-edit").click(function(){
+        $(document).off('click', '.btn-edit-time').on('click', '.btn-edit-time',function(e) {       
     	    var ID = $(this).attr('year');
     	     modal_generate('edit','Edit',ID);
         });
 
-        $(".btn-delete").click(function(){	
+        // $(".btn-delete").click(function(){
+        $(document).off('click', '.btn-deleteTime').on('click', '.btn-deleteTime',function(e) {   	
             var ID = $(this).attr('year');
              $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Are you sure ? </b> ' +
                  '<button type="button" id="confirmYesDelete" class="btn btn-primary" style="margin-right: 5px;" data-smt = "'+ID+'">Yes</button>' +

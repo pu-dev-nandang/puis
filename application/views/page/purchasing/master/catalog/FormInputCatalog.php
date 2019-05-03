@@ -55,7 +55,7 @@
 		<div class="form-group">
 			<div class="row">
 				<div class="col-xs-2">
-					<label class="control-label">Detail (Dynamic Input)</label>
+					<label class="control-label">Specification / Detail</label>
 				</div>
 				<div class="col-xs-2">
 					<button class="btn btn-default" id = "addDetail"><i class="icon-plus"></i> Add</button>
@@ -106,6 +106,11 @@
 		<?php if ($action == 'edit'): ?>
 			$("#Desc").val("<?php echo $get[0]['Desc'] ?>");
 			$("#ItemName").val("<?php echo $get[0]['Item'] ?>");
+
+			<?php if ($arr_lock > 0): ?>
+				$("#Desc").prop('disabled',true);
+				$("#ItemName").prop('disabled',true);
+			<?php endif ?>
 
 			var ShowPhoto = "<?php echo $get[0]['Photo'] ?>";
 			var temp = '';
@@ -331,9 +336,9 @@
 	            }
 	            break; 
           case  "EstimaValue" :
-          	if (arr[key] == 0) {
-          		toatString += 'Estimate Value must be higher than 0' + "<br>";
-          	}
+          	// if (arr[key] == 0) {
+          	// 	toatString += 'Estimate Value must be higher than 0' + "<br>";
+          	// }
           	result = Validation_required(arr[key],key);
           	if (result['status'] == 0) {
           	  toatString += result['messages'] + "<br>";
@@ -458,7 +463,7 @@
 		}
 		else
 		{
-			arr = '';
+			arr = {};
 		}
 
 		return arr;

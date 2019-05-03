@@ -34,7 +34,7 @@
     }
 </style>
 
-<div class="row" style="margin-top: 30px;">
+<!-- <div class="row" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -42,21 +42,25 @@
             </div>
             <div class="widget-content">
                 <div class = "row">
-                        <div class="col-md-2" style="">
-                            Prody
-                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
-                                <option></option>
-                            </select>
-                        </div>
-                        <div class="col-md-2" style="">
-                            Nama
-                            <input class="form-control" id="Nama" placeholder="All..." "="">
-                        </div>
-                        <div class="col-md-2" style="">
-                            Sekolah
-                            <input class="form-control" id="Sekolah" placeholder="All..." "="">
-                        </div>
-                    <div  class="col-md-6" align="right" id="pagination_link"></div>
+                    <div class="col-md-2" style="">
+                        Prody
+                        <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2" style="">
+                        Nama
+                        <input class="form-control" id="Nama" placeholder="All..." "="">
+                    </div>
+                    <div class="col-md-2" style="">
+                        No Formulir
+                        <input class="form-control" id="No_Formulir" placeholder="All..." "="">
+                    </div>
+                    <div class="col-md-2" style="">
+                        Sekolah
+                        <input class="form-control" id="Sekolah" placeholder="All..." "="">
+                    </div>
+                    <div  class="col-md-4" align="right" id="pagination_link"></div>
                 </div>
                 <div class="row" style="margin-top: 10px;margin-left: 0px;margin-right: 0px">
                     <div id="pageData">
@@ -71,7 +75,8 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+<h4>Comming Soon</h4>
 
 
 <script type="text/javascript">
@@ -109,12 +114,14 @@
         var url = base_url_js+'admission/proses-calon-mahasiswa/loadData_calon_mahasiswa/'+page;
         var Nama = $("#Nama").val();
         var selectProgramStudy = $("#selectProgramStudy").val();
+        var No_Formulir = $("#No_Formulir").val();
         selectProgramStudy = (selectProgramStudy == '') ? '%' : selectProgramStudy;
         // var Sekolah = $("#Sekolah").val();
         data = {
             Nama : Nama,
             selectProgramStudy : selectProgramStudy,
             Sekolah : temp,
+            No_Formulir : No_Formulir,
         }
         var token = jwt_encode(data,"UAP)(*");
         $.post(url,{token:token},function (data_json) {
@@ -262,6 +269,14 @@
       var Sekolah = $("#Sekolah").val();  
       temp = (Sekolah == '') ? '' : temp; 
       loadData(1)
+    });
+
+    $(document).on("keypress", "#No_Formulir", function(event){
+        var code = event.keyCode || event.which;
+        if(code==13){
+            loadData(1);
+        }
+      
     });
 
 </script>

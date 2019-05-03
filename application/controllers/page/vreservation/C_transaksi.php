@@ -266,26 +266,60 @@ class C_transaksi extends Vreservation_Controler {
                                                 $PositionMain = $this->session->userdata('PositionMain');
                                                 $IDDivision = $PositionMain['IDDivision'];
                                                 $IDPositionApprover = $Approver1[$l]->Approver; 
-                                                if ($IDDivision == 15) { // if prodi
-                                                    $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ?';
-                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                if ($IDDivision == 15 || $IDDivision == 33) { // if prodi
+                                                    $sqlgg = 'select * from db_academic.program_study where AdminID = ? or KaprodiID = ? or Laboran = ?';
+                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
                                                     if (count($gg) > 0) {
                                                         for ($k=0; $k < count($gg); $k++) { 
                                                             $Kaprodi = $gg[$k]['KaprodiID'];
                                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
-                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }
                                                         
                                                     }
                                                 }
+                                                elseif ($IDDivision == 34 || $IDDivision == 33) {
+                                                    $sqlgg = 'select * from db_academic.faculty where AdminID = ? or NIP = ? or Laboran = ?';
+                                                    $gg=$this->db->query($sqlgg, array($this->session->userdata('NIP'),$this->session->userdata('NIP'),$this->session->userdata('NIP')))->result_array();
+                                                    if (count($gg) > 0) {
+                                                        for ($k=0; $k < count($gg); $k++) { 
+                                                            $Dekan = $gg[$k]['NIP'];
+                                                            $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Dekan);
+                                                            for ($m=0; $m < count($getApprover1); $m++) { 
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Dekan,'TypeApprover' => $TypeApprover);
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                    }
+                                                }
+                                                elseif ($IDDivision == 14) { // lecturer
+                                                    $EM = $this->m_master->caribasedprimary('db_employees.employees','NIP',$this->session->userdata('NIP'));
+                                                    $ProdiID = $EM[0]['ProdiID'];
+                                                    $G_Prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                                                    $Kaprodi = $G_Prodi[0]['KaprodiID'];
+                                                    $G_Kaprodi = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
+                                                    $dataApprover[0] = array('Email' => $G_Kaprodi[0]['EmailPU'],'Name' => $G_Kaprodi[0]['Name'],'Code' => $G_Kaprodi[0]['NIP'],'TypeApprover' => $TypeApprover);
+                                                }
                                                 else
                                                 {
                                                     // find by division and position
                                                     $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionMain',$IDDivision.'.'.$IDPositionApprover);
+                                                    $arr = array();
+                                                    for ($k=0; $k < count($getApprover1); $k++) {
+                                                        if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
+                                                            $arr[] =  $getApprover1[$k];
+                                                        } 
+                                                       
+                                                    }
+
+                                                    $getApprover1 = $arr;
+                                                    
                                                     if (count($getApprover1) == 0) {
                                                         $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','PositionOther1',$IDDivision.'.'.$IDPositionApprover);
                                                         if (count($getApprover1) == 0) {
@@ -1245,8 +1279,8 @@ class C_transaksi extends Vreservation_Controler {
                                                             $Kaprodi = $gg[$k]['KaprodiID'];
                                                             $getApprover1 = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Kaprodi);
                                                             for ($m=0; $m < count($getApprover1); $m++) { 
-                                                                if ($getApprover1[$k]['StatusEmployeeID'] > 0) {
-                                                                     $dataApprover[] = array('Email' => $getApprover1[$k]['EmailPU'],'Name' => $getApprover1[$k]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
+                                                                if ($getApprover1[$m]['StatusEmployeeID'] > 0) {
+                                                                     $dataApprover[] = array('Email' => $getApprover1[$m]['EmailPU'],'Name' => $getApprover1[$m]['Name'],'Code' => $Kaprodi,'TypeApprover' => $TypeApprover);
                                                                 }
                                                             }
                                                         }

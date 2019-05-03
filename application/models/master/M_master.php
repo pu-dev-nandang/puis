@@ -44,6 +44,14 @@ class M_master extends CI_Model {
         return $query->result_array();
     }
 
+    public function showDataFiles_array($tabel)
+    {
+        $sql = "SELECT * FROM db_employees.master_files WHERE ID NOT IN('14', '15') ";
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+    }
+
+
     public function showDataActive_array($tabel,$Active)
     {
         $sql = "select * from ".$tabel." where Active = ?";
@@ -64,6 +72,41 @@ class M_master extends CI_Model {
         $query=$this->db->query($sql, array($valuePrimary));
         return $query->result_array();
     }
+
+    public function carifilestemp() {
+
+       $logged_in = $this->session->userdata('NIP');
+
+       $sql = "SELECT * FROM db_employees.temp_files AS a WHERE a.user_create = '.$logged_in.' ";
+       $query=$this->db->query($sql, array());
+        return $query->result_array();
+    
+       //$query=$this->db->query($sql, result_array());
+        
+       //$this->db->where("user_create", $logged_in);
+       //return $this->db->get("temp_files")->row_array();
+    }
+    
+   
+
+    public function save_image() {
+
+        //$id_survey = $this->input->post('id_survey');
+        //$dates = date("Y-m-d H:i:s");
+        $filePath = $upload_data['file_name'];
+    
+        $data = array(
+            'kode_survey_penyewa' => $id_survey,
+            'nama_file' => $filePath,
+            'user_upload' => $this->session->userdata('user_id'),
+            'date_upload' => $dates,
+            'ip_address' => $ipget,
+            'mac_address' => $mac_address   
+        );
+        
+        $this->db->insert('upload_foto_survey', $data);
+    }
+
 
     public function getColumnTable($table)
     {
@@ -2533,6 +2576,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query; 
     }
 
+    public function MasterfileStatus($Colom)
+    {
+
+        $sql = 'SELECT ID FROM db_employees.master_files where TypeFiles = "'.$Colom.'" ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;   
+                                      
+    }
+
     public function AuthAPI($arr_content)
     {
         $key = 's3Cr3T-G4N';
@@ -2611,7 +2663,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function UserQNA($IDDivision = '')
     {
         $arr_result = array();
-        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by ID asc,Type asc';
+        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
         $sql = 'select * from db_employees.user_qna '.$Q_add;
         $query=$this->db->query($sql, array())->result_array();
         for ($i=0; $i < count($query); $i++) { 
@@ -2638,6 +2690,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $i = $j-1;
                     break;
                 }
+
+                 $i=$j;
             }
 
             $temp['data'] = $datatemp;
@@ -2647,5 +2701,276 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
 
         return $arr_result;
+    }
+
+    public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
+    {
+        // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
+        $sql1 = 'select * from db_finance.tuition_fee where PTID = ? and ProdiID = ? and ClassOf = ?';
+        $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
+        $PTID = $query1[0]['PTID'];
+        for ($k=1; $k <= 14; $k++) {
+                $st = $k; 
+                switch ($PTID) {
+                    case 1:
+                    case 4:
+                        if ($k == 1) {
+                            $Invoice = $query1[0]['Cost'];
+                            $Discount = $Discount_Q;
+                            $st = 15;
+                        }
+                        break;
+                    case 2:
+                    case 3:
+                        $Invoice = $query1[0]['Cost'];
+                        $Discount = 0;
+                        if ($k == 1) {
+                           $Invoice = $Invoice_Q;
+                           $Discount = $Discount_Q;
+                           // if ($PTID == 3) { // karena hitung satu sks
+                           //     $Invoice = $query1[0]['Cost'];
+                           //     $Discount = $Discount_Q;
+                           // }
+                        }
+                        break;
+                    default:
+                        $Invoice = 0;
+                        $Discount = 0;
+                        break;
+                }
+               $Semester = $k;
+               $dataSave = array(
+                    'Semester' => $Semester,
+                    'PTID' => $PTID,
+                    'NPM' => $NPM,
+                    'Invoice' => $Invoice,
+                    'Discount' => $Discount,
+               );
+               $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+               $k = $st;
+        }
+    }
+
+    public function exColExcelNumber($ColomNumber)
+    {
+        $ColNumber = 363;
+        $string = '';
+        // $c = $this->Loop_HurufColExcelNumber($ColNumber)
+        $keyM = array('A','B','C');
+        $bool = true;
+        $WordTime = 0;
+        $inc = 0;
+        // loop array pankat dari total key
+        // $arr_limit =array();
+        // $c = 1;
+        // $bool_limit = true;
+        // $totInc = 0;
+        // while ($bool_limit) {
+        //     $c = $c * 3;
+        //     $arr_limit[] = $c;
+        //     $totInc = $totInc + $c;
+        //     if ($totInc >= $ColNumber) {
+        //         $bool_limit = false;
+        //     }
+        // }
+        // print_r($arr_limit);
+        // print_r($totInc);die();
+        while ($bool) {
+            // $count = $arr_limit[$WordTime];
+            $str = '';
+            for ($i=0; $i < count($keyM) ; $i++) {
+                $string = $str.$keyM[$i];
+                print_r($string.'{}<br>');
+                // print_r($inc.'inc--<br>');
+                if ($inc == $ColNumber) {
+                    $bool = false;
+                    break;
+                }
+                $t = $i+1;
+                if ($t >= count($keyM)) {
+                    $i = -1;
+                    if ($str == '') {
+                        $str = $keyM[0];
+                    }
+                    else
+                    {
+                        $lengthString = strlen($str);
+                        // print_r($WordTime.'--WordTime<br>');
+                        $bool2 = true;
+                        for ($j=-1; $j < $lengthString; $j--) {
+                            $min = '-'.$lengthString;
+                            $min = (int) $min;
+                            $lastchars = substr($str, $j,1);
+                            // print_r($j.'--j<br>');
+                            // print_r($lastchars.'--lastchars<br>');
+                            // print_r($min.'--min<br>');
+                            for ($k=0; $k < count($keyM); $k++) { 
+                                $t = $keyM[$k];
+                                if ($lastchars ==  $t) {
+                                    if ( ($k+1) == count($keyM) ) {
+                                        // print_r($str.'--end from last<br>');
+                                        //cek lenght string yang diupdate bagian mana
+                                        $bool3 = true;
+                                        for ($l=0; $l < $lengthString; $l++) { 
+                                            if (substr($str, $l,1) != $keyM[$k]) {
+                                                $bool3 = false;
+                                                break;
+                                            }
+                                        }
+                                        
+                                        // $str = substr($str, 0,($lengthString+$j) ).$keyM[0];
+
+                                        $upd = $keyM[0];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+
+                                        $bool4 = true;
+                                        for ($l=0; $l < strlen($str); $l++) { 
+                                            if (substr($str, $l,1) != $keyM[0]) {
+                                                $bool4 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if ( ($bool3 || $bool4) && $j == $min) {
+                                            // print_r('--All Last<br>');
+                                           $str = $keyM[0].$str;
+                                        }
+                                        
+                                        // print_r($str.'-result<br>');
+                                        // print_r($str.'--Last End<br>');
+                                        //break;
+                                    }
+                                    else
+                                    {
+                                        $upd = $keyM[($k+1)];
+                                        // print_r(substr($str, ($lengthString+$j+1),$lengthString).'==str'); 
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+                                        $bool2 = false;
+                                        // print_r($str.'--loopNaikHruf<br>');
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if ($min == $j || (!$bool2) ) {
+                                break;
+                            }
+                            
+                        }
+                    }
+                }
+                $inc++;
+            }
+            // $WordTime++;
+        }
+        
+        // while ($bool) {
+        //     for ($i=0; $i < count($keyM); $i++) { 
+        //         if ($inc == $ColNumber) {
+        //             $string = $keyM[$i];
+        //             $bool = false;
+        //             break;
+        //         }
+        //         $inc++;
+        //     }
+
+        //     if (!$bool) {
+        //         if ($WordTime == 0) {
+        //            $string = $keyM[$WordTime].$string;
+        //         }
+        //         else
+        //         {
+        //             if ($WordTime > 0) {
+                        
+        //             }
+        //         }
+        //     }
+        //     $WordTime++;
+        // }
+        
+
+        return $string;
+    }
+
+    public function HurufColExcelNumber($ColNumber)
+    {
+        $string = '';
+        $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $bool = true;
+        $inc = 0;
+        
+        while ($bool) {
+            $str = '';
+            for ($i=0; $i < count($keyM) ; $i++) {
+                if ($inc == $ColNumber) {
+                    $string = $str.$keyM[$i];
+                    $bool = false;
+                    break;
+                }
+                $t = $i+1;
+                if ($t >= count($keyM)) {
+                    $i = -1;
+                    if ($str == '') {
+                        $str = $keyM[0];
+                    }
+                    else
+                    {
+                        $lengthString = strlen($str);
+                        $bool2 = true;
+                        for ($j=-1; $j < $lengthString; $j--) {
+                            $min = '-'.$lengthString;
+                            $min = (int) $min;
+                            $lastchars = substr($str, $j,1);
+                            for ($k=0; $k < count($keyM); $k++) { 
+                                $t = $keyM[$k];
+                                if ($lastchars ==  $t) {
+                                    if ( ($k+1) == count($keyM) ) {
+                                        //cek lenght string yang diupdate bagian mana
+                                        $bool3 = true;
+                                        for ($l=0; $l < $lengthString; $l++) { 
+                                            if (substr($str, $l,1) != $keyM[$k]) {
+                                                $bool3 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        $upd = $keyM[0];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+
+                                        $bool4 = true;
+                                        for ($l=0; $l < strlen($str); $l++) { 
+                                            if (substr($str, $l,1) != $keyM[0]) {
+                                                $bool4 = false;
+                                                break;
+                                            }
+                                        }
+
+                                        if ( ($bool3 || $bool4) && $j == $min) {
+                                           $str = $keyM[0].$str;
+                                        }
+                                        
+                                    }
+                                    else
+                                    {
+                                        $upd = $keyM[($k+1)];
+                                        $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
+                                        $bool2 = false;
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if ($min == $j || (!$bool2) ) {
+                                break;
+                            }
+                            
+                        }
+                    }
+                }
+                $inc++;
+            }
+        }
+ 
+        return $string;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 require APPPATH.'third_party/fpdf/watermark/rotation.php';
-class pdf extends PDF_Rotate{
+class Pdf extends PDF_Rotate{
 
     function __construct($orientation='P', $unit='mm', $size='A4') {
     	FPDF::__construct($orientation,$unit,$size);

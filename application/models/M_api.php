@@ -433,10 +433,6 @@ class M_api extends CI_Model {
 
 //        print_r($data);
 
-
-
-
-
         return $data;
     }
 
@@ -770,7 +766,116 @@ class M_api extends CI_Model {
 
     }
 
+    public function views_datarequestdoc($NIP) {
+        $sql = "SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
+                    WHERE a.NIP = '".$NIP."' AND a.Active = 1 AND b.RequestDocument = 1
+                    ORDER BY a.IDRequest DESC";
 
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+    }
+
+     // ====== Get Academic Employee =======
+
+    public function views_academic($NIP) {
+
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND em.Active = '1' AND em.LinkFiles NOT IN ('') AND em.LinkFiles IS NOT NULL ORDER BY em.TypeFiles ASC ";
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+    }
+
+    // ====== Get Academic Employee Files =======
+     public function views_otherfile($NIP) {
+        $sql = "SELECT f.*, m.NameFiles
+            FROM db_employees.files AS f
+            LEFT JOIN db_employees.master_files AS m ON (f.TypeFiles = m.ID)
+            WHERE f.NIP = '".$NIP."' AND m.Type ='1' AND f.Active = '1' AND f.LinkFiles NOT IN ('') AND f.LinkFiles IS NOT NULL";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+     }
+
+     public function views_files1($NIP,$srata) {
+        
+             $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
+                    FROM db_employees.files 
+                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
+             $query=$this->db->query($sql, array());
+             return $query->result_array();
+        
+    }
+
+    public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv) {
+
+        $sql = "SELECT *
+                FROM db_employees.files 
+                WHERE NIP= '".$NIP."' AND NameUniversity= '".$nameuniv."'";
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+        
+     }
+
+     public function views_editotfiles($NIP,$IDfiles) {
+
+        $sql = "SELECT *
+                FROM db_employees.files 
+                WHERE NIP= '".$NIP."' AND ID= '".$IDfiles."' AND Active = '1' ";
+
+        $query=$this->db->query($sql, array());
+        return $query->result_array();
+
+     }
+
+
+    public function edit_academicemployee()
+    {
+        $sql = "UPDATE db_employees.employees_academic SET NoIjazah='".$NIP."', DateIjazah='".$NIP."',NameUniversity='".$NIP."',Major='".$NIP."',ProgramStudy='".$NIP."', Grade='".$NIP."',TotalCredit='".$NIP."', TotalSemester='".$NIP."'
+            WHERE NIP ='".$NIP."' AND IjazahFile='".$NIP."' AND TranscriptFile='".$NIP."' ";
+        $query=$this->db->query($sql);
+    }
+
+
+     public function delistacademicemployee($ID1, $ID2){
+
+        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $query=$this->db->query($sql);
+
+     }
+
+     public function delistotherfiles($ID1){
+
+        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID = '".$ID1."' ";
+        $query=$this->db->query($sql);
+
+     }
+
+    public function deletelistversion($versionid){
+
+        $this->db->where('IDVersion', $versionid); 
+        $this->db->delete('db_it.module'); 
+
+        //$sql = "UPDATE db_it.version SET Active='0' WHERE IDVersion = '".$versionid."' ";
+        //$query=$this->db->query($sql);
+
+     }
+
+
+    function getRowsmodule($keyword){
+        
+        $this->db->select('*')->from('db_it.group_module');
+        $this->db->like('NameGroup',$keyword);
+        $query = $this->db->get();    
+         
+        return $query->result();
+
+    }
+    
     // ====== Get Jadwal Per Day =======
 
     public function getTotalPerDay($DayID,$dataWhere){
@@ -792,7 +897,6 @@ class M_api extends CI_Model {
                                            GROUP BY s.ID ')->result_array();
 
         $res = $dataDay;
-
         return $res;
 
     }
@@ -1317,8 +1421,10 @@ class M_api extends CI_Model {
     public function __getLecturerDetail($NIP){
 
 //        $data = $this->db->query('SELECT e.* FROM db_employees.employees e WHERE e.NIP="'.$NIP.'" AND e.PositionMain = "14.7"');
-        $data = $this->db->query('SELECT e.* FROM db_employees.employees e 
-                  WHERE e.NIP="'.$NIP.'" LIMIT 1 ')->result_array();
+        $data = $this->db->query('SELECT e.*, ag.nama AS Religion, dp.Name AS Nameprov
+                                    FROM db_employees.employees e
+                                    LEFT JOIN db_admission.agama ag ON (e.ReligionID = ag.ID) 
+                                    LEFT JOIN db_employees.data_province dp ON (e.ProvinceID = dp.IDProvince) WHERE e.NIP="'.$NIP.'" LIMIT 1')->result_array();
 
         if(count($data)>0){
             return $data[0];
@@ -2059,48 +2165,48 @@ class M_api extends CI_Model {
             // Student
             $this->db->query('CREATE TABLE '.$db_new.'.students (
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
-                              `ProdiID` int(11) DEFAULT NULL,
-                              `ProgramID` int(11) DEFAULT NULL,
-                              `LevelStudyID` int(11) DEFAULT NULL,
-                              `ReligionID` int(11) DEFAULT NULL,
-                              `NationalityID` int(11) DEFAULT NULL,
-                              `ProvinceID` int(11) DEFAULT NULL,
-                              `CityID` int(11) DEFAULT NULL,
-                              `HighSchoolID` int(11) DEFAULT NULL,
-                              `HighSchool` text,
-                              `MajorsHighSchool` varchar(45) DEFAULT NULL,
-                              `NPM` varchar(20) DEFAULT NULL,
-                              `Name` varchar(200) DEFAULT NULL,
-                              `Address` text,
-                              `Photo` text,
-                              `Gender` varchar(2) DEFAULT NULL,
-                              `PlaceOfBirth` varchar(100) DEFAULT NULL,
-                              `DateOfBirth` date DEFAULT NULL,
-                              `Phone` varchar(10) DEFAULT NULL,
-                              `HP` varchar(15) DEFAULT NULL,
-                              `ClassOf` varchar(30) DEFAULT NULL,
-                              `Email` varchar(100) DEFAULT NULL,
-                              `Jacket` varchar(2) DEFAULT NULL,
-                              `AnakKe` int(11) DEFAULT NULL,
-                              `JumlahSaudara` int(11) DEFAULT NULL,
-                              `NationExamValue` decimal(10,0) DEFAULT NULL,
-                              `GraduationYear` int(11) DEFAULT NULL,
-                              `IjazahNumber` varchar(50) DEFAULT NULL,
-                              `Father` varchar(45) DEFAULT NULL,
-                              `Mother` varchar(45) DEFAULT NULL,
-                              `StatusFather` varchar(2) DEFAULT NULL,
-                              `StatusMother` varchar(2) DEFAULT NULL,
-                              `PhoneFather` varchar(15) DEFAULT NULL,
-                              `PhoneMother` varchar(15) DEFAULT NULL,
-                              `OccupationFather` text,
-                              `OccupationMother` text,
-                              `EducationFather` varchar(45) DEFAULT NULL,
-                              `EducationMother` varchar(45) DEFAULT NULL,
-                              `AddressFather` text,
-                              `AddressMother` text,
-                              `EmailFather` varchar(100) DEFAULT NULL,
-                              `EmailMother` varchar(100) DEFAULT NULL,
-                              `StatusStudentID` int(11) DEFAULT NULL,
+                            `ProdiID` int(11) DEFAULT NULL,
+                            `ProgramID` int(11) DEFAULT NULL,
+                            `LevelStudyID` int(11) DEFAULT NULL,
+                            `ReligionID` int(11) DEFAULT NULL,
+                            `NationalityID` int(11) DEFAULT NULL,
+                            `ProvinceID` int(11) DEFAULT NULL,
+                            `CityID` int(11) DEFAULT NULL,
+                            `HighSchoolID` int(11) DEFAULT NULL,
+                            `HighSchool` text,
+                            `MajorsHighSchool` varchar(45) DEFAULT NULL,
+                            `NPM` varchar(20) DEFAULT NULL,
+                            `Name` varchar(200) DEFAULT NULL,
+                            `Address` text,
+                            `Photo` text,
+                            `Gender` varchar(2) DEFAULT NULL,
+                            `PlaceOfBirth` varchar(100) DEFAULT NULL,
+                            `DateOfBirth` date DEFAULT NULL,
+                            `Phone` varchar(10) DEFAULT NULL,
+                            `HP` varchar(15) DEFAULT NULL,
+                            `ClassOf` varchar(30) DEFAULT NULL,
+                            `Email` varchar(100) DEFAULT NULL,
+                            `Jacket` varchar(2) DEFAULT NULL,
+                            `AnakKe` int(11) DEFAULT NULL,
+                            `JumlahSaudara` int(11) DEFAULT NULL,
+                            `NationExamValue` decimal(10,0) DEFAULT NULL,
+                            `GraduationYear` int(11) DEFAULT NULL,
+                            `IjazahNumber` varchar(50) DEFAULT NULL,
+                            `Father` varchar(45) DEFAULT NULL,
+                            `Mother` varchar(45) DEFAULT NULL,
+                            `StatusFather` varchar(2) DEFAULT NULL,
+                            `StatusMother` varchar(2) DEFAULT NULL,
+                            `PhoneFather` varchar(15) DEFAULT NULL,
+                            `PhoneMother` varchar(15) DEFAULT NULL,
+                            `OccupationFather` text,
+                            `OccupationMother` text,
+                            `EducationFather` varchar(45) DEFAULT NULL,
+                            `EducationMother` varchar(45) DEFAULT NULL,
+                            `AddressFather` text,
+                            `AddressMother` text,
+                            `EmailFather` varchar(100) DEFAULT NULL,
+                            `EmailMother` varchar(100) DEFAULT NULL,
+                            `StatusStudentID` int(11) DEFAULT NULL,
                               PRIMARY KEY (`ID`),
                               UNIQUE KEY `NPM` (`NPM`)
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
@@ -2108,29 +2214,37 @@ class M_api extends CI_Model {
             // study_planning
             $this->db->query('CREATE TABLE '.$db_new.'.study_planning (
                               `ID` int(11) NOT NULL AUTO_INCREMENT,
-                              `SemesterID` int(11) DEFAULT NULL,
-                              `MhswID` int(11) DEFAULT NULL,
-                              `NPM` varchar(30) NOT NULL,
-                              `ScheduleID` int(11) NOT NULL,
-                              `TypeSchedule` enum("Br","Ul") DEFAULT NULL,
-                              `CDID` int(11) DEFAULT NULL,
-                              `MKID` int(11) DEFAULT NULL,
-                              `Credit` int(11) DEFAULT NULL,
-                              `Evaluasi1` float DEFAULT NULL,
-                              `Evaluasi2` float DEFAULT NULL,
-                              `Evaluasi3` float DEFAULT NULL,
-                              `Evaluasi4` float DEFAULT NULL,
-                              `Evaluasi5` float DEFAULT NULL,
-                              `UTS` float DEFAULT NULL,
-                              `UAS` float DEFAULT NULL,
-                              `Score` float DEFAULT NULL,
-                              `Grade` varchar(3) DEFAULT NULL,
-                              `GradeValue` float DEFAULT NULL,
-                              `Approval` enum("0","1") DEFAULT NULL,
-                              `StatusSystem` enum("1","0") DEFAULT NULL COMMENT "0 = Siak Lama , 1 = Baru",
-                              `Glue` varchar(45) DEFAULT NULL,
-                              `Status` enum("0","1") DEFAULT NULL,
-                              PRIMARY KEY (`ID`)
+                                `SemesterID` int(11) DEFAULT NULL,
+                                `MhswID` int(11) DEFAULT NULL,
+                                `NPM` varchar(30) NOT NULL,
+                                `ScheduleID` int(11) NOT NULL,
+                                `TypeSchedule` enum("Br","Ul") DEFAULT NULL,
+                                `CDID` int(11) DEFAULT NULL,
+                                `MKID` int(11) DEFAULT NULL,
+                                `Credit` int(11) DEFAULT NULL,
+                                `Evaluasi1` float DEFAULT NULL,
+                                `Evaluasi2` float DEFAULT NULL,
+                                `Evaluasi3` float DEFAULT NULL,
+                                `Evaluasi4` float DEFAULT NULL,
+                                `Evaluasi5` float DEFAULT NULL,
+                                `UTS` float DEFAULT NULL,
+                                `UAS` float DEFAULT NULL,
+                                `Score` float DEFAULT NULL,
+                                `Grade` varchar(3) DEFAULT NULL,
+                                `GradeValue` float DEFAULT NULL,
+                                `Approval` enum("0","1","2") DEFAULT NULL COMMENT "0 = Blm Approve, 1 = UTS Approve, 2 = UAS Approve",
+                                `StatusResign` enum("0","1") DEFAULT "0",
+                                `ShowTranscript` enum("0","1") DEFAULT "1" COMMENT "0 = No Showing\n1 = Show",
+                                `StatusSystem` enum("1","0") DEFAULT NULL COMMENT "0 = Siak Lama , 1 = Baru",
+                                `Glue` varchar(45) DEFAULT NULL,
+                                `TransferCourse` enum("0","1") DEFAULT "0" COMMENT "0 = Bukan mata kuliah transfer\n1 = Mata kuliah transfer, maka tidak perlu membaca schedule",
+                                `Status` enum("0","1") DEFAULT NULL,
+                              PRIMARY KEY (`ID`),
+                              KEY `SemesterID` (`SemesterID`) USING BTREE,
+                                KEY `NPM` (`NPM`) USING BTREE,
+                                KEY `ScheduleID` (`ScheduleID`) USING BTREE,
+                                KEY `CDID` (`CDID`) USING BTREE,
+                                KEY `MKID` (`MKID`) USING BTREE
                             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1');
 
         }

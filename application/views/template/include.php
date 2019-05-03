@@ -179,6 +179,13 @@
         width : 110px !important;
     }
 
+    .toast-top-right {
+        top: 50% !important;
+        right: 50% !important;
+        left: 50% !important;
+        bottom: 50% !important;
+    }
+
 
 </style>
 
@@ -289,11 +296,10 @@
 <!-- JWT Decode -->
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/');?>jwt/decode/build/jwt-decode.min.js"></script>
 
-<!--<script type="text/javascript" src="--><?php //echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?><!--"></script>-->
+<!-- <script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script> -->
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
-
+<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script> 
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js');?>"></script>
 
 <!-- Countdown -->
@@ -1157,7 +1163,17 @@
                 ],
                 "sSwfPath": base_url_js+"assets/template/plugins/datatables/tabletools/swf/copy_csv_xls_pdf.swf"
             },
+            "columnDefs": [ {
+            "targets": 0,
+            "orderable": false
+            } ]
         });
+
+        table.on( 'order.dt search.dt', function () {
+                table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                    cell.innerHTML = i+1;
+                } );
+            } ).draw();
     }
 
     function LoaddataTableStandard(element) {
@@ -1485,5 +1501,4 @@
         var elmChild = $(classHeader).children(findTag)[indexAct];
         $(classHeader).find(elmChild).addClass(classActiveName);
     }
-
 </script>

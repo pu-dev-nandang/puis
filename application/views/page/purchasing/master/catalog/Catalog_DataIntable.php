@@ -1,16 +1,4 @@
-<style type="text/css">
-	#datatablesServer thead th,#datatablesServer tfoot td {
 
-	    text-align: center;
-	    background: #20485A;
-	    color: #FFFFFF;
-
-	}
-
-	#datatablesServer>thead>tr>th, #datatablesServer>tbody>tr>th, #datatablesServer>tfoot>tr>th, #datatablesServer>thead>tr>td, #datatablesServer>tbody>tr>td, #datatablesServer>tfoot>tr>td {
-	    border: 1px solid #b7b7b7
-	}
-</style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
 	<div class="well">
 		<div class="row">
@@ -43,6 +31,7 @@
 						<th>Departement</th>
 						<th>DetailCatalog</th>
 						<th>CreatedBy</th>
+						<th>Status</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -99,9 +88,12 @@
 		$('#datatablesServer tbody').on('click', '.btn-edit-catalog', function () {
 			$('.pageAnchor[page="DataIntable"]').trigger('click');
 			var ID = $(this).attr('code');
-	      	if (CountColapses == 0) {
-	      		// $('.pageAnchor[page="FormInput"]').trigger('click');
-	      		$('#FormInput').show();
+	      	// if (CountColapses == 0) {
+	      	if ($('#FormInput').attr('class') == 'collapse') {
+	      		//$('.pageAnchor[page="FormInput"]').trigger('click');
+	      		//$('#FormInput').show();
+	      		$('#FormInput').attr('class','in');
+	      		$('#FormInput').attr('style','height: auto;');
 	      		var page = 'FormInput';
 	      		loading_page("#page"+page);
 	      		var url = base_url_js+'purchasing/page/catalog/'+page;
@@ -214,6 +206,80 @@
 			else {
                 return false;
             }
+		});
+
+		$('#datatablesServer tbody').on('click', '.btn-reason', function () {
+			var Reason = $(this).attr('reason');
+			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+			    '';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Reason'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(Reason);
+			$('#GlobalModalLarge .modal-footer').html(footer);
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
+		});	
+
+		$('#datatablesServer tbody').on('click', '.btn-reject-catalog', function () {
+			var ID = $(this).attr('code');
+
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+			$("#confirmYes").click(function(){
+				var Reason = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var data = {
+		  	                    Detail : '',
+          		                Action : "reject",
+          		                Departement : '',
+          		                Item : '',
+          		                Desc : '',
+          		                EstimaValue : '',
+          		                ID : ID,
+          		                Reason : Reason,
+	  	                   };
+			  	var token = jwt_encode(data,"UAP)(*");
+			  	var url = base_url_js + "purchasing/page/catalog/saveFormInput";
+			  	$.post(url,{token:token},function (data_json) {
+  	               var obj = JSON.parse(data_json); 
+  	               if(obj == "")
+  	               {
+  	               	var page = 'ApprovalCatalog';
+  	               	LoadPage(page)
+  	               	toastr.success("Done", 'Success!');
+  	               }
+  	               else
+  	               {
+  	               	toastr.error(obj,'Failed!!');
+  	               }
+
+  	           }).done(function() {
+  	             $('#NotificationModal').modal('hide');
+  	           }).fail(function() {
+  	             toastr.error('The Database connection error, please try again', 'Failed!!');
+  	           }).always(function() {
+  	           		
+
+  	           });
+
+			})
+			
 		});
 
 	}); // exit document Function

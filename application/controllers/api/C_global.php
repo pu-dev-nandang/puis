@@ -212,22 +212,21 @@ class C_global extends CI_Controller {
         $input = $this->getInputToken();
         $ID_register_formulir = $input['ID_register_formulir'];
         $query = array();
-        // cek apakah ikut ujian atau tidak
-        $get = $this->m_master->caribasedprimary('db_admission.register_butuh_ujian','ID_register_formulir',$ID_register_formulir);
-        if (count($get) == 0) {
-            $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
-            for ($i=0; $i < count($get2); $i++) { 
-                $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
-                $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
-            }
-            $query = $get2;
-        }
-        else
-        {
-            $this->load->model('admission/m_admission');
-            $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
-            $query = $get2;
-        }
+        $query = $this->m_master->caribasedprimary('db_admission.register_nilai_fin','ID_register_formulir',$ID_register_formulir);
+        // if (count($get) == 0) {
+        //     $get2 = $this->m_master->caribasedprimary('db_admission.register_nilai','ID_register_formulir',$ID_register_formulir);
+        //     for ($i=0; $i < count($get2); $i++) { 
+        //         $NamaUjian = $this->m_master->caribasedprimary('db_admission.ujian_perprody_m','ID',$get2[$i]['ID_ujian_perprody']);
+        //         $get2[$i] = $get2[$i] + array('NamaUjian' => $NamaUjian[0]['NamaUjian'],'Bobot' => $NamaUjian[0]['Bobot']);
+        //     }
+        //     $query = $get2;
+        // }
+        // else
+        // {
+        //     $this->load->model('admission/m_admission');
+        //     $get2 = $this->m_admission->getHasilUjian($ID_register_formulir);
+        //     $query = $get2;
+        // }
         echo json_encode($query);
     }
 
@@ -249,7 +248,48 @@ class C_global extends CI_Controller {
     public function testInject()
     {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
-        ini_set('max_execution_time', 0); // for infinite time of execution 
+        ini_set('max_execution_time', 0); // for infinite time of execution
+
+        // $sql = 'select * from db_employees.division';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) {
+        //     $sql1 = 'select * from db_employees.rule_service where IDService = 5 and IDDivision = '.$query[$i]['ID'];
+        //     $query1=$this->db->query($sql1, array())->result_array();
+        //     if (count($query1) == 0) {
+        //         $datasave = array(
+        //             'IDDivision' => $query[$i]['ID'],
+        //             'IDService' => 5,
+        //             'Status' => '1',
+        //         );
+        //         $this->db->insert('db_employees.rule_service',$datasave);
+        //     }
+           
+        // }
+
+        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
+        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
+        //              a.StatusEmployeeID
+        // FROM   db_employees.employees as a
+        // where SPLIT_STR(a.PositionMain, ".", 1) = 12 and a.StatusEmployeeID != -1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     $IDDivision = 34;
+        //     $sql1 = 'select count(*) as total from db_employees.rule_users where NIP = ? and IDDivision = ?';
+        //     $query1=$this->db->query($sql1, array($NIP,$IDDivision))->result_array();
+        //     $total = $query1[0]['total'];
+        //     if ($total == 0) {
+        //        $dataSave = array(
+        //             'NIP' => $NIP,
+        //             'IDDivision' => $IDDivision,
+        //             'privilege' => 1,
+        //        );
+
+        //        $this->db->insert('db_employees.rule_users',$dataSave);
+        //     }
+        // }
+
+
 
         // $datasave = array(
         //     'Approver2' => '[{"TypeApprover":"Division","Approver":"8"}]',
@@ -323,6 +363,8 @@ class C_global extends CI_Controller {
         // }
         
     }
+
+
 
     public function testInject5()
     {
@@ -450,7 +492,7 @@ class C_global extends CI_Controller {
        //catch exception
        catch(Exception $e) {
          // handling orang iseng
-         echo '{"status":"999","message":"jangan iseng :D"}';
+         echo '{"status":"999","message":"Not Authorize"}';
        }
     }
 
@@ -953,7 +995,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1046,7 +1088,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         } 
     }
 
@@ -1080,7 +1122,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1231,7 +1273,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1247,7 +1289,8 @@ class C_global extends CI_Controller {
                 $arr_eq = (array)$dataToken['arr_eq'];
                 $this->load->model('vreservation/m_reservation');
                 for ($i=0; $i < count($arr_eq); $i++) {
-                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional($idtbooking,$arr_eq[$i]);
+                    $chkQty = ($action == 'Reject') ? true : $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
+                    // $chkQty = $this->m_reservation->chkQty_eq_additional2($idtbooking,$arr_eq[$i]);
                     if ($chkQty) {
                         $datasave = array(
                             'ApproveBy' => $this->session->userdata('NIP'),
@@ -1278,7 +1321,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1316,7 +1359,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1346,7 +1389,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1387,7 +1430,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
         
 
@@ -1417,7 +1460,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1473,7 +1516,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1506,7 +1549,7 @@ class C_global extends CI_Controller {
         //catch exception
         catch(Exception $e) {
           // handling orang iseng
-          echo '{"status":"999","message":"jangan iseng :D"}';
+          echo '{"status":"999","message":"Not Authorize"}';
         }
     }
 
@@ -1560,6 +1603,7 @@ class C_global extends CI_Controller {
 //        exit;
         $this->load->view('global/academic/exam');
     }
+
 
     public function upload_files2(){
 
@@ -1624,6 +1668,26 @@ class C_global extends CI_Controller {
 
 
     }
+
+    public function menu_request($page){
+        $data['page'] = $page;
+        $content = $this->load->view('page/rektorat/menu_rektorat',$data,true);
+        //$this->temp($content);
+    }
+
+
+     public function getlistrequestdoc(){
+
+        $page = $this->load->view('page/rektorat/listrek_requestdoc','',true);
+        $this->menu_request($page);
+
+     }
+
+
+     
+
+    
+
 
 
 }

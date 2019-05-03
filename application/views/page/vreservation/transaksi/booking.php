@@ -605,6 +605,12 @@
 
     });
 
+    $(document).on('change','#End', function () {
+      $('input.chk_e_additional').prop('checked', false);
+      $('#e_additionalTDK').prop('checked',true);
+      $("#e_additionalTDK").trigger('change');
+    });
+
     $(document).on('change','#multipleYA', function () {
         if(this.checked) {
             //equipment_additional = [];
@@ -629,7 +635,16 @@
             $('#divE_additional').remove();
             // get data m_equipment_additional
             var url = base_url_js+"api/__m_equipment_additional";
-            $.post(url,function (data_json) {
+            var date = $('#datetime_deadline1').val();
+            var Start = $("#Start").val();
+            var End = $("#End").val();
+            var data = {
+                date : date,
+                Start : Start,
+                End : End,
+            };
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
               var response = data_json;
               console.log(response);
               var splitBagi = 2;
@@ -652,7 +667,7 @@
                     $('#a'+i).append('<td>'+
                                         '<input type="checkbox" min = "1" class = "chke_additional" name="chke_additional" value = "'+response[getRow].ID_add+'" max ="'+response[getRow].Qty+'">&nbsp'+ response[getRow].Equipment+' By '+response[getRow].Division+
                                      '</td>'+
-                                     '<td>'+
+                                     '<td style = "width : 61px;">'+
                                         ' <input type="number" min = "1" class="form-control chke_additional_number chke_additional'+response[getRow].ID_add+' hide"  value="1" id = "chke_additional'+response[getRow].ID_add+'" max ="'+response[getRow].Qty+'">'+'</td>'
                                     );
                     getRow++;

@@ -11,7 +11,7 @@
             <a href="javascript:void(0)" class="pageAnchor" page = "MasterPost">Master Post</a>
         </li>
         <li class="<?php if($request=='SetPostDepartement'){echo "active";} ?>">
-            <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Set Post Department</a>
+            <a href="javascript:void(0)" class="pageAnchor" page = "SetPostDepartement">Allocation Head Account</a>
         </li>
         <li class="<?php if($request=='UserRole'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "SetUserRole">Set User Role Department</a>

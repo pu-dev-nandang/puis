@@ -1,70 +1,73 @@
 <?php
 
-require_once APPPATH.'third_party/fpdf/fpdf-1.8.php';
+require_once APPPATH.'libraries/Pdf.php';
 
-class Pdf_mc_table extends FPDF
+class Pdf_mc_table extends Pdf
 {
     var $widths;
     var $aligns;
+    var $lineHeight;
 
     function __construct($orientation='P', $unit='mm', $size='A4') {
          parent::__construct($orientation, $unit, $size);
     }
 
-    function SetWidths($w)
-    {
-        //Set the array of column widths
+    function SetWidths($w){
         $this->widths=$w;
     }
-
-    function SetAligns($a)
-    {
-        //Set the array of column alignments
+    //Set the array of column alignments
+    function SetAligns($a){
         $this->aligns=$a;
     }
-
-    function Row($data,$line,$space)
+    //Set line height
+    function SetLineHeight($h){
+        $this->lineHeight=$h;
+    }
+    //Calculate the height of the row
+    function Row($data)
     {
-        //Calculate the height of the row
+        // number of line
         $nb=0;
-        for($i=0;$i<count($data);$i++)
+        // loop each data to find out greatest line number in a row.
+        for($i=0;$i<count($data);$i++){
+            // NbLines will calculate how many lines needed to display text wrapped in specified width.
+            // then max function will compare the result with current $nb. Returning the greatest one. And reassign the $nb.
             $nb=max($nb,$this->NbLines($this->widths[$i],$data[$i]));
-        $h=$space*$nb;
-
+        }
+        
+        //multiply number of line with line height. This will be the height of current row
+        $h=$this->lineHeight * $nb;
         //Issue a page break first if needed
         $this->CheckPageBreak($h);
-        //Draw the cells of the row
+        //Draw the cells of current row
         for($i=0;$i<count($data);$i++)
         {
+            // width of the current col
             $w=$this->widths[$i];
+            // alignment of the current col. if unset, make it left.
             $a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
             //Save the current position
             $x=$this->GetX();
             $y=$this->GetY();
             //Draw the border
-            if($line==1){
-                $this->Rect($x,$y,$w,$h);
-            }
-
+            $this->Rect($x,$y,$w,$h);
             //Print the text
-            $this->MultiCell($w,$space,$data[$i],0,$a);
+            $this->MultiCell($w,5,$data[$i],0,$a);
             //Put the position to the right of the cell
             $this->SetXY($x+$w,$y);
         }
         //Go to the next line
         $this->Ln($h);
     }
-
     function CheckPageBreak($h)
     {
         //If the height h would cause an overflow, add a new page immediately
         if($this->GetY()+$h>$this->PageBreakTrigger)
             $this->AddPage($this->CurOrientation);
     }
-
     function NbLines($w,$txt)
     {
-        //Computes the number of lines a MultiCell of width w will take
+        //calculate the number of lines a MultiCell of width w will take
         $cw=&$this->CurrentFont['cw'];
         if($w==0)
             $w=$this->w-$this->rMargin-$this->x;

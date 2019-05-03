@@ -42,7 +42,13 @@ class C_master extends Purchasing_Controler {
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
             $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+
+            // lock beberapa field untuk tidak bisa diedit
+                $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
+                $query=$this->db->query($sql, array($Input['ID']))->result_array();
+                $this->data['arr_lock'] = count($query);
         }
+
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/FormInputCatalog',$this->data,true);
         echo json_encode($arr_result);
@@ -148,7 +154,7 @@ class C_master extends Purchasing_Controler {
                     echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
                 }
                 break;
-            case 'delete':
+            case 'status':
                 $dataSave = array(
                     'Active' => 0,
                     'LastUpdateBy' => $this->session->userdata('NIP'),
@@ -158,16 +164,41 @@ class C_master extends Purchasing_Controler {
                 $this->db->update('db_purchasing.m_catalog', $dataSave);
                 echo json_encode(array(''));
                 break;
+            case 'delete':
+                $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
+                $query=$this->db->query($sql, array($Input['ID']))->result_array();
+                if (count($query) == 0) {
+                  $this->db->where('ID', $Input['ID']);
+                  $this->db->delete('db_purchasing.m_catalog');
+                  echo json_encode(array(''));
+                }
+                else
+                {
+                  echo json_encode(array($this->Msg['NotAction']));
+                }
+                break;    
             case 'approve':
                 $dataSave = array(
                     'Approval' => 1,
                     'ApprovalBy' => $this->session->userdata('NIP'),
                     'ApprovalAt' => date('Y-m-d H:i:s'),
+                    'Reason' => '',
                 );
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_catalog', $dataSave);
                 echo json_encode(array(''));
-                break;        
+            break;
+            case 'reject':
+                $dataSave = array(
+                    'Approval' => -1,
+                    'ApprovalBy' => $this->session->userdata('NIP'),
+                    'ApprovalAt' => date('Y-m-d H:i:s'),
+                    'Reason' => $Input['Reason'],
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_purchasing.m_catalog', $dataSave);
+                echo json_encode(array(''));
+            break;         
             default:
                 # code...
                 break;
@@ -240,6 +271,67 @@ class C_master extends Purchasing_Controler {
         echo json_encode($arr_result);
     }
 
+    public function allow_division_catalog()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/allow_division_catalog',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function table_allow_div()
+    {
+      $this->auth_ajax();
+      $arr_result = array('html' => '','jsonPass' => '');
+      $GetDeparment = $this->m_master->apiservertoserver(url_pas.'api/__getAllDepartementPU','');
+      for ($i=0; $i < count($GetDeparment); $i++) { 
+        $CodeDepartment = $GetDeparment[$i]['Code'];
+        // check in table catalog_permission
+        $c = $this->m_master->caribasedprimary('db_purchasing.catalog_permission','Departement',$CodeDepartment);
+        $GetDeparment[$i]['No'] = $i + 1;
+        if (count($c) > 0) {
+          $st = 'Allowed';
+          $stcode = '<button class = "btn btn-inverse btnpermission" department = "'.$GetDeparment[$i]['Code'].'" stnow = "1">Not Allow</button>';
+          $GetDeparment[$i]['st'] = $st;
+          $GetDeparment[$i]['stcode'] = $stcode;
+        }
+        else
+        {
+          $st = 'Not Allowed';
+          $stcode = '<button class = "btn btn-primary btnpermission" department = "'.$GetDeparment[$i]['Code'].'" stnow = "0">Allow</button>';
+          $GetDeparment[$i]['st'] = $st;
+          $GetDeparment[$i]['stcode'] = $stcode;
+        }
+      }
+
+      $this->data['GetDeparment'] = $GetDeparment;
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/table_allow_div',$this->data,true);
+      echo json_encode($arr_result);
+    }
+
+    public function submit_permission_division()
+    {
+      $this->auth_ajax();
+      $Input = $this->getInputToken();
+      $Departement = $Input['Department'];
+      switch ($Input['passaction']) {
+        case 'delete':
+           $this->db->where('Departement', $Departement);
+           $this->db->delete('db_purchasing.catalog_permission');
+          break;
+        case 'add':
+           $dataSave = array('Departement' => $Departement);
+           $this->db->insert('db_purchasing.catalog_permission',$dataSave);
+          break;
+        default:
+          # code...
+          break;
+      }
+
+      echo json_encode('');
+
+    }
+
     public function Catalog_DataIntable_server_side()
     {
         $this->auth_ajax();
@@ -249,7 +341,7 @@ class C_master extends Purchasing_Controler {
            $condition = ' and a.Approval = 1';
         }
         elseif ($action == 'non_approval') {
-            $condition = ' and a.Approval = 0';
+            $condition = ' and a.Approval != 1';
         }
 
         $requestData= $_REQUEST;
@@ -317,7 +409,7 @@ class C_master extends Purchasing_Controler {
             }
             elseif ($action == 'non_approval')
             {
-                $btn = '<button type="button" class="btn btn-default btn-edit btn-approve-catalog" code="'.$row['ID'].'"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button>';
+                $btn = '<button type="button" class="btn btn-default btn-edit btn-approve-catalog" code="'.$row['ID'].'"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button>&nbsp <button type="button" class="btn btn-inverse btn-edit btn-reject-catalog" code="'.$row['ID'].'"> Reject</button>';
             }
             else
             {
@@ -326,7 +418,25 @@ class C_master extends Purchasing_Controler {
             
             $nestedData[] = $temp;
             $nestedData[] = $row['NameCreated'];
+            $st = '';
+            switch ($row['Approval']) {
+              case 0:
+                $st = 'Not Approval';
+                break;
+              case 1:
+                $st = 'Approve';
+                break;
+              case -1:
+                $st = 'Reject<br><br><button type="button" class="btn btn-default btn-edit btn-reason" reason= "'.$row['Reason'].'"> Reason</button>';
+                break;  
+              default:
+                # code...
+                break;
+            }
+
+            $nestedData[] = $st;
             $nestedData[] = $btn;
+            $nestedData[] = $row['Reason'];
             $data[] = $nestedData;
 
             $No++;
@@ -364,6 +474,12 @@ class C_master extends Purchasing_Controler {
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
             $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
+            $d = $this->data['get'];
+            $CodeSupplier = $d[0]['CodeSupplier'];
+            // lock beberapa field untuk tidak bisa diedit
+                $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+                $query=$this->db->query($sql, array($CodeSupplier))->result_array();
+                $this->data['arr_lock'] = count($query); 
         }
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/supplier/FormInputSupplier',$this->data,true);
@@ -458,6 +574,20 @@ class C_master extends Purchasing_Controler {
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_supplier', $dataSave);
                 break;
+            // case 'delete':
+            //     $G_data = $this->m_master->caribasedprimary('db_purchasing.m_supplier','ID',$Input['ID']);
+            //     $CodeSupplier = $G_data[0]['CodeSupplier'];
+            //     $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+            //     $query=$this->db->query($sql, array($CodeSupplier))->result_array();
+            //     if (count($query) == 0) {
+            //       $this->db->where('ID', $Input['ID']);
+            //       $this->db->delete('db_purchasing.m_supplier');
+            //     }
+            //     else
+            //     {
+            //       $msg = 'The data has been used for transaction, Cannot be action';
+            //     }
+            //     break;    
             case 'approve':
                 $dataSave = array(
                     'Approval' => 1,
@@ -480,10 +610,46 @@ class C_master extends Purchasing_Controler {
         $this->auth_ajax();
         $Input = $this->getInputToken();
         $CategoryName = $Input['CategoryName'];
-        $dataSave = array(
-            'CategoryName' => trim(ucwords($CategoryName)),
-        );
-        $this->db->insert('db_purchasing.m_categorysupplier', $dataSave);
+        $action = $Input['action'];
+        switch ($action) {
+          case 'add':
+            $dataSave = array(
+                'CategoryName' => trim(ucwords($CategoryName)),
+            );
+            $this->db->insert('db_purchasing.m_categorysupplier', $dataSave);
+            break;
+          case 'edit':
+            $ID = $Input['id_data'];
+            $dataSave = array(
+                'CategoryName' => trim(ucwords($CategoryName)),
+            );
+            $this->db->where('ID',$ID);
+            $this->db->update('db_purchasing.m_categorysupplier', $dataSave);
+            break;
+          case 'delete':
+            $ID = $Input['id_data'];
+            // $G = $this->m_master->caribasedprimary('db_purchasing.m_supplier','CategorySupplier',$ID);
+            // if (count($G) > 0) {
+            //   echo json_encode(0);
+            // }
+            // else
+            // {
+            //   $this->db->where('ID',$ID);
+            //   $this->db->delete('db_purchasing.m_categorysupplier');
+            //   echo json_encode(1);
+            // }
+            $dataSave = array(
+                'Active' => 0,
+            );
+            $this->db->where('ID', $ID);
+            $this->db->update('db_purchasing.m_categorysupplier', $dataSave);
+            echo json_encode(1);
+            break;  
+          default:
+            # code...
+            break;
+        }
+        
     }
 
     public function Supplier_DataIntable($action = "All_approval")
@@ -520,7 +686,7 @@ class C_master extends Purchasing_Controler {
                ';
 
         $sql.= ' where ( a.CodeSupplier LIKE "'.$requestData['search']['value'].'%" or a.NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or a.PICName LIKE "'.$requestData['search']['value'].'%" or a.DetailInfo LIKE "%'.$requestData['search']['value'].'%" or c.CategoryName LIKE "'.$requestData['search']['value'].'%" or a.CategorySupplier LIKE "%'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or a.DetailItem LIKE "%'.$requestData['search']['value'].'%"
-                ) and a.Active = 1 '.$condition;
+                ) and a.Active = 1 and c.Active = 1'.$condition;
         $sql.= ' ORDER BY a.ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
 

@@ -23,6 +23,10 @@ index.php
 /uploads/students/ta_2016/*.jpg
 /uploads/students/ta_2016/*.png
 
+/uploads/students/ta_2019/*.jpeg
+/uploads/students/ta_2019/*.jpg
+/uploads/students/ta_2019/*.png
+
 **/uploads/document/
 **/uploads/vreservation/
 ***/uploads/budgeting/catalog/
@@ -30,6 +34,8 @@ index.php
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
+**/uploads/files/
+
 
 /uploads/budgeting/catalog/*.jpeg
 /uploads/budgeting/catalog/*.jpg

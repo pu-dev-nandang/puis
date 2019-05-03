@@ -27,7 +27,7 @@ class C_dashboard extends Globalclass {
                     $this->m_menu->set_model('admission_sess','auth_admission_sess','menu_admission_sess','menu_admission_grouping','db_admission');
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
-                    break;
+                break;
                 case 15: // Admin Prodi
                     // check session admin prodi
                     $this->load->model('prodi/m_prodi');
@@ -94,7 +94,74 @@ class C_dashboard extends Globalclass {
                             $this->temp($content);
                         }
                     }
-                    break;
+                break;
+                case 34: // Admin Fakultas
+                    // check session admin Fakultas
+                    $this->load->model('faculty/m_faculty');
+                    if ($this->session->userdata('faculty_get')) {
+                        // check multiple akses
+                        if (count($this->session->userdata('faculty_get')) > 1) {
+                            if (empty($_POST)) {
+                                $content = $this->load->view('global/switch_faculty',$data,true);
+                                $this->temp($content);
+                            }
+                            else
+                            {
+                                $faculty_active_id =  $this->input->post('faculty');
+                                $get = $this->m_master->caribasedprimary('db_academic.faculty','ID',$faculty_active_id);
+                                $this->session->set_userdata('faculty_active',$get[0]['Name']);
+                                $this->session->set_userdata('faculty_active_id',$get[0]['ID']);
+                                $data['Namefaculty'] = $get[0]['Name'];
+                                $data['Namefaculty'] = strtolower($data['Namefaculty'] );
+                                $data['Namefaculty']  = str_replace(" ", "-", $data['Namefaculty'] );
+                                // print_r($data['department']);die();
+                                if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard.php')) {
+                                    $content = $this->load->view('page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard',$data,true);
+                                }
+                                else
+                                {
+                                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                                }
+                                $this->temp($content);
+                            }    
+                        }
+                        else
+                        {
+                            $data['Namefaculty'] = $this->session->userdata('faculty_active');
+                            if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard.php')) {
+                                $content = $this->load->view('page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard',$data,true);
+                            }
+                            else
+                            {
+                                $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                            }
+                            $this->temp($content);
+                        }
+                        
+                    }
+                    else
+                    {
+                        $this->m_faculty->auth(); // get session
+                        // check multiple akses
+                        if (count($this->session->userdata('faculty_get')) > 1) {
+                            $content = $this->load->view('global/switch_faculty',$data,true);
+                            $this->temp($content);
+                        }
+                        else
+                        {
+                            $data['Namefaculty']  = $this->session->userdata('faculty_active');
+                            if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard.php')) {
+                                $content = $this->load->view('page/'.$data['department'].'/'.$data['Namefaculty'].'/dashboard',$data,true);
+                            }
+                            else
+                            {
+                                $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                            }
+                            
+                            $this->temp($content);
+                        }
+                    }
+                break;
 
                 default:
                     $getSemester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);

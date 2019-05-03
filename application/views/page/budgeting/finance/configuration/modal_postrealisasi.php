@@ -10,7 +10,7 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post Item Code:</label>
+                    <label class="control-label">Sub Account Code:</label>
                 </div>
                 <?php if ($action == 'add'): ?>
                   <div class="col-sm-6">
@@ -30,17 +30,17 @@
             </div>
             <div class="row <?php echo $a = ($action == 'add') ? 'hide' :'' ?>" id = "rowCodePostRealisasi">
               <div class="col-md-6 col-md-offset-4">
-                <input type="text" name="CodePost" id= "CodePostRealisasi" placeholder="Code" class="form-control">
+                <input type="text" name="CodePost" id= "CodePostRealisasi" placeholder="Code" class="form-control" maxlength="10">
               </div>
             </div>
         </div>
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Post :</label>
+                    <label class="control-label">Head Account :</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 full-width-fix" id="PostItem">
+                   <select class="select2-select-00 full-width-fix" id="HeadAccount">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -49,20 +49,30 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">ItemPostName:</label>
+                    <label class="control-label">Sub Account Name:</label>
                 </div>    
                 <div class="col-sm-6">
-                   <input type="text" name="PostName" id= "RealisasiPostName" placeholder="RealisasiPostName" class="form-control">
+                   <input type="text" name="PostName" id= "RealisasiPostName" placeholder="Sub Account Name" class="form-control">
                 </div>
             </div>
         </div>
         <div class="form-group">
             <div class="row">
                 <div class="col-sm-4">
-                    <label class="control-label">Department:</label>
+                    <label class="control-label">Desc:</label>
                 </div>    
                 <div class="col-sm-6">
-                   <select class="select2-select-00 full-width-fix" id="Departement">
+                   <textarea class="form-control" id = "Desc" maxlength="100"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">User :</label>
+                </div>    
+                <div class="col-sm-6">
+                   <select class="select2-select-00 full-width-fix" id="Departement2">
                         <!-- <option></option> -->
                     </select>
                 </div>
@@ -83,6 +93,7 @@
         <?php if ($action == 'edit'): ?>
           $("#CodePostRealisasi").val('<?php echo $getData[0]['CodePostRealisasi'] ?>');
           $("#RealisasiPostName").val('<?php echo $getData[0]['RealisasiPostName'] ?>');
+          $("#Desc").val('<?php echo $getData[0]['Desc'] ?>');
         <?php endif ?>
 
         $(".NeedPrefix").change(function(){
@@ -108,23 +119,40 @@
 
     function getDataPostItem()
     {
-      var url = base_url_js+"budgeting/table_all/cfg_post/1";
-      $('#PostItem').empty();
+      var url = base_url_js+"budgeting/get_cfg_head_account";
+      $('#HeadAccount').empty();
       $.post(url,function (data_json) {
         var response = jQuery.parseJSON(data_json);
+        var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
         for (var i = 0; i < response.length; i++) {
-            var selected = (i==0) ? 'selected' : '';
-            $('#PostItem').append('<option value="'+ response[i]['CodePost']  +'" '+selected+'>'+response[i]['PostName']+'</option>');
+            var CodeDepartment = response[i].Departement;
+            <?php if (!isset($Departement)): ?>
+              if (sessIDDepartementPUBudget != 'NA.9') {
+                if (CodeDepartment == sessIDDepartementPUBudget) {
+                  var selected = (i==0) ? 'selected' : '';
+                  $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+                } 
+              } else {
+                var selected = (i==0) ? 'selected' : '';
+                $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+              }
+            <?php else: ?>
+                if (CodeDepartment == sessIDDepartementPUBudget) {
+                  var selected = (i==0) ? 'selected' : '';
+                  $('#HeadAccount').append('<option value="'+ response[i]['CodeHeadAccount']  +'" '+selected+'>'+response[i]['NameHeadAccount']+' {'+response[i]['DepartementName']+'}'+'</option>');
+                } 
+            <?php endif ?>
+             
         }
 
         <?php if ($action == 'edit'): ?>
-          $("#PostItem option").filter(function() {
+          $("#HeadAccount option").filter(function() {
             //may want to use $.trim in here
-            return $(this).val() == "<?php echo $getData[0]['CodePost'] ?>"; 
+            return $(this).val() == "<?php echo $getData[0]['CodeHeadAccount'] ?>"; 
           }).prop("selected", true);
         <?php endif ?>
 
-        $('#PostItem').select2({
+        $('#HeadAccount').select2({
            //allowClear: true
         });
       }).done(function () {
@@ -136,36 +164,22 @@
     function getAllDepartementPU()
     {
       var url = base_url_js+"api/__getAllDepartementPU";
-      $('#Departement').empty();
+      $('#Departement2').empty();
+      var Div = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
       $.post(url,function (data_json) {
         for (var i = 0; i < data_json.length; i++) {
-            var selected = (i==0) ? 'selected' : '';
-            $('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
-        }
-
-        // lock department if not finance
-        var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
-        if (sessIDDepartementPUBudget != 'NA.9') {
-          $("#Departement option").filter(function() {
-           //may want to use $.trim in here
-           return $(this).val() == sessIDDepartementPUBudget; 
-         }).prop("selected", true);
-         $( "#Departement" ).prop( "disabled", true );
+            var selected = (data_json[i]['Code']==Div) ? 'selected' : '';
+            $('#Departement2').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
         }
 
         <?php if ($action == 'edit'): ?>
-            $("#Departement option").filter(function() {
+            $("#Departement2 option").filter(function() {
              //may want to use $.trim in here
-             return $(this).val() == "<?php echo $getData[0]['Departement'] ?>"; 
+             return $(this).val() == "<?php echo $getData[0]['UnitDiv'] ?>"; 
            }).prop("selected", true);
-
-            // lock department if not finance
-               if (sessIDDepartementPUBudget != 'NA.9') {
-                $( "#Departement" ).prop( "disabled", true );
-               }
         <?php endif ?>
        
-        $('#Departement').select2({
+        $('#Departement2').select2({
            //allowClear: true
         });
       }).done(function () {
