@@ -55,7 +55,7 @@ $d = $dataEmp[0];
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label>Name : <?= $d['TitleAhead']," ",$d['Name']," ",$d['TitleBehind']," -- ", $d['NIP']; ?> </label>
+                                            <label class="text-primary">Name : <?= $d['TitleAhead']," ",$d['Name']," ",$d['TitleBehind']," -- ", $d['NIP']; ?> </label>
                                         </div>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@ $d = $dataEmp[0];
 					    		<div class="row">
 				                    <div class="col-xs-12">
 				                        <div class="form-group">
-				                            <label>To attend event</label>
+				                            <label>For Request</label>
 				                            	<input class="form-control" id="to_event">
 				                        </div>
 				                    </div>
@@ -123,7 +123,7 @@ $d = $dataEmp[0];
 
 				                <div class="row">
 				                	<div class="col-xs-12">
-				                		<label>Description Venue </label>
+				                		<label>Description Request Location </label>
 				                		<textarea rows="3" cols="5" name="DescriptionVenue" id="DescriptionVenue" class="form-control"></textarea>
 				                	</div>
 				                </div>
@@ -252,16 +252,16 @@ function loadlistrequestdocument() {
             var response = resultJson;
             console.log(response);
 
-                $("#loadtablerequest").append('<div class="table-responsive">                                               '+
-                    '     <table class="table table-striped  table-bordered" id="tableList">                        '+
+                $("#loadtablerequest").append('<div class="table-responsive">                        '+
+                    '     <table class="table table-striped  table-bordered" id="tableList">        '+
                     '         <thead>                                                               '+
                     '         <tr style="background: #3968c6;color: #FFFFFF;">                      '+
                     '             <th style="width: 5%;text-align: center;">No.</th>           		'+
                     '             <th style="width: 11%;text-align: center;">Name/ NIP</th>   		'+
                     '             <th style="width: 8%;text-align: center;">Type Request</th>       '+
-                     '            <th style="width: 18%;text-align: center;">For Request</th>       	'+
+                     '            <th style="width: 18%;text-align: center;">For Request</th>        '+
                     '             <th style="width: 13%;text-align: center;">Date Time</th>         '+
-                    '            <th style="width: 22%;text-align: center;">Description Request</th>        '+
+                    '            <th style="width: 22%;text-align: center;">Description Request</th>  '+
                     '            <th style="width: 10%;text-align: center;">Date Confirm</th>       '+
                     '             <th style="text-align: center;width: 5%;">Action</th>             '+
                     '         </tr>                                                                 '+

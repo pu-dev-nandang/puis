@@ -89,11 +89,15 @@
 </script>
 
 <script>
+    
     $(document).on('click','.btnapproved',function () {
-        var requestID = $(this).attr('requestid'); 
 
-        if(requestID!=null && requestID!='') { 
-            var data = {
+        if (confirm('Are you sure Approved Request?')) {
+
+            var requestID = $(this).attr('requestid');
+            if(requestID!=null && requestID!='') { 
+
+                var data = {
                 action : 'Approved',
                 formInsert : {
                     requestID : requestID
@@ -102,27 +106,35 @@
 
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__confirmrequest';
-            $.post(url,{token:token},function (result) {
+                $.post(url,{token:token},function (result) {
                     
-                if(result==0 || result=='0'){
-                } else { 
-                    toastr.success('Success Approved Request','Success');
-                    load_documentrequestlist();
-                }
-            });
-        }
-        else {
-            toastr.error('Confirmation Error!','Error');
-            return;
-        }
-    });
+                    if(result==0 || result=='0'){ 
+                    } 
+                    else { 
+                        toastr.success('Success Approved Request','Success');
+                        load_documentrequestlist();
+                    }
+                });
+            }  
+            else {
+                toastr.error('Confirmation Error!','Error');
+                return;
+            }
+        } 
+    else { 
+        return;
+    }
+});
+
 </script>
 
 
 <script>
-    $(document).on('click','.btnrejected',function () {
+$(document).on('click','.btnrejected',function () {
+        
+    if (confirm('Are you sure Rejected Request?')) {
+
         var requestID = $(this).attr('requestid'); 
-        alert(requestID);
         
         if(requestID!=null && requestID!='') { 
     
@@ -141,15 +153,19 @@
             
                 } else { 
                     toastr.success('Success Rejected Request!','Success');
+                    load_documentrequestlist();
                 }
-                load_documentrequestlist();
             });
         }
         else {
             toastr.error('Confirmation Error!!','Error');
             return;
         }
-    });
+
+    } else {
+        return;
+    }
+});
 
 </script>
 
