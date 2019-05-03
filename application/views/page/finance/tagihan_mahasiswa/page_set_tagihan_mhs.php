@@ -189,6 +189,7 @@
               //if(resultJson.msg == '')
               if(true)
               {
+                // Read Cek Deadline Semester Antara
                 $('#NotificationModal .modal-header').addClass('hide');
                 $('#NotificationModal .modal-body').html('<center>' +
                     '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
