@@ -100,7 +100,7 @@
             var token = jwt_encode({action:'read'},'UAP)(*');
             var url = base_url_js+'api/__crudTahunAkademik';
             $.post(url,{token:token},function (jsonResult) {
-              console.log(jsonResult);
+              // console.log(jsonResult);
                if(jsonResult.length>0){
                     for (var i = 0; i < jsonResult.length; i++) {
                       var dt = jsonResult[i];
@@ -228,12 +228,29 @@
                        var value_cost = Data_mhs[i]['Cost'] - ((Data_mhs[i]['Discount']/100)*Data_mhs[i]['Cost']);
                        var yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
                        
-                       if(PTID == 3)
+                       if(PTID == 3 || PTID == 6)
                        {
-                         var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
-                         var value_cost = t - ((Data_mhs[i]['Discount']/100)*t);
-                         yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
-                         selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
+                        // Untuk PTID == 3 atau credit maka Discount dikalikan dengan Credit / SKS baru tidak untuk mengulang
+                        if (PTID == 3) {
+                          var Credit_Detail = Data_mhs[i]['Credit_Detail'];
+                          var CreditBr = Credit_Detail['CreditBr'];
+                          var CreditUl = Credit_Detail['CreditUl'];
+
+                          var t = parseInt(Data_mhs[i]['Cost']) * parseInt(CreditBr);
+                          value_cost = t - ((Data_mhs[i]['Discount']/100)*t);
+                          var t2 = parseInt(Data_mhs[i]['Cost']) * parseInt(CreditUl);
+                          value_cost = parseInt(value_cost) + parseInt(t2);
+                          yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                          selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+Data_mhs[i]['Cost']+'" CreditBr = "'+CreditBr+'" CreditUl = "'+CreditUl+'" Credit = "'+Data_mhs[i]['Credit']+'">';
+                        }
+                        else
+                        {
+                          var t = parseInt(Data_mhs[i]['Cost']) * parseInt(Data_mhs[i]['Credit']);
+                          var value_cost = t - ((Data_mhs[i]['Discount']/100)*t);
+                          yy = (value_cost != '') ? formatRupiah(value_cost) : '-';
+                          selecTOption = '<select class="selecTOption getDom" id="'+'discount_'+Data_mhs[i]['NPM']+'" NPM = "'+Data_mhs[i]['NPM']+'" payment-type = "'+PTID+'" invoice = "'+t+'">';
+                        }
+                         
                        } 
                             for (var k = 0;k < xx['Discount'].length; k++)
                             {
@@ -466,10 +483,21 @@
     });
 
     $(document).on('change','.selecTOption', function () {
+      var PTID = $('#selectPTID option:selected').val();
       var Discount = $(this).val();
       var Npm = $(this).attr('npm');
       var Invoice = $(this).attr('invoice');
       value_cost = Invoice - ((Discount/100)*Invoice);
+      if (PTID == 3) {
+        var CreditBr = $(this).attr('creditbr');
+        var CreditUl = $(this).attr('creditul');
+
+        var t = parseInt(Invoice) * parseInt(CreditBr);
+        value_cost = t - ((Discount/100)*t);
+        var t2 = parseInt(Invoice) * parseInt(CreditUl);
+        value_cost = parseInt(value_cost) + parseInt(t2);
+      }
+      
       $("#cost_"+Npm).val(formatRupiah(value_cost));
     });
 

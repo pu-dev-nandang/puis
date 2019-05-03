@@ -1107,11 +1107,12 @@ class M_finance extends CI_Model {
     $field = 'StatusStudentID';
     $value = 3;
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+    $SemesterID = $Semester;
 
     // find semester id to get semester in m_tuition_fee
         $GetSemester = $this->m_master->GetSemester($ta,$Semester);
-        if ($PTID != 2 && $PTID != 3) {
+        if ($PTID != 2 && $PTID != 3 && $PTID != 5 && $PTID != 6 ) {
           $GetSemester = 1;
         }
 
@@ -1133,6 +1134,39 @@ class M_finance extends CI_Model {
                    where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
                      order by a.NPM asc';
       $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$GetSemester,$PTID))->result_array();
+    }
+
+    if ($PTID == 5 || $PTID == 6) {
+      $queryAdd = '';
+      $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','SemesterID',$Semester);
+      $SASemesterID = $G_data[0]['ID'];
+      $PTIDSelected = ($PTID == 5) ? 2 : 3;
+      $GetSemester = $this->m_master->GetSemester($ta,$Semester);
+      if ($PTIDSelected != 2 && $PTIDSelected != 3 && $PTIDSelected != 5 && $PTIDSelected != 6 ) {
+        $GetSemester = 1;
+      }
+      if ($prodi == '') {
+        $sql = 'select count(*) as total from '.$db.' as a join db_academic.auth_students as b on a.NPM = b.NPM
+                join db_academic.sa_student as sast on sast.NPM = b.NPM 
+                join db_finance.m_tuition_fee as c
+                on a.NPM = c.NPM
+                where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+                and a.NPM in (select NPM from db_academic.sa_student_details where `Status` = "3")
+                  order by a.NPM asc';
+                  // print_r($sql);die();
+        $Data_mhs=$this->db->query($sql, array($PTID,$SASemesterID,$GetSemester,$PTIDSelected))->result_array();
+      }
+      else
+      {
+        $sql = 'select count(*) as total from '.$db.' as a join db_academic.auth_students as b on a.NPM = b.NPM
+                    join db_academic.sa_student as sast on sast.NPM = b.NPM  
+                    join db_finance.m_tuition_fee as c
+                     on a.NPM = c.NPM
+                     where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+                     and a.NPM in (select NPM from db_academic.sa_student_details where `Status` = "3")
+                       order by a.NPM asc';
+        $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$SASemesterID,$GetSemester,$PTIDSelected))->result_array();
+      }
     }
 
     return $Data_mhs[0]['total'];
@@ -1221,11 +1255,11 @@ class M_finance extends CI_Model {
     $value = 3;
     $NPM = ($NPM == "" || $NPM == null) ? '' : ' and a.NPM = "'.$NPM.'"';
     $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
-
+    // $SemesterID = $Semester;
     $queryAdd = '';
     // find semester id to get semester in m_tuition_fee
             $GetSemester = $this->m_master->GetSemester($ta,$Semester);
-            if ($PTID != 2 && $PTID != 3) {
+            if ($PTID != 2 && $PTID != 3 && $PTID != 5 && $PTID != 6) {
               $GetSemester = 1;
             }
 
@@ -1250,6 +1284,45 @@ class M_finance extends CI_Model {
       $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$Semester,$GetSemester,$PTID))->result_array();
     }
 
+    if ($PTID == 5 || $PTID == 6) {
+      $queryAdd = '';
+      $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','SemesterID',$Semester);
+      $SASemesterID = $G_data[0]['ID'];
+      $PTIDSelected = ($PTID == 5) ? 2 : 3;
+      $GetSemester = $this->m_master->GetSemester($ta,$Semester);
+      $SemesterID = $this->m_master->caribasedprimary('db_academic.semester_antara','SemesterID',$Semester);
+      if ($PTIDSelected != 2 && $PTIDSelected != 3 && $PTIDSelected != 5 && $PTIDSelected != 6 ) {
+        $GetSemester = 1;
+      }
+
+      if ($prodi == '') {
+       $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a 
+                join db_academic.auth_students as b on a.NPM = b.NPM
+                join db_academic.sa_student as sast on sast.NPM = b.NPM  
+                join db_finance.m_tuition_fee as c
+               on a.NPM = c.NPM
+               where a.StatusStudentID in (3,2,8)  and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+               and a.NPM in (select NPM from db_academic.sa_student_details where `Status` = "3")
+                 order by a.NPM asc
+               LIMIT '.$start. ', '.$limit;
+       $Data_mhs=$this->db->query($sql, array($PTID,$SASemesterID,$GetSemester,$PTIDSelected))->result_array();
+      }
+      else
+      {
+        $sql = 'select a.*,b.EmailPU,c.Invoice as Cost,c.Discount from '.$db.' as a 
+                join db_academic.auth_students as b on a.NPM = b.NPM
+                join db_academic.sa_student as sast on sast.NPM = b.NPM   
+                join db_finance.m_tuition_fee as c
+                on a.NPM = c.NPM
+                where a.StatusStudentID in (3,2,8)  and a.ProdiID = ? and a.NPM not in (select NPM from db_finance.payment where PTID = ? and SemesterID = ?) and c.Semester = ? and c.PTID = ? '.$NPM.$queryAdd.'
+                  and a.NPM in (select NPM from db_academic.sa_student_details where `Status` = "3")
+                  order by a.NPM asc 
+                LIMIT '.$start. ', '.$limit;
+        $Data_mhs=$this->db->query($sql, array($prodi,$PTID,$SASemesterID,$GetSemester,$PTIDSelected))->result_array();
+      }
+
+    }
+
     // get Number VA Mahasiswa
     $Const_VA = $this->m_master->showData_array('db_va.master_va');
 
@@ -1267,11 +1340,11 @@ class M_finance extends CI_Model {
       $Data_mhs[$i] = $Data_mhs[$i] + $array;
 
       // get IPS Mahasiswa
-        $IPS = $this->getIPSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
+        $IPS = $this->getIPSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$Semester);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPS' => $IPS);
 
       // get IPK Mahasiswa
-        $IPK = $this->getIPKMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
+        $IPK = $this->getIPKMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$Semester);
         $Data_mhs[$i] = $Data_mhs[$i] + array('IPK' => $IPK);
 
       // get VA Mahasiwa
@@ -1279,9 +1352,22 @@ class M_finance extends CI_Model {
         $Data_mhs[$i] = $Data_mhs[$i] + array('VA' => $VA);
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
+         $Credit = $this->getSKSMahasiswaBySemester($db2,$Data_mhs[$i]['NPM'],$Semester);
+         $Credit_Detail = $this->getSKSMahasiswaBySemester_detail($db2,$Data_mhs[$i]['NPM'],$Semester);
+         if ($PTID == 5 || $PTID == 6) { // Semester Antara
+           $Credit = $this->getSKSMahasiswaBySemester_antara($db2,$Data_mhs[$i]['NPM'],$SemesterID[0]['ID']);
+           // Get Discount
+           $G_data_= $this->m_master->caribasedprimary('db_academic.sa_academic_years','SASemesterID',$SemesterID[0]['ID']);
+           if ($PTID == 5) {
+             $Data_mhs[$i]['Discount'] = number_format((float)$G_data_[0]['DiscountBPP'], 1, '.', '');
+           }
+           else
+           {
+            $Data_mhs[$i]['Discount'] = number_format((float)0, 1, '.', '');
+           }
+         }
          $Data_mhs[$i] = $Data_mhs[$i] + array('Credit' => $Credit);
-
+         $Data_mhs[$i] = $Data_mhs[$i] + array('Credit_Detail' => $Credit_Detail);
       // update Bea_BPP & Bea_Credit   
          // $Data_mhs[$i]['Bea_BPP'] 
 
@@ -1323,6 +1409,60 @@ class M_finance extends CI_Model {
       for ($j=0; $j < count($query); $j++) { 
        $CreditSub = $query[$j]['TotalSKS'];
        $Credit = $Credit + $CreditSub;
+      }
+
+      return $Credit;
+
+   }
+
+   public function getSKSMahasiswaBySemester_detail($db,$NPM,$SemesterID)
+   {
+      $arr = array();
+      $sql = 'select b.TotalSKS,a.* from '.$db.'.study_planning as a
+              left join db_academic.curriculum_details as b
+              on a.CDID = b.ID
+            where NPM = ? and SemesterID = ? and TransferCourse = "0" and a.TypeSchedule = "Br"';
+      $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+
+      $Credit = 0;
+      for ($j=0; $j < count($query); $j++) { 
+       $CreditSub = $query[$j]['TotalSKS'];
+       $Credit = $Credit + $CreditSub;
+      }
+
+      $arr['CreditBr'] = $Credit;
+
+      $sql = 'select b.TotalSKS,a.* from '.$db.'.study_planning as a
+              left join db_academic.curriculum_details as b
+              on a.CDID = b.ID
+            where NPM = ? and SemesterID = ? and TransferCourse = "0" and a.TypeSchedule = "Ul"';
+      $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+
+      $Credit = 0;
+      for ($j=0; $j < count($query); $j++) { 
+       $CreditSub = $query[$j]['TotalSKS'];
+       $Credit = $Credit + $CreditSub;
+      }
+
+      $arr['CreditUl'] = $Credit;
+
+      return $arr;
+
+   }
+
+   public function getSKSMahasiswaBySemester_antara($db,$NPM,$SemesterID)
+   {
+      $sql = 'select a.SASemesterID,a.NPM,b.Credit,c.SemesterID
+              from db_academic.sa_student as a join
+              db_academic.sa_student_details as b on a.ID = b.IDSAStudent
+              join db_academic.semester_antara as c on a.SASemesterID = c.ID
+              where a.NPM = ? and c.ID = ? and b.Status = "3"
+              ';
+      $query = $this->db->query($sql, array($NPM,$SemesterID))->result_array();
+
+      $Credit = 0;
+      for ($j=0; $j < count($query); $j++) { 
+       $Credit = $Credit + $query[$j]['Credit'];
       }
 
       return $Credit;
@@ -1507,8 +1647,9 @@ class M_finance extends CI_Model {
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $ProdiID = ($ProdiSplit == '' || $ProdiSplit == Null) ? '' : ' and b.ProdiID = '.$ProdiSplit;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
-    $SemesterID = $SemesterID[0]['ID'];
+    // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
+    // $SemesterID = $SemesterID[0]['ID'];
+    $SemesterID = $Semester;
     if ($ta == '') {
       $ta1 = $ta;
     }
@@ -1524,24 +1665,45 @@ class M_finance extends CI_Model {
     // }
 
     if ($ta1 == '') {
-      $sql = 'select count(*) as total 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$policyStatus.'
-               and b.StatusStudentID in (3,2,8)'
+      $sql = '
+              select sum(total) as total from(
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$policyStatus.'
+                 and b.StatusStudentID in (3,2,8)
+                UNION ALL
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and sa.SemesterID = ? '.$policyStatus.'
+                 and b.StatusStudentID in (3,2,8)
+              ) aa
+              '
               ;
               // print_r($sql);die();
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
 
     }
     else
     {
-      $sql = 'select count(*) as total 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$policyStatus.'
-               and b.StatusStudentID in (3,2,8)';
-      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+      $sql = 'select sum(total) as total from(
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$policyStatus.'
+                 and b.StatusStudentID in (3,2,8)
+                 UNION ALL
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and sa.SemesterID = ? '.$policyStatus.'
+                 and b.StatusStudentID in (3,2,8) 
+              )aa
+             ';
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
     }
     // print_r($query);die();
     return $query[0]['total'];
@@ -1560,8 +1722,9 @@ class M_finance extends CI_Model {
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
     $ProdiID = ($ProdiSplit == '' || $ProdiSplit == Null) ? '' : ' and b.ProdiID = '.$ProdiSplit;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
-    $SemesterID = $SemesterID[0]['ID'];
+    // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
+    // $SemesterID = $SemesterID[0]['ID'];
+    $SemesterID = $Semester;
     if ($ta == '') {
       $ta1 = $ta;
     }
@@ -1574,24 +1737,43 @@ class M_finance extends CI_Model {
     $Status = 'and a.Status = "0"';
 
     if ($ta1 == '') {
-      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$Status.' 
-              and b.StatusStudentID in (3,2,8)
-              order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $sql = 'select * from (
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and c.ID = ? '.$Status.' 
+                and b.StatusStudentID in (3,2,8)
+                UNION
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and sa.SemesterID = ? '.$Status.' 
+                and b.StatusStudentID in (3,2,8)
+              ) aa
+              LIMIT '.$start. ', '.$limit;
+
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
 
     }
     else
     {
-      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$Status.' 
-              and b.StatusStudentID in (3,2,8)
-              order by a.Status asc LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+      $sql = 'select * from (
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and c.ID = ? '.$Status.' 
+                and b.StatusStudentID in (3,2,8)
+                UNION
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$ProdiID.' and b.Year = ? and sa.SemesterID = ? '.$Status.' 
+                and b.StatusStudentID in (3,2,8)
+              ) aa
+              LIMIT '.$start. ', '.$limit;
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
     }
 
     // get Number VA Mahasiswa
@@ -1603,16 +1785,21 @@ class M_finance extends CI_Model {
       $db = 'ta_'.$Year.'.students';
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
       // get IPS Mahasiswa
-         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
 
       // get IPS Mahasiswa
-         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
 
       // ge VA Mahasiwa
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         // $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         // get sks yang diambil
+            $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
+            if ($query[$i]['PTID'] == 5 || $query[$i]['PTID'] == 6) { // Semester Antara
+              $Credit = $this->getSKSMahasiswaBySemester_antara('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+            }
 
       // Detail Payment & cek cancel   
          $DetailPayment = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[$i]['ID']);
@@ -1691,15 +1878,14 @@ class M_finance extends CI_Model {
    {
     $arr = array();
     $this->load->model('master/m_master');
-
     // join dengan table auth terlebih dahulu
     $PTID = ($PTID == '' || $PTID == Null) ? '' : ' and a.PTID = '.$PTID;
     $prodiex = explode(".", $prodi);
     $prodiex = $prodiex[0];
     $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
-    $SemesterID = $SemesterID[0]['ID'];
+    // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
+    $SemesterID = $Semester;
     if ($ta == '') {
       $ta1 = $ta;
     }
@@ -1740,24 +1926,46 @@ class M_finance extends CI_Model {
     // }
 
     if ($ta1 == '') {
-      $sql = 'select count(*) as total 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ?
-              and b.StatusStudentID in (3,2,8)
-              '.$AddWhereStatusPayment.$ChangeStatus;
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $sql = 'select sum(total) as total from (
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and c.ID = ?
+                and b.StatusStudentID in (3,2,8)
+                '.$AddWhereStatusPayment.$ChangeStatus.'
+                UNION ALL
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and sa.SemesterID = ?
+                and b.StatusStudentID in (3,2,8)
+                '.$AddWhereStatusPayment.$ChangeStatus.'
+              ) aa
+              ';
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
 
     }
     else
     {
-      $sql = 'select count(*) as total 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
-              and b.StatusStudentID in (3,2,8)
-              '.$AddWhereStatusPayment.$ChangeStatus;
-      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+      $sql = 'select sum(total) as total from(
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
+                and b.StatusStudentID in (3,2,8)
+                '.$AddWhereStatusPayment.$ChangeStatus.'
+                UNION ALL
+                select count(*) as total 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID '.$NIM.$PTID.$prodiex.' and b.Year = ? and sa.SemesterID = ?
+                and b.StatusStudentID in (3,2,8)
+                '.$AddWhereStatusPayment.$ChangeStatus.'
+              ) aa
+              ';
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
     }
     // print_r($sql);die();
     return $query[0]['total'];
@@ -1767,6 +1975,10 @@ class M_finance extends CI_Model {
    public function get_created_tagihan_mhs($ta,$prodi,$PTID,$NIM,$Semester,$StatusPayment,$ChangeStatus,$limit, $start)
    {
     // error_reporting(0);
+
+    // print_r($limit.'<br>');
+    // print_r($start);die();
+
     $arr = array();
     $this->load->model('master/m_master');
 
@@ -1776,8 +1988,8 @@ class M_finance extends CI_Model {
     $prodiex = $prodiex[0];
     $prodiex = ($prodi == '' || $prodi == Null) ? '' : ' and b.ProdiID = '.$prodiex;
     $NIM = ($NIM == '' || $NIM == Null) ? 'where a.NPM like "%"' : ' where  a.NPM = '.$NIM;
-    $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
-    $SemesterID = $SemesterID[0]['ID'];
+    // $SemesterID = $this->m_master->caribasedprimary('db_academic.semester','ID',$Semester);
+    $SemesterID = $Semester;
     if ($ta == '') {
       $ta1 = $ta;
     }
@@ -1820,28 +2032,54 @@ class M_finance extends CI_Model {
     // }
 
     if ($ta1 == '') {
-      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID 
-              left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
-              '.$NIM.$PTID.$prodiex.' and c.ID = ? 
-              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
-              group by a.PTID,a.SemesterID,a.NPM order by pp.ID desc,c.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $sql = 'select * from (
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description,pp.ID as ID_payment_proof
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID 
+                left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+                '.$NIM.$PTID.$prodiex.' and c.ID = ? 
+                and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
+                group by a.PTID,a.SemesterID,a.NPM
+                UNION
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description,pp.ID as ID_payment_proof 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID 
+                left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+                '.$NIM.$PTID.$prodiex.' and sa.SemesterID = ? 
+                and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
+                group by a.PTID,a.SemesterID,a.NPM
+              ) aa
+              order by ID_payment_proof desc,Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
 
     }
     else
     {
-      $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID 
-              left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
-              '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
-              and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
-              group by a.PTID,a.SemesterID,a.NPM order by pp.ID desc,a.Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
-      $query=$this->db->query($sql, array($ta1,$SemesterID))->result_array();
+      $sql = 'select * from (
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description,pp.ID as ID_payment_proof 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.semester as c on a.SemesterID = c.ID
+                join db_finance.payment_type as d on a.PTID = d.ID 
+                left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+                '.$NIM.$PTID.$prodiex.' and b.Year = ? and c.ID = ? 
+                and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
+                group by a.PTID,a.SemesterID,a.NPM
+                UNION
+                select a.*, b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description,pp.ID as ID_payment_proof 
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                join db_finance.payment_type as d on a.PTID = d.ID 
+                left join db_finance.payment_proof as pp on a.ID = pp.ID_payment
+                '.$NIM.$PTID.$prodiex.' and b.Year = ? and sa.SemesterID = ?
+                and b.StatusStudentID in (3,2,8) '.$AddWhereStatusPayment.$ChangeStatus.'
+                group by a.PTID,a.SemesterID,a.NPM
+              ) aa  
+               order by ID_payment_proof desc,Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
     }
     // print_r($sql);die();
     // get Number VA Mahasiswa
@@ -1853,18 +2091,21 @@ class M_finance extends CI_Model {
       $db = 'ta_'.$Year.'.students';
       $dt = $this->m_master->caribasedprimary($db,'NPM',$query[$i]['NPM']);
       // get IPS Mahasiswa
-         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         $IPS = $this->getIPSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
 
       // get IPK Mahasiswa
          // $IPK = $this->getIPKMahasiswa('ta_'.$Year,$query[$i]['NPM']);
-         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         $IPK = $this->getIPKMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
 
       // ge VA Mahasiwa
          $VA = $Const_VA[0]['Const_VA'].$query[$i]['NPM'];
 
       // get sks yang diambil
-         $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
-
+         $Credit = $this->getSKSMahasiswaBySemester('ta_'.$Year,$query[$i]['NPM'],$SemesterID);
+         if ($query[$i]['PTID'] == 5 || $query[$i]['PTID'] == 6) { // Semester Antara
+           $Credit = $this->getSKSMahasiswaBySemester_antara('ta_'.$Year,$query[$i]['NPM'],$query[$i]['SemesterID']);
+         }
+         
       // cek cancel   
          $cancelPay = $this->getCancel($query[$i]['PTID'],$query[$i]['SemesterID'],$query[$i]['NPM']);
 
@@ -4355,18 +4596,30 @@ class M_finance extends CI_Model {
       $SemesterID = explode('.', $Semester);
       $SemesterID = $SemesterID[0];
       $this->load->model('master/m_master');
-      $sql = 'select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
-        ,e.Invoice as PaymentMhs,b.Year
-              from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
-              join db_academic.semester as c on a.SemesterID = c.ID
-              join db_finance.payment_type as d on a.PTID = d.ID
-              join db_finance.payment_students as e on a.ID = e.ID_payment
-              join db_academic.program_study as f on b.ProdiID = f.ID
-              where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
-              order by b.ProdiID asc,a.NPM asc,e.ID_payment asc,e.ID asc';
+      $sql = 'select * from (
+                  select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+              ,e.Invoice as PaymentMhs
+                    from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+                    join db_academic.semester as c on a.SemesterID = c.ID
+                    join db_finance.payment_type as d on a.PTID = d.ID
+                    join db_finance.payment_students as e on a.ID = e.ID_payment
+                    join db_academic.program_study as f on b.ProdiID = f.ID
+                    where e.`Status` = 1  and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+                    UNION
+                    select a.*, b.Name as NamaMHS,b.Year,b.EmailPU,b.Pay_Cond,sa.Name as NameSemester, d.Description ,e.DatePayment,e.ID_payment,b.ProdiID,f.Name as NamePrody,e.ID as ID_payment_students
+                            ,e.Invoice as PaymentMhs
+                                  from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
+                                  join db_academic.sa_academic_years as c on a.SemesterID = c.SASemesterID
+                                  join db_academic.semester_antara as sa on sa.ID = c.SASemesterID
+                                  join db_finance.payment_type as d on a.PTID = d.ID
+                                  join db_finance.payment_students as e on a.ID = e.ID_payment
+                                  join db_academic.program_study as f on b.ProdiID = f.ID
+                                  where e.`Status` = 1  and sa.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
+              ) aa
+              order by ProdiID asc,NPM asc,ID_payment asc,ID_payment_students asc';
       // print_r($sql);die();
               //and a.SemesterID = ? and e.DatePayment like "'.$DailyTgl.'%"
-      $query=$this->db->query($sql, array($SemesterID))->result_array();
+      $query=$this->db->query($sql, array($SemesterID,$SemesterID))->result_array();
       $f_Pembayaranke = function($ID_payment,$ID_payment_students){
          $sql = 'select * from db_finance.payment_students where ID_payment = ?';
          $query=$this->db->query($sql, array($ID_payment))->result_array();
@@ -4416,7 +4669,17 @@ class M_finance extends CI_Model {
         $data = $arr['data'];
         $subtotal = $arr['subtotal'];
         $Pembayaranke = $f_Pembayaranke($query[$i]['ID_payment'],$query[$i]['ID_payment_students']); // query berdasarkan ID payment
-        $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
+        // jika Semester Antara
+        if ($query[$i]['PTID'] == 5 || $query[$i]['PTID'] == 6) {
+          $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$query[$i]['SemesterID']);
+          $SemesterID = $G_data[0]['SemesterID'];
+          $semesterCount = $f_findSemester($SemesterID,$query[$i]['Year']);
+        }
+        else
+        {
+          $semesterCount = $f_findSemester($query[$i]['SemesterID'],$query[$i]['Year']);
+        }
+        
         $data[] = $query[$i] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
         $subtotal = $subtotal + $query[$i]['PaymentMhs'];
         $NPM1 = $query[$i]['NPM'];
@@ -4425,7 +4688,15 @@ class M_finance extends CI_Model {
           $ID_program_study2 = $query[$j]['ProdiID'];
           if ($ID_program_study1 == $ID_program_study2) {
             $Pembayaranke =  $f_Pembayaranke($query[$j]['ID_payment'],$query[$j]['ID_payment_students']); // query berdasarkan ID payment
-            $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
+            if ($query[$j]['PTID'] == 5 || $query[$j]['PTID'] == 6) {
+              $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$query[$j]['SemesterID']);
+              $SemesterID = $G_data[0]['SemesterID'];
+              $semesterCount = $f_findSemester($SemesterID,$query[$j]['Year']);
+            }
+            else
+            {
+              $semesterCount = $f_findSemester($query[$j]['SemesterID'],$query[$j]['Year']);
+            }
             $data[] = $query[$j] + array('Pembayaranke' => $Pembayaranke,'semesterCount' => $semesterCount);
             $subtotal = $subtotal + $query[$j]['PaymentMhs'];
 
