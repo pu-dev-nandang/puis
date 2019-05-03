@@ -2363,9 +2363,6 @@ class C_api2 extends CI_Controller {
             $this->db->delete('db_academic.sa_student_details');
             $this->db->reset_query();
 
-            $this->db->where('IDSSD', $SSDID);
-            $this->db->delete('db_academic.sa_study_planning');
-            $this->db->reset_query();
 
 
             $IDSAStudent = $data_arr['IDSAStudent'];
@@ -2980,25 +2977,48 @@ class C_api2 extends CI_Controller {
                 $d = $dataStd[0];
 
                 // Remove tagihan
-                $this->db->where(array(
+
+                $whereBPP = array(
                     'PTID' => 5,
                     'SemesterID' => $d['SASemesterID'],
                     'NPM' => $d['NPM']
-                ));
-                $this->db->delete('db_finance.payment');
-                $this->db->reset_query();
+                );
 
-                // Remove tagihan
-                $this->db->where(array(
+                $checkPayBpp = $this->db->select('ID')->get_where('db_finance.payment',$whereBPP)->result_array();
+
+                if(count($checkPayBpp)>0){
+                    $ID_payment = $checkPayBpp[0]['ID'];
+                    $this->db->where('ID_payment',$ID_payment);
+                    $this->db->delete('db_finance.payment_students');
+                    $this->db->reset_query();
+
+                    $this->db->where($whereBPP);
+                    $this->db->delete('db_finance.payment');
+                    $this->db->reset_query();
+                }
+
+
+
+                $whereCredit = array(
                     'PTID' => 6,
                     'SemesterID' => $d['SASemesterID'],
                     'NPM' => $d['NPM']
-                ));
-                $this->db->delete('db_finance.payment');
-                $this->db->reset_query();
+                );
+                $checkPayCredit = $this->db->select('ID')->get_where('db_finance.payment',$whereCredit)->result_array();
 
+                if(count($checkPayCredit)>0){
+                    $ID_payment = $checkPayCredit[0]['ID'];
+                    $this->db->where('ID_payment',$ID_payment);
+                    $this->db->delete('db_finance.payment_students');
+                    $this->db->reset_query();
 
-                $tables = array('db_academic.sa_student_details', 'db_academic.sa_study_planning');
+                    $this->db->where($whereCredit);
+                    $this->db->delete('db_finance.payment');
+                    $this->db->reset_query();
+                }
+                
+
+                $tables = array('db_academic.sa_student_details');
                 $this->db->where('IDSAStudent', $IDSAStudent);
                 $this->db->delete($tables);
                 $this->db->reset_query();
@@ -3492,6 +3512,15 @@ class C_api2 extends CI_Controller {
                 'Discount' => $DiscountBPP
             );
             $this->db->insert('db_finance.payment',$dataInsrtBPP);
+            $insert_id = $this->db->insert_id();
+
+            $dataInsertPaymentStd = array(
+                'ID_payment' => $insert_id,
+                'Invoice' => $InvoiceBPP,
+                'BilingID' => 0,
+                'Deadline' => $dataConf[0]['EndPayment']
+            );
+            $this->db->insert('db_finance.payment_students',$dataInsertPaymentStd);
 
         }
 
@@ -3527,12 +3556,41 @@ class C_api2 extends CI_Controller {
                 $this->db->set($dataInsrtCredit);
                 $this->db->where('ID', $IDP);
                 $this->db->update('db_finance.payment');
+
+                $this->db->reset_query();
+                $this->db->where('ID_payment', $IDP);
+                $this->db->delete('db_finance.payment_students');
+
+                $this->db->reset_query();
+
+
+
+                // Update payment Student
+                $dataInsertPaymentStd = array(
+                    'ID_payment' => $IDP,
+                    'Invoice' => $dataC[0]['TotalCredit'] * $dataTagihanCredit[0]['Invoice'],
+                    'BilingID' => 0,
+                    'Deadline' => $dataConf[0]['EndPayment']
+                );
+
+                $this->db->insert('db_finance.payment_students',$dataInsertPaymentStd);
+
             }
 
 
-        } else {
+        }
+        else {
             if($dataC[0]['TotalCredit']!=null && $dataC[0]['TotalCredit']>0){
                 $this->db->insert('db_finance.payment',$dataInsrtCredit);
+                $insert_id = $this->db->insert_id();
+
+                $dataInsertPaymentStd = array(
+                    'ID_payment' => $insert_id,
+                    'Invoice' => $dataC[0]['TotalCredit'] * $dataTagihanCredit[0]['Invoice'],
+                    'BilingID' => 0,
+                    'Deadline' => $dataConf[0]['EndPayment']
+                );
+                $this->db->insert('db_finance.payment_students',$dataInsertPaymentStd);
             }
         }
 
