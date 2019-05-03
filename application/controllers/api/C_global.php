@@ -1604,6 +1604,71 @@ class C_global extends CI_Controller {
         $this->load->view('global/academic/exam');
     }
 
+
+    public function upload_files2(){
+
+        $fileName = $this->input->get('name');
+        $id = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/files/';
+        $config['allowed_types']        = 'pdf';
+        $config['max_size']             = 5000; // 5 mb
+        $config['file_name']            = $fileName;
+
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+
+            // Get file lama
+            $dataC = $this->db->limit(1)->get_where('db_employees.files',array(
+                'ID' => $id
+            ))->result_array();
+
+            if(count($dataC)>0){
+                if($dataC[0]['LinkFiles']==null || $dataC[0]['LinkFiles']==''){
+                    $this->db->where('ID', $id);
+                    $this->db->delete('db_employees.files');
+                }
+            }
+
+
+
+            return print_r(json_encode($error));
+        }
+        else {
+
+
+            // Get file lama
+            $dataC = $this->db->limit(1)->get_where('db_employees.files',array(
+                'ID' => $id
+            ))->result_array();
+
+            if(count($dataC)>0){
+                $d = $dataC[0];
+                $fileLama = $d['LinkFiles'];
+                if(is_file('./uploads/files/'.$fileLama)){
+                    unlink('./uploads/files/'.$fileLama);
+                }
+            }
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            $this->db->set('LinkFiles', $fileName);
+            $this->db->where('ID', $id);
+            $this->db->update('db_employees.files');
+
+//            return print_r(json_encode($success));
+            return print_r(json_encode(array(
+                'Upload' => 'Success'
+            )));
+        }
+
+
+
+    }
+
     public function menu_request($page){
         $data['page'] = $page;
         $content = $this->load->view('page/rektorat/menu_rektorat',$data,true);
@@ -1622,6 +1687,7 @@ class C_global extends CI_Controller {
      
 
     
+
 
 
 }
