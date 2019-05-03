@@ -100,7 +100,7 @@
             var token = jwt_encode({action:'read'},'UAP)(*');
             var url = base_url_js+'api/__crudTahunAkademik';
             $.post(url,{token:token},function (jsonResult) {
-              console.log(jsonResult);
+              // console.log(jsonResult);
                if(jsonResult.length>0){
                     for (var i = 0; i < jsonResult.length; i++) {
                       var dt = jsonResult[i];

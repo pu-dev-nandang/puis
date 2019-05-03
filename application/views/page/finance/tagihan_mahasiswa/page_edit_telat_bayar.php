@@ -10,16 +10,12 @@
         <table class="table table-bordered datatable2 hide" id = "datatable2">
             <thead>
             <tr style="background: #333;color: #fff;">
-                <!-- <th style="width: 3%;"></th> -->
                 <th style="width: 12%;">Program Study</th>
-                <!-- <th style="width: 10%;">Semester</th> -->
                 <th style="width: 20%;">Nama,NPM &  VA</th>
-                <!-- <th style="width: 5%;">NPM</th> -->
-                <!-- <th style="width: 5%;">Year</th> -->
                 <th style="width: 15%;">Payment Type</th>
-                <th style="width: 15%;">Email PU</th>
-                <th style="width: 15%;">IPS</th>
-                <th style="width: 15%;">IPK</th>
+                <th style="width: 5%;">Credit</th>
+                <th style="width: 5%;">IPS</th>
+                <th style="width: 5%;">IPK</th>
                 <th style="width: 10%;">Discount</th>
                 <th style="width: 10%;">Invoice</th>
                 <th style="width: 10%;">Status</th>
@@ -32,7 +28,7 @@
         <div id = "inputCicilan" class="hide">
           <div class="widget box">
               <div class="widget-header">
-                  <h4 class="header"><i class="icon-reorder"></i>Edit / Delete Cicilan</h4>
+                  <h4 class="header"><i class="icon-reorder"></i>Edit</h4>
               </div>
               <div class="widget-content">
                   <!--  -->
@@ -99,6 +95,7 @@
                 'show' : true
             });
             $('#dataRow').html('');
+            var PTID = '<?php echo $PTID ?>';
             var url = base_url_js+'finance/get_created_tagihan_mhs/'+page;
             var data = {
                 ta : '',
@@ -110,207 +107,30 @@
             // console.log(data)
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
-               var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
-                var Data_mhs = resultJson.loadtable;
-                dataaModal = Data_mhs;
-                if (Data_mhs.length == 1) {
-                    for(var i=0;i<Data_mhs.length;i++){
-                         var ccc = 0;
-                         var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
-                         get_Invoice = Data_mhs[i]['InvoicePayment'];
-                          var n = get_Invoice.indexOf(".");
-                         get_Invoice = get_Invoice.substring(0, n);
-                         dataa = {ID : Data_mhs[i]['PaymentID'],PTID : Data_mhs[i]['PTID'],SemesterID : Data_mhs[i]['SemesterID']};
-                         // proses status
-                         var status = '';
-                         if(Data_mhs[i]['StatusPayment'] == 0)
-                         {
-                           status = 'Belum Approve ';
-                           for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
-                             var a = Data_mhs[i]['DetailPayment'][j]['Status'];
-                             if(a== 1)
-                             {
-                               b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
-                               //bayar = bayar + 1;
-                             }
-                             //cicilan = cicilan + 1;
-                           }
-                           if(b < Data_mhs[i]['InvoicePayment'])
-                           {
-                             status += '<br> Belum Lunas';
-                             // ccc = 1;
-                           }
-                           else
-                           {
-                             status += '<br> Lunas';
-                             // ccc = 2
-                           }
-                         }
-                         else
-                         {
-                           status = 'Approve';
-                           // check lunas atau tidak
-                             // count jumlah pembayaran dengan status 1
-                             var b = 0;
-                             for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
-                               var a = Data_mhs[i]['DetailPayment'][j]['Status'];
-                               if(a== 1)
-                               {
-                                 b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
-                               }
-                             }
-
-                             // console.log('b : '+b+ '  ..InvoicePayment : ' + Data_mhs[i]['InvoicePayment']);
-                             if(b < Data_mhs[i]['InvoicePayment'])
-                             {
-                               status += '<br> Belum Lunas';
-                               ccc = 1;
-                             }
-                             else
-                             {
-                               status += '<br> Lunas';
-                               ccc = 2
-                             }
-                         }
-
-                        var tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
-                        var inputCHK = ''; 
-                        if (ccc == 0) {
-                         tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
-                         inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
-                        } else if(ccc == 1) {
-                           tr = '<tr style="background-color: #eade8e; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
-                           inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
-                        }
-                        else
-                        {
-                         tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
-                         inputCHK = ''; 
-                        }
-
-                        if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
-                         {    
-                              var IPSTo = '';
-                              var IPKTo = '';
-                              try {
-                                  IPSTo = getCustomtoFixed(Data_mhs[i]['IPS'],2);
-                                  IPKTo = getCustomtoFixed(Data_mhs[i]['IPK'],2);
-                              }
-                              catch(err) {
-                                  IPSTo = '';
-                                  IPKTo = '';
-                              } 
-                              // show bintang
-                              var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
-                              if (Data_mhs[i]['DetailPayment'].length > 0) { // menandakan memiliki cicilan lebih dari 1
-                               $('#dataRow').append(tr +
-                                                      // '<td>'+inputCHK+'</td>' +
-                                                      '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                                      // '<td>'+Data_mhs[i]['SemesterName']+'</td>' +
-                                                      '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
-                                                      // '<td>'+Data_mhs[i]['NPM']+'</td>' +
-                                                      // '<td>'+Data_mhs[i]['Year']+'</td>' +
-                                                      '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                                                      '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
-                                                      '<td>'+IPSTo+'</td>' +
-                                                      '<td>'+IPKTo+'</td>' +
-                                                      '<td>'+Data_mhs[i]['Discount']+'%</td>' +
-                                                      '<td>'+yy+'</td>' +
-                                                      '<td>'+status+'</td>' +
-                                                      '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
-                                                      '</tr>');
-                            }   
-                            
+               
+            }).done(function(resultJson) {
+                var resultJson = jQuery.parseJSON(resultJson);
+                console.log(resultJson);
+                 var Data_mhs = resultJson.loadtable;
+                 dataaModal = Data_mhs;
+                 // Cek Deadline Semester Antara
+                   var CekDeadline = ''; 
+                   if (PTID == 5 || PTID == 6) {
+                     ajax_data_deadline_semester_antara(Data_mhs[0]['SemesterID']).then(function(data){
+                         if (data == 1) {
+                           CekDeadline = false;
+                           HTMLWrite(Data_mhs);
                          }
                          else{
-                          toastr.info('Mohon Unapprove dahulu sebelum di edit'); 
-                         } 
-                        
-                    }
-
-                    if(Data_mhs.length == 1)
-                    {
-                      if (Data_mhs[0]['StatusPayment'] == 0) {
-                        if (Data_mhs[0]['DetailPayment'].length > 0) {
-                              $('#datatable2').removeClass('hide');
-                              var DetailPayment = Data_mhs[0]['DetailPayment'];
-                              // buat table cicilan beserta input
-                                var div = '';
-                                var enddiv = '</div>';
-                                var table = '';
-                                div = '<div id = "tblData" class="table-responsive">';
-                                table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
-                                '<thead>'+
-                                    '<tr>'
-                                for (var i = 0; i < DetailPayment.length; i++) {
-                                      var a = parseInt(i) + 1
-                                      table += '<th style="width: 75px;">'+'Cicilan '+a+'</th>' ;
-                                }
-                                table += '<th style="width: 70px;">Action</th>';  
-                                table += '</tr>' ;  
-                                table += '</thead>' ; 
-                                table += '<tbody>' ;  
-                                table += '</tbody>' ; 
-                                table += '</table>' ; 
-                              $(".widget-content").html(div+table+enddiv);
-                              $("#inputCicilan").removeClass('hide');
-                              var tbodyTbl = '<tr>';
-                              totMin = 0;
-                              for (var i = 0; i < DetailPayment.length; i++) {
-                                var cicilan = parseInt(i) + 1;
-                                var Cost = DetailPayment[i]['Invoice'];
-                                var n = Cost.indexOf(".");
-                                var Cost = Cost.substring(0, n);
-                                if (DetailPayment[i]['Status'] == 1) {
-                                  totMin = parseInt(totMin) + parseInt(Cost);
-                                }
-
-                                if (CanBeDelete == 1) {
-                                  if (DetailPayment[i]['Status'] == 1) {
-                                      CanBeDelete = 0;
-                                  }
-                                }
-
-                                var Invoice = (DetailPayment[i]['Status'] == 1) ? '<label>'+formatRupiah(DetailPayment[i]['Invoice'])+'</label><br>' : '<input type="text" id = "cost'+i+'" value = "'+Cost+'" class = "form-control costInput" cicilan = "'+cicilan+'" BilingID = "'+DetailPayment[i]['BilingID']+'" SID = "'+i+'" IDStudent = "'+DetailPayment[i]['ID']+'"><br>';
-                                var Deadline = (DetailPayment[i]['Status'] == 1) ? '<label>'+DetailPayment[i]['UpdateAt']+'</label><br>Sudah Bayar' : 'Deadline<div id="datetimepicker'+i+'" class="input-group input-append date datetimepicker">'+
-                              '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control datetimepickerClass"  id="datetime_deadline'+i+'" type="text" cicilan = "'+cicilan+'" value = "'+DetailPayment[i]['Deadline']+'" BilingID = "'+DetailPayment[i]['BilingID']+'" IDStudent = "'+DetailPayment[i]['ID']+'"></input>'+
-                              '<span class="input-group-addon add-on">'+
-                                '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
-                                '</i>'+
-                              '</span>'+
-                          '</div>';
-                                tbodyTbl += '<td>'+Invoice+Deadline+'</td>';
-                              }
-                              var btn_edit = '<span data-smt="" class="btn btn-xs btn-edit">'+
-                                                   '<i class="fa fa-pencil-square-o"></i> Edit'+
-                                                  '</span>';
-                              var btn_delete = '';                  
-                              tbodyTbl += '<td>'+btn_edit+btn_delete+'</td>';
-                              tbodyTbl += '</tr>';
-                              $(".tableData tbody").append(tbodyTbl);
-
-                              Date.prototype.addDays = function(days) {
-                                  var date = new Date(this.valueOf());
-                                  date.setDate(date.getDate() + days);
-                                  return date;
-                              }
-                              var date = new Date();
-                              $('.datetimepicker').datetimepicker({
-                               // startDate: today,
-                               // startDate: '+2d',
-                               startDate: date.addDays(1),
-                              });
-                              $('.datetimepickerClass').prop('readonly',true);
-                              $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-                              $('.costInput').maskMoney('mask', '9894');
-                        }
-                      }        
-
-                    }
-                } else {
-                  toastr.error('Error', 'Failed!!');
-                }
+                          toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+                         }          
+                     })
+                   }
+                   else
+                   {
+                    HTMLWrite(Data_mhs);
+                   }
+                  
             }).fail(function() {
               
               toastr.info('No Result Data'); 
@@ -576,5 +396,222 @@
         });    
 
     });
+
+    function ajax_data_deadline_semester_antara(SemesterID)
+    {
+      var def = jQuery.Deferred();
+      var data = {
+          SemesterID : SemesterID,
+          auth : 's3Cr3T-G4N',
+      };
+      var token = jwt_encode(data,"UAP)(*");
+      var url = base_url_js+'rest/__cek_deadline_payment_semester_antara';
+      $.post(url,{ token:token },function () {
+
+      }).done(function(data_json) {
+        def.resolve(data_json);
+      }).fail(function() {
+          def.reject();
+      });
+      return def.promise();
+    }
+
+    function HTMLWrite(Data_mhs)
+    {
+      if (Data_mhs.length == 1) {
+          for(var i=0;i<Data_mhs.length;i++){
+               var ccc = 0;
+               var yy = (Data_mhs[i]['InvoicePayment'] != '') ? formatRupiah(Data_mhs[i]['InvoicePayment']) : '-';
+               get_Invoice = Data_mhs[i]['InvoicePayment'];
+                var n = get_Invoice.indexOf(".");
+               get_Invoice = get_Invoice.substring(0, n);
+               dataa = {ID : Data_mhs[i]['PaymentID'],PTID : Data_mhs[i]['PTID'],SemesterID : Data_mhs[i]['SemesterID']};
+               // proses status
+               var status = '';
+               if(Data_mhs[i]['StatusPayment'] == 0)
+               {
+                 status = 'Belum Approve ';
+                 for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
+                   var a = Data_mhs[i]['DetailPayment'][j]['Status'];
+                   if(a== 1)
+                   {
+                     b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                     //bayar = bayar + 1;
+                   }
+                   //cicilan = cicilan + 1;
+                 }
+                 if(b < Data_mhs[i]['InvoicePayment'])
+                 {
+                   status += '<br> Belum Lunas';
+                   // ccc = 1;
+                 }
+                 else
+                 {
+                   status += '<br> Lunas';
+                   // ccc = 2
+                 }
+               }
+               else
+               {
+                 status = 'Approve';
+                 // check lunas atau tidak
+                   // count jumlah pembayaran dengan status 1
+                   var b = 0;
+                   for (var j = 0; j < Data_mhs[i]['DetailPayment'].length; j++) {
+                     var a = Data_mhs[i]['DetailPayment'][j]['Status'];
+                     if(a== 1)
+                     {
+                       b = parseInt(b) + parseInt(Data_mhs[i]['DetailPayment'][j]['Invoice']);
+                     }
+                   }
+
+                   // console.log('b : '+b+ '  ..InvoicePayment : ' + Data_mhs[i]['InvoicePayment']);
+                   if(b < Data_mhs[i]['InvoicePayment'])
+                   {
+                     status += '<br> Belum Lunas';
+                     ccc = 1;
+                   }
+                   else
+                   {
+                     status += '<br> Lunas';
+                     ccc = 2
+                   }
+               }
+
+              var tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
+              var inputCHK = ''; 
+              if (ccc == 0) {
+               tr = '<tr NPM = "'+Data_mhs[i]['NPM']+'">';
+               inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
+              } else if(ccc == 1) {
+                 tr = '<tr style="background-color: #eade8e; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
+                 inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">'; 
+              }
+              else
+              {
+               tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
+               inputCHK = ''; 
+              }
+
+              if(Data_mhs[i]['StatusPayment'] == 0) // menandakan belum approve
+               { 
+                    var IPSTo = '';
+                    var IPKTo = '';
+                    try {
+                        IPSTo = getCustomtoFixed(Data_mhs[i]['IPS'],2);
+                        IPKTo = getCustomtoFixed(Data_mhs[i]['IPK'],2);
+                    }
+                    catch(err) {
+                        IPSTo = '';
+                        IPKTo = '';
+                    } 
+                    // show bintang
+                    var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
+                    if (Data_mhs[i]['DetailPayment'].length > 0) { // menandakan memiliki cicilan lebih dari 1
+                     $('#dataRow').append(tr +
+                                            '<td>'+Data_mhs[i]['ProdiEng']+'<br>'+Data_mhs[i]['SemesterName']+'</td>' +
+                                            '<td>'+bintang+Data_mhs[i]['Nama']+'<br>'+Data_mhs[i]['NPM']+'<br>'+Data_mhs[i]['VA']+'</td>' +
+                                            '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
+                                            '<td>'+Data_mhs[i]['Credit']+'</td>' +
+                                            '<td>'+IPSTo+'</td>' +
+                                            '<td>'+IPKTo+'</td>' +
+                                            '<td>'+Data_mhs[i]['Discount']+'%</td>' +
+                                            '<td>'+yy+'</td>' +
+                                            '<td>'+status+'</td>' +
+                                            '<td>'+'<button class = "DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'">View</button>'+'</td>' +
+                                            '</tr>');
+                    }   
+                  
+               }
+               else
+               {
+                  toastr.info('Mohon Unapprove dahulu sebelum di edit'); 
+               } 
+              
+          }
+
+          if(Data_mhs.length == 1)
+          {
+            if (Data_mhs[0]['StatusPayment'] == 0) {
+              if (Data_mhs[0]['DetailPayment'].length > 0) {
+                    $('#datatable2').removeClass('hide');
+                    var DetailPayment = Data_mhs[0]['DetailPayment'];
+                    // buat table cicilan beserta input
+                      var div = '';
+                      var enddiv = '</div>';
+                      var table = '';
+                      div = '<div id = "tblData" class="table-responsive">';
+                      table = '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+                      '<thead>'+
+                          '<tr>'
+                      for (var i = 0; i < DetailPayment.length; i++) {
+                            var a = parseInt(i) + 1
+                            table += '<th style="width: 75px;">'+'Cicilan '+a+'</th>' ;
+                      }
+                      table += '<th style="width: 70px;">Action</th>';  
+                      table += '</tr>' ;  
+                      table += '</thead>' ; 
+                      table += '<tbody>' ;  
+                      table += '</tbody>' ; 
+                      table += '</table>' ; 
+                    $(".widget-content").html(div+table+enddiv);
+                    $("#inputCicilan").removeClass('hide');
+                    var tbodyTbl = '<tr>';
+                    totMin = 0;
+                    for (var i = 0; i < DetailPayment.length; i++) {
+                      var cicilan = parseInt(i) + 1;
+                      var Cost = DetailPayment[i]['Invoice'];
+                      var n = Cost.indexOf(".");
+                      var Cost = Cost.substring(0, n);
+                      if (DetailPayment[i]['Status'] == 1) {
+                        totMin = parseInt(totMin) + parseInt(Cost);
+                      }
+
+                      if (CanBeDelete == 1) {
+                        if (DetailPayment[i]['Status'] == 1) {
+                            CanBeDelete = 0;
+                        }
+                      }
+
+                      var Invoice = (DetailPayment[i]['Status'] == 1) ? '<label>'+formatRupiah(DetailPayment[i]['Invoice'])+'</label><br>' : '<input type="text" id = "cost'+i+'" value = "'+Cost+'" class = "form-control costInput" cicilan = "'+cicilan+'" BilingID = "'+DetailPayment[i]['BilingID']+'" SID = "'+i+'" IDStudent = "'+DetailPayment[i]['ID']+'"><br>';
+                      var Deadline = (DetailPayment[i]['Status'] == 1) ? '<label>'+DetailPayment[i]['UpdateAt']+'</label><br>Sudah Bayar' : 'Deadline<div id="datetimepicker'+i+'" class="input-group input-append date datetimepicker">'+
+                    '<input data-format="yyyy-MM-dd hh:mm:ss" class="form-control datetimepickerClass"  id="datetime_deadline'+i+'" type="text" cicilan = "'+cicilan+'" value = "'+DetailPayment[i]['Deadline']+'" BilingID = "'+DetailPayment[i]['BilingID']+'" IDStudent = "'+DetailPayment[i]['ID']+'"></input>'+
+                    '<span class="input-group-addon add-on">'+
+                      '<i data-time-icon="icon-time" data-date-icon="icon-calendar">'+
+                      '</i>'+
+                    '</span>'+
+                '</div>';
+                      tbodyTbl += '<td>'+Invoice+Deadline+'</td>';
+                    }
+                    var btn_edit = '<span data-smt="" class="btn btn-xs btn-edit">'+
+                                         '<i class="fa fa-pencil-square-o"></i> Edit'+
+                                        '</span>';
+                    var btn_delete = '';                  
+                    tbodyTbl += '<td>'+btn_edit+btn_delete+'</td>';
+                    tbodyTbl += '</tr>';
+                    $(".tableData tbody").append(tbodyTbl);
+
+                    Date.prototype.addDays = function(days) {
+                        var date = new Date(this.valueOf());
+                        date.setDate(date.getDate() + days);
+                        return date;
+                    }
+                    var date = new Date();
+                    $('.datetimepicker').datetimepicker({
+                     // startDate: today,
+                     // startDate: '+2d',
+                     startDate: date.addDays(1),
+                    });
+                    $('.datetimepickerClass').prop('readonly',true);
+                    $('.costInput').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                    $('.costInput').maskMoney('mask', '9894');
+              }
+            }        
+
+          }
+      } else {
+        toastr.error('Error', 'Failed!!');
+      } 
+    }
 
 </script>

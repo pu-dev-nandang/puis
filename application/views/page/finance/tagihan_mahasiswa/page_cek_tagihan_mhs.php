@@ -275,7 +275,7 @@
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
+               // console.log(resultJson);
                 var Data_mhs = resultJson.loadtable;
                 data = Data_mhs;
                 dataaModal = Data_mhs;

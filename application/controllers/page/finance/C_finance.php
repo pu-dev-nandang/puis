@@ -709,7 +709,14 @@ class C_finance extends Finnance_Controler {
 
         $this->load->library('pagination');
         // count all
-        // $count = $this->m_finance->count_get_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NPM']);
+           if ($input['PTID'] == 5 || $input['PTID'] == 6) { // semester antara
+               // search SemesterID Semester Antara
+               $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$input['Semester']);
+               if (count($G_data) > 0) {
+                   $input['Semester'] = $G_data[0]['SemesterID'];
+               }
+           } 
+
         $count = $this->m_finance->count_get_tagihan_mhs2($input['ta'],$input['prodi'],$input['PTID'],$input['NPM'],$input['Semester']);
 
         $config = $this->config_pagination_default_ajax($count,10,3);
@@ -886,6 +893,15 @@ class C_finance extends Finnance_Controler {
         if (!array_key_exists('ChangeStatus', $input)) {
             $input['ChangeStatus'] = '';
         }
+
+        if ($input['PTID'] == 5 || $input['PTID'] == 6) { // semester antara
+            // search SemesterID Semester Antara
+            $G_data = $this->m_master->caribasedprimary('db_academic.semester_antara','ID',$input['Semester']);
+            if (count($G_data) > 0) {
+                $input['Semester'] = $G_data[0]['SemesterID'];
+            }
+        }
+
         // count
         $count = $this->m_finance->count_get_created_tagihan_mhs($input['ta'],$input['prodi'],$input['PTID'],$input['NIM'],$input['Semester'],$input['StatusPayment'],$input['ChangeStatus']);
         $config = $this->config_pagination_default_ajax($count,15,3);
@@ -920,6 +936,7 @@ class C_finance extends Finnance_Controler {
         $output = array(
         'pagination_link'  => $this->pagination->create_links(),
         'loadtable'   => $data,
+        'totaldata'   => $count,
         );
         echo json_encode($output);
     }

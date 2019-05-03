@@ -829,6 +829,7 @@ $route['api/__getDataRegisterBelumBayar'] = 'api/c_api/getDataRegisterBelumBayar
 $route['api/__getDataRegisterTelahBayar'] = 'api/c_api/getDataRegisterTelahBayar';
 $route['api/__cek_deadlineBPPSKS'] = 'api/c_api/cek_deadlineBPPSKS';
 $route['api/__cek_deadline_paymentNPM'] = 'api/c_api/cek_deadline_paymentNPM';
+$route['rest/__cek_deadline_payment_semester_antara'] = 'api/c_rest/cek_deadline_payment_semester_antara';
 
 
 $route['api/__crudTuitionFee'] = 'api/c_api/crudTuitionFee';

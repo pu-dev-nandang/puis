@@ -72,7 +72,7 @@
                                 <!-- <th style="width: 5%;">NPM</th> -->
                                 <!-- <th style="width: 5%;">Year</th> -->
                                 <th style="width: 15%;">Payment Type</th>
-                                <th style="width: 15%;">Email PU</th>
+                                <th style="width: 5%;">Credit</th>
                                 <th style="width: 15%;">IPS</th>
                                 <th style="width: 15%;">IPK</th>
                                 <th style="width: 10%;">Discount</th>
@@ -287,7 +287,7 @@
                                                // '<td>'+Data_mhs[i]['NPM']+'</td>' +
                                                // '<td>'+Data_mhs[i]['Year']+'</td>' +
                                                '<td>'+Data_mhs[i]['PTIDDesc']+'</td>' +
-                                               '<td>'+Data_mhs[i]['EmailPU']+'</td>' +
+                                               '<td>'+Data_mhs[i]['Credit']+'</td>' +
                                                '<td>'+getCustomtoFixed(Data_mhs[i]['IPS'],2)+'</td>' +
                                                '<td>'+getCustomtoFixed(Data_mhs[i]['IPK'],2)+'</td>' +
                                                '<td>'+Data_mhs[i]['Discount']+'%</td>' +
@@ -447,6 +447,8 @@
     $(document).on('click','#btn-cancel', function () {
         var arrValueCHK = getChecboxNPM();
         console.log(arrValueCHK);
+        var BoolSemesterAntara = false;
+        var semesterID_antara = '';
         if (arrValueCHK.length > 0) {
             // check status jika 1
             var bool = true;
@@ -471,6 +473,12 @@
                 bool = false;
                 break;
               }
+
+              if (!BoolSemesterAntara && (arrValueCHK[i].PTID == 5 || arrValueCHK[i].PTID == 6 ) ) {
+                BoolSemesterAntara = true;
+                semesterID_antara = arrValueCHK[i].semester;
+              }
+
               var yy = (arrValueCHK[i]['Invoice'] != '') ? formatRupiah(arrValueCHK[i]['Invoice']) : '-';
                 isi += '<tr>'+
                       '<td>'+ (i+1) + '</td>'+
@@ -514,33 +522,71 @@
            $( "#ModalbtnSaveForm" ).click(function() {
             var Reason = $(".TextareaReason").val();
             if (Reason == '') {toastr.info('Reason is required');return}
-            loading_button('#ModalbtnSaveForm');
-            var url = base_url_js+'finance/cancel_created_tagihan_mhs';
-            var data = {
-                arrValueCHK : arrValueCHK,
-                Reason : Reason,
-            };
-            console.log(data);
-            var token = jwt_encode(data,'UAP)(*');
-            $.post(url,{token:token},function (resultJson) {
-               // var resultJson = jQuery.parseJSON(resultJson);
-               loadData(1);
-               $('#GlobalModalLarge').modal('hide');
-            }).fail(function() {
-              toastr.info('No Action...'); 
-              // toastr.error('The Database connection error, please try again', 'Failed!!');
-            }).always(function() {
-                $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
-            });
+            // Cek Deadline Semester Antara
+              if (BoolSemesterAntara) {
+                ajax_data_deadline_semester_antara(semesterID_antara).then(function(data){
+                    if (data == 1) {
+                      CekDeadline = false;
+                      __submit_cancel_created_tagihan_mhs(arrValueCHK,Reason)
+                    }
+                    else{
+                     toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+                    }          
+                })
+              }
+              else
+              {
+                __submit_cancel_created_tagihan_mhs(arrValueCHK,Reason)
+              }
              
            }); // exit click function
-
         }
         else
         {
             toastr.error("Silahkan checked dahulu", 'Failed!!');
         }
     });
+
+    function ajax_data_deadline_semester_antara(SemesterID)
+    {
+      var def = jQuery.Deferred();
+      var data = {
+          SemesterID : SemesterID,
+          auth : 's3Cr3T-G4N',
+      };
+      var token = jwt_encode(data,"UAP)(*");
+      var url = base_url_js+'rest/__cek_deadline_payment_semester_antara';
+      $.post(url,{ token:token },function () {
+
+      }).done(function(data_json) {
+        def.resolve(data_json);
+      }).fail(function() {
+          def.reject();
+      });
+      return def.promise();
+    }
+
+    function __submit_cancel_created_tagihan_mhs(arrValueCHK,Reason)
+    {
+      loading_button('#ModalbtnSaveForm');
+      var url = base_url_js+'finance/cancel_created_tagihan_mhs';
+      var data = {
+          arrValueCHK : arrValueCHK,
+          Reason : Reason,
+      };
+      console.log(data);
+      var token = jwt_encode(data,'UAP)(*');
+      $.post(url,{token:token},function (resultJson) {
+         // var resultJson = jQuery.parseJSON(resultJson);
+         loadData(1);
+         $('#GlobalModalLarge').modal('hide');
+      }).fail(function() {
+        toastr.info('No Action...'); 
+        // toastr.error('The Database connection error, please try again', 'Failed!!');
+      }).always(function() {
+          $('#ModalbtnSaveForm').prop('disabled',false).html('Save');
+      });
+    }
 
     function getReloadTableSocket()
     {

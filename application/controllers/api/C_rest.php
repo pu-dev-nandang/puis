@@ -3043,4 +3043,34 @@ class C_rest extends CI_Controller {
                  echo '{"status":"999","message":"Not Authorize"}';
             }
     }
+
+    public function cek_deadline_payment_semester_antara()
+    {
+        try {
+             $dataToken = $this->getInputToken2();
+             $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $SemesterID = $dataToken['SemesterID']; // SemesterID semester antara
+                $G_data = $this->m_master->caribasedprimary('db_academic.sa_academic_years','SASemesterID',$SemesterID);
+                $EndKRS = $G_data[0]['EndKRS'];
+                $chkTgl = $this->m_master->checkTglNow($EndKRS);
+                if (!$chkTgl) {
+                    echo json_encode(1); // melewati
+                }
+                else
+                {
+                    echo json_encode(0);
+                }
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        catch(Exception $e) {
+             // handling orang iseng
+             echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
 }
