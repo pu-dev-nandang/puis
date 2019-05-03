@@ -140,6 +140,7 @@ $route['human-resources/lecturers'] = 'page/database/c_database/lecturers';
 $route['human-resources/employees'] = 'page/hr/c_employees/employees';
 $route['human-resources/employees/files'] = 'page/hr/c_employees/employees_files';
 $route['human-resources/employees/upload_files'] = 'page/hr/c_employees/upload_files';
+$route['human-resources/employees/upload_files2'] = 'page/hr/c_employees/upload_files2';
 $route['human-resources/employees/remove_files'] = 'page/hr/c_employees/remove_files';
 $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input_employees';
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
@@ -947,6 +948,8 @@ $route['api2/__crudSemesterAntara'] = 'api/c_api2/crudSemesterAntara';
 $route['api2/__getTimetableSA'] = 'api/c_api2/getTimetableSA';
 $route['api2/__getStudentSA'] = 'api/c_api2/getStudentSA';
 $route['api2/__getStudentList'] = 'api/c_api2/getStudentList';
+
+$route['api2/__crudFiles'] = 'api/c_api2/crudFiles';
 
 
 $route['api2/__checkConflict_Venue'] = 'api/c_api2/checkConflict_Venue';

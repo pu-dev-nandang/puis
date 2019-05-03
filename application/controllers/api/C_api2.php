@@ -3690,5 +3690,71 @@ class C_api2 extends CI_Controller {
         return print_r(json_encode($dataCheck));
     }
 
+    public function crudFiles(){
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='getNonAcademic'){
+            $data = $this->db->get_where('db_employees.master_files',array('Type' => 1))->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='insertFiles'){
+
+            $datainsert = (array) $data_arr['datainsert'];
+
+            $this->db->insert('db_employees.files', $datainsert);
+            $insert_id = $this->db->insert_id();
+
+            $result = array(
+                'insert_id' => $insert_id
+            );
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='updateFiles'){
+            $ID = $data_arr['ID'];
+            $dataUpdate = (array) $data_arr['dataUpdate'];
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.files',$dataUpdate);
+
+            $result = array(
+                'insert_id' => $ID
+            );
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='loadDocument'){
+            $NIP = $data_arr['NIP'];
+
+            $dataF = $this->db->query('SELECT f.*, mf.NameFiles FROM db_employees.files f 
+                                                  LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                                                  WHERE f.NIP = "'.$NIP.'" AND f.Active = 1 ORDER BY mf.ID ASC')->result_array();
+
+            return print_r(json_encode($dataF));
+        }
+        else if($data_arr['action']=='removeDoc'){
+            $ID = $data_arr['ID'];
+            $this->db->set('Active', 0);
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.files');
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='readDoc'){
+            $ID = $data_arr['ID'];
+
+
+            $data = $this->db->query('SELECT f.*, mf.TypeFiles AS M_TypeFiles FROM db_employees.files f 
+                                                  LEFT JOIN db_employees.master_files mf ON (mf.ID = f.TypeFiles)
+                                                  WHERE f.ID = "'.$ID.'" ')->result_array();
+
+
+            return print_r(json_encode($data));
+        }
+
+    }
+
 
 }
