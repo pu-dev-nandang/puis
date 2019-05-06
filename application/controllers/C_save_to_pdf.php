@@ -6001,6 +6001,12 @@ Phone: (021) 29200456';
         $NIP = $data_arr['NIP'];
         $IDRequest = $data_arr['IDRequest'];
 
+        $dataLect = $this->db->query('SELECT em.*, ps.Name AS ProdiName, fs.Name AS NameFak
+                                                  FROM db_employees.employees em 
+                                                  LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                                                  LEFT JOIN db_academic.faculty fs ON (ps.FacultyID = fs.FacultyID)
+                                                  WHERE em.NIP = "'.$NIP.'" LIMIT 1')->result_array();
+
         $dataRequest = $this->db->limit(1)->get_where('db_employees.request_document',array(
             'IDRequest' => $IDRequest,
             'NIP' => $NIP
@@ -6009,17 +6015,44 @@ Phone: (021) 29200456';
 
         if(count($dataRequest)>0){
 
-            //$starthari = time(" hh:mm ", strtotime($dataRequest[0]['StartDate']));
-            $time1 = date('H:i', strtotime($dataRequest[0]['StartDate']));
-            $time2 = date('H:i', strtotime($dataRequest[0]['EndDate']));
-            $DateConfirm = date('dd M yy', strtotime($dataRequest[0]['DateConfirm']));
-            
-            $description = $dataRequest[0]['DescriptionAddress'];
-            
+            $d = $dataLect[0];
 
-            $ForTask = trim($dataRequest[0]['ForTask']);
-            $pada = ' Pada :';
-            $nametask = 'Untuk '.$ForTask.''.$pada;
+            $time1 = date('H:i', strtotime($dataRequest[0]['StartDate']));
+            $time2x = date('H:i', strtotime($dataRequest[0]['EndDate']));
+
+            $daftar_hari = array(
+                'Sunday' => 'Minggu',
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu'
+            );
+
+            $namahari = date('l', strtotime($dataRequest[0]['StartDate']));
+            $starthari =  $daftar_hari[''.$namahari];
+
+            $date1 = $this->getDateIndonesian($dataRequest[0]['StartDate']);
+            $date2 = $this->getDateIndonesian($dataRequest[0]['EndDate']);
+
+            if($date1 = $date2) {
+                    $tanggalx = $this->getDateIndonesian($dataRequest[0]['StartDate']);
+            }else {
+                    $tanggalx = $date1.' s/d '.$date2;
+
+            }
+
+            if($time2x == '00:00') {
+                $time2 = 'Selesai';
+            }else {
+                $time2 = date('H:i', strtotime($dataRequest[0]['EndDate']));
+
+            }
+            
+            $DateConfirm = date('dd M yy', strtotime($dataRequest[0]['DateConfirm']));
+            $description = $dataRequest[0]['DescriptionAddress'];
+            $nametask = trim($dataRequest[0]['ForTask']);
 
             $dataEmploy = $this->db->limit(1)->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
                 'NIP' => $NIP
@@ -6060,29 +6093,34 @@ Phone: (021) 29200456';
         $pdf->Ln(1);
 
         $blnRomawi = $this->m_master->romawiNumber($bln);
-        $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/WR1/SKU/'.$blnRomawi.'/'.$thn,0,1,'C');
+        $pdf->Cell(0,5,'Nomor : '.$dataNum.'/UAP/R/SKU/'.$blnRomawi.'/'.$thn,0,1,'C');
 
         $h = 5;
         $pdf->Ln(10);
-        $pdf->Cell(0,$h,'Plt Wakil Rektor Akademik Universitas Agung Podomoro : ',0,1,'L');
+        $pdf->Cell(0,$h,'Universitas Agung Podomoro menugaskan kepada : ',0,1,'L');
 
 
         $pdf->Ln(3);
 
-        $pdf->Cell(10,$h,'',0,0,'L');
-        $pdf->Cell(30,$h,'Nama',0,0,'L');
-        $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,trim($NamePHR),0,1,'L');
+        //$pdf->Cell(10,$h,'',0,0,'L');
+        //$pdf->Cell(30,$h,'Nama',0,0,'L');
+        //$pdf->Cell(5,$h,':',0,0,'C');
+        //$pdf->Cell(145,$h,trim($NamePHR),0,1,'L');
 
-        $pdf->Cell(10,$h,'',0,0,'L');
-        $pdf->Cell(30,$h,'NIP',0,0,'L');
-        $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,$NIPPHR,0,1,'L');
+        //$pdf->Cell(10,$h,'',0,0,'L');
+        //$pdf->Cell(30,$h,'NIP',0,0,'L');
+        //$pdf->Cell(5,$h,':',0,0,'C');
+        //$pdf->Cell(145,$h,$NIPPHR,0,1,'L');
 
-        $pdf->SetFont('Arial','B',11);
-        $pdf->Ln(3);
-        $pdf->Cell(0,$h,'Menugaskan Kepada : ',0,1,'C');
-        $pdf->Ln(3);
+        //$pdf->Cell(10,$h,'',0,0,'L');
+        //$pdf->Cell(30,$h,'Program Studi',0,0,'L');
+        //$pdf->Cell(5,$h,':',0,0,'C');
+        //$pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
+
+        //$pdf->SetFont('Arial','B',11);
+        //$pdf->Ln(3);
+        //$pdf->Cell(0,$h,'Menugaskan Kepada : ',0,1,'C');
+        //$pdf->Ln(3);
 
         $pdf->SetFont('Arial','',10);
         $pdf->Cell(10,$h,'',0,0,'L');
@@ -6095,24 +6133,31 @@ Phone: (021) 29200456';
         $pdf->Cell(5,$h,':',0,0,'C');
         $pdf->Cell(145,$h,$NIP,0,1,'L');
 
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Program Studi',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
+
+        //$pdf->SetFont('Arial','B',10);
         $pdf->Ln(3);
-        $pdf->Cell(0,$h,$nametask,0,1,'L');
+        $pdf->Cell(0,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
 
         $pdf->Ln(3);
-        //$pdf->Cell(10,$h,'',0,0,'L');
-        //$pdf->Cell(30,$h,'Hari',0,0,'L');
-        //$pdf->Cell(5,$h,':',0,0,'C');
-        //$pdf->Cell(145,$h,$starthari,0,1,'L');
+        $pdf->Cell(10,$h,'',0,0,'L');
+        $pdf->Cell(30,$h,'Hari',0,0,'L');
+        $pdf->Cell(5,$h,':',0,0,'C');
+        $pdf->Cell(145,$h,$starthari,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
+        //$pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
+        $pdf->Cell(145,$h,$tanggalx,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,$time1.' - '.$time2.' WIB ',0,1,'L');
+        $pdf->Cell(145,$h,$time1.' - '.$time2.'',0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tempat',0,0,'L');
@@ -6128,8 +6173,8 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',11);
         $y = $pdf->GetY()+20;
 
-        $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-        $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+        $pdf->Image(base_url('images/cap.png'),130,$y+1,40);
+        $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+4,40);
 
 
         $pdf->Ln(11);
@@ -6139,10 +6184,10 @@ Phone: (021) 29200456';
         $pdf->Cell($w2,$h,'Jakarta, '.$this->getDateIndonesian($dataRequest[0]['DateConfirm']),0,1,'L');
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'Plt. Wakil Rektor',0,1,'L');
+        $pdf->Cell($w2,$h,'An Rektor',0,1,'L');
 
         $pdf->Cell($w,$h,'',0,0,'L');
-        $pdf->Cell($w2,$h,'Bid. Akademik',0,1,'L');
+        $pdf->Cell($w2,$h,'',0,1,'L');
 
         $pdf->Ln(17);
 
@@ -6151,6 +6196,19 @@ Phone: (021) 29200456';
 
         $pdf->Cell($w,$h,'',0,0,'L');
         $pdf->Cell($w2,$h,'NIP : 2617100 ',0,1,'L');
+
+        $pdf->SetFont('Arial','',10);
+        $pdf->SetXY(10,$y+45);
+        $pdf->Cell(60,5,'Tembusan Yth.',0,1,'L');
+
+        $pdf->SetXY(17,$y+51);
+        $pdf->Cell(60,5,'1. Rektor',0,1,'L');
+
+        $pdf->SetXY(17,$y+56);
+        $pdf->Cell(60,5,'2. Dekan '.$d['NameFak'],0,1,'L');
+
+        $pdf->SetXY(17,$y+61);
+        $pdf->Cell(60,5,'2. Kaprodi '.$d['ProdiName'],0,1,'L');
 
 
         $pdf->Output('I','Tugas_Keluar.pdf');

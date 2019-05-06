@@ -34,7 +34,24 @@ $d = $dataEmp[0];
     font-size: 13px;
 }
 
+.dlk-radio input[type="radio"],
+.dlk-radio input[type="checkbox"] 
+{
+    margin-left:-99999px;
+    display:none;
+}
+.dlk-radio input[type="radio"] + .fa ,
+.dlk-radio input[type="checkbox"] + .fa {
+     opacity:0.15
+}
+.dlk-radio input[type="radio"]:checked + .fa,
+.dlk-radio input[type="checkbox"]:checked + .fa{
+    opacity:1
+}
 
+.checkbox.checkbox-circle label::before {
+  border-radius: 50%;
+}
 </style> 
 
 <style>
@@ -110,7 +127,7 @@ $d = $dataEmp[0];
 			                                </span>
 			                            </div>
 			                        </div>
-				                    <div class="col-xs-4 form-group">
+				                    <div class="col-xs-4 form-group" id="timeend">
 				                		<label>End Time</label>
 			                            <div id="timepicker2" data-no="1" class="input-group input-append date datetimepicker">
 			                                <input data-format="hh:mm" type="text" class="form-control" id="endTime" readonly>
@@ -118,6 +135,9 @@ $d = $dataEmp[0];
 			                                    <i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-time"></i>
 			                                </span>
 			                            </div>
+                                        <span> 
+                                            <label><input type="checkbox" name="checkselesai" id="checkselesai"> Selesai </label>
+                                        </span>
 		                        	</div>
 				                </div>
 
@@ -159,11 +179,23 @@ $d = $dataEmp[0];
     </div>
 </div>
 
+
 <script>
     
     $(document).on('click','.btnsaverequest',function () {
         loading_button('.btnsaverequest');
         savedatarequestdoc();
+    });
+
+
+    $('#checkselesai').change(function(){
+
+        if($('#checkselesai').is(':checked')){
+            $('#timepicker2').addClass('hide');
+        } else {
+            $('#timepicker2').removeClass('hide');
+        }
+        // $('#endTime').append('00:00');
     });
 
     function savedatarequestdoc() {
@@ -176,7 +208,12 @@ $d = $dataEmp[0];
         var stardatetime = startDate+' '+startTime;
 
         var endDate = $('#endDate').val();
-        var endTime = $('#endTime').val();
+        //var endTime = $('#endTime').val();
+        if($('#checkselesai').is(':checked')){
+            var endTime = "00:00";
+        } else {
+            var endTime = $('#endTime').val();
+        }
         var enddatetime = endDate+' '+endTime;
         var DescriptionVenue = $('#DescriptionVenue').val();
 
