@@ -3012,7 +3012,8 @@ class C_rest extends CI_Controller {
                     $this->load->model('budgeting/m_pr_po');
                     $arr_result = array('pr_create' => array(),'pr_detail' => array());
                     $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode($dataToken['PRCode']);
-                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
+                    // $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO($dataToken['PRCode']);
                     echo json_encode($arr_result);
                 }
                 else

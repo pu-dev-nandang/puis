@@ -1110,8 +1110,6 @@
 		}
 		td.append('<ul class = "ulUpload">'+htmlLi+'</ul>');
 	})
-	
-
 
 	$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
 		var data = $(this).attr('data');

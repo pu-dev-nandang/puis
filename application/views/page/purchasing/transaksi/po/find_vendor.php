@@ -1,3 +1,18 @@
+<style type="text/css">
+	.thumbnail {
+	    display: inline-block;
+	    display: block;
+	    height: auto;
+	    max-width: 100%;
+	    padding: 16px;
+	    line-height: 1.428571429;
+	    background-color: #fff;
+	    border: 1px solid #aec10b;
+	    border-radius: 20px;
+	    -webkit-transition: all .2s ease-in-out;
+	    transition: all .2s ease-in-out;
+	}
+</style>
 <div class="row">
 	<div class="col-xs-4">
 		<div class="thumbnail">
@@ -40,7 +55,7 @@
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 					 			'</tr>'+
 					 		'<thead>'+
-					 		'<tbody id="dataRow"></tbody>'+
+					 		'<tbody id="dataRow" style="background-color: #8ED6EA;"></tbody>'+
 		        		'</table>'+
 		        		'</div>'+
 		        	 '</div>'+
@@ -147,7 +162,7 @@
 
 			// for detail catalog
 				var Desc = pr_detail[i]['Desc'];
-				var EstimaValue = pr_detail[i]['UnitCost'];
+				var EstimaValue = pr_detail[i]['EstimaValue'];
 				var arr_Photo = pr_detail[i]['Photo'];
 				arr_Photo = arr_Photo.split(',');
 				htmlPhoto = '<ul>';
@@ -206,12 +221,12 @@
 				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;">Desc</th>'+
 				                            '<th width = "4%" style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">Qty</th>'+
 				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Cost</th>'+
-				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">PPN(%)</th>'+
 				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 				                            '<th width = "150px" style = "text-align: center;background: #607D8B;color: #FFFFFF;">Date Needed</th>'+
 										'</tr>'+
 										'</thead>'+
-										'<tbody>'+IsiInputPR+'</tbody></table>'+
+										'<tbody style = "background-color : #eade8e;">'+IsiInputPR+'</tbody></table>'+
 									'</div>'+
 								'</div>'+
 							'</div>';
@@ -293,7 +308,7 @@
 					if (ID_pr_detail_ == ID_pr_detail) {
 						// for detail catalog
 							var Desc = pr_detail[k]['Desc'];
-							var EstimaValue = pr_detail[k]['UnitCost'];
+							var EstimaValue = pr_detail[k]['EstimaValue'];
 							var arr_Photo = pr_detail[k]['Photo'];
 							arr_Photo = arr_Photo.split(',');
 							htmlPhoto = '<ul>';
@@ -352,7 +367,7 @@
 		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Desc</th>'+
 		                            '<th width = "4%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 78px;">Qty</th>'+
 		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Cost</th>'+
-		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 78px;">PPH(%)</th>'+
+		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 78px;">PPN(%)</th>'+
 		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 		                            '<th width = "150px" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">Date Needed</th>'+
 								'</tr>'+
@@ -371,7 +386,7 @@
 		        				'<div class = "col-xs-3">'+
 		        					'<div class="thumbnail">'+
 		        						'<div class="form-group">'+
-				                            '<label>Choose Total Vendor</label>'+
+				                            '<label style= "color : red">Choose Total Vendor</label>'+
 				                            '<select class="form-control" id="ChooseTotVendor" style = "width : 140px;">'+
 				                            	'<option value="1">1</option>'+
 				                            	'<option value="2">2</option>'+
@@ -389,13 +404,117 @@
 				                '<div>'+
 				            '</div>'+
 				        '</div>'+
-				    '</div>'                 
+				    '</div>'+
+				    '<div class = "row" style = "margin-top : 10px;">'+
+				    	'<div class = "col-md-4">'+
+				    		'<button class="btn btn-success" id="OpenPO">Open PO</button>'+' '+
+				    		'<button class="btn btn-warning" id="Clear">Clear</button>'+
+				    	'</div>'+
+				    '</div>'		
 		        	;
 		$('#page_pr_selected_list').html(html);
 		$('#ChooseTotVendor').trigger('change');        	
 	}
 
-	$(document).off('change', '#ChooseTotVendor').on('change', '#ChooseTotVendor',function(e) {
-		
+	$(document).off('click', '#Clear').on('click', '#Clear',function(e) {
+		$('.C_radio_pr:checked').prop('checked',false);
+		$('#page_pr_item_list').empty();
+		ClassDt.Dt_selection = [];
+		ClassDt.Dt_ChooseSelectPR = [];
+		ShowClassDt_selection();
 	})
+
+	$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
+		var data = $(this).attr('data');
+		var arr = data.split('@@');
+		var html = '';
+			html ='<div class = "row">'+
+					'<div class = "col-md-12">'+
+						'<table id="example" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>Item</th>'+
+                     '<th>Desc</th>'+
+                     '<th>Estimate Value</th>'+
+                     '<th>Photo</th>'+
+                     '<th>DetailCatalog</th>'+
+                  '</tr>'+
+               '</thead>'+
+               '<tbody><tr>';
+               		for (var i = 0; i < arr.length; i++) {
+               			var v = (i == 2) ? formatRupiah(arr[i]) : arr[i];
+               			html += '<td>'+v+'</td>';
+               		}
+               		html += '</tr></tbody>';
+         html += '</table></div></div>';
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Catalog'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+	})
+
+	$(document).off('change', '#ChooseTotVendor').on('change', '#ChooseTotVendor',function(e) {
+		var v = $('#ChooseTotVendor option:selected').val();
+		MakeDom_page_PageSearchVendor(v);
+	})
+
+	function MakeDom_page_PageSearchVendor(Tot_vendor)
+	{
+		var html ='<div class = "row">'+
+					'<div class ="col-md-12">'+'<label style= "color : red">Select Vendor</label>'+
+						'<table class = "table" id = "Tbl_selectVendor">'+
+							'<thead>'+
+								'<tr>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">No</th>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Select Vendor</th>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Detail</th>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">File Offer</th>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Approve</th>'+
+								'<tr>'+
+							'</thead>'+
+							'<tbody></tbody>'+
+						'</table>'+
+					'</div>'+
+				 '</div>';
+		
+		$('#PageSearchVendor').html(html);		 					
+
+		var rowCount = $('#Tbl_selectVendor tbody tr').length;
+		if (Tot_vendor < rowCount) {
+			var v = rowCount - Tot_vendor;
+			for (var i = 0; i < v; i++) {
+				$('#Tbl_selectVendor tbody tr:not(:last)').remove();
+			}
+		}
+		else if(Tot_vendor > rowCount){
+			var v = Tot_vendor - rowCount;
+			// console.log(Tot_vendor);
+			// console.log(rowCount);
+			var htmlWr = function(No){
+				var html = '';
+					html = '<tr>'+
+								'<td style = "text-align:center;">'+No+'</td>'+
+								'<td>'+'<div align = "center"><button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button></div>'+'<div style = "margin-top : 5px;"><label class="D_Vendor"></label></div></td>'+
+								'<td style = "text-align:center;"><button class="btn btn-primary Detail_Vendor" data="">Detail</button></td>'+
+								'<td><div align = "center"><input type="file" data-style="fileinput" class="BrowseFile" multiple="" accept="image/*,application/pdf" style="width : 97px;"></div></td>'+
+								'<td><div align = "center"><select class="form-control" class ="OpApprove_vendor" style = "width : 100px;">'+
+										'<option value = "0" selected>No</option>'+
+										'<option value = "1">Yes</option>'+
+									 '</select></div>'+
+								'</td>'+	 	
+							'</tr>';	
+				return html;
+			}
+
+			for (var i = 0; i < v; i++) {
+				var NO = i + 1;
+				$('#Tbl_selectVendor tbody').append(htmlWr(NO));
+			}
+
+		}
+
+	}
 </script>
