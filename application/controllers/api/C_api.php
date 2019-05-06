@@ -203,6 +203,18 @@ class C_api extends CI_Controller {
         for($i=0;$i<count($query);$i++){
             $nestedData=array();
             $row = $query[$i];
+
+            $endtimex = date('H:i',strtotime($row['EndDate']));
+            //$Start = date("Y-m-d H:i:s", strtotime($data_arr['date'].$data_arr['Start']));
+            $statime = 'Selesai';
+
+            if ($endtimex == '00:00') {
+                
+                $endtimes = '<div style="text-align:center;">'.date('d M Y',strtotime($row['StartDate'])).'</div>';
+                $endtimesz = $endtimes.' - '.$statime;
+            }else {
+                $endtimesz = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
+            }
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
@@ -211,7 +223,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['RequestDate'])).'</div>';
             $nestedData[] = $row["ForTask"] ;
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
-            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';;
+            $nestedData[] = $endtimesz;
             $nestedData[] = $row["DescriptionAddress"];
 
             $NIP = $row["NIP"];
