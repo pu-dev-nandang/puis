@@ -8,7 +8,7 @@
     <div class="col-xs-12" >
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
-                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Report</h4>
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Set Cicilan</h4>
             </div>
             <div class="panel-body">
                <div class="row" style="margin-top: 30px;">
@@ -261,33 +261,89 @@
             });
     }
 
+    function ajax_data_deadline_semester_antara(SemesterID)
+    {
+      var def = jQuery.Deferred();
+      var data = {
+          SemesterID : SemesterID,
+          auth : 's3Cr3T-G4N',
+      };
+      var token = jwt_encode(data,"UAP)(*");
+      var url = base_url_js+'rest/__cek_deadline_payment_semester_antara';
+      $.post(url,{ token:token },function () {
+
+      }).done(function(data_json) {
+        def.resolve(data_json);
+      }).fail(function() {
+          def.reject();
+      });
+      return def.promise();
+    }
+
     $(document).on('click','.uniform', function () {
       $('input.uniform').prop('checked', false);
       $(this).prop('checked',true);
-      var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
-                         ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
-      for (var l = 2; l <= max_cicilan; l++) {
-          sss += ' <option value = "'+l+'">'+l+'</option>'
-      }
-
-      sss += '</select>';                   
-
-      var aaa = '<div class = "row">'+
-              '<div class="form-group">'+
-                  '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
-                  '<div class = "col-xs-2">'+
-                     sss+
-                  '</div>'+  
-              '</div>'+    
-          '</div><br>'+
-          '<div class = "row" id="pageSetCicilan">'+
-          '</div>'
-      $(".widget-content").html(aaa);
-      $("#inputCicilan").removeClass('hide');
+      var PTID = $(this).attr('ptid');
+      var SemesterID = $(this).attr('semester');
       get_Invoice = $(this).attr('invoice');
       var n = get_Invoice.indexOf(".");
       get_Invoice = get_Invoice.substring(0, n);
-      dataa = {ID : $(this).attr('paymentid'),PTID : $(this).attr('ptid'),SemesterID : $(this).attr('semester')};
+      var paymentid = $(this).attr('paymentid');
+      if (PTID == 5 || PTID == 6) {
+        ajax_data_deadline_semester_antara(SemesterID).then(function(data){
+            if (data == 1) {
+              var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
+                                 ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
+              for (var l = 2; l <= max_cicilan; l++) {
+                  sss += ' <option value = "'+l+'">'+l+'</option>'
+              }
+
+              sss += '</select>';                   
+
+              var aaa = '<div class = "row">'+
+                      '<div class="form-group">'+
+                          '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                          '<div class = "col-xs-2">'+
+                             sss+
+                          '</div>'+  
+                      '</div>'+    
+                  '</div><br>'+
+                  '<div class = "row" id="pageSetCicilan">'+
+                  '</div>'
+              $(".widget-content").html(aaa);
+              $("#inputCicilan").removeClass('hide');
+              dataa = {ID : paymentid,PTID : PTID,SemesterID : SemesterID};
+            }
+            else{
+             toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+            }          
+        })
+      }
+      else
+      {
+       var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
+                          ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
+       for (var l = 2; l <= max_cicilan; l++) {
+           sss += ' <option value = "'+l+'">'+l+'</option>'
+       }
+
+       sss += '</select>';                   
+
+       var aaa = '<div class = "row">'+
+               '<div class="form-group">'+
+                   '<label class="col-xs-1 control-label">Set Cicilan</label>'+  
+                   '<div class = "col-xs-2">'+
+                      sss+
+                   '</div>'+  
+               '</div>'+    
+           '</div><br>'+
+           '<div class = "row" id="pageSetCicilan">'+
+           '</div>'
+       $(".widget-content").html(aaa);
+       $("#inputCicilan").removeClass('hide');
+       dataa = {ID : paymentid,PTID : PTID,SemesterID : SemesterID};
+      }
+      
     });
 
 
