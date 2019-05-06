@@ -2160,7 +2160,7 @@ class C_rest extends CI_Controller {
 
                             if ($arr_upd['Status'] == 2) {
                                 if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
-                                    $Desc .= '<br>{<br>'.$dataToken['NoteDel'].'<br>}';
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
                                 }
                             }
                             
