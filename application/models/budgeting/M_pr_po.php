@@ -338,7 +338,7 @@ class M_pr_po extends CI_Model {
                                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                     ) aa
                     ) as h on d.Departement = h.ID 
-                where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po)
+                where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail)
                ';
         $query = $this->db->query($sql, array($PRCode))->result_array();
         // get combine 

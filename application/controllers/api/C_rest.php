@@ -2154,6 +2154,18 @@ class C_rest extends CI_Controller {
                                     );
 
                                     $this->db->insert('db_purchasing.pr_status',$dataSave);
+                                    $ID_pr_status = $this->db->insert_id();
+
+                                    // save to db_purchasing pr_status_detail
+                                    for ($i=0; $i < count($G_data_detail); $i++) { 
+                                        $ID_pr_detail = $G_data_detail[$i]['ID'];
+                                        $dataSave = array(
+                                            'ID_pr_status' => $ID_pr_status,
+                                            'ID_pr_detail' => $ID_pr_detail,
+                                            'Status' => 0,
+                                        );
+                                        $this->db->insert('db_purchasing.pr_status_detail',$dataSave);
+                                    }
 
                                 }
                             }

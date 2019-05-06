@@ -497,14 +497,15 @@
 				var html = '';
 					html = '<tr>'+
 								'<td style = "text-align:center;">'+No+'</td>'+
-								'<td>'+'<div align = "center"><button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button></div>'+'<div style = "margin-top : 5px;"><label class="D_Vendor"></label></div></td>'+
+								'<td>'+'<div align = "center"><button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button></div>'+'<div style = "margin-top : 5px;" class = "LblNmVendor"></div></td>'+
 								'<td style = "text-align:center;"><button class="btn btn-primary Detail_Vendor" data="">Detail</button></td>'+
 								'<td><div align = "center"><input type="file" data-style="fileinput" class="BrowseFile" multiple="" accept="image/*,application/pdf" style="width : 97px;"></div></td>'+
-								'<td><div align = "center"><select class="form-control" class ="OpApprove_vendor" style = "width : 100px;">'+
-										'<option value = "0" selected>No</option>'+
-										'<option value = "1">Yes</option>'+
-									 '</select></div>'+
-								'</td>'+	 	
+								// '<td><div align = "center"><select class="form-control" class ="OpApprove_vendor" style = "width : 100px;">'+
+								// 		'<option value = "0" selected>No</option>'+
+								// 		'<option value = "1">Yes</option>'+
+								// 	 '</select></div>'+
+								// '</td>'+	
+								'<td><div align = "center"><label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "0" checked> No</label> &nbsp <label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "1"> Yes</label></div></td>'+ 	
 							'</tr>';	
 				return html;
 			}
@@ -517,4 +518,45 @@
 		}
 
 	}
+
+	$(document).off('click', '.C_radio_approve').on('click', '.C_radio_approve',function(e) {
+		var v = $(this).val();
+		if (v == 1) {
+			$('.C_radio_approve[value="1"]').prop('checked',false);
+			$('.C_radio_approve[value="0"]').prop('checked',true);
+			$(this).prop('checked',true);
+		}
+	})
+
+	$(document).off('click', '.SearchVendor').on('click', '.SearchVendor',function(e) {
+		var html = '';
+			html = '<div class="row">'+
+						'<div class = "col-md-12">'+
+							'<div class="table-responsive">'+
+								'<table class="table table-bordered tableData" id ="datatablesServer">'+
+									'<thead>'+
+										'<tr>'+
+											'<th width = "3%">No</th>'+
+											'<th>Category Supplier</th>'+
+											'<th>Supplier</th>'+
+											'<th>Detail Item</th>'+
+										'<tr>'+
+									'</thead>'+
+									'<tbody></tbody>'+
+								'</table>'+
+							'<div>'+
+						'</div>'+
+					'</div>';						
+
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Vendor'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});		
+
+
+	})	
+
 </script>
