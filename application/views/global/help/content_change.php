@@ -26,7 +26,7 @@
                                     <?php echo $data[$j]['Answers'] ?>
                                 </p>
                                 <div style="margin-top: 15px;margin-bottom: 15px;">
-                                    <a class="btn btn-default" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/help-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> PDF File</a>
+                                    <a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/help-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> PDF File</a>
                                 </div>
                             </div>
                         </li>
