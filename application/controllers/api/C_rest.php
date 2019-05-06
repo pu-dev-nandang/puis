@@ -3050,16 +3050,24 @@ class C_rest extends CI_Controller {
              $dataToken = $this->getInputToken2();
              $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
+                $arr = array('status' => 0,'StartKRS' =>'0000-00-00' ,'EndKRS' => '0000-00-00');
                 $SemesterID = $dataToken['SemesterID']; // SemesterID semester antara
                 $G_data = $this->m_master->caribasedprimary('db_academic.sa_academic_years','SASemesterID',$SemesterID);
                 $EndKRS = $G_data[0]['EndKRS'];
+                $StartKRS = $G_data[0]['StartKRS'];
                 $chkTgl = $this->m_master->checkTglNow($EndKRS);
+                
+                $arr = array('status' => 0,'StartKRS' =>date("d M Y", strtotime($StartKRS)) ,'EndKRS' => date("d M Y", strtotime($EndKRS)));
                 if (!$chkTgl) {
-                    echo json_encode(1); // melewati
+                    $arr['status'] = 1;
+                    // echo json_encode(1); // melewati
+                    echo json_encode($arr); // melewati
                 }
                 else
                 {
-                    echo json_encode(0);
+                    $arr['status'] = 0;
+                    // echo json_encode(0);
+                    echo json_encode($arr);
                 }
             }
             else
