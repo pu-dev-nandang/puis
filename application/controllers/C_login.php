@@ -610,7 +610,33 @@ class C_login extends CI_Controller {
           $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
           if (count($dataUser) > 0) {
             $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-            redirect(base_url().'dashboard');
+            // cek User (KaProdi,Dekan & Lecturer)
+            $PositionMain = $this->session->userdata('PositionMain');
+            $Position = $PositionMain['IDPosition'];
+            
+            switch ($Position) {
+              case 5: // Dekan
+                $this->load->model('faculty/m_faculty');
+                $this->session->set_userdata('IDdepartementNavigation','34');
+                $this->session->set_userdata('departementNavigation','admin-fakultas');
+                $this->m_faculty->auth(); // get session
+                redirect(base_url().'dashboard');
+                break;
+              case 6: // KAPRODI
+                $this->load->model('prodi/m_prodi');
+                $this->session->set_userdata('IDdepartementNavigation','15');
+                $this->session->set_userdata('departementNavigation','admin-prodi');
+                $this->m_prodi->auth(); // get session
+                redirect(base_url().'dashboard');
+                break;
+              case 7: // DOSEN
+                redirect(base_url().'dashboard');
+                break;  
+              default:
+                redirect(base_url().'dashboard');
+                break;
+            }
+            
           }
         }
 
