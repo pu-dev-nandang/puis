@@ -227,17 +227,17 @@ class C_api extends CI_Controller {
             $nestedData[] = $row["DescriptionAddress"];
 
             $NIP = $row["NIP"];
-            $IDRequest = $row["IDRequest"];
+            $IDRequest = $row["IDRequest"]; 
 
             $tokenPDF = $this->jwt->encode(array('NIP' => $NIP, 'IDRequest' => $IDRequest),'UAP)(*');
 
             if($row['ConfirmStatus'] == 0){
                 $status = '<button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button>';
             } else if($row['ConfirmStatus'] == 1) {
-                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved"> <i class="fa fa-download" disabled></i> Download </a> ';
+                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> ';
             } else {
 
-                $status = '<label> Rejected</label>';
+                $status = '<label class="text-danger"> Rejected</label>';
             }
 
 
