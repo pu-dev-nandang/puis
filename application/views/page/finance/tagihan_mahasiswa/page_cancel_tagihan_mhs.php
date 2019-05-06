@@ -525,12 +525,12 @@
             // Cek Deadline Semester Antara
               if (BoolSemesterAntara) {
                 ajax_data_deadline_semester_antara(semesterID_antara).then(function(data){
-                    if (data == 1) {
+                    if (data.status == 1) {
                       CekDeadline = false;
                       __submit_cancel_created_tagihan_mhs(arrValueCHK,Reason)
                     }
                     else{
-                     toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+                     toastr.info('Tanggal KRS Semester Antara belum berakhir Period('+data.StartKRS+' - '+data.EndKRS+'), tidak bisa melakukan action '); 
                     }          
                 })
               }

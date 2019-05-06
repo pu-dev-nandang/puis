@@ -117,12 +117,12 @@
                    var CekDeadline = ''; 
                    if (PTID == 5 || PTID == 6) {
                      ajax_data_deadline_semester_antara(Data_mhs[0]['SemesterID']).then(function(data){
-                         if (data == 1) {
+                         if (data.status == 1) {
                            CekDeadline = false;
                            HTMLWrite(Data_mhs);
                          }
                          else{
-                          toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+                          toastr.info('Tanggal KRS Semester Antara belum berakhir Period('+data.StartKRS+' - '+data.EndKRS+'), tidak bisa melakukan action '); 
                          }          
                      })
                    }

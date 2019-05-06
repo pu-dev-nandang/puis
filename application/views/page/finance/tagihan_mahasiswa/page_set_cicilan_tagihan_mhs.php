@@ -291,7 +291,7 @@
       var paymentid = $(this).attr('paymentid');
       if (PTID == 5 || PTID == 6) {
         ajax_data_deadline_semester_antara(SemesterID).then(function(data){
-            if (data == 1) {
+            if (data.status == 1) {
               var sss = '<select class = "full-width-fix" id = "jml_cicilan">'+
                                  ' <option value = "" disabled selected>--Pilih Jumlah Cicilan--</option>';
               for (var l = 2; l <= max_cicilan; l++) {
@@ -315,7 +315,7 @@
               dataa = {ID : paymentid,PTID : PTID,SemesterID : SemesterID};
             }
             else{
-             toastr.info('Tanggal KRS Semester Antara belum berakhir, tidak bisa melakukan action '); 
+             toastr.info('Tanggal KRS Semester Antara belum berakhir Period('+data.StartKRS+' - '+data.EndKRS+'), tidak bisa melakukan action '); 
             }          
         })
       }
