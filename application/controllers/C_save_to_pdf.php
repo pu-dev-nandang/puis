@@ -6208,7 +6208,7 @@ Phone: (021) 29200456';
         $pdf->Cell(60,5,'2. Dekan '.$d['NameFak'],0,1,'L');
 
         $pdf->SetXY(17,$y+61);
-        $pdf->Cell(60,5,'2. Kaprodi '.$d['ProdiName'],0,1,'L');
+        $pdf->Cell(60,5,'3. Kaprodi '.$d['ProdiName'],0,1,'L');
 
 
         $pdf->Output('I','Tugas_Keluar.pdf');
