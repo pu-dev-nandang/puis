@@ -136,7 +136,8 @@
 	<hr class="style-eight" />
 	<script type="text/javascript">
 		$(document).ready(function () {
-			$('#btn-unpprove<?php echo $i ?>').click(function(){
+			$(document).off('click', '#btn-unpprove<?php echo $i ?>').on('click', '#btn-unpprove<?php echo $i ?>',function(e) {
+			// $('#btn-unpprove<?php echo $i ?>').click(function(){
 					loading_button('#btn-unpprove<?php echo $i ?>');
 					var ID_register_document = getValueChecbox<?php echo $i ?>('.tableData<?php echo $i ?>');
 					  // console.log(ID_register_document);
@@ -159,11 +160,13 @@
 			})
 		});
 
-		$(document).on('click','#dataResultCheckAll<?php echo $i ?>', function () {
+		$(document).off('click', '#dataResultCheckAll<?php echo $i ?>').on('click', '#dataResultCheckAll<?php echo $i ?>',function(e) {
+		// $(document).on('click','#dataResultCheckAll<?php echo $i ?>', function () {
 			$('input.uniform<?php echo $i ?>').not(this).prop('checked', this.checked);
 		});
 
-		$(document).on('click','#btn-approve<?php echo $i ?>', function () {
+		$(document).off('click', '#btn-approve<?php echo $i ?>').on('click', '#btn-approve<?php echo $i ?>',function(e) {
+		// $(document).on('click','#btn-approve<?php echo $i ?>', function () {
 			loading_button('#btn-approve<?php echo $i ?>');
 			var ID_register_document = getValueChecbox<?php echo $i ?>('.tableData<?php echo $i ?>');
 			  // console.log(ID_register_document);
@@ -207,7 +210,8 @@
 
 		});
 
-		$(document).on('click','#btn-reject<?php echo $i ?>', function () {
+		$(document).off('click', '#btn-reject<?php echo $i ?>').on('click', '#btn-reject<?php echo $i ?>',function(e) {
+		// $(document).on('click','#btn-reject<?php echo $i ?>', function () {
 			loading_button('#btn-reject<?php echo $i ?>');
 			var ID_register_document = getValueChecbox<?php echo $i ?>('.tableData<?php echo $i ?>');
 			  // console.log(ID_register_document);
@@ -265,7 +269,8 @@
 	<div align = 'center'>No Result Data...</div>
 <?php endif ?>
 <script type="text/javascript">
-$(document).on('click','#confirmYesProcess', function () {
+$(document).off('click', '#confirmYesProcess').on('click', '#confirmYesProcess',function(e) {	
+// $(document).on('click','#confirmYesProcess', function () {
 	$('#NotificationModal .modal-header').addClass('hide');
     $('#NotificationModal .modal-body').html('<center>' +
         '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +

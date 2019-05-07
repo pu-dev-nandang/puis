@@ -46,8 +46,8 @@
         $('#filterCurriculum,#filterBaseProdi').empty();
         loadSelectOptionCurriculum('#filterCurriculum','');
 
-        // $('#filterBaseProdi').append('<option value="">--- All Program Study ---</option>' +
-        //     '<option disabled>------------------------------------------</option>');
+        $('#filterBaseProdi').append('<option value="">--- All Program Study ---</option>' +
+            '<option disabled>------------------------------------------</option>');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
 
         setTimeout(function () { loadPage(); },1500);
@@ -55,7 +55,6 @@
         $('#filterStatus').append('<option value="">--- All Status ---</option>' +
             '<option disabled>------------------------------------------</option>');
         loadSelectOptionStatusStudent('#filterStatus','');
-
     });
 
     function loadSelectOptionBaseProdi(element,selected) {
@@ -248,8 +247,7 @@
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterStatus = $('#filterStatus').val();
 
-        if(filterCurriculum!='' && filterCurriculum!=null
-        && filterBaseProdi!='' && filterBaseProdi!=null){
+        if(filterCurriculum!='' && filterCurriculum!=null){
 
             var data = {
                 Year : filterCurriculum.split('.')[1],

@@ -1226,6 +1226,8 @@ class C_admission extends Admission_Controler {
 
     public function generate_to_be_mhs()
     {
+      // die();
+
       $input = $this->getInputToken();
       $msg = '';
       //check existing db
@@ -1536,6 +1538,7 @@ class C_admission extends Admission_Controler {
                 'NPM' => $NPM,
                 'FormulirCode' => $data2[0]['FormulirCode'],
                 'DateTime' => date('Y-m-d H:i:s'),
+                'GeneratedBy' => $this->session->userdata('NIP'),
             );
             $this->db->insert('db_admission.to_be_mhs', $dataSave);
 
@@ -1645,6 +1648,32 @@ class C_admission extends Admission_Controler {
           if($_SERVER['SERVER_NAME']!='localhost') {
             $this->m_admission->insert_to_Library($arr_insert_auth);
           }
+
+          // send notif
+            $data = array(
+                'auth' => 's3Cr3T-G4N',
+                'Logging' => array(
+                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Generate Student',
+                                'Description' => 'Admission has been Generate Student',
+                                'URLDirect' => 'database/students/'.$YearAuth,
+                                'CreatedBy' => $this->session->userdata('NIP'),
+                              ),
+                'To' => array(
+                          'Div' => array(6,12),
+                        ),
+                'Email' => 'No', 
+            );
+
+            $url = url_pas.'rest2/__send_notif_browser';
+            $token = $this->jwt->encode($data,"UAP)(*");
+            $this->m_master->apiservertoserver($url,$token);
+
+            // send to admission dengan url yang berbeda
+              $data['Logging']['URLDirect'] = 'admission/master-calon-mahasiswa/data-mahasiswa';
+              $data['To']['Div'] = array(10);
+              $token = $this->jwt->encode($data,"UAP)(*");
+              $this->m_master->apiservertoserver($url,$token);
+
           echo json_encode($msg);
     }
 

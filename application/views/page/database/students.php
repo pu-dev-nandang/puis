@@ -73,13 +73,47 @@
 
 
 <script>
+    var TaSegment = '<?php echo $this->uri->segment(3) ?>';
     var TableSess = '';
     var TempCheckBoxIDCard = [];
     $(document).ready(function () {
         loadSelectOptionClassOf_ASC('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
         loadSelectOptionStatusStudent('#filterStatus','');
-        loadStudent();
+        var bool = 0;
+        var urlInarray = [base_url_js+'api/__getKurikulumSelectOptionASC'];
+
+        $( document ).ajaxSuccess(function( event, xhr, settings ) {
+           if (jQuery.inArray( settings.url, urlInarray )) {
+               bool++;
+               if (bool == 1) {
+
+                   setTimeout(function(){
+                        // select filterCurriculum by TaSegment
+                            if (TaSegment != '' && TaSegment != null) {
+                                var S_filterCurriculum = $('#filterCurriculum option');
+                                var rs = '';
+                                S_filterCurriculum.each(function(){
+                                    var v = $(this).val();
+                                    var c = $(this).val();
+                                    // console.log(c);
+                                    v = v.split('.');
+                                    if (v[1] == TaSegment) {
+                                        rs = c;
+                                    }
+                                })
+
+                                console.log(rs);
+                                $('#filterCurriculum').find('option[value="'+rs+'"]').prop('selected',true);
+
+                            }
+                        loadStudent(); 
+
+                    }, 500);
+                  
+               }
+           }
+        });
 
     });
 
