@@ -696,7 +696,7 @@ class C_master extends Purchasing_Controler {
             $row = $query[$i];
             $nestedData[] = $No;
             $nestedData[] = $row['CodeSupplier'];
-            $nestedData[] = $row['NamaSupplier'].'<br>'.$row['Website'].'<br>'.'PIC : '.$row['PICName'].'<br>'.'Alamat : '.$row['Alamat'];
+            $nestedData[] = '<label>'.$row['NamaSupplier'].'</label><br>'.$row['Website'].'<br>'.'PIC : '.$row['PICName'].'<br>'.'Alamat : '.$row['Alamat'];
             // $nestedData[] = $row['Website'];
             // $nestedData[] = $row['PICName'];
             // $nestedData[] = $row['Alamat'];

@@ -12,6 +12,11 @@
 	    -webkit-transition: all .2s ease-in-out;
 	    transition: all .2s ease-in-out;
 	}
+
+	#datatablesServer.dataTable tbody tr:hover {
+	   background-color:#71d1eb !important;
+	   cursor: pointer;
+	}
 </style>
 <div class="row">
 	<div class="col-xs-4">
@@ -465,11 +470,11 @@
 	{
 		var html ='<div class = "row">'+
 					'<div class ="col-md-12">'+'<label style= "color : red">Select Vendor</label>'+
-						'<table class = "table" id = "Tbl_selectVendor">'+
+						'<table class = "table table-bordered" id = "Tbl_selectVendor">'+
 							'<thead>'+
 								'<tr>'+
 									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">No</th>'+
-									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Select Vendor</th>'+
+									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;width:327px">Select Vendor</th>'+
 									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Detail</th>'+
 									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">File Offer</th>'+
 									'<th style = "text-align: center;background: #7da962;color: #FFFFFF;">Approve</th>'+
@@ -529,21 +534,26 @@
 	})
 
 	$(document).off('click', '.SearchVendor').on('click', '.SearchVendor',function(e) {
+		var SelectorFirst = $(this);
 		var html = '';
 			html = '<div class="row">'+
 						'<div class = "col-md-12">'+
+							'<div class="thumbnail" style="padding: 10px;">'+
+			           			'<b>Status : </b><i class="fa fa-circle" style="color: #eade8e;"></i> Already Selected'+
+			                '</div><br>'+
 							'<div class="table-responsive">'+
 								'<table class="table table-bordered tableData" id ="datatablesServer">'+
-									'<thead>'+
-										'<tr>'+
-											'<th width = "3%">No</th>'+
-											'<th>Category Supplier</th>'+
-											'<th>Supplier</th>'+
-											'<th>Detail Item</th>'+
-										'<tr>'+
-									'</thead>'+
-									'<tbody></tbody>'+
-								'</table>'+
+			        				'<thead>'+
+			        					'<tr>'+
+			        						'<th width = "2%" style = "text-align: center;background: #EE556C;color: #FFFFFF;">No</th>'+
+			        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;">Category Supplier</th>'+
+			        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;width: 250px;">Supplier</th>'+
+			        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;">Detail Item</th>'+
+			        					'</tr>'+
+			        				'</thead>'+
+			        				'<tbody>'+
+			        				'</tbody>'+
+			        			'</table>'+
 							'<div>'+
 						'</div>'+
 					'</div>';						
@@ -554,8 +564,84 @@
 			$('#GlobalModalLarge').modal({
 			    'show' : true,
 			    'backdrop' : 'static'
-			});		
+			});
 
+			// load data
+				$("#datatablesServer tbody").empty();
+				$.fn.dataTable.ext.errMode = 'throw';
+				$.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+				{
+				    return {
+				        "iStart": oSettings._iDisplayStart,
+				        "iEnd": oSettings.fnDisplayEnd(),
+				        "iLength": oSettings._iDisplayLength,
+				        "iTotal": oSettings.fnRecordsTotal(),
+				        "iFilteredTotal": oSettings.fnRecordsDisplay(),
+				        "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+				        "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+				    };
+				};
+
+				var dataTable = $('#datatablesServer').DataTable( {
+				    "processing": true,
+				    "destroy": true,
+				    "serverSide": true,
+				    "iDisplayLength" : 10,
+				    "ordering" : false,
+				    "ajax":{
+				        url : base_url_js+"purchasing/page/supplier/DataIntable/server_side", // json datasource
+				        ordering : false,
+				        type: "post",  // method  , by default get
+				        data : {action : "All_approval"},
+				        error: function(){  // error handling
+				            $(".employee-grid-error").html("");
+				            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+				            $("#employee-grid_processing").css("display","none");
+				        },
+				    },
+				    'createdRow': function( row, data, dataIndex ) {
+				    	// cek data ada pada LblNmVendor
+				    	var bool = true;
+				    	$(".LblNmVendor").each(function(){
+				    		var idtable = $(this).attr('idtable');
+				    		if (bool) {
+				    			if (data[1] == idtable) {
+				    				bool = false;
+				    			}
+				    		}
+				    	})
+
+				    	if (bool) {
+				    		$(row).find('td:eq(1)').html('<div align="center"><b>'+data[4]+'</b></div>');
+				    		$(row).find('td:eq(3)').html('<div align="left">'+data[6]+'</div>');
+				    		$(row).attr('idtable',data[1]);
+				    	}
+				    	else
+				    	{
+				    		$(row).prop('disabled',true);
+				    		$(row).attr('style','background-color: #eade8e;');
+				    		$(row).find('td:eq(1)').html('<div align="center"><b>'+data[4]+'</b></div>');
+				    		$(row).find('td:eq(3)').html('<div align="left">'+data[6]+'</div>');
+				    		$(row).attr('idtable',data[1]);
+				    	}
+
+				    },
+				    
+				} );
+
+				dataTable.on( 'click', 'tr', function (e) {
+				       var row = $(this);
+				       var idtable = row.attr('idtable');
+				       var SuplierNM = row.find('td:eq(2)').html();
+				       // get selector LblNmVendor
+				       var tdParent = SelectorFirst.closest('td');
+				       tdParent.find('.LblNmVendor').html(SuplierNM);
+				       tdParent.find('.LblNmVendor').attr('idtable',idtable);
+				       var arr = row.find('td:eq(0)').html()+'@@'+row.find('td:eq(1)').html()+'@@'+row.find('td:eq(2)').html()+'@@'+row.find('td:eq(3)').html();
+				       var trParent = SelectorFirst.closest('tr');
+				       trParent.find('.Detail_Vendor').attr('data',arr);
+				       $('#GlobalModalLarge').modal('hide');
+				} );		
 
 	})	
 
