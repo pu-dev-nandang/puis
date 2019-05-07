@@ -255,8 +255,6 @@ class C_api2 extends CI_Controller {
                             }
                         }
 
-
-
                         $result = array(
                             'Status' => '1',
                             'Message' => 'Approved',

@@ -540,38 +540,50 @@ class C_api extends CI_Controller {
 
         $db_ = 'ta_'.$dataYear;
 
-        $dataWhere = 's.ProdiID = "'.$dataProdiID.'"';
+        $dataWhere = ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID)) ? 'WHERE s.ProdiID = "'.$dataProdiID.'"' : '';
         $arryWhere = array('ProdiID' => $dataProdiID);
         if($dataStatus!='' && $dataStatus!=null){
-            $arryWhere = array(
-                'ProdiID' => $dataProdiID,
-                'StatusStudentID' => $dataStatus
-            );
-            $dataWhere = 's.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
+            if ($dataProdiID != '' && $dataProdiID != null && !empty($dataProdiID) ) {
+                $arryWhere = array(
+                    'ProdiID' => $dataProdiID,
+                    'StatusStudentID' => $dataStatus
+                );
+                $dataWhere = 'WHERE s.ProdiID = "'.$dataProdiID.'" AND s.StatusStudentID = "'.$dataStatus.'" ';
+            }
+            else
+            {
+                $arryWhere = array(
+                    'StatusStudentID' => $dataStatus
+                );
+                $dataWhere = 'WHERE  s.StatusStudentID = "'.$dataStatus.'" ';
+            }
+            
         }
 
         $totalData = $this->db->get_where($db_.'.students',$arryWhere
         )->result_array();
 
-        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
+        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
-                          ast.EmailPU
+                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy
                           FROM '.$db_.'.students s 
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
                           LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
+                          LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
 
         if( !empty($requestData['search']['value']) ) {
-            $sql.= ' WHERE '.$dataWhere.' AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= '  '.$dataWhere.' AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {
-            $sql.= 'WHERE '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            $sql.= ' '.$dataWhere.' ORDER BY s.NPM, s.ProdiID ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
 
         // print_r($sql);die();
@@ -615,8 +627,9 @@ class C_api extends CI_Controller {
 
             //                       </ul>
             //                     </div>';
-//            $nestedData[] = $row["ProdiNameEng"];
+            $nestedData[] = $row["ProdiNameInd"];
             $nestedData[] = '<div style="text-align: center;"><i class="fa fa-circle" '.$label.'></i></div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NameGeneratedBy"].'</div>';
 
             $data[] = $nestedData;
         }

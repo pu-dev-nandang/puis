@@ -173,6 +173,7 @@ $route['database/loadpagelecturersDetails'] = 'page/database/c_database/loadpage
 $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailResetPassword';
 
 $route['database/students'] = 'page/database/c_database/students';
+$route['database/students/(:num)'] = 'page/database/c_database/students/$1';
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
 $route['database/employees'] = 'page/database/c_database/employees';
@@ -911,6 +912,7 @@ $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_Power
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
+$route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
