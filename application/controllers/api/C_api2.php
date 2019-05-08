@@ -2451,7 +2451,7 @@ class C_api2 extends CI_Controller {
             if(count($data)>0){
                 for ($i=0;$i<count($data);$i++){
                     $d = $data[$i];
-                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit FROM db_academic.sa_student_details ssd 
+                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit, cd.Semester FROM db_academic.sa_student_details ssd 
                                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                                 WHERE ssd.IDSAStudent = "'.$d['ID'].'" 
@@ -2484,7 +2484,7 @@ class C_api2 extends CI_Controller {
             if(count($data)>0){
                 for ($i=0;$i<count($data);$i++){
                     $d = $data[$i];
-                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit FROM db_academic.sa_student_details ssd 
+                    $dataDet = $this->db->query('SELECT ssd.*, mk.NameEng AS CourseEng,  mk.MKCode, cd.TotalSKS AS Credit, cd.Semester FROM db_academic.sa_student_details ssd 
                                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                                 LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                                 WHERE ssd.IDSAStudent = "'.$d['ID'].'" 
@@ -2613,11 +2613,17 @@ class C_api2 extends CI_Controller {
                             $dataSD = $this->db->select('ID,CDID,MKID')->get_where('db_academic.sa_student_details',
                                 array('ID' => $ArrIDSSD[$i]))->result_array();
 
+                            $dataSD = $this->db->query('SELECT ssd.ID, ssd.CDID, ssd.MKID, cd.ProdiID FROM db_academic.sa_student_details ssd 
+                                                                    LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                                    WHERE ssd.ID = "'.$ArrIDSSD[$i].'" 
+                                                                    GROUP BY ssd.CDID')->result_array();
+
                             $arrIns = array(
                                 'ScheduleIDSA' => $ScheduleIDSA,
                                 'IDSSD' => $dataSD[0]['ID'],
                                 'CDID' => $dataSD[0]['CDID'],
-                                'MKID' => $dataSD[0]['MKID']
+                                'MKID' => $dataSD[0]['MKID'],
+                                'ProdiID' => $dataSD[0]['ProdiID']
                             );
                             $this->db->insert('db_academic.sa_schedule_course',$arrIns);
 
@@ -3014,7 +3020,7 @@ class C_api2 extends CI_Controller {
                     $this->db->delete('db_finance.payment');
                     $this->db->reset_query();
                 }
-                
+
 
                 $tables = array('db_academic.sa_student_details');
                 $this->db->where('IDSAStudent', $IDSAStudent);
@@ -3068,27 +3074,50 @@ class C_api2 extends CI_Controller {
                 for ($i=0;$i<count($dataStd);$i++){
                     $d = $dataStd[$i];
 
-                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
+                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.CDID, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
                                                                 FROM db_academic.sa_student_details ssd
                                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
-                                                                WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')->result_array();
+                                                                WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')
+                        ->result_array();
 
                     if(count($dataDetails)>0){
                         for ($s=0;$s<count($dataDetails);$s++){
                             $ds = $dataDetails[$s];
-                            $dataSchedule = $this->db->query('SELECT ss.ID AS ScheduleIDSA,ss.ClassGroup, ss.Start, ss.End, em.NIP, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room  FROM db_academic.sa_schedule ss
+                            $dataSchedule = $this->db->query('SELECT ss.ID AS ScheduleIDSA,ss.ClassGroup, ss.Start, ss.End, em.NIP, 
+                                                                        em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room  FROM db_academic.sa_schedule ss
                                                                         LEFT JOIN db_academic.sa_schedule_course ssc ON (ss.ID = ssc.ScheduleIDSA)
                                                                         LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
                                                                         LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
                                                                         LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
-                                                                        WHERE ssc.IDSSD = "'.$ds['IDSSD'].'" ')
+                                                                        WHERE ssc.CDID = "'.$ds['CDID'].'" ')
                                 ->result_array();
 
                             if(count($dataSchedule)>0){
                                 for($t=0;$t<count($dataSchedule);$t++){
                                     $dataSchedule[$t]['TeamTeaching'] = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.sa_schedule_team_teaching sstt
                                                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = sstt.NIP)
-                                                                                                WHERE sstt.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" ')->result_array();
+                                                                                                WHERE sstt.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" ')
+                                        ->result_array();
+
+                                    // Attendance
+                                    $dataAttd = $this->db->query('SELECT sattd.Meet, sattd.Status, sattd.EntredAt  
+                                                                        FROM db_academic.sa_attendance sattd WHERE sattd.UserID = "'.$NPM.'"
+                                                                        AND sattd.ScheduleIDSA = "'.$dataSchedule[$t]['ScheduleIDSA'].'" ')->result_array();
+
+
+                                    $totalPresent = 0;
+                                    if(count($dataAttd)>0){
+
+                                        foreach ($dataAttd AS $itemAtd){
+                                            if($itemAtd['Status']=='1'){
+                                                $totalPresent = $totalPresent + 1;
+                                            }
+                                        }
+                                    }
+
+                                    $countAttd = ($totalPresent>0) ? $totalPresent/14 : 0;
+                                    $dataSchedule[$t]['Attendance'] = $countAttd;
+                                    $dataSchedule[$t]['AttendanceDetails'] = $dataAttd;
                                 }
                             }
 
@@ -3111,7 +3140,8 @@ class C_api2 extends CI_Controller {
             $NPM = $data_arr['NPM'];
 
             $dateNow = $this->m_rest->getDateNow();
-            $dataStd = $this->db->query('SELECT ss.NPM, ss.Mentor, sa.Name, ss.ID AS IDSAStudent, sa.*, say.ShowUTSSchedule, say.ShowUASSchedule  FROM db_academic.sa_student ss 
+            $dataStd = $this->db->query('SELECT ss.NPM, ss.Mentor, sa.Name, ss.ID AS IDSAStudent, sa.*, say.ShowUTSSchedule, say.ShowUASSchedule   
+                                                    FROM db_academic.sa_student ss
                                                     LEFT JOIN db_academic.semester_antara sa ON (sa.ID = ss.SASemesterID)
                                                     LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
                                                     WHERE ss.NPM = "'.$NPM.'" ORDER BY ss.SASemesterID ASC ')->result_array();
@@ -3120,7 +3150,7 @@ class C_api2 extends CI_Controller {
                 for ($i=0;$i<count($dataStd);$i++){
                     $d = $dataStd[$i];
 
-                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
+                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.CDID, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode  
                                                                 FROM db_academic.sa_student_details ssd
                                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
                                                                 WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')->result_array();
@@ -3134,7 +3164,7 @@ class C_api2 extends CI_Controller {
                                                                         LEFT JOIN db_academic.days d ON (d.ID = ss.DayID)
                                                                         LEFT JOIN db_academic.classroom cl ON (cl.ID = ss.ClassroomID)
                                                                         LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
-                                                                        WHERE ssc.IDSSD = "'.$ds['IDSSD'].'" ')->result_array();
+                                                                        WHERE ssc.CDID = "'.$ds['CDID'].'" ')->result_array();
 
                             if(count($dataSchedule)>0){
                                 for($t=0;$t<count($dataSchedule);$t++){
@@ -3193,10 +3223,151 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='SAScoreStd'){
+
+            $NPM = $data_arr['NPM'];
+
+            $dateNow = $this->m_rest->getDateNow();
+
+            $dataStd = $this->db->query('SELECT ss.ID AS IDSAStudent, sa.Name, say.ShowUTS, say.ShowUAS  FROM db_academic.sa_student ss 
+                                                    LEFT JOIN db_academic.semester_antara sa ON (sa.ID = ss.SASemesterID)
+                                                    LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
+                                                    WHERE ss.NPM = "'.$NPM.'" ORDER BY ss.SASemesterID ASC ')->result_array();
+
+            if(count($dataStd)>0) {
+                for ($i = 0; $i < count($dataStd); $i++) {
+                    $d = $dataStd[$i];
+
+                    $dataDetails = $this->db->query('SELECT ssd.ID AS IDSSD, ssd.CDID, ssd.Type, ssd.Status, ssd.Credit, mk.NameEng AS CourseEng, mk.MKCode,  
+                                                                ssd.Evaluasi, ssd.UTS, ssd.UAS, ssd.ScoreNew, ssd.GradeNew, ssd.GradeValueNew, ssd.StatusNew,
+                                                                ssd.StatusNew
+                                                                FROM db_academic.sa_student_details ssd
+                                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssd.MKID)
+                                                                WHERE ssd.IDSAStudent = "'.$d['IDSAStudent'].'" AND ssd.Status = "3" ')
+                        ->result_array();
+
+                    if(count($dataDetails)>0){
+                        for ($i2=0;$i2<count($dataDetails);$i2++){
+
+                            if($d['ShowUTS']>$dateNow){
+                                $dataDetails[$i2]['UTS'] = '';
+                                $dataDetails[$i2]['UAS'] = '';
+                                $dataDetails[$i2]['ScoreNew'] = '';
+                                $dataDetails[$i2]['GradeNew'] = '';
+                                $dataDetails[$i2]['GradeValueNew'] = '';
+                            }
+
+                            if($d['ShowUAS']>$dateNow){
+                                $dataDetails[$i2]['UAS'] = '';
+                                $dataDetails[$i2]['ScoreNew'] = '';
+                                $dataDetails[$i2]['GradeNew'] = '';
+                                $dataDetails[$i2]['GradeValueNew'] = '';
+                            }
+
+
+                            if($dataDetails[$i2]['StatusNew']=='0' || $dataDetails[$i2]['StatusNew']==0){
+//                                $dataDetails[$i2]['Evaluasi'] = '';
+//                                $dataDetails[$i2]['UTS'] = '';
+                                $dataDetails[$i2]['UAS'] = '';
+                                $dataDetails[$i2]['ScoreNew'] = '';
+                                $dataDetails[$i2]['GradeNew'] = '';
+                                $dataDetails[$i2]['GradeValueNew'] = '';
+                            }
+
+                        }
+                    }
+
+                    $dataStd[$i]['Course'] = $dataDetails;
+
+                }
+            }
+
+            return print_r(json_encode($dataStd));
+
+        }
+        else if($data_arr['action']=='loadListApprovalSa'){
+            $ProdiID = $data_arr['ProdiID'];
+            $SASemesterID = $data_arr['SASemesterID'];
+
+            $dataCourse = $this->db->query('SELECT ss.*, mk.NameEng AS CourseEng, mk.MKCode, say.EndInputUAS FROM db_academic.sa_schedule_course ssc
+                                                      LEFT JOIN db_academic.sa_schedule ss ON (ssc.ScheduleIDSA = ss.ID)
+                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                                                      LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = ss.SASemesterID)
+                                                      WHERE ssc.ProdiID = "'.$ProdiID.'" AND ss.SASemesterID = "'.$SASemesterID.'"')->result_array();
+
+            return print_r(json_encode($dataCourse));
+
+        }
+
+        else if($data_arr['action']=='loadStd2Apprv'){
+
+            $ScheduleIDSA = $data_arr['ScheduleIDSA'];
+
+            // Get Detail Course
+            $dataCourse = $this->db->get_where('db_academic.sa_schedule_course',
+                array('ID'=>$ScheduleIDSA))->result_array();
+
+            $student = [];
+            if(count($dataCourse)>0){
+
+                for($i=0;$i<count($dataCourse);$i++){
+                    $d = $dataCourse[$i];
+
+                    $dataStd = $this->db->query('SELECT ssd.*, ats.Name AS NameStudent FROM db_academic.sa_student_details ssd 
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM) 
+                                                              WHERE ssd.CDID = "'.$d['CDID'].'" AND ssd.Status="3" ')->result_array();
+
+                    if(count($dataStd)>0){
+                        foreach ($dataStd AS $item){
+                            array_push($student,$item);
+                        }
+                    }
+
+                }
+
+            }
+
+            usort($student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
+            return print_r(json_encode($student));
+
+        }
+        else if($data_arr['action']=='approveStdSA1'){
+
+            $ID = $data_arr['ID'];
+            $this->db->set('StatusNew', '1');
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.sa_student_details');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='approveStdSAAll'){
+
+            $arrID = (array) $data_arr['arrID'];
+            if(count($arrID)>0){
+                for($i=0;$i<count($arrID);$i++){
+                    $ID = $arrID[$i];
+                    $this->db->set('StatusNew', '1');
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_academic.sa_student_details');
+                }
+            }
+
+            return print_r(1);
+
+        }
+
         else if($data_arr['action']=='SATimetablesLecturer'){
 
             $NIP = $data_arr['NIP'];
             $SASemesterID = $data_arr['SASemesterID'];
+
+            $dateNow = $this->m_rest->getDateNow();
+
+            // Settingan Semester Antara
+            $dataSetting = $this->db->limit(0)->get_where('db_academic.sa_academic_years',array(
+                'SASemesterID' => $SASemesterID
+            ))->result_array();
 
             $q1 = 'SELECT ss.ID AS ScheduleIDSA, ss.ClassGroup, ss.Coordinator, ss.Start, ss.End,   
                             mk.MKCode, mk.NameEng AS CourseEng, em.Name AS CoordinatorName, d.NameEng AS DayEng, cl.Room
@@ -3260,6 +3431,41 @@ class C_api2 extends CI_Controller {
                     usort($Student, function ($a, $b){return strcmp($a['NPM'], $b['NPM']);});
 
                     $dataSchedule[$i]['Students'] = $Student;
+
+                    $dataExamUTS = [];
+                    $dataExamUAS = [];
+                    // Jadwal Ujian
+                    if(count($dataSetting)>0){
+
+                        if($dataSetting[0]['ShowUTSSchedule'] <= $dateNow){
+                            $dataExamUTS = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room, em1.Name AS Inv1, em2.Name AS Inv2 FROM db_academic.sa_exam se 
+                                                                LEFT JOIN db_academic.sa_exam_course sec ON (sec.ExamIDSA = se.ID)
+                                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
+                                                                LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
+                                                                WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "uts"
+                                                                GROUP BY sec.ExamIDSA ')->result_array();
+                        }
+
+                        if($dataSetting[0]['ShowUASSchedule'] <= $dateNow){
+                            $dataExamUAS = $this->db->query('SELECT se.ExamDate, se.Start, se.End, cl.Room, em1.Name AS Inv1, em2.Name AS Inv2 FROM db_academic.sa_exam se 
+                                                                LEFT JOIN db_academic.sa_exam_course sec ON (sec.ExamIDSA = se.ID)
+                                                                LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                                                LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
+                                                                LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
+                                                                WHERE sec.ScheduleIDSA = "'.$ScheduleIDSA.'" AND se.Type = "uas"
+                                                                GROUP BY sec.ExamIDSA ')->result_array();
+                        }
+
+                    }
+
+
+                    $dataSchedule[$i]['ShowUTSSchedule'] = $dataSetting[0]['ShowUTSSchedule'];
+                    $dataSchedule[$i]['ShowUASSchedule'] = $dataSetting[0]['ShowUASSchedule'];
+                    $dataSchedule[$i]['dateNow'] = $dateNow;
+
+                    $dataSchedule[$i]['ExamUTS'] = $dataExamUTS;
+                    $dataSchedule[$i]['ExamUAS'] = $dataExamUAS;
 
 
                 }
@@ -3430,7 +3636,7 @@ class C_api2 extends CI_Controller {
                 // Get Setting
                 $SASemesterID = $data_arr['SASemesterID'];
                 $dataAY = $this->db->get_where('db_academic.sa_academic_years',array(
-                    'ID' => $SASemesterID
+                    'SASemesterID' => $SASemesterID
                 ))->result_array();
 
                 $dateNow = $this->m_rest->getDateNow();
