@@ -21,9 +21,9 @@ class C_po extends Transaksi_Controler {
         $this->page_po($page);
     }
 
-    public function find_vendor()
+    public function open()
     {
-       $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/find_vendor',$this->data,true);
+       $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/open',$this->data,true);
        $this->page_po($page); 
     }
 

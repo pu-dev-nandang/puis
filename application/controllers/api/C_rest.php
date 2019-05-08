@@ -2170,13 +2170,25 @@ class C_rest extends CI_Controller {
                                     );
 
                                     $this->db->insert('db_purchasing.pr_status',$dataSave);
+                                    $ID_pr_status = $this->db->insert_id();
+
+                                    // save to db_purchasing pr_status_detail
+                                    for ($i=0; $i < count($G_data_detail); $i++) { 
+                                        $ID_pr_detail = $G_data_detail[$i]['ID'];
+                                        $dataSave = array(
+                                            'ID_pr_status' => $ID_pr_status,
+                                            'ID_pr_detail' => $ID_pr_detail,
+                                            'Status' => 0,
+                                        );
+                                        $this->db->insert('db_purchasing.pr_status_detail',$dataSave);
+                                    }
 
                                 }
                             }
 
                             if ($arr_upd['Status'] == 2) {
                                 if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
-                                    $Desc .= '<br>{<br>'.$dataToken['NoteDel'].'<br>}';
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
                                 }
                             }
                             
@@ -3028,7 +3040,8 @@ class C_rest extends CI_Controller {
                     $this->load->model('budgeting/m_pr_po');
                     $arr_result = array('pr_create' => array(),'pr_detail' => array());
                     $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode($dataToken['PRCode']);
-                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
+                    // $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO($dataToken['PRCode']);
                     echo json_encode($arr_result);
                 }
                 else

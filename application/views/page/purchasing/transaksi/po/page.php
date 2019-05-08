@@ -20,9 +20,6 @@
         <li class="<?php echo ($this->uri->segment(4) == 'list') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/list'?>">List</a>
         </li>
-        <li class="<?php echo ($this->uri->segment(4) == 'find_vendor') ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'purchasing/transaction/po/find_vendor'?>">Find Vendor</a>
-        </li>
         <li class="<?php echo ($this->uri->segment(4) == 'open') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/open'?>">Open PO</a>
         </li>

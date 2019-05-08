@@ -1347,7 +1347,7 @@ $route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import
 $route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/allow_division_catalog';
 $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
-$route['purchasing/transaction/po/find_vendor'] = 'page/purchasing/c_po/find_vendor';
+$route['purchasing/transaction/po/open'] = 'page/purchasing/c_po/open';
 
 
 // IT

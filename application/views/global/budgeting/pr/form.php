@@ -1110,8 +1110,6 @@
 		}
 		td.append('<ul class = "ulUpload">'+htmlLi+'</ul>');
 	})
-	
-
 
 	$(document).off('click', '.Detail').on('click', '.Detail',function(e) {
 		var data = $(this).attr('data');
@@ -1852,7 +1850,7 @@
 		       		else
 		       		{
 		       			if (data['BudgetChange'] == 1) { // alert Budget Remaining telah di update oleh transaksi lain
-		       				toastr.info('Budget Remaining already have updated by another person.The data will be reload in a few second, Please check !!!');
+		       				toastr.info('Budget Remaining already have updated by another person.Please check !!!');
 		       				loadingStart();
 		       				if (ClassDt.PRCodeVal != '') {
 		       					// load lagi Budget remaining
@@ -2412,7 +2410,11 @@
 							var st = 'Not Approve';
 							var tu = NameTypeDesc;
 							var vt = evtr.find('td:eq(4)').find('.listVisible option:selected').text();
-							evtr.find('td:eq(1)').html(NIP_ + ' || '+Nm);
+							// console.log(NIP_)
+							// console.log(Nm) // ex = 1014026 | Sovie Liestiyani
+							var rrr = Nm.split(' | ');
+							// console.log(rrr);
+							evtr.find('td:eq(1)').html(NIP_ + ' || '+rrr[1]);
 							evtr.find('td:eq(2)').html(st);
 							evtr.find('td:eq(3)').html(tu);
 							evtr.find('td:eq(4)').html(vt);
