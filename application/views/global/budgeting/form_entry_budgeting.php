@@ -457,7 +457,7 @@ function makeContent()
 		html += '<div class = "col-md-1 Custom-PostBudget">'+
 					'<span class = "numberNO">'+No+'</span>&nbsp'+
 					'<select class="select2-select-00 full-width-fix PostBudget Custom-select2" style = "margin-top : 5px;">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1 Custom-UnitCost">'+
@@ -1220,7 +1220,7 @@ function makeContent_existing()
 		html += '<div class = "col-md-1 Custom-PostBudget">'+
 					'<span class = "numberNO">'+No+'</span>&nbsp'+
 					'<select class="select2-select-00 full-width-fix PostBudget Custom-select2" style = "margin-top : 5px;">'+
-						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
+						'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 					 '</select>'+
 				'</div>'+
 				'<div class = "col-md-1 Custom-UnitCost">'+
