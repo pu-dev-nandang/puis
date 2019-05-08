@@ -60,7 +60,7 @@ class C_rest2 extends CI_Controller {
                         'Logging' : {fieldTable}, //  field CreatedBy,salah satu field URL,Title,Description required
                         'To' : {
                             'NIP' : [], berbentuk array indeks // boleh salah satu
-                            'DIV' : [], berbentuk array indeks // boleh salah satu
+                            'Div' : [], berbentuk array indeks // boleh salah satu
                         },
                         'Email' : 'Yes', Field ini bersifat tentative
                     };

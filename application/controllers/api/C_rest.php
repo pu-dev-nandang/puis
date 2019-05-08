@@ -2407,6 +2407,8 @@ class C_rest extends CI_Controller {
                 $this->load->model('budgeting/m_budgeting');
                 $id_creator_budget_approval = $dataToken['id_creator_budget_approval'];
                 $NIP = $dataToken['NIP'];
+                $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                $NameFor_NIP = $G_emp[0]['Name'];
                 $action = $dataToken['action'];
 
                 // get data
@@ -2456,6 +2458,51 @@ class C_rest extends CI_Controller {
                     if ($boolReject) {
                         $datasave['Status'] = 3;
                     }
+                    else
+                    {
+                        // Notif to next step approval & User
+                            $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                            $IDdiv = $G_data[0]['Departement'];
+                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            // Send Notif for next approval
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Budget of '.$NameDepartement,
+                                                    'Description' => 'Please approve budget '.$NameDepartement,
+                                                    'URLDirect' => 'budgeting_entry',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => array($NIPApprovalNext),
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
+
+                            // Send Notif for user 
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Budget Approve',
+                                                    'Description' => 'Budget '.$NameDepartement.' has been approved by '.$NameFor_NIP,
+                                                    'URLDirect' => 'budgeting_entry',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);    
+                    }
                 }
 
                 $this->db->where('ID',$id_creator_budget_approval);
@@ -2490,13 +2537,62 @@ class C_rest extends CI_Controller {
                                         );
                                         $this->db->insert('db_budgeting.budget_left',$dtSave);
                                 }
+
+                            // Notif All Approve to JsonStatus allkey
+                                $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                                $NameDepartement = $G_div[0]['NameDepartement'];
+                                $arr_to = array();
+                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                    $arr_to[] = $JsonStatus[$i]['NIP'];
+                                }
+
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget All Approve of '.$NameDepartement,
+                                                    'Description' => 'Budget '.$NameDepartement.' has been all approve and posting date at : '.$datasave['PostingDate'],
+                                                    'URLDirect' => 'budgeting_entry',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => $arr_to,
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
                         }
                     }
 
                     if ($arr_upd['Status'] == 2) {
                         if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
-                            $Desc .= '</br> {</br>'.$dataToken['NoteDel'].'</br>}';
+                            $Desc .= '</br> {'.$dataToken['NoteDel'].'}';
                         }
+
+                        // Notif Reject to JsonStatus key 0
+                            $IDdiv = $G_data[0]['Departement'];
+                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            // Send Notif for user 
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget Reject of '.$NameDepartement,
+                                                    'Description' => 'Budget '.$NameDepartement.' has been rejected by '.$NameFor_NIP,
+                                                    'URLDirect' => 'budgeting_entry',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token); 
                     }
                     // save to log
                         $this->m_budgeting->log_budget($id_creator_budget_approval,$Desc,$NIP); 
