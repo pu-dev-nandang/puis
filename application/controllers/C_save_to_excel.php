@@ -4248,12 +4248,171 @@ class C_save_to_excel extends CI_Controller
                             $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_anggaran);
                             $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
 
-
-                                    
         
+        // footer signatures
+            $St_line_end= $col__;
+            $arr_col = array();
+                $__function_col= function($St_line_end){
+                    $arr = array(); 
+                    $splitBagi =3;
+                    $split = $St_line_end / $splitBagi;
+                    $split = (int) $split;
+                    for ($i=1; $i <= $splitBagi; $i++) { 
+                        $s = $i * $split;
+                        if ($s > $St_line_end) {
+                           $rs = $split - ($s - $St_line_end);
+                        }
+                        else
+                        {
+                            $rs = $split;
+                        }
+
+                        $arr[] = $rs;
+                    }
+                    
+                    // join array
+                        $arr[0] = $arr[0]+$arr[1];
+                        $arr[1] = $arr[2] / 2;
+                        $arr[1] = (int)$arr[1];
+                        $arr[2] = $arr[2]-$arr[1];
+                    return $arr;
+                };
+
+            $arr_col =  $__function_col($St_line_end);
+            $n = $n +3;
+            $thick = array ();
+            $thick['borders']=array();
+            $thick['borders']['top']=array();
+            $thick['borders']['top']['style']=PHPExcel_Style_Border::BORDER_THIN ;
+            $huruf = $this->m_master->HurufColExcelNumber(0);
+            $huruf_ = $this->m_master->HurufColExcelNumber($col__);
+            $excel->getActiveSheet()->getStyle($huruf.$n.':'.$huruf_.$n)->applyFromArray($thick);
+            $st = 0;
+            for ($i=0; $i < count($arr_col); $i++) {
+                $stAwal = $st;
+                // Garis untuk nama signatures dengan row + 9
+                    $ct = 1;
+                    $rt = $n+9;
+
+                $st = $st + $arr_col[$i];
+                $huruf = $this->m_master->HurufColExcelNumber($st);
+                // total row = 12
+                $rn = $n+12;
+                $thick = array ();
+                $thick['borders']=array();
+                $thick['borders']['right']=array();
+                $thick['borders']['right']['style']=PHPExcel_Style_Border::BORDER_THIN ;
+                $excel->getActiveSheet()->getStyle($huruf.$n.':'.$huruf.$rn)->applyFromArray($thick);
+
+                // Garis untuk nama signatures dengan row + 9
+                $huruf = $this->m_master->HurufColExcelNumber($ct);
+                if ($i==0) {
+                    $thick = array ();
+                    $thick['borders']=array();
+                    $thick['borders']['bottom']=array();
+                    $thick['borders']['bottom']['style']=PHPExcel_Style_Border::BORDER_THIN ;
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf.$rt)->applyFromArray($thick);
+                    // print_r($huruf.'Rosa<br>');
+
+                    $ct = $st - 3;
+                    $huruf = $this->m_master->HurufColExcelNumber($ct);
+                    $ct = $ct+2;
+                    $huruf_ = $this->m_master->HurufColExcelNumber($ct);
+                    $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($thick);
+                    // print_r($huruf.'WK1<br>');
+
+                    $ct = $st - 7;
+                    $huruf = $this->m_master->HurufColExcelNumber($ct);
+                    $ct = $ct+2;
+                    $huruf_ = $this->m_master->HurufColExcelNumber($ct);
+                    $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($thick);
+                    // print_r($huruf.'WK1<br>');
+
+                    $rt = $n;
+                    $huruf = $this->m_master->HurufColExcelNumber($stAwal);
+                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$rt,'Diajukan oleh,');
+                    $huruf_ = $this->m_master->HurufColExcelNumber($st);
+                    $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                    $style = array(
+                        'font' => array('bold' => true), // Set font nya jadi bold
+                        'alignment' => array(
+                            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                        ),
+                    );
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($style);
+                }
+                else
+                {
+                    $thick = array ();
+                    $thick['borders']=array();
+                    $thick['borders']['bottom']=array();
+                    $thick['borders']['bottom']['style']=PHPExcel_Style_Border::BORDER_THIN ;
+
+                    $ct = $st - 3;
+                    $huruf = $this->m_master->HurufColExcelNumber($ct);
+                    $ct = $ct+2;
+                    $huruf_ = $this->m_master->HurufColExcelNumber($ct);
+                    $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($thick);
+                    // print_r($huruf.'WK1<br>');
+
+                    $ct = $st - 8;
+                    $huruf = $this->m_master->HurufColExcelNumber($ct);
+                    $ct = $ct+2;
+                    $huruf_ = $this->m_master->HurufColExcelNumber($ct);
+                    $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                    $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($thick);
+                    // print_r($huruf.'WK1<br>');
+
+
+                    $stAwal = $stAwal +1;
+                    if ($i==1) {
+                        $rt = $n;
+                        $huruf = $this->m_master->HurufColExcelNumber($stAwal);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$rt,'Diketahui oleh,');
+                        $huruf_ = $this->m_master->HurufColExcelNumber($st);
+                        $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                        $style = array(
+                            'font' => array('bold' => true), // Set font nya jadi bold
+                            'alignment' => array(
+                                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                            ),
+                        );
+                        $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($style);
+                    }
+                    elseif ($i==2) {
+                        $rt = $n;
+                        $huruf = $this->m_master->HurufColExcelNumber($stAwal);
+                        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$rt,'Disetujui oleh,');
+                        $huruf_ = $this->m_master->HurufColExcelNumber($st);
+                        $excel->getActiveSheet()->mergeCells($huruf.$rt.':'.$huruf_.$rt);
+                        $style = array(
+                            'font' => array('bold' => true), // Set font nya jadi bold
+                            'alignment' => array(
+                                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+                            ),
+                        );
+                        $excel->getActiveSheet()->getStyle($huruf.$rt.':'.$huruf_.$rt)->applyFromArray($style);
+                    }
+                }
+            }
+
+            $n = $n+12;
+            $thick = array ();
+            $thick['borders']=array();
+            $thick['borders']['bottom']=array();
+            $thick['borders']['bottom']['style']=PHPExcel_Style_Border::BORDER_THIN ;
+            $huruf = $this->m_master->HurufColExcelNumber(0);
+            $huruf_ = $this->m_master->HurufColExcelNumber($col__);
+            $excel->getActiveSheet()->getStyle($huruf.$n.':'.$huruf_.$n)->applyFromArray($thick);
 
         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);             
-
+        // die();
         // Set judul file excel nya
         $excel->getActiveSheet()->setTitle('Report-Anggaran '.$wrYear);
         $excel->setActiveSheetIndex(0);
