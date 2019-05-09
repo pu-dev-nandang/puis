@@ -10,7 +10,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menu-po">
     <ul class="nav nav-tabs">
         <li role="presentation">
-            <a href="<?php echo base_url().'purchasing_dashboard' ?>" style="padding:0px 15px">
+            <a href="<?php echo base_url().'dashboard' ?>" style="padding:0px 15px">
                 <button class="btn btn-primary" id="btnBackToHome" name="button"><i class="fa fa-home" aria-hidden="true"></i></button>
             </a>
         </li>

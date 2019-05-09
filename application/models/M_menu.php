@@ -182,8 +182,14 @@ class M_menu extends CI_Model {
       $URISlug = 'and a.Slug = "'.$URL.'"';
       if ($a[$b] == 1) {
           $URISlug = '';
-          for ($i=0; $i < count($b); $i++) { 
-              $URISlug .= $a[$i].'/';
+          for ($i=0; $i < $b ; $i++) {
+              if ($i != ($b) ) {
+                 $URISlug .= $a[$i].'/';
+              }
+              else{
+                $URISlug .= $a[$i];
+              } 
+             
           }
           $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
       }
@@ -191,6 +197,29 @@ class M_menu extends CI_Model {
       join ".$db.".previleges_guser as c on c.G_user = b.cfg_group_user
       where c.NIP = ? ".$URISlug;
       $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
+      if (count($query) == 0) { // digunakan untuk horizontal URL
+        /*
+          URL  : purchasing/transaction/po/list
+          jika URL = purchasing/transaction/po/open tidak ditemukan pada query, maka ambil URl terdekat.  
+        */
+          $URISlug = '';
+          // hilangkan satu segment url terakhir
+          for ($i=0; $i < ($b - 1) ; $i++) {
+              if ($i != ($b - 1) ) {
+                 $URISlug .= $a[$i].'/';
+              }
+              else{
+                $URISlug .= $a[$i];
+              } 
+             
+          }
+          $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
+
+          $sql = "select b.read,b.write,b.update,b.delete from ".$db.".cfg_sub_menu as a join ".$db.".cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
+          join ".$db.".previleges_guser as c on c.G_user = b.cfg_group_user
+          where c.NIP = ? ".$URISlug;
+          $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
+      }
       return $query;
   }
 
@@ -199,7 +228,6 @@ class M_menu extends CI_Model {
       $base_url = base_url();
       $currentURL = current_url();
       $URL = str_replace($base_url,"",$currentURL);
-      
       // get Access URL
       $getDataSess  = $this->session->userdata($this->MenuSessGrouping);
       $access = array(

@@ -2256,6 +2256,29 @@ class C_rest extends CI_Controller {
                                         $url = url_pas.'rest2/__send_notif_browser';
                                         $token = $this->jwt->encode($data,"UAP)(*");
                                         $this->m_master->apiservertoserver($url,$token);
+
+                                    // Notif to Purchasing 
+                                        $IDdiv = $G_data[0]['Departement'];
+                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                        $NameDepartement = $G_div[0]['NameDepartement'];
+
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'URLDirect' => 'purchasing/transaction/po/open',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'Div' => array(4),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);   
                                 }
                             }
 

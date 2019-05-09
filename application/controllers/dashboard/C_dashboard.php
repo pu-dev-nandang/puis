@@ -28,6 +28,11 @@ class C_dashboard extends Globalclass {
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;
+                case 4: // Purchasing
+                    $this->m_menu->set_model('purchasing_sess','auth_purchasing_sess','menu_purchasing_sess','menu_purchasing_grouping','db_purchasing');
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                break;
                 case 15: // Admin Prodi
                     // check session admin prodi
                     $this->load->model('prodi/m_prodi');
