@@ -33,6 +33,11 @@ class C_dashboard extends Globalclass {
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;
+                case 12: // IT
+                    $this->m_menu->set_model('it_sess','auth_it_sess','menu_it_sess','menu_it_grouping','db_it');
+                    $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
+                    $this->temp($content);
+                break;
                 case 15: // Admin Prodi
                     // check session admin prodi
                     $this->load->model('prodi/m_prodi');

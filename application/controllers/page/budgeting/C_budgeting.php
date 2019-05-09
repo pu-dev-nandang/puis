@@ -31,7 +31,8 @@ class C_budgeting extends Budgeting_Controler {
 
         $this->getAuthSession($MenuDepartement);
         $this->data['GetPeriod'] = $this->m_budgeting->GetPeriod();
-        if (file_exists(APPPATH.'view/page/budgeting'.$this->data['department'].'dashboard')) {
+        // if (file_exists(APPPATH.'views/page/'.$data['department'].'/dashboard.php')) {
+        if (file_exists(APPPATH.'views/page/budgeting/'.$this->data['department'].'/dashboard.php')) {
             $content = $this->load->view('page/budgeting/'.$this->data['department'].'/dashboard',$this->data,true);
         }
         else
