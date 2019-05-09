@@ -243,4 +243,92 @@ class C_rest2 extends CI_Controller {
              echo '{"status":"999","message":"Not Authorize"}';
         }
     }
+
+    public function remove_file()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $DeleteDb = $dataToken['DeleteDb'];
+                $filePath = $dataToken['filePath'];
+                $filePath = str_replace('-', '\\', $filePath);
+                $bool = false;
+                $DeleteDb = (array) json_decode(json_encode($DeleteDb),true);
+                if ($DeleteDb['auth'] == 'Yes') {
+                    /* Type Field 
+                        0 : String
+                        1 : Array
+                    */
+                        $detail = $DeleteDb['detail'];
+                        $table = $detail['table'];
+                        $idtable = $detail['idtable'];
+                        $field = $detail['field'];
+                        $typefield = $detail['typefield'];
+                        $delimiter = $detail['delimiter'];
+                        $fieldwhere = $detail['fieldwhere'];
+                      $G_data = $this->m_master->caribasedprimary($table,$fieldwhere,$idtable);
+                      if ($typefield == 0) {
+                          if ($delimiter != '' && $delimiter != null) {
+                             $arr_file = explode($delimiter, $G_data[0][$field]);
+                             // get filename
+                             $arr_temp = explode('\\', $filePath);
+                             $keyArr = count($arr_temp) - 1;
+                             $filename = $arr_temp[$keyArr];
+                             $arr_rs = array();
+                             for ($i=0; $i < count($arr_file); $i++) { 
+                                if ($filename != $arr_file[$i]) {
+                                    $arr_rs[] = $arr_file[$i];
+                                }
+                             }
+
+                             $rs = (count($arr_rs) == 0) ? '' : implode($delimiter, $arr_rs);
+                             $dataSave = array(
+                                $field => $rs
+                             );
+
+                             $this->db->where($fieldwhere,$idtable);
+                             $this->db->update($table,$dataSave);
+                             $bool = true;
+                          }
+                      }
+                      else if ($typefield == 1) {
+                          $arr_file = (array) json_decode($G_data[0][$field],true);
+                          // get filename
+                          $arr_temp = explode('\\', $filePath);
+                          $keyArr = count($arr_temp) - 1;
+                          $filename = $arr_temp[$keyArr];
+
+                          $arr_rs = array();
+                          for ($i=0; $i < count($arr_file); $i++) { 
+                             if ($filename != $arr_file[$i]) {
+                                 $arr_rs[] = $arr_file[$i];
+                             }
+                          }
+
+                          $rs = (count($arr_rs) == 0) ? NULL : json_encode($arr_rs);
+                          $dataSave = array(
+                             $field => $rs
+                          );
+                          $this->db->where($fieldwhere,$idtable);
+                          $this->db->update($table,$dataSave);
+                          $bool = true;
+                      }
+
+                }
+                $path = FCPATH.'uploads\\'.$filePath;
+                unlink($path);
+                echo json_encode(1);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        catch(Exception $e) {
+             // handling orang iseng
+             echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
 }

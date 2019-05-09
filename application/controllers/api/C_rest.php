@@ -2728,6 +2728,8 @@ class C_rest extends CI_Controller {
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
+            $this->load->model('budgeting/m_budgeting');
+            $path = FCPATH.'uploads\\budgeting\\catalog\\';
             if ($auth) {
                 $Input = $dataToken;
                 $Item = $Input['Item'];
@@ -2774,7 +2776,31 @@ class C_rest extends CI_Controller {
                                    'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
                                );
                                $this->db->insert('db_purchasing.m_catalog', $dataSave);
-                               echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+
+                               // Send Notif for Purchasing 
+                                    $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$user);
+                                    $NameFor_NIP = $G_emp[0]['Name'];
+                                    $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                                    $NameDepartement = $G_div[0]['NameDepartement'];
+                                   $data = array(
+                                       'auth' => 's3Cr3T-G4N',
+                                       'Logging' => array(
+                                                       'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$NameDepartement.' has been added',
+                                                       'Description' => 'Catalog '.$NameDepartement.' has been added by '.$NameFor_NIP,
+                                                       'URLDirect' => 'purchasing/master/catalog',
+                                                       'CreatedBy' => $user,
+                                                     ),
+                                       'To' => array(
+                                                 'Div' => array(4),
+                                               ),
+                                       'Email' => 'No', 
+                                   );
+
+                                   $url = url_pas.'rest2/__send_notif_browser';
+                                   $token = $this->jwt->encode($data,"UAP)(*");
+                                   $this->m_master->apiservertoserver($url,$token); 
+
+                               echo json_encode(array('msg' => 'Saved','status' => 1));
                            }
                            else
                            {
@@ -2796,7 +2822,31 @@ class C_rest extends CI_Controller {
                                'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
                             );
                             $this->db->insert('db_purchasing.m_catalog', $dataSave);
-                            echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+
+                                // Send Notif for Purchasing 
+                                     $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$user);
+                                     $NameFor_NIP = $G_emp[0]['Name'];
+                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                                     $NameDepartement = $G_div[0]['NameDepartement'];
+                                    $data = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Logging' => array(
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$NameDepartement.' has been added',
+                                                        'Description' => 'Catalog '.$NameDepartement.' has been added by '.$NameFor_NIP,
+                                                        'URLDirect' => 'purchasing/master/catalog',
+                                                        'CreatedBy' => $user,
+                                                      ),
+                                        'To' => array(
+                                                  'Div' => array(4),
+                                                ),
+                                        'Email' => 'No', 
+                                    );
+
+                                    $url = url_pas.'rest2/__send_notif_browser';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver($url,$token); 
+
+                            echo json_encode(array('msg' => 'Saved','status' => 1));
                         }
 
                         break;
@@ -2809,6 +2859,11 @@ class C_rest extends CI_Controller {
                                $uploadFile = $this->m_rest->uploadDokumenMultiple($filename,'fileData',$path);
                                if (is_array($uploadFile)) {
                                    $uploadFile = implode(',', $uploadFile);
+                                   // get all file first
+                                        $F = $Get_Data[0]['Photo'];
+                                        if ($F != '' && $F != null && !empty($F)) {
+                                            $uploadFile = $uploadFile.','.$F;
+                                        }
                                    $dataSave = array(
                                        'Item' => $Item,
                                        'Desc' => $Desc,
@@ -2821,7 +2876,7 @@ class C_rest extends CI_Controller {
                                    );
                                    $this->db->where('ID', $Input['ID']);
                                    $this->db->update('db_purchasing.m_catalog', $dataSave);
-                                   echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                                   echo json_encode(array('msg' => 'Saved','status' => 1));
                                }
                                else
                                {
@@ -2840,7 +2895,7 @@ class C_rest extends CI_Controller {
                                 );
                                 $this->db->where('ID', $Input['ID']);
                                 $this->db->update('db_purchasing.m_catalog', $dataSave);
-                                echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                                echo json_encode(array('msg' => 'Saved','status' => 1));
                             }
                         }
                         else
@@ -2853,8 +2908,18 @@ class C_rest extends CI_Controller {
                         $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
                         $query=$this->db->query($sql, array($Input['ID']))->result_array();
                         if (count($query) == 0) {
+                            $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                            $F = $Get_Data[0]['Photo'];
+                            $F = explode(',', $F);
+
                           $this->db->where('ID', $Input['ID']);
                           $this->db->delete('db_purchasing.m_catalog');
+
+                          // delete all file
+                                for ($i=0; $i < count($F); $i++) { 
+                                    unlink($path.$F[$i]);
+                                }
+
                           echo json_encode(array(''));
                         }
                         else

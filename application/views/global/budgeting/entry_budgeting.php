@@ -34,6 +34,25 @@
         font-size: 13px;
         /*padding: 15px !important;*/
     }
+
+
+    #TblBudgetAllocation tbody {
+        display:block;
+        height:120px;
+        overflow:auto;
+    }
+    #TblBudgetAllocation thead,#TblBudgetAllocation tfoot,#TblBudgetAllocation tbody tr {
+        display:table;
+        width:100%;
+        table-layout:fixed; /* even columns width , fix width of table too*/
+    }
+    #TblBudgetAllocation thead,#TblBudgetAllocation tfoot {
+        /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
+         width: calc( 100% - 1.3em )
+    }
+    /*#TblBudgetAllocation table {
+        width:400px;
+    }*/
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">

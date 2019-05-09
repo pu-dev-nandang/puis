@@ -121,7 +121,7 @@
 				ShowPhoto = ShowPhoto.split(",");
 				temp = '<ul>';
 					for (var i = 0; i < ShowPhoto.length; i++) {
-						temp += '<li>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+ShowPhoto[i]+'" target = "_blank">'+ShowPhoto[i]+'</a></li>';
+						temp += '<li style = "margin-top : 4px;">'+'<a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+ShowPhoto[i]+'" target = "_blank">'+ShowPhoto[i]+'</a> &nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file"  filepath = "budgeting-catalog-'+ShowPhoto[i]+'" type="button" idtable = "<?php echo $get[0]['ID'] ?>" table = "db_purchasing.m_catalog" field = "Photo" typefield = "0" delimiter = "," fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
 					}
 				temp += '</ul>'
 			}
@@ -152,7 +152,7 @@
 												'<input type="text" class="form-control addDetailinput" placeholder = "Input Value" value = "'+getDetail[key]+'">'+
 											'</div>'+
 											'<div class="col-xs-2">'+
-												'<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
+												'<button type="button" class="btn btn-danger btn-delete-detail"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>'+
 											'</div>'+	
 										'</div>'+
 									'</div>';
@@ -160,7 +160,7 @@
 
 					$("#pageAddDetail").append(Input);	
 
-					$(".btn-delete").click(function(){
+					$(".btn-delete-detail").click(function(){
 						$(this)
 						  .parentsUntil( 'div[class="row"]' ).remove();
 					})	
@@ -301,6 +301,10 @@
 						var checkFile = file_validation('ExFile');
 						if (checkFile) {
 							saveFileAndData(checkAddDetail);
+						}
+						else
+						{
+							$('#btnSaveForm').prop('disabled',false).html('Save');
 						}
 						
 					} else {
