@@ -2061,6 +2061,8 @@ class C_rest extends CI_Controller {
                 $PRCode = $dataToken['PRCode'];
                 $approval_number = $dataToken['approval_number'];
                 $NIP = $dataToken['NIP'];
+                $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                $NameFor_NIP = $G_emp[0]['Name'];
                 $action = $dataToken['action'];
                 // check data telah berubah atau tidak
                    $DtExisting = $dataToken['DtExisting'];
@@ -2150,6 +2152,51 @@ class C_rest extends CI_Controller {
                                 $datasave['Status'] = 3;
                                 // $datasave['Notes'] = $Notes;
                             }
+                            else
+                            {
+                                // Notif to next step approval & User
+                                    $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                    $IDdiv = $G_data[0]['Departement'];
+                                    $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                    $NameDepartement = $G_div[0]['NameDepartement'];
+                                    // Send Notif for next approval
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$NameDepartement,
+                                                            'Description' => 'Please approve PR '.$PRCode.' of '.$NameDepartement,
+                                                            'URLDirect' => 'budgeting_pr',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($NIPApprovalNext),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PR '.$PRCode.' has been Approved',
+                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been approved by '.$NameFor_NIP,
+                                                            'URLDirect' => 'budgeting_pr',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                            }
                         }
 
                         $this->db->where('PRCode',$PRCode);
@@ -2183,6 +2230,55 @@ class C_rest extends CI_Controller {
                                         $this->db->insert('db_purchasing.pr_status_detail',$dataSave);
                                     }
 
+                                    // Notif All Approve to JsonStatus allkey
+                                        $IDdiv = $G_data[0]['Departement'];
+                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                        $NameDepartement = $G_div[0]['NameDepartement'];
+                                        $arr_to = array();
+                                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                                            $arr_to[] = $JsonStatus[$i]['NIP'];
+                                        }
+
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'URLDirect' => 'budgeting_pr',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => $arr_to,
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Notif to Purchasing 
+                                        $IDdiv = $G_data[0]['Departement'];
+                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                        $NameDepartement = $G_div[0]['NameDepartement'];
+
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'URLDirect' => 'purchasing/transaction/po/open',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'Div' => array(4),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);   
                                 }
                             }
 
@@ -2190,6 +2286,30 @@ class C_rest extends CI_Controller {
                                 if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
                                     $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
                                 }
+
+                                // Notif Reject to JsonStatus key 0
+                                    $IDdiv = $G_data[0]['Departement'];
+                                    $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                    $NameDepartement = $G_div[0]['NameDepartement'];
+
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Rejected',
+                                                            'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                            'URLDirect' => 'budgeting_pr',
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
                             }
                             
                             $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
