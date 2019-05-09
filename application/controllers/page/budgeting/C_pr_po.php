@@ -613,6 +613,27 @@ class C_pr_po extends Budgeting_Controler {
 
                         // insert to pr_circulation_sheet
                             $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued');
+
+                        // send notifikasi
+                            $IDdiv = $Departement;
+                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            $data = array(
+                                'auth' => 's3Cr3T-G4N',
+                                'Logging' => array(
+                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Created by '.$NameDepartement,
+                                                'Description' => 'PR '.$PRCode.' has been Created by '.$NameDepartement.'('.$this->session->userdata('Name').')',
+                                                'URLDirect' => 'budgeting_pr',
+                                                'CreatedBy' => $this->session->userdata('NIP'),
+                                              ),
+                                'To' => array(
+                                          'NIP' => array($JsonStatus[1]['NIP']),
+                                        ),
+                                'Email' => 'No', 
+                            );
+                            $url = url_pas.'rest2/__send_notif_browser';
+                            $token = $this->jwt->encode($data,"UAP)(*");
+                            $this->m_master->apiservertoserver($url,$token);      
                     }
                     else
                     {
@@ -813,6 +834,27 @@ class C_pr_po extends Budgeting_Controler {
 
                             // insert to pr_circulation_sheet
                                 $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued & Edited');
+
+                                // send notifikasi
+                                    $IDdiv = $Departement;
+                                    $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                    $NameDepartement = $G_div[0]['NameDepartement'];
+                                    $data = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Logging' => array(
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Revised by '.$NameDepartement,
+                                                        'Description' => 'PR '.$PRCode.' has been Revised by '.$NameDepartement.'('.$this->session->userdata('Name').')',
+                                                        'URLDirect' => 'budgeting_pr',
+                                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                                      ),
+                                        'To' => array(
+                                                  'NIP' => array($JsonStatus[1]['NIP']),
+                                                ),
+                                        'Email' => 'No', 
+                                    );
+                                    $url = url_pas.'rest2/__send_notif_browser';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver($url,$token);
                         }
                         else
                         {
