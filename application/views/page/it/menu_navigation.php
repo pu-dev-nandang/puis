@@ -1,7 +1,7 @@
 <?php
-if ($this->uri->segment(1) == 'dashboard') {
-    redirect(base_url().'it_dashboard');
-}
+// if ($this->uri->segment(1) == 'dashboard') {
+//     redirect(base_url().'it_dashboard');
+// }
 
 ?>
 <div id="sidebar" class="sidebar-fixed">

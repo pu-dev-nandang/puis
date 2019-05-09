@@ -653,7 +653,6 @@ abstract class It_Controler extends Globalclass{
 
     public $data = array();
 
-
     public function __construct()
     {
         parent::__construct();
