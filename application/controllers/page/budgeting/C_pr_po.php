@@ -675,18 +675,23 @@ class C_pr_po extends Budgeting_Controler {
             'Status' => 1,
             'Notes' => $Notes,
         );
-
+        $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
         // adding Supporting_documents
             $Supporting_documents = array();
             $Supporting_documents = json_encode($Supporting_documents); 
             if (array_key_exists('Supporting_documents', $_FILES)) {
                 // do upload file
                 $uploadFile = $this->uploadDokumenMultiple(uniqid(),'Supporting_documents');
+                $F_Supporting_documents = $G_data[0]['Supporting_documents'];
+                $F_Supporting_documents = (array) json_decode($F_Supporting_documents,true);
+                // for ($i=0; $i < count($F_Supporting_documents); $i++) { 
+                //     $uploadFile[] = $F_Supporting_documents[$i];
+                // }
+                //print_r($uploadFile);
+                $uploadFile = array_merge($uploadFile,$F_Supporting_documents);
                 $Supporting_documents = json_encode($uploadFile);
                 $dataSave['Supporting_documents'] = $Supporting_documents; 
             }
-
-        $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
         $JsonStatus = $G_data[0]['JsonStatus'];
         $JsonStatus = (array) json_decode($JsonStatus,true);
 
@@ -746,6 +751,10 @@ class C_pr_po extends Budgeting_Controler {
                             */
                              $BackBudgetToBeforeCreate = $this->m_pr_po->BackBudgetToBeforeCreate($PRCode,$Year,$Departement);  
 
+                             // Simpan File pr_detail
+                                $G_pr_detail = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+
+
                             // remove PRCode in pr_detail
                                 $this->db->where(array('PRCode' => $PRCode));
                                 $this->db->delete('db_budgeting.pr_detail');
@@ -757,8 +766,21 @@ class C_pr_po extends Budgeting_Controler {
                                 // proses upload file
                                     if (array_key_exists('UploadFile'.$PassNumber, $_FILES)) {
                                         // do upload file
-                                        $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$PassNumber);
+                                        $uploadFile = $this->uploadDokumenMultiple(uniqid(),'UploadFile'.$PassNumber);
+                                        $F_UploadFile = $G_pr_detail[$PassNumber]['UploadFile'];
+                                        $F_UploadFile = (array) json_decode($F_UploadFile,true);
+                                        $uploadFile = array_merge($uploadFile,$F_UploadFile);
                                         $data_arr['UploadFile'] = json_encode($uploadFile); 
+                                    }
+                                    else
+                                    {
+                                        // check file upload before
+                                            if (array_key_exists($i, $G_pr_detail)) {
+                                                $F_UploadFile = $G_pr_detail[$i]['UploadFile'];
+                                                $F_UploadFile = (array) json_decode($F_UploadFile,true);
+                                                $uploadFile = $F_UploadFile;
+                                                $data_arr['UploadFile'] = json_encode($uploadFile); 
+                                            }
                                     }
 
                                     // exclude 

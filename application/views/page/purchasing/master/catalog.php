@@ -187,6 +187,53 @@
           return true;
         }
     }
+
+    $(document).off('click', '.btn-delete-file').on('click', '.btn-delete-file',function(e) {
+        var Sthis = $(this);
+        var li = Sthis.closest('li');
+        var filePath = Sthis.attr('filepath');
+        var idtable = Sthis.attr('idtable');
+        var fieldwhere = Sthis.attr('fieldwhere');
+        var table = Sthis.attr('table');
+        var field = Sthis.attr('field');
+        var typefield = Sthis.attr('typefield');
+        var delimiter = Sthis.attr('delimiter');
+        var DeleteDb = {
+            auth : 'Yes',
+            detail : {
+                idtable : idtable,
+                fieldwhere : fieldwhere,
+                table : table,
+                field : field,
+                typefield : typefield,
+                delimiter : delimiter,
+            },
+        }
+        if (confirm('Are you sure ?')) {
+            Sthis.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+            Sthis.prop('disabled',true);
+            var url = base_url_js + 'rest2/__remove_file';
+            var data = {
+                filePath : filePath,
+                auth : 's3Cr3T-G4N',
+                DeleteDb :DeleteDb,
+            }
+
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{ token:token },function (resultJson) {
+                if (resultJson == 1) {
+                    li.remove();
+                }
+                else{
+                    toastr.error('', '!!!Failed');
+                }
+            }).fail(function() {
+              toastr.error('The Database connection error, please try again', 'Failed!!');
+            }).always(function() {
+                Sthis.prop('disabled',false).html('<i class="fa fa-trash" aria-hidden="true"></i>');
+            });
+        }
+    })
 </script>
 
 <!-- Script js allow division -->

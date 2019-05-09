@@ -67,6 +67,7 @@ class C_master extends Purchasing_Controler {
 
         $filename = $Input['Item'].'_Uploaded';
         $filename = str_replace(" ", '_', $filename);
+        $path = FCPATH.'uploads\\budgeting\\catalog\\';
         switch ($Input['Action']) {
             case 'add':
                 if (array_key_exists('fileData',$_FILES)) {
@@ -88,7 +89,7 @@ class C_master extends Purchasing_Controler {
                            'ApprovalAt' => date('Y-m-d H:i:s'),
                        );
                        $this->db->insert('db_purchasing.m_catalog', $dataSave);
-                       echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                       echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
                    {
@@ -110,16 +111,22 @@ class C_master extends Purchasing_Controler {
                         'ApprovalAt' => date('Y-m-d H:i:s'),
                     );
                     $this->db->insert('db_purchasing.m_catalog', $dataSave);
-                    echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                    echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
 
                 break;
             case 'edit':
+                $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
                 if (array_key_exists('fileData',$_FILES)) {
                    $path = './uploads/budgeting/catalog';
                    $uploadFile = $this->uploadDokumenMultiple($path,$filename);
                    if (is_array($uploadFile)) {
                        $uploadFile = implode(',', $uploadFile);
+                       // get all file first
+                            $F = $Get_Data[0]['Photo'];
+                            if ($F != '' && $F != null && !empty($F)) {
+                                $uploadFile = $uploadFile.','.$F;
+                            }
                        $dataSave = array(
                            'Item' => $Item,
                            'Desc' => $Desc,
@@ -132,7 +139,7 @@ class C_master extends Purchasing_Controler {
                        );
                        $this->db->where('ID', $Input['ID']);
                        $this->db->update('db_purchasing.m_catalog', $dataSave);
-                       echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                       echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
                    {
@@ -151,7 +158,7 @@ class C_master extends Purchasing_Controler {
                     );
                     $this->db->where('ID', $Input['ID']);
                     $this->db->update('db_purchasing.m_catalog', $dataSave);
-                    echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
+                    echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
                 break;
             case 'status':
@@ -168,8 +175,18 @@ class C_master extends Purchasing_Controler {
                 $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
                 $query=$this->db->query($sql, array($Input['ID']))->result_array();
                 if (count($query) == 0) {
+                  $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+                  $F = $Get_Data[0]['Photo'];
+                  $F = explode(',', $F);
+
                   $this->db->where('ID', $Input['ID']);
                   $this->db->delete('db_purchasing.m_catalog');
+
+                  // delete all file
+                        for ($i=0; $i < count($F); $i++) { 
+                            unlink($path.$F[$i]);
+                        }
+                  
                   echo json_encode(array(''));
                 }
                 else

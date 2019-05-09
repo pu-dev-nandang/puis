@@ -173,31 +173,32 @@ function makeHtmlBudgetAllocation()
 	// loading_page('#BudgetAllocation');
 	var dt = ClassDt.BudgetAllocation;
 	setTimeout(function () {
-		var html = '<div class = "row">'+
-						'<div class = "col-md-12">'+
-							'<div style = "overflow : auto;max-height : 200px;">'+
-								'<div class ="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="tableData3">'+
-									'<caption><b>Budget Allocation</b></caption>'+
-										'<thead>'+
-											'<tr>'+
-												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Head Account</th>'+
-												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Allocation</th>'+
-												'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
-											'</tr>'+
-										'</thead><tbody>';
-		for (var i = 0; i < dt.length; i++) {
-			html += '<tr>'+
-						// '<td>'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'</td>'+
-						'<td>'+dt[i]['NameHeadAccount']+'</td>'+
-						'<td>'+formatRupiah(dt[i]['Budget'])+'</td>'+
-						'<td>'+formatRupiah(dt[i]['Remaining'])+'</td>'+
-					'</tr>';	
+		if (dt.length > 0) {
+			var html = '<div class = "row">'+
+							'<div class = "col-md-12">'+
+									'<div class ="table-responsive">'+
+										'<table class="table table-bordered tableData" id ="TblBudgetAllocation">'+
+										'<caption><b>Budget Allocation</b></caption>'+
+											'<thead>'+
+												'<tr>'+
+													'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Head Account</th>'+
+													'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Allocation</th>'+
+													'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Remaining</th>'+
+												'</tr>'+
+											'</thead><tbody>';
+			for (var i = 0; i < dt.length; i++) {
+				html += '<tr>'+
+							// '<td>'+dt[i]['PostName']+'-'+dt[i]['NameHeadAccount']+'</td>'+
+							'<td>'+dt[i]['NameHeadAccount']+'</td>'+
+							'<td>'+formatRupiah(dt[i]['Budget'])+'</td>'+
+							'<td>'+formatRupiah(dt[i]['Remaining'])+'</td>'+
+						'</tr>';	
 
+			}
+
+			html += '</tbody></table></div></div></div>';
+			$("#BudgetAllocation").html(html);
 		}
-
-		html += '</tbody></table></div></div></div></div>';
-		$("#BudgetAllocation").html(html);
 	},1000);
 					
 }

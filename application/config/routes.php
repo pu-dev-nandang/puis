@@ -913,6 +913,8 @@ $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
+$route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

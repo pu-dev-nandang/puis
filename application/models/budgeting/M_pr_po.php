@@ -560,7 +560,7 @@ class M_pr_po extends CI_Model {
                    $getData[$i]['Using'] = $Using;
                    $bool2 = false;
                    for ($m=0; $m < count($temp); $m++) { 
-                       if ($temp[$m] == $getData[$l]['ID']) {
+                       if ($temp[$m] == $getData[$i]['ID']) {
                            $bool2 = true;
                            break;
                        }

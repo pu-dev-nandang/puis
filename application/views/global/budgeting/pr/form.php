@@ -289,7 +289,7 @@
 			if (Supporting_documents != null) {
 				if (Supporting_documents.length > 0) {
 					for (var i = 0; i < Supporting_documents.length; i++) {
-						htmlSupporting_documents += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a></li>';
+						htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-pr-'+Supporting_documents[i]+'" type="button" idtable = "'+pr_create[0]['PRCode']+'" table = "db_budgeting.pr_create" field = "Supporting_documents" typefield = "1" delimiter = "" fieldwhere = "PRCode"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
 					}
 				}
 			}
@@ -361,7 +361,7 @@
 			if (UploadFile != null) {
 				if (UploadFile.length > 0) {
 					for (var j = 0; j < UploadFile.length; j++) {
-						htmlUploadFile += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+UploadFile[j]+'" target="_blank" class = "Fileexist">File '+(j+1)+'</a></li>';
+						htmlUploadFile += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+UploadFile[j]+'" target="_blank" class = "Fileexist">File '+(j+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file"  filepath = "budgeting-pr-'+UploadFile[j]+'" type="button" idtable = "'+pr_detail[i]['ID']+'" table = "db_budgeting.pr_detail" field = "UploadFile" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
 					}
 				}
 			}
@@ -608,7 +608,7 @@
 				else
 				{
 					// check rule entry
-					$('.btn-add-pr,input[type="file"]').prop('disabled',true);
+					$('.btn-add-pr,input[type="file"],.btn-delete-file').prop('disabled',true);
 					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
 					$('input,textarea').prop('disabled',true);
 				}
@@ -742,7 +742,7 @@
 			else
 			{
 				// check rule entry
-				$('.btn-add-pr,input[type="file"]').prop('disabled',true);
+				$('.btn-add-pr,input[type="file"],.btn-delete-file').prop('disabled',true);
 			}		   
 		}
 		
@@ -758,7 +758,7 @@
 
 		$('textarea').prop('disabled',false);
 		$('#SaveSubmit').prop('disabled',false);
-		$('.btn-add-pr').prop('disabled',false);
+		$('.btn-add-pr,input[type="file"],.btn-delete-file').prop('disabled',false);
 		$(this).remove();
 	})
 
@@ -1748,14 +1748,6 @@
 			SubTotal = findAndReplace(SubTotal, ".","");
 			var DateNeeded = fillItem.find('.datetimepicker').find('input').val();
 
-			if ( $( '#'+'BrowseFileSD').length ) {
-				var UploadFile = $('#'+'BrowseFileSD')[0].files;
-				for(var count = 0; count<UploadFile.length; count++)
-				{
-				 form_data.append("Supporting_documents[]", UploadFile[count]);
-				}
-			}
-
 			if ( fillItem.find('.BrowseFile').length ) {
 				var UploadFile = fillItem.find('.BrowseFile')[0].files;
 				for(var count = 0; count<UploadFile.length; count++)
@@ -1793,7 +1785,16 @@
 			 FormInsertDetail.push(token);
 			 PassNumber++
 		})
+		// console.log(form_data);
 
+		if ( $( '#'+'BrowseFileSD').length ) {
+			var UploadFile = $('#'+'BrowseFileSD')[0].files;
+			for(var count = 0; count<UploadFile.length; count++)
+			{
+			 form_data.append("Supporting_documents[]", UploadFile[count]);
+			}
+		}
+		
 		// return;
 
 		var token = jwt_encode(FormInsertDetail,"UAP)(*");
