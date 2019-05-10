@@ -367,7 +367,7 @@ class M_save_to_pdf extends CI_Model {
 
     public function getTranscript($DBStudent,$NPM){
 
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN,  
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN, 
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
                                             edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, 
                                             fp.TitleInd, fp.TitleEng, f.Name AS FacultyName
@@ -471,7 +471,7 @@ class M_save_to_pdf extends CI_Model {
 
     public function getIjazah($DBStudent,$NPM){
         $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, 
-                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, 
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, aus.KTPNumber,
                                             ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, 
                                             edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
                                             em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 

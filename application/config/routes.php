@@ -379,9 +379,7 @@ $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 //Surat Tugas Keluar 
 // $route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
 $route['requestsurat'] = 'api/c_global/getlistrequestdoc';
-
 $route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
-
 
 $route['admission/master-registration/biaya-kuliah'] = 'page/admission/c_master/biaya_kuliah';
 $route['admission/config/menu-previleges'] = 'page/admission/c_master/menu_previleges'; // db menu

@@ -1347,6 +1347,8 @@ class M_api extends CI_Model {
                                       WHERE s.NPM = "'.$NPM.'" LIMIT 1');
 
         return $data->result_array();
+
+        print_r($data); exit;
     }
 
     public function __checkClassGroup($ProgramsCampusID,$SemesterID,$ProdiCode,$IsSemesterAntara){

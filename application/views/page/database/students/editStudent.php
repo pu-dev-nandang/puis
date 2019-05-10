@@ -1,7 +1,23 @@
+<style>
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+
+.btn-round{
+    border-radius: 10px 50px;
+}
+
+</style>
 
 <div class="row">
     <div class="col-md-12">
-        <a href="<?php echo base_url('database/students'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List Student</a>
+        <a href="<?php echo base_url('database/students'); ?>" class="btn btn-warning btn-round"><i class="fa fa-arrow-left margin-right"></i> Back to List Student</a>
     </div>
 </div>
 
@@ -64,6 +80,14 @@
                     </tr>
 
                     <tr>
+                        <th>KTP/ NIK Number</th>
+                        <th>:</th>
+                        <td>
+                            <input class="form-control formBiodata" id="formKtp">
+                        </td>
+                    </tr>
+
+                    <tr>
                         <th>Phone</th>
                         <th>:</th>
                         <td>
@@ -109,7 +133,7 @@
 
                 <div style="text-align: right;">
                     <hr/>
-                    <button class="btn btn-success" id="btnSaveBiodata">Save</button>
+                    <button class="btn btn-success" id="btnSaveBiodata"> Save</button>
                 </div>
 
             </div>
@@ -128,48 +152,50 @@
 
                 <table class="table">
                     <tr>
-                        <th style="width: 30%;">Programs</th>
-                        <th style="width: 1%;">:</th>
-                        <td>
-                            <input class="form-control">
-                        </td>
-                    </tr>
-                    <tr>
                         <th>Programs</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formProgram" readonly>
                         </td>
                     </tr>
                     <tr>
                         <th>Programme Study</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formProgramStudy" readonly>
                         </td>
                     </tr>
                     <tr>
                         <th>Study Level</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Mentor Academic</th>
-                        <th>:</th>
-                        <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formStudyLevel" readonly>
                         </td>
                     </tr>
                     <tr>
                         <th>Status</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formStatusAcademic" readonly>
                         </td>
                     </tr>
+                    <tr>
+                        <th>Mentor Academic</th>
+                        <th>:</th>
+                        <td>
+                            <input class="form-control" id="formMentorAcademic" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Email Mentor </th>
+                        <th>:</th>
+                        <td>
+                            <input class="form-control" id="formMentorEmail" readonly>
+                        </td>
+                    </tr>
+                    
                 </table>
+
 
             </div>
         </div>
@@ -193,56 +219,56 @@
                         <th style="width: 25%;">Name</th>
                         <th style="width: 1%;">:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formNameFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Status</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formStatusFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Education</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formEducationFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Occupation</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formOccuFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Phone</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formPhoneFather">
                         </td>
                     </tr>
                     <tr>
                         <th>HP</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formHpFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Email</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formEmailFather">
                         </td>
                     </tr>
                     <tr>
                         <th>Adress</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formAddressFather">
                         </td>
                     </tr>
 
@@ -254,61 +280,60 @@
                         <th>Name</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formNameMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Status</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formStatusMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Education</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formEducationMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Occupation</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formOccupationMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Phone</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formPhoneMother">
                         </td>
                     </tr>
                     <tr>
                         <th>HP</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formHpMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Email</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formEmailMother">
                         </td>
                     </tr>
                     <tr>
                         <th>Adress</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control">
+                            <input class="form-control" id="formAddressMother">
                         </td>
                     </tr>
-
                 </table>
-
+                
             </div>
         </div>
 
@@ -345,6 +370,8 @@
             var formHP = $('#formHP').val();
             var formEmail = $('#formEmail').val();
             var formEmailPU = $('#formEmailPU').val();
+            var formKtp = $('#formKtp').val(); 
+
 
             var data = {
                 action : 'updateBiodataStudent',
@@ -364,6 +391,7 @@
                 },
                 dataAuth : {
                     Name : formName,
+                    KTPNumber : formKtp,
                     EmailPU : formEmailPU
                 }
             };
@@ -404,6 +432,7 @@
                 $('input[type=radio][name=formGender][value='+d.Gender+']').prop('checked',true);
                 $('#formPlaceOfBirth').val(d.PlaceOfBirth);
                 $('#formDateOfBirthValue').val(d.DateOfBirth);
+                $('#formKtp').val(d.KTPNumber);
                 $('#formPhone').val(d.Phone);
                 $('#formHP').val(d.HP);
                 $('#formEmail').val(d.Email);
@@ -411,6 +440,30 @@
                 $('#formAddress').val(d.Address);
                 $('#formJacket').val(d.Jacket);
 
+                //---data parent --
+                $('#formNameFather').val(d.Father); 
+                $('#formStatusFather').val(d.StatusFather); 
+                $('#formEducationFather').val(d.EducationFather); 
+                $('#formOccuFather').val(d.OccupationFather); 
+                $('#formPhoneFather').val(d.PhoneFather); 
+                //$('#formHpFather').val(d.Jacket); 
+                $('#formEmailFather').val(d.EmailFather); 
+                $('#formAddressFather').val(d.AddressFather); 
+                $('#formNameMother').val(d.Mother); 
+                $('#formStatusMother').val(d.StatusMother); 
+                $('#formEducationMother').val(d.EducationMother); 
+                $('#formOccupationMother').val(d.OccupationMother); 
+                $('#formPhoneMother').val(d.PhoneMother); 
+                //$('#formHpMother').val(d.Jacket); 
+                $('#formEmailMother').val(d.EmailMother); 
+                $('#formAddressMother').val(d.AddressMother); 
+
+                //--- data academic ---
+                $('#formProgramStudy').val(d.ProdiName); 
+                $('#formStatusAcademic').val(d.StatusStudentDesc); 
+                $('#formMentorAcademic').val(d.Mentor); 
+                $('#formMentorEmail').val(d.MentorEmailPU); 
+                
                 $( "#formDateOfBirth" )
                     .datepicker({
                         showOtherMonths:true,

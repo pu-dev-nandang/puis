@@ -205,18 +205,15 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             $endtimex = date('H:i',strtotime($row['EndDate']));
-            //$Start = date("Y-m-d H:i:s", strtotime($data_arr['date'].$data_arr['Start']));
             $statime = 'Selesai';
 
             if ($endtimex == '00:00') {
-                
-                $endtimes = '<div style="text-align:center;">'.date('d M Y',strtotime($row['StartDate'])).'</div>';
+                $endtimes = '<div style="text-align:center;">'.date('d M Y',strtotime($row['EndDate'])).'</div>';
                 $endtimesz = $endtimes.' - '.$statime;
             }else {
-                $endtimesz = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
+                $endtimesz = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';
             }
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
-
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NIP"].' - '.$row["Name"];
             $nestedData[] = $row["NameFiles"];
@@ -344,7 +341,7 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
 
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
-        print_r($status);
+        //print_r($status);
 
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
@@ -425,8 +422,6 @@ class C_api extends CI_Controller {
             $data[] = $nestedData;
 
         }
-
-        // print_r($data);
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
@@ -638,7 +633,14 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
+        $totalData = $this->db->query('SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
+                        LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
@@ -650,11 +652,9 @@ class C_api extends CI_Controller {
             WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-            //$sql.= ') ORDER BY NIP,em.PositionMain ASC';
+            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
+            //$sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY xx.Totalfiles DESC';
-
         }
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
@@ -665,13 +665,11 @@ class C_api extends CI_Controller {
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
             WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus;
-            //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
             $sql.= 'ORDER BY xx.Totalfiles DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
         
         $query = $this->db->query($sql)->result_array();
-        //$sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
         $no = $requestData['start']+1;
 
         $data = array();
@@ -821,7 +819,6 @@ class C_api extends CI_Controller {
         $generate = $this->db->query('SELECT * FROM db_employees.master_files WHERE RequestDocument = 1')->result_array();
         echo json_encode($generate);
     }
-
 
 
     public function getstatusversion()
@@ -2392,8 +2389,98 @@ class C_api extends CI_Controller {
             "data"            => $data
         );
         echo json_encode($json_data);
+    }
+
+    public function getdatarequestdocument(){
+        
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+        $NIP = $this->session->userdata('NIP');
+        
+        $totalData = $this->db->query('SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
+                    WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
+                    WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1 AND (';
+            $sql.= ' b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR c.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' ) ORDER BY a.IDRequest DESC';
+
+        }
+        else {
+            $sql = 'SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
+                    FROM db_employees.request_document AS a
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
+                    WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1 ';
+            $sql.= 'ORDER BY a.IDRequest DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+        }
+        
+        $query = $this->db->query($sql)->result_array();
+        $no = $requestData['start']+1;
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $stats = ($row["Active"]=='1') ? 'Active' : 'Non Active';
+
+            $StartDate = date('d M Y h:i',strtotime($row['StartDate']));
+            $EndDate = date(' d M Y h:i',strtotime($row['EndDate']));
+                   
+            if($row['ConfirmStatus'] == 1) {
+                
+                $token = $this->jwt->encode(array(
+                                'NIP' => $row['NIP'],
+                                'IDRequest' => $row['IDRequest']
+                            ),'UAP)(*');
+                $linksurat = base_url('save2pdf/suratTugasKeluar/'.$token);
+                $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ';
+            } else if($row['ConfirmStatus'] == -1) {
+                $buttonlink = '<p class="text-danger"> Rejected </p>';
+            } else {
+                $buttonlink = '<p class="text-primary"> Waiting Approved </p>';
+            }
+
+            if($row['DateConfirm'] == '0000-00-00 00:00:00' ) {
+                $dateconfirms = '';
+            } else {
+                $datex = $row['DateConfirm'];
+                $dateconfirms = date("d M Y h:i",strtotime($row['DateConfirm']));
+            }
+
+            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["NIP"].' - '.$row["Name"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["ForTask"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$StartDate.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$EndDate.'</div>';
+            $nestedData[] = '<div style="text-align: left;">'.$row["DescriptionAddress"].'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$dateconfirms.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$buttonlink.'</div>';
+            $no++;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
 
     }
+
     
     public function getversiondetail(){
 
@@ -6534,15 +6621,7 @@ class C_api extends CI_Controller {
         }
     }
 
-    public function getdatarequestdocument(){
-         
-        $data_arr = $this->getInputToken();
-        $NIP = $data_arr['NIP'];
-        $viewfiles = $this->m_api->views_datarequestdoc($NIP);
-        echo json_encode($viewfiles);     
-
-     }
-
+    
     public function getAgama()
     {
         $generate = $this->m_api->getAgama();
@@ -7351,8 +7430,8 @@ class C_api extends CI_Controller {
             $db_ = 'ta_'.$row['Year'];
 
             $btnSKPI = '<div  style="text-align:center;">
-                            <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-sm btn-default-warning btnDownloadSKPI"><i class="fa fa-download margin-right"></i> SKPI</a>
-                            <a class="btn btn-default btn-sm btn-default-warning btnDownloadSkls"data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> SKL</a>
+                            <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-sm btn-default-warning btn-round btnDownloadSKPI" disabled><i class="fa fa-download margin-right"></i> SKPI</a>
+                            <a class="btn btn-default btn-sm btn-default-warning btn-round btnDownloadSkls"data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> SKL</a>
                             
                             </div>';
 
@@ -7364,7 +7443,7 @@ class C_api extends CI_Controller {
                             </div>';
 
             $btnIjazah = '<div  style="text-align:center;">
-                            <button class="btn btn-sm btn-default btn-default-success btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> Ijazah</button>
+                            <button class="btn btn-sm btn-default btn-default-success btn-round btnDownloadIjazah" data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> Ijazah</button>
                             </div>';
 
 
@@ -7375,15 +7454,35 @@ class C_api extends CI_Controller {
                                         <a>'.$row['EmailPU'].'</a></div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:left;">
-                                    <div class="">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                                <label  class="text-primary">National Certificate Number</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-10" style="padding-right: 0px;">
+                                            <input id="formCNN'.$row['NPM'].'" class="form-control hide" value="'.$row['CertificateNationalNumber'].'"/>
+                                            <span id="viewCNN'.$row['NPM'].'">'.$row['CertificateNationalNumber'].'</span>
+                                        </div>
+                                        <div class="col-xs-2">   
+                                            <button class="btn btn-sm btn-success btn-block btnSaveCNN btn-circle hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCNN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                                <label  class="text-primary">Certificate Serial Number</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-xs-10" style="padding-right: 0px;">
                                             <input id="formCSN'.$row['NPM'].'" class="form-control hide" value="'.$row['CertificateSerialNumber'].'"/>
                                             <span id="viewCSN'.$row['NPM'].'">'.$row['CertificateSerialNumber'].'</span>
                                         </div>
-                                        <div class="col-xs-2">
-                                               
-                                            <button class="btn btn-sm btn-success btn-block btnSaveCSN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
-                                            <button class="btn btn-sm btn-default btn-block btnEditCSN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                        <div class="col-xs-2">   
+                                            <button class="btn btn-sm btn-success btn-block btnSaveCSN btn-circle hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCSN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
                                         </div>
                                     </div>
                                      
@@ -7397,8 +7496,8 @@ class C_api extends CI_Controller {
                                         </div>
                                         <div class="col-xs-2">
                                                
-                                            <button class="btn btn-sm btn-success btn-block btnSaveSKLN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
-                                            <button class="btn btn-sm btn-default btn-block btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                            <button class="btn btn-sm btn-success btn-block btn-circle btnSaveSKLN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
                                         </div>
                                     </div>
                                      
@@ -7460,6 +7559,12 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='updateCSN'){
                 $this->db->set('CertificateSerialNumber', $data_arr['CSN']);
+                $this->db->where('NPM', $data_arr['NPM']);
+                $this->db->update('db_academic.auth_students');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateCNN'){
+                $this->db->set('CertificateNationalNumber', $data_arr['CNN']);
                 $this->db->where('NPM', $data_arr['NPM']);
                 $this->db->update('db_academic.auth_students');
                 return print_r(1);
@@ -8105,9 +8210,16 @@ class C_api extends CI_Controller {
 
                 $DB_Student = $data_arr['DB_Student'];
                 $NPM = $data_arr['NPM'];
-                $data = $this->db->query('SELECT std.*, auts.EmailPU FROM '.$DB_Student.'.students std 
-                                                  LEFT JOIN db_academic.auth_students auts ON (auts.NPM = std.NPM)
-                                                  WHERE std.NPM = "'.$NPM.'" LIMIT 1')->result_array();
+                $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
+                                      ss.Description AS StatusStudentDesc, au.KTPNumber,
+                                      em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
+                                      FROM '.$DB_Student.'.students s
+                                      LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
+                                      LEFT JOIN db_academic.status_student ss ON (s.StatusStudentID = ss.ID)
+                                      LEFT JOIN db_academic.auth_students au ON (s.NPM = au.NPM)
+                                      LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM=s.NPM)
+                                      LEFT JOIN db_employees.employees em ON (em.NIP=ma.NIP)
+                                      WHERE s.NPM = "'.$NPM.'" LIMIT 1')->result_array();
 
                 return print_r(json_encode($data));
             }

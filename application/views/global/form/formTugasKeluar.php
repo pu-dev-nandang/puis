@@ -168,16 +168,70 @@ $d = $dataEmp[0];
 </div>
 
 
-<div class="container">
-    <div class="row">
-        <div class="widget-content col-md-12">
-            <div class="thumbnail">
-            
-             <div id="loadtablerequest"></div>  
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-12">
+        <div class="widget box">
+            <div class="widget-header">
+                <h4 class=""><i class="icon-reorder"></i> List Data Request</h4>
+                <div class="toolbar no-padding">
+                    <div class="btn-group">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="widget-content col-md-12">
+                <div class="">
+                    <table class="table table-bordered table-striped" id="tablemodule">
+                        <thead>
+                        <tr style="background: #3968c6;color: #FFFFFF;">
+                            <th style="width: 5%;text-align: center;">No</th>
+                            <th style="width: 11%;text-align: center;">Name/ NIP</th>
+                            <th style="width: 8%;text-align: center;">Type</th>
+                            <th style="width: 20%;text-align: center;">For Request</th>
+                            <th style="width: 11%;text-align: center;">Start Date</th>
+                            <th style="width: 11%;text-align: center;">End Date</th>
+                            <th style="width: 22%;text-align: center;">Description Request</th>
+                            <th style="width: 10%;text-align: center;">Date Confirm</th>
+                            <th style="width: 5%;text-align: center;">Action</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>            
+                <!-- <div id="loadPage"></div> -->
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        loadDataModule('');
+    });
+
+    $('#filterStatusEmployees').change(function () {
+        var s = $(this).val();
+    });
+
+    function loadDataModule(status) {
+        var dataTable = $('#tablemodule').DataTable( {
+            "processing": true,
+            "destroy": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api/__getrequestnip?s="+status, // json datasource group
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        } );
+    }
+</script>
 
 
 <script>
@@ -187,7 +241,6 @@ $d = $dataEmp[0];
         savedatarequestdoc();
     });
 
-
     $('#checkselesai').change(function(){
 
         if($('#checkselesai').is(':checked')){
@@ -195,7 +248,6 @@ $d = $dataEmp[0];
         } else {
             $('#timepicker2').removeClass('hide');
         }
-        // $('#endTime').append('00:00');
     });
 
     function savedatarequestdoc() {
@@ -236,7 +288,6 @@ $d = $dataEmp[0];
                     DescriptionVenue : DescriptionVenue
                 }
             };
-
                 var token = jwt_encode(data,'UAP)(*');
                 var url = base_url_js+'api2/__crudrequestdoc';
                 $.post(url,{token:token},function (result) {
