@@ -801,7 +801,7 @@ class M_budgeting extends CI_Model {
                     select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                     UNION
                     select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-                   ) as dp on b.UnitDiv = dp.ID
+                   ) as dp on c.Departement = dp.ID
                    join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
                                  where cba.`Year` = ? and cba.Status = 2
 
@@ -826,7 +826,7 @@ class M_budgeting extends CI_Model {
                                         select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                                         UNION
                                         select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-                                       ) as dp on b.UnitDiv = dp.ID
+                                       ) as dp on c.Departement = dp.ID
                                        join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
                                                      where cba.`Year` = ? and cba.Status = 2 and c.CodePost = ?
                                 ) as subquery
@@ -854,7 +854,7 @@ class M_budgeting extends CI_Model {
             $arr_custom[$i] = '"'.$arr_custom[$i].'"';
         }
         $CodeHeadAccountIn = implode(',', $arr_custom);
-        $sql = 'select a.CodeHeadAccount,a.Name,b.CodePostRealisasi,b.RealisasiPostName,b.UnitDiv,c.UnitCost,c.Freq,c.DetailMonth,c.SubTotal
+        $sql = 'select a.CodeHeadAccount,a.Name,b.CodePostRealisasi,b.RealisasiPostName,b.UnitDiv,c.UnitCost,c.Freq,c.DetailMonth,c.SubTotal, d.Departement as DepartementID
                 from db_budgeting.cfg_head_account as a join db_budgeting.cfg_postrealisasi as b on a.CodeHeadAccount = b.CodeHeadAccount
                     join db_budgeting.creator_budget as c on b.CodePostRealisasi = c.CodePostRealisasi
                     join db_budgeting.creator_budget_approval as d on c.ID_creator_budget_approval = d.ID
@@ -918,7 +918,7 @@ class M_budgeting extends CI_Model {
             $Code = $arr_Department_ac[$i]['Code'];
             $bool = true;
             for ($j=0; $j < count($query); $j++) { 
-                $UnitDiv = $query[$j]['UnitDiv'];
+                $UnitDiv = $query[$j]['DepartementID'];
                 if ($Code == $UnitDiv) {
                     $SubTotal = $query[$j]['SubTotal'] / 1000;
                     // check array key exist
@@ -955,7 +955,7 @@ class M_budgeting extends CI_Model {
             $Code = $arr_Department_nac[$i]['Code'];
             $bool = true;
             for ($j=0; $j < count($query); $j++) { 
-                $UnitDiv = $query[$j]['UnitDiv'];
+                $UnitDiv = $query[$j]['DepartementID'];
                 if ($Code == $UnitDiv) {
                     $SubTotal = $query[$j]['SubTotal'] / 1000;
                     // check array key exist
