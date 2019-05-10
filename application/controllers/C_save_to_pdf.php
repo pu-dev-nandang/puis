@@ -3738,7 +3738,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetY(8); //novie
         $pdf->SetFont('dinpromedium','',8);
         $pdf->Cell($w_left,$h,'Nomor Keputusan Akreditasi Pendirian Perguruan Tinggi dan / atau Program Studi : '.$Ijazah['NumberUniv'],$border,0,'L');
-        $pdf->Cell($w_right,$h,'Nomor Ijazah Nasional : '.$Student['CSN'],$border,1,'L');
+        $pdf->Cell($w_right,$h,'Nomor Ijazah Nasional : '.$Student['CNN'],$border,1,'L');
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_left,$h,'University Accreditation Number / Study Program Accreditation Number',$border,0,'L');
         $pdf->Cell($w_right,$h,'National Certificate Number',$border,1,'L');
