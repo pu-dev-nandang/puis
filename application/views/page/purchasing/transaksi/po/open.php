@@ -44,6 +44,8 @@
 		Dt_selection : [],
 		ThisTableSelect : '',
 		Dt_ChooseSelectPR : [],
+		action_mode : '<?php echo $action_mode ?>',
+		POCode : '<?php echo $POCode ?>',
 		htmlPage_pr_list : function(){
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
@@ -412,7 +414,8 @@
 				    '</div>'+
 				    '<div class = "row" style = "margin-top : 10px;">'+
 				    	'<div class = "col-md-4">'+
-				    		'<button class="btn btn-success" id="OpenPO">Open PO</button>'+' '+
+				    		'<button class="btn btn-primary" id="OpenPO">Open PO</button>'+' '+
+				    		'<button class="btn btn-success" id="OpenSPK">Open SPK</button>'+' '+
 				    		'<button class="btn btn-warning" id="Clear">Clear</button>'+
 				    	'</div>'+
 				    '</div>'		
@@ -485,13 +488,16 @@
 					'</div>'+
 				 '</div>';
 		
-		$('#PageSearchVendor').html(html);		 					
+		if (!$('#Tbl_selectVendor').length) {
+			$('#PageSearchVendor').html(html);	
+		}
+			 					
 
 		var rowCount = $('#Tbl_selectVendor tbody tr').length;
 		if (Tot_vendor < rowCount) {
 			var v = rowCount - Tot_vendor;
 			for (var i = 0; i < v; i++) {
-				$('#Tbl_selectVendor tbody tr:not(:last)').remove();
+				$('#Tbl_selectVendor tbody tr:last').remove();
 			}
 		}
 		else if(Tot_vendor > rowCount){
@@ -515,9 +521,17 @@
 				return html;
 			}
 
+			var NOGet = $('#Tbl_selectVendor tbody tr:last').find('td:eq(0)').html();
+			if (NOGet != '' && NOGet != null && NOGet != undefined) {
+				NO = parseInt(NOGet) + 1;
+			}
+			else
+			{
+				var NO = 1;
+			}
 			for (var i = 0; i < v; i++) {
-				var NO = i + 1;
 				$('#Tbl_selectVendor tbody').append(htmlWr(NO));
+				NO++;
 			}
 
 		}
@@ -643,6 +657,195 @@
 				       $('#GlobalModalLarge').modal('hide');
 				} );		
 
-	})	
+	})
+
+
+	// Detail_Vendor
+	$(document).off('click', '.Detail_Vendor').on('click', '.Detail_Vendor',function(e) {
+		var data = $(this).attr('data');
+		if (data != '' && data != undefined && data != null) {
+			var html = '';
+			var arr = data.split('@@');
+			var	isian = '<tr style = "background-color : #eade8e;">';
+				for (var i = 0; i < arr.length; i++) {
+					isian += '<td>'+arr[i]+'</td>';
+				}
+
+				isian += '</tr>';
+
+				html = '<div class="row">'+
+							'<div class = "col-md-12">'+
+								'<div class="thumbnail" style="padding: 10px;">'+
+				           			'<b>Status : </b><i class="fa fa-circle" style="color: #eade8e;"></i> Already Selected'+
+				                '</div><br>'+
+								'<div class="table-responsive">'+
+									'<table class="table table-bordered tableData" id ="datatablesServer">'+
+				        				'<thead>'+
+				        					'<tr>'+
+				        						'<th width = "2%" style = "text-align: center;background: #EE556C;color: #FFFFFF;">No</th>'+
+				        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;">Category Supplier</th>'+
+				        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;width: 250px;">Supplier</th>'+
+				        						'<th style = "text-align: center;background: #EE556C;color: #FFFFFF;">Detail Item</th>'+
+				        					'</tr>'+
+				        				'</thead>'+
+				        				'<tbody>'+
+				        					isian+
+				        				'</tbody>'+
+				        			'</table>'+
+								'<div>'+
+							'</div>'+
+						'</div>';						
+
+				$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Vendor'+'</h4>');
+				$('#GlobalModalLarge .modal-body').html(html);
+				$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+				$('#GlobalModalLarge').modal({
+				    'show' : true,
+				    'backdrop' : 'static'
+				});
+		}		
+	})
+
+	$(document).off('click', '#OpenPO').on('click', '#OpenPO',function(e) {
+		// check pr selected harus lebih dari 0
+			var arr_pr_detail_selected = [];
+			$('.id_pr_detail_selected:checked').each(function(){
+				var id_pr_detail = $(this).attr('id_pr_detail');
+				arr_pr_detail_selected.push(id_pr_detail);
+			})
+		// Select vendor harus ada yang approve = 1
+			var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+
+		// check Choose vendor dengan select vendor
+			var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
+			var c = 0;
+			$('.LblNmVendor').each(function(){
+				var idtable = $(this).attr('idtable');
+				if (idtable != '' && idtable != null && idtable != undefined) {
+					c++;
+				}
+			})
+
+			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c) {
+				// create po
+				if (ClassDt.action_mode == 'add') {
+					_Create_PO().then(function(data){
+						
+					    window.location.href = base_url_js+'';
+					    
+					})
+				}
+				else
+				{
+
+				}
+			}
+			else
+			{
+				toastr.info('<li>PR Selected must be having less one checked</li>'+
+							'<li>Select Vendor must be having less one approve</li>'+
+							'<li>Total Vendor must be same with total selected vendor</li>'
+							);
+			}
+
+		// dapatkan no po dan show page PO created
+	})
+
+	$(document).off('click', '#OpenSPK').on('click', '#OpenSPK',function(e) {
+		// check pr selected harus lebih dari 0
+			var arr_pr_detail_selected = [];
+			$('.id_pr_detail_selected:checked').each(function(){
+				var id_pr_detail = $(this).attr('id_pr_detail');
+				arr_pr_detail_selected.push(id_pr_detail);
+			})
+		// Select vendor harus ada yang approve = 1
+			var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+
+		// check Choose vendor dengan select vendor
+			var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
+			var c = 0;
+			$('.LblNmVendor').each(function(){
+				var idtable = $(this).attr('idtable');
+				if (idtable != '' && idtable != null && idtable != undefined) {
+					c++;
+				}
+			})
+
+			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c) {
+				loading_button('#OpenSPK')
+				if (ClassDt.action_mode == 'add') {
+					
+				}
+				else
+				{
+
+				}
+				
+			}
+			else
+			{
+				toastr.info('<li>PR Selected must be having less one checked</li>'+
+							'<li>Select Vendor must be having less one approve</li>'+
+							'<li>Total Vendor must be same with total selected vendor</li>'
+							);
+			}
+
+		// dapatkan no SPK dan show page SPK created
+	})
+
+	function _Create_PO()
+	{
+		var def = jQuery.Deferred();
+		var arr_pr_detail_selected = [];
+			$('.id_pr_detail_selected:checked').each(function(){
+				var id_pr_detail = $(this).attr('id_pr_detail');
+				arr_pr_detail_selected.push(id_pr_detail);
+			})
+
+		var arr_supplier = [];
+		var form_data = new FormData();
+		var PassNumber = 0; 
+			$(".LblNmVendor").each(function(){
+				var idtable = $(this).attr('idtable');
+				var fillItem = $(this).closest('tr');
+				if (idtable != '' && idtable != null && idtable != undefined) {
+					if ( fillItem.find('.BrowseFile').length ) {
+						var UploadFile = fillItem.find('.BrowseFile')[0].files;
+						for(var count = 0; count<UploadFile.length; count++)
+						{
+						 form_data.append("UploadFile"+PassNumber+"[]", UploadFile[count]);
+						}
+					}
+
+					arr_supplier.push(idtable);
+				}
+			})
+
+		var token = jwt_encode(arr_pr_detail_selected,"UAP)(*");
+		form_data.append('arr_pr_detail',token);
+
+		var token = jwt_encode(arr_supplier,"UAP)(*");
+		form_data.append('arr_supplier',token);
+
+		var url = base_url_js + "po/submit_create"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		    def.resolve(data)
+		  },
+		  error: function (data) {
+		    def.reject();
+		  }
+		})	
+
+		return def.promise();
+	}	
 
 </script>

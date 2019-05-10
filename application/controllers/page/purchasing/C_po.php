@@ -23,6 +23,8 @@ class C_po extends Transaksi_Controler {
 
     public function open()
     {
+       $this->data['action_mode'] = 'add';
+       $this->data['POCode'] = '';
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/open',$this->data,true);
        $this->page_po($page); 
     }

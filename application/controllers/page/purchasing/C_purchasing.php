@@ -15,7 +15,7 @@ class C_purchasing extends Purchasing_Controler {
     public function dashboard()
     {
       $data['department'] = parent::__getDepartement();
-      $content = $this->load->view('dashboard/dashboard',$data,true);
+      $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
       $this->temp($content);
     }
 
