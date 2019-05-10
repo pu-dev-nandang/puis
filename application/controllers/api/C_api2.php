@@ -3236,7 +3236,7 @@ class C_api2 extends CI_Controller {
 
             // Get Detail Course
             $dataCourse = $this->db->get_where('db_academic.sa_schedule_course',
-                array('ID'=>$ScheduleIDSA))->result_array();
+                array('ScheduleIDSA'=>$ScheduleIDSA))->result_array();
 
             $student = [];
             if(count($dataCourse)>0){
