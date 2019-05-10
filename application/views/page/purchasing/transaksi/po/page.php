@@ -14,14 +14,14 @@
                 <button class="btn btn-primary" id="btnBackToHome" name="button"><i class="fa fa-home" aria-hidden="true"></i></button>
             </a>
         </li>
-        <li class="<?php echo ($this->uri->segment(4) == 'configuration') ? 'active' : '' ?>">
+        <li class="<?php echo ($this->uri->segment(5) == 'configuration') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/configuration'?>">Configuration</a>
         </li>
-        <li class="<?php echo ($this->uri->segment(4) == 'list') ? 'active' : '' ?>">
+        <li class="<?php echo ($this->uri->segment(4) == 'list' &&  ($this->uri->segment(5) == '' || $this->uri->segment(5) == null)  ) ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/list'?>">List</a>
         </li>
-        <li class="<?php echo ($this->uri->segment(4) == 'open') ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'purchasing/transaction/po/open'?>">Open PO</a>
+        <li class="<?php echo ($this->uri->segment(5) == 'open') ? 'active' : '' ?>">
+            <a href="<?php echo base_url().'purchasing/transaction/po/list/open'?>">Open PO / SPK</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">

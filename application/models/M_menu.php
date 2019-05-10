@@ -202,10 +202,11 @@ class M_menu extends CI_Model {
           URL  : purchasing/transaction/po/list
           jika URL = purchasing/transaction/po/open tidak ditemukan pada query, maka ambil URl terdekat.  
         */
+          $b = count($a);
           $URISlug = '';
           // hilangkan satu segment url terakhir
           for ($i=0; $i < ($b - 1) ; $i++) {
-              if ($i != ($b - 1) ) {
+              if ($i != ($b - 2) ) {
                  $URISlug .= $a[$i].'/';
               }
               else{
@@ -213,8 +214,8 @@ class M_menu extends CI_Model {
               } 
              
           }
-          $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
-
+          
+          $URISlug = 'and a.Slug = "'.$URISlug.'"';
           $sql = "select b.read,b.write,b.update,b.delete from ".$db.".cfg_sub_menu as a join ".$db.".cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join ".$db.".previleges_guser as c on c.G_user = b.cfg_group_user
           where c.NIP = ? ".$URISlug;
