@@ -2194,9 +2194,11 @@ class C_save_to_pdf extends CI_Controller {
 
     }
 
-    public function exam_layout($ExamID){
+    public function exam_layout($TypeSemester,$ExamID){
 
-        $data = $this->m_save_to_pdf->getExamByID($ExamID);
+        $data = $this->m_save_to_pdf->getExamByID($TypeSemester,$ExamID);
+
+//        print_r($data);exit;
 
         if(count($data)>0){
 

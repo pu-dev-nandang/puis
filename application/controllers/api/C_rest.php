@@ -663,7 +663,9 @@ class C_rest extends CI_Controller {
                                                     LEFT JOIN db_finance.payment_type pt ON (pt.ID = p.PTID)
                                                     LEFT JOIN db_academic.semester s ON (s.ID = p.SemesterID AND pt.Type="0")
                                                     LEFT JOIN db_academic.semester_antara sa ON (sa.ID = p.SemesterID AND pt.Type="1")
-                                                    WHERE p.NPM = "'.$dataToken['NPM'].'" ORDER BY p.SemesterID DESC, p.PTID DESC')->result_array();
+                                                    WHERE p.NPM = "'.$dataToken['NPM'].'" ORDER BY pt.Type DESC, p.SemesterID DESC')->result_array();
+
+//            print_r($data);exit;
 
 //            print_r($data);
 
@@ -671,23 +673,20 @@ class C_rest extends CI_Controller {
             if(count($data)>0){
                 for($i=0;$i<count($data);$i++){
 
-//                    print_r('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'"
-//                                                    AND ID <= "'.$data[$i]['SemesterID'].'"');
-
                     if($data[$i]['TypePT']=='1'){
                         $data[$i]['SemesterName'] = $data[$i]['SemesterAntaraName'];
 
                         // Cek semester antara
-                        $dataSmt = $this->db->query('SELECT * FROM db_academic.semester_antara WHERE Year >= "'.$dataToken['ClassOf'].'" 
-                                                    AND ID <= "'.$data[$i]['SemesterID'].'" ')->result_array();
+                        $dataSmt_a = $this->db->query('SELECT SemesterID FROM db_academic.semester_antara WHERE ID = "'.$data[$i]['SemesterID'].'" ')->result_array();
+
+                        $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'" 
+                                                    AND ID <= "'.$dataSmt_a[0]['SemesterID'].'" ')->result_array();
 
                     } else {
                         // Cek semester
                         $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE Year >= "'.$dataToken['ClassOf'].'" 
                                                     AND ID <= "'.$data[$i]['SemesterID'].'" ')->result_array();
                     }
-
-
 
                     //Cek Bukti Upload
                         $payment_proof = $this->m_master->caribasedprimary('db_finance.payment_proof','ID_payment',$data[$i]['ID']);
@@ -701,6 +700,8 @@ class C_rest extends CI_Controller {
                     }
                 }
             }
+
+//            usort($result, function ($a, $b){return strcmp($a['Semester'], $b['Semester']);});
 
             return print_r(json_encode($result));
 

@@ -142,8 +142,8 @@
                         '        <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '    </button>' +
                         '    <ul class="dropdown-menu">' +
-                        '        <li><a href="#">Publish</a></li>' +
-                        '        <li><a href="#">Remove</a></li>' +
+                        '        <li><a href="javascript:void(0);" class="btnPublish" data-id="'+data.ID+'">Publish</a></li>' +
+                        // '        <li><a href="#">Remove</a></li>' +
                         '    </ul>' +
                         '</div>';
 
@@ -152,7 +152,7 @@
                         '<td class="td-center">'+data.Year+''+data.Code+'</td>' +
                         // '<td><a href="javascipt:void(0);" data-id="'+data.ID+'" class="btnDetails">'+data.Name+'</a></td>' +
                         '<td><a href="'+base_url_js+'academic/semester-antara/timetable/'+data.ID+'">'+data.Name+'</a></td>' +
-                        '<td class="td-center">10</td>' +
+                        '<td class="td-center">'+data.TotalStudent+'</td>' +
                         '<td class="td-center">'+btnAct+'</td>' +
                         '<td class="td-center">'+status+'</td>' +
                         '</tr>');
@@ -179,5 +179,24 @@
             $('#loadPage').html(html);
         })
     }
+
+    // === BTN Publish ===
+    $(document).on('click','.btnPublish',function () {
+
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+
+            var url = base_url_js+'api/__crudTahunAkademik';
+            var token = jwt_encode({action:'publishSemesterAntara',ID:ID},'UAP)(*');
+
+            $.post(url,{token:token},function () {
+                toastr.success('Published','Success');
+                setTimeout(function () {
+                    loadDataSemesterAntara();
+                },500);
+            });
+        }
+
+    });
 
 </script>
