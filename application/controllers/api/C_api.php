@@ -1222,6 +1222,18 @@ class C_api extends CI_Controller {
 
                 $data = $this->db->query('SELECT * FROM db_academic.semester_antara ORDER BY SemesterID DESC')->result_array();
 
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+
+                        // Get Student
+                        $dataStd = $this->db->query('SELECT count(*) AS Total FROM db_academic.sa_student 
+                                                        WHERE SASemesterID = "'.$data[$i]['ID'].'" ')->result_array();
+
+                        $data[$i]['TotalStudent'] = $dataStd[0]['Total'];
+
+                    }
+                }
+
 //                $data = $this->db
 //                    ->select('semester_antara.*')
 //                    ->join('db_academic.semester','semester.ID = semester_antara.SemesterID')
@@ -1230,6 +1242,14 @@ class C_api extends CI_Controller {
 //                    ->result_array();
 
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='publishSemesterAntara'){
+
+                $ID = $data_arr['ID'];
+                $this->db->query('UPDATE db_academic.semester_antara s SET s.Status=IF(s.ID="'.$ID.'","1","0")');
+                return print_r($ID);
+
+
             }
             else if($data_arr['action']=='checkSemesterAntara'){
                 $data = $this->db
@@ -3138,6 +3158,10 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
                 $data = $this->m_api->getSemester($data_arr['order']);
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='readAntara'){
+                $data = $this->m_api->getSemesterAntara($data_arr['order']);
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='ReadSemesterActive'){
@@ -7069,8 +7093,14 @@ class C_api extends CI_Controller {
 
                 $dateTimeNow = $this->m_rest->getDateTimeNow();
 
-                $data = $this->m_api->getInvigilatorSch($data_arr['SemesterID'],
-                    $data_arr['TypeExam'],$data_arr['NIP'],$dateTimeNow);
+                if($data_arr['TypeSemester']==1 || $data_arr['TypeSemester']=='1'){
+                    $data = $this->m_api->getInvigilatorSch($data_arr['SemesterID'],
+                        $data_arr['TypeExam'],$data_arr['NIP'],$dateTimeNow);
+                } else {
+                    $data = $this->m_api->getInvigilatorSchAntara($data_arr['SemesterID'],
+                        $data_arr['TypeExam'],$data_arr['NIP'],$dateTimeNow);
+                }
+
                 return print_r(json_encode($data));
             }
 

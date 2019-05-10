@@ -584,6 +584,59 @@ class M_rest extends CI_Model {
 
     }
 
+    public function getListStudentExamAntara($CDID,$order=''){
+        $orderby = 'ORDER BY ast.NPM ASC';
+
+        if($order!=''){
+            $orderby = 'ORDER BY '.$order;
+        }
+
+        $resStd = $this->db->query('SELECT ast.NPM, ast.Name, p1.Status AS StatusBPP, p2.Status AS StatusCredit  
+                                                                    FROM db_academic.sa_student_details ssd
+                                                                    LEFT JOIN db_academic.auth_students ast ON (ast.NPM = ssd.NPM)
+                                                                    LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
+                                                                    LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
+                                                                    WHERE ssd.CDID = "'.$CDID.'" AND ssd.Status = "3" '.$orderby)->result_array();
+
+        $result = [];
+        if(count($resStd)>0){
+            foreach ($resStd AS $item){
+                if($item['StatusBPP']=='1' && $item['StatusCredit']=='1'){
+                    array_push($result,$item);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getListStudentExamAntara2($ExamIDSA){
+
+
+
+        $result = $this->db->query('SELECT exg.ID AS EXDID, exg.ExamIDSA AS ExamID, exg.Status,ast.Name FROM db_academic.sa_exam_student exg
+                                                          LEFT JOIN db_academic.auth_students ast ON (ast.NPM = exg.NPM)
+                                                          WHERE exg.ExamIDSA = "'.$ExamIDSA.'" ORDER BY ast.NPM ASC
+                                          ')->result_array();
+
+//        print_r($result);
+
+//        $result = [];
+//        if(count($dataC)>0){
+//            for($c=0;$c<count($dataC);$c++){
+//
+//                $resStd = $this->m_rest->getListStudentExamAntara($dataC[$c]['CDID'],'');
+//                if(count($resStd)>0){
+//                    array_push($result,$resStd);
+//                }
+//
+//            }
+//        }
+
+        return $result;
+
+    }
+
     public function checkSemesterStudent($Year){
 
         $data = $this->db->query('SELECT Status FROM db_academic.semester WHERE Year >= "'.$Year.'" ')->result_array();

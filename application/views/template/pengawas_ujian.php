@@ -111,16 +111,25 @@
 
                 <hr/>
 
-                <div class="col-md-6 col-md-offset-3">
-                    <div class="well">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="well" style="padding-bottom: 5px;">
                         <div class="row">
-                            <div class="col-md-6">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <select class="form-control form-filter-inv" id="filterTypeSemester">
+                                        <option value="1">Semester Reguler</option>
+                                        <option value="2">Semester Antara</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <select class="form-control form-filter-inv" id="filterSemester">
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <select class="form-control form-filter-inv" id="filterTypeExam">
                                         <option value="uts">UTS</option>
@@ -177,8 +186,29 @@
         var sessionLoginAt = "<?php echo $this->session->userdata('LoginAt'); ?>";
         var endSesi = sessionLoginAt.split(' ')[1];
 
-        countdw('#viewCD',endSesi);
-        timeOutCw(endSesi);
+        // countdw('#viewCD',endSesi);
+        // timeOutCw(endSesi);
+    });
+
+    $('#filterTypeSemester').change(function () {
+
+        var filterTypeSemester = $('#filterTypeSemester').val();
+        $('#filterSemester').empty();
+        if(filterTypeSemester==1){
+            loSelectOptionSemester('#filterSemester','');
+        } else {
+            loSelectOptionSemesterAntara('#filterSemester','');
+        }
+
+        var firstLoad = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            var filterTypeExam = $('#filterTypeExam').val();
+            if(filterTypeExam!='' && filterTypeExam!=null && filterSemester!='' && filterSemester!=null){
+                loadDataScheduleInvigilator();
+                clearInterval(firstLoad);
+            }
+        },1000);
+
     });
 
     $('.form-filter-inv').change(function () {
@@ -228,6 +258,9 @@
     }
 
     function loadDataScheduleInvigilator() {
+
+        var filterTypeSemester = $('#filterTypeSemester').val();
+
         var filterTypeExam = $('#filterTypeExam').val();
         var filterSemester = $('#filterSemester').val();
 
@@ -236,14 +269,12 @@
             var SemesterID = filterSemester.split('.')[0];
 
             var url = base_url_js+'api/__crudInvigilator';
-            var token = jwt_encode({action:'readScheduleInvigilator',SemesterID:SemesterID,TypeExam:filterTypeExam,NIP : sessionNIP},'UAP)(*');
+            var token = jwt_encode({action:'readScheduleInvigilator',TypeSemester:filterTypeSemester,SemesterID:SemesterID,TypeExam:filterTypeExam,NIP : sessionNIP},'UAP)(*');
             $.post(url,{token:token},function (jsonResult) {
 
-                $('#dataInvSchedule,#dataInvScheduleToday').empty();
+                $('#dataInvSchedule').empty();
                 if(jsonResult.length>0){
                     var no = 0;
-                    var noToday = 0;
-                    var today = moment().format('YYYY-MM-DD');
                     for(var i=0;i<jsonResult.length;i++){
                         var d = jsonResult[i];
                         var ddt = moment(d.ExamDate).format('dddd, DD MMM YYYY');
@@ -255,7 +286,7 @@
                             ? '<button data-id="'+d.ID+'" class="btn btn-primary btnLoadAttendance">Attendance</button>' : '-';
 
                         var btnLayout = (d.ButtonAttendance==1 || d.ButtonAttendance=='1')
-                            ? '<a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a>' : '-';
+                            ? '<a href="'+base_url_js+'save2pdf/exam-layout/'+filterTypeSemester+'/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a>' : '-';
 
                         $('#dataInvSchedule').append('<tr>' +
                             '<td>'+no+'</td>' +
@@ -267,31 +298,22 @@
                             '<td>'+btnLayout+'</td>' +
                             '</tr>');
 
-                        // if(today==d.ExamDate){
-                        //     noToday+=1;
-                        //     $('#dataInvScheduleToday').append('<tr>' +
-                        //         '<td>'+noToday+'</td>' +
-                        //         '<td>'+time+'</td>' +
-                        //         '<td>'+d.Room+'</td>' +
-                        //         '<td><a href="'+base_url_js+'save2pdf/exam-layout/'+d.ID+'" target="_blank" class="btn btn-default btn-sm btn-default-success"><i class="fa fa-arrows-alt margin-right"></i> Layout</a></td>' +
-                        //         '</tr>');
-                        // }
-
                     }
 
                     $('.btnLoadAttendance').click(function () {
                         var ID = $(this).attr('data-id');
-                        
+
                         var data = {
                             action : 'readAttendanceExam',
-                            ID : ID
+                            ID : ID,
+                            TypeSemester : filterTypeSemester
                         };
                         
                         var token = jwt_encode(data,'UAP)(*');
                         var url = base_url_js+'api2/__crudAttendance2';
                         
                         $.post(url,{token:token},function (jsonResult) {
-                            console.log(jsonResult);
+                            // console.log(jsonResult);
 
                             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Students Attendance <input class="hide" id="totalStudents" value="'+jsonResult.length+'" ></h4>');
                             $('#GlobalModal .modal-body').html('<div class="row">' +
@@ -374,7 +396,8 @@
 
                                 var data2 = {
                                     action : 'insertAttdExam',
-                                    arrAttd : arrAttd
+                                    arrAttd : arrAttd,
+                                    TypeSemester : filterTypeSemester
                                 };
 
                                 var token2 = jwt_encode(data2,'UAP)(*');
@@ -404,17 +427,10 @@
                         
                     });
 
-                    // if(noToday==0){
-                    //     $('#dataInvScheduleToday').append('<tr>' +
-                    //         '<td colspan="4" style="text-align: center;">--- Data Not Yet ---</td>' +
-                    //         '</tr>');
-                    // }
-                } else {
+                }
+                else {
                     $('#dataInvSchedule').append('<tr>' +
-                        '<td colspan="5" style="text-align: center;">--- Data Not Yet ---</td>' +
-                        '</tr>');
-                    $('#dataInvScheduleToday').append('<tr>' +
-                        '<td colspan="4" style="text-align: center;">--- Data Not Yet ---</td>' +
+                        '<td colspan="7" style="text-align: center;">--- Data Not Yet ---</td>' +
                         '</tr>');
                 }
 

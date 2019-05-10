@@ -379,6 +379,12 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
+    public function getSemesterAntara($order){
+        $data = $this->db->query('SELECT * FROM db_academic.semester_antara ORDER BY ID '.$order);
+
+        return $data->result_array();
+    }
+
     public function getSemesterActive($SemesterID,$CurriculumID,$ProdiID,$Semester,$IsSemesterAntara){
         $data = $this->db->query('SELECT * FROM db_academic.semester WHERE ID = "'.$SemesterID.'" ')->result_array();
 
@@ -3838,7 +3844,8 @@ class M_api extends CI_Model {
     }
 
     public function getInvigilatorSch($SemesterID,$Type,$NIP,$dateTimeNow){
-        $data = $this->db->query('SELECT ex.*, cl.Room, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+        $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,
+                                          mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
                                           FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_academic.exam_details exd ON (exd.ExamID = ex.ID)
@@ -3855,6 +3862,7 @@ class M_api extends CI_Model {
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
+
                 $d = $data[$i];
 
                 $start = $d['ExamDate'].' '.$d['ExamStart'];
@@ -3875,6 +3883,46 @@ class M_api extends CI_Model {
 
         return $data;
     }
+
+    public function getInvigilatorSchAntara($SemesterID,$Type,$NIP,$dateTimeNow){
+
+        $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.Start AS ExamStart, ex.END AS ExamEnd, cl.Room, 
+                                            mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup
+                                            FROM db_academic.sa_exam ex
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ClassroomID)
+                                            LEFT JOIN db_academic.sa_exam_course exc ON (exc.ExamIDSA = ex.ID)
+                                            LEFT JOIN db_academic.sa_schedule s ON (s.ID = exc.ScheduleIDSA)
+                                            LEFT JOIN db_academic.sa_schedule_course sdc ON (sdc.ScheduleIDSA = s.ID)
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                            WHERE ex.SASemesterID = "'.$SemesterID.'" 
+                                            AND ex.Type = "'.$Type.'" 
+                                            AND  
+                                            ( ex.Invigilator1 = "'.$NIP.'"
+                                                OR ex.Invigilator2 = "'.$NIP.'" )
+                                           GROUP BY ex.ID ORDER BY ex.ExamDate, ex.Start ASC')->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                $d = $data[$i];
+
+                $start = $d['ExamDate'].' '.$d['ExamStart'];
+                $end = $d['ExamDate'].' '.$d['ExamEnd'];
+
+                $n = strtotime($dateTimeNow);
+
+                if(strtotime($start) <= $n && strtotime($end) >= $n ){
+                    $data[$i]['ButtonAttendance'] = '1';
+                } else {
+                    $data[$i]['ButtonAttendance'] = '0';
+                }
+            }
+        }
+
+        return $data;
+
+    }
+
 
     public function getExamStudent($ExamID){
         $dataExamDetail = $this->db->query('SELECT exd.*,ex.SemesterID, ex.Type, aut.Name, aut.Year FROM db_academic.exam_details exd 
