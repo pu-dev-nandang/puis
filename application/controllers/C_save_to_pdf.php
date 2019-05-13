@@ -3299,7 +3299,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(25,7,'National Certificate Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
         $pdf->Cell(15,7,' : ',0,0,'C');
-        $pdf->Cell(7,7,$Student['CNN'],0,1,'R');
+        $pdf->Cell(9,7,$Student['CNN'],0,1,'R');
 
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,7);
@@ -3309,7 +3309,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(20,7,'Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
         $pdf->Cell(5,7,' : ',0,0,'C');
-        $pdf->Cell(20,7,$Student['CSN'],0,1,'R');
+        $pdf->Cell(10,7,$Student['CSN'],0,1,'R');
 
         $pdf->SetXY($margin_left,35); // novie
 
