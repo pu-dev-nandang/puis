@@ -4189,5 +4189,28 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function updateCurriculum(){
+
+        $dataForm = $this->input->post('dataForm');
+
+        $db = 'ta_'.$dataForm['ta'];
+
+        $arrData = $dataForm['arrData'];
+
+        if(count($arrData)>0){
+            foreach ($arrData AS $item){
+                $arrUpdt = array(
+                    'CDID' => $item['CDID'],
+                    'MKID' => $item['MKID']
+                );
+                $this->db->where('ID', $item['SPID']);
+                $this->db->update($db.'.study_planning',$arrUpdt);
+            }
+        }
+
+        return print_r(1);
+
+    }
+
 
 }

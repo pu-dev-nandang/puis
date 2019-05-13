@@ -42,6 +42,7 @@ $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
 
 // === Academic ===
+$route['academic/curriculum_cross/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1';
 $route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
 $route['academic/kurikulum-detail'] = 'page/academic/c_kurikulum/kurikulum_detail';
 $route['academic/kurikulum/add-kurikulum'] = 'page/academic/c_kurikulum/add_kurikulum';
@@ -842,6 +843,8 @@ $route['api/__crudAttendance'] = 'api/c_api/crudAttendance';
 $route['api2/__crudAttendance2'] = 'api/c_api2/crudAttendance2';
 $route['api2/__getAnnouncement'] = 'api/c_api2/getAnnouncement';
 $route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
+
+$route['api2/_updateCurriculum'] = 'api/c_api2/updateCurriculum';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
