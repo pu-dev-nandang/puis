@@ -371,7 +371,7 @@
             var formEmail = $('#formEmail').val();
             var formEmailPU = $('#formEmailPU').val();
             var formKtp = $('#formKtp').val(); 
-
+            alert(formKtp);
 
             var data = {
                 action : 'updateBiodataStudent',
