@@ -147,7 +147,7 @@ class C_kurikulum extends Academic_Controler {
         $this->load->view('page/'.$data['department'].'/kurikulum_detail_mk',$data);
     }
 
-    public function curriculum_cross($ta){
+    public function curriculum_cross($ta,$ProdiID){
 
         $q = 'SELECT sp.ID AS SPID, sp.SemesterID, sp.NPM, ats.Name, sp.CDID AS CDID_1, sp.MKID AS MKID_1, cd.Semester, cd.ProdiID,
                                                 cd.ID AS CDID_2, cd.MKID AS MKID_2, c.Year, mk.MKCode, mk.NameEng, ps.Name AS ProdiName , ats.ProdiID AS ProdiAsal
@@ -157,6 +157,7 @@ class C_kurikulum extends Academic_Controler {
                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = cd.ProdiID)
                                                 LEFT JOIN ta_'.$ta.'.students ats ON (ats.NPM = sp.NPM)
+                                                WHERE ats.ProdiID = "'.$ProdiID.'"
                                                 ORDER BY sp.NPM, cd.Semester, cd.ProdiID ASC ';
 
 
@@ -193,10 +194,16 @@ class C_kurikulum extends Academic_Controler {
 
         $department = parent::__getDepartement();
 
+        $dataP = $this->db->select('Name')->get_where('db_academic.program_study',array(
+            'ID' => $ProdiID
+        ))->result_array();
+
         $result['DataOk'] = array(
             'Student' => $resOk,
             'Kesalahan' => count($resOk),
-            'TA' => $ta
+            'TA' => $ta,
+            'ProdiID' => $ProdiID,
+            'Prodi' => $dataP[0]['Name']
         );
 
 //        print_r($result);exit;
