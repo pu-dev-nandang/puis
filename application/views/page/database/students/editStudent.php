@@ -83,7 +83,7 @@
                         <th>KTP/ NIK Number</th>
                         <th>:</th>
                         <td>
-                            <input class="form-control formBiodata" id="formKtp" onkeyup="this.value=this.value.replace(/[^\d]/,'')" maxlength="16">
+                            <input class="form-control formBiodata" id="formKtp" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" maxlength="16">
                         </td>
                     </tr>
 
