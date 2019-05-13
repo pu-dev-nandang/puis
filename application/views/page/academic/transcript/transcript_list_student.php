@@ -244,6 +244,8 @@
 
                    $('#viewCSN'+NPM).html(formCSN);
                    $('.btnSaveCSN[data-npm='+NPM+'], .btnEditCSN').prop('disabled',false);
+                   $('.btnSaveCNN[data-npm='+NPM+'], .btnEditCNN').prop('disabled',false);
+                   
                    $('.btnSaveCSN[data-npm='+NPM+']').html('<i class="fa fa-check-circle"></i>');
                },500);
 
@@ -298,6 +300,8 @@
 
                    $('#viewCNN'+NPM).html(formCNN);
                    $('.btnSaveCNN[data-npm='+NPM+'], .btnEditCNN').prop('disabled',false);
+                   $('.btnSaveCSN[data-npm='+NPM+'], .btnEditCSN').prop('disabled',false);
+
                    $('.btnSaveCNN[data-npm='+NPM+']').html('<i class="fa fa-check-circle"></i>');
                },500);
 
