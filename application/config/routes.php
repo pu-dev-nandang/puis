@@ -42,7 +42,7 @@ $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
 
 // === Academic ===
-$route['academic/curriculum_cross/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1';
+$route['academic/curriculum_cross/(:any)/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1/$2';
 $route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
 $route['academic/kurikulum-detail'] = 'page/academic/c_kurikulum/kurikulum_detail';
 $route['academic/kurikulum/add-kurikulum'] = 'page/academic/c_kurikulum/add_kurikulum';
