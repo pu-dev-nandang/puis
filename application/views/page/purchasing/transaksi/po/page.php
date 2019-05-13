@@ -1,11 +1,3 @@
-<style type="text/css">
-    h3.header-blue {
-        margin-top: 0px;
-        border-left: 7px solid #2196F3;
-        padding-left: 10px;
-        font-weight: bold;
-    }
-</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menu-po">
     <ul class="nav nav-tabs">

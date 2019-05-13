@@ -331,4 +331,109 @@ class C_rest2 extends CI_Controller {
              echo '{"status":"999","message":"Not Authorize"}';
         }
     }
+
+    public function get_data_po($Status)
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                     $this->load->model('budgeting/m_pr_po');
+                    $requestData= $_REQUEST;
+                    $sqltotalData = 'select count(*) as total from db_purchasing.po_create';
+                    $StatusQuery = ($Status == 'All') ? '' : ' where Status = '.$Status;
+                    $sqltotalData .= $StatusQuery;
+                    $querytotalData = $this->db->query($sqltotalData)->result_array();
+                    $totalData = $querytotalData[0]['total'];
+
+                    $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
+                    $sql = 'select * from (
+                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                    c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                    a.JsonStatus,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateAt,a.CreatedAt,a.PostingDate
+                                from db_purchasing.po_create as a
+                                left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                                left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                                left join db_employees.employees as d on a.CreatedAt = d.NIP     
+                            )aa
+                           ';
+
+                    $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                          or NameCreateAt LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
+                        ) '.$StatusQuery ;
+                    $sql.= ' ORDER BY Code Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $query = $this->db->query($sql)->result_array();
+
+                    $No = $requestData['start'] + 1;
+                    $G_Approver = $this->m_pr_po->Get_m_Approver_po();
+                    if (array_key_exists('length', $dataToken)) {
+                        $Count_G_Approver = $dataToken['length'];
+                    }
+                    else
+                    {
+                        $Count_G_Approver = count($G_Approver);
+                    }
+                    $data = array();
+                    for($i=0;$i<count($query);$i++){
+                        $nestedData=array();
+                        $row = $query[$i];
+                        $nestedData[] = $No;
+                        $nestedData[] = $row['Code'];
+                        $nestedData[] = $row['TypeCode'];
+                        $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
+                        $nestedData[] = $row['StatusName'];
+                        $nestedData[] = '';
+                        $JsonStatus = (array)json_decode($row['JsonStatus'],true);
+                        $arr = array();
+                        if (count($JsonStatus) > 0) {
+                            for ($j=1; $j < count($JsonStatus); $j++) {
+                                $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                                $Name = $getName[0]['Name'];
+                                $StatusInJson = $JsonStatus[$j]['Status'];
+                                switch ($StatusInJson) {
+                                    case '1':
+                                        $stjson = '<i class="fa fa-check" style="color: green;"></i>';
+                                        break;
+                                    case '2':
+                                        $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+                                        break;
+                                    default:
+                                        $stjson = "-";
+                                        break;
+                                }
+                                $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
+                            }
+                        }
+
+                        $c = $Count_G_Approver - count($arr);
+                        for ($l=0; $l < $c; $l++) { 
+                             $arr[] = '-';
+                        }
+
+                        $nestedData = array_merge($nestedData,$arr);
+                        $nestedData[] = $row['NameCreateAt'];
+                        $data[] = $nestedData;
+                        $No++;
+                    }
+
+                    $json_data = array(
+                        "draw"            => intval( $requestData['draw'] ),
+                        "recordsTotal"    => intval($totalData),
+                        "recordsFiltered" => intval($totalData ),
+                        "data"            => $data,
+                    );
+                    echo json_encode($json_data);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
 }

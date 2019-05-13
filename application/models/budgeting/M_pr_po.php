@@ -463,6 +463,13 @@ class M_pr_po extends CI_Model {
         return $query;   
     }
 
+    public function Get_m_Approver_po()
+    {
+        $sql = 'select * from db_purchasing.cfg_m_userrole where ID != 1';
+        $query = $this->db->query($sql, array())->result_array();
+        return $query;   
+    }
+
     public function SearchDepartementBudgeting($DepartementBudgeting)
     {
         $sql = 'select * from (
@@ -526,6 +533,21 @@ class M_pr_po extends CI_Model {
         );
 
         $this->db->insert('db_budgeting.pr_circulation_sheet',$dataSave);
+    }
+
+    public function po_circulation_sheet($Code,$Desc,$By = '')
+    {
+        if ($By ==  '') {
+            $By = $this->session->userdata('NIP');
+        }
+        $dataSave = array(
+            'Code' => $Code,
+            'Desc' => $Desc,
+            'Date' => date('Y-m-d'),
+            'By' => $By,
+        );
+
+        $this->db->insert('db_purchasing.po_circulation_sheet',$dataSave);
     }
 
     public function get_approval_pr($Departement)

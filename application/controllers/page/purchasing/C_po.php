@@ -17,6 +17,8 @@ class C_po extends Transaksi_Controler {
 
     public function index()
     {
+        $this->data['G_Approver'] = $this->m_pr_po->Get_m_Approver_po();
+        $this->data['m_type_user'] = $this->m_master->showData_array('db_purchasing.cfg_m_type_approval');
         $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/list',$this->data,true);
         $this->page_po($page);
     }
@@ -212,6 +214,8 @@ class C_po extends Transaksi_Controler {
             4.insert to db_purchasing_pre_po_supplier
             5.insert to db_purchasing.po_create && get code
             6.insert to db_purchasing.po_detail
+            7.insert to db_purchasing.pr_status
+            8.insert to db_purchasing.pr_status_detail
 
         */
 
@@ -228,6 +232,7 @@ class C_po extends Transaksi_Controler {
             $Amount = 0;
             $dt_po_detail = array();
             $Code = $this->m_pr_po->Get_POCode(); 
+            $arr_pr_code = array();
             for ($i=0; $i < count($arr_pr_detail); $i++) { 
                 $dataSave = array(
                     'ID_pre_po' => $ID_pre_po,
@@ -249,6 +254,36 @@ class C_po extends Transaksi_Controler {
                     'SubTotal' => $G[0]['SubTotal'],
                 );
                 $dt_po_detail[] = $temp;
+
+                // adding PR Code
+                if (count($arr_pr_code) == 0) {
+                    $temp = array(
+                        'PRCode' => $G[0]['PRCode'],
+                        'Count' => 1,
+                    );
+
+                    $arr_pr_code[] = $temp;
+                }
+                else
+                {
+                    $bool= true;
+                    for ($i=0; $i < count($arr_pr_code); $i++) { 
+                        if ($arr_pr_code[$i]['PRCode'] == $G[0]['PRCode']) {
+                            $arr_pr_code[$i]['Count'] = $arr_pr_code[$i]['Count'] + 1;
+                            $bool = false;
+                            break;
+                        }
+                    }
+
+                    if ($bool) {
+                       $temp = array(
+                           'PRCode' => $G[0]['PRCode'],
+                           'Count' => 1,
+                       );
+
+                       $arr_pr_code[] = $temp;
+                    }
+                }
             }
 
           // 4
@@ -289,9 +324,46 @@ class C_po extends Transaksi_Controler {
                 $this->db->insert('db_purchasing.po_detail',$dataSave);
             }
 
+         // 7 PO & 8
+            /* pr_status => Pengurangan dari Item_pending ke Item_proc($arr_pr_code)  & Status = 1
+               pr_status_detail => $arr_pr_detail get ID_pr_detail untuk perubahan status dari 0 => 1 
+            */  
+              // 7 
+              for ($i=0; $i < count($arr_pr_code); $i++) {
+                   $PRCode = $arr_pr_code[$i]['PRCode'];
+                   $G_data = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                   $Item_pending = $G_data[0]['Item_pending'];
+                   $Item_pending = $Item_pending - $arr_pr_code[$i]['Count'];
+                   $Item_proc = $G_data[0]['Item_proc'];
+                   $Item_proc = $Item_proc  + $arr_pr_code[$i]['Count'];
+
+                   $dataSave = array(
+                    'Item_pending' => $Item_pending,
+                    'Item_proc' => $Item_proc,
+                   );
+
+                   $this->db->where('ID',$G_data[0]['ID']);
+                   $this->db->update('db_purchasing.pr_status',$dataSave);
+               }
+
+               // 8
+               for ($i=0; $i < count($arr_pr_detail); $i++) { 
+                   $ID_pr_detail = $arr_pr_detail[$i];
+                   $dataSave = array(
+                    'Status' => 1,
+                   );
+                   $this->db->where('ID_pr_detail',$ID_pr_detail);
+                   $this->db->update('db_purchasing.pr_status_detail',$dataSave); 
+               } 
+              
+
             $urlCode = str_replace('/', '-', $Code);
             $arr_rs['url'] = 'purchasing/transaction/po/list/'.$urlCode;
             $arr_rs['Code'] = $Code;
+
+            // insert to pr_circulation_sheet
+                $this->m_pr_po->po_circulation_sheet($Code,'PO Created');
+
         echo json_encode($arr_rs);    
     }
 

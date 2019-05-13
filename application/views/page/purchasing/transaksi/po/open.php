@@ -17,6 +17,13 @@
 	   background-color:#71d1eb !important;
 	   cursor: pointer;
 	}
+
+	h3.header-blue {
+	    margin-top: 0px;
+	    border-left: 7px solid #2196F3;
+	    padding-left: 10px;
+	    font-weight: bold;
+	}
 </style>
 <div class="row">
 	<div class="col-xs-4">
@@ -88,6 +95,7 @@
        var data = {
            PurchasingStatus : '!=2',
            auth : 's3Cr3T-G4N',
+           Item_pending : '>0',
        };
        var token = jwt_encode(data,"UAP)(*");
        	var table = $('#tableData_pr').DataTable({
@@ -214,7 +222,7 @@
 
 		var  htmlInputPR= '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
 							'<div style="padding: 5px;">'+
-								'<h3 class="header-blue">'+pr_detail[0]['PRCode']+'</h3>'+
+								'<h3 class="header-blue">'+$('.C_radio_pr:checked').attr('prcode')+'</h3>'+
 							'</div>'+
 							'<div class = "col-md-12">'+
 								'<div class="table-responsive">'+

@@ -3222,16 +3222,53 @@ class C_rest extends CI_Controller {
             if ($auth) {
                 $requestData= $_REQUEST;
                 $StatusQuery = ($Status == 'All') ? '' : 'where a.Status = '.$Status;
-                if (array_key_exists('PurchasingStatus', $_POST)) {
-                    $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
+                if (array_key_exists('PurchasingStatus', $dataToken)) {
+                    if ($StatusQuery == '') {
+                        $StatusQuery = 'where b.Status '.$dataToken['PurchasingStatus'];
+                    }
+                    else
+                    {
+                        $StatusQuery .= ' and b.Status '.$dataToken['PurchasingStatus'];
+                    }
+                    // $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$dataToken['PurchasingStatus'] : ' and b.Status '.$dataToken['PurchasingStatus'] ;
                 }
+
+                if (array_key_exists('Item_pending', $dataToken)) {
+                    if ($StatusQuery == '') {
+                        $StatusQuery = 'where b.Item_pending '.$dataToken['Item_pending'];
+                    }
+                    else
+                    {
+                        $StatusQuery .= ' and b.Item_pending '.$dataToken['Item_pending'] ;
+                    }
+                    // $StatusQuery = ($StatusQuery == '') ? 'where b.Item_pending '.$dataToken['Item_pending'] : ' and b.Item_pending '.$dataToken['Item_pending'] ;
+                }
+
                 $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a left join db_purchasing.pr_status as b on a.PRCode = b.PRCode '.$StatusQuery;
                 $querytotalData = $this->db->query($sqltotalData)->result_array();
                 $totalData = $querytotalData[0]['total'];
 
                 $StatusQuery = ($Status == 'All') ? '' : 'and a.Status = '.$Status;
-                if (array_key_exists('PurchasingStatus', $_POST)) {
-                    $StatusQuery = ($StatusQuery == '') ? 'and b.Status '.$_POST['PurchasingStatus'] : ' and b.Status '.$_POST['PurchasingStatus'] ;
+                if (array_key_exists('PurchasingStatus', $dataToken)) {
+                    if ($StatusQuery == '') {
+                        $StatusQuery = 'and b.Status '.$dataToken['PurchasingStatus'];
+                    }
+                    else
+                    {
+                        $StatusQuery .= ' and b.Status '.$dataToken['PurchasingStatus'];
+                    }
+                    // $StatusQuery = ($StatusQuery == '') ? 'where b.Status '.$dataToken['PurchasingStatus'] : ' and b.Status '.$dataToken['PurchasingStatus'] ;
+                }
+
+                if (array_key_exists('Item_pending', $dataToken)) {
+                    if ($StatusQuery == '') {
+                        $StatusQuery = 'and b.Item_pending '.$dataToken['Item_pending'];
+                    }
+                    else
+                    {
+                        $StatusQuery .= ' and b.Item_pending '.$dataToken['Item_pending'] ;
+                    }
+                    // $StatusQuery = ($StatusQuery == '') ? 'where b.Item_pending '.$dataToken['Item_pending'] : ' and b.Item_pending '.$dataToken['Item_pending'] ;
                 }
 
                 $sql = 'select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
@@ -3254,6 +3291,7 @@ class C_rest extends CI_Controller {
                        ';
 
                 $sql.= ' where (a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%") '.$StatusQuery;
+                
                 $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $query = $this->db->query($sql)->result_array();
 
