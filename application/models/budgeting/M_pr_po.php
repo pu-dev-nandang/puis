@@ -133,6 +133,66 @@ class M_pr_po extends CI_Model {
 
     }
 
+    public function Get_POCode()
+    {
+        /* method PO
+           Code : 016/PO/YPAP/IX/2018
+           05 : Increment (Max length = 3)
+           PO : Fix
+           YPAP : Fix
+           IX : Bulan dalam romawi
+           2018 : Get Years Now
+        */
+        $Code = '';   
+        $Year = date('Y');
+        $Month = date('m');
+        $Month = $this->m_master->romawiNumber($Month);
+        $MaxLengthINC = 3;
+        
+        $sql = 'select * from db_purchasing.po_create 
+                where SPLIT_STR(Code, "/", 5) = ?
+                and SPLIT_STR(Code, "/", 4) = ?
+                order by SPLIT_STR(Code, "/", 1) desc
+                limit 1';
+        $query=$this->db->query($sql, array($Year,$Month))->result_array();
+        if (count($query) == 1) {
+            // Inc last code
+            $Code = $query[0]['Code'];
+            $explode = explode('/', $Code);
+            $C = $explode[0];
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $explode[0] = $strINC;
+            $Code = implode('/', $explode);
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+            /* method PO
+               Code : 016/PO/YPAP/IX/2018
+               05 : Increment (Max length = 3)
+               PO : Fix
+               YPAP : Fix
+               IX : Bulan dalam romawi
+               2018 : Get Years Now
+            */
+
+            $Code = $strINC.'/'.'PO/'.'YPAP'.'/'.$Month.'/'.$Year;
+        }    
+        return $Code;        
+    }
+
     public function Get_DataBudgeting_by_ID_budget_left($ID_budget_left)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
@@ -605,5 +665,69 @@ class M_pr_po extends CI_Model {
            $this->db->update('db_budgeting.budget_left', $data_arr);        
         }
     }
+
+    public function GetRuleApproval_PO_JsonStatus($Amount)
+    {
+        $Departement = 'NA.4'; // Purchasing
+
+        $arr = array();
+        $C_ = 0;
+        $rs = array();
+
+        $G1 = $this->m_master->showData_array('db_purchasing.cfg_set_userrole');
+        for ($j=0; $j < count($G1); $j++) { 
+            $MaxLimit = $G1[$j]['MaxLimit'];
+            if ($MaxLimit >= $Amount) {
+               $sql = 'select count(*) as total from db_purchasing.cfg_set_userrole where MaxLimit = ? and Approved = 1'; 
+               $query = $this->db->query($sql, array($MaxLimit))->result_array();
+               if ($query[0]['total'] >= $C_) {
+                   $C_ = $query[0]['total'];
+                   $temp = array(
+                       'MaxLimit' => $MaxLimit,
+                       'Count' => $C_, 
+                   );
+                   $arr = $temp;
+               }
+               break;
+            }
+        }
+
+        $G = $this->get_approval_po($Departement);
+        $ID_m_userrole_limit = $arr['Count'] + 1;
+        for ($i=0; $i < count($G); $i++) { 
+            $ID_m_userrole = $G[$i]['ID'];
+            if ($ID_m_userrole <= $ID_m_userrole_limit) {
+                $Status = ($ID_m_userrole == 1) ? 1 : 0;
+                $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
+                if ($i == 0) {
+                    $G[$i]['NIP'] = $this->session->userdata('NIP');
+                }
+                $rs[] = array(
+                    'NIP' => $G[$i]['NIP'],
+                    'Status' => $Status,
+                    'ApproveAt' => $ApproveAt,
+                    'Representedby' => '',
+                    'Visible' => $G[$i]['Visible'],
+                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+                );
+            }
+            
+        }
+        return $rs;       
+    }
+
+    public function get_approval_po($Departement)
+    {
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc
+                from db_purchasing.cfg_m_userrole as a join (select * from db_purchasing.cfg_approval where Departement = ? ) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                join db_purchasing.cfg_m_type_approval as d on d.ID = c.TypeDesc
+                order by c.ID asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        return $query;
+    }
+
 
 }

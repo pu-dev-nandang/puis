@@ -510,7 +510,7 @@
 								'<td style = "text-align:center;">'+No+'</td>'+
 								'<td>'+'<div align = "center"><button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button></div>'+'<div style = "margin-top : 5px;" class = "LblNmVendor"></div></td>'+
 								'<td style = "text-align:center;"><button class="btn btn-primary Detail_Vendor" data="">Detail</button></td>'+
-								'<td><div align = "center"><input type="file" data-style="fileinput" class="BrowseFile" multiple="" accept="image/*,application/pdf" style="width : 97px;"></div></td>'+
+								'<td><div align = "center"><input type="file" data-style="fileinput" class="BrowseFile" multiple="" accept="image/*,application/pdf"></div></td>'+
 								// '<td><div align = "center"><select class="form-control" class ="OpApprove_vendor" style = "width : 100px;">'+
 								// 		'<option value = "0" selected>No</option>'+
 								// 		'<option value = "1">Yes</option>'+
@@ -726,13 +726,26 @@
 				}
 			})
 
-			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c) {
+			// validation file
+				var BoolFile = true;
+			$(".BrowseFile").each(function(){
+				var ev = $(this);
+				var tr = ev.closest('tr');
+				if (BoolFile) {
+					BoolFile = file_validation(ev);
+				}
+				
+			})
+
+
+			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
+				loading_button('#OpenPO');
 				// create po
 				if (ClassDt.action_mode == 'add') {
-					_Create_PO().then(function(data){
-						
-					    window.location.href = base_url_js+'';
-					    
+					var action_submit = 'PO';
+					var id_selector = '#OpenPO';
+					_Create_PO_SPK(action_submit,id_selector).then(function(data){
+					    window.location.href = base_url_js+data['url'];
 					})
 				}
 				else
@@ -771,10 +784,31 @@
 				}
 			})
 
-			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c) {
-				loading_button('#OpenSPK')
+			// validation file
+				var BoolFile = true;
+			$(".BrowseFile").each(function(){
+				var ev = $(this);
+				var tr = ev.closest('tr');
+				if (BoolFile) {
+					if (tr.find('.BrowseFile').length) {
+						BoolFile = file_validation(ev);
+					}
+					else
+					{
+						BoolFile = false;
+					}
+				}
+				
+			})
+
+			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
+				loading_button('#OpenSPK');
 				if (ClassDt.action_mode == 'add') {
-					
+					var action_submit = 'SPK';
+					var id_selector = '#OpenSPK';
+					_Create_PO_SPK(action_submit,id_selector).then(function(data){
+					    window.location.href = base_url_js+data['url'];
+					})
 				}
 				else
 				{
@@ -793,7 +827,7 @@
 		// dapatkan no SPK dan show page SPK created
 	})
 
-	function _Create_PO()
+	function _Create_PO_SPK(action_submit,id_selector)
 	{
 		var def = jQuery.Deferred();
 		var arr_pr_detail_selected = [];
@@ -817,8 +851,17 @@
 						}
 					}
 
-					arr_supplier.push(idtable);
+					// approve
+						var approve = fillItem.find('.C_radio_approve:checked').val();
+
+					var temp = {
+						CodeSupplier : idtable,
+						Approve : approve,
+					}
+					arr_supplier.push(temp);
 				}
+
+				PassNumber++;
 			})
 
 		var token = jwt_encode(arr_pr_detail_selected,"UAP)(*");
@@ -827,7 +870,13 @@
 		var token = jwt_encode(arr_supplier,"UAP)(*");
 		form_data.append('arr_supplier',token);
 
-		var url = base_url_js + "po/submit_create"
+		var token = jwt_encode(ClassDt.action_mode,"UAP)(*");
+		form_data.append('action_mode',token);
+
+		var token = jwt_encode(action_submit,"UAP)(*");
+		form_data.append('action_submit',token);
+
+		var url = base_url_js + "po_spk/submit_create"
 		$.ajax({
 		  type:"POST",
 		  url:url,
@@ -841,11 +890,59 @@
 		    def.resolve(data)
 		  },
 		  error: function (data) {
+		  	var nmbtn = '';
+		  	if (id_selector == '#OpenPO') {
+		  		nmbtn = 'Open PO';
+		  	}
+		  	else if(id_selector == '#OpenSPK')
+		  	{
+		  		nmbtn = 'Open SPK';
+		  	}
+		  	$(id_selector).prop('disabled',false).html(nmbtn);
 		    def.reject();
 		  }
 		})	
 
 		return def.promise();
+	}
+
+	function file_validation(ev)
+	{
+		var error = '';
+		var msgStr = '';
+	    var files = ev[0].files;
+	    if (files.length > 0) {
+    	   	var name = files[0].name;
+    	   	var extension = name.split('.').pop().toLowerCase();
+    	   	if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+    		{
+    		    msgStr += 'Invalid Type File<br>';
+    		}
+
+    	   	var oFReader = new FileReader();
+    	   	oFReader.readAsDataURL(files[0]);
+    	   	var f = files[0];
+    	   	var fsize = f.size||f.fileSize;
+
+    	   	if(fsize > 2000000) // 2mb
+    		{
+    		    msgStr += 'Image File Size is very big<br>';
+    		}
+	    }
+	    else
+	    {
+	    	msgStr += 'File Offer required<br>';
+	    }
+	   	
+
+	   if (msgStr != '') {
+	     toastr.error(msgStr, 'Failed!!');
+	     return false;
+	   }
+	   else
+	   {
+	     return true;
+	   }
 	}	
 
 </script>

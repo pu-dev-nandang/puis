@@ -31,6 +31,8 @@
 **/uploads/vreservation/
 ***/uploads/budgeting/catalog/
 ***/uploads/budgeting/pr/
+***/uploads/budgeting/po/
+**/uploads/budgeting/
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
