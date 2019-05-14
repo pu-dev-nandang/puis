@@ -2391,9 +2391,24 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
           where (a.Name like "%'.$Nama.'%" or a.NIP like "%'.$Nama.'%" )
-          GROUP BY a.NIP';
+          UNION
+          select CONCAT(a.Name," | ",a.NIK)  as Name,a.NIK as NIP from db_employees.holding as a
+          where (a.Name like "%'.$Nama.'%" or a.NIK like "%'.$Nama.'%" )
+          ';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
+    }
+
+    public function SearchNameNIP_Employees_PU_Holding($NIP)
+    {
+        $sql = 'select Name from db_employees.employees
+                where NIP = "'.$NIP.'"
+                UNION
+                select Name from db_employees.holding
+                where NIK = "'.$NIP.'"
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;        
     }
 
     public function getDataWithoutSuperAdmin()

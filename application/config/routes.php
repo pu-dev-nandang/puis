@@ -913,7 +913,7 @@ $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
-
+$route['rest2/__Get_data_po_by_Code'] = 'api/c_rest2/Get_data_po_by_Code';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1356,6 +1356,10 @@ $route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Appr
 $route['purchasing/transaction/po/userroledepart_submit'] = 'page/purchasing/c_po/userroledepart_submit';
 $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_po/$1';
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
+// global lihat PO
+$route['global/purchasing/transaction/po/list/(:any)'] = 'page/C_globalpage/InfoPO/$1';
+
+
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');

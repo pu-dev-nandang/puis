@@ -751,5 +751,66 @@ class M_pr_po extends CI_Model {
         return $query;
     }
 
+    public function Get_data_po_by_Code($Code)
+    {
+        $arr = array();
+        $sql = 'select a.ID_pre_po,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,b.FileOffer,
+                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,a.AnotherCost,a.JsonStatus,a.Status,a.Notes,a.Supporting_documents,a.POPrint_Approve,
+                a.PostingDate,a.CreatedBy,a.CreatedAt
+                from db_purchasing.po_create as a 
+                join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                where a.Code = ?
+                ';
+       $query=$this->db->query($sql, array($Code))->result_array();
+       for ($i=0; $i < count($query); $i++) { 
+           $JsonStatus = json_decode($query[$i]['JsonStatus'],true);
+           for ($j=0; $j < count($JsonStatus); $j++) { 
+               $NIP = $JsonStatus[$j]['NIP'];
+               $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+               $Name = $G_emp[0]['Name'];
+               $JsonStatus[$j]['Name'] = $Name;
+           }
+           $query[$i]['JsonStatus']= json_encode($JsonStatus);
+           $CreatedAt = $TimeStart = date("Y-m-d", strtotime($query[$i]['CreatedAt']));
+           $query[$i]['CreatedAt_Indo'] = $this->m_master->getIndoBulan($CreatedAt);
+       }
+       $arr['po_create'] = $query;
+
+       $sql = 'select a.ID_pre_po_detail,a.UnitCost as UnitCost_PO,a.Discount as Discount_PO,a.PPN as PPN_PO,a.Subtotal,
+                b.ID_pr_detail,c.Qty as QtyPR,c.Item,c.Desc,c.DateNeeded,c.Spec_add,c.UnitCost as UnitCost_PR,c.Subtotal as Subtotal_PR,
+                c.ID_budget_left,c.ID_creator_budget,c.CodePostRealisasi,c.CodeHeadAccount,c.CodePost,c.RealisasiPostName,c.Departement as Departement_HA,c.PostName,c.NameHeadAccount,c.PPH as PPH_PR,c.PRCode,c.DetailCatalog
+                from db_purchasing.po_detail as a 
+                join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                join (
+                    select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
+                                    e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                                    a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue
+                                    from db_budgeting.pr_detail as a
+                                    join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                                    join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                                    join db_budgeting.cfg_postrealisasi as e on c.CodePostRealisasi = e.CodePostRealisasi
+                                    join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
+                                    join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
+                                    join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                                    join (
+                                        select * from (
+                                                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                                        UNION
+                                                        select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                        UNION
+                                                        select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                                        ) aa
+                                        ) as h on d.Departement = h.ID 
+                    ) c on c.ID = b.ID_pr_detail
+                    where a.Code = ?
+                ';
+        $query=$this->db->query($sql, array($Code))->result_array();        
+        $arr['po_detail'] = $query; 
+        
+        return $arr;       
+
+    }
+
 
 }

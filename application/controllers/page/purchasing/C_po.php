@@ -358,7 +358,7 @@ class C_po extends Transaksi_Controler {
               
 
             $urlCode = str_replace('/', '-', $Code);
-            $arr_rs['url'] = 'purchasing/transaction/po/list/'.$urlCode;
+            $arr_rs['url'] = 'global/purchasing/transaction/po/list/'.$urlCode;
             $arr_rs['Code'] = $Code;
 
             // insert to pr_circulation_sheet
