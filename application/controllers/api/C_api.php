@@ -142,6 +142,7 @@ class C_api extends CI_Controller {
             }
 
             $imgEmp = url_img_employees.''.$row["Photo"];
+
             $nestedData[] = $row["NIP"];
             $nestedData[] = $row["NIDN"];
             $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
@@ -162,6 +163,88 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
+    public function getLecturermengajar(){
+        $requestData= $_REQUEST;
+
+        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
+
+            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ') ORDER BY em.PositionMain, NIP ASC';
+
+        }
+        else {
+            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                        ps.NameEng AS ProdiNameEng
+                        FROM db_employees.employees em 
+                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
+            $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+
+        $query = $this->db->query($sql)->result_array();
+
+        // Get Semester
+        $dataSemesterOption = $this->db->order_by('ID', 'DESC')->get('db_academic.semester')->result_array();
+
+        $option = '';
+        foreach ($dataSemesterOption as $item) {
+            $sc = ($item['Status']=='1') ? 'selected' : '';
+            $option = $option.'<option value="'.$item['ID'].'" '.$sc.'>'.$item['Name'].'</option>';
+        }
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $jb = explode('.',$row["PositionMain"]);
+            $Division = '';
+            $Position = '';
+
+            if(count($jb)>1){
+                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                $Division = $dataDivision['Division'];
+                $Position = $dataPosition['Position'];
+            }
+
+            $imgEmp = url_img_employees.''.$row["Photo"];
+            $tokenPDF = '';
+            $NIP = $row["NIP"];
+
+
+            
+            $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
+            $nestedData[] = $row["NIP"].' - '.$row["NIDN"];
+            //$nestedData[] = $row["NIDN"];
+            
+            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            $nestedData[] = $Division.' - '.$Position;
+            $nestedData[] = $row["ProdiNameEng"];
+            $nestedData[] = '<div><select class="form-control option-filter filterSemester" id="filterSemester_'.$NIP.'">'.$option.'</select></div>';
+            $nestedData[] = '<center><div><a href="javascript:void(0);" type="button" id="btnDownloadTugasMengajar" NIP="'.$NIP.'" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> </div></center>';
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
 
     public function getreqdocument(){
         $requestData= $_REQUEST;

@@ -9,6 +9,11 @@
                     <i class="fa fa-files-o"></i> Request Document
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(1)=='reqsuratmengajar'){echo"current";}?>">
+                <a href="<?php echo base_url('rectorat/reqsuratmengajar');?>">
+                    <i class="fa fa-book"></i> Request Surat Mengajar
+                </a>
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">

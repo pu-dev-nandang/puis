@@ -714,7 +714,7 @@ $route['api/__getSemester'] = 'api/c_api/getSemester';
 $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
-
+$route['api/__getLecturermengajar'] = 'api/c_api/getLecturermengajar';
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
@@ -1136,6 +1136,7 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 
 // Request Document | Bismar
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
+$route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
@@ -1160,7 +1161,6 @@ $route['fmail/schedule-exchange/approved/(:any)'] = 'api/c_global/exchange_appro
 $route['fmail/schedule-exchange/rejected/(:any)'] = 'api/c_global/exchange_rejected/$1';
 
 $route['fmail/modify-attendance/(:any)/(:any)'] = 'api/c_global/modify_attendance/$1/$2';
-
 
 // Pengawas Ujian
 $route['invigilator'] = 'c_pengawas_ujian';
