@@ -1018,7 +1018,7 @@ class C_save_to_excel extends CI_Controller
                        }
 
                        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['SubTotal'] / 1000);
-                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                     // Grpuping
                     for ($j=$i+1; $j < count($getData); $j++) { 
@@ -1078,7 +1078,7 @@ class C_save_to_excel extends CI_Controller
                                    $StH = $StH + 1;
                                }
                                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['SubTotal'] / 1000);
-                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                         }
                         else
                         {
@@ -1458,7 +1458,7 @@ class C_save_to_excel extends CI_Controller
                                }
 
                                $excel->setCellValue($keyM[$StH].$St, $getData[$i]['SubTotal'] / 1000);
-                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                             // Grpuping
                             for ($j=$i+1; $j < count($getData); $j++) { 
@@ -1518,7 +1518,7 @@ class C_save_to_excel extends CI_Controller
                                            $StH = $StH + 1;
                                        }
                                        $excel->setCellValue($keyM[$StH].$St, $getData[$j]['SubTotal'] / 1000);
-                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_col);
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
                                 }
                                 else
                                 {
