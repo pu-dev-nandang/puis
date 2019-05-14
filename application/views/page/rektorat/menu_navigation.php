@@ -11,7 +11,7 @@
             </li>
             <li class="<?php if($this->uri->segment(1)=='reqsuratmengajar'){echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/reqsuratmengajar');?>">
-                    <i class="fa fa-book"></i> Request Surat Mengajar
+                    <i class="fa fa-book"></i> Surat Mengajar
                 </a>
             </li>
         </ul>
