@@ -816,6 +816,10 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('H3')->getFont()->setBold(TRUE);
         $excel->getActiveSheet()->getStyle('H3')->getFont()->setSize(15);
 
+        $excel->setActiveSheetIndex(0)->setCellValue('W5', '(,000)');
+        $excel->getActiveSheet()->getStyle('W5')->getFont()->setBold(TRUE);
+        $excel->getActiveSheet()->getStyle('W5')->getFont()->setSize(12);
+
         // get Month
         $month = $getData[0]['DetailMonth'];
         $month = json_decode($month);
@@ -1112,6 +1116,23 @@ class C_save_to_excel extends CI_Controller
                 $excel->setActiveSheetIndex(0)->setCellValue('D'.$StTot, "Presentasi Deviasi");
                 $excel->getActiveSheet()->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
 
+                // get anggaran tahun lalu,anggaran tahun sekarang dan presentasi deviasi
+                    $SumAnggaranPerYear = $this->m_budgeting->SumAnggaranPerYear($dt[0]['Departement'],($Year - 1) );
+                    $excel->setActiveSheetIndex(0)->setCellValue('H'.$St, $SumAnggaranPerYear);
+                    $excel->setActiveSheetIndex(0)->setCellValue('H'.($St+1), $total);
+                    $PersentasiDeviasi = (($total - $SumAnggaranPerYear)/$total) * 100;
+                    $PersentasiDeviasiWr = $PersentasiDeviasi.'%';
+                    $excel->setActiveSheetIndex(0)->setCellValue('H'.$StTot, $PersentasiDeviasiWr);
+                    $custom_style = array(
+                        'font' => array('bold' => true), // Set font nya jadi bold
+                        'alignment' => array(
+                            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                        )
+                    );
+
+                    $excel->getActiveSheet()->getStyle('H'.$St.':H'.$StTot)->applyFromArray($custom_style);
+
+
             // Write Rule Approval
                $St = $StTot + 2;     
                $excel->setActiveSheetIndex(0)->setCellValue('D'.$St, "Jakarta,");
@@ -1234,6 +1255,10 @@ class C_save_to_excel extends CI_Controller
             $excel->setCellValue('H3', $NameDepartement);
             $excel->getStyle('H3')->getFont()->setBold(TRUE);
             $excel->getStyle('H3')->getFont()->setSize(15);
+
+            $excel->setCellValue('W5', '(,000)');
+            $excel->getStyle('W5')->getFont()->setBold(TRUE);
+            $excel->getStyle('W5')->getFont()->setSize(12);
 
             // get Month
             $month = array();
@@ -1529,6 +1554,23 @@ class C_save_to_excel extends CI_Controller
                         $excel->setCellValue('D'.($St+1), "Anggaran TA ".$YearWr);
                         $excel->setCellValue('D'.$StTot, "Presentasi Deviasi");
                         $excel->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
+
+                        // get anggaran tahun lalu,anggaran tahun sekarang dan presentasi deviasi
+                            $SumAnggaranPerYear = $this->m_budgeting->SumAnggaranPerYear($dt[$m]['Departement'],($Year - 1) );
+                            $excel->setCellValue('H'.$St, $SumAnggaranPerYear);
+                            $excel->setCellValue('H'.($St+1), $total);
+                            $PersentasiDeviasi = (($total - $SumAnggaranPerYear)/$total) * 100;
+                            $PersentasiDeviasiWr = $PersentasiDeviasi.'%';
+                            $excel->setCellValue('H'.$StTot, $PersentasiDeviasiWr);
+                            $custom_style = array(
+                                'font' => array('bold' => true), // Set font nya jadi bold
+                                'alignment' => array(
+                                    'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT,
+                                )
+                            );
+
+                            $excel->getStyle('H'.$St.':H'.$StTot)->applyFromArray($custom_style);
+
 
                     // Write Rule Approval
                        $St = $StTot + 2;     
@@ -3739,6 +3781,10 @@ class C_save_to_excel extends CI_Controller
         // make header
             $YearSelected = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Year',$Year);
             $arr_bulan = $this->m_master->getShowIntervalBulan($YearSelected[0]['StartPeriod'],$YearSelected[0]['EndPeriod']);
+
+            $excel->setActiveSheetIndex(0)->setCellValue('A1', "(,000)");
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE);
+            $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(12);
             
             $excel->setActiveSheetIndex(0)->setCellValue('A2', "No");
             $excel->getActiveSheet()->mergeCells('A2:A3');

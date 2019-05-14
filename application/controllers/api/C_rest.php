@@ -2159,13 +2159,14 @@ class C_rest extends CI_Controller {
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     $IDdiv = $G_data[0]['Departement'];
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                    $NameDepartement = $G_div[0]['NameDepartement'];
+                                    // $NameDepartement = $G_div[0]['NameDepartement'];
+                                    $Code = $G_div[0]['Code'];
                                     // Send Notif for next approval
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$NameDepartement,
-                                                            'Description' => 'Please approve PR '.$PRCode.' of '.$NameDepartement,
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$Code,
+                                                            'Description' => 'Please approve PR '.$PRCode.' of '.$Code,
                                                             'URLDirect' => 'budgeting_pr',
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2184,7 +2185,7 @@ class C_rest extends CI_Controller {
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PR '.$PRCode.' has been Approved',
-                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been approved by '.$NameFor_NIP,
+                                                            'Description' => 'PR '.$PRCode.' of '.$Code.' has been approved by '.$NameFor_NIP,
                                                             'URLDirect' => 'budgeting_pr',
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2234,7 +2235,8 @@ class C_rest extends CI_Controller {
                                     // Notif All Approve to JsonStatus allkey
                                         $IDdiv = $G_data[0]['Departement'];
                                         $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                        $NameDepartement = $G_div[0]['NameDepartement'];
+                                        // $NameDepartement = $G_div[0]['NameDepartement'];
+                                        $Code = $G_div[0]['Code'];
                                         $arr_to = array();
                                         for ($i=0; $i < count($JsonStatus); $i++) { 
                                             $arr_to[] = $JsonStatus[$i]['NIP'];
@@ -2243,8 +2245,8 @@ class C_rest extends CI_Controller {
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$NameDepartement.' has been done',
-                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
+                                                            'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
                                                             'URLDirect' => 'budgeting_pr',
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2261,13 +2263,14 @@ class C_rest extends CI_Controller {
                                     // Notif to Purchasing 
                                         $IDdiv = $G_data[0]['Departement'];
                                         $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                        $NameDepartement = $G_div[0]['NameDepartement'];
+                                        //$NameDepartement = $G_div[0]['NameDepartement'];
+                                        $Code = $G_div[0]['Code'];
 
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$NameDepartement.' has been done',
-                                                            'Description' => 'PR '.$PRCode.' of '.$NameDepartement.' has been done',
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
+                                                            'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
                                                             'URLDirect' => 'purchasing/transaction/po/open',
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2585,13 +2588,14 @@ class C_rest extends CI_Controller {
                             $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                             $IDdiv = $G_data[0]['Departement'];
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            // $NameDepartement = $G_div[0]['NameDepartement'];
+                            $Code = $G_div[0]['Code'];
                             // Send Notif for next approval
                                 $data = array(
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
-                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Budget of '.$NameDepartement,
-                                                    'Description' => 'Please approve budget '.$NameDepartement,
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Budget of '.$Code,
+                                                    'Description' => 'Please approve budget '.$Code,
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),
@@ -2610,7 +2614,7 @@ class C_rest extends CI_Controller {
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
                                                     'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Budget Approve',
-                                                    'Description' => 'Budget '.$NameDepartement.' has been approved by '.$NameFor_NIP,
+                                                    'Description' => 'Budget '.$Code.' has been approved by '.$NameFor_NIP,
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),
@@ -2661,7 +2665,8 @@ class C_rest extends CI_Controller {
 
                             // Notif All Approve to JsonStatus allkey
                                 $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
-                                $NameDepartement = $G_div[0]['NameDepartement'];
+                                //$NameDepartement = $G_div[0]['NameDepartement'];
+                                $Code = $G_div[0]['Code'];
                                 $arr_to = array();
                                 for ($i=0; $i < count($JsonStatus); $i++) { 
                                     $arr_to[] = $JsonStatus[$i]['NIP'];
@@ -2670,8 +2675,8 @@ class C_rest extends CI_Controller {
                                 $data = array(
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
-                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget All Approve of '.$NameDepartement,
-                                                    'Description' => 'Budget '.$NameDepartement.' has been all approve and posting date at : '.$datasave['PostingDate'],
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget All Approve of '.$Code,
+                                                    'Description' => 'Budget '.$Code.' has been all approve and posting date at : '.$datasave['PostingDate'],
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),
@@ -2695,13 +2700,14 @@ class C_rest extends CI_Controller {
                         // Notif Reject to JsonStatus key 0
                             $IDdiv = $G_data[0]['Departement'];
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            //$NameDepartement = $G_div[0]['NameDepartement'];
+                            $Code = $G_div[0]['Code'];
                             // Send Notif for user 
                                 $data = array(
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
-                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget Reject of '.$NameDepartement,
-                                                    'Description' => 'Budget '.$NameDepartement.' has been rejected by '.$NameFor_NIP,
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Budget Reject of '.$Code,
+                                                    'Description' => 'Budget '.$Code.' has been rejected by '.$NameFor_NIP,
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),
@@ -2903,11 +2909,12 @@ class C_rest extends CI_Controller {
                                     $NameFor_NIP = $G_emp[0]['Name'];
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
                                     $NameDepartement = $G_div[0]['NameDepartement'];
+                                    $Code = $G_div[0]['Code'];
                                    $data = array(
                                        'auth' => 's3Cr3T-G4N',
                                        'Logging' => array(
-                                                       'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$NameDepartement.' has been added',
-                                                       'Description' => 'Catalog '.$NameDepartement.' has been added by '.$NameFor_NIP,
+                                                       'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$Code.' has been added',
+                                                       'Description' => 'Catalog '.$Code.' has been added by '.$NameFor_NIP,
                                                        'URLDirect' => 'purchasing/master/catalog',
                                                        'CreatedBy' => $user,
                                                      ),
@@ -2948,12 +2955,13 @@ class C_rest extends CI_Controller {
                                      $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$user);
                                      $NameFor_NIP = $G_emp[0]['Name'];
                                      $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
-                                     $NameDepartement = $G_div[0]['NameDepartement'];
+                                     //$NameDepartement = $G_div[0]['NameDepartement'];
+                                     $Code = $G_div[0]['Code'];
                                     $data = array(
                                         'auth' => 's3Cr3T-G4N',
                                         'Logging' => array(
-                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$NameDepartement.' has been added',
-                                                        'Description' => 'Catalog '.$NameDepartement.' has been added by '.$NameFor_NIP,
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$Code.' has been added',
+                                                        'Description' => 'Catalog '.$Code.' has been added by '.$NameFor_NIP,
                                                         'URLDirect' => 'purchasing/master/catalog',
                                                         'CreatedBy' => $user,
                                                       ),

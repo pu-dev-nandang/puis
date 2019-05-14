@@ -359,7 +359,7 @@ class C_rest2 extends CI_Controller {
                             )aa
                            ';
 
-                    $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                    $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                           or NameCreateAt LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
                         ) '.$StatusQuery ;
                     $sql.= ' ORDER BY Code Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';

@@ -148,7 +148,7 @@ function Add_Department_auth()
 		}
 	}
 
-	if (!$(".ContentDataPostBudget").length &&  $('#Departement').find('option').length == 1 && b == 1) {
+	if (!$(".ContentDataPostBudget").length &&  $('#Departement').find('option').length > 0 && b == 1) {
 		LoadFirstLoad();
 	}
 

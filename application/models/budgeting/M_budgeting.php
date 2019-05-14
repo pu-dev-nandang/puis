@@ -994,5 +994,15 @@ class M_budgeting extends CI_Model {
 
         return $rs;
         
+    }
+
+    public function SumAnggaranPerYear($Departement,$Year)
+    {
+        $sql = 'select sum(b.SubTotal) as Total from db_budgeting.creator_budget_approval as a 
+                join db_budgeting.creator_budget as b on a.ID = b.ID_creator_budget_approval
+                where a.Departement = ? and a.Year = ?
+                ';
+        $query=$this->db->query($sql, array($Departement,$Year))->result_array();
+        return (int)$query[0]['Total'];        
     }  
 }

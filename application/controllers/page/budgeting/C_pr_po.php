@@ -247,7 +247,7 @@ class C_pr_po extends Budgeting_Controler {
 
         $sql = 'select * from 
                 (
-                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                    select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
                                     as StatusName, a.JsonStatus,a.PostingDate 
                                     from db_budgeting.pr_create as a 
@@ -265,15 +265,16 @@ class C_pr_po extends Budgeting_Controler {
 
         $sql.= ' where PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%" or StatusName LIKE "'.$requestData['search']['value'].'%" 
                 ';
-        $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+        $sql.= ' ORDER BY PRID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
         $query = $this->db->query($sql)->result_array();
 
         $No = $requestData['start'] + 1;
         $data = array();
 
         $G_Approver = $this->m_pr_po->Get_m_Approver();
-        if (array_key_exists('length', $_POST)) {
-            $Count_G_Approver = $_POST['length'];
+        if (array_key_exists('ApproverLength', $_POST)) {
+            $Count_G_Approver = $_POST['ApproverLength'];
         }
         else
         {
@@ -617,12 +618,13 @@ class C_pr_po extends Budgeting_Controler {
                         // send notifikasi
                             $IDdiv = $Departement;
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                            $NameDepartement = $G_div[0]['NameDepartement'];
+                            // $NameDepartement = $G_div[0]['NameDepartement'];
+                            $Code = $G_div[0]['Code'];
                             $data = array(
                                 'auth' => 's3Cr3T-G4N',
                                 'Logging' => array(
-                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Created by '.$NameDepartement,
-                                                'Description' => 'PR '.$PRCode.' has been Created by '.$NameDepartement.'('.$this->session->userdata('Name').')',
+                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Created by '.$Code,
+                                                'Description' => 'PR '.$PRCode.' has been Created by '.$Code.'('.$this->session->userdata('Name').')',
                                                 'URLDirect' => 'budgeting_pr',
                                                 'CreatedBy' => $this->session->userdata('NIP'),
                                               ),
@@ -838,12 +840,13 @@ class C_pr_po extends Budgeting_Controler {
                                 // send notifikasi
                                     $IDdiv = $Departement;
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                    $NameDepartement = $G_div[0]['NameDepartement'];
+                                    // $NameDepartement = $G_div[0]['NameDepartement'];
+                                    $Code = $G_div[0]['Code'];
                                     $data = array(
                                         'auth' => 's3Cr3T-G4N',
                                         'Logging' => array(
-                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Revised by '.$NameDepartement,
-                                                        'Description' => 'PR '.$PRCode.' has been Revised by '.$NameDepartement.'('.$this->session->userdata('Name').')',
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Revised by '.$Code,
+                                                        'Description' => 'PR '.$PRCode.' has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                         'URLDirect' => 'budgeting_pr',
                                                         'CreatedBy' => $this->session->userdata('NIP'),
                                                       ),
