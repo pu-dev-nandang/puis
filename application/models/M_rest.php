@@ -614,24 +614,24 @@ class M_rest extends CI_Model {
 
 
 
-        $result = $this->db->query('SELECT exg.ID AS EXDID, exg.ExamIDSA AS ExamID, exg.Status,ast.Name FROM db_academic.sa_exam_student exg
+        $dataStd = $this->db->query('SELECT exg.ID AS EXDID, exg.ExamIDSA AS ExamID, exg.Status,ast.Name, ast.NPM, 
+                                                          p1.Status AS StatusBPP, p2.Status AS StatusCredit
+                                                          FROM db_academic.sa_exam_student exg
                                                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = exg.NPM)
+                                                          LEFT JOIN db_finance.payment p1 ON (p1.NPM = ast.NPM AND p1.PTID = "5")
+                                                          LEFT JOIN db_finance.payment p2 ON (p2.NPM = ast.NPM AND p2.PTID = "6")
                                                           WHERE exg.ExamIDSA = "'.$ExamIDSA.'" ORDER BY ast.NPM ASC
                                           ')->result_array();
 
-//        print_r($result);
 
-//        $result = [];
-//        if(count($dataC)>0){
-//            for($c=0;$c<count($dataC);$c++){
-//
-//                $resStd = $this->m_rest->getListStudentExamAntara($dataC[$c]['CDID'],'');
-//                if(count($resStd)>0){
-//                    array_push($result,$resStd);
-//                }
-//
-//            }
-//        }
+        $result = [];
+        if(count($dataStd)>0){
+            foreach ($dataStd AS $item){
+                if($item['StatusBPP']=='1' && $item['StatusCredit']=='1'){
+                    array_push($result,$item);
+                }
+            }
+        }
 
         return $result;
 
