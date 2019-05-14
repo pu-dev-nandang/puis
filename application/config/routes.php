@@ -845,6 +845,7 @@ $route['api2/__getAnnouncement'] = 'api/c_api2/getAnnouncement';
 $route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
 
 $route['api2/_updateCurriculum'] = 'api/c_api2/updateCurriculum';
+$route['api2/_checkEdom'] = 'api/c_api2/checkEdom';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';

@@ -4229,5 +4229,67 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function checkEdom(){
+
+        $data_arr = $this->getInputToken();
+
+        $dataSmt = $this->m_rest->_getSemesterActive();
+        $SemesterID = $dataSmt['SemesterID'];
+
+
+        $academicYear = $this->db->get_where('db_academic.academic_years'
+            ,array('SemesterID'=>$SemesterID),1)->result_array()[0];
+
+        $dateTimeNow = $this->m_rest->getDateTimeNow();
+        $explodeDate = explode(' ',$dateTimeNow);
+        $dateNow = trim($explodeDate[0]);
+
+        $result = array(
+            'Edom' => 0
+        );
+
+        // Cek Edom
+        if($academicYear['edomStart']<=$dateNow && $academicYear['edomEnd']>=$dateNow){
+
+
+            $course = $this->m_rest->getScheduleBYNPM($SemesterID,$data_arr['Year'],$data_arr['NPM']);
+
+            // cek total lecturer
+            if(count($course)>0){
+                $totalLecturer = 0;
+                $totalAnswer = 0;
+                for($i=0;$i<count($course);$i++){
+                    $d = $course[$i];
+                    $totalLecturer = $totalLecturer + $d['TotalLecturer'];
+                    $totalAnswer = $totalAnswer + $d['EdomAnswer'];
+                }
+
+                if($totalLecturer != $totalAnswer){
+                    $result = array(
+                        'Edom' => 1
+                    );
+                }
+
+
+
+            }
+
+        } else if($academicYear['edom2Start']<=$dateNow && $academicYear['edom2End']>=$dateNow){
+
+            $result = array(
+                'Edom' => 1
+            );
+
+
+        }
+
+//        $result = array(
+//            'Edom' => 1
+//        );
+
+        return print_r(json_encode($result));
+
+    }
+
 
 }
