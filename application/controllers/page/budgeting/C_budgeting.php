@@ -1725,12 +1725,13 @@ class C_budgeting extends Budgeting_Controler {
                 // Send Notif
                     $IDdiv = $G_data[0]['Departement'];
                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                    $NameDepartement = $G_div[0]['NameDepartement'];
+                    // $NameDepartement = $G_div[0]['NameDepartement'];
+                    $Code = $G_div[0]['Code'];
                     $data = array(
                         'auth' => 's3Cr3T-G4N',
                         'Logging' => array(
-                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Set Budget of '.$NameDepartement,
-                                        'Description' => 'Budget '.$NameDepartement.' has been already set by '.$this->session->userdata('Name'),
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Set Budget of '.$Code,
+                                        'Description' => 'Budget '.$Code.' has been already set by '.$this->session->userdata('Name'),
                                         'URLDirect' => 'budgeting_entry',
                                         'CreatedBy' => $this->session->userdata('NIP'),
                                       ),

@@ -630,6 +630,8 @@ class C_login extends CI_Controller {
                 redirect(base_url().'dashboard');
                 break;
               case 7: // DOSEN
+                $this->session->set_userdata('IDdepartementNavigation','36');
+                $this->session->set_userdata('departementNavigation','other-division');
                 redirect(base_url().'dashboard');
                 break;  
               default:

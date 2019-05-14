@@ -337,13 +337,17 @@
 				var Desc = pr_detail[i]['Desc'];
 				var EstimaValue = pr_detail[i]['UnitCost'];
 				var arr_Photo = pr_detail[i]['Photo'];
-				arr_Photo = arr_Photo.split(',');
-				htmlPhoto = '<ul>';
-				for (var j = 0; j < arr_Photo.length; j++) {
-					htmlPhoto += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+arr_Photo[j]+'" target="_blank">'+
-										arr_Photo[j]+'</a></li>';
+				htmlPhoto = '';
+				if (arr_Photo != undefined && arr_Photo != null && arr_Photo != '') {
+					arr_Photo = arr_Photo.split(',');
+					htmlPhoto = '<ul>';
+					for (var j = 0; j < arr_Photo.length; j++) {
+						htmlPhoto += '<li><a href = "'+base_url_js+'fileGetAny/budgeting-catalog-'+arr_Photo[j]+'" target="_blank">'+
+											arr_Photo[j]+'</a></li>';
+					}
+					htmlPhoto += '</ul>';
 				}
-				htmlPhoto += '</ul>';
+				
 				var DetailCatalog = jQuery.parseJSON(pr_detail[i]['DetailCatalog']);
 				var htmlDetailCatalog = '';
 				for (var prop in DetailCatalog) {

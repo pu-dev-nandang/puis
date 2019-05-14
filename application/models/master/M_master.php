@@ -2973,4 +2973,57 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
  
         return $string;
     }
+
+    public function uploadDokumenMultiple($filename,$varFiles = 'UploadFile',$path)
+    {
+        //$path = './uploads/budgeting/pr';
+        // Count total files
+        $countfiles = count($_FILES[$varFiles ]['name']);
+      
+      $output = array();
+      // Looping all files
+      for($i=0;$i<$countfiles;$i++){
+            $config = array();
+            if(!empty($_FILES[$varFiles ]['name'][$i])){
+     
+              // Define new $_FILES array - $_FILES['file']
+              $_FILES['file']['name'] = $_FILES[$varFiles]['name'][$i];
+              $_FILES['file']['type'] = $_FILES[$varFiles]['type'][$i];
+              $_FILES['file']['tmp_name'] = $_FILES[$varFiles]['tmp_name'][$i];
+              $_FILES['file']['error'] = $_FILES[$varFiles]['error'][$i];
+              $_FILES['file']['size'] = $_FILES[$varFiles]['size'][$i];
+
+              // Set preference
+              $config['upload_path'] = $path.'/';
+              $config['allowed_types'] = '*';
+              $config['overwrite'] = TRUE; 
+              $no = $i + 1;
+              $config['file_name'] = $filename.'_'.$no;
+
+              $filenameUpload = $_FILES['file']['name'];
+              $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
+              $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
+     
+              //Load upload library
+              $this->load->library('upload',$config); 
+              $this->upload->initialize($config);
+     
+              // File upload
+              if($this->upload->do_upload('file')){
+                // Get data about the file
+                $uploadData = $this->upload->data();
+                $filePath = $uploadData['file_path'];
+                $filename_uploaded = $uploadData['file_name'];
+                // rename file
+                $old = $filePath.'/'.$filename_uploaded;
+                $new = $filePath.'/'.$filenameNew;
+
+                rename($old, $new);
+
+                $output[] = $filenameNew;
+              }
+            }
+        }
+        return $output; // return array and encode to insert to db
+    }
 }

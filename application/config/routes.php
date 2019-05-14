@@ -915,6 +915,7 @@ $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
+$route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
 
 
 
@@ -1351,8 +1352,13 @@ $route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/all
 $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
 $route['purchasing/transaction/po/list/open'] = 'page/purchasing/c_po/open';
-
-
+$route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
+$route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
+$route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';
+$route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Approval';
+$route['purchasing/transaction/po/userroledepart_submit'] = 'page/purchasing/c_po/userroledepart_submit';
+$route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_po/$1';
+$route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
@@ -1417,3 +1423,4 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
 
 $route['portal'] = 'c_login/portal';
+
