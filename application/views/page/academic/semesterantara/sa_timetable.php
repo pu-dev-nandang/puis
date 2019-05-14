@@ -303,8 +303,8 @@
             var bodyGrade = 'Syllabus & RPS not been sent';
             if(d.DocumentStatus==1 || d.DocumentStatus=='1' || d.DocumentStatus==2 || d.DocumentStatus=='2'){
 
-                var btnSyllabus = (d.Syllabus!=null && d.Syllabus!='') ? '<button href="'+d.Syllabus+'" class="btn btn-sm btn-block btn-default">Download</button>' : '-';
-                var btnRPS = (d.RPS!=null && d.RPS!='') ? '<button href="'+d.RPS+'" class="btn btn-sm btn-block btn-default">Download</button>' : '-';
+                var btnSyllabus = (d.Syllabus!=null && d.Syllabus!='') ? '<a href="'+base_url_portal_lecturers+'uploads/silabus/'+d.Syllabus+'" target="_blank" class="btn btn-sm btn-block btn-default">Download Syllabus</a>' : '-';
+                var btnRPS = (d.RPS!=null && d.RPS!='') ? '<a href="'+base_url_portal_lecturers+'uploads/sap/'+d.RPS+'" target="_blank" class="btn btn-sm btn-block btn-default">Download RPS</a>' : '-';
 
                 var Evaluation = (d.Evaluasi!=null && d.Evaluasi!='') ? d.Evaluasi : 0;
                 var UTS = (d.UTS!=null && d.UTS!='') ? d.UTS : 0;

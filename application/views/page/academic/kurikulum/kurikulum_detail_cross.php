@@ -126,6 +126,8 @@
 
                         $arr = array(
                                 'SPID' => $item['SPID'],
+                                'CDID_Old' => $item['CDID_1'],
+                                'NPM' => $item['NPM'],
                                 'CDID' => $dtB['CDID'],
                                 'MKID' => $dtB['MKID']
                         );

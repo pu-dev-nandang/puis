@@ -161,7 +161,7 @@ class C_kurikulum extends Academic_Controler {
                                                 ORDER BY sp.NPM, cd.Semester, cd.ProdiID ASC ';
 
 
-        $data = $this->db->query($q.' LIMIT 300')->result_array();
+        $data = $this->db->query($q)->result_array();
 
 //        print_r($data);exit;
 
