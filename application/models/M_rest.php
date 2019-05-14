@@ -1795,4 +1795,73 @@ class M_rest extends CI_Model {
 
     }
 
+    public function getScheduleBYNPM($SemesterID,$DB_,$NPM){
+
+//        $NPM = $this->session->userdata('student_NPM');
+//        $SemesterID = $this->session->userdata('student_SemesterID');
+//        $DB_ = $this->session->userdata('student_DB');
+
+        $data = $this->db->select('ScheduleID')->get_where($DB_.'.study_planning',
+            array('NPM'=>$NPM,'SemesterID'=>$SemesterID))->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            foreach ($data AS $item){
+                $dataSch = $this->db->query('SELECT sdc.MKID,sdc.ScheduleID,mk.MKCode, mk.Name, mk.NameEng FROM db_academic.schedule_details_course sdc
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                    WHERE sdc.ScheduleID = "'.$item['ScheduleID'].'" GROUP BY sdc.ScheduleID ')->result_array();
+
+
+                $dsn = $this->getLecturerByScheduleID($item['ScheduleID']);
+
+                $totalStatus = 0;
+                // cek apakah mhs sudah mengisi edom untuk dosen
+                if(count($dsn)>0){
+                    for($c=0;$c<count($dsn);$c++){
+                        $dataEdom = $this->db->get_where('db_academic.edom_answer',
+                            array('SemesterID'=>$SemesterID,'ScheduleID' => $item['ScheduleID'],
+                                'NPM'=>$NPM,'NIP'=>$dsn[$c]['NIP']),1)->result_array();
+
+                        $sts = (count($dataEdom)>0) ? 1 : 0;
+                        $dsn[$c]['Status'] = $sts;
+
+                        $totalStatus = $totalStatus + $sts;
+                    }
+                }
+
+
+
+                $dataSch[0]['TotalLecturer'] = count($dsn);
+                $dataSch[0]['EdomAnswer'] = $totalStatus;
+                $dataSch[0]['Lecturer'] = $dsn;
+                array_push($result,$dataSch[0]);
+            }
+        }
+
+        return $result;
+
+
+    }
+
+    private function getLecturerByScheduleID($ScheduleID){
+
+//        $ScheduleID = $this->input->get('ScheduleID');
+        $data = $this->db->query('SELECT em.NIP, em.Name, s.TeamTeaching FROM db_academic.schedule s
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                            WHERE s.ID="'.$ScheduleID.'" LIMIT 1')->result_array();
+
+        if(count($data)>0 && $data[0]['TeamTeaching']=='1'){
+            $dataTeam = $this->db->query('SELECT em.NIP, em.Name FROM db_academic.schedule_team_teaching stt
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP=stt.NIP)
+                                                    WHERE stt.ScheduleID = "'.$ScheduleID.'" ORDER BY stt.NIP ASC ')->result_array();
+            if(count($dataTeam)>0){
+                for ($i=0;$i<count($dataTeam);$i++){
+                    array_push($data,$dataTeam[$i]);
+                }
+            }
+        }
+
+        return $data;
+    }
+
 }
