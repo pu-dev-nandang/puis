@@ -1113,7 +1113,7 @@ class C_save_to_excel extends CI_Controller
                 $StTot = $St + 2;
                 $excel->setActiveSheetIndex(0)->setCellValue('D'.$St, "Anggaran TA ".$YearWr2);
                 $excel->setActiveSheetIndex(0)->setCellValue('D'.($St+1), "Anggaran TA ".$YearWr);
-                $excel->setActiveSheetIndex(0)->setCellValue('D'.$StTot, "Presentasi Deviasi");
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$StTot, "Persentase Deviasi");
                 $excel->getActiveSheet()->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
 
                 // get anggaran tahun lalu,anggaran tahun sekarang dan presentasi deviasi
@@ -1552,7 +1552,7 @@ class C_save_to_excel extends CI_Controller
                         $StTot = $St + 2;
                         $excel->setCellValue('D'.$St, "Anggaran TA ".$YearWr2);
                         $excel->setCellValue('D'.($St+1), "Anggaran TA ".$YearWr);
-                        $excel->setCellValue('D'.$StTot, "Presentasi Deviasi");
+                        $excel->setCellValue('D'.$StTot, "Persentase Deviasi");
                         $excel->getStyle('D'.$St.':'.'H'.$StTot)->applyFromArray($style_row);
 
                         // get anggaran tahun lalu,anggaran tahun sekarang dan presentasi deviasi

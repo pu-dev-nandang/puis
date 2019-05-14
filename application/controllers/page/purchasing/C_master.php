@@ -494,7 +494,7 @@ class C_master extends Purchasing_Controler {
             $d = $this->data['get'];
             $CodeSupplier = $d[0]['CodeSupplier'];
             // lock beberapa field untuk tidak bisa diedit
-                $sql = 'select * from db_purchasing.pre_po where CodeSupplier = ? limit 1';
+                $sql = 'select * from db_purchasing.pre_po_supplier where CodeSupplier = ? limit 1';
                 $query=$this->db->query($sql, array($CodeSupplier))->result_array();
                 $this->data['arr_lock'] = count($query); 
         }

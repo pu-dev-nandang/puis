@@ -436,4 +436,27 @@ class C_rest2 extends CI_Controller {
                  echo '{"status":"999","message":"Not Authorize"}';
             }
     }
+
+    public function Get_data_po_by_Code()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $Code = $dataToken['Code'];
+                    $data = $this->m_pr_po->Get_data_po_by_Code($Code);
+                    echo json_encode($data);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
 }

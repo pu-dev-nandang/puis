@@ -63,7 +63,7 @@
     var NIP = sessionNIP;
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
-        $("#sidebar").remove();
+        // $("#sidebar").remove();
         LoadPage('data');
 
         $(".pageAnchor").click(function(){
