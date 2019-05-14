@@ -4080,6 +4080,23 @@ class C_api2 extends CI_Controller {
 
         if(count($arrData)>0){
             foreach ($arrData AS $item){
+
+                // Get ID transfer history
+                $data = $this->db->select('ID')->get_where('db_academic.transfer_history_conversion',
+                    array(
+                        'NPM_Before' => $item['NPM'],
+                        'CDID_Before' => $item['CDID_Old']
+                    ))->result_array();
+
+                if(count($data)>0){
+                    $ID = $data[0]['ID'];
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_academic.transfer_history_conversion',array(
+                        'CDID_Before' => $item['CDID']
+                    ));
+                }
+
+
                 $arrUpdt = array(
                     'CDID' => $item['CDID'],
                     'MKID' => $item['MKID']
