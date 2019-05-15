@@ -5,13 +5,32 @@
 }
 
 .borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
-    padding: 8px;
-    line-height: 1.428571429;
-    vertical-align: top;
-    border-top: none !important;
-} 
+	    padding: 8px;
+	    line-height: 1.428571429;
+	    vertical-align: top;
+	    border-top: none !important;
+	}
+@page {
+  size: A4;
+  margin: 1;
+}
+@media print {
+    .container { 
+      display: block !important;
+        font-size: 10px; 
+        top: -70pt;
+        left:0pt;
+        right: 0pt;
+    }
+    .tbody1 {
+      font-size: 10px; 
+    }
+    .btn .noPrint a { 
+    	display:none !important;
+    }
+}
 </style>
-<div class="row">
+<div class="row noPrint">
 	<div class="col-xs-2">
 		<?php if ($this->session->userdata('IDdepartementNavigation') == 4): ?>
 			<div><a href="<?php echo base_url().'purchasing/transaction/po/list' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
@@ -19,10 +38,11 @@
 			<div><a href="<?php echo base_url().'global/transaction/po/list' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
 		<?php endif ?>
 			<?php if ($bool): ?>
-				<!-- <div style="margin-top: 10px;"><button class="btn btn-danger" id = "CustomItem" code = "<?php echo $Code ?>"> <i class="fa fa-th-list right-margin" aria-hidden="true"></i> Custom Item</button></div> -->
+
 			<?php endif ?>
 	</div>
 </div>
+<div id="DocPenawaran" class="row"></div>
 <div class="row" style="margin-top: 2px;">
 	<div class="col-xs-12">
 		<table class="table borderless">
@@ -103,7 +123,7 @@
 		// PageContain
 		var html = '<div class = "row">'+
 						'<div class = "col-xs-12">'+
-							'<table class = "table borderless">'+
+							'<table class = "table borderless" style = "margin-left: -8px;">'+
 								'<thead></thead>'+
 								'<tbody>'+
 									'<tr>'+
@@ -116,7 +136,7 @@
 										'</td>'+
 										'<td></td>'+
 										'<td>'+
-											'<div style = "margin-left : 70%">'+
+											'<div style = "margin-left : 50%">'+
 												'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
 												'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
 												'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
@@ -154,14 +174,32 @@
 		$('#PageContain').html(html);
 		makeTblDetail();
 		makeSignatures();
-		makeFooter();						
+		makeFooter();
+		makeDocPenawaran();
+		makeAction();						
+	}
+
+	function makeDocPenawaran()
+	{
+		console.log(ClassDt);
+		var po_data = ClassDt.po_data;
+		var po_create = po_data['po_create'];
+		var FileOffer = jQuery.parseJSON(po_create[0]['FileOffer']);
+		$('#DocPenawaran').html('<div class="col-xs-12"><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div>');
+
+	}
+
+	function makeAction()
+	{
+		// r_action
+
 	}
 
 	function makeFooter()
 	{
 		//r_footer
 		var html = '<div class = "row" style = "margin-top : 40px;">'+
-						'<div class = "col-xs-3">'+
+						'<div class = "col-xs-4">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
