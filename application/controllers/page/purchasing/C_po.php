@@ -311,7 +311,7 @@ class C_po extends Transaksi_Controler {
                 'AnotherCost' => 0,
                 'JsonStatus' => json_encode($JsonStatus),
                 'Status' => 0,
-                'Notes' => '',
+                'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
                 'Supporting_documents' => json_encode($arr = array()),
                 'CreatedBy' => $this->session->userdata('NIP'),
                 'CreatedAt' => date('Y-m-d H:i:s'), 

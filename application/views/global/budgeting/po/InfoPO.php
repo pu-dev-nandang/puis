@@ -1,3 +1,16 @@
+<style type="text/css">
+.borderless thead>tr>th {
+    vertical-align: bottom;
+    border-bottom: none !important;
+}
+
+.borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
+    padding: 8px;
+    line-height: 1.428571429;
+    vertical-align: top;
+    border-top: none !important;
+} 
+</style>
 <div class="row">
 	<div class="col-xs-2">
 		<?php if ($this->session->userdata('IDdepartementNavigation') == 4): ?>
@@ -11,18 +24,18 @@
 	</div>
 </div>
 <div class="row" style="margin-top: 2px;">
-	<div class="col-xs-4 col-md-offset-4">
-		<div class="row">
-			<div class="col-xs-4 col-md-offset-2" align="center">
-				<p><h3>Purchase Order</h3></p>
-				<p><?php echo $Code ?></p>
-			</div>	
-		</div>
-		<!-- <p><h3>Purchase Order</h3></p>
-		<p><?php echo $Code ?></p> -->
-	</div>
-	<div class="col-xs-4" align="right">
-		
+	<div class="col-xs-12">
+		<table class="table borderless">
+			<thead></thead>
+			<tbody>
+				<tr>
+					<td style="text-align :center">
+						<p><h3>Purchase Order</h3></p>
+						<p><?php echo $Code ?></p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 <?php if ($bool): ?>
@@ -49,19 +62,14 @@
 		Code : "<?php echo $Code ?>",
 		po_create_m  : <?php echo json_encode($G_data) ?>,
 		po_data : [],
+		PRCode_arr : [],
 		total_po_detail : 0,
 	};
 	$(document).ready(function() {
-	   //loadingStart();
+	   loadingStart();
 	   Get_data_po().then(function(data){
 	   		ClassDt.po_data = data;
 	   		WriteHtml();
-	   		// Get_data_pr().then(function(data){
-
-	   				
-	   		//     //loadingEnd(500);
-	   		// })
-	       loadingEnd(2000);
 	   })
 	}); // exit document Function
 
@@ -94,19 +102,44 @@
 		var PICPU = JsonStatus[0]['Name'];
 		// PageContain
 		var html = '<div class = "row">'+
-						'<div class = "col-xs-4">'+
-							'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
-							'<div>Podomoro City APL Tower, Lantai 5</div>'+
-							'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
-							'<div>Telp 021 29200456</div>'+
-							'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
-						'</div>'+
-						'<div class = "col-xs-3 col-md-offset-5">'+
-							'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
-							'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
-							'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
-							'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
-						'</div>'+
+						'<div class = "col-xs-12">'+
+							'<table class = "table borderless">'+
+								'<thead></thead>'+
+								'<tbody>'+
+									'<tr>'+
+										'<td>'+
+											'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
+											'<div>Podomoro City APL Tower, Lantai 5</div>'+
+											'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
+											'<div>Telp 021 29200456</div>'+
+											'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
+										'</td>'+
+										'<td></td>'+
+										'<td>'+
+											'<div style = "margin-left : 70%">'+
+												'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
+												'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
+												'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
+												'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
+											'</div>'+	
+										'</td>'+
+									'</tr>'+
+								'</tbody>'+
+							'</table>'+
+						'</div>'+						
+						// '<div class = "col-xs-4">'+
+						// 	'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
+						// 	'<div>Podomoro City APL Tower, Lantai 5</div>'+
+						// 	'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
+						// 	'<div>Telp 021 29200456</div>'+
+						// 	'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
+						// '</div>'+
+						// '<div class = "col-xs-3 col-md-offset-5">'+
+						// 	'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
+						// 	'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
+						// 	'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
+						// 	'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
+						// '</div>'+
 					'</div>'+
 					'<div class = "row" style = "margin-top : 10px;">'+
 						'<div class = "col-xs-12">'+
@@ -116,9 +149,138 @@
 					'<div id = "r_tblDetail"></div>'+
 					'<div id = "r_terbilang"></div>'+
 					'<div id = "r_signatures"></div>'+
-					'<div id = "r_footer"></div>';
+					'<div id = "r_footer"></div>'+
+					'<div id = "r_action"></div>';
 		$('#PageContain').html(html);
-		makeTblDetail();						
+		makeTblDetail();
+		makeSignatures();
+		makeFooter();						
+	}
+
+	function makeFooter()
+	{
+		//r_footer
+		var html = '<div class = "row" style = "margin-top : 40px;">'+
+						'<div class = "col-xs-3">'+
+							'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr style = "height : 70px">'+
+											'<td>'+
+												'No. PR : '+
+											'</td>'+
+											'<td>';
+
+		var arr = ClassDt.PRCode_arr;
+		var t = '';									
+		for (var i = 0; i < arr.length; i++) {
+			t += '<li>'+arr[i]+'</li>';
+		}
+
+		html += t;
+		html += '</td></tr>';
+		html += '<tr style = "height : 100px">'+
+					'<td colspan = "2">'+
+						'<b>Diterima oleh Vendor,'+
+					'</td>'+
+				'</tr>'+
+				'<tr>'+
+					'<td colspan = "2">'+
+						'<i>(Tandatangan,Nama,Stampel),</br>Note : Copi PO mohon dapat dilampirkan pada kami bersama invoice</i>'+
+					'</td>'+
+				'</tr>';
+
+		html += '</tbody></table></div></div>';		
+		$('#r_footer').html(html);
+
+
+	}
+
+	function makeSignatures(){
+		// r_signatures
+		var dt = ClassDt.po_data;
+		var po_create = dt['po_create'];
+		var html = '<div class= "row" style = "margin-top : 40px;">'+
+						'<div class = "col-xs-12">'+
+							'<table class = "table borderless">'+
+								'<thead>'+
+									'<tr>'
+				;
+		var JsonStatus = jQuery.parseJSON(po_create[0]['JsonStatus']);
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<th '+style+'>'+
+						JsonStatus[i].NameTypeDesc+
+					'</th>';	
+		}
+
+		html += '</tr>';
+
+		html += '</thead>'+
+					'<tbody>'+
+						'<tr style = "height : 51px">';
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var v = '-';
+			if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+				v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+			}
+			else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+			{
+				v = '<i class="fa fa-check" style="color: green;"></i>';
+			}
+			else
+			{
+				v = '-';
+			}
+
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<td '+style+'>'+
+						v+
+					'</td>';	
+		}
+
+		html += '</tr></tbody>';				
+		html += '<tfoot>'+
+					'<tr>';
+
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+		}
+
+		html += '</tr></tfoot></table></div></div>';							
+		$('#r_signatures').html(html);
+
 	}
 
 	function makeTblDetail()
@@ -131,7 +293,7 @@
 		var Subtotal = 	parseInt(ClassDt.total_po_detail)+parseInt(po_create[0]['AnotherCost'])	// 0 adalah persentase		
 		var htmlInputPO = '<div class = "row" style = "margin-top : 15px;">'+
 							'<div class = "col-md-12">'+
-								'<div class="table-responsive">'+
+								//'<div class="table-responsive">'+
 									'<table class="table table-bordered tableData" id ="table_input_po">'+
 									'<thead>'+
 									'<tr>'+
@@ -158,13 +320,46 @@
 										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
 											'<td colspan = "6">Sub Total</td>'+
 											'<td colspan = "3">'+formatRupiah(Subtotal)+'</td>'+
-										'</tr>'+	
+										'</tr>'+
+										'<tr>'+
+											'<td colspan = "9"><b>'+po_create[0]['Notes']+'</b></td>'+
+										'</tr>'+		
 									'</table>'+
-								'</div>'+
+								//'</div>'+
 						   '</div></div>';
-			var html = htmlBtnAdd + htmlInputPO;			   
-			$('#r_tblDetail').html(html);			   			
 
+		_ajax_terbilang(Subtotal).then(function(data){
+			var html = htmlBtnAdd + htmlInputPO;			   
+			$('#r_tblDetail').html(html);
+			$('#r_terbilang').html('<div class = "row" style = "margin-top : 20px;">'+
+										'<div class="col-xs-12">'+
+											'<b>Terbilang (Rupiah) : '+data+'</b>'+
+										'</div>'+
+									'</div>'		
+			);
+
+	    	loadingEnd(1000);
+		})		   
+
+	}
+
+	function _ajax_terbilang(bilangan)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__ajax_terbilang";
+		var data = {
+		    bilangan : bilangan,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
 	}
 
 	function MakeIsiPO()
@@ -209,8 +404,27 @@
 						'<td>'+'<div align="center">'+formatRupiah(po_detail[i]['Subtotal'])+'</div></td>'+
 					'</tr>';
 
-			total = parseInt(total) + parseInt(po_detail[i]['Subtotal']);			
+			total = parseInt(total) + parseInt(po_detail[i]['Subtotal']);
 
+			// add PRCode
+			if (ClassDt.PRCode_arr.length == 0) {
+				ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
+			}
+			else
+			{
+				var bool = true;
+				for (var j = 0; j < ClassDt.PRCode_arr.length; j++) {
+					var arr = ClassDt.PRCode_arr;
+					if (arr[j] == po_detail[i]['PRCode']) {
+						bool = false;
+						break;
+					}
+				}
+
+				if (bool) {
+					ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
+				}
+			}			
 		}
 
 		ClassDt.total_po_detail = total;

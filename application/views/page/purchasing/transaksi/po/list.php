@@ -77,8 +77,8 @@ $(document).ready(function() {
        	    'createdRow': function( row, data, dataIndex ) {
        	    	$( row ).find('td:eq(0)').attr('align','center');
        	    	var code_url = findAndReplace(data[1],'/','-');
-       	    	$( row ).find('td:eq(1)').html('<a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a>');
-       	    	$( row ).find('td:eq(1)').attr('align','center');
+       	    	$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[8]+'</div>');
+       	    	//$( row ).find('td:eq(1)').attr('align','center');
        	    	$( row ).find('td:eq(2)').attr('align','center');
        	    	$( row ).find('td:eq(4)').attr('align','center');
        	    	$( row ).find('td:eq(5)').attr('align','center');
