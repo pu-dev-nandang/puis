@@ -1703,7 +1703,7 @@ class M_finance extends CI_Model {
                  and b.StatusStudentID in (3,2,8) 
               )aa
              ';
-      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$ta1,$SemesterID))->result_array();
     }
     // print_r($query);die();
     return $query[0]['total'];
@@ -1773,7 +1773,7 @@ class M_finance extends CI_Model {
                 and b.StatusStudentID in (3,2,8)
               ) aa
               LIMIT '.$start. ', '.$limit;
-      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$ta1,$SemesterID))->result_array();
     }
 
     // get Number VA Mahasiswa
@@ -1965,7 +1965,7 @@ class M_finance extends CI_Model {
                 '.$AddWhereStatusPayment.$ChangeStatus.'
               ) aa
               ';
-      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$ta1,$SemesterID))->result_array();
     }
     // print_r($sql);die();
     return $query[0]['total'];
@@ -2079,7 +2079,7 @@ class M_finance extends CI_Model {
                 group by a.PTID,a.SemesterID,a.NPM
               ) aa  
                order by ID_payment_proof desc,Status asc LIMIT '.$start. ', '.$limit; // and c.ID = ?
-      $query=$this->db->query($sql, array($ta1,$SemesterID,$SemesterID))->result_array();
+      $query=$this->db->query($sql, array($ta1,$SemesterID,$ta1,$SemesterID))->result_array();
     }
     // print_r($sql);die();
     // get Number VA Mahasiswa
