@@ -210,8 +210,8 @@
 
                     var dt = JSON.parse(totalStd);
 
-                    console.log(dt);
-                    return false;
+                    // console.log(dt);
+                    // return false;
 
                     var url = '<?= base_url(); ?>api2/_updateCurriculum';
                     $.post(url,{dataForm:dt},function (result) {
