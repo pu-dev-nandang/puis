@@ -489,7 +489,7 @@ class C_admission extends Admission_Controler {
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
-      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      $this->data['payment_type'] = json_encode($this->m_master->caribasedprimary('db_finance.payment_type','Type','0'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee($config["per_page"], $start,$FormulirCode));
       $this->data['no'] = $start + 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_input',$this->data,true);
@@ -531,7 +531,8 @@ class C_admission extends Admission_Controler {
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
-      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      // $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      $this->data['payment_type'] = json_encode($this->m_master->caribasedprimary('db_finance.payment_type','Type','0'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode));
       $this->data['no'] = $start + 1;
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_delete',$this->data,true);
@@ -560,7 +561,8 @@ class C_admission extends Admission_Controler {
       $page = $this->uri->segment(5);
       $start = ($page - 1) * $config["per_page"];
 
-      $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      // $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+      $this->data['payment_type'] = json_encode($this->m_master->caribasedprimary('db_finance.payment_type','Type','0'));
       $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start,$FormulirCode,'p.Status = "Approved"'));
       $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_tuition_fee_approved',$this->data,true);
       $output = array(
