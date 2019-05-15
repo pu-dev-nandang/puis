@@ -150,7 +150,8 @@ class C_finance extends Finnance_Controler {
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
-        $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+        // $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+        $this->data['payment_type'] = json_encode($this->m_master->caribasedprimary('db_finance.payment_type','Type','0'));
         $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_delete($config["per_page"], $start,$FormulirCode,'p.Status = "Created"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approve',$this->data,true);
         $output = array(
@@ -687,7 +688,8 @@ class C_finance extends Finnance_Controler {
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
 
-        $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+        // $this->data['payment_type'] = json_encode($this->m_master->showData_array('db_finance.payment_type'));
+        $this->data['payment_type'] = json_encode($this->m_master->caribasedprimary('db_finance.payment_type','Type','0'));
         $this->data['getDataCalonMhs'] = json_encode($this->m_admission->getDataCalonMhsTuitionFee_approved($config["per_page"], $start,$FormulirCode,'p.Status = "Approved"'));
         $content = $this->load->view('page/'.$this->data['department'].'/approved/page_tuition_fee_approved',$this->data,true);
         $output = array(
