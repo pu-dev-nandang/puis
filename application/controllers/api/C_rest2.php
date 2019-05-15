@@ -202,7 +202,10 @@ class C_rest2 extends CI_Controller {
                             $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
                             // fill arr_to_email
                             $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$arr_to[$i]);
-                            $arr_to_email[] = $G_emp[0]['EmailPU'];
+                            if (count($G_emp) > 0) {
+                                $arr_to_email[] = $G_emp[0]['EmailPU'];
+                            }
+                            
                         }     
 
                     if (array_key_exists('Email', $dataToken)) {

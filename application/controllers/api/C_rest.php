@@ -847,7 +847,7 @@ class C_rest extends CI_Controller {
 
     public function getEmployees($Status = 'aktif')
     {
-        error_reporting(0);
+        //error_reporting(0);
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
@@ -867,7 +867,12 @@ class C_rest extends CI_Controller {
                             LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
                             ';
 
-                $sql.= $AddSql.' order by em.NIP asc';
+                $sql.= $AddSql;
+                $sql .= ' UNION
+                        select NIK as NIP,NULL,NULL,Name,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+                        from db_employees.holding
+                        ';
+                $sql .= 'order by NIP asc';        
                 $query=$this->db->query($sql, array())->result_array();
 
                 echo json_encode($query);

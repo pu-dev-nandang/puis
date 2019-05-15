@@ -294,7 +294,7 @@ class C_pr_po extends Budgeting_Controler {
             $arr = array();
             if (count($JsonStatus) > 0) {
                 for ($j=1; $j < count($JsonStatus); $j++) {
-                    $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                    $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$j]['NIP']);
                     $Name = $getName[0]['Name'];
                     $StatusInJson = $JsonStatus[$j]['Status'];
                     switch ($StatusInJson) {
@@ -320,7 +320,7 @@ class C_pr_po extends Budgeting_Controler {
             $nestedData = array_merge($nestedData,$arr);
             $nestedData[] = $row['Departement'];
             // get name created by
-                $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$row['CreatedBy']);
+                $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($row['CreatedBy']);
                 $nestedData[] = $getName[0]['Name'];
 
 
@@ -923,7 +923,7 @@ class C_pr_po extends Budgeting_Controler {
                         // search name NameAprrovedBy
                         for ($i=0; $i < count($JsonPassHtml); $i++) { 
                             $NIP = $JsonPassHtml[$i]['NIP'];
-                            $EMPL = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                            $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                             $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                         }
 
@@ -968,7 +968,7 @@ class C_pr_po extends Budgeting_Controler {
                         // search name NameAprrovedBy
                         for ($i=0; $i < count($JsonPassHtml); $i++) { 
                             $NIP = $JsonPassHtml[$i]['NIP'];
-                            $EMPL = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                            $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                             $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                         }
 
@@ -1010,7 +1010,7 @@ class C_pr_po extends Budgeting_Controler {
                             // search name NameAprrovedBy
                             for ($i=0; $i < count($JsonPassHtml); $i++) { 
                                 $NIP = $JsonPassHtml[$i]['NIP'];
-                                $EMPL = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                                $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                                 $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                             }
 
@@ -1051,7 +1051,7 @@ class C_pr_po extends Budgeting_Controler {
                             // search name NameAprrovedBy
                             for ($i=0; $i < count($JsonPassHtml); $i++) { 
                                 $NIP = $JsonPassHtml[$i]['NIP'];
-                                $EMPL = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                                $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                                 $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                             }
 
@@ -1089,7 +1089,7 @@ class C_pr_po extends Budgeting_Controler {
                         // search name NameAprrovedBy
                         for ($i=0; $i < count($JsonPassHtml); $i++) { 
                             $NIP = $JsonPassHtml[$i]['NIP'];
-                            $EMPL = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                            $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                             $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                         }
 

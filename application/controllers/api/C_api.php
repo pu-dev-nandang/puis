@@ -5243,8 +5243,14 @@ class C_api extends CI_Controller {
         
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
-                $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',
-                    array('StatusEmployeeID !=' => -2))->result_array();
+                // $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',
+                //     array('StatusEmployeeID !=' => -2))->result_array();
+                $sql = 'select NIP,Name from db_employees.employees
+                        where StatusEmployeeID != -2
+                        UNION
+                        select NIK as NIP,Name from db_employees.holding
+                        ';
+                $data=$this->db->query($sql, array())->result_array();        
                 return print_r(json_encode($data));
             }
 

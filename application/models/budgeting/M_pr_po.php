@@ -313,7 +313,7 @@ class M_pr_po extends CI_Model {
                 $JsonStatusDecode = (array)json_decode($JsonStatus,true);
                 for ($j=0; $j < count($JsonStatusDecode); $j++) { 
                     $ApprovedBy = $JsonStatusDecode[$j]['NIP'];
-                    $NameAprrovedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy);
+                    $NameAprrovedBy = $this->m_master->SearchNameNIP_Employees_PU_Holding($ApprovedBy);
                     $NameAprrovedBy = $NameAprrovedBy[0]['Name'];
                     $JsonStatusDecode[$j]['NameAprrovedBy'] = $NameAprrovedBy;
                 }
