@@ -23,7 +23,7 @@
 <body>
 
 <style>
-    #tb tr th, #tb tr td {
+    #tb tr th, #tb tr td, #tbOk tr th, #tbOk tr td {
         text-align: center;
     }
 </style>
@@ -115,7 +115,9 @@
                         $tdlu = '<td colspan="4" style="text-align: left;font-weight: bold;">MATA KULIAH INI BELUM DI TAMBAHKAN PADA KURIKULUM INI</td>';
                     } else if(count($item['Bener'])>1){
                         $dg = 'style="background:#dffbff;color:blue;"';
-                        $tdlu = '<td colspan="4" style="text-align: left;font-weight: bold;">MATA KULIAH YG TAMBAHKAN DI KURIKULUM LEBIH DARI 1</td>';
+
+                        $tdlu = '<textarea class="hide" id="data_benar_'.$no.'">'.json_encode($item['Bener']).'</textarea><td colspan="4" style="text-align: left;font-weight: bold;">MATA KULIAH YG TAMBAHKAN DI KURIKULUM LEBIH DARI 1 
+                                    <button style="float: right;" data-spid="'.$item['SPID'].'" data-npm="'.$item['NPM'].'" data-cd="'.$item['CDID_1'].'" data-no="'.$no.'" class="btn btn-primary btnPerbaiki">Perbaiki Manual</button></td>';
                     } else if (count($item['Bener'])==1) {
                         $dtB = $item['Bener'][0];
                         $dg = '';
@@ -159,6 +161,21 @@
 </div>
 
 
+<!-- Modal -->
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Perbaiki data kurikulum</h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="btnModalTutup" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script type="text/javascript" src="<?php echo base_url('assets/template/js/libs/jquery-1.10.2.min.js'); ?>"></script>
@@ -193,15 +210,97 @@
 
                     var dt = JSON.parse(totalStd);
 
+                    console.log(dt);
+                    return false;
+
                     var url = '<?= base_url(); ?>api2/_updateCurriculum';
                     $.post(url,{dataForm:dt},function (result) {
                         setTimeout(function (args) {
                             window.location.href='';
                         },500);
-                    })
+                    });
 
                 }
             }
+        });
+
+        $(document).on('click','.btnPerbaiki',function () {
+
+            var no = $(this).attr('data-no');
+            var SPID = $(this).attr('data-spid');
+            var NPM = $(this).attr('data-npm');
+            var CDID_Old = $(this).attr('data-cd');
+            var ta = "<?= $DataOk['TA']; ?>";
+            var benar = JSON.parse($('#data_benar_'+no).val());
+
+            var td = '';
+            var no = 1;
+            $.each(benar,function (i,v) {
+                td = td+'<tr>' +
+                    '<td>'+no+'</td>' +
+                    '<td style="text-align: left;">'+v.ProdiName+'</td>' +
+                    '<td>'+v.MKCode+'</td>' +
+                    '<td>'+v.Semester+'</td>' +
+                    '<td style="text-align: left;">'+v.NameEng+'</td>' +
+                    '<td><button class="btn btn-success btnOkeKirim" data-mkid="'+v.MKID+'" data-cdid="'+v.CDID+'">Perbaiki</button></td>' +
+                    '</tr>';
+                no++;
+            });
+
+            var tb = '<table class="table table-bordered table-striped" id="tbOk">' +
+                '    <thead>' +
+                '    <tr>' +
+                '        <th style="width: 1%;">No</th>' +
+                '        <th style="width: 20%;">Prodi</th>' +
+                '        <th style="width: 5%;">Kode</th>' +
+                '        <th style="width: 1%;">Smt</th>' +
+                '        <th>Mata Kuliah</th>' +
+                '        <th style="width: 5%;">Aksi</th>' +
+                '    </tr>' +
+                '    </thead>' +
+                '    <tbody>'+td+'</tbody>' +
+                '</table>';
+
+            $('#myModal .modal-body').html(tb);
+            $('#myModal').modal({
+                backdrop : 'static',
+                show : true
+            });
+            
+            $('.btnOkeKirim').click(function () {
+
+                if(confirm('Anda yakin?')){
+                    var CDID = $(this).attr('data-cdid');
+                    var MKID = $(this).attr('data-mkid');
+
+                    $('.btnOkeKirim,#btnModalTutup').prop('disbaled',true);
+
+                    var data = {
+                        ta : ta,
+                        arrData : [
+                            {
+                                SPID : SPID,
+                                CDID_Old : CDID_Old,
+                                NPM : NPM,
+                                CDID : CDID,
+                                MKID : MKID,
+                            }
+                        ]
+                    };
+
+                    console.log(data);
+                    var url = '<?= base_url(); ?>api2/_updateCurriculum';
+                    $.post(url,{dataForm:data},function (result) {
+                        setTimeout(function (args) {
+                            window.location.href='';
+                        },500);
+                    });
+                }
+
+
+            });
+
+            console.log(benar);
         });
     </script>
 
