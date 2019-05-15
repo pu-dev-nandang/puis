@@ -17,14 +17,15 @@
 @media print {
     .container { 
       display: block !important;
-        font-size: 10px; 
+        font-size: 9px; 
         top: -70pt;
         left:0pt;
         right: 0pt;
     }
-    .tbody1 {
-      font-size: 10px; 
+    table{
+    	font-size: 8px; 
     }
+    
     .btn .noPrint a { 
     	display:none !important;
     }
@@ -147,19 +148,6 @@
 								'</tbody>'+
 							'</table>'+
 						'</div>'+						
-						// '<div class = "col-xs-4">'+
-						// 	'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
-						// 	'<div>Podomoro City APL Tower, Lantai 5</div>'+
-						// 	'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
-						// 	'<div>Telp 021 29200456</div>'+
-						// 	'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
-						// '</div>'+
-						// '<div class = "col-xs-3 col-md-offset-5">'+
-						// 	'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
-						// 	'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
-						// 	'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
-						// 	'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
-						// '</div>'+
 					'</div>'+
 					'<div class = "row" style = "margin-top : 10px;">'+
 						'<div class = "col-xs-12">'+
@@ -181,7 +169,6 @@
 
 	function makeDocPenawaran()
 	{
-		console.log(ClassDt);
 		var po_data = ClassDt.po_data;
 		var po_create = po_data['po_create'];
 		var FileOffer = jQuery.parseJSON(po_create[0]['FileOffer']);
@@ -191,8 +178,14 @@
 
 	function makeAction()
 	{
-		// r_action
-
+		// r_action sessionNIP
+		/*
+			1.Baca Status dahulu
+			2.Status Approved semua maka show PDF & muncul tombol Create SPB
+			3.Ada tombol edit ke halaman Open PO
+			4.ada tombol edit PO
+			5.Tombol Approve & Reject
+		*/
 	}
 
 	function makeFooter()
