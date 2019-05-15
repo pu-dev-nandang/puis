@@ -546,7 +546,7 @@ class C_admission extends Admission_Controler {
     public function set_tuition_fee_delete_data()
     {
       $input = $this->getInputToken();
-      $this->m_admission->set_tuition_fee_delete_data($input);
+      $this->m_admission->set_tuition_fee_delete_data($input,'Created');
     }
 
     public function set_tuition_fee_approved($page = null)

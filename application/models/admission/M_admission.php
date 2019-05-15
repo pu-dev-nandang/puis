@@ -1983,7 +1983,8 @@ class M_admission extends CI_Model {
       return $query[0]['total'];
      }
 
-     public function count_getDataCalonMhsTuitionFee_delete($FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
+     // public function count_getDataCalonMhsTuitionFee_delete($FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
+     public function count_getDataCalonMhsTuitionFee_delete($FormulirCode,$Status = 'p.Status = "Created"')
      {
 
       if($FormulirCode != '%') {
@@ -2037,7 +2038,8 @@ class M_admission extends CI_Model {
       
      }
 
-     public function getDataCalonMhsTuitionFee_delete($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
+     // public function getDataCalonMhsTuitionFee_delete($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
+     public function getDataCalonMhsTuitionFee_delete($limit, $start,$FormulirCode,$Status = 'p.Status = "Created"')
      {
 
       if($FormulirCode != '%') {
@@ -2166,10 +2168,14 @@ class M_admission extends CI_Model {
 
      }
 
-     public function set_tuition_fee_delete_data($input)
+     public function set_tuition_fee_delete_data($input,$approved = null)
      {
+      $addQ = '';
+      if ($approved != null) {
+        $addQ = ' and Status = "'.$approved.'"';
+      }
       for ($i=0; $i < count($input); $i++) { 
-        $sql = "delete from db_finance.register_admisi where ID_register_formulir = ".$input[$i];
+        $sql = "delete from db_finance.register_admisi where ID_register_formulir = ".$input[$i].' '.$addQ;
         $query=$this->db->query($sql, array()); 
 
         $sql = "delete from db_finance.payment_admisi where ID_register_formulir = ".$input[$i];
