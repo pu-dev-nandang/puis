@@ -3230,6 +3230,19 @@ class C_api2 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='loadDateExamSA'){
+
+            $SASemesterID = $data_arr['SASemesterID'];
+            $Type = $data_arr['Type'];
+
+            $dataSa = $this->db->query('SELECT se.ExamDate FROM db_academic.sa_exam se 
+                                                  WHERE se.SASemesterID = "'.$SASemesterID.'" AND se.Type = "'.$Type.'" 
+                                                  GROUP BY se.ExamDate ORDER BY se.ExamDate ASC ')->result_array();
+
+            return print_r(json_encode($dataSa));
+
+        }
+
         else if($data_arr['action']=='loadStd2Apprv'){
 
             $ScheduleIDSA = $data_arr['ScheduleIDSA'];
@@ -4150,8 +4163,6 @@ class C_api2 extends CI_Controller {
                         'Edom' => 1
                     );
                 }
-
-
 
             }
 

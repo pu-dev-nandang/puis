@@ -965,11 +965,19 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
 
+//        print_r($data_arr);exit;
+
+
         if($data_arr['DocumentType']==1){
 
-            // Get data exam
-            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            if(isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']=='1' || $data_arr['IsSemesterSA']==1)){
+                $dataExam = $this->m_save_to_pdf->getExamSchedule_SA($data_arr['SASemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            } else {
+                // Get data exam
+                $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            }
 
+//            print_r($dataExam);exit;
 
             $pdf = new FPDF('l','mm','A4');
 
@@ -1000,8 +1008,12 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==2){
 
-            // Get data exam
-            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            if(isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']=='1' || $data_arr['IsSemesterSA']==1)){
+                $dataExam = $this->m_save_to_pdf->getExamSchedule_SA($data_arr['SASemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            } else {
+                // Get data exam
+                $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            }
 
 
             $pdf = new FPDF('P','mm','A4');
@@ -1031,10 +1043,12 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==3){
 
-//            print_r($data_arr);
-//            exit;
-            // Get data exam
-            $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            if(isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']=='1' || $data_arr['IsSemesterSA']==1)){
+                $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent_SA($data_arr['SASemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            } else {
+                // Get data exam
+                $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            }
 
             $pdf = new FPDF('P','mm','A4');
 
@@ -1066,8 +1080,12 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==4){
 
-            // Get data exam
-            $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            if(isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']=='1' || $data_arr['IsSemesterSA']==1)){
+                $dataExam = $this->m_save_to_pdf->getExamSchedule_SA($data_arr['SASemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            } else {
+                // Get data exam
+                $dataExam = $this->m_save_to_pdf->getExamSchedule($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            }
 
             $pdf = new FPDF('P','mm','A4');
             if(count($dataExam)>0){
@@ -1092,8 +1110,12 @@ class C_save_to_pdf extends CI_Controller {
         }
         else if($data_arr['DocumentType']==5){
 
-            // Get data exam
-            $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            if(isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']=='1' || $data_arr['IsSemesterSA']==1)){
+                $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent_SA($data_arr['SASemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            } else {
+                // Get data exam
+                $dataExam = $this->m_save_to_pdf->getExamScheduleWithStudent($data_arr['SemesterID'],$data_arr['Type'],$data_arr['ExamDate']);
+            }
 
             if(count($dataExam)>0){
 
@@ -1163,17 +1185,20 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetFont('Times','B',10);
 
+        $Semester = explode(' ',$data_arr['Semester']);
         $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
-        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
+        $xam_h = (trim($Semester[1])=='Ganjil') ? 'ODD' : 'EVEN';
+
+        $Antara = (isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']==1 || $data_arr['IsSemesterSA']=='1')) ? ' ANTARA' : '';
 
         $pdf->Cell(135,$h,$xam_t.' PAPER HANDOVER',0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
         $pdf->Cell(135,$h,$xam_t.' PAPER HANDOVER',0,1,'C');
 
-        $Semester = explode(' ',$data_arr['Semester']);
-        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,0,'C');
+
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])).''.$Antara,0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])).''.$Antara,0,1,'C');
 
         $pdf->SetFont('Times','',10);
 
@@ -1454,15 +1479,17 @@ class C_save_to_pdf extends CI_Controller {
     private function header_exam_attendance_students($pdf,$data_arr,$dataDetailExam,$dataCourse){
 
         $this->headerDefaultPotret($pdf,'FM-UAP/AKD-13-03A');
+        $Semester = explode(' ',$data_arr['Semester']);
 
         $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
-        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
-        $Semester = explode(' ',$data_arr['Semester']);
+        $xam_h = (trim($Semester[1])=='Ganjil') ? 'ODD' : 'EVEN';
+
+        $Antara = (isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']==1 || $data_arr['IsSemesterSA']=='1')) ? ' ANTARA' : '';
 
         $h = 5;
         $pdf->SetFont('Times','B',10);
         $pdf->Cell(195,$h,'ATTENDANCE '.$xam_t,0,1,'C');
-        $pdf->Cell(195,$h,$xam_h.' SEMESTER ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
+        $pdf->Cell(195,$h,$xam_h.' SEMESTER ACADEMIC YEAR '.strtoupper(trim($Semester[0])).''.$Antara,0,1,'C');
 
         $pdf->Ln(5);
         $pdf->SetFont('Times','',10);
@@ -1818,7 +1845,8 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Times','B',10);
 
         $xam_t = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'MID EXAM' : 'FINAL EXAM';
-        $xam_h = ($data_arr['Type']=='uts' || $data_arr['Type']=='UTS') ? 'ODD' : 'EVEN';
+        $xam_h = ($dataDetailExam['CodeSemester']=='1' || $dataDetailExam['CodeSemester']==1
+        || $dataDetailExam['CodeSemester']=='3' || $dataDetailExam['CodeSemester']==3) ? 'ODD' : 'EVEN';
 
         $pdf->Cell(135,$h,$xam_t,0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
@@ -1829,9 +1857,10 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(135,$h,'EVEN SEMESTER',0,1,'C');
 
         $Semester = explode(' ',$data_arr['Semester']);
-        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,0,'C');
+        $Antara = (isset($data_arr['IsSemesterSA']) && ($data_arr['IsSemesterSA']==1 || $data_arr['IsSemesterSA']=='1')) ? ' ANTARA' : '';
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])).''.$Antara,0,0,'C');
         $pdf->Cell(17,$h,'',0,0);
-        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])),0,1,'C');
+        $pdf->Cell(135,$h,$xam_h.' ACADEMIC YEAR '.strtoupper(trim($Semester[0])).''.$Antara,0,1,'C');
 
         //++++++++++++++++++++++++++++++++++++++++++++
         $pdf->Ln(5);

@@ -148,13 +148,68 @@ class M_save_to_pdf extends CI_Model {
         return $data;
 
     }
+    public function getExamSchedule_SA($SASemesterID,$Type,$ExamDate){
+        $data = $this->db->query('SELECT se.ID, se.SASemesterID, se.Type, se.ExamDate, se.Start AS ExamStart, se.End AS ExamEnd, cl.Room,
+                                            em1.Name AS Name_P1, em2.Name AS Name_P2, sa.Code AS CodeSemester
+                                            FROM db_academic.sa_exam se
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
+                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
+                                            LEFT JOIN db_academic.semester_antara sa ON (sa.ID = se.SASemesterID)
+                                            WHERE se.SASemesterID = "'.$SASemesterID.'" 
+                                            AND se.Type = "'.$Type.'"
+                                            AND se.ExamDate = "'.$ExamDate.'" 
+                                            ORDER BY se.ExamDate, se.Start, se.End')->result_array();
+
+        if(count($data)>0){
+            for($c=0;$c<count($data);$c++){
+                $d = $data[$c];
+                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec 
+                                                     LEFT JOIN db_academic.sa_schedule ss ON (ss.ID = sec.ScheduleIDSA)
+                                                     LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
+                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator) 
+                                                     WHERE sec.ExamIDSA = "'.$d['ID'].'"
+                                                     GROUP BY ss.ID ORDER BY ss.ClassGroup ASC
+                                                     ')->result_array();
+
+                if(count($dataC)>0){
+
+                    // Get Prodi
+                    for($r=0;$r<count($dataC);$r++){
+                        $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.sa_schedule_course ssc
+                                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ssc.ProdiID)
+                                                                WHERE ssc.ScheduleIDSA = "'.$dataC[$r]['ScheduleIDSA'].'"
+                                                                GROUP BY ps.ID ORDER BY ps.ID')->result_array();
+
+                        $prodi = '';
+                        for($p=0;$p<count($dataProdi);$p++){
+                            $del = ($p==0) ? '' : ', ';
+                            $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
+                        }
+                        $dataC[$r]['Prodi'] = $prodi;
+
+                    }
+
+                }
+
+                $data[$c]['Course'] = $dataC;
+            }
+        }
+
+        return $data;
+    }
+
 
     public function getExamScheduleWithStudent($SemesterID,$Type,$ExamDate){
 
-        $data = $this->db->query('SELECT ex.*,cl.Room, em1.Name AS Name_P1, em2.Name AS Name_P2 FROM db_academic.exam ex 
+        $data = $this->db->query('SELECT ex.ID, ex.SemesterID, ex.Type, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
+                                          em1.Name AS Name_P1, em2.Name AS Name_P2, s.Code AS CodeSemester FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
                                           LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
+                                          LEFT JOIN db_academic.semester s ON (s.ID = ex.SemesterID)
                                           WHERE ex.SemesterID = "'.$SemesterID.'"
                                            AND ex.Type = "'.$Type.'"
                                             AND ex.ExamDate = "'.$ExamDate.'"
@@ -192,8 +247,6 @@ class M_save_to_pdf extends CI_Model {
                         $dataC[$r]['Prodi'] = $prodi;
                     }
 
-
-
                     // Get Students
                     for($r=0;$r<count($dataC);$r++){
 
@@ -207,12 +260,70 @@ class M_save_to_pdf extends CI_Model {
 
                     }
 
-
                 }
 
+                $data[$c]['Course'] = $dataC;
+            }
+        }
+
+        return $data;
+
+    }
+
+    public function getExamScheduleWithStudent_SA($SASemesterID,$Type,$ExamDate){
+
+        $data = $this->db->query('SELECT se.ID, se.SASemesterID, se.Type, se.ExamDate, se.Start AS ExamStart, se.End AS ExamEnd, cl.Room,
+                                            em1.Name AS Name_P1, em2.Name AS Name_P2, sa.Code AS CodeSemester
+                                            FROM db_academic.sa_exam se
+                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = se.ClassroomID)
+                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
+                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
+                                            LEFT JOIN db_academic.semester_antara sa ON (sa.ID = se.SASemesterID)
+                                            WHERE se.SASemesterID = "'.$SASemesterID.'" 
+                                            AND se.Type = "'.$Type.'"
+                                            AND se.ExamDate = "'.$ExamDate.'" 
+                                            ORDER BY se.ExamDate, se.Start, se.End')->result_array();
+
+        if(count($data)>0){
+            for($c=0;$c<count($data);$c++){
+                $d = $data[$c];
+                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec 
+                                                     LEFT JOIN db_academic.sa_schedule ss ON (ss.ID = sec.ScheduleIDSA)
+                                                     LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
+                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator) 
+                                                     WHERE sec.ExamIDSA = "'.$d['ID'].'"
+                                                     GROUP BY ss.ID ORDER BY ss.ClassGroup ASC
+                                                     ')->result_array();
+
+                if(count($dataC)>0){
+
+                    // Get Prodi
+                    for($r=0;$r<count($dataC);$r++){
+                        $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.sa_schedule_course ssc
+                                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ssc.ProdiID)
+                                                                WHERE ssc.ScheduleIDSA = "'.$dataC[$r]['ScheduleIDSA'].'"
+                                                                GROUP BY ps.ID ORDER BY ps.ID')->result_array();
+
+                        $prodi = '';
+                        for($p=0;$p<count($dataProdi);$p++){
+                            $del = ($p==0) ? '' : ', ';
+                            $prodi = $prodi.''.$del.''.''.$dataProdi[$p]['Code'];
+                        }
+                        $dataC[$r]['Prodi'] = $prodi;
 
 
+                        $arr_student = [];
+                        $dataStdInExcam = $this->m_rest->getListStudentExamAntara($dataC[$r]['CDID']);
+//                        if($dataStdInExcam['Status']=='1' || $dataStdInExcam['Status']==1){
+//                            $arr_student = $dataStdInExcam['DetailStudents'];
+//                        }
 
+                        $dataC[$r]['DetailStudents'] = $dataStdInExcam;
+                    }
+
+                }
 
                 $data[$c]['Course'] = $dataC;
             }

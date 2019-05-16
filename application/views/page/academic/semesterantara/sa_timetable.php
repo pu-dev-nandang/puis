@@ -41,11 +41,15 @@
 </style>
 
 <!--<h1>sa_timetable</h1>-->
-
+<div style="text-align: right;margin-bottom: 15px;">
+    <button class="btn btn-default" id="loadDocumentExam"><i class="fa fa-download margin-right"></i> Exam Document</button>
+</div>
 <div id="viewTableTimetable"></div>
 
 <input id="tempScheduleIDSA" class="hide">
 <textarea id="tempStd" class="hide"></textarea>
+
+
 
 <script>
 
@@ -255,29 +259,29 @@
 
         });
 
-
-        return false;
-
-        var dataTable = $('#tableMonScore').DataTable( {
-            "processing": true,
-            "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
-            "language": {
-                "searchPlaceholder": "NIM, Student, Group, Lecturer"
-            },
-            "ajax":{
-                url : base_url_js+"api/__getMonScoreStd", // json datasource
-                data : {token:token},
-                ordering : false,
-                type: "post",  // method  , by default get
-                error: function(){  // error handling
-                    $(".employee-grid-error").html("");
-                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                    $("#employee-grid_processing").css("display","none");
-                }
-            }
-        });
+        //
+        // return false;
+        //
+        // var dataTable = $('#tableMonScore').DataTable( {
+        //     "processing": true,
+        //     "serverSide": true,
+        //     "iDisplayLength" : 10,
+        //     "ordering" : false,
+        //     "language": {
+        //         "searchPlaceholder": "NIM, Student, Group, Lecturer"
+        //     },
+        //     "ajax":{
+        //         url : base_url_js+"api/__getMonScoreStd", // json datasource
+        //         data : {token:token},
+        //         ordering : false,
+        //         type: "post",  // method  , by default get
+        //         error: function(){  // error handling
+        //             $(".employee-grid-error").html("");
+        //             $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+        //             $("#employee-grid_processing").css("display","none");
+        //         }
+        //     }
+        // });
 
     }
 
@@ -578,5 +582,132 @@
         });
 
     }
+
+    $('#loadDocumentExam').click(function () {
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Exam Document</h4>');
+
+
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-3">' +
+            '        <div class="form-group">' +
+            '            <label>Exam</label>' +
+            '            <select class="form-control" id="formExamType">' +
+            '                <option value="uts">UTS</option>' +
+            '                <option value="uas">UAS</option>' +
+            '                <option disabled>--- Make-up Exams ---</option>' +
+            '                <option value="re_uts" style="color: orangered;">Make-up UTS</option>' +
+            '                <option value="re_uas" style="color: orangered;">Make-up UAS</option>' +
+            '            </select>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="col-md-4">' +
+            '        <div class="form-group">' +
+            '            <label>Date</label>' +
+            '            <select class="form-control" id="formExamDate"></select>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="col-md-5">' +
+            '        <div class="form-group">' +
+            '            <label>Document</label>' +
+            '            <select class="form-control" id="formPDFTypeDocument">' +
+            '               <option value="5">Tamplate Map Soal</option>' +
+            '               <option value="1">Berita Acara Penyerahan</option>' +
+            '               <option value="2">Berita Acara Pelaksanaan Ujian</option>' +
+            '               <option value="3">Exam Attendance</option>' +
+            '               <option disabled="">-----------------------</option>' +
+            '               <option value="4">Pengawas</option>' +
+            '            </select>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        loadExamDate2PDF();
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+            '<button type="button" class="btn btn-success" id="downloadDocumentExam" disabled>Download</button>');
+
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('#formExamType').change(function () {
+            loadExamDate2PDF();
+        });
+
+        $('#downloadDocumentExam').click(function () {
+            var formExamType = $('#formExamType').val();
+            var formExamDate = $('#formExamDate').val();
+            var formPDFTypeDocument = $('#formPDFTypeDocument').val();
+
+            var dataSemester = JSON.parse($('#dataSemester').val());
+            var SemesterName = (dataSemester.length>0) ? dataSemester[0].Name : '';
+
+
+            var data = {
+                SASemesterID : '<?=$SASemesterID; ?>',
+                Semester : SemesterName,
+                Type : formExamType,
+                ExamDate : formExamDate,
+                DocumentType : formPDFTypeDocument,
+                IsSemesterSA : 1
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2pdf/filterDocument';
+
+            FormSubmitAuto(url,'POST',[{ name: 'token', value: token }]);
+
+
+
+        });
+
+
+
+
+    });
+
+    function loadExamDate2PDF() {
+
+        $('#downloadDocumentExam').prop('disabled',true);
+        $('#formExamDate').empty();
+
+        var formExamType = $('#formExamType').val();
+
+        var data = {
+            action : 'loadDateExamSA',
+            SASemesterID : '<?=$SASemesterID; ?>',
+            Type : formExamType
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api2/__crudSemesterAntara';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            // console.log(jsonResult);
+            if(jsonResult.length>0){
+                var dateOpt = '';
+                $.each(jsonResult,function (i,v) {
+                    var d = moment(v.ExamDate).format('ddd, DD MMM YYYY');
+                    dateOpt = dateOpt+'<option value="'+v.ExamDate+'">'+d+'</option>';
+                });
+
+                $('#formExamDate').append(dateOpt);
+
+                $('#downloadDocumentExam').prop('disabled',false);
+            }
+
+
+        });
+    }
+
+
 
 </script>
