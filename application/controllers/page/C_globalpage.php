@@ -65,7 +65,9 @@ class C_globalpage extends Globalclass {
          $data['bool'] = $bool;
          $data['Code'] = $Code;
          $data['G_data'] = $G_data;
-         $content = $this->load->view('global/budgeting/po/InfoPO',$data,true);
+         if ($G_data[0]['TypeCreate'] == 1) { // PO
+            $content = $this->load->view('global/budgeting/po/InfoPO',$data,true);
+         }
          $this->temp($content);   
     }
 

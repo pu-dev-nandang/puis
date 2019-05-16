@@ -337,6 +337,7 @@
 	      case  "Detail" :
 	      case  "Action" :
 	      case  "Departement" :
+	      case  "Desc" :
 	            break;
 	      case  "Item" :
 	            result = Validation_required(arr[key],key);
@@ -344,12 +345,12 @@
 	              toatString += result['messages'] + "<br>";
 	            }
 	            break;
-	      case  "Desc" :
-	            result = Validation_required(arr[key],key);
-	            if (result['status'] == 0) {
-	              toatString += result['messages'] + "<br>";
-	            }
-	            break; 
+	      // case  "Desc" :
+	      //       result = Validation_required(arr[key],key);
+	      //       if (result['status'] == 0) {
+	      //         toatString += result['messages'] + "<br>";
+	      //       }
+	      //       break; 
           case  "EstimaValue" :
           	// if (arr[key] == 0) {
           	// 	toatString += 'Estimate Value must be higher than 0' + "<br>";

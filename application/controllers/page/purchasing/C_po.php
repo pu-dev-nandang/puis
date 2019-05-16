@@ -165,16 +165,10 @@ class C_po extends Transaksi_Controler {
             case 'PO':
                 $this->submit_po();
                 break;    
-            
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
         }
-        /*arr_pr_detail
-        arr_supplier
-        action_mode
-        action_submit
-        */
     }
 
     public function submit_po()
@@ -190,6 +184,9 @@ class C_po extends Transaksi_Controler {
             case 'edit':
                 $this->edit_submit_po();
                 break;
+            case 'modifycreated':
+                $this->modifycreated_submit_po();
+                break;    
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -365,6 +362,52 @@ class C_po extends Transaksi_Controler {
                 $this->m_pr_po->po_circulation_sheet($Code,'PO Created');
 
         echo json_encode($arr_rs);    
+    }
+
+    public function modifycreated_submit_po()
+    {
+        $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+        $Input = $this->getInputToken();
+        $po_data = $Input['po_data']; // data yang di passing awal dari server ke client
+        $arr_post_data_detail =$Input['arr_post_data_detail'];
+        $AnotherCost = $Input['AnotherCost'];
+        $Notes = $Input['Notes'];
+
+        $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
+        if ($CheckPerubahanData) {
+            $arr_post_data_detail = json_decode(json_encode($arr_post_data_detail),true);
+            for ($i=0; $i < count($arr_post_data_detail); $i++) { 
+                $dataSave = $arr_post_data_detail[$i];
+                unset($dataSave['ID_po_detail']);
+                $ID = $arr_post_data_detail[$i]['ID_po_detail'];
+                $this->db->where('ID',$ID);
+                $this->db->update('db_purchasing.po_detail',$dataSave);
+            }
+
+            $po_data = json_decode(json_encode($po_data),true);
+            $po_create = $po_data['po_create'];
+            $Code = $po_create[0]['Code'];
+
+            // cek circulation sheet
+            if ($po_create[0]['Code'] != 0) {
+                // insert to pr_circulation_sheet
+                    $this->m_pr_po->po_circulation_sheet($Code,'PO Edited');
+            }
+
+            $dataSave = array(
+                'AnotherCost' => $AnotherCost,
+                'Notes' => $Notes,
+                'Status' => 1,
+            );
+            $this->db->where('Code',$Code);
+            $this->db->update('db_purchasing.po_create',$dataSave);
+        }
+        else
+        {
+            $rs['Change'] = 1;
+        }
+
+        echo json_encode($rs);
     }
 
     public function submit_spk()

@@ -2401,10 +2401,10 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function SearchNameNIP_Employees_PU_Holding($NIP)
     {
-        $sql = 'select Name from db_employees.employees
+        $sql = 'select Name,EmailPU from db_employees.employees
                 where NIP = "'.$NIP.'"
                 UNION
-                select Name from db_employees.holding
+                select Name,Email as EmailPU from db_employees.holding
                 where NIK = "'.$NIP.'"
                 ';
         $query=$this->db->query($sql, array())->result_array();

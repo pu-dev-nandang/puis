@@ -1118,4 +1118,12 @@ class C_pr_po extends Budgeting_Controler {
         echo json_encode($rs);
     }
 
+    public function po()
+    {
+        $this->data['G_Approver'] = $this->m_pr_po->Get_m_Approver_po();
+        $this->data['m_type_user'] = $this->m_master->showData_array('db_purchasing.cfg_m_type_approval');
+        $content = $this->load->view('page/'.'purchasing'.'/transaksi/po/list',$this->data,true);
+        $this->temp($content);
+    }
+
 }

@@ -1361,6 +1361,7 @@ $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purch
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
 // global lihat PO
 $route['global/purchasing/transaction/po/list/(:any)'] = 'page/C_globalpage/InfoPO/$1';
+$route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
 
