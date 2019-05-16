@@ -313,7 +313,7 @@ class M_pr_po extends CI_Model {
                 $JsonStatusDecode = (array)json_decode($JsonStatus,true);
                 for ($j=0; $j < count($JsonStatusDecode); $j++) { 
                     $ApprovedBy = $JsonStatusDecode[$j]['NIP'];
-                    $NameAprrovedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy);
+                    $NameAprrovedBy = $this->m_master->SearchNameNIP_Employees_PU_Holding($ApprovedBy);
                     $NameAprrovedBy = $NameAprrovedBy[0]['Name'];
                     $JsonStatusDecode[$j]['NameAprrovedBy'] = $NameAprrovedBy;
                 }
@@ -777,7 +777,7 @@ class M_pr_po extends CI_Model {
        }
        $arr['po_create'] = $query;
 
-       $sql = 'select a.ID_pre_po_detail,a.UnitCost as UnitCost_PO,a.Discount as Discount_PO,a.PPN as PPN_PO,a.Subtotal,
+       $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,a.UnitCost as UnitCost_PO,a.Discount as Discount_PO,a.PPN as PPN_PO,a.SubTotal as Subtotal,
                 b.ID_pr_detail,c.Qty as QtyPR,c.Item,c.Desc,c.DateNeeded,c.Spec_add,c.UnitCost as UnitCost_PR,c.Subtotal as Subtotal_PR,
                 c.ID_budget_left,c.ID_creator_budget,c.CodePostRealisasi,c.CodeHeadAccount,c.CodePost,c.RealisasiPostName,c.Departement as Departement_HA,c.PostName,c.NameHeadAccount,c.PPH as PPH_PR,c.PRCode,c.DetailCatalog
                 from db_purchasing.po_detail as a 
@@ -810,6 +810,71 @@ class M_pr_po extends CI_Model {
         
         return $arr;       
 
+    }
+
+    public function CheckPerubahanData_PO_Created($po_data)
+    {
+        $bool = true;
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+        $po_detail = $po_data['po_detail'];
+        $ID_pre_po_supplier = $po_create[0]['ID_pre_po_supplier'];
+        $Status = $po_create[0]['Status'];
+        $AnotherCost = $po_create[0]['AnotherCost'];
+        $Notes = $po_create[0]['Notes'];
+        /*
+            1.Compare dengan data po sekarang
+        */
+
+         $Code = $po_create[0]['Code'];
+         $G_po_create = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+         if ($G_po_create[0]['Status'] != $Status || $G_po_create[0]['ID_pre_po_supplier'] != $ID_pre_po_supplier || $G_po_create[0]['AnotherCost'] != $AnotherCost || $G_po_create[0]['Notes'] != $Notes ) {
+               $bool = false;
+         }
+
+         /*
+            2.Compare dengan data detail sekarang
+         */
+            if ($bool) {
+                $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code);
+                if (count($G_po_detail) != count($po_detail)) {
+                   $bool = false;
+                }
+                else
+                {
+                    for ($i=0; $i < count($po_detail); $i++) { 
+                        $ID_po_detail = $po_detail[$i]['ID_po_detail'];
+                        $bool2 = false;
+                        for ($j=0; $j < count($G_po_detail); $j++) { 
+                            $ID_po_detail_ = $G_po_detail[$j]['ID'];
+                            if ($ID_po_detail == $ID_po_detail_) {
+                                $UnitCost_PO = $po_detail[$i]['UnitCost_PO'];
+                                $Discount_PO = $po_detail[$i]['Discount_PO'];
+                                $PPN_PO = $po_detail[$i]['PPN_PO'];
+                                $Subtotal = $po_detail[$i]['Subtotal'];
+                                $ID_pre_po_detail = $po_detail[$i]['ID_pre_po_detail'];
+                                if ($UnitCost_PO != $G_po_detail[$j]['UnitCost'] || $Discount_PO !=  $G_po_detail[$j]['Discount'] || $PPN_PO != $G_po_detail[$j]['PPN']  ||  $Subtotal != $G_po_detail[$j]['SubTotal'] || $ID_pre_po_detail != $G_po_detail[$j]['ID_pre_po_detail'] ) {
+                                   $bool2 = false;
+                                }
+                                else
+                                {
+                                    $bool2 = true;
+                                }
+                                break;
+                            }
+                        }
+
+                        if (!$bool2) {
+                            $bool = false;
+                            break;
+                        }
+                    }
+                }
+                
+            }
+
+        return $bool;    
+                  
     }
 
 

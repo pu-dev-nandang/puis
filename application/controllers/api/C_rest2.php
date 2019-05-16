@@ -201,8 +201,14 @@ class C_rest2 extends CI_Controller {
                             );
                             $this->db->insert('db_notifikasi.logging_user',$Log_arr_ins);
                             // fill arr_to_email
-                            $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$arr_to[$i]);
-                            $arr_to_email[] = $G_emp[0]['EmailPU'];
+                            $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($arr_to[$i]);
+                            if (count($G_emp) > 0) {
+                                if ($G_emp[0]['EmailPU'] != '') {
+                                    $arr_to_email[] = $G_emp[0]['EmailPU'];
+                                }
+                                
+                            }
+                            
                         }     
 
                     if (array_key_exists('Email', $dataToken)) {
@@ -351,16 +357,16 @@ class C_rest2 extends CI_Controller {
                                 select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateAt,a.CreatedAt,a.PostingDate
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
-                                left join db_employees.employees as d on a.CreatedAt = d.NIP     
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP     
                             )aa
                            ';
 
                     $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
-                          or NameCreateAt LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
                         ) '.$StatusQuery ;
                     $sql.= ' ORDER BY Code Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
@@ -412,7 +418,7 @@ class C_rest2 extends CI_Controller {
                         }
 
                         $nestedData = array_merge($nestedData,$arr);
-                        $nestedData[] = $row['NameCreateAt'];
+                        $nestedData[] = $row['NameCreateBy'];
                         $data[] = $nestedData;
                         $No++;
                     }
@@ -447,6 +453,28 @@ class C_rest2 extends CI_Controller {
                     $Code = $dataToken['Code'];
                     $data = $this->m_pr_po->Get_data_po_by_Code($Code);
                     echo json_encode($data);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function ajax_terbilang()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $terbilang = $this->m_master->moneySay($dataToken['bilangan']).'Rupiah';
+                    $terbilang = trim(ucwords($terbilang));
+                    echo json_encode($terbilang);
                 }
                 else
                 {
