@@ -38,6 +38,10 @@
         margin-bottom: 7px;
         vertical-align: middle;
     }
+
+    #tableScoreing tr th, #tableScoreing tr td {
+        text-align: center;
+    }
 </style>
 
 <!--<h1>sa_timetable</h1>-->
@@ -54,7 +58,6 @@
 <script>
 
     $(document).ready(function () {
-        // loadTimetableSA();
         loadTimetables();
     });
 
@@ -111,7 +114,7 @@
         var course = $(this).attr('data-course');
 
         var dataToken = jwt_decode(token,'UAP)(*');
-        console.log(dataToken);
+
 
         $('#GlobalModalLarge .modal-dialog').css('width','1200px');
         $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -242,48 +245,6 @@
             'backdrop' : 'static'
         });
     });
-
-    function loadTimetableSA() {
-
-        var data = {
-            action : 'loadTimetableSA',
-            SASemesterID : '<?=$SASemesterID; ?>'
-        };
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api2/__crudSemesterAntara';
-
-        $.post(url,{token:token},function (jsonResult) {
-
-            console.log(jsonResult);
-
-        });
-
-        //
-        // return false;
-        //
-        // var dataTable = $('#tableMonScore').DataTable( {
-        //     "processing": true,
-        //     "serverSide": true,
-        //     "iDisplayLength" : 10,
-        //     "ordering" : false,
-        //     "language": {
-        //         "searchPlaceholder": "NIM, Student, Group, Lecturer"
-        //     },
-        //     "ajax":{
-        //         url : base_url_js+"api/__getMonScoreStd", // json datasource
-        //         data : {token:token},
-        //         ordering : false,
-        //         type: "post",  // method  , by default get
-        //         error: function(){  // error handling
-        //             $(".employee-grid-error").html("");
-        //             $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-        //             $("#employee-grid_processing").css("display","none");
-        //         }
-        //     }
-        // });
-
-    }
 
     $(document).on('click','.loadSyllabusRPS',function () {
 
@@ -668,9 +629,6 @@
 
         });
 
-
-
-
     });
 
     function loadExamDate2PDF() {
@@ -707,6 +665,250 @@
 
         });
     }
+
+    // === BTN Score ===
+    $(document).on('click','.btnScore',function () {
+        var ScheduleIDSA = $(this).attr('data-id');
+        var Course = $(this).attr('data-course');
+
+        var dataCheck = {
+            action : 'loadDocumentSA_Score',
+            SASemesterID : '<?=$SASemesterID; ?>',
+            ScheduleIDSA : ScheduleIDSA,
+
+        };
+
+        var tokenCheck = jwt_encode(dataCheck,'UAP)(*');
+        var url2 = base_url_js+'api2/__crudSemesterAntara';
+
+        $.post(url2,{token:tokenCheck},function (jsonResult) {
+
+            var d = jsonResult[0];
+            var bodyModal = '<div class="alert alert-warning" role="alert">Syllabus & RPS not yet Approve</div>';
+
+            $('#GlobalModalLarge .modal-dialog').css('width','1200px');
+            $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">'+Course+'</h4>');
+
+            $('#GlobalModalLarge .modal-body').html();
+
+            (d.DocumentStatus==2 || d.DocumentStatus=='2')
+                ? $('#GlobalModalLarge .modal-footer').removeClass('hide')
+                    .html(' <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+                        '<button id="submitScore" class="btn btn-success">Submit</button> ')
+                : $('#GlobalModalLarge .modal-footer').removeClass('hide')
+                    .html(' <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+            if(d.DocumentStatus==2 || d.DocumentStatus=='2'){
+
+
+                var fm_ev_en = 'form-score-enable';
+                var fm_UTS_en = 'form-score-enable';
+                var fm_UAS_en = 'form-score-enable';
+
+                var std = '';
+                var no = 1;
+                var ArrIDSSD = [];
+                $.each(d.Students,function (i,v) {
+                    ArrIDSSD.push(v.IDSSD);
+
+                    var Evaluasi_ = (v.Evaluasi!=null && v.Evaluasi!='') ? v.Evaluasi : '';
+                    var UTS_ = (v.UTS!=null && v.UTS!='') ? v.UTS : '';
+                    var UAS_ = (v.UAS!=null && v.UAS!='') ? v.UAS : '';
+
+                    var ViewScore_ = (v.ScoreNew!=null && v.ScoreNew!='') ? v.ScoreNew : '0.00';
+                    var Score_ = (v.ScoreNew!=null && v.ScoreNew!='') ? v.ScoreNew : '0.00';
+
+                    var ViewGrade_ = (v.GradeNew!=null && v.GradeNew!='') ? v.GradeNew : '';
+
+                    var color = '';
+                    if(ViewGrade_=='A' || ViewGrade_=='A-') {
+                        color = 'style="color:green;"';
+                    }
+                    else if(ViewGrade_=='B+' || ViewGrade_=='B' || ViewGrade_=='B-'){
+                        color = 'style="color:blue;"';
+                    }
+                    else if(ViewGrade_=='C+' || ViewGrade_=='C'){
+                        color = 'style="color:#dc8300;"';
+                    }
+                    else if(ViewGrade_=='D' || ViewGrade_=='E'){
+                        color = 'style="color:red;"';
+                    }
+
+                    var Grade_ = (v.GradeNew!=null && v.GradeNew!='') ? v.GradeNew : '';
+
+                    var GradeValue_ = (v.GradeValueNew!=null && v.GradeValueNew!='') ? v.GradeValueNew : '';
+
+
+                    std = std+'<tr>' +
+                        '<td style="border-right: 1px solid #ccc;">'+no+'</td>' +
+                        '<td style="text-align: left;">'+v.Name+'<br/>'+v.NPM+'</td>' +
+                        '<td><input class="form-control form-score '+fm_ev_en+'" data-id="'+v.IDSSD+'" id="Evaluasi_'+v.IDSSD+'" value="'+Evaluasi_+'" type="number"/></td>' +
+                        '<td><input class="form-control form-score '+fm_UTS_en+'" data-id="'+v.IDSSD+'" id="UTS_'+v.IDSSD+'" value="'+UTS_+'" type="number"/></td>' +
+                        '<td style="border-right: 1px solid #ccc;"><input class="form-control form-score '+fm_UAS_en+'" data-id="'+v.IDSSD+'" id="UAS_'+v.IDSSD+'" value="'+UAS_+'" type="number"/></td>' +
+                        '<td><div id="ViewScore_'+v.IDSSD+'">'+ViewScore_+'</div><input class="hide" id="Score_'+v.IDSSD+'" value="'+Score_+'" /></td>' +
+                        '<td><div id="ViewGrade_'+v.IDSSD+'"><b '+color+'>'+ViewGrade_+'</b></div><input class="hide" id="Grade_'+v.IDSSD+'" value="'+Grade_+'" /><input class="hide" id="GradeValue_'+v.IDSSD+'" value="'+GradeValue_+'" /></td>' +
+                        '</tr>';
+                    no++;
+                });
+
+                bodyModal = '' +
+                    '<input id="dataPercentage" class="hide" value="'+d.Evaluasi+'|'+d.UTS+'|'+d.UAS+'">' +
+                    '<textarea id="ArrIDSSD" class="hide">'+JSON.stringify(ArrIDSSD)+'</textarea>' +
+                    '<table class="table table-striped" id="tableScoreing">' +
+                    '    <thead>' +
+                    '    <tr>' +
+                    '        <th style="width: 1%;">No</th>' +
+                    '        <th>Student</th>' +
+                    '        <th style="width: 15%;">Assg. ('+d.Evaluasi+'%)</th>' +
+                    '        <th style="width: 15%;">UTS ('+d.UTS+'%)</th>' +
+                    '        <th style="width: 15%;">UAS ('+d.UAS+'%)</th>' +
+                    '        <th style="width: 7%;">Score</th>' +
+                    '        <th style="width: 7%;">Grade</th>' +
+                    '    </tr>' +
+                    '    </thead>' +
+                    '   <tbody id="loadStudent">'+std+'</tbody>' +
+                    '</table>';
+            }
+
+            $('#GlobalModalLarge .modal-body').html(bodyModal);
+
+
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+
+
+        });
+
+    });
+
+    $(document).on('keyup','.form-score-enable',function () {
+
+        var v = ($(this).val()!='')? $(this).val() : 0;
+
+
+        if(parseFloat(v)<=100){
+            var IDSSD = $(this).attr('data-id');
+            var dataPercentage = $('#dataPercentage').val().split('|');
+
+            var Evaluasi_ = $('#Evaluasi_'+IDSSD).val();
+            var UTS_ = $('#UTS_'+IDSSD).val();
+            var UAS_ = $('#UAS_'+IDSSD).val();
+
+            var Evaluasi = (Evaluasi_!='' && Evaluasi_!=null) ? parseFloat(Evaluasi_) : 0;
+            var UTS = (UTS_!='' && UTS_!=null) ? parseFloat(UTS_) : 0;
+            var UAS = (UAS_!='' && UAS_!=null) ? parseFloat(UAS_) : 0;
+
+            var Score_ = (Evaluasi * parseFloat(dataPercentage[0])/100) +
+                (UTS * parseFloat(dataPercentage[1])/100) + (UAS * parseFloat(dataPercentage[2])/100);
+
+            var Score = parseFloat(Score_).toFixed(2);
+            $('#ViewScore_'+IDSSD).html(Score);
+            $('#Score_'+IDSSD).val(Score);
+
+
+
+            var url = base_url_js+'api/__crudScore';
+            var token = jwt_encode({action:'grade',Score:Score},'UAP)(*');
+            $.post(url,{token:token},function (jsonResult) {
+
+                var color = '';
+                if(jsonResult.Grade=='A' || jsonResult.Grade=='A-') {
+                    color = 'style="color:green;"';
+                }
+                else if(jsonResult.Grade=='B+' || jsonResult.Grade=='B' || jsonResult.Grade=='B-'){
+                    color = 'style="color:blue;"';
+                }
+                else if(jsonResult.Grade=='C+' || jsonResult.Grade=='C'){
+                    color = 'style="color:#dc8300;"';
+                }
+                else if(jsonResult.Grade=='D' || jsonResult.Grade=='E'){
+                    color = 'style="color:red;"';
+                }
+
+                $('#ViewGrade_'+IDSSD).html('<b '+color+'>'+jsonResult.Grade+'</b>');
+                $('#Grade_'+IDSSD).val(jsonResult.Grade);
+                $('#GradeValue_'+IDSSD).val(jsonResult.Score);
+
+            });
+
+        } else {
+            toastr.warning('Maximum score 100','Warning');
+            $(this).val(100);
+        }
+
+    });
+
+    $(document).on('click','#submitScore',function () {
+
+        loading_button('#submitScore');
+        $('button[data-dismiss=modal],.form-score-enable').prop('disabled',true);
+
+        var ArrIDSSD = $('#ArrIDSSD').val();
+        if(ArrIDSSD!=''){
+            ArrIDSSD = JSON.parse(ArrIDSSD);
+            console.log(ArrIDSSD);
+
+            var std = [];
+            if(ArrIDSSD.length>0){
+
+                for(var i=0;i<ArrIDSSD.length;i++){
+                    var IDSSD = ArrIDSSD[i];
+
+                    var Evaluasi_ = $('#Evaluasi_'+IDSSD).val();
+                    var UTS_ = $('#UTS_'+IDSSD).val();
+                    var UAS_ = $('#UAS_'+IDSSD).val();
+                    var Score_ = $('#Score_'+IDSSD).val();
+                    var Grade_ = $('#Grade_'+IDSSD).val();
+                    var GradeValue_ = $('#GradeValue_'+IDSSD).val();
+
+
+                    var Evaluasi = (Evaluasi_!='' && Evaluasi_!=null) ? parseFloat(Evaluasi_) : 0;
+                    var UTS = (UTS_!='' && UTS_!=null) ? parseFloat(UTS_) : 0;
+                    var UAS = (UAS_!='' && UAS_!=null) ? parseFloat(UAS_) : 0;
+                    var Score = (Score_!='' && Score_!=null) ? parseFloat(Score_) : 0;
+                    var Grade = (Grade_!='' && Grade_!=null) ? Grade_ : 'E';
+                    var GradeValue = (GradeValue_!='' && GradeValue_!=null) ? parseFloat(GradeValue_) : 0;
+
+                    var arrStd = {
+                        IDSSD : IDSSD,
+                        Update : {
+                            Evaluasi : Evaluasi,
+                            UTS : UTS,
+                            UAS : UAS,
+                            ScoreNew : Score,
+                            GradeNew : Grade,
+                            GradeValueNew : GradeValue
+                        }
+                    };
+
+                    std.push(arrStd);
+                }
+            }
+
+            var data = {
+                action : 'updateScoreSA',
+                dataStd : std
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudSemesterAntara';
+
+            $.post(url,{token:token},function (result) {
+
+                toastr.success('Score saved','Success');
+                setTimeout(function () {
+                    $('#submitScore').prop('disabled',false).html('Submit');
+                    $('button[data-dismiss=modal],.form-score-enable').prop('disabled',false);
+                },500);
+
+
+            });
+
+        }
+    });
 
 
 
