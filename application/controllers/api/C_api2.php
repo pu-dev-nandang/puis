@@ -3890,7 +3890,7 @@ class C_api2 extends CI_Controller {
                                         <li><a href="javascript:void(0);" class="btnAttdStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" data-id="'.$ScheduleIDSA.'" data-std="'.$tokenStd.'">Student Attendance</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="javascript:void(0);" class="loadSyllabusRPS" data-id="'.$ScheduleIDSA.'" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'">Syllabus & RPS</a></li>
-                                        <li><a href="#">Score</a></li>
+                                        <li><a href="javascript:void(0);" class="btnScore" data-id="'.$ScheduleIDSA.'" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'">Score</a></li>
                                       </ul>
                                     </div>
                                 </div>';
