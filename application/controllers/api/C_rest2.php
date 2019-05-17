@@ -487,4 +487,263 @@ class C_rest2 extends CI_Controller {
                  echo '{"status":"999","message":"Not Authorize"}';
             }
     }
+
+    public function approve_po()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $po_data = $dataToken['po_data'];
+                    $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
+                    if ($CheckPerubahanData) {
+                        $Code = $dataToken['Code'];
+                        $CodeUrl = str_replace($Code, '/', '-');
+                        $approval_number = $dataToken['approval_number'];
+                        $NIP = $dataToken['NIP'];
+                        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                        $NameFor_NIP = $G_emp[0]['Name'];
+                        $action = $dataToken['action'];
+
+                        // get data
+                        $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+
+                        $keyJson = $approval_number - 1; // get array index json
+                        $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                        // get data update to approval
+                        $arr_upd = $JsonStatus[$keyJson];
+
+                        if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                            $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                            $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                            $JsonStatus[$keyJson] = $arr_upd;
+                            $datasave = array(
+                                'JsonStatus' => json_encode($JsonStatus),
+                            );
+
+                            // check all status for update data
+                            $boolApprove = true;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2 || $Status == 0) {
+                                    $boolApprove = false;
+                                    break;
+                                }
+                            }
+
+                            if ($boolApprove) {
+                                $datasave['Status'] = 2;
+                                $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                            }
+                            else
+                            {
+                                $boolReject = false;
+                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                    $arr = $JsonStatus[$i];
+                                    $Status = $arr['Status'];
+                                    if ($Status == 2) {
+                                        $boolReject = true;
+                                        break;
+                                    }
+                                }
+
+                                if ($boolReject) {
+                                    $NoteDel = $dataToken['NoteDel'];
+                                    $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                    $datasave['Status'] = 3;
+                                    // $datasave['Notes'] = $Notes;
+                                }
+                                else
+                                {
+                                    // Notif to next step approval & User
+                                        $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                        // Send Notif for next approval
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO : '.$Code,
+                                                                'Description' => 'Please approve PO '.$Code,
+                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($NIPApprovalNext),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token);
+
+                                        // Send Notif for user 
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PO '.$Code.' has been Approved',
+                                                                'Description' => 'PR '.$Code.' has been approved by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($JsonStatus[0]['NIP']),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token); 
+                                }
+                            }
+
+                            $this->db->where('PRCode',$PRCode);
+                            $this->db->update('db_budgeting.pr_create',$datasave);
+
+                            // insert to pr_circulation_sheet
+                                $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                                if (array_key_exists('Status', $datasave)) {
+                                    if ($datasave['Status'] == 2) {
+                                        $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                                        // save to db_purchasing pr_status
+                                        $dataSave = array(
+                                            'PRCode' => $PRCode,
+                                            'Item_proc' => 0,
+                                            'Item_done' => 0,
+                                            'Item_pending' => count($this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode)),
+                                            'Status' => 0,
+                                        );
+
+                                        $this->db->insert('db_purchasing.pr_status',$dataSave);
+                                        $ID_pr_status = $this->db->insert_id();
+
+                                        // save to db_purchasing pr_status_detail
+                                        for ($i=0; $i < count($G_data_detail); $i++) { 
+                                            $ID_pr_detail = $G_data_detail[$i]['ID'];
+                                            $dataSave = array(
+                                                'ID_pr_status' => $ID_pr_status,
+                                                'ID_pr_detail' => $ID_pr_detail,
+                                                'Status' => 0,
+                                            );
+                                            $this->db->insert('db_purchasing.pr_status_detail',$dataSave);
+                                        }
+
+                                        // Notif All Approve to JsonStatus allkey
+                                            $IDdiv = $G_data[0]['Departement'];
+                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                            // $NameDepartement = $G_div[0]['NameDepartement'];
+                                            $Code = $G_div[0]['Code'];
+                                            $arr_to = array();
+                                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                                $arr_to[] = $JsonStatus[$i]['NIP'];
+                                            }
+
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
+                                                                'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
+                                                                'URLDirect' => 'budgeting_pr',
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => $arr_to,
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token);
+
+                                        // Notif to Purchasing 
+                                            $IDdiv = $G_data[0]['Departement'];
+                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                            //$NameDepartement = $G_div[0]['NameDepartement'];
+                                            $Code = $G_div[0]['Code'];
+
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
+                                                                'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
+                                                                'URLDirect' => 'purchasing/transaction/po/open',
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'Div' => array(4),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token);   
+                                    }
+                                }
+
+                                if ($arr_upd['Status'] == 2) {
+                                    if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                        $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                    }
+
+                                    // Notif Reject to JsonStatus key 0
+                                        $IDdiv = $G_data[0]['Departement'];
+                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                        $NameDepartement = $G_div[0]['NameDepartement'];
+
+                                        // Send Notif for user 
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Rejected',
+                                                                'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                                'URLDirect' => 'budgeting_pr',
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($JsonStatus[0]['NIP']),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token);
+                                }
+                                
+                                $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                        }
+                        else
+                        {
+                            $msg = 'Not Authorize';
+                        }
+
+
+                    }
+                    else
+                    {
+                        $rs['Change'] = 1;
+                    }
+
+
+                    echo json_encode($rs);
+
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
 }
