@@ -236,13 +236,85 @@
                 </div>
             </div>
 
-
         </div>
     </div>
 </div>
+<br />
+
+<div class="row">
+     <div class="col-md-8">
+        <div class="thumbnail" style="padding: 0px">
+            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Study Program Accreditation</span>
+
+            <div style="margin: 5px;margin-top: 15px;">
+                <table class="table table-bordered" id="tableStudyAcc">
+                    <tr>
+                        <th style="width: 10%">Name Study Indo</th>
+                        <th style="width: 10%">Name Study Eng</th>
+                        <th style="width: 10%">Program</th>
+                        <th style="width: 10%">Name Faculty</th>
+
+                        <th style="width: 10%">Akreditasi Date </th>
+                        <th style="width: 10%">No Akreditasi </th>
+                        <th style="width: 2%">Action</th>
+                    </tr>
+
+                    <?php foreach ($ProgramStudy AS $itemX){ ?>
+                        <tr>
+                            <td><?php echo $itemX['Name']; ?></td>
+                            <td><?php echo $itemX['NameEng']; ?></td>
+                            <td><?php echo $itemX['NameLevel']; ?></td>
+                            <td><?php echo $itemX['NameFak']; ?></td>
+                            <td>
+                                <span id="SKBANPTDate<?php echo $itemX['ID']; ?>"><?php echo $itemX['SKBANPTDate']; ?></span>
+                                <!--<input class="form-control frmdatepicker hide" id="formAkreditasiBANPTDate<?php //echo $itemX['ID']; ?>" value="<?php //echo $itemX['AkreditasiBANPTDate']; ?>"> -->
+                            </td>
+                            <td>
+                                <span id="NoSKBANPT<?php echo $itemX['ID']; ?>"><?php echo $itemX['NoSKBANPT']; ?></span>
+                                <!-- <input class="form-control hide" id="formNoAkreditasiBANPT<?php //echo $itemX['NoAkreditasiBANPT']; ?>" value="<?php //echo $itemX['NoAkreditasiBANPT']; ?>"> -->
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm btnSaveEdStudy hide" id="btnSaveEdStudy<?php echo $itemX['ID']; ?>" data-id="<?php echo $itemX['ID']; ?>">Save</button>
+
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle btnDropDownEdStudy" id="btnDropDownEdStudy<?php echo $itemX['ID']; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="javascript:void(0);" class="btnEditEdStudy" data-id="<?php echo $itemX['ID']; ?>">Edit</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li class="disabled"><a href="javascript:void(0);" class="btnDelEd disabled" disabled="disabled" data-id="<?php echo $itemX['ID']; ?>">Delete</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php } ?>
+
+                    <!--                    <button class="btn btn-sm btn-default btn-default-danger"><i class="fa fa-trash"></i></button>-->
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
 
 <script>
     $(document).ready(function () {
+
+        $('.frmdatepicker').datepicker({
+          dateFormat : 'yy-mm-dd',
+          changeMonth : true,
+          changeYear : true,
+          autoSize: true,
+          autoclose: true,
+          todayHighlight: true
+          //uiLibrary: 'bootstrap'
+        });
+
         $( "#formSTDateIssued,#formSTDateOfYudisium,#formTemp_TsDate" )
             .datepicker({
                 showOtherMonths:true,
@@ -465,8 +537,55 @@
     $(document).on('click','.btnEditEd',function () {
         var ID = $(this).attr('data-id');
         $('#btnDropDownEd'+ID+', #viewDescriptionEng'+ID).addClass('hide');
-        $('#btnSaveEd'+ID+', #formEDescriptionEng'+ID).removeClass('hide');
+        $('#btnSaveEdStudy'+ID+', #formEDescriptionEng'+ID).removeClass('hide');
     });
+
+    // Program Study Accreditation
+    $(document).on('click','.btnEditEdStudy',function () {
+        
+        var tr = $(this).closest('tr');
+        tr.find('td:eq(4)').html('<center><input type = "text" class = "form-control" id="formAkreditasiBANPTDate"></center>');
+        tr.find('td:eq(5)').html('<input type = "text" class = "form-control" >');
+        
+        $('.btnDropDownEdStudy').addClass('hide');
+        $('.btnSaveEdStudy').removeClass('hide');
+
+        $('#formAkreditasiBANPTDate').datepicker({
+              dateFormat : 'yy-mm-dd',
+              changeMonth : true,
+              changeYear : true,
+              autoclose: true,
+              todayHighlight: true,
+              uiLibrary: 'bootstrap'
+        });
+
+    });
+
+    $(document).on('click','.btnSaveEdStudy',function () {
+        var tr = $(this).closest('tr');
+        var dateacc = tr.find('td:eq(4)').find('input').val();
+        var noacc = tr.find('td:eq(5)').find('input').val();
+        var ID = $(this).attr('data-id');
+        alert(ID);
+
+        var data = {
+            action : 'updateStudyAcc',
+            Dateacc : dateacc,
+            ID : ID,
+            Noacc : noacc
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudTranscript';
+
+        $.post(url,{token:token},function (result) {
+            toastr.success('Data Saved','Success');
+            setTimeout(function () {
+                window.location.href = '';
+            },500);
+        });
+    });
+
+
     $(document).on('click','.btnSaveEd',function () {
         var ID = $(this).attr('data-id');
         loading_buttonSm('#btnSaveEd'+ID);
