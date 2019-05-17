@@ -908,6 +908,8 @@ $route['rest/__approve_pr'] = 'api/c_rest/approve_pr';
 $route['rest/__budgeting_dashboard'] = 'api/c_rest/budgeting_dashboard';
 $route['rest/__InputCatalog_saveFormInput'] = 'api/c_rest/InputCatalog_saveFormInput';
 $route['rest/__show_circulation_sheet'] = 'api/c_rest/show_circulation_sheet';
+$route['rest/__show_circulation_sheet_po'] = 'api/c_rest/show_circulation_sheet_po';
+
 $route['rest/__log_budgeting'] = 'api/c_rest/log_budgeting';
 $route['rest/__approve_budget'] = 'api/c_rest/approve_budget';
 $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_PowerApps';

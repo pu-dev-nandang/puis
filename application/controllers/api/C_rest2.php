@@ -500,10 +500,10 @@ class C_rest2 extends CI_Controller {
                     $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
                     if ($CheckPerubahanData) {
                         $Code = $dataToken['Code'];
-                        $CodeUrl = str_replace($Code, '/', '-');
+                        $CodeUrl = str_replace('/', '-', $Code);
                         $approval_number = $dataToken['approval_number'];
                         $NIP = $dataToken['NIP'];
-                        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                        $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                         $NameFor_NIP = $G_emp[0]['Name'];
                         $action = $dataToken['action'];
 
@@ -554,7 +554,7 @@ class C_rest2 extends CI_Controller {
                                 if ($boolReject) {
                                     $NoteDel = $dataToken['NoteDel'];
                                     $Notes = $G_data[0]['Notes']."\n".$NoteDel;
-                                    $datasave['Status'] = 3;
+                                    $datasave['Status'] = -1;
                                     // $datasave['Notes'] = $Notes;
                                 }
                                 else
@@ -601,42 +601,16 @@ class C_rest2 extends CI_Controller {
                                 }
                             }
 
-                            $this->db->where('PRCode',$PRCode);
-                            $this->db->update('db_budgeting.pr_create',$datasave);
+                            $this->db->where('Code',$Code);
+                            $this->db->update('db_purchasing.po_create',$datasave); 
 
-                            // insert to pr_circulation_sheet
+                            // insert to po_circulation_sheet
                                 $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
                                 if (array_key_exists('Status', $datasave)) {
                                     if ($datasave['Status'] == 2) {
                                         $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
-                                        // save to db_purchasing pr_status
-                                        $dataSave = array(
-                                            'PRCode' => $PRCode,
-                                            'Item_proc' => 0,
-                                            'Item_done' => 0,
-                                            'Item_pending' => count($this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode)),
-                                            'Status' => 0,
-                                        );
-
-                                        $this->db->insert('db_purchasing.pr_status',$dataSave);
-                                        $ID_pr_status = $this->db->insert_id();
-
-                                        // save to db_purchasing pr_status_detail
-                                        for ($i=0; $i < count($G_data_detail); $i++) { 
-                                            $ID_pr_detail = $G_data_detail[$i]['ID'];
-                                            $dataSave = array(
-                                                'ID_pr_status' => $ID_pr_status,
-                                                'ID_pr_detail' => $ID_pr_detail,
-                                                'Status' => 0,
-                                            );
-                                            $this->db->insert('db_purchasing.pr_status_detail',$dataSave);
-                                        }
 
                                         // Notif All Approve to JsonStatus allkey
-                                            $IDdiv = $G_data[0]['Departement'];
-                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                            // $NameDepartement = $G_div[0]['NameDepartement'];
-                                            $Code = $G_div[0]['Code'];
                                             $arr_to = array();
                                             for ($i=0; $i < count($JsonStatus); $i++) { 
                                                 $arr_to[] = $JsonStatus[$i]['NIP'];
@@ -645,9 +619,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
-                                                                'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
-                                                                'URLDirect' => 'budgeting_pr',
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
+                                                                'Description' => 'PO '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -661,17 +635,12 @@ class C_rest2 extends CI_Controller {
                                             $this->m_master->apiservertoserver($url,$token);
 
                                         // Notif to Purchasing 
-                                            $IDdiv = $G_data[0]['Departement'];
-                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                            //$NameDepartement = $G_div[0]['NameDepartement'];
-                                            $Code = $G_div[0]['Code'];
-
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
-                                                                'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
-                                                                'URLDirect' => 'purchasing/transaction/po/open',
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
+                                                                'Description' => 'PO '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -692,17 +661,13 @@ class C_rest2 extends CI_Controller {
                                     }
 
                                     // Notif Reject to JsonStatus key 0
-                                        $IDdiv = $G_data[0]['Departement'];
-                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
-                                        $NameDepartement = $G_div[0]['NameDepartement'];
-
                                         // Send Notif for user 
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Rejected',
-                                                                'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
-                                                                'URLDirect' => 'budgeting_pr',
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been Rejected',
+                                                                'Description' => 'PO '.$Code.' has been Rejected by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -716,7 +681,7 @@ class C_rest2 extends CI_Controller {
                                             $this->m_master->apiservertoserver($url,$token);
                                 }
                                 
-                                $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+                                $this->m_pr_po->po_circulation_sheet($Code,$Desc,$NIP);
 
                         }
                         else
@@ -730,7 +695,6 @@ class C_rest2 extends CI_Controller {
                     {
                         $rs['Change'] = 1;
                     }
-
 
                     echo json_encode($rs);
 

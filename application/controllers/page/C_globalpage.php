@@ -41,34 +41,41 @@ class C_globalpage extends Globalclass {
         */
 
          $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
-         $bool = true;
-         if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
-                $bool = true;
-         }
-         else{
-            $bool = false;
-         }
-
-         if (!$bool) { // for user
-            $JsonStatus = $G_data[0]['JsonStatus'];
-            $arr = (array) json_decode($JsonStatus,true);
-            $NIP = $this->session->userdata('NIP');
-            for ($i=0; $i < count($arr); $i++) { 
-                $NIP_ = $arr[$i]['NIP'];
-                if ($NIP == $NIP_) {
+         if (count($G_data) > 0) {
+             $bool = true;
+             if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
                     $bool = true;
-                    break;
-                }
-            }
-         }
+             }
+             else{
+                $bool = false;
+             }
 
-         $data['bool'] = $bool;
-         $data['Code'] = $Code;
-         $data['G_data'] = $G_data;
-         if ($G_data[0]['TypeCreate'] == 1) { // PO
-            $content = $this->load->view('global/budgeting/po/InfoPO',$data,true);
+             if (!$bool) { // for user
+                $JsonStatus = $G_data[0]['JsonStatus'];
+                $arr = (array) json_decode($JsonStatus,true);
+                $NIP = $this->session->userdata('NIP');
+                for ($i=0; $i < count($arr); $i++) { 
+                    $NIP_ = $arr[$i]['NIP'];
+                    if ($NIP == $NIP_) {
+                        $bool = true;
+                        break;
+                    }
+                }
+             }
+
+             $data['bool'] = $bool;
+             $data['Code'] = $Code;
+             $data['G_data'] = $G_data;
+             if ($G_data[0]['TypeCreate'] == 1) { // PO
+                $content = $this->load->view('global/budgeting/po/InfoPO',$data,true);
+             }
+             $this->temp($content);
          }
-         $this->temp($content);   
+         else
+         {
+            show_404($log_error = TRUE); 
+         }
+            
     }
 
 }
