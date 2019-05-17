@@ -56,7 +56,7 @@
         $('#SemesterName').html(SemesterName);
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['timetable','students','score','setting-timetable','setting-exam','setting'];
+        var arrMenu = ['timetable','students','setting-timetable','setting-exam','setting'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
     });
 

@@ -8,6 +8,7 @@ class C_semester_antara extends Academic_Controler {
         parent::__construct();
 //        $this->session->set_userdata('departement_nav', 'academic');
         $this->load->model('akademik/m_matakuliah');
+        $this->load->model('akademik/m_semester_antara');
     }
 
 
@@ -53,10 +54,16 @@ class C_semester_antara extends Academic_Controler {
         $this->menu_semester_antara($page,$SASemesterID);
     }
 
-    public function score($SASemesterID){
+    public function recap_attendance($SASemesterID,$ScheduleIDSA){
         $data['SASemesterID'] = $SASemesterID;
         $data['department'] = parent::__getDepartement();
-        $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_score',$data,true);
+        $dataRecap = $this->m_semester_antara->getRecapAttendance($ScheduleIDSA);
+
+        $data['dataCourse'] = $dataRecap['dataCourse'][0];
+        $data['dataLec'] = $dataRecap['dataLec'];
+        $data['dataStd'] = $dataRecap['dataStd'];
+
+        $page = $this->load->view('page/'.$data['department'].'/semesterantara/sa_recap_attendance',$data,true);
         $this->menu_semester_antara($page,$SASemesterID);
     }
 

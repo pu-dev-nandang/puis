@@ -3626,8 +3626,8 @@ class C_api2 extends CI_Controller {
                 $this->db->where('ID', $dataCk[0]['ID']);
                 $this->db->update('db_academic.sa_attendance', $inputAttd);
             } else {
-                $inputAttd['EntredAt'] = $dataTimeNow;
-                $inputAttd['EntredBy'] = $inputAttd['UpdatedBy'];
+                $inputAttd['EntredAt'] = (isset($inputAttd['EntredAt'])) ? $inputAttd['EntredAt'] : $dataTimeNow;
+                $inputAttd['EntredBy'] = (isset($inputAttd['EntredBy'])) ? $inputAttd['EntredBy'] : $inputAttd['UpdatedBy'];
                 $this->db->insert('db_academic.sa_attendance', $inputAttd);
             }
 
@@ -3890,6 +3890,7 @@ class C_api2 extends CI_Controller {
 
         $no = $requestData['start'] + 1;
         $data = array();
+        $arrLec = [];
         for($i=0;$i<count($query);$i++) {
             $nestedData = array();
 
@@ -3903,11 +3904,22 @@ class C_api2 extends CI_Controller {
                                       WHERE sstt.ScheduleIDSA = "'.$ScheduleIDSA.'" ')->result_array();
 
             $Lec = '<b>(Co) '.$row['Name'].'</b>';
+            array_push($arrLec,array(
+                'NIP' => $row['Coordinator'],
+                'Name' => $row['Name']
+            ));
             if(count($TeamTeaching)>0){
                 foreach ($TeamTeaching AS $item){
                     $Lec = $Lec.'<div>- '.$item['Name'].'</div>';
+
+                    array_push($arrLec,array(
+                        'NIP' => $item['NIP'],
+                        'Name' => $item['Name']
+                    ));
                 }
             }
+
+            $tokenLec = $this->jwt->encode($arrLec,'UAP)(*');
 
             // Load Course
             $Course = $this->db->query('SELECT ssc.*
@@ -4005,8 +4017,9 @@ class C_api2 extends CI_Controller {
                                         <i class="fa fa-edit"></i> <span class="caret"></span>
                                       </button>
                                       <ul class="dropdown-menu">
-                                        <li><a href="#">Lecturer Attendance</a></li>
+                                        <li><a href="javascript:void(0);" class="btnAttdLecturer" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" data-id="'.$ScheduleIDSA.'" data-token="'.$tokenLec.'">Lecturer Attendance</a></li>
                                         <li><a href="javascript:void(0);" class="btnAttdStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" data-id="'.$ScheduleIDSA.'" data-std="'.$tokenStd.'">Student Attendance</a></li>
+                                        <li><a href="javascript:void(0);" class="btnRecapAttdStd" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'" data-id="'.$ScheduleIDSA.'">Recap Attendance</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="javascript:void(0);" class="loadSyllabusRPS" data-id="'.$ScheduleIDSA.'" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'">Syllabus & RPS</a></li>
                                         <li><a href="javascript:void(0);" class="btnScore" data-id="'.$ScheduleIDSA.'" data-course="'.$row['ClassGroup'].' - '.$row['CourseEng'].'">Score</a></li>
