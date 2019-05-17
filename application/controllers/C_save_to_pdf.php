@@ -3720,6 +3720,7 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
         $dataIjazah = $this->m_save_to_pdf->getIjazah($data_arr['DBStudent'],$data_arr['NPM']);
+        //print_r($dataIjazah); exit;
         $pdf = new FPDF('L','mm','A4');
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
         // membuat halaman baru
@@ -3735,7 +3736,7 @@ class C_save_to_pdf extends CI_Controller {
         $w_right = $full_width - $w_left;
         $pdf->SetY(8); //novie
         $pdf->SetFont('dinpromedium','',8);
-        $pdf->Cell($w_left,$h,'Nomor Keputusan Akreditasi Program Studi : '.$Ijazah['NumberUniv'],$border,0,'L');
+        $pdf->Cell($w_left,$h,'Nomor Keputusan Akreditasi Program Studi : '.$Student['NoSKBANPT'],$border,0,'L');
         $pdf->Cell($w_right,$h,'Nomor Ijazah Nasional : '.$Student['CNN'],$border,1,'L');
         $pdf->SetFont('dinlightitalic','',8);
         $pdf->Cell($w_left,$h,'Study Program Accreditation Number',$border,0,'L');
