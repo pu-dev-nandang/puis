@@ -197,9 +197,100 @@
 				  	StatusName = 'Cancel';
 				    break;    
 		}
-		$('#DocPenawaran').html('<div class="col-xs-12"><div style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div></div>');
+
+		$('#DocPenawaran').html('<div class="col-xs-12"><div style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Log</a></div></div>');
 
 	}
+
+	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
+	    var url = base_url_js+'rest/__show_circulation_sheet_po';
+   		var data = {
+   		    Code : ClassDt.Code,
+   		    auth : 's3Cr3T-G4N',
+   		};
+   		var token = jwt_encode(data,"UAP)(*");
+   		$.post(url,{ token:token },function (data_json) {
+   			var html = '<div class = "row"><div class="col-md-12">';
+   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">Date</th>'+
+                              '<th style="width: 55px;">By</th>';
+		        html += '</tr>' ;
+		        html += '</thead>' ;
+		        html += '<tbody>' ;
+
+		        // for (var i = 0; i < data_json.length; i++) {
+		        // 	var No = parseInt(i) + 1;
+		        // 	html += '<tr>'+
+		        // 	      '<td>'+ No + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Desc'] + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Date'] + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Name'] + '</td>'+
+		        // 	    '<tr>';	
+		        // }
+
+		        html += '</tbody>' ;
+		        html += '</table></div></div>' ;	
+
+   			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+   			    '';
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Circulation Sheet'+'</h4>');
+   			$('#GlobalModalLarge .modal-body').html(html);
+   			$('#GlobalModalLarge .modal-footer').html(footer);
+   			$('#GlobalModalLarge').modal({
+   			    'show' : true,
+   			    'backdrop' : 'static'
+   			});
+
+   			// make datatable
+   				var table = $('#TblModal').DataTable({
+   				      "data" : data_json,
+   				      'columnDefs': [
+   					      {
+   					         'targets': 0,
+   					         'searchable': false,
+   					         'orderable': false,
+   					         'className': 'dt-body-center',
+   					         'render': function (data, type, full, meta){
+   					             return '';
+   					         }
+   					      },
+   					      {
+   					         'targets': 1,
+   					         'render': function (data, type, full, meta){
+   					             return full.Desc;
+   					         }
+   					      },
+   					      {
+   					         'targets': 2,
+   					         'render': function (data, type, full, meta){
+   					             return full.Date;
+   					         }
+   					      },
+   					      {
+   					         'targets': 3,
+   					         'render': function (data, type, full, meta){
+   					             return full.Name;
+   					         }
+   					      },
+   				      ],
+   				      'createdRow': function( row, data, dataIndex ) {
+   				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   				      	
+   				      },
+   				});
+
+   				table.on( 'order.dt search.dt', function () {
+   				        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   				            cell.innerHTML = i+1;
+   				        } );
+   				} ).draw();
+
+   		});
+	})
 
 	function makeAction()
 	{
@@ -225,6 +316,8 @@
 		switch(Status) {
 		  case 0:
 		  case '0':
+		  case -1:
+		  case '-1':
 		  	var JsonStatus = po_create[0]['JsonStatus'];
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
@@ -301,10 +394,6 @@
 		    break;
 		  case 2:
 		  case '2':
-		    // code block
-		    break;
-		  case -1:
-		  case '-1':
 		    // code block
 		    break;
 		  case 4:
@@ -808,7 +897,7 @@
 				NIP : sessionNIP,
 				action : 'approve',
 				auth : 's3Cr3T-G4N',
-				DtExisting : ClassDt.po_data,
+				po_data : ClassDt.po_data,
 			}
 
 			var token = jwt_encode(data,"UAP)(*");
@@ -842,7 +931,81 @@
 			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 			});
 		}
-	})	
+	})
+
+	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
+		if (confirm('Are you sure ?')) {
+			var Code = ClassDt.Code;
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_po';
+				var data = {
+					Code : Code,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					po_data : ClassDt.po_data,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						Get_data_po().then(function(data){
+								ClassDt.po_data = data;
+								WriteHtml();
+						})
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							Get_data_po().then(function(data){
+									ClassDt.po_data = data;
+									WriteHtml();
+							})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
+	})
 
 		
 </script>

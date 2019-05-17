@@ -132,7 +132,7 @@ $(document).ready(function() {
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function (data_json) {
    			var html = '<div class = "row"><div class="col-md-12">';
-   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData">'+
+   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -143,15 +143,15 @@ $(document).ready(function() {
 		        html += '</thead>' ;
 		        html += '<tbody>' ;
 
-		        for (var i = 0; i < data_json.length; i++) {
-		        	var No = parseInt(i) + 1;
-		        	html += '<tr>'+
-		        	      '<td>'+ No + '</td>'+
-		        	      '<td>'+ data_json[i]['Desc'] + '</td>'+
-		        	      '<td>'+ data_json[i]['Date'] + '</td>'+
-		        	      '<td>'+ data_json[i]['Name'] + '</td>'+
-		        	    '<tr>';	
-		        }
+		        // for (var i = 0; i < data_json.length; i++) {
+		        // 	var No = parseInt(i) + 1;
+		        // 	html += '<tr>'+
+		        // 	      '<td>'+ No + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Desc'] + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Date'] + '</td>'+
+		        // 	      '<td>'+ data_json[i]['Name'] + '</td>'+
+		        // 	    '<tr>';	
+		        // }
 
 		        html += '</tbody>' ;
 		        html += '</table></div></div>' ;	
@@ -165,6 +165,52 @@ $(document).ready(function() {
    			    'show' : true,
    			    'backdrop' : 'static'
    			});
+
+   			// make datatable
+   				var table = $('#TblModal').DataTable({
+   				      "data" : data_json,
+   				      'columnDefs': [
+   					      {
+   					         'targets': 0,
+   					         'searchable': false,
+   					         'orderable': false,
+   					         'className': 'dt-body-center',
+   					         'render': function (data, type, full, meta){
+   					             return '';
+   					         }
+   					      },
+   					      {
+   					         'targets': 1,
+   					         'render': function (data, type, full, meta){
+   					             return full.Desc;
+   					         }
+   					      },
+   					      {
+   					         'targets': 2,
+   					         'render': function (data, type, full, meta){
+   					             return full.Date;
+   					         }
+   					      },
+   					      {
+   					         'targets': 3,
+   					         'render': function (data, type, full, meta){
+   					             return full.Name;
+   					         }
+   					      },
+   				      ],
+   				      'createdRow': function( row, data, dataIndex ) {
+   				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   				      	
+   				      },
+   				});
+
+   				table.on( 'order.dt search.dt', function () {
+   				        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   				            cell.innerHTML = i+1;
+   				        } );
+   				} ).draw();
+
+
    		});
 	})
 	    

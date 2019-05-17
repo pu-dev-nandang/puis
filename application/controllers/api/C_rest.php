@@ -2067,7 +2067,7 @@ class C_rest extends CI_Controller {
                 $PRCode = $dataToken['PRCode'];
                 $approval_number = $dataToken['approval_number'];
                 $NIP = $dataToken['NIP'];
-                $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                 $NameFor_NIP = $G_emp[0]['Name'];
                 $action = $dataToken['action'];
                 // check data telah berubah atau tidak
@@ -3125,6 +3125,35 @@ class C_rest extends CI_Controller {
                         where a.PRCode = ?
                         ';
                 $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs = $query;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function show_circulation_sheet_po()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $Code = $dataToken['Code'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.po_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.Code = ?
+                        ';
+                $query=$this->db->query($sql, array($Code))->result_array();
                 $rs = $query;        
                 echo json_encode($rs);
             }
