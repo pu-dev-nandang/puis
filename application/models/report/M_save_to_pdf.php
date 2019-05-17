@@ -540,7 +540,7 @@ class M_save_to_pdf extends CI_Model {
     public function getIjazah($DBStudent,$NPM){
         $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN, 
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, aus.KTPNumber,
-                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, 
+                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, ps.NoSKBANPT,
                                             edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
                                             em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
                                             FROM '.$DBStudent.'.students s
@@ -595,5 +595,14 @@ class M_save_to_pdf extends CI_Model {
     }
 //==============================================================================================================================
 //==============================================================================================================================
+
+    public function getAkreditasiStudy($DBStudent,$NPM){
+        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
+                                                  WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
+                                                   LIMIT 1')->result_array();
+
+        return $dataGrade;
+
+    }
 
 }
