@@ -69,12 +69,15 @@ class M_finance extends CI_Model {
     $this->db->insert('db_admission.register_verified', $dataSave);
    }
 
-   public function getFormulirCode($tipeFormulirCode = null)
+   public function getFormulirCode($tipeFormulirCode = null,$year = null)
     {
       // get Year
       $this->load->model('master/m_master');
-      $G_ta = $this->m_master->showData_array('db_admission.set_ta');
-      $year = $G_ta[0]['Ta'];
+      if ($year == null) {
+        $G_ta = $this->m_master->showData_array('db_admission.set_ta');
+        $year = $G_ta[0]['Ta'];
+      }
+      
      if ($tipeFormulirCode == 'online') { // online
          $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$year."' order by ID asc limit 1";
      }
@@ -894,43 +897,52 @@ class M_finance extends CI_Model {
       // get number surat
        $No_Surat = $this->getNumberSuratTuitionFee($arrDataPersonal[0]['ID_register_formulir']);
 
-       if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
-           $process = $this->create_va_Payment($payment,$DeadLinePayment, $arrDataPersonal[0]['Name'], $arrDataPersonal[0]['Email'],$arrDataPersonal[0]['VA_number']);
-            if ($process['status']) {
-                $BilingID = $process['msg']['trx_id'];
-                $dataSave = array(
-                        'BilingID' => $BilingID,
-                                );
-                $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
-                $this->db->where('Deadline',$DeadLinePayment);
-                $this->db->update('db_finance.payment_pre', $dataSave);
+       // if ($this->session->userdata('finance_auth_Policy_SYS') == 1) {
+       //     $process = $this->create_va_Payment($payment,$DeadLinePayment, $arrDataPersonal[0]['Name'], $arrDataPersonal[0]['Email'],$arrDataPersonal[0]['VA_number']);
+       //      if ($process['status']) {
+       //          $BilingID = $process['msg']['trx_id'];
+       //          $dataSave = array(
+       //                  'BilingID' => $BilingID,
+       //                          );
+       //          $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
+       //          $this->db->where('Deadline',$DeadLinePayment);
+       //          $this->db->update('db_finance.payment_pre', $dataSave);
 
-                $dataSave = array(
-                        'Status' => 'Approved',
-                        'No_Surat' => $No_Surat,
-                        'ApprovedBY' => $this->session->userdata('NIP'),
-                        'ApprovedAT' => date('Y-m-d'),
-                                );
-                $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
-                $this->db->update('db_finance.register_admisi', $dataSave);
+       //          $dataSave = array(
+       //                  'Status' => 'Approved',
+       //                  'No_Surat' => $No_Surat,
+       //                  'ApprovedBY' => $this->session->userdata('NIP'),
+       //                  'ApprovedAT' => date('Y-m-d'),
+       //                          );
+       //          $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
+       //          $this->db->update('db_finance.register_admisi', $dataSave);
 
-            }
-            else
-            {
-                $errorMSG = 'Error activated virtual account, please try again';
-            }
-       }
-       else
-       {
-           $dataSave = array(
-                   'Status' => 'Approved',
-                   'No_Surat' => $No_Surat,
-                   'ApprovedBY' => $this->session->userdata('NIP'),
-                   'ApprovedAT' => date('Y-m-d'),
-                           );
-           $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
-           $this->db->update('db_finance.register_admisi', $dataSave);
-       }
+       //      }
+       //      else
+       //      {
+       //          $errorMSG = 'Error activated virtual account, please try again';
+       //      }
+       // }
+       // else
+       // {
+       //     $dataSave = array(
+       //             'Status' => 'Approved',
+       //             'No_Surat' => $No_Surat,
+       //             'ApprovedBY' => $this->session->userdata('NIP'),
+       //             'ApprovedAT' => date('Y-m-d'),
+       //                     );
+       //     $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
+       //     $this->db->update('db_finance.register_admisi', $dataSave);
+       // }
+
+       $dataSave = array(
+               'Status' => 'Approved',
+               'No_Surat' => $No_Surat,
+               'ApprovedBY' => $this->session->userdata('NIP'),
+               'ApprovedAT' => date('Y-m-d'),
+                       );
+       $this->db->where('ID_register_formulir',$arrDataPersonal[0]['ID_register_formulir']);
+       $this->db->update('db_finance.register_admisi', $dataSave);
        
 
        return $errorMSG;

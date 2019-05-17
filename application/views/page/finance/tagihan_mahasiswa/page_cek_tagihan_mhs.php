@@ -391,8 +391,9 @@
                    {
                     tr = '<tr style="background-color: #8ED6EA; color: black;" NPM = "'+Data_mhs[i]['NPM']+'">';
                     inputCHK = '';
+                    inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
                     <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-                       inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
+                       // inputCHK = '<input type="checkbox" class="uniform" value ="'+Data_mhs[i]['NPM']+'" Prodi = "'+Data_mhs[i]['ProdiEng']+'" Nama ="'+Data_mhs[i]['Nama']+'" semester = "'+Data_mhs[i]['SemesterID']+'" ta = "'+Data_mhs[i]['Year']+'" invoice = "'+Data_mhs[i]['InvoicePayment']+'" discount = "'+Data_mhs[i]['Discount']+'" PTID = "'+Data_mhs[i]['PTID']+'" PTName = "'+Data_mhs[i]['PTIDDesc']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'" Status = "'+ccc+'">';
                      <?php endif ?>
                    }
 
@@ -412,10 +413,12 @@
                    var bintang = (Data_mhs[i]['Pay_Cond'] == 1) ? '<p style="color: red;">*</p>' : '<p style="color: red;">**</p>';
 
                    var btn_edit = '';
-                   var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
+                   //var btn_view = '<button class = "btn btn-default DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-search" aria-hidden="true"></i> View</button>';
+                   btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+                   var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-                     btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-                     var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
+                     // btn_edit = '<br><br> <button class = "btn btn-default edit" NPM = "'+Data_mhs[i]['NPM']+'" semester = "'+Data_mhs[i]['SemesterID']+'" PTID = "'+Data_mhs[i]['PTID']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+                     // var btn_view = '<button class = " btn btn-primary DetailPayment" NPM = "'+Data_mhs[i]['NPM']+'" PaymentID = "'+Data_mhs[i]['PaymentID']+'">Pembayaran Manual </button>';
                    <?php endif ?>
 
                    // adding status
@@ -512,8 +515,9 @@
                               '<th style="width: 55px;">Deadline</th>'+
                               '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
+          table += '<th style="width: 100px;">Action</th>' ;                    
         <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
-          table += '<th style="width: 100px;">Action</th>' ;
+          //table += '<th style="width: 100px;">Action</th>' ;
         <?php endif ?>
         table += '</tr>' ;
         table += '</thead>' ;
@@ -543,8 +547,9 @@
                     '<td>'+ Deadline + '</td>'+
                     '<td>'+ PaymentDate + '</td>'+
                     '<td>'+UpdateAt + '</td>'+
-                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
                     '<td>'+ btn_bayar + '</td>'+
+                    <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
+                    //'<td>'+ btn_bayar + '</td>'+
                     <?php endif ?>
                   '<tr>';
             }
