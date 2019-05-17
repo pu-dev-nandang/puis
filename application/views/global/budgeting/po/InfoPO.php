@@ -794,6 +794,56 @@
 
 	$(document).off('click', '#BtnCancel').on('click', '#BtnCancel',function(e) {
 		window.location.reload(true);	
-	})		
+	})	
+
+	$(document).off('click', '#Approve').on('click', '#Approve',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve');
+			var Code = ClassDt.Code;
+			var approval_number = $(this).attr('approval_number');
+			var url = base_url_js + 'rest2/__approve_po';
+			var data = {
+				Code : Code,
+				approval_number : approval_number,
+				NIP : sessionNIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+				DtExisting : ClassDt.po_data,
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				var rs = resultJson;
+				if (rs.Status == 1) {
+					Get_data_po().then(function(data){
+							ClassDt.po_data = data;
+							WriteHtml();
+					})
+				}
+				else
+				{
+					if (rs.Change == 1) {
+						toastr.info('The Data already have updated by another person,Please check !!!');
+						Get_data_po().then(function(data){
+								ClassDt.po_data = data;
+								WriteHtml();
+						})
+					}
+					else
+					{
+						toastr.error(rs.msg,'!!!Failed');
+					}
+				}
+			}).fail(function() {
+
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+	})	
+
+		
 </script>
 <?php endif ?>	
