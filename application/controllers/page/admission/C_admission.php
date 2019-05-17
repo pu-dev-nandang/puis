@@ -1350,9 +1350,9 @@ class C_admission extends Admission_Controler {
               $Jacket = $Jacket[0]['JacketSize'];
             }
             
-            $AnakKe = '';
-            $JumlahSaudara = '';
-            $NationExamValue = '';
+            $AnakKe = 0;
+            $JumlahSaudara = 0;
+            $NationExamValue = 0;
             $GraduationYear = $data[0]['YearGraduate'];
             $IjazahNumber = '';
             $Father = $data[0]['FatherName'];
