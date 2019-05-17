@@ -3414,9 +3414,10 @@ class C_save_to_pdf extends CI_Controller {
         //$pdf->Cell($label_l+$sparator_l+$fill_l,$h,'',0,0,'L');
 
         $pdf->SetFont('dinlightitalic','',$f_title_i);
-        $pdf->Cell($label_r,$h,'Date Of Yudisium',$border,0,'L');
+        $pdf->Cell($label_r,$h,'Date of Yudisium',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
-        $pdf->Cell($fill_r,$h,$this->getDateIndonesian($dataTranscript[0]['DateOfYudisium']),$border,1,'L');
+        //$pdf->Cell($fill_r,$h,$this->getDateIndonesian($dataTranscript[0]['DateOfYudisium']),$border,1,'L');
+        $pdf->Cell($fill_r,$h,date('F j, Y',strtotime($dataTranscript[0]['DateOfYudisium'])),$border,1,'L');
 
 
         // Table
@@ -3574,9 +3575,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $yA = $pdf->GetY();
 
-
-
-        $pdf->Cell($w_R_label,$h,'Judul Skripsi',0,0,'L');
+        $pdf->Cell($w_R_label,$h,'Judul Skripsi / Tugas Akhir',0,0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
         $pdf->MultiCell($w_R_fill+$w_Div-2,$h,$SkripsiInd,0);
 
@@ -3640,18 +3639,15 @@ class C_save_to_pdf extends CI_Controller {
         $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
 
         // Foto
-
-
         $pdf->SetFont('dinpromedium','',$font_medium);
         $pdf->Cell($w_Div+$min,$h,$Rektor,$borderttd,0,'L');
         $pdf->Cell($w_Div-$min,$h,$Dekan,$borderttd,1,'L');
 
         $pdf->SetFont('dinpromedium','',$font_medium_i);
-        $pdf->Cell($w_Div+$min,$h,'NIK : '.$Rektorat['NIP'],$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'NIK : '.$Student['NIP'],$borderttd,1,'L');
+        $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
+        $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
 
         $pdf->Rect(77, $y+5, 40, 58);
-
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
@@ -3768,10 +3764,10 @@ class C_save_to_pdf extends CI_Controller {
         $w_right = $full_width - $w_left;
         $pdf->SetY(8); //novie
         $pdf->SetFont('dinpromedium','',8);
-        $pdf->Cell($w_left,$h,'Nomor Keputusan Akreditasi Pendirian Perguruan Tinggi dan / atau Program Studi : '.$Ijazah['NumberUniv'],$border,0,'L');
+        $pdf->Cell($w_left,$h,'Nomor Keputusan Akreditasi Program Studi : '.$Ijazah['NumberUniv'],$border,0,'L');
         $pdf->Cell($w_right,$h,'Nomor Ijazah Nasional : '.$Student['CNN'],$border,1,'L');
         $pdf->SetFont('dinlightitalic','',8);
-        $pdf->Cell($w_left,$h,'University Accreditation Number / Study Program Accreditation Number',$border,0,'L');
+        $pdf->Cell($w_left,$h,'Study Program Accreditation Number',$border,0,'L');
         $pdf->Cell($w_right,$h,'National Certificate Number',$border,1,'L');
         $pdf->Ln(29);
         $fn_b = 11.5;
@@ -3855,7 +3851,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill,$h,$Student['GradeDesc'],$border,1,'L');
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
-        $pdf->Cell($label,$h,'Education Program',$border,0,'L');
+        $pdf->Cell($label,$h,'Educational Program',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['GradeDescEng'],$border,1,'L');
         $pdf->Ln($ln);
@@ -3868,7 +3864,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fill,$h,$this->getDateIndonesian($Ijazah['DateOfYudisium']),$border,1,'L');
         $pdf->SetX($x);
         $pdf->SetFont('dinlightitalic','',$fn_i);
-        $pdf->Cell($label,$h,'Date of Yudisiom',$border,0,'L');
+        $pdf->Cell($label,$h,'Date of Yudisium',$border,0,'L');
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,date('F j, Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
 //        $pdf->Cell($fill,$h,date('d/m/Y',strtotime($Ijazah['DateOfYudisium'])),$border,1,'L');
@@ -3933,7 +3929,7 @@ class C_save_to_pdf extends CI_Controller {
         $ytext = $pdf->GetY()+$yy+4;
         $xtext = $pdf->GetX()+$xx;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
-        $pdf->Text($xtext,$ytext,'NIK : '.$Rektorat['NIP']);
+        $pdf->Text($xtext,$ytext,'NIP : '.$Rektorat['NIP']);
         $pdf->SetFont('dinpromedium','',$fn_b);
         $ytext = $pdf->GetY()+$yy;
         $xtext = $pdf->GetX()+$xx+138;
@@ -3941,7 +3937,7 @@ class C_save_to_pdf extends CI_Controller {
         $ytext = $pdf->GetY()+$yy+4;
         $xtext = $pdf->GetX()+$xx+138;
         $pdf->SetFont('dinpromedium','',$fn_b-2);
-        $pdf->Text($xtext,$ytext,'NIK : '.$Student['NIP']);
+        $pdf->Text($xtext,$ytext,'NIP : '.$Student['NIP']);
         //foto
         $pdf->Rect($x+95, $y, 40, 58);
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));

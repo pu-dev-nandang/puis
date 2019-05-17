@@ -7707,13 +7707,18 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.auth_students');
                 return print_r(1);
             }
-
             else if($data_arr['action']=='updateTempTranscript'){
 
                 $dataUpdate = (array) $data_arr['dataForm'];
                 $this->db->where('ID', 1);
                 $this->db->update('db_academic.setting_temp_transcript',$dataUpdate);
-
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateStudyAcc'){
+                $this->db->set('SKBANPTDate', $data_arr['Dateacc']);
+                $this->db->set('NoSKBANPT', $data_arr['Noacc']);
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->update('db_academic.program_study');
                 return print_r(1);
             }
         }
