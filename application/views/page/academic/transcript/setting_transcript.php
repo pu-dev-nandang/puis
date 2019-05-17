@@ -566,7 +566,6 @@
         var dateacc = tr.find('td:eq(4)').find('input').val();
         var noacc = tr.find('td:eq(5)').find('input').val();
         var ID = $(this).attr('data-id');
-        alert(ID);
 
         var data = {
             action : 'updateStudyAcc',
