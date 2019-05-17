@@ -638,8 +638,44 @@ class C_api extends CI_Controller {
             
         }
 
-        $totalData = $this->db->get_where($db_.'.students',$arryWhere
-        )->result_array();
+        // $totalData = $this->db->get_where($db_.'.students',$arryWhere
+        // )->result_array();
+        $sqlTotalData = 'select count(*) as total  FROM '.$db_.'.students s 
+                                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
+                                                      LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
+                                                      LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
+                                                      LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
+                                                      LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
+
+                        ';
+
+        if( !empty($requestData['search']['value']) ) {
+            if ($dataWhere == '') {
+                $dataWhere = ' where ';
+            }
+            else
+            {
+                $dataWhere .= ' AND ';
+            }
+            $sqlTotalData.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            $sqlTotalData.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sqlTotalData.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
+            $sqlTotalData.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
+            $sqlTotalData.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
+            $sqlTotalData.= ' ORDER BY s.NPM, s.ProdiID ASC';
+        }
+        else {
+            $sqlTotalData.= '';
+        }
+
+        // print_r($sqlTotalData);   
+
+        $query = $this->db->query($sqlTotalData)->result_array();
+        $totalData = $query[0]['total'];
+                // )->result_array();             
+
+
+        // -------------total data---------- //                 
 
         $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
@@ -721,8 +757,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData),
             "data"            => $data
         );
         echo json_encode($json_data);

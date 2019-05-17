@@ -187,17 +187,25 @@
 		if (confirm('Are you sure you want to save this thing into the database?')) {
 		    // Save it!
 		    var RegID = $(this).attr('RegID');
+		    var Year = $('#selectTahun option:selected').val();
 		    loading_button(".btn_bayar[RegID='"+RegID+"']");
 		    var url = base_url_js+'finance/bayar_manual_mahasiswa_formulironline';
 		    var data = {
 		        RegID : RegID,
+		        Year : Year,
 		    };
 		    var token = jwt_encode(data,'UAP)(*');
 		    $.post(url,{token:token},function (resultJson) {
-		       // var resultJson = jQuery.parseJSON(resultJson);
-		       loaddataBelumBayar();
-		       loadDataTelahBayar();
-		       // $(".bayar[IDStudent='"+IDStudent+"']").remove();
+		    	var rs = jQuery.parseJSON(resultJson);
+		    	if (rs == 1) {
+		    		loaddataBelumBayar();
+		    		loadDataTelahBayar();
+		    	}
+		    	else
+		    	{
+		    		toastr.info('That something wrong')
+		    	}
+		      
 		    }).fail(function() {
 		      toastr.info('No Action...'); 
 		      // toastr.error('The Database connection error, please try again', 'Failed!!');

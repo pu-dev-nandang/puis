@@ -1851,32 +1851,42 @@ class C_finance extends Finnance_Controler {
     public function bayar_manual_mahasiswa_formulironline()
     {
         $input = $this->getInputToken();
-        $RegID = $input['RegID'];
-        $dataSave = array(
-              'BilingID' => 0,
-                      );
-      $this->db->where('ID',$RegID);
-      $this->db->update('db_admission.register', $dataSave);
+        $Year = $input['Year'];
+        $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) > 0) {
+              $RegID = $input['RegID'];
+              $dataSave = array(
+                    'BilingID' => 0,
+                            );
+            $this->db->where('ID',$RegID);
+            $this->db->update('db_admission.register', $dataSave);
 
-      // insert to another table
-      $getData = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
-      $Email = $getData[0]['Email'];
-      $RegisterID = $getData[0]['ID'];
-      $this->m_master->saveDataToVerification_offline($RegisterID);
-      $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
-      $RegVerificationID = $getData[0]['ID'];
-      $FormulirCode = $this->m_finance->getFormulirCode('online');
-      // save data to register_verified
-      $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
+            // insert to another table
+            $getData = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
+            $Email = $getData[0]['Email'];
+            $RegisterID = $getData[0]['ID'];
+            $this->m_master->saveDataToVerification_offline($RegisterID);
+            $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
+            $RegVerificationID = $getData[0]['ID'];
+            $FormulirCode = $this->m_finance->getFormulirCode('online',$Year);
+            // save data to register_verified
+            $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
 
-      $text = 'Dear Candidate,<br><br>
-                  Your payment has been received,<br>
-                  Please click link below to login your portal <br>
-                  '.url_registration."login/".'
-              ';        
-      $to = $Email;
-      $subject = "Podomoro University Link Formulir Registration";
-      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            $text = 'Dear Candidate,<br><br>
+                        Your payment has been received,<br>
+                        Please click link below to login your portal <br>
+                        '.url_registration."login/".'
+                    ';        
+            $to = $Email;
+            $subject = "Podomoro University Link Formulir Registration";
+            $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+            echo json_encode(1);
+        }
+        else
+        {
+            echo json_encode(0);
+        }
 
     }
 
