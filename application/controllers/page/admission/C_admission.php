@@ -32,18 +32,20 @@ class C_admission extends Admission_Controler {
     public function pagination_calon_mahasiswa($page= null)
     {
         $input =  $this->getInputToken();
-        $tahun = $input['selectTahun'];
+        //$tahun = $input['selectTahun'];
         $nama = $input['NamaCandidate'];
         $status = $input['selectStatus'];
         $FormulirCode = $input['FormulirCode'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode),2,6);
+        // $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode),2,6);
+        $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($nama,$status,$FormulirCode),2,6);
   
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);
         $start = ($page - 1) * $config["per_page"];
-        $this->data['datadb'] = $this->m_admission->selectDataCalonMahasiswa($config["per_page"], $start,$tahun,$nama,$status,$FormulirCode);
+        // $this->data['datadb'] = $this->m_admission->selectDataCalonMahasiswa($config["per_page"], $start,$tahun,$nama,$status,$FormulirCode);
+        $this->data['datadb'] = $this->m_admission->selectDataCalonMahasiswa($config["per_page"], $start,$nama,$status,$FormulirCode);
        $content = $this->load->view('page/'.$this->data['department'].'/proses_calon_mahasiswa/page_verifikasi_dokumen',$this->data,true);
 
         $output = array(
@@ -1413,21 +1415,30 @@ class C_admission extends Admission_Controler {
                       $G_FileName = $explode[0];
                       $ff = explode('.', $G_FileName);
                       $Photo = $NPM.'.'.$ff[1];
-                      copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                      if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[0])) {
+                        copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
+                      }
+                      
                     }
                   }
 
                 // if ($getDoc[$z]['Status'] == 'Done') {
                   if (count($explode) > 0) {
-                    for ($ee=0; $ee < count($explode); $ee++) { 
+                    for ($ee=0; $ee < count($explode); $ee++) {
+                     if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[$ee])) {
                       copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
                       unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+                     }
+                      
                     }
                   }
                   else
                   {
-                    copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
-                    unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                    if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
+                      copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
+                      unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                    }
+                    
                   }
                   
                   // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
