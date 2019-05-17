@@ -70,26 +70,30 @@ class M_finance extends CI_Model {
    }
 
    public function getFormulirCode($tipeFormulirCode = null)
-   {
-    if ($tipeFormulirCode == 'online') { // online
-        $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".date('Y')."' order by ID asc limit 1";
-    }
-    else{
-      $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = 0 and Years ='".date('Y')."' order by ID asc limit 1";
-    }
-    $query=$this->db->query($sql, array())->result_array();
-    $FormulirCode = $query[0]['FormulirCode'];
-    
-    if ($tipeFormulirCode == 'online') { // online
-      $this->updateStatusFormulirCodeOnline($FormulirCode);
-    }
-    else
     {
-      $this->updateStatusFormulirCodeOffline($FormulirCode);
-    }
+      // get Year
+      $this->load->model('master/m_master');
+      $G_ta = $this->m_master->showData_array('db_admission.set_ta');
+      $year = $G_ta[0]['Ta'];
+     if ($tipeFormulirCode == 'online') { // online
+         $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$year."' order by ID asc limit 1";
+     }
+     else{
+       $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = 0 and Years ='".$year."' order by ID asc limit 1";
+     }
+     $query=$this->db->query($sql, array())->result_array();
+     $FormulirCode = $query[0]['FormulirCode'];
 
-    return $FormulirCode;
-   }
+     if ($tipeFormulirCode == 'online') { // online
+       $this->updateStatusFormulirCodeOnline($FormulirCode);
+     }
+     else
+     {
+       $this->updateStatusFormulirCodeOffline($FormulirCode);
+     }
+
+     return $FormulirCode;
+    }
 
    public function updateStatusFormulirCodeOnline($FormulirCode)
    {
