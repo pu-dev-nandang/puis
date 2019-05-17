@@ -17,13 +17,13 @@
 @media print {
     .container { 
       display: block !important;
-        font-size: 9px; 
+        font-size: 10px; 
         top: -40pt;
         left:0pt;
         right: 0pt;
     }
     table{
-    	font-size: 8px; 
+    	font-size: 10px; 
     }
     
     .btn,.noPrint a { 
