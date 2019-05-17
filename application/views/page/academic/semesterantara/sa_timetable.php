@@ -55,6 +55,9 @@
 
 
 
+
+
+
 <script>
 
     $(document).ready(function () {
@@ -116,7 +119,7 @@
         var dataToken = jwt_decode(token,'UAP)(*');
 
 
-        $('#GlobalModalLarge .modal-dialog').css('width','1200px');
+        $('#GlobalModalLarge .modal-dialog').css('width','600px');
         $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">'+course+'</h4>');
 
@@ -129,25 +132,9 @@
             '                <th>Student</th>' +
             '                <th style="width: 4%;">BPP</th>' +
             '                <th style="width: 4%;">Crdt</th>' +
-            '                <th class="td-attd">1</th>' +
-            '                <th class="td-attd">2</th>' +
-            '                <th class="td-attd">3</th>' +
-            '                <th class="td-attd">4</th>' +
-            '                <th class="td-attd">5</th>' +
-            '                <th class="td-attd">6</th>' +
-            '                <th class="td-attd">7</th>' +
-            '                <th class="td-attd">8</th>' +
-            '                <th class="td-attd">9</th>' +
-            '                <th class="td-attd">10</th>' +
-            '                <th class="td-attd">11</th>' +
-            '                <th class="td-attd">12</th>' +
-            '                <th class="td-attd">13</th>' +
-            '                <th class="td-attd">14</th>' +
-            '                <th class="td-attd">UTS</th>' +
-            '                <th class="td-attd">UAS</th>' +
             '            </tr>' +
             '            </thead>' +
-            '            <tbody id="listStudent"></tbody>' +
+            '            <tbody id="listStudentShowStd"></tbody>' +
             '        </table>' +
             '    </div>' +
             '</div>');
@@ -175,64 +162,12 @@
                 // var p = '<input type="checkbox " value="1">';
 
 
-                $('#listStudent').append('<tr>' +
+                $('#listStudentShowStd').append('<tr>' +
                     '<td>'+no+'</td>' +
                     '<td style="text-align: left;"><b>'+v.Name+'</b><br/>'+v.NPM+'</td>' +
                     '<td>'+StatusBPP+'</td>' +
                     '<td>'+StatusCredit+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-                    '<td>'+p+'</td>' +
-
                     '</tr>');
-
-                // for(var a=1;a<=14;a++){
-                //     var p = ((v.StatusBPP==0 || v.StatusBPP=='0') && (v.StatusCredit==0 || v.StatusCredit=='0'))
-                //         ? '-'
-                //         : '<div class="checkbox ck-attd">' +
-                //         '  <label>' +
-                //         '    <input type="checkbox " value="1">' +
-                //         '  </label>' +
-                //         '</div>';
-                //
-                //     $('#tdAttd_'+no).append('<td>'+p+'</td>');
-                // }
-                //
-                // // UTS
-                // var UTS = ((v.StatusBPP==0 || v.StatusBPP=='0') && (v.StatusCredit==0 || v.StatusCredit=='0'))
-                //     ? '-'
-                //     : '<div class="checkbox ck-attd">' +
-                //     '  <label>' +
-                //     '    <input type="checkbox " value="1">' +
-                //     '  </label>' +
-                //     '</div>';
-                //
-                // $('#tdAttd_'+no).append('<td>'+UTS+'</td>');
-                //
-                //
-                // // UAS
-                // var UAS = ((v.StatusBPP==0 || v.StatusBPP=='0') && (v.StatusCredit==0 || v.StatusCredit=='0'))
-                //     ? '-'
-                //     : '<div class="checkbox ck-attd">' +
-                //     '  <label>' +
-                //     '    <input type="checkbox " value="1">' +
-                //     '  </label>' +
-                //     '</div>';
-                //
-                // $('#tdAttd_'+no).append('<td>'+UAS+'</td>');
 
                 no++;
             })
@@ -405,7 +340,7 @@
             $('#GlobalModal .modal-body').html(bodyModal);
 
             for (var i = 1;i<=14;i++){
-                var dsb = ($.inArray(''+i,ArrMeet)!=-1) ? '' : 'disabled';
+                var dsb = ($.inArray(''+i,ArrMeet)!=-1) ? '' : '';
                 var selc = '';
                 if(ArrMeet.length>0){
                     var idS = ArrMeet[0];
@@ -908,6 +843,147 @@
             });
 
         }
+    });
+
+
+    // === BTN Racap
+    $(document).on('click','.btnRecapAttdStd',function () {
+
+        var SASemesterID = '<?=$SASemesterID; ?>';
+        var ScheduleIDSA = $(this).attr('data-id');
+
+        window.location.href = base_url_js+'academic/semester-antara/recap-attendance/'+SASemesterID+'/'+ScheduleIDSA;
+
+    });
+
+    $(document).on('click','.btnAttdLecturer',function () {
+
+        var token = $(this).attr('data-token');
+        var course = $(this).attr('data-course');
+        var ScheduleIDSA = $(this).attr('data-id');
+
+        var dataToken = jwt_decode(token,'UAP)(*');
+
+
+        $('#GlobalModalLarge .modal-dialog').css('width','600px');
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+course+'</h4>');
+
+        var opts = '';
+        for(var i=1;i<=14;i++){
+            opts = opts+'<option value="'+i+'">Sessions '+i+'</option>';
+        }
+
+        var optlec = '';
+        $.each(dataToken,function (i,v) {
+            optlec = optlec+'<option value="'+v.NIP+'">'+v.Name+'</option>';
+        });
+
+        $('#GlobalModalLarge .modal-body').html('<div class="row">' +
+            '    <div class="col-xs-4">' +
+            '        <div class="form-group">' +
+            '            <label>Session</label>' +
+            '            <select class="form-control" id="formSessions">'+opts+'</select>' +
+            '        </div>  ' +
+            '    </div>' +
+            '    <div class="col-xs-5">' +
+            '        <div class="form-group">' +
+            '            <label>Date</label>' +
+            '            <input class="hide" id="formDate">' +
+            '            <input class="form-control" id="formViewDate">' +
+            '        </div>  ' +
+            '    </div>' +
+            '    <div class="col-xs-3">' +
+            '        <div class="form-group">' +
+            '            <label>Time</label>' +
+            '                       <div id="inputTime" class="input-group">' +
+            '                                <input data-format="hh:mm" type="text" id="formTime" class="form-control form-exam" value="00:00"/>' +
+            '                                <span class="add-on input-group-addon">' +
+            '                                <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>' +
+            '                            </span>' +
+            '                            </div>' +
+            '        </div>  ' +
+            '    </div>' +
+            '</div>' +
+            '<div class="row">' +
+            '    <div class="col-xs-12">' +
+            '        <div class="form-group">' +
+            '            <label>Lecturer</label>' +
+            '            <select class="form-control" id="formLecturer">'+optlec+'</select>' +
+            '        </div>  ' +
+            '    </div>' +
+            '</div>');
+
+        $('#formViewDate').datepicker({
+            showOtherMonths:true,
+            autoSize: true,
+            dateFormat: 'dd MM yy',
+            onSelect : function () {
+                var data_date = $(this).val().split(' ');
+                var momentDate = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]);
+                var CustomMoment = momentDate.day();
+                var day = (CustomMoment==0) ? 7 : CustomMoment;
+                // $('#formDayID').val(day);
+                $('#formDate').val(momentDate.format('YYYY-MM-DD'));
+            }
+        });
+
+        $('#inputTime').datetimepicker({
+            pickDate: false,
+            pickSeconds : false
+        });
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button class="btn btn-success" id="buttonAddAttendanceLec">Submit</button> ');
+
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('#buttonAddAttendanceLec').click(function () {
+
+            if(confirm('Are you sure?')){
+
+                loading_buttonSm('#buttonAddAttendanceLec');
+                $('button[data-dismiss=modal]').prop('disabled',true);
+
+                var formSessions = $('#formSessions').val();
+                var formLecturer = $('#formLecturer').val();
+
+                var formDate = $('#formDate').val();
+                var formTime = $('#formTime').val();
+
+                var EntredAt = formDate+' '+formTime+':00';
+
+                var data = {
+                    action : 'inputAttendanceLecturerSA',
+                    inputAttd : {
+                        Meet : formSessions,
+                        ScheduleIDSA : ScheduleIDSA,
+                        UserID : formLecturer,
+                        Status : '1',
+                        Type : 'lec',
+                        UpdatedAt : dateTimeNow(),
+                        UpdatedBy : sessionNIP,
+                        EntredAt : EntredAt,
+                        EntredBy : sessionNIP
+                    }
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api2/__crudSemesterAntara';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Saved','Success');
+                    setTimeout(function () {
+                        $('#buttonAddAttendanceLec').html('Submit');
+                        $('button[data-dismiss=modal],#buttonAddAttendanceLec').prop('disabled',false);
+                    },500);
+                });
+            }
+
+
+
+        });
     });
 
 

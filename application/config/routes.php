@@ -69,7 +69,7 @@ $route['academic/tahun-akademik-detail-date'] = 'page/academic/c_tahun_akademik/
 $route['academic/semester-antara'] = 'page/academic/c_semester_antara';
 $route['academic/semester-antara/timetable/(:num)'] = 'page/academic/c_semester_antara/timetable/$1';
 $route['academic/semester-antara/students/(:num)'] = 'page/academic/c_semester_antara/students/$1';
-$route['academic/semester-antara/score/(:num)'] = 'page/academic/c_semester_antara/score/$1';
+$route['academic/semester-antara/recap-attendance/(:num)/(:num)'] = 'page/academic/c_semester_antara/recap_attendance/$1/$2';
 
 $route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_semester_antara/setting_timetable/$1';
 $route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
