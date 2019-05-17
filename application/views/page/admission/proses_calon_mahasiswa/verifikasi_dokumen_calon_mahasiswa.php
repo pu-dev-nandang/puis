@@ -10,12 +10,12 @@
 						Formulir Code
 						<input class="form-control" id="FormulirCode" placeholder="All..." "="">
 					</div>	
-					<div class="col-md-2" style="">
+					<!-- <div class="col-md-2" style="">
 						Tahun
 						<select class="select2-select-00 col-md-4 full-width-fix" id="selectTahun">
 						    <option></option>
 						</select>
-					</div>
+					</div> -->
 					<div class="col-md-2" style="">
 						Nama
 						<input class="form-control" id="Nama" placeholder="All..." "="">
@@ -39,7 +39,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function () {
-		loadTahun();
+		//loadTahun();
 	    loadData_register_document(1);
 	});
 
@@ -47,9 +47,9 @@
     	loadData_register_document(1);
     });
 
-    $(document).on('change','#selectTahun', function () {
-    	loadData_register_document(1);
-    });
+    // $(document).on('change','#selectTahun', function () {
+    // 	loadData_register_document(1);
+    // });
 
     $(document).on("keyup", "#FormulirCode", function(event){
     	var FormulirCode = $('#FormulirCode').val();
@@ -75,14 +75,14 @@
 	{
 		loading_page('#register_document_table');
 		var url = base_url_js+'admission/proses-calon-mahasiswa/verifikasi-dokument/register_document_table/pagination/'+page;
-		var selectTahun = $("#selectTahun").find(':selected').val();
+		//var selectTahun = $("#selectTahun").find(':selected').val();
 		var NamaCandidate = $("#Nama").val();
 		var FormulirCode = $("#FormulirCode").val();
 		if (FormulirCode == '') {FormulirCode = '%'};
 		 if (NamaCandidate == '') {NamaCandidate = '%'};
 		var selectStatus = $("#selectStatus").find(':selected').val();
 		var data = {
-					selectTahun : selectTahun,
+					//selectTahun : selectTahun,
 					NamaCandidate : NamaCandidate,
 					selectStatus : selectStatus,
 					FormulirCode : FormulirCode,					

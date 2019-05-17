@@ -27,7 +27,8 @@ class M_admission extends CI_Model {
         return $conVertINT;
     }
 
-    public function CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode)
+    // public function CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode)
+    public function CountSelectDataCalonMahasiswa($nama,$status,$FormulirCode)
     {
       if($FormulirCode != '%') {
           $FormulirCode = '"%'.$FormulirCode.'%"'; 
@@ -52,7 +53,7 @@ class M_admission extends CI_Model {
         $status = 'Status = "Done"';
       }
 
-      $tahun = 'year(RegisterAT) = '.$tahun;
+      //$tahun = 'year(RegisterAT) = '.$tahun;
       $sql = "select count(*) as total from (
                 select * from (
                 select a.ID,z.name as name_programstudy,b.FormulirCode, 
@@ -97,7 +98,7 @@ class M_admission extends CI_Model {
                 Left JOIN db_admission.formulir_number_offline_m as az
                 on b.FormulirCode = az.FormulirCode
                 ) as a
-                where document_undone > 0 and Name like ".$nama." and ".$tahun."
+                where document_undone > 0 and Name like ".$nama." 
                 and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs) and (FormulirCode like ".$FormulirCode." or No_Ref like ".$FormulirCode.")
               ) aa
               "; // query undone
@@ -106,7 +107,8 @@ class M_admission extends CI_Model {
         return $query[0]['total'];
     }
 
-    public function selectDataCalonMahasiswa($limit,$start,$tahun,$nama,$status,$FormulirCode)
+    // public function selectDataCalonMahasiswa($limit,$start,$tahun,$nama,$status,$FormulirCode)
+    public function selectDataCalonMahasiswa($limit,$start,$nama,$status,$FormulirCode)
     {
       $arr_temp = array('data' => array());
       if($FormulirCode != '%') {
@@ -132,7 +134,7 @@ class M_admission extends CI_Model {
         $status = 'Status = "Done"';
       }
 
-      $tahun = 'year(RegisterAT) = '.$tahun;
+      //$tahun = 'year(RegisterAT) = '.$tahun;
       $sql = "select * from (
               select a.ID,z.name as name_programstudy,b.FormulirCode, 
               (select count(*) as total from db_admission.register_document 
@@ -176,7 +178,7 @@ class M_admission extends CI_Model {
               Left JOIN db_admission.formulir_number_offline_m as az
               on b.FormulirCode = az.FormulirCode
               ) as a
-              where document_undone > 0 and Name like ".$nama." and ".$tahun."
+              where document_undone > 0 and Name like ".$nama."
               and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs) and (FormulirCode like ".$FormulirCode." or No_Ref like ".$FormulirCode.")
               order by document_progress desc
               LIMIT ".$start. ", ".$limit; // query undone

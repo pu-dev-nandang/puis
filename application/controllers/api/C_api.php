@@ -653,11 +653,18 @@ class C_api extends CI_Controller {
                           ';
 
         if( !empty($requestData['search']['value']) ) {
-            $sql.= '  '.$dataWhere.' AND ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
+            if ($dataWhere == '') {
+                $dataWhere = ' where ';
+            }
+            else
+            {
+                $dataWhere .= ' AND ';
+            }
+            $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
         else {

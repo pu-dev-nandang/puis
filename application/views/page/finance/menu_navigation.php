@@ -10,7 +10,7 @@
             ?>
 
 
-            <?php if ($this->session->userdata('NIP') == '2018018' ): ?>
+            <?php if ($this->session->userdata('NIP') == '2018018' || $this->session->userdata('NIP') == '2016065' ): ?>
                 <li class="<?php if($this->uri->segment(2)=='config'){echo "current open";} ?>">
                     <a href="javascript:void(0);">
                         <i class="fa fa-wrench"></i>
