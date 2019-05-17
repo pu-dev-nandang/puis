@@ -283,10 +283,23 @@ class C_mobile extends CI_Controller {
 
             $day = $this->m_rest->getCustomeDateTimeNow('N');
 
+            $dateNow = $this->m_rest->getDateNow();
+
             $dataSmtActive = $this->m_rest->_getSemesterActive();
 
+            // Get setting
+            $dataAcademicyear = $this->db->get_where('db_academic.academic_years',array(
+                'SemesterID' => $dataSmtActive['SemesterID']
+            ))->result_array();
 
-            $data = $this->db->query('SELECT sd.ID AS SDID, sd.ScheduleID, attd.ID AS ID_Attd, sd.StartSessions,sd.EndSessions, cl.Room, mk.NameEng AS CourseEng
+            // Cek apakah sedang UTS atau UAS
+            $uts = ($dateNow>=$dataAcademicyear[0]['utsStart'] && $dateNow<=$dataAcademicyear[0]['utsEnd']) ? 0 : 1;
+            $uas = ($dateNow>=$dataAcademicyear[0]['uasStart'] && $dateNow<=$dataAcademicyear[0]['uasEnd']) ? 0 : 1;
+
+            $data = [];
+            if($dateNow>=$dataAcademicyear[0]['kuliahStart'] && $dateNow<=$dataAcademicyear[0]['kuliahEnd'] && $uts==1 && $uas==1){
+
+                $data = $this->db->query('SELECT sd.ID AS SDID, sd.ScheduleID, attd.ID AS ID_Attd, sd.StartSessions,sd.EndSessions, cl.Room, mk.NameEng AS CourseEng
                                                  FROM '.$db.'.study_planning sp
                                                 LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = sp.ScheduleID)
                                                 LEFT JOIN db_academic.classroom cl ON (sd.ClassroomID = cl.ID)
@@ -298,26 +311,28 @@ class C_mobile extends CI_Controller {
                                                  AND sd.DayID = "'.$day.'" 
                                                  GROUP BY sp.ScheduleID
                                                  ORDER BY sd.StartSessions ')
-                                ->result_array();
+                    ->result_array();
 
-            // Get Attendance
-            if(count($data)>0){
-                for($i=0;$i<count($data);$i++){
-                    $d = $data[$i];
-                    // Get Meet
-                    $Meet = $this->m_rest->getSessionByID_Attd($d['ID_Attd']);
-                    $data[$i]['Meet'] = $Meet;
+                // Get Attendance
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        $d = $data[$i];
+                        // Get Meet
+                        $Meet = $this->m_rest->getSessionByID_Attd($d['ID_Attd']);
+                        $data[$i]['Meet'] = $Meet;
 
-                    // Get Status Attendance
+                        // Get Status Attendance
 
-                    $sc = 'attds.M'.$Meet.' AS Status';
+                        $sc = 'attds.M'.$Meet.' AS Status';
 
-                    $dataStatus = $this->db->query('SELECT '.$sc.' FROM db_academic.attendance_students attds 
+                        $dataStatus = $this->db->query('SELECT '.$sc.' FROM db_academic.attendance_students attds 
                                                             WHERE attds.ID_Attd = "'.$d['ID_Attd'].'" 
                                                             AND attds.NPM = "'.$NPM.'"
                                                             LIMIT 1')->result_array();
-                    $data[$i]['StatusAttd'] = $dataStatus[0]['Status'];
+                        $data[$i]['StatusAttd'] = $dataStatus[0]['Status'];
+                    }
                 }
+
             }
 
             return print_r(json_encode($data));
