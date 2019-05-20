@@ -402,12 +402,15 @@
 
                             no++;
                         });
+
+
                     }
                     else {
                         $('#rowSelected').html('<tr>' +
                             '<td colspan="8" style="text-align: center;"><h3 style="color: #CCCCCC;">-- Course Not Yet --</h3></td>' +
                             '</tr>');
-
+                        $('#formTotalCredit').val(0);
+                        $('#viewTotalCredit').html(0);
                     }
 
                     loadCurriculum();
