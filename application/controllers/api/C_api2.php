@@ -3376,13 +3376,19 @@ class C_api2 extends CI_Controller {
                 for($i=0;$i<count($dataCourse);$i++){
                     $d = $dataCourse[$i];
 
-                    $dataStd = $this->db->query('SELECT ssd.*, ats.Name AS NameStudent FROM db_academic.sa_student_details ssd 
-                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM) 
+                    $dataStd = $this->db->query('SELECT ssd.*, ats.Name AS NameStudent, p1.Status AS StatusBPP, p2.Status AS StatusCredit  
+                                                              FROM db_academic.sa_student_details ssd
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssd.NPM)
+                                                              LEFT JOIN db_finance.payment p1 ON (p1.NPM = ssd.NPM AND p1.PTID = "5")
+                                                              LEFT JOIN db_finance.payment p2 ON (p2.NPM = ssd.NPM AND p2.PTID = "6")
                                                               WHERE ssd.CDID = "'.$d['CDID'].'" AND ssd.Status="3" ')->result_array();
 
                     if(count($dataStd)>0){
                         foreach ($dataStd AS $item){
-                            array_push($student,$item);
+                            if($item['StatusBPP']=='1' && $item['StatusCredit']=='1'){
+                                array_push($student,$item);
+                            }
+
                         }
                     }
 
@@ -4278,7 +4284,7 @@ class C_api2 extends CI_Controller {
         if($academicYear['edomStart']<=$dateNow && $academicYear['edomEnd']>=$dateNow){
 
 
-            $course = $this->m_rest->getScheduleBYNPM($SemesterID,$data_arr['Year'],$data_arr['NPM']);
+            $course = $this->m_rest->getScheduleBYNPM($SemesterID,'ta_'.$data_arr['Year'],$data_arr['NPM']);
 
             // cek total lecturer
             if(count($course)>0){
