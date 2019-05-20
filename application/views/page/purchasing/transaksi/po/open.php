@@ -81,6 +81,7 @@
 
 	$(document).ready(function() {
 	    $('#page_pr_list').html(ClassDt.htmlPage_pr_list);
+	    console.log(ClassDt);
 	    skip_error_dt_table();
 		    Get_data_pr().then(function(data){
 		        loadingEnd(500);
@@ -91,11 +92,14 @@
 	}); // exit document Function
 
 	function Get_data_pr(){
+	   var action_edit = (ClassDt.POCode == '') ? '': 'edit';
        var def = jQuery.Deferred();
        var data = {
            PurchasingStatus : '!=2',
            auth : 's3Cr3T-G4N',
            Item_pending : '>0',
+           action_edit : action_edit,
+           POCode : ClassDt.POCode,
        };
        var token = jwt_encode(data,"UAP)(*");
        	var table = $('#tableData_pr').DataTable({
@@ -158,6 +162,7 @@
    		var data = {
    		    PRCode : PRCode,
    		    auth : 's3Cr3T-G4N',
+   		    POCode : ClassDt.POCode,
    		};
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function () {

@@ -307,7 +307,7 @@
 		var po_create = po_data['po_create'];
 		var btn_edit = '<button class = "btn btn-primary" id = "BtnEdit"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 		var btn_submit = '<button class = "btn btn-success" id = "BtnSubmit" disabled> <i class="fa fa-database" aria-hidden="true"></i> Submit</button>';
-		var btn_custom = '<button class = "btn btn-warning" id = "BtnCustom"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Custom</button>';
+		var btn_re_open = '<button class = "btn btn-warning" id = "BtnReopen"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Re-Open</button>';
 		var btn_approve = '<button class="btn btn-primary" id="Approve" action="approve">Approve</button>';
 		var btn_reject = '<button class="btn btn-inverse" id="Reject" action="reject">Reject</button>';
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> Print PDF</button>';
@@ -322,7 +322,7 @@
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_custom+'&nbsp'+btn_submit+'</div>');
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
 		  	}
 		    
 		    break;
@@ -342,7 +342,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_custom+'&nbsp'+btn_submit+'</div>');
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
 		    	}
 		    }
 
@@ -931,6 +931,12 @@
 			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 			});
 		}
+	})
+
+	$(document).off('click','#BtnReopen').on('click','#BtnReopen',function(e){
+		var Code = ClassDt.Code;
+		var CodeURL = findAndReplace(Code, "/","-");
+		window.location.href = base_url_js+'purchasing/transaction/po/list/open?POCode='+CodeURL;
 	})
 
 	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {

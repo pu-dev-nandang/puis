@@ -25,8 +25,27 @@ class C_po extends Transaksi_Controler {
 
     public function open()
     {
-       $this->data['action_mode'] = 'add';
-       $this->data['POCode'] = '';
+        if (empty($_GET)) {
+            // print_r('NOGet'); die();
+           $this->data['action_mode'] = 'add';
+           $this->data['POCode'] = '';
+        }
+        else{
+            //find data
+            // print_r('Get'); die();
+            $POCode = $_GET['POCode'];
+            $Code = str_replace('-','/', $POCode);
+            $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+            if (count($G_data) > 0) {
+                $this->data['action_mode'] = 'edit';
+                $this->data['POCode'] = $Code;
+            }
+            else
+            {
+                show_404($log_error = TRUE); 
+            }
+        } 
+       
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/open',$this->data,true);
        $this->page_po($page); 
     }
