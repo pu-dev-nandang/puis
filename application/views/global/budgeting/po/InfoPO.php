@@ -936,7 +936,8 @@
 	$(document).off('click','#BtnReopen').on('click','#BtnReopen',function(e){
 		var Code = ClassDt.Code;
 		var CodeURL = findAndReplace(Code, "/","-");
-		window.location.href = base_url_js+'purchasing/transaction/po/list/open?POCode='+CodeURL;
+		var token = jwt_encode(CodeURL,"UAP)(*");
+		window.location.href = base_url_js+'purchasing/transaction/po/list/open?POCode='+token;
 	})
 
 	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {

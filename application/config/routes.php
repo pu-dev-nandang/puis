@@ -917,6 +917,7 @@ $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
 $route['rest2/__Get_data_po_by_Code'] = 'api/c_rest2/Get_data_po_by_Code';
+$route['rest2/__Get_supplier_po_by_Code'] = 'api/c_rest2/Get_supplier_po_by_Code';
 $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
 
