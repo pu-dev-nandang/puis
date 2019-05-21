@@ -1467,7 +1467,7 @@ class M_rest extends CI_Model {
 
         $transcript = [];
         $arrTranscriptID = [];
-        $dateNow = date("Y-m-d");
+        $dateNow = $this->getDateNow();
         $showNilaiSemesterActive = ($dataSmtActive['updateTranscript'] <= $dateNow) ? 1 : 0;
 
         $smt = ($order=='ASC') ? 0 : count($data) + 1;
@@ -1483,8 +1483,8 @@ class M_rest extends CI_Model {
                 for($k=0;$k<count($khs);$k++){
                     $d = $khs[$k];
                     if($d['ShowTranscript']==1 && $d['ShowTranscript']=='1'){
-                        // cek akaha sudah ada di list transcript atau belum, jika belim lanjutkan
-                        if(in_array($d['MKID'],$arrTranscriptID)!=-1){
+                        // cek apakah sudah ada di list transcript atau belum, jika belim lanjutkan
+                        if(in_array($d['MKID'],$arrTranscriptID)==false){
 
                             // cek apakah MKID punya lebih dari 1 jika maka ambil nilai tertingginya
                             if($showNilaiSemesterActive==1 || $showNilaiSemesterActive=='1'){
@@ -1516,7 +1516,6 @@ class M_rest extends CI_Model {
                                 array_push($transcript,$arrTr);
                             }
 
-
                         }
                     }
 
@@ -1526,8 +1525,83 @@ class M_rest extends CI_Model {
             }
 
 
-        }
 
+            // Cek semester antara
+            $dataSemesterAntara = $this->db->query('SELECT say.SASemesterID, say.UpdateTranscript FROM db_academic.semester_antara sa 
+                                                                              LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
+                                                                              WHERE sa.SemesterID = "'.$dataSmtActive['SemesterID'].'" ')->result_array();
+
+            if(count($dataSemesterAntara)>0){
+
+                $dt = $dataSemesterAntara[0];
+
+                if($dateNow>=$dt['UpdateTranscript']){
+                    // Cek apakah ada npmnya atau tidak
+                    $dataStd = $this->db->query('SELECT ssd.*,mk.MKCode, mk.Name, mk.NameEng FROM db_academic.sa_student_details ssd 
+                                                            LEFT JOIN db_academic.sa_student ss ON (ss.ID = ssd.IDSAStudent)
+                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
+                                                            WHERE ss.SASemesterID = "'.$dt['SASemesterID'].'" AND ss.NPM = "'.$NPM.'" ')
+                                            ->result_array();
+
+                    if(count($dataStd)>0){
+                        for ($s=0;$s<count($dataStd);$s++){
+                            $d_sa = $dataStd[$s];
+                            if($d_sa['MKID']=='Br'){
+
+                                $Score = (isset($d_sa['Score']) && $d_sa['Score']!='' && $d_sa['Score']!=null && $d_sa['Score']!='-')
+                                    ? $d_sa['Score'] : 0;
+                                $Grade = (isset($d_sa['Grade']) && $d_sa['Grade']!='' && $d_sa['Grade']!=null && $d_sa['Grade']!='-')
+                                    ? $d_sa['Grade'] : 'E';
+                                $GradeValue = (isset($d_sa['GradeValue']) && $d_sa['GradeValue']!='' && $d_sa['GradeValue']!=null && $d_sa['GradeValue']!='-')
+                                    ? $d_sa['GradeValue'] : 0;
+
+
+                                $arrTr = array(
+                                    'MKID' => $d_sa['MKID'],
+                                    'MKCode' => $d_sa['MKCode'],
+                                    'Course' => $d_sa['Name'],
+                                    'CourseEng' => $d_sa['NameEng'],
+                                    'Credit' => $d_sa['Credit'],
+                                    'Score' => $Score,
+                                    'Grade' => $Grade,
+                                    'GradeValue' => $GradeValue,
+                                    'Point' => ($d_sa['Credit']* $GradeValue),
+                                    'Source' => 'Semester Antara'
+
+
+                            );
+                                array_push($arrTranscriptID,$d_sa['MKID']);
+                                array_push($transcript,$arrTr);
+
+
+                            } else {
+
+                                for ($i2=0;$i2<count($transcript);$i2++){
+
+                                    $item = $transcript[$i2];
+
+                                    if($item['MKID']==$d_sa['MKID']){
+                                        if($item['Score'] < $d_sa['ScoreNew']){
+                                            $transcript[$i2]['Grade'] = $d_sa['GradeNew'];
+                                            $transcript[$i2]['Score'] = $d_sa['ScoreNew'];
+                                            $transcript[$i2]['GradeValue'] = $d_sa['GradeValueNew'];
+                                            $transcript[$i2]['Point'] = $transcript[$i]['Credit'] * $d_sa['GradeValueNew'];
+                                            $transcript[$i2]['Source'] = 'Semester Antara';
+                                        }
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
+        }
 
         return $transcript;
     }
@@ -1545,7 +1619,7 @@ class M_rest extends CI_Model {
                                         AND sp.CDID IS NOT NULL 
                                         ORDER BY mk.MKCode ASC ')->result_array();
 
-        $dateNow = date("Y-m-d");
+        $dateNow = $this->getDateNow();
         $showUTS = false;
         $showUAS = false;
         if($System=='1'){
