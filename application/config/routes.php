@@ -912,6 +912,7 @@ $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_Power
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
+$route['rest/__show_pr_detail_multiple_pr_code'] = 'api/c_rest/show_pr_detail_multiple_pr_code';
 
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';

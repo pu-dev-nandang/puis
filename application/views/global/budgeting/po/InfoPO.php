@@ -12,13 +12,13 @@
 	}
 @page {
   size: A4;
-  margin: 1;
+  margin: 0.5;
 }
 @media print {
     .container { 
       display: block !important;
         font-size: 10px; 
-        top: -40pt;
+        top: -60pt;
         left:0pt;
         right: 0pt;
     }
@@ -151,7 +151,7 @@
 							'</table>'+
 						'</div>'+						
 					'</div>'+
-					'<div class = "row" style = "margin-top : 10px;">'+
+					'<div class = "row" style = "margin-top : -5px;">'+
 						'<div class = "col-xs-12">'+
 							'<div>Bersama ini kami meminta untuk dikirim barang-barang sebagai berikut :</div>'+
 						'</div>'+
@@ -409,12 +409,12 @@
 	function makeFooter()
 	{
 		//r_footer
-		var html = '<div class = "row" style = "margin-top : 40px;">'+
+		var html = '<div class = "row" style = "margin-top : 10px;">'+
 						'<div class = "col-xs-4">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
-										'<tr style = "height : 70px">'+
+										'<tr style = "height : 40px">'+
 											'<td>'+
 												'No. PR : '+
 											'</td>'+
@@ -449,7 +449,7 @@
 		// r_signatures
 		var dt = ClassDt.po_data;
 		var po_create = dt['po_create'];
-		var html = '<div class= "row" style = "margin-top : 40px;">'+
+		var html = '<div class= "row" style = "margin-top : 20px;">'+
 						'<div class = "col-xs-12">'+
 							'<table class = "table borderless">'+
 								'<thead>'+
@@ -540,7 +540,7 @@
 		htmlBtnAdd =    '';
 		var IsiInputPO = MakeIsiPO();
 		var Subtotal = 	parseInt(ClassDt.total_po_detail)+parseInt(po_create[0]['AnotherCost'])	// 0 adalah persentase		
-		var htmlInputPO = '<div class = "row" style = "margin-top : 15px;">'+
+		var htmlInputPO = '<div class = "row" style = "margin-top : 5px;">'+
 							'<div class = "col-md-12">'+
 								//'<div class="table-responsive">'+
 									'<table class="table table-bordered tableData" id ="table_input_po">'+
@@ -580,7 +580,7 @@
 		_ajax_terbilang(Subtotal).then(function(data){
 			var html = htmlBtnAdd + htmlInputPO;			   
 			$('#r_tblDetail').html(html);
-			$('#r_terbilang').html('<div class = "row" style = "margin-top : 20px;">'+
+			$('#r_terbilang').html('<div class = "row" style = "margin-top : 10px;">'+
 										'<div class="col-xs-12">'+
 											'<b>Terbilang (Rupiah) : '+data+'</b>'+
 										'</div>'+
@@ -620,7 +620,8 @@
 		for (var i = 0; i < po_detail.length; i++) {
 			var Spesification = '';
 			DetailCatalog = jQuery.parseJSON(po_detail[i]['DetailCatalog']);
-			if (typeof(DetailCatalog) == 'object') {
+			// console.log(Object.entries(DetailCatalog).length);
+			if (typeof(DetailCatalog) == 'object' && Object.entries(DetailCatalog).length > 0) {
 				Spesification = '<div>Detail Catalog</div>';
 				Spesification += '<div>';
 				for (var prop in DetailCatalog) {

@@ -3488,6 +3488,40 @@ class C_rest extends CI_Controller {
             }
     }
 
+    public function show_pr_detail_multiple_pr_code()
+    {
+            try {
+                 $dataToken = $this->getInputToken2();
+                 $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $arr_result = array('pr_create' => array(),'pr_detail' => array());
+                    $arr_pr_code = json_decode(json_encode($dataToken['PRCode']),true);
+                    for ($i=0; $i < count($arr_pr_code); $i++) { 
+                        $arr_pr_code[$i] = '"'.$arr_pr_code[$i].'"';
+                    }
+                    $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode_multiple_pr_code($arr_pr_code);
+                    $POCode = '';
+                    if (array_key_exists('POCode', $dataToken)) {
+                       $POCode = $dataToken['POCode'];
+                    }
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO_multiple_pr_code($arr_pr_code,$POCode);
+                    echo json_encode($arr_result);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            //catch exception
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
     public function cek_deadline_payment_semester_antara()
     {
         try {

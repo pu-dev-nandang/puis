@@ -53,6 +53,7 @@
 		Dt_ChooseSelectPR : [],
 		action_mode : '<?php echo $action_mode ?>',
 		POCode : '<?php echo $POCode ?>',
+		POData : [],
 		htmlPage_pr_list : function(){
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
@@ -80,6 +81,18 @@
 	};
 
 	$(document).ready(function() {
+		// Show number PO if edit
+		if (ClassDt.POCode != '') {
+			var r = $('#page_pr_list').closest('.row');
+			var html = '<div class = "row">'+
+							'<div class = "col-xs-12" align="center">'+
+								'<h3><b>POCode : '+ClassDt.POCode+'</b></h3>'+
+							'</div>'+
+						'</div>';
+
+			r.before(html);					
+
+		}
 	    $('#page_pr_list').html(ClassDt.htmlPage_pr_list);
 	    skip_error_dt_table();
 		    Get_data_pr().then(function(data){
@@ -92,6 +105,8 @@
 		    	else
 		    	{
 		    		Get_data_open_po_created_detail().then(function(data){
+		    			// console.log(data);
+		    			ClassDt.POData = data;
 		    			var resultJson = data['po_detail'];
 		    			var temp = ClassDt.Dt_selection;
 		    			for (var i = 0; i < resultJson.length; i++) {
@@ -108,19 +123,49 @@
 		    			  }
 		    			};
 
-		    			waitForEl(".id_pr_detail", function() {
-		    			  $('.id_pr_detail:first').trigger('change');
-		    			});
+		    			// get ALL PR
+    						LoadPRSelected(data).then(function(data){
+    							SelectedPR_selection(data);
+    							waitForEl(".id_pr_detail", function() {
+    							  $('.id_pr_detail:first').trigger('change');
+    							});
 
-		    			$('.C_radio_pr:first').prop('checked',true);
-		    			$('.C_radio_pr:first').trigger('change');
-		    			loadingEnd(1000);
+    							$('.C_radio_pr:first').prop('checked',true);
+    							$('.C_radio_pr:first').trigger('change');
+    							loadingEnd(1000);
+    						})
 		    		})
 		    	}
 		        
 		        
 		    })
 	}); // exit document Function
+
+	function LoadPRSelected(dt)
+	{
+	   var po_detail = dt['po_detail'];
+	   var arr = [];
+	   for (var i = 0; i < po_detail.length; i++) {
+	   	arr.push(po_detail[i].PRCode);
+	   }
+       var def = jQuery.Deferred();
+       var url = base_url_js + 'rest/__show_pr_detail_multiple_pr_code';
+       var data = {
+           PRCode : arr,
+           auth : 's3Cr3T-G4N',
+           POCode : ClassDt.POCode,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       $.post(url,{ token:token },function (resultJson) {
+       		def.resolve(resultJson);
+       }).fail(function() {
+       	  def.reject();
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
+       return def.promise();
+	}
 
 	function Get_data_open_po_created_detail(){
        var def = jQuery.Deferred();
@@ -373,6 +418,7 @@
 		var IsiInputPR = '';
 		var Dt_ChooseSelectPR = ClassDt.Dt_ChooseSelectPR;
 		var Dt_selection = ClassDt.Dt_selection;
+
 		for (var i = 0; i < Dt_selection.length; i++) {
 			var ID_pr_detail = Dt_selection[i];
 			for (var j = 0; j < Dt_ChooseSelectPR.length; j++) {
@@ -494,6 +540,17 @@
 		$('#page_pr_selected_list').html(html);
 		// for edit
 			if (ClassDt.POCode != '') {
+				$('#Clear').remove();
+				var POData = ClassDt.POData;
+				var po_create = POData['po_create'];
+				if (po_create[0]['TypeCode'] == 'PO') {
+					$('#OpenSPK').remove();
+				}
+				else
+				{
+					$('#OpenPO').remove();
+				}
+			
 				Get_data_open_po_created_supplier().then(function(data){
 					var Tot = data.length;
 					
@@ -899,7 +956,7 @@
 					var action_submit = 'PO';
 					var id_selector = '#OpenPO';
 					_Create_PO_SPK(action_submit,id_selector).then(function(data){
-						if (data.Status == 1) {
+						if (data.status == 1) {
 							window.location.href = base_url_js+data['url'];
 						}
 						else
@@ -1040,6 +1097,15 @@
 		var token = jwt_encode(ClassDt.POCode,"UAP)(*");
 		form_data.append('Code',token);
 
+		var nmbtn = '';
+		if (id_selector == '#OpenPO') {
+			nmbtn = 'Open PO';
+		}
+		else if(id_selector == '#OpenSPK')
+		{
+			nmbtn = 'Open SPK';
+		}
+
 		var url = base_url_js + "po_spk/submit_create"
 		$.ajax({
 		  type:"POST",
@@ -1052,16 +1118,9 @@
 		  success:function(data)
 		  {
 		    def.resolve(data)
+		    $(id_selector).prop('disabled',false).html(nmbtn);
 		  },
 		  error: function (data) {
-		  	var nmbtn = '';
-		  	if (id_selector == '#OpenPO') {
-		  		nmbtn = 'Open PO';
-		  	}
-		  	else if(id_selector == '#OpenSPK')
-		  	{
-		  		nmbtn = 'Open SPK';
-		  	}
 		  	$(id_selector).prop('disabled',false).html(nmbtn);
 		    def.reject();
 		  }

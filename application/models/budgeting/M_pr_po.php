@@ -324,6 +324,43 @@ class M_pr_po extends CI_Model {
         return $query;
     }
 
+    public function GetPR_CreateByPRCode_multiple_pr_code($arr_pr_code)
+    {
+        $imp = implode(',', $arr_pr_code);
+        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done","Reject") ))
+                                    as StatusName,a.Status, a.JsonStatus ,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
+                                    from db_budgeting.pr_create as a 
+                join (
+                select * from (
+                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                ) aa
+                ) as b on a.Departement = b.ID
+                join db_employees.employees as c on a.CreatedBy = c.NIP
+                where a.PRCode in ('.$imp.')
+                ';
+        $query = $this->db->query($sql, array())->result_array();
+        // show Name Json Status
+            for ($i=0; $i < count($query); $i++) { 
+                $JsonStatus = $query[$i]['JsonStatus'];
+                $JsonStatusDecode = (array)json_decode($JsonStatus,true);
+                for ($j=0; $j < count($JsonStatusDecode); $j++) { 
+                    $ApprovedBy = $JsonStatusDecode[$j]['NIP'];
+                    $NameAprrovedBy = $this->m_master->SearchNameNIP_Employees_PU_Holding($ApprovedBy);
+                    $NameAprrovedBy = $NameAprrovedBy[0]['Name'];
+                    $JsonStatusDecode[$j]['NameAprrovedBy'] = $NameAprrovedBy;
+                }
+
+                $JsonStatus = json_encode($JsonStatusDecode);
+                $query[$i]['JsonStatus'] = $JsonStatus;
+            }
+        return $query;
+    }
+
     public function GetPR_DetailByPRCode($PRCode)
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
@@ -433,13 +470,109 @@ class M_pr_po extends CI_Model {
                                                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                                ) aa
                                ) as h on d.Departement = h.ID 
-                           where a.PRCode = ? and a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.Code = "'.$POCode.'")
-                          '; 
+                           where a.PRCode = ? and a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'")
+                          ';
+
                 }
                
             }
 
         $query = $this->db->query($sql, array($PRCode))->result_array();
+        // get combine 
+        for ($i=0; $i < count($query); $i++) { 
+            $arr = array();
+            $sql = 'select b.ID_budget_left as ID_budget_left_Combine,c.ID_creator_budget as ID_creator_budget_Combine,d.CodePostRealisasi as CodePostBudget_Combine,e.CodeHeadAccount as CodeHeadAccount_Combine,e.CodePost as CodePost_Combine,
+                f.RealisasiPostName as RealisasiPostName_Combine,e.Departement as Departement_Combine,g.PostName as PostName_Combine,
+                h.NameDepartement as NameDepartement_Combine,b.Cost as Cost_Combine from 
+                db_budgeting.pr_detail_combined as b
+                join db_budgeting.budget_left as c on b.ID_budget_left = c.ID
+               join db_budgeting.creator_budget as d on c.ID_creator_budget = d.ID
+               join db_budgeting.cfg_postrealisasi as f on d.CodePostRealisasi = f.CodePostRealisasi
+                             join db_budgeting.cfg_head_account as e on e.CodeHeadAccount = f.CodeHeadAccount
+               join db_budgeting.cfg_post as g on e.CodePost = g.CodePost
+               join (
+                   select * from (
+                                   select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                   UNION
+                                   select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                   UNION
+                                   select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                   ) aa
+                   ) as h on e.Departement = h.ID
+                where b.ID_pr_detail = ?   
+                ';
+            $arr = $this->db->query($sql, array($query[$i]['ID']))->result_array();
+            $query[$i]['Combine'] = $arr;   
+        }
+        return $query;       
+    }
+
+
+    public function GetPR_DetailByPRCode_UN_PO_multiple_pr_code($arr_pr_code,$POCode = '')
+    {
+        $temp = implode(',', $arr_pr_code);
+        $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
+                e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue
+                from db_budgeting.pr_detail as a
+                join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                join db_budgeting.cfg_postrealisasi as e on c.CodePostRealisasi = e.CodePostRealisasi
+                                join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
+                join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
+                join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                join (
+                    select * from (
+                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                    UNION
+                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                    UNION
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                    ) aa
+                    ) as h on d.Departement = h.ID 
+                where a.PRCode in ('.$temp.') and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail)
+               ';
+
+            // for edit in Open PO   
+            if ($POCode != '') {
+               $G_pr_po = $this->Get_data_po_by_Code($POCode);
+               $po_detail = $G_pr_po['po_detail'];
+               $bool = true;
+               // for ($i=0; $i < count($po_detail); $i++) {
+               //     if ($po_detail[$i]['PRCode'] == $PRCode) {
+               //         $bool = true;
+               //     } 
+               // }
+
+               if ($bool) {
+                   $sql = '
+                           select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
+                           e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                           a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue
+                           from db_budgeting.pr_detail as a
+                           join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                           join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                           join db_budgeting.cfg_postrealisasi as e on c.CodePostRealisasi = e.CodePostRealisasi
+                                           join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
+                           join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
+                           join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                           join (
+                               select * from (
+                                               select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                               UNION
+                                               select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                               UNION
+                                               select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                               ) aa
+                               ) as h on d.Departement = h.ID 
+                           where a.PRCode in ('.$temp.') and a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'")
+                          ';
+
+                }
+               
+            }
+
+        $query = $this->db->query($sql, array())->result_array();
         // get combine 
         for ($i=0; $i < count($query); $i++) { 
             $arr = array();

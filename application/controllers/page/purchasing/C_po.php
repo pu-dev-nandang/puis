@@ -431,12 +431,15 @@ class C_po extends Transaksi_Controler {
         $Code = $this->input->post('Code');
         $Code = $this->jwt->decode($Code,$key);
 
+        // print_r($arr_supplier);die();
+
         /*
             1.Cari Data Code dengan POCode pada po_create
             2.Dapatkan ID_pre_po
             3.Dapatkan pre_po_supplier dengan ID_pre_po
-              bandingkan dengan arr_supplier, @jika ada check file upload ada atau tidak, jika tidak gunakan file lama
-              jika ada hapus file lama dan upload file baru lalu update data untuk simpan filenamenya
+              bandingkan dengan arr_supplier, @jika ada check file upload ada atau tidak, jika tidak ada upload file gunakan file lama jika CodeSupplier Sama,
+              jika CodeSupplier tidak sama maka required fileupload
+              jika ada upload file hapus file lama dan upload file baru lalu update data untuk simpan filenamenya
               @jika tidak ada maka buat file upload menjadi required
             4.Cari data dengan ID_pre_po pada table pre_po_detail
             5.Dapatkan Nomor PRnya dengan cari ke pr_detail dengan ID_pr_detail
@@ -446,6 +449,7 @@ class C_po extends Transaksi_Controler {
               dapatkan ID_pre_po_detail
               hapus pre_po_detail by ID dengan ID_pre_po_detail
             7.Hapus po_detail by Code
+            8 dan seterusnya sama dengan metode insert
             
 
         */
@@ -456,223 +460,255 @@ class C_po extends Transaksi_Controler {
             // 3  
               $G_pre_po_supplier = $this->m_master->caribasedprimary('db_purchasing.pre_po_supplier','ID_pre_po',$ID_pre_po);
               $ID_pre_po_supplier = ''; // for approve
-                  for ($i=0; $i < count($G_pre_po_supplier); $i++) { 
-                    $bool_s = true;
+
+                // validation file required
+                $CheckUpload  = true;
+                for ($i=0; $i < count($G_pre_po_supplier); $i++) { 
                     $ID = $G_pre_po_supplier[$i]['ID'];
-                    $FileOffer = $G_pre_po_supplier[$i]['FileOffer'];
-                    $FileOffer = json_decode($FileOffer,true); // only one file
-                    $FileOffer = $FileOffer[0];
                     for ($j=0; $j < count($arr_supplier); $j++) { 
-                        if ($G_pre_po_supplier[$i]['CodeSupplier'] == $arr_supplier[$j]) {
-                            $bool_s = false;
-                            // jika ada check file upload ada atau tidak, jika tidak gunakan file lama
-                            // jika ada hapus file lama dan upload file baru lalu update data untuk simpan filenamenya
-                                if (array_key_exists('UploadFile'.$j, $_FILES)) {
-                                    // do upload file
-                                    $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadFile'.$j,$path = './uploads/budgeting/po');
-                                    $dataSave['FileOffer'] = json_encode($uploadFile); 
-                                    // delete file lama
-                                    $path = FCPATH.'uploads\\budgeting\\po\\'.$FileOffer;
-                                    unlink($path);
-                                    // update di database
-                                    $this->db->where('ID',$ID);
-                                    $this->db->update('db_purchasing.pre_po_supplier',$dataSave);
+                        if ($G_pre_po_supplier[$i]['CodeSupplier'] == $arr_supplier[$j]['CodeSupplier']) {
+                            if (!array_key_exists('UploadFile'.$j, $_FILES)) {
+                                $CheckUpload = false;
+                                $arr_rs['status'] = 0;
+                                $arr_rs['message'] = 'File is required';
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if ($CheckUpload) {
+                    $ID_pre_po_supplier = '';
+                    for ($i=0; $i < count($G_pre_po_supplier); $i++) { 
+                      $bool_s = true;
+                      $ID = $G_pre_po_supplier[$i]['ID'];
+                      $FileOffer = $G_pre_po_supplier[$i]['FileOffer'];
+                      $FileOffer = json_decode($FileOffer,true); // only one file
+                      $FileOffer = $FileOffer[0];
+                      for ($j=0; $j < count($arr_supplier); $j++) { 
+                          if ($G_pre_po_supplier[$i]['CodeSupplier'] == $arr_supplier[$j]['CodeSupplier']) {
+                              $bool_s = false;
+                              // jika ada check file upload ada atau tidak, jika tidak gunakan file lama
+                              // jika ada hapus file lama dan upload file baru lalu update data untuk simpan filenamenya
+                                  if (array_key_exists('UploadFile'.$j, $_FILES)) {
+                                      // do upload file
+                                      $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadFile'.$j,$path = './uploads/budgeting/po');
+                                      $dataSave = $arr_supplier[$j];
+                                      $dataSave['FileOffer'] = json_encode($uploadFile); 
+                                      // delete file lama
+                                      $path = FCPATH.'uploads\\budgeting\\po\\'.$FileOffer;
+                                      if (file_exists($path)) {
+                                        unlink($path);
+                                      }
+                                      
+                                      // update di database
+                                      $this->db->where('ID',$ID);
+                                      $this->db->update('db_purchasing.pre_po_supplier',$dataSave);
+
+                                      if ($dataSave['Approve'] == 1) {
+                                          $ID_pre_po_supplier = $ID;
+                                      }
+                                  }
+                                  
+                              break;
+                           }
+                      }
+                       
+                       if ($bool_s) {
+                           // delete db and delete file
+                            $path = FCPATH.'uploads\\budgeting\\po\\'.$FileOffer;
+                            if (file_exists($path)) {
+                              unlink($path);
+                            }
+                           $this->db->where('ID',$ID);
+                           $this->db->delete('db_purchasing.pre_po_supplier');
+                       }
+                    }
+
+                    // file arr_supplier tambahan jika ada
+                    $G_pre_po_supplier = $this->m_master->caribasedprimary('db_purchasing.pre_po_supplier','ID_pre_po',$ID_pre_po);
+                    for ($i=0; $i < count($arr_supplier); $i++) {
+                        $bool = true;
+                        for ($j=0; $j < count($G_pre_po_supplier); $j++) {
+                           if ($G_pre_po_supplier[$j]['CodeSupplier'] == $arr_supplier[$i]['CodeSupplier']) {
+                             $bool = false;
+                             break;
+                           }
+                        }
+
+                        if ($bool) {
+                            if (array_key_exists('UploadFile'.$i, $_FILES)) {
+                                $dataSave = $arr_supplier[$i];
+                                // do upload file
+                                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadFile'.$i,$path = './uploads/budgeting/po');
+                                $dataSave['FileOffer'] = json_encode($uploadFile); 
+                                $dataSave['ID_pre_po'] = $ID_pre_po;
+                                $this->db->insert('db_purchasing.pre_po_supplier',$dataSave);
+                                $LastInserID = $this->db->insert_id();
+                                if ($dataSave['Approve'] == 1) {
+                                    $ID_pre_po_supplier = $LastInserID;
                                 }
-                            break;
+                            }
                         }
+
                     }
-                     
-                     if ($bool_s) {
-                         // delete db and delete file
-                         $this->db->where('ID',$ID);
-                         $this->db->delete('db_purchasing.pre_po_supplier');
-                     }
-                  }
 
-            // 4
-                $sql = 'select a.ID as pre_po_detail, a.ID_pre_po,a.ID_pr_detail,b.*
-                        from db_purchasing.pre_po_detail as a 
-                        join db_budgeting.pr_detail as b on a.ID_pr_detail = b.ID
-                        where a.ID_pre_po = ?
-                        ';
-                $query=$this->db->query($sql, array($ID_pre_po))->result_array();
-            // 5    
-                for ($i=0; $i < count($query); $i++) { 
-                    $PRCode = $query[$i]['PRCode'];
-                    $ID_pr_detail = $query[$i]['ID_pr_detail'];
-                    $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                    $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
-                    $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
-                    $dataSave = array(
-                       'Item_proc' => $Item_proc,
-                        'Item_pending' => $Item_pending,   
-                    );
-
-                    $this->db->where('PRCode',$PRCode);
-                    $this->db->update('db_purchasing.pr_status',$dataSave);
-
-                    $G_data_pr_status_detail = $this->m_master->caribasedprimary('db_purchasing.pr_status_detail','ID_pr_detail',$G_data_pr_status[0]['ID']);
-                    for ($j=0; $j < count($G_data_pr_status_detail); $j++) { 
-                        $ID_pr_detail_ = $G_data_pr_status_detail[$j]['ID_pr_detail'];
-                        if ($ID_pr_detail $ID_pr_detail_) {
+                    // 4 & // 5 
+                        $sql = 'select a.ID as pre_po_detail, a.ID_pre_po,a.ID_pr_detail,b.*
+                                from db_purchasing.pre_po_detail as a 
+                                join db_budgeting.pr_detail as b on a.ID_pr_detail = b.ID
+                                where a.ID_pre_po = ?
+                                ';
+                        $query=$this->db->query($sql, array($ID_pre_po))->result_array();
+                        for ($i=0; $i < count($query); $i++) { 
+                            $PRCode = $query[$i]['PRCode'];
+                            $ID_pr_detail = $query[$i]['ID_pr_detail'];
+                            $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                            $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
+                            $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
                             $dataSave = array(
-                                'Status' => 0,
+                               'Item_proc' => $Item_proc,
+                                'Item_pending' => $Item_pending,   
                             );
-                            $this->db->where('ID',$G_data_pr_status_detail[$j]['ID']);
-                            $this->db->update('db_purchasing.pr_status_detail',$dataSave);
+
+                            $this->db->where('PRCode',$PRCode);
+                            $this->db->update('db_purchasing.pr_status',$dataSave);
+
+                            $G_data_pr_status_detail = $this->m_master->caribasedprimary('db_purchasing.pr_status_detail','ID_pr_status',$G_data_pr_status[0]['ID']);
+                            for ($j=0; $j < count($G_data_pr_status_detail); $j++) { 
+                                $ID_pr_detail_ = $G_data_pr_status_detail[$j]['ID_pr_detail'];
+                                if ($ID_pr_detail == $ID_pr_detail_) {
+                                    $dataSave = array(
+                                        'Status' => 0,
+                                    );
+                                    $this->db->where('ID',$G_data_pr_status_detail[$j]['ID']);
+                                    $this->db->update('db_purchasing.pr_status_detail',$dataSave);
+                                }
+                            }
                         }
-                    }
-                }
 
-            // 6  
-                $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code);
-                for ($i=0; $i < count($G_po_detail); $i++) { 
-                    $ID_pre_po_detail = $G_po_detail[$i]['ID_pre_po_detail'];
-                    $this->db->where('ID',$ID_pre_po_detail);
-                    $this->db->delete('db_purchasing.pre_po_detail');
-                }
-
-                $this->db->where('Code',$Code);
-                $this->db->delete('db_purchasing.po_detail');             
-
-
-
-         // 3
-            $Amount = 0;
-            $dt_po_detail = array();
-            $arr_pr_code = array();
-            for ($i=0; $i < count($arr_pr_detail); $i++) { 
-                $dataSave = array(
-                    'ID_pre_po' => $ID_pre_po,
-                    'ID_pr_detail' => $arr_pr_detail[$i],
-                );
-
-                $this->db->insert('db_purchasing.pre_po_detail',$dataSave);
-                $ID_pre_po_detail = $this->db->insert_id();
-                // get amount dari ID_pr_detail
-                $G = $this->m_master->caribasedprimary('db_budgeting.pr_detail','ID',$arr_pr_detail[$i]);
-                $Amount = $Amount +$G[0]['SubTotal'];
-
-                $temp = array(
-                    'Code' => $Code,
-                    'ID_pre_po_detail' => $ID_pre_po_detail,
-                    'UnitCost' => $G[0]['UnitCost'],
-                    'Discount' => 0,
-                    'PPN' => $G[0]['PPH'],
-                    'SubTotal' => $G[0]['SubTotal'],
-                );
-                $dt_po_detail[] = $temp;
-
-                // adding PR Code
-                if (count($arr_pr_code) == 0) {
-                    $temp = array(
-                        'PRCode' => $G[0]['PRCode'],
-                        'Count' => 1,
-                    );
-
-                    $arr_pr_code[] = $temp;
-                }
-                else
-                {
-                    $bool= true;
-                    for ($j=0; $j < count($arr_pr_code); $j++) { 
-                        if ($arr_pr_code[$j]['PRCode'] == $G[0]['PRCode']) {
-                            $arr_pr_code[$j]['Count'] = $arr_pr_code[$j]['Count'] + 1;
-                            $bool = false;
-                            break;
+                    // 6  
+                        $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code);
+                        for ($i=0; $i < count($G_po_detail); $i++) { 
+                            $ID_pre_po_detail = $G_po_detail[$i]['ID_pre_po_detail'];
+                            $this->db->where('ID',$ID_pre_po_detail);
+                            $this->db->delete('db_purchasing.pre_po_detail');
                         }
-                    }
+                    // 7    
+                        $this->db->where('Code',$Code);
+                        $this->db->delete('db_purchasing.po_detail'); 
 
-                    if ($bool) {
-                       $temp = array(
-                           'PRCode' => $G[0]['PRCode'],
-                           'Count' => 1,
+
+                    // 8    
+                        $Amount = 0;
+                        $dt_po_detail = array();
+                        $arr_pr_code = array();
+                        for ($i=0; $i < count($arr_pr_detail); $i++) { 
+                            $dataSave = array(
+                                'ID_pre_po' => $ID_pre_po,
+                                'ID_pr_detail' => $arr_pr_detail[$i],
+                            );
+
+                            $this->db->insert('db_purchasing.pre_po_detail',$dataSave);
+                            $ID_pre_po_detail = $this->db->insert_id();
+                            // get amount dari ID_pr_detail
+                            $G = $this->m_master->caribasedprimary('db_budgeting.pr_detail','ID',$arr_pr_detail[$i]);
+                            $Amount = $Amount +$G[0]['SubTotal'];
+
+                            $temp = array(
+                                'Code' => $Code,
+                                'ID_pre_po_detail' => $ID_pre_po_detail,
+                                'UnitCost' => $G[0]['UnitCost'],
+                                'Discount' => 0,
+                                'PPN' => $G[0]['PPH'],
+                                'SubTotal' => $G[0]['SubTotal'],
+                            );
+                            $dt_po_detail[] = $temp;
+
+                            // adding PR Code
+                            if (count($arr_pr_code) == 0) {
+                                $temp = array(
+                                    'PRCode' => $G[0]['PRCode'],
+                                    'Count' => 1,
+                                );
+
+                                $arr_pr_code[] = $temp;
+                            }
+                            else
+                            {
+                                $bool= true;
+                                for ($j=0; $j < count($arr_pr_code); $j++) { 
+                                    if ($arr_pr_code[$j]['PRCode'] == $G[0]['PRCode']) {
+                                        $arr_pr_code[$j]['Count'] = $arr_pr_code[$j]['Count'] + 1;
+                                        $bool = false;
+                                        break;
+                                    }
+                                }
+
+                                if ($bool) {
+                                   $temp = array(
+                                       'PRCode' => $G[0]['PRCode'],
+                                       'Count' => 1,
+                                   );
+
+                                   $arr_pr_code[] = $temp;
+                                }
+                            }
+                        }
+
+                    // 9
+                       $JsonStatus = $this->m_pr_po->GetRuleApproval_PO_JsonStatus($Amount);
+                       $dataSave = array(
+                           'TypeCreate' => 1,
+                           'ID_pre_po_supplier' => $ID_pre_po_supplier,
+                           'AnotherCost' => 0,
+                           'JsonStatus' => json_encode($JsonStatus),
+                           'Status' => 0,
+                           'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                           'Supporting_documents' => json_encode($arr = array()),
                        );
 
-                       $arr_pr_code[] = $temp;
-                    }
+                       $this->db->where('Code',$Code);
+                       $this->db->update('db_purchasing.po_create',$dataSave);
+
+                       for ($i=0; $i < count($dt_po_detail); $i++) { 
+                           $dataSave = $dt_po_detail[$i];
+                           $this->db->insert('db_purchasing.po_detail',$dataSave);
+                       }
+
+                       for ($i=0; $i < count($arr_pr_code); $i++) {
+                            $PRCode = $arr_pr_code[$i]['PRCode'];
+                            $G_data = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                            $Item_pending = $G_data[0]['Item_pending'];
+                            $Item_pending = $Item_pending - $arr_pr_code[$i]['Count'];
+                            $Item_proc = $G_data[0]['Item_proc'];
+                            $Item_proc = $Item_proc  + $arr_pr_code[$i]['Count'];
+
+                            $dataSave = array(
+                             'Item_pending' => $Item_pending,
+                             'Item_proc' => $Item_proc,
+                            );
+
+                            $this->db->where('ID',$G_data[0]['ID']);
+                            $this->db->update('db_purchasing.pr_status',$dataSave);
+                        }
+
+                        for ($i=0; $i < count($arr_pr_detail); $i++) { 
+                            $ID_pr_detail = $arr_pr_detail[$i];
+                            $dataSave = array(
+                             'Status' => 1,
+                            );
+                            $this->db->where('ID_pr_detail',$ID_pr_detail);
+                            $this->db->update('db_purchasing.pr_status_detail',$dataSave); 
+                        }
+
+                        $urlCode = str_replace('/', '-', $Code);
+                        $arr_rs['url'] = 'global/purchasing/transaction/po/list/'.$urlCode;
+                        $arr_rs['Code'] = $Code;
+
+                        // insert to pr_circulation_sheet
+                            $this->m_pr_po->po_circulation_sheet($Code,'Re-Open-PO'); 
                 }
-            }
-
-
-            // Tommorow 20-05-2019    
-          // 4
-            $ID_pre_po_supplier = '';
-            for ($i=0; $i < count($arr_supplier); $i++) { 
-                $dataSave = $arr_supplier[$i];
-                // do upload file
-                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadFile'.$i,$path = './uploads/budgeting/po');
-                $dataSave['FileOffer'] = json_encode($uploadFile); 
-                $dataSave['ID_pre_po'] = $ID_pre_po;
-                $this->db->insert('db_purchasing.pre_po_supplier',$dataSave);
-                $LastInserID = $this->db->insert_id();
-                if ($dataSave['Approve'] == 1) {
-                    $ID_pre_po_supplier = $LastInserID;
-                }
-            }
-
-          // 5 PO & 6
-            $JsonStatus = $this->m_pr_po->GetRuleApproval_PO_JsonStatus($Amount);
-            $dataSave = array(
-                'ID_pre_po' => $ID_pre_po,
-                'TypeCreate' => 1,
-                'Code' => $Code,
-                'ID_pre_po_supplier' => $ID_pre_po_supplier,
-                'AnotherCost' => 0,
-                'JsonStatus' => json_encode($JsonStatus),
-                'Status' => 0,
-                'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
-                'Supporting_documents' => json_encode($arr = array()),
-                'CreatedBy' => $this->session->userdata('NIP'),
-                'CreatedAt' => date('Y-m-d H:i:s'), 
-            );
-
-            $this->db->insert('db_purchasing.po_create',$dataSave);
-
-            for ($i=0; $i < count($dt_po_detail); $i++) { 
-                $dataSave = $dt_po_detail[$i];
-                $this->db->insert('db_purchasing.po_detail',$dataSave);
-            }
-
-         // 7 PO & 8
-            /* pr_status => Pengurangan dari Item_pending ke Item_proc($arr_pr_code)  & Status = 1
-               pr_status_detail => $arr_pr_detail get ID_pr_detail untuk perubahan status dari 0 => 1 
-            */  
-              // 7 
-              for ($i=0; $i < count($arr_pr_code); $i++) {
-                   $PRCode = $arr_pr_code[$i]['PRCode'];
-                   $G_data = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                   $Item_pending = $G_data[0]['Item_pending'];
-                   $Item_pending = $Item_pending - $arr_pr_code[$i]['Count'];
-                   $Item_proc = $G_data[0]['Item_proc'];
-                   $Item_proc = $Item_proc  + $arr_pr_code[$i]['Count'];
-
-                   $dataSave = array(
-                    'Item_pending' => $Item_pending,
-                    'Item_proc' => $Item_proc,
-                   );
-
-                   $this->db->where('ID',$G_data[0]['ID']);
-                   $this->db->update('db_purchasing.pr_status',$dataSave);
-               }
-
-               // 8
-               for ($i=0; $i < count($arr_pr_detail); $i++) { 
-                   $ID_pr_detail = $arr_pr_detail[$i];
-                   $dataSave = array(
-                    'Status' => 1,
-                   );
-                   $this->db->where('ID_pr_detail',$ID_pr_detail);
-                   $this->db->update('db_purchasing.pr_status_detail',$dataSave); 
-               } 
-              
-
-            $urlCode = str_replace('/', '-', $Code);
-            $arr_rs['url'] = 'global/purchasing/transaction/po/list/'.$urlCode;
-            $arr_rs['Code'] = $Code;
-
-            // insert to pr_circulation_sheet
-                $this->m_pr_po->po_circulation_sheet($Code,'PO Created');
 
         echo json_encode($arr_rs);
     }
