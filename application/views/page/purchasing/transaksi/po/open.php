@@ -940,19 +940,6 @@
 
 				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
 					loading_button('#OpenPO');
-					// create po
-					// if (ClassDt.action_mode == 'add') {
-					// 	var action_submit = 'PO';
-					// 	var id_selector = '#OpenPO';
-					// 	_Create_PO_SPK(action_submit,id_selector).then(function(data){
-					// 	    window.location.href = base_url_js+data['url'];
-					// 	})
-					// }
-					// else
-					// {
-
-					// }
-
 					var action_submit = 'PO';
 					var id_selector = '#OpenPO';
 					_Create_PO_SPK(action_submit,id_selector).then(function(data){
@@ -983,66 +970,74 @@
 	})
 
 	$(document).off('click', '#OpenSPK').on('click', '#OpenSPK',function(e) {
-		// check pr selected harus lebih dari 0
-			var arr_pr_detail_selected = [];
-			$('.id_pr_detail_selected:checked').each(function(){
-				var id_pr_detail = $(this).attr('id_pr_detail');
-				arr_pr_detail_selected.push(id_pr_detail);
-			})
-		// Select vendor harus ada yang approve = 1
-			var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+		if (confirm('Are you sure ?')) {
+			// check pr selected harus lebih dari 0
+				var arr_pr_detail_selected = [];
+				$('.id_pr_detail_selected:checked').each(function(){
+					var id_pr_detail = $(this).attr('id_pr_detail');
+					arr_pr_detail_selected.push(id_pr_detail);
+				})
+			// Select vendor harus ada yang approve = 1
+				var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
 
-		// check Choose vendor dengan select vendor
-			var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
-			var c = 0;
-			$('.LblNmVendor').each(function(){
-				var idtable = $(this).attr('idtable');
-				if (idtable != '' && idtable != null && idtable != undefined) {
-					c++;
-				}
-			})
+			// check Choose vendor dengan select vendor
+				var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
+				var c = 0;
+				$('.LblNmVendor').each(function(){
+					var idtable = $(this).attr('idtable');
+					if (idtable != '' && idtable != null && idtable != undefined) {
+						c++;
+					}
+				})
 
-			// validation file
-				var BoolFile = true;
-			$(".BrowseFile").each(function(){
-				var ev = $(this);
-				var tr = ev.closest('tr');
-				if (BoolFile) {
-					if (tr.find('.BrowseFile').length) {
+				// validation file
+					var BoolFile = true;
+				$(".BrowseFile").each(function(){
+					var ev = $(this);
+					var tr = ev.closest('tr');
+					var td = ev.closest('td');
+					// cek apakah ada file exist
+					var bool22 = true;
+					if (td.find('li').length) {
+						bool22 = false;
+					}
+
+					if (BoolFile && bool22) {
 						BoolFile = file_validation(ev);
 					}
-					else
-					{
-						BoolFile = false;
-					}
-				}
-				
-			})
+					
+				})
 
-			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
-				loading_button('#OpenSPK');
-				if (ClassDt.action_mode == 'add') {
+
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
+					loading_button('#OpenSPK');
 					var action_submit = 'SPK';
 					var id_selector = '#OpenSPK';
 					_Create_PO_SPK(action_submit,id_selector).then(function(data){
-					    window.location.href = base_url_js+data['url'];
+						if (data.status == 1) {
+							window.location.href = base_url_js+data['url'];
+						}
+						else
+						{
+							toastr.info(data.message);
+						}
+					    
 					})
 				}
 				else
 				{
-
+					toastr.info('<li>PR Selected must be having less one checked</li>'+
+								'<li>Select Vendor must be having less one approve</li>'+
+								'<li>Total Vendor must be same with total selected vendor</li>'
+								);
 				}
-				
-			}
-			else
-			{
-				toastr.info('<li>PR Selected must be having less one checked</li>'+
-							'<li>Select Vendor must be having less one approve</li>'+
-							'<li>Total Vendor must be same with total selected vendor</li>'
-							);
-			}
+		}
+		else
+		{
 
-		// dapatkan no SPK dan show page SPK created
+		}
+
+		// dapatkan no po dan show page PO created
 	})
 
 	function _Create_PO_SPK(action_submit,id_selector)

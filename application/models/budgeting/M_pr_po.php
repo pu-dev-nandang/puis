@@ -152,6 +152,7 @@ class M_pr_po extends CI_Model {
         $sql = 'select * from db_purchasing.po_create 
                 where SPLIT_STR(Code, "/", 5) = ?
                 and SPLIT_STR(Code, "/", 4) = ?
+                and TypeCreate = 1
                 order by SPLIT_STR(Code, "/", 1) desc
                 limit 1';
         $query=$this->db->query($sql, array($Year,$Month))->result_array();
@@ -189,6 +190,87 @@ class M_pr_po extends CI_Model {
             */
 
             $Code = $strINC.'/'.'PO/'.'YPAP'.'/'.$Month.'/'.$Year;
+        }    
+        return $Code;        
+    }
+
+
+    public function Get_SPKCode()
+    {
+        /* method PO
+           Code : 016/PO/YPAP/IX/2018
+           016 : Increment (Max length = 3)
+           PO : Fix
+           YPAP : Fix
+           IX : Bulan dalam romawi
+           2018 : Get Years Now
+        */
+
+       /* method SPK
+          Code : S001/SPK/YPAP/I/2019
+          S001 : Increment (Max length = 4) dengan huruf S didepan
+          SPK : Fix
+          YPAP : Fix
+          IX : Bulan dalam romawi
+          2018 : Get Years Now
+       */
+        $Code = '';   
+        $Year = date('Y');
+        $Month = date('m');
+        $Month = $this->m_master->romawiNumber($Month);
+        $MaxLengthINC = 3; // digit number aja
+        $HurufFixed = 'S';
+        
+        $sql = 'select * from db_purchasing.po_create 
+                where SPLIT_STR(Code, "/", 5) = ?
+                and SPLIT_STR(Code, "/", 4) = ?
+                and TypeCreate = 2
+                order by SPLIT_STR(Code, "/", 1) desc
+                limit 1';
+        $query=$this->db->query($sql, array($Year,$Month))->result_array();
+        if (count($query) == 1) {
+            // Inc last code
+            $Code = $query[0]['Code'];
+            $explode = explode('/', $Code);
+            $C = $explode[0];
+            $C = str_replace($HurufFixed, '', $C);
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $explode[0] = $HurufFixed.$strINC;
+            $Code = implode('/', $explode);
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+            $strINC = $HurufFixed.$strINC;
+            /* method PO
+               Code : 016/PO/YPAP/IX/2018
+               05 : Increment (Max length = 3)
+               PO : Fix
+               YPAP : Fix
+               IX : Bulan dalam romawi
+               2018 : Get Years Now
+            */
+            /* method SPK
+               Code : S001/SPK/YPAP/I/2019
+               S001 : Increment (Max length = 4) dengan huruf S didepan
+               SPK : Fix
+               YPAP : Fix
+               IX : Bulan dalam romawi
+               2018 : Get Years Now
+            */   
+            $Code = $strINC.'/'.'SPK/'.'YPAP'.'/'.$Month.'/'.$Year;
         }    
         return $Code;        
     }
@@ -943,7 +1025,7 @@ class M_pr_po extends CI_Model {
     {
         $arr = array();
         $sql = 'select a.ID_pre_po,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,b.FileOffer,
-                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,a.AnotherCost,a.JsonStatus,a.Status,a.Notes,a.Supporting_documents,a.POPrint_Approve,
+                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.AnotherCost,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,
                 a.PostingDate,a.CreatedBy,a.CreatedAt
                 from db_purchasing.po_create as a 
                 join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID

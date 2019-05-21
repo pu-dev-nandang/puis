@@ -12,24 +12,33 @@
 	}
 @page {
   size: A4;
-  margin: 0.5;
+  /*margin: 0.5;*/
+  margin-left: 0.5pt;
+  margin-top: 10pt;
+  margin-bottom : 1pt;
+  margin-right : 1pt;
 }
 @media print {
     .container { 
       display: block !important;
         font-size: 10px; 
-        top: -60pt;
-        left:0pt;
-        right: 0pt;
+        /*top: -60pt;*/
+        /*left:0pt;*/
+        /*right: 0pt;*/
     }
     table{
     	font-size: 10px; 
     }
     
-    .btn,.noPrint, a { 
+    .btn, .noPrint, a { 
     	display:none !important;
     }
+    .CustomTD
+    {
+    	width: 200px !important;
+    }
 }
+
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="row noPrint">
@@ -44,7 +53,7 @@
 			<?php endif ?>
 	</div>
 </div>
-<div id="DocPenawaran" class="row"></div>
+<div id="DocPenawaran" class="row noPrint"></div>
 <div class="row" style="margin-top: 2px;">
 	<div class="col-xs-12">
 		<table class="table borderless">
@@ -52,7 +61,7 @@
 			<tbody>
 				<tr>
 					<td style="text-align :center">
-						<p><h3>Purchase Order</h3></p>
+						<p><h3><u>Surat Perintah Kerja</u></h3></p>
 						<p style="margin-top: -10px;"><?php echo $Code ?></p>
 					</td>
 				</tr>
@@ -61,7 +70,7 @@
 	</div>
 </div>
 <?php if ($bool): ?>
-<div id = "PageContain">
+<div id = "PageContain"">
 	
 </div>
 <?php else: ?>
@@ -116,57 +125,181 @@
 		return def.promise();
 	}
 
+	function __Get_spk_pembukaan(Date)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__Get_spk_pembukaan";
+		var data = {
+		    Date : Date,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
+
 	function WriteHtml()
 	{
 		var dt = ClassDt.po_data;
 		var po_create = dt.po_create;
+		var po_detail = dt.po_detail;
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
-		// PageContain
-		var html = '<div class = "row">'+
-						'<div class = "col-xs-12">'+
-							'<table class = "table borderless" style = "margin-left: -8px;">'+
-								'<thead></thead>'+
-								'<tbody>'+
-									'<tr>'+
-										'<td>'+
-											'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
-											'<div>Podomoro City APL Tower, Lantai 5</div>'+
-											'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
-											'<div>Telp 021 29200456</div>'+
-											'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
-										'</td>'+
-										'<td></td>'+
-										'<td>'+
-											'<div style = "margin-left : 50%">'+
-												'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
-												'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
-												'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
-												'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
-											'</div>'+	
-										'</td>'+
-									'</tr>'+
-								'</tbody>'+
-							'</table>'+
-						'</div>'+						
-					'</div>'+
-					'<div class = "row" style = "margin-top : -5px;">'+
-						'<div class = "col-xs-12">'+
-							'<div>Bersama ini kami meminta untuk dikirim barang-barang sebagai berikut :</div>'+
+
+		__Get_spk_pembukaan(po_create[0]['CreatedAt']).then(function(data){
+			var html = '<div class = "row">'+
+							'<div class = "col-xs-12">'+
+								'<div>'+data+'</div>'+
+							'</div>'+
 						'</div>'+
-					'</div>'+
-					'<div id = "r_tblDetail"></div>'+
-					'<div id = "r_terbilang"></div>'+
-					'<div id = "r_signatures"></div>'+
-					'<div id = "r_footer"></div>'+
-					'<div id = "r_action"></div>';
-		$('#PageContain').html(html);
-		makeTblDetail();
-		makeSignatures();
-		makeFooter();
-		makeDocPenawaran();
-		makeAction();						
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "5" style = "width : 45px;">I</td>'+
+											'<td colspan = "3"><b>PEMBERI TUGAS</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>NAMA PERUSAHAAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>YAY PENDIDIKAN AGUNG PODOMORO</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>PENANGGUNG JAWAB</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>SERIAN WIJATNO & WIBOWO NGASERIN</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>JABATAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>SEKRETARIS & KETUA YAYASAN</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>ALAMAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>Jl.S. Parman Kav 28, Tanjung Duren Selatan, Grogol Petamburan,Jakarta Barat</b></td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 15px;">'+
+							'<div class = "col-xs-12">'+
+								'<div>Yang selanjutnya disebut sebagai <b>PIHAK PERTAMA</b></div>'+
+							'</div>'+
+						'</div>'+
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "5" style = "width : 45px;">II</td>'+
+											'<td colspan = "3"><b>PENERIMA TUGAS</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>NAMA PERUSAHAAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['NamaSupplier'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>PENANGGUNG JAWAB</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['PICName'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>JABATAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['JabatanPIC'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>ALAMAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['Alamat']+'</b></td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 15px;">'+
+							'<div class = "col-xs-12">'+
+								'<div>Yang selanjutnya disebut sebagai <b>PIHAK KEDUA</b></div>'+
+							'</div>'+
+						'</div>'+
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "5" style = "width : 45px;"></td>'+
+											'<td colspan = "3"></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>UNTUK MENGERJAKAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_detail[0]['Item']+'</br>'+po_detail[0]['Desc']+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>HARGA TOTAL</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+formatRupiah(po_detail[0]['Subtotal'])+'</b></br><b>(include PPn '+parseInt(po_detail[0]['PPN_PO'])+'%)</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td>'+po_create[0]['Notes']+'</td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['Notes2']+'</b></td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div id = "r_footer"></div>'+
+						'<div id = "r_action" style = "margin-left : -15px;margin-right:-15px;"></div>';
+
+			$('#PageContain').html(html);
+
+			if (ClassDt.PRCode_arr.length == 0) {
+				ClassDt.PRCode_arr.push(po_detail[0]['PRCode']);
+			}
+			else
+			{
+				var bool = true;
+				for (var j = 0; j < ClassDt.PRCode_arr.length; j++) {
+					var arr = ClassDt.PRCode_arr;
+					if (arr[j] == po_detail[0]['PRCode']) {
+						bool = false;
+						break;
+					}
+				}
+
+				if (bool) {
+					ClassDt.PRCode_arr.push(po_detail[0]['PRCode']);
+				}
+			}
+
+
+			
+			makeFooter();
+			makeDocPenawaran();
+			// makeAction();
+			loadingEnd(1000);									
+
+		})
 	}
 
 	function makeDocPenawaran()
@@ -198,7 +331,7 @@
 				    break;    
 		}
 
-		$('#DocPenawaran').html('<div class="col-xs-12"><div style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Log</a></div></div>');
+		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Log</a></div></div>');
 
 	}
 
@@ -221,16 +354,6 @@
 		        html += '</tr>' ;
 		        html += '</thead>' ;
 		        html += '<tbody>' ;
-
-		        // for (var i = 0; i < data_json.length; i++) {
-		        // 	var No = parseInt(i) + 1;
-		        // 	html += '<tr>'+
-		        // 	      '<td>'+ No + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Desc'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Date'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Name'] + '</td>'+
-		        // 	    '<tr>';	
-		        // }
 
 		        html += '</tbody>' ;
 		        html += '</table></div></div>' ;	
@@ -410,8 +533,11 @@
 
 	function makeFooter()
 	{
+		var dt = ClassDt.po_data;
+		var po_create = dt.po_create;
+		var po_detail = dt.po_detail;
 		//r_footer
-		var html = '<div class = "row" style = "margin-top : 10px;">'+
+		var html = '<div class = "row">'+
 						'<div class = "col-xs-4">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
@@ -430,18 +556,32 @@
 
 		html += t;
 		html += '</td></tr>';
-		html += '<tr style = "height : 100px">'+
-					'<td colspan = "2">'+
-						'<b>Diterima oleh Vendor,'+
-					'</td>'+
-				'</tr>'+
-				'<tr>'+
-					'<td colspan = "2">'+
-						'<i>(Tandatangan,Nama,Stampel),</br>Note : Copi PO mohon dapat dilampirkan pada kami bersama invoice</i>'+
-					'</td>'+
-				'</tr>';
+		html += '</tbody></table></div></div>';	
+		html += '<div class = "row">'+
+					'<div class = "col-xs-12">'+
+						'<table class = "table borderless">'+
+							'<thead></thead>'+
+							'<tbody>'+
+								'<tr>'+
+									'<td><div align = "left"><b>PIHAK I</b></div></td>'+
+									'<td style="text-align :right"><div><b>PIHAK II</b></div></td>'+
+								'<tr>'+
+									'<td><div align = "left"><b>YAY PENDIDIKAN AGUNG PODOMORO</b></div></td>'+
+									'<td style="text-align :right"><div><b>'+po_create[0]['NamaSupplier'].toUpperCase()+'</b></div></td>'+	
+								'<tr>'+
+								'<tr style = "height : 60px;">'+
+									'<td></td>'+
+									'<td></td>'+
+								'</tr>'+
+								'<tr>'+
+									'<td><div align = "left"><b><u>SERIAN WIJATNO & WIBOWO NGASERIN</u></b></br>SEKRETARIS & KETUA YAYASAN</div></td>'+
+									'<td style="text-align :right"><div><b><u>'+po_create[0]['PICName'].toUpperCase()+'</u></b></br>'+po_create[0]['JabatanPIC'].toUpperCase()+'</div></td>'+	
+								'<tr>'+		
+							'</tbody>'+
+						'</table>'+
+					'</div>'+
+				'</div>';		
 
-		html += '</tbody></table></div></div>';		
 		$('#r_footer').html(html);
 
 
@@ -531,66 +671,6 @@
 
 		html += '</tr></tfoot></table></div></div>';							
 		$('#r_signatures').html(html);
-
-	}
-
-	function makeTblDetail()
-	{
-		// r_tblDetail
-		var dt = ClassDt.po_data;
-		var po_create = dt['po_create'];
-		htmlBtnAdd =    '';
-		var IsiInputPO = MakeIsiPO();
-		var Subtotal = 	parseInt(ClassDt.total_po_detail)+parseInt(po_create[0]['AnotherCost'])	// 0 adalah persentase		
-		var htmlInputPO = '<div class = "row" style = "margin-top : 5px;">'+
-							'<div class = "col-md-12">'+
-								//'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_po">'+
-									'<thead>'+
-									'<tr>'+
-										'<th width = "3%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">No</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 350px;">Nama Barang</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 350px;">Spesification</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 200px;">Date Needed</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 100px;">Qty</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Harga</th>'+
-    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">PPN(%)</th>'+
-    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Discount(%)</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Sub Total</th>'+
-									'</tr></thead>'+
-									'<tbody>'+IsiInputPO+'</tbody>'+
-									'<tfoot>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Total</td>'+
-											'<td colspan = "3" class = "tdTotal" value = "'+ClassDt.total_po_detail+'">'+formatRupiah(ClassDt.total_po_detail)+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Biaya Lain-Lain</td>'+
-											'<td colspan = "3" class = "tdAnotherCost" value = "'+po_create[0]['AnotherCost']+'">'+formatRupiah(po_create[0]['AnotherCost'])+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Sub Total</td>'+
-											'<td colspan = "3" class = "tdSubtotal_All" value = "'+Subtotal+'">'+formatRupiah(Subtotal)+'</td>'+
-										'</tr>'+
-										'<tr>'+
-											'<td colspan = "9" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+po_create[0]['Notes']+'</b></td>'+
-										'</tr>'+		
-									'</table>'+
-								//'</div>'+
-						   '</div></div>';
-
-		_ajax_terbilang(Subtotal).then(function(data){
-			var html = htmlBtnAdd + htmlInputPO;			   
-			$('#r_tblDetail').html(html);
-			$('#r_terbilang').html('<div class = "row" style = "margin-top : 10px;">'+
-										'<div class="col-xs-12">'+
-											'<b>Terbilang (Rupiah) : '+data+' Rupiah</b>'+
-										'</div>'+
-									'</div>'		
-			);
-
-	    	loadingEnd(1000);
-		})		   
 
 	}
 

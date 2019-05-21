@@ -920,6 +920,9 @@ $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
 $route['rest2/__Get_data_po_by_Code'] = 'api/c_rest2/Get_data_po_by_Code';
 $route['rest2/__Get_supplier_po_by_Code'] = 'api/c_rest2/Get_supplier_po_by_Code';
 $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
+$route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
+$route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
+
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
 
 
@@ -1367,6 +1370,7 @@ $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purch
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
 // global lihat PO
 $route['global/purchasing/transaction/po/list/(:any)'] = 'page/C_globalpage/InfoPO/$1';
+$route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/InfoSPK/$1';
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
