@@ -3145,7 +3145,7 @@ class C_api2 extends CI_Controller {
                                         }
                                     }
 
-                                    $countAttd = ($totalPresent>0) ? $totalPresent/14 : 0;
+                                    $countAttd = ($totalPresent>0) ? $totalPresent/14 * 100 : 0;
                                     $dataSchedule[$t]['Attendance'] =  $countAttd;
                                     $dataSchedule[$t]['AttendanceDetails'] = $dataAttd;
 
