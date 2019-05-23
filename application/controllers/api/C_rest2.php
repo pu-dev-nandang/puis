@@ -466,15 +466,130 @@ class C_rest2 extends CI_Controller {
             }
     }
 
+    public function Get_supplier_po_by_Code()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $Code = $dataToken['Code'];
+                    $data = $this->m_pr_po->Get_supplier_po_by_Code($Code);
+                    echo json_encode($data);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
     public function ajax_terbilang()
     {
         try {
                 $dataToken = $this->getInputToken2();
                 $auth = $this->m_master->AuthAPI($dataToken);
                 if ($auth) {
-                    $terbilang = $this->m_master->moneySay($dataToken['bilangan']).'Rupiah';
+                    $terbilang = $this->m_master->moneySay($dataToken['bilangan']);
                     $terbilang = trim(ucwords($terbilang));
                     echo json_encode($terbilang);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function ajax_dayOfDate()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = '';
+                    $hari = array ( 1 =>    'Senin',
+                                'Selasa',
+                                'Rabu',
+                                'Kamis',
+                                'Jumat',
+                                'Sabtu',
+                                'Minggu'
+                            );
+                    $Date = $dataToken['Date'];
+                    $Date = date("Y-m-d", strtotime($Date));
+                    $num = date('N', strtotime($Date)); 
+                    $NameDay = $hari[$num];
+                    echo json_encode($NameDay);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function Get_spk_pembukaan()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = '';
+                    $Date = $dataToken['Date'];
+                    // get hari
+                        $data = array(
+                              'Date' => $Date,
+                              'auth' => 's3Cr3T-G4N', 
+                        ); 
+                        $url = url_pas.'rest2/__ajax_dayOfDate';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                        $NameDay = $this->m_master->apiservertoserver($url,$token);
+                    // terbilang tanggal
+                         $bilangan = date("d", strtotime($Date));
+                         $data = array(
+                               'bilangan' => $bilangan,
+                               'auth' => 's3Cr3T-G4N', 
+                         ); 
+                         $url = url_pas.'rest2/__ajax_terbilang';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         $this->m_master->apiservertoserver($url,$token);
+                         $Tanggal = $this->m_master->apiservertoserver($url,$token);
+
+                    // Nama Bulan
+                        $Date_ = date("Y-m-d", strtotime($Date));
+                        $DateIndo = $this->m_master->getIndoBulan($Date_);
+                        $DateIndo = explode(' ', $DateIndo);
+                        $NmBulan = $DateIndo[1];
+
+                    // terbilang tahun
+                         $bilangan = date("Y", strtotime($Date));
+                         $data = array(
+                               'bilangan' => $bilangan,
+                               'auth' => 's3Cr3T-G4N', 
+                         ); 
+                         $url = url_pas.'rest2/__ajax_terbilang';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         $this->m_master->apiservertoserver($url,$token);
+                         $Tahun = $this->m_master->apiservertoserver($url,$token);          
+                    $rs = 'Pada hari ini '.$NameDay[0].', tanggal '.$Tanggal[0].' Bulan '.$NmBulan.', tahun '.$Tahun[0].', kami yang bertanda tangan dibawah ini :';     
+                    echo json_encode($rs);
                 }
                 else
                 {

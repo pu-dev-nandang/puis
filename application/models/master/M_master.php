@@ -2527,7 +2527,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         if ($x < 12)
             return " " . $abil[$x];
         elseif ($x < 20)
-            return $this->moneySay($x - 10) . "belas";
+            return $this->moneySay($x - 10) . " belas";
         elseif ($x < 100)
             return $this->moneySay($x / 10) . " puluh" . $this->moneySay($x % 10);
         elseif ($x < 200)

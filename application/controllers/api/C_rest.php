@@ -3262,6 +3262,7 @@ class C_rest extends CI_Controller {
              $dataToken = $this->getInputToken2();
              $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
+                $this->load->model('budgeting/m_pr_po');
                 $requestData= $_REQUEST;
                 $StatusQuery = ($Status == 'All') ? '' : 'where a.Status = '.$Status;
                 if (array_key_exists('PurchasingStatus', $dataToken)) {
@@ -3286,9 +3287,14 @@ class C_rest extends CI_Controller {
                     // $StatusQuery = ($StatusQuery == '') ? 'where b.Item_pending '.$dataToken['Item_pending'] : ' and b.Item_pending '.$dataToken['Item_pending'] ;
                 }
 
+
                 $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a left join db_purchasing.pr_status as b on a.PRCode = b.PRCode '.$StatusQuery;
                 $querytotalData = $this->db->query($sqltotalData)->result_array();
                 $totalData = $querytotalData[0]['total'];
+
+                if ($dataToken['action_edit'] != '') {
+                    $totalData++;
+                }
 
                 $StatusQuery = ($Status == 'All') ? '' : 'and a.Status = '.$Status;
                 if (array_key_exists('PurchasingStatus', $dataToken)) {
@@ -3308,9 +3314,8 @@ class C_rest extends CI_Controller {
                     }
                     else
                     {
-                        $StatusQuery .= ' and b.Item_pending '.$dataToken['Item_pending'] ;
+                        $StatusQuery .= ' and b.Item_pending '.$dataToken['Item_pending'];
                     }
-                    // $StatusQuery = ($StatusQuery == '') ? 'where b.Item_pending '.$dataToken['Item_pending'] : ' and b.Item_pending '.$dataToken['Item_pending'] ;
                 }
 
                 $sql = 'select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
@@ -3335,6 +3340,66 @@ class C_rest extends CI_Controller {
                 $sql.= ' where (a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%") '.$StatusQuery;
                 
                 $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
+                // for edit in open po
+                if ($dataToken['action_edit'] != '') {
+                    // find number PR dari PO Number
+                    $Code = $dataToken['POCode'];
+                    $G_pr_po = $this->m_pr_po->Get_data_po_by_Code($Code);
+                    $po_detail = $G_pr_po['po_detail'];
+                    $temp = array();
+                    for ($i=0; $i < count($po_detail); $i++) { 
+                        $temp[] = '"'.$po_detail[$i]['PRCode'].'"';
+                    }
+
+                    $temp = implode(',', $temp);
+
+
+                    $sql = 'select * from (
+                                select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
+                                (
+                                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
+                                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                                    as StatusName, a.JsonStatus,a.PostingDate
+                                                    from db_budgeting.pr_create as a 
+                                    join (
+                                    select * from (
+                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                                    UNION
+                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                                    UNION
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                                    ) aa
+                                    ) as b on a.Departement = b.ID
+                                )a
+                                    LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
+                                    where a.PRCode like "%%" '.$StatusQuery.' 
+                                UNION
+                                select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
+                                (
+                                    select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
+                                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                                    as StatusName, a.JsonStatus,a.PostingDate
+                                                    from db_budgeting.pr_create as a 
+                                    join (
+                                    select * from (
+                                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                                    UNION
+                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                                    UNION
+                                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                                    ) aa
+                                    ) as b on a.Departement = b.ID
+                                )a
+                                    LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
+                                    where a.PRCode in ('.$temp.')    
+                            ) aa
+                           ';
+                    $sql.= ' where (PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%") ';
+                    
+                    $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                }
+
                 $query = $this->db->query($sql)->result_array();
 
                 $No = $requestData['start'] + 1;
@@ -3403,7 +3468,45 @@ class C_rest extends CI_Controller {
                     $arr_result = array('pr_create' => array(),'pr_detail' => array());
                     $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode($dataToken['PRCode']);
                     // $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode($dataToken['PRCode']);
-                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO($dataToken['PRCode']);
+                    $POCode = '';
+                    if (array_key_exists('POCode', $dataToken)) {
+                       $POCode = $dataToken['POCode'];
+                    }
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO($dataToken['PRCode'],$POCode);
+                    echo json_encode($arr_result);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            //catch exception
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function show_pr_detail_multiple_pr_code()
+    {
+            try {
+                 $dataToken = $this->getInputToken2();
+                 $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $arr_result = array('pr_create' => array(),'pr_detail' => array());
+                    $arr_pr_code = json_decode(json_encode($dataToken['PRCode']),true);
+                    for ($i=0; $i < count($arr_pr_code); $i++) { 
+                        $arr_pr_code[$i] = '"'.$arr_pr_code[$i].'"';
+                    }
+                    $arr_result['pr_create'] = $this->m_pr_po->GetPR_CreateByPRCode_multiple_pr_code($arr_pr_code);
+                    $POCode = '';
+                    if (array_key_exists('POCode', $dataToken)) {
+                       $POCode = $dataToken['POCode'];
+                    }
+                    $arr_result['pr_detail'] = $this->m_pr_po->GetPR_DetailByPRCode_UN_PO_multiple_pr_code($arr_pr_code,$POCode);
                     echo json_encode($arr_result);
                 }
                 else
