@@ -346,9 +346,23 @@ class C_rest2 extends CI_Controller {
                 if ($auth) {
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
-                    $sqltotalData = 'select count(*) as total from db_purchasing.po_create';
-                    $StatusQuery = ($Status == 'All') ? '' : ' where Status = '.$Status;
-                    $sqltotalData .= $StatusQuery;
+                    $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
+                    $sqltotalData = 'select count(*) as total  from (
+                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                    c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                    a.JsonStatus,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate
+                                from db_purchasing.po_create as a
+                                left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                                left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP     
+                            )aa
+                           ';
+
+                    $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
+                        ) '.$StatusQuery ;
+
                     $querytotalData = $this->db->query($sqltotalData)->result_array();
                     $totalData = $querytotalData[0]['total'];
 
