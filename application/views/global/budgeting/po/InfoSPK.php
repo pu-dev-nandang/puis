@@ -10,6 +10,9 @@
 	    vertical-align: top;
 	    border-top: none !important;
 	}
+.CustomMargin{
+	width:800px; margin:0 auto;
+}	
 @page {
   size: A4;
   /*margin: 0.5;*/
@@ -70,7 +73,7 @@
 	</div>
 </div>
 <?php if ($bool): ?>
-<div id = "PageContain"">
+<div id = "PageContain" class="CustomMargin">
 	
 </div>
 <?php else: ?>
@@ -237,10 +240,10 @@
 						'</div>'+
 						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
 							'<div class= "col-xs-12">'+
-								'<table class = "table borderless">'+
+								'<table class = "table borderless" id = "table_input_spk">'+
 									'<thead></thead>'+
 									'<tbody>'+
-										'<tr>'+
+										'<tr id_po_detail = "'+po_detail[0]['ID_po_detail']+'">'+
 											'<td rowspan = "5" style = "width : 45px;"></td>'+
 											'<td colspan = "3"></td>'+
 										'</tr>'+
@@ -252,23 +255,24 @@
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>HARGA TOTAL</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td><b>'+formatRupiah(po_detail[0]['Subtotal'])+'</b></br><b>(include PPn '+parseInt(po_detail[0]['PPN_PO'])+'%)</b></td>'+
+											'<td unitcost = "'+po_detail[0]['UnitCost_PO']+'" subtotal = "'+po_detail[0]['Subtotal']+'" ppn = "'+po_detail[0]['PPN_PO']+'" max = "'+po_detail[0]['Subtotal_PR']+'" qty= "'+po_detail[0]['QtyPR']+'"><b>'+formatRupiah(po_detail[0]['Subtotal'])+'</b></br><b>(include PPn '+parseInt(po_detail[0]['PPN_PO'])+'%)</b></td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td>'+po_create[0]['Notes']+'</td>'+
+											'<td notes = "'+po_create[0]['Notes']+'">'+po_create[0]['Notes']+'</td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td><b>'+po_create[0]['Notes2']+'</b></td>'+
+											'<td notes2 = "'+po_create[0]['Notes2']+'">'+po_create[0]['Notes2']+'</td>'+
 										'</tr>'+
 									'</tbody>'+
 								'</table>'+
 							'</div>'+
 						'</div>'+
 						'<div id = "r_footer"></div>'+
+						'<div id = "r_signatures"></div>'+
 						'<div id = "r_action" style = "margin-left : -15px;margin-right:-15px;"></div>';
 
 			$('#PageContain').html(html);
@@ -296,7 +300,8 @@
 			
 			makeFooter();
 			makeDocPenawaran();
-			// makeAction();
+			makeSignatures();
+			makeAction();
 			loadingEnd(1000);									
 
 		})
@@ -518,8 +523,12 @@
 		    break;
 		  case 2:
 		  case '2':
-		    $('#r_action').html(html);
-		    $('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_pdf+'&nbsp'+btn_create_spb+'</div>');
+		    var JsonStatus = po_create[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		    	$('#r_action').html(html);
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'</div>');
+		    }
 		    break;
 		  case 4:
 		  case '4':
@@ -591,9 +600,9 @@
 		// r_signatures
 		var dt = ClassDt.po_data;
 		var po_create = dt['po_create'];
-		var html = '<div class= "row" style = "margin-top : 20px;">'+
-						'<div class = "col-xs-12">'+
-							'<table class = "table borderless">'+
+		var html = '<div class= "row noPrint" style = "margin-top : 100px;">'+
+						'<div class = "col-xs-6 col-md-offset-6">'+
+							'<table class = "table">'+
 								'<thead>'+
 									'<tr>'
 				;
@@ -693,77 +702,6 @@
 		return def.promise();
 	}
 
-	function MakeIsiPO()
-	{
-		var dt = ClassDt.po_data;
-		var po_detail = dt['po_detail'];
-		var html = '';
-		var total = 0;
-		for (var i = 0; i < po_detail.length; i++) {
-			var Spesification = '';
-			DetailCatalog = jQuery.parseJSON(po_detail[i]['DetailCatalog']);
-			// console.log(Object.entries(DetailCatalog).length);
-			if (typeof(DetailCatalog) == 'object' && Object.entries(DetailCatalog).length > 0) {
-				Spesification = '<div>Detail Catalog</div>';
-				Spesification += '<div>';
-				for (var prop in DetailCatalog) {
-					Spesification += prop + ' :  '+DetailCatalog[prop]+'<br>';
-				}
-
-				Spesification +='</div>';
-			}
-
-			// if (po_detail[i]['Desc'] != '' && po_detail[i]['Desc'] != null && po_detail[i]['Desc'] != undefined) {
-			// 	var st = (Spesification != '') ? 'style = "margin-top : 5px;"' : '';
-			// 	Spesification += '<div '+st+'>Desc</div>';
-			// 	Spesification += '<div>'+po_detail[i]['Desc']+'</div>';
-
-			// }
-
-			if (po_detail[i]['Spec_add'] != '' && po_detail[i]['Spec_add'] != null && po_detail[i]['Spec_add'] != undefined) {
-				Spesification += '<div style = "margin-top : 5px;">Additional</div>';
-				Spesification += '<div>'+po_detail[i]['Spec_add']+'</div>';
-			}
-			
-			html +='<tr ID_po_detail = "'+po_detail[i]['ID_po_detail']+'">'+
-						'<td>'+(i+1)+'</td>'+
-						'<td>'+po_detail[i]['Item']+'<br>'+po_detail[i]['Desc']+'</td>'+
-						'<td>'+Spesification+'</td>'+
-						'<td>'+'<div align="center">'+po_detail[i]['DateNeeded']+'</div></td>'+
-						'<td class = "tdqty" value = "'+po_detail[i]['QtyPR']+'">'+'<div align="center">'+po_detail[i]['QtyPR']+'</div></td>'+
-						'<td class = "tdUnitCost" value = "'+po_detail[i]['UnitCost_PO']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</div></td>'+
-						'<td class = "tdPPN" value = "'+po_detail[i]['PPN_PO']+'">'+'<div align="center">'+po_detail[i]['PPN_PO']+'</div></td>'+
-						'<td class = "tdDiscount" value = "'+po_detail[i]['Discount_PO']+'">'+'<div align="center">'+po_detail[i]['Discount_PO']+'</div></td>'+
-						'<td class = "tdSubtotal" value = "'+po_detail[i]['Subtotal']+'" max = "'+po_detail[i]['Subtotal_PR']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['Subtotal'])+'</div></td>'+
-					'</tr>';
-
-			total = parseInt(total) + parseInt(po_detail[i]['Subtotal']);
-
-			// add PRCode
-			if (ClassDt.PRCode_arr.length == 0) {
-				ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
-			}
-			else
-			{
-				var bool = true;
-				for (var j = 0; j < ClassDt.PRCode_arr.length; j++) {
-					var arr = ClassDt.PRCode_arr;
-					if (arr[j] == po_detail[i]['PRCode']) {
-						bool = false;
-						break;
-					}
-				}
-
-				if (bool) {
-					ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
-				}
-			}			
-		}
-
-		ClassDt.total_po_detail = total;
-		return html;
-	}
-
 	$(document).off('click', '#BtnEdit').on('click', '#BtnEdit',function(e) {
 		$(this).attr('class','btn btn-danger');
 		$(this).find('i').remove();
@@ -776,35 +714,32 @@
 
 	function __input_reload()
 	{
-		$('#table_input_po tbody').find('tr').each(function(){
-			var value = $(this).find('.tdUnitCost').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdUnitCost').html('<input type="text" class="form-control UnitCost" value="'+value+'">');
-			$(this).find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			$(this).find('.UnitCost').maskMoney('mask', '9894');
 
-			var value = $(this).find('.tdPPN').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdPPN').html('<input type="number" class="form-control PPN" value="'+value+'">');
-			
-			var value = $(this).find('.tdDiscount').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdDiscount').html('<input type="number" class="form-control Discount" value="'+value+'">');
+		var UnitCost_PO = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('unitcost');
+			var n = UnitCost_PO.indexOf(".");
+			UnitCost_PO = UnitCost_PO.substring(0, n);
+		var PPN = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('ppn');
+			var n = PPN.indexOf(".");
+			PPN = PPN.substring(0, n);
+		var qty = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('qty');
 
-		})
+		$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').html('<div class = "form-group"><label>UnitCost</label>'+
+				'<input type="text" class="form-control UnitCost" value="'+UnitCost_PO+'" style = "width : 300px;"></div>'+
+				'<div class = "form-group"><label>Qty</label>'+
+				'<input type="number" class="form-control qty" value="'+qty+'" style = "width : 300px;" disabled></div>'+
+				'<div class = "form-group"><label>PPN</label>'+
+				'<input type="number" class="form-control PPN" value="'+PPN+'" style = "width : 300px;"></div></br>'+
+				'<label class = "Subtotal">'+formatRupiah($('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('subtotal'))+'</label>'
+					);
+			$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').maskMoney('mask', '9894');
 
-		var value  = $('#table_input_po tfoot').find('.tdAnotherCost').attr('value');
-		var n = value.indexOf(".");
-		value = value.substring(0, n);
-		$('#table_input_po tfoot').find('.tdAnotherCost').html('<input type="text" class="form-control AnotherCost" value="'+value+'">');
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney('mask', '9894');
+			var Notes = $('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').attr('notes');
+			$('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').html('<input type="text" class="form-control Notes" value="'+Notes+'" style = "width : 500px;">')
+			var Notes2 = $('#table_input_spk tbody').find('tr:eq(4)').find('td:eq(2)').attr('notes2');
+			$('#table_input_spk tbody').find('tr:eq(4)').find('td:eq(2)').html('<input type="text" class="form-control Notes2" value="'+Notes2+'" style = "width : 500px;">');
 
-		var value  = $('#table_input_po tfoot').find('.tdNotes').attr('value');
-		$('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+			$('.UnitCost').trigger('keyup');
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {
@@ -813,12 +748,16 @@
 		}
 	})
 
+	$(document).off('change', '.Discount,.PPN').on('change', '.Discount,.PPN',function(e) {
+		$('.UnitCost').trigger('keyup');
+	})
+
 	$(document).off('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost').on('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost',function(e) {
-		var tr = $(this).closest('tr');
-		var ChangeBool = CountSubTotal_table(tr);
+		var td = $(this).closest('td');
+		var ChangeBool = CountSubTotal_table(td);
 		if (!ChangeBool) {
 			__input_reload();
-			var bool = CountSubTotal_table(tr);
+			var bool = CountSubTotal_table(td);
 			if (bool) {
 				$('#BtnSubmit').prop('disabled',false);
 			}
@@ -836,56 +775,33 @@
 
 	function CountSubTotal_table(ev)
 	{
-		var SubTotal_All = 0;
 		var bool = true;
-		$('#table_input_po tbody').find('tr').each(function(){
-			if (bool) {
-				var ev = $(this);
-				var qty = ev.find('.tdqty').attr('value');
-				var UnitCost = ev.find('.UnitCost').val();
-				UnitCost = findAndReplace(UnitCost, ".","");
-				var PPN = ev.find('.PPN').val();
-				var Discount = ev.find('.Discount').val();
-				var total_raw = (parseInt(UnitCost) * parseInt(qty));
-				var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
-				var Discount_ = (parseInt(Discount) * parseInt(total_raw)) / 100;
-				var Subtotal = parseInt(total_raw) + parseInt(PPN_) - parseInt(Discount_);
-				var Subtotal_limit = ev.find('.tdSubtotal').attr('max');
-				var n = Subtotal_limit.indexOf(".");
-				Subtotal_limit = Subtotal_limit.substring(0, n);
-				Subtotal_limit = parseInt(Subtotal_limit);
-				if (Subtotal > Subtotal_limit) {
-					var NmBrg = ev.find('td:eq(1)').html();
-					toastr.info('Subtotal '+NmBrg + ' melebihi dari Anggaran PR yaitu '+formatRupiah(Subtotal_limit));
-					bool = false;
-					return;
-				}
-				else
-				{
-					ev.find('.tdSubtotal').attr('value',Subtotal);
-					ev.find('.tdSubtotal').html('<div align="center">'+formatRupiah(Subtotal)+'</div>');
-					SubTotal_All = parseInt(SubTotal_All) + parseInt(Subtotal);
-				}
-			}
 
-		})
+		// process
+		var Subtotal_limit = ev.attr('max');
+		var n = Subtotal_limit.indexOf(".");
+		Subtotal_limit = Subtotal_limit.substring(0, n);
+		var PPN = ev.find('.PPN').val();
+		var UnitCost = ev.find('.UnitCost').val();
+		UnitCost = findAndReplace(UnitCost, ".","");
+		var qty = ev.attr('qty');
 
-		if (bool) {
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
-			$('#table_input_po tfoot').find('.tdTotal').html(formatRupiah(SubTotal_All));
-			SubTotal_All = parseInt(SubTotal_All) + parseInt(AnotherCost);
-			$('#table_input_po tfoot').find('.tdSubtotal_All').html(formatRupiah(SubTotal_All));
-			// loading page r_terbilang for ajax later && show total
-				loading_page('#r_terbilang');
-				_ajax_terbilang(SubTotal_All).then(function(data){
-					$('#r_terbilang').html('<div class = "row" style = "margin-top : 20px;">'+
-												'<div class="col-xs-12">'+
-													'<b>Terbilang (Rupiah) : '+data+'</b>'+
-												'</div>'+
-											'</div>'		
-					);
-				})
+		var total_raw = (parseInt(UnitCost) * parseInt(qty));
+		var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
+		var Discount_ = 0;
+		var Subtotal = parseInt(total_raw) + parseInt(PPN_) - parseInt(Discount_);
+
+		if (Subtotal > Subtotal_limit) {
+			toastr.info('Subtotal melebihi dari Anggaran PR yaitu '+formatRupiah(Subtotal_limit));
+			bool = false;
+			return;
+		}
+		else
+		{
+			// 	console.log('asdasd')
+			ev.find('.Subtotal').attr('subtotal',Subtotal);
+			ev.find('.Subtotal').html(formatRupiah(Subtotal));
+
 		}
 
 		return bool;		
@@ -899,39 +815,31 @@
 		if (confirm('Are you sure ?')) {
 			loadingStart();
 			var po_data = ClassDt.po_data;
-			var arr_post_data_detail = [];
-			$('#table_input_po tbody').find('tr').each(function(){
-				var ID_po_detail = $(this).attr('id_po_detail');
-				var UnitCost = $(this).find('.UnitCost').val();
-				UnitCost = findAndReplace(UnitCost, ".","");
-				var Discount = $(this).find('.Discount').val();
-				var PPN = $(this).find('.PPN').val();
-				var Subtotal = $(this).find('.tdSubtotal').attr('value');
-				var temp = {
-					ID_po_detail :ID_po_detail,
-					UnitCost : UnitCost,
-					Discount : Discount,
-					PPN : PPN,
-					Subtotal : Subtotal,
-				};
+			var UnitCost = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').val();
+			UnitCost = findAndReplace(UnitCost, ".","");
+			var PPN = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.PPN').val();
+			var Subtotal = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.Subtotal').attr('subtotal');
+			var ID_po_detail = $('#table_input_spk tbody').find('tr:eq(0)').attr('id_po_detail');
+			var arr_post_data_detail = {
+				ID_po_detail :ID_po_detail,
+				UnitCost : UnitCost,
+				PPN : PPN,
+				Subtotal : Subtotal,
+			};
 
-				arr_post_data_detail.push(temp);
-			})
-
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
-			var Notes =  $('#table_input_po tfoot').find('.Notes').val();
+			var Notes =  $('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').find('.Notes').val();
+			var Notes2 =  $('#table_input_spk tbody').find('tr:eq(4)').find('.Notes2').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
 			    arr_post_data_detail : arr_post_data_detail,
-			    AnotherCost : AnotherCost,
 			    Notes : Notes,
+			    Notes2 : Notes2,
 			};
 			var token = jwt_encode(data,"UAP)(*");
 			var action_mode = 'modifycreated';
 				action_mode = jwt_encode(action_mode,"UAP)(*");
-			var action_submit = 'PO';
+			var action_submit = 'SPK';
 				action_submit = jwt_encode(action_submit,"UAP)(*");	
 			$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
 				var rs = jQuery.parseJSON(resultJson);
@@ -1095,6 +1003,10 @@
 			})	
 		}
 
+	})
+
+	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
+		window.print();
 	})
 
 		
