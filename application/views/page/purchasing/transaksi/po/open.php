@@ -86,7 +86,7 @@
 			var r = $('#page_pr_list').closest('.row');
 			var html = '<div class = "row">'+
 							'<div class = "col-xs-12" align="center">'+
-								'<h3><b>POCode : '+ClassDt.POCode+'</b></h3>'+
+								'<h3><b>Code : '+ClassDt.POCode+'</b></h3>'+
 							'</div>'+
 						'</div>';
 
@@ -1043,11 +1043,33 @@
 	function _Create_PO_SPK(action_submit,id_selector)
 	{
 		var def = jQuery.Deferred();
+
+		var nmbtn = '';
+		if (id_selector == '#OpenPO') {
+			nmbtn = 'Open PO';
+		}
+		else if(id_selector == '#OpenSPK')
+		{
+			nmbtn = 'Open SPK';
+		}
+		
 		var arr_pr_detail_selected = [];
 			$('.id_pr_detail_selected:checked').each(function(){
 				var id_pr_detail = $(this).attr('id_pr_detail');
 				arr_pr_detail_selected.push(id_pr_detail);
 			})
+
+		if (action_submit == 'SPK') {
+			if (arr_pr_detail_selected.length >  1) {
+				var data = {
+					status : 0,
+					message : 'Item from PR Selected must be one',
+				}
+				def.resolve(data);
+				$(id_selector).prop('disabled',false).html(nmbtn);
+				return def.promise();
+			}
+		}	
 
 		var arr_supplier = [];
 		var form_data = new FormData();
@@ -1092,14 +1114,7 @@
 		var token = jwt_encode(ClassDt.POCode,"UAP)(*");
 		form_data.append('Code',token);
 
-		var nmbtn = '';
-		if (id_selector == '#OpenPO') {
-			nmbtn = 'Open PO';
-		}
-		else if(id_selector == '#OpenSPK')
-		{
-			nmbtn = 'Open SPK';
-		}
+		
 
 		var url = base_url_js + "po_spk/submit_create"
 		$.ajax({

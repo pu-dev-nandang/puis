@@ -1008,6 +1008,30 @@ class M_pr_po extends CI_Model {
         return $rs;       
     }
 
+    public function GetRuleApproval_SPK_JsonStatus()
+    {
+        $G = $this->m_master->showData_array('db_purchasing.cfg_approval_spk');
+        for ($i=0; $i < count($G); $i++) { 
+            $ID_m_userrole = $G[$i]['ID_m_userrole'];
+            $DG = $this->m_master->caribasedprimary('db_purchasing.cfg_m_type_approval','ID',$G[$i]['TypeDesc']);
+            $Status = ($ID_m_userrole == 1) ? 1 : 0;
+            $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
+            if ($i == 0) {
+                $G[$i]['NIP'] = $this->session->userdata('NIP');
+            }
+            $rs[] = array(
+                'NIP' => $G[$i]['NIP'],
+                'Status' => $Status,
+                'ApproveAt' => $ApproveAt,
+                'Representedby' => '',
+                'Visible' => $G[$i]['Visible'],
+                'NameTypeDesc' => $DG[0]['Name'],
+            );
+            
+        }
+        return $rs;       
+    }
+
     public function get_approval_po($Departement)
     {
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc

@@ -18,7 +18,7 @@
     .container { 
       display: block !important;
         font-size: 10px; 
-        top: -60pt;
+        top: -40pt;
         left:0pt;
         right: 0pt;
     }
@@ -395,8 +395,12 @@
 		    break;
 		  case 2:
 		  case '2':
-		    $('#r_action').html(html);
-		    $('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_pdf+'&nbsp'+btn_create_spb+'</div>');
+		  	var JsonStatus = po_create[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		  		$('#r_action').html(html);
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'</div>');
+		  	}
 		    break;
 		  case 4:
 		  case '4':
@@ -733,6 +737,10 @@
 		}
 	})
 
+	$(document).off('change', '.Discount,.PPN').on('change', '.Discount,.PPN',function(e) {
+		$('.UnitCost').trigger('keyup');
+	})
+
 	$(document).off('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost').on('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost',function(e) {
 		var tr = $(this).closest('tr');
 		var ChangeBool = CountSubTotal_table(tr);
@@ -1017,6 +1025,10 @@
 
 	})
 
+	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
+		window.print();
+	})
+	
 		
 </script>
 <?php endif ?>	

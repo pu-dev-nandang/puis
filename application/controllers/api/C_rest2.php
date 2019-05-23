@@ -624,6 +624,7 @@ class C_rest2 extends CI_Controller {
 
                         // get data
                         $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+                        $urlS = ($G_data[0]['TypeCreate'] == 1) ? 'po' : 'spk';
 
                         $keyJson = $approval_number - 1; // get array index json
                         $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
@@ -680,9 +681,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO : '.$Code,
-                                                                'Description' => 'Please approve PO '.$Code,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                                                'Description' => 'Please approve PO/SPK '.$Code,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -699,9 +700,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PO '.$Code.' has been Approved',
-                                                                'Description' => 'PR '.$Code.' has been approved by '.$NameFor_NIP,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PO/SPK '.$Code.' has been Approved',
+                                                                'Description' => 'PO/SPK '.$Code.' has been approved by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -734,9 +735,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
-                                                                'Description' => 'PO '.$Code.' has been done',
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been done',
+                                                                'Description' => 'PO/SPK '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -753,9 +754,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
-                                                                'Description' => 'PO '.$Code.' has been done',
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been done',
+                                                                'Description' => 'PO/SPK '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -766,7 +767,41 @@ class C_rest2 extends CI_Controller {
 
                                             $url = url_pas.'rest2/__send_notif_browser';
                                             $token = $this->jwt->encode($data,"UAP)(*");
-                                            $this->m_master->apiservertoserver($url,$token);   
+                                            $this->m_master->apiservertoserver($url,$token);
+
+                                        // insert to po_invoice_status
+                                            $Code_po_create = $Code;
+                                            $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code_po_create);
+                                            $InvoicePO = 0;
+                                            for ($i=0; $i < count($G_po_detail); $i++) { 
+                                               $InvoicePO = $InvoicePO + $G_po_detail[$i]['SubTotal'];
+                                            }
+                                        // check po_invoice_status already exist or not
+                                             $G_po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
+                                             if (count($G_po_invoice_status) > 0 ) {
+                                                  $InvoicePayPO = $G_po_invoice_status[0]['InvoicePayPO']; 
+                                                  $InvoiceLeftPO = $InvoicePO - $InvoicePayPO;
+
+                                                  $dtSave = array(
+                                                    'InvoicePO' => $InvoicePO,
+                                                    'InvoicePayPO' => $InvoicePayPO,
+                                                    'InvoiceLeftPO' => $InvoiceLeftPO,
+                                                  );
+                                                  $this->db->where('Code_po_create',$Code_po_create);
+                                                  $this->db->update('db_purchasing.po_invoice_status',$dtSave); 
+                                              }
+                                              else{
+                                                $InvoicePayPO = 0; 
+                                                $InvoiceLeftPO = $InvoicePO;
+                                                $dtSave = array(
+                                                  'Code_po_create' => $Code_po_create,  
+                                                  'InvoicePO' => $InvoicePO,
+                                                  'InvoicePayPO' => $InvoicePayPO,
+                                                  'InvoiceLeftPO' => $InvoiceLeftPO,
+                                                );
+                                                $this->db->insert('db_purchasing.po_invoice_status',$dtSave);
+                                              }   
+
                                     }
                                 }
 
@@ -780,9 +815,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been Rejected',
-                                                                'Description' => 'PO '.$Code.' has been Rejected by '.$NameFor_NIP,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been Rejected',
+                                                                'Description' => 'PO/SPK '.$Code.' has been Rejected by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
