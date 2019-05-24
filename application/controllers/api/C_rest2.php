@@ -615,7 +615,7 @@ class C_rest2 extends CI_Controller {
                         ); 
                         $url = url_pas.'rest2/__ajax_dayOfDate';
                         $token = $this->jwt->encode($data,"UAP)(*");
-                        $this->m_master->apiservertoserver($url,$token);
+                        // $this->m_master->apiservertoserver($url,$token);
                         $NameDay = $this->m_master->apiservertoserver($url,$token);
                     // terbilang tanggal
                          $bilangan = date("d", strtotime($Date));
@@ -625,7 +625,7 @@ class C_rest2 extends CI_Controller {
                          ); 
                          $url = url_pas.'rest2/__ajax_terbilang';
                          $token = $this->jwt->encode($data,"UAP)(*");
-                         $this->m_master->apiservertoserver($url,$token);
+                         // $this->m_master->apiservertoserver($url,$token);
                          $Tanggal = $this->m_master->apiservertoserver($url,$token);
 
                     // Nama Bulan
@@ -642,7 +642,7 @@ class C_rest2 extends CI_Controller {
                          ); 
                          $url = url_pas.'rest2/__ajax_terbilang';
                          $token = $this->jwt->encode($data,"UAP)(*");
-                         $this->m_master->apiservertoserver($url,$token);
+                         // $this->m_master->apiservertoserver($url,$token);
                          $Tahun = $this->m_master->apiservertoserver($url,$token);          
                     $rs = 'Pada hari ini '.$NameDay[0].', tanggal '.$Tanggal[0].' Bulan '.$NmBulan.', tahun '.$Tahun[0].', kami yang bertanda tangan dibawah ini :';     
                     echo json_encode($rs);
