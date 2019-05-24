@@ -391,6 +391,7 @@ class C_po extends Transaksi_Controler {
                    $dataSave = array(
                     'Item_pending' => $Item_pending,
                     'Item_proc' => $Item_proc,
+                    'Status' => 1,
                    );
 
                    $this->db->where('ID',$G_data[0]['ID']);
@@ -566,9 +567,11 @@ class C_po extends Transaksi_Controler {
                             $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
                             $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
                             $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            $Status = ($Item_proc == 0 && $G_data_pr_status[0]['Item_done'] == 0) ? 0 : 1;
                             $dataSave = array(
                                'Item_proc' => $Item_proc,
-                                'Item_pending' => $Item_pending,   
+                                'Item_pending' => $Item_pending,
+                                'Status' => $Status,   
                             );
 
                             $this->db->where('PRCode',$PRCode);
@@ -683,10 +686,11 @@ class C_po extends Transaksi_Controler {
                             $Item_pending = $Item_pending - $arr_pr_code[$i]['Count'];
                             $Item_proc = $G_data[0]['Item_proc'];
                             $Item_proc = $Item_proc  + $arr_pr_code[$i]['Count'];
-
+                            $Status = ($Item_proc == 0 && $G_data[0]['Item_done'] == 0) ? 0 : 1;
                             $dataSave = array(
                              'Item_pending' => $Item_pending,
                              'Item_proc' => $Item_proc,
+                             'Status' => $Status,
                             );
 
                             $this->db->where('ID',$G_data[0]['ID']);
@@ -926,6 +930,7 @@ class C_po extends Transaksi_Controler {
                    $dataSave = array(
                     'Item_pending' => $Item_pending,
                     'Item_proc' => $Item_proc,
+                    'Status' => 1,
                    );
 
                    $this->db->where('ID',$G_data[0]['ID']);
@@ -1101,9 +1106,11 @@ class C_po extends Transaksi_Controler {
                             $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
                             $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
                             $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            $Status = ($G_data_pr_status[0]['Item_done'] == 0 && $Item_proc == 0) ? 0 : 1;
                             $dataSave = array(
                                'Item_proc' => $Item_proc,
-                                'Item_pending' => $Item_pending,   
+                                'Item_pending' => $Item_pending,
+                                'Status' => $Status   
                             );
 
                             $this->db->where('PRCode',$PRCode);
@@ -1218,10 +1225,12 @@ class C_po extends Transaksi_Controler {
                             $Item_pending = $Item_pending - $arr_pr_code[$i]['Count'];
                             $Item_proc = $G_data[0]['Item_proc'];
                             $Item_proc = $Item_proc  + $arr_pr_code[$i]['Count'];
+                            $Status = ($G_data[0]['Item_done'] == 0 && $Item_proc == 0) ? 0 : 1;
 
                             $dataSave = array(
                              'Item_pending' => $Item_pending,
                              'Item_proc' => $Item_proc,
+                             'Status' => $Status,
                             );
 
                             $this->db->where('ID',$G_data[0]['ID']);

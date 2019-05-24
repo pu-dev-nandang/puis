@@ -552,7 +552,10 @@ class M_pr_po extends CI_Model {
                                                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                                ) aa
                                ) as h on d.Departement = h.ID 
-                           where a.PRCode = ? and a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'")
+                           where a.PRCode = ? and (
+                                a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'") 
+                                or a.ID NOT IN (select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID)
+                            )
                           ';
 
                 }

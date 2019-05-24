@@ -336,20 +336,21 @@
 				    break;    
 		}
 
-		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Log</a></div></div>');
+		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
 
 	}
 
 	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
-	    var url = base_url_js+'rest/__show_circulation_sheet_po';
+	    var url = base_url_js+'rest2/__show_info_po';
    		var data = {
    		    Code : ClassDt.Code,
    		    auth : 's3Cr3T-G4N',
    		};
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function (data_json) {
-   			var html = '<div class = "row"><div class="col-md-12">';
+   			var html = '<div class = "row"><div class="col-md-12"><div class="well">';
    				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<caption><h4>Circulation Sheet</h4></caption>'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -359,13 +360,28 @@
 		        html += '</tr>' ;
 		        html += '</thead>' ;
 		        html += '<tbody>' ;
-
 		        html += '</tbody>' ;
-		        html += '</table></div></div>' ;	
+		        html += '</table></div></div></div>' ;
+
+            if (data_json['po_invoice_status'].length > 0) {
+              html += '<div class = "row" style = "margin-top:10px;"><div class="col-md-12"><div class="well">';
+          html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal2">'+
+                      '<caption><h4>Invoice Status</h4></caption>'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">Invoice PO</th>'+
+                              '<th style="width: 55px;">Paid</th>'+
+                              '<th style="width: 55px;">Left</th>';
+            html += '</tr>' ;
+            html += '</thead>' ;
+            html += '<tbody>' ;
+            html += '</tbody>' ;
+            html += '</table></div></div></div>' ;
+            }	
 
    			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
    			    '';
-   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Circulation Sheet'+'</h4>');
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info PO/SPK Code : '+ClassDt.Code+'</h4>');
    			$('#GlobalModalLarge .modal-body').html(html);
    			$('#GlobalModalLarge .modal-footer').html(footer);
    			$('#GlobalModalLarge').modal({
@@ -375,7 +391,7 @@
 
    			// make datatable
    				var table = $('#TblModal').DataTable({
-   				      "data" : data_json,
+   				      "data" : data_json['po_circulation_sheet'],
    				      'columnDefs': [
    					      {
    					         'targets': 0,
@@ -416,6 +432,46 @@
    				            cell.innerHTML = i+1;
    				        } );
    				} ).draw();
+
+
+          if (data_json['po_invoice_status'].length > 0) {
+            var table2 = $('#TblModal2').DataTable({
+                  "data" : data_json['po_invoice_status'],
+                  "ordering": false,
+                  "searching": false,
+                  "paging":   false,
+                  'columnDefs': [
+                    {
+                       'targets': 0,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoicePO);
+                       }
+                    },
+                    {
+                       'targets': 1,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoicePayPO);
+                       }
+                    },
+                    {
+                       'targets': 2,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoiceLeftPO);
+                       }
+                    },
+                  ],
+                  'createdRow': function( row, data, dataIndex ) {
+                      $(row).find('td:eq(0)').attr('style','width : 10px;')
+                    
+                  },
+            });
+
+            table2.on( 'order.dt search.dt', function () {
+                    table2.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                        cell.innerHTML = i+1;
+                    } );
+            } ).draw();
+          }
 
    		});
 	})
