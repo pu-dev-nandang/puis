@@ -346,29 +346,53 @@ class C_rest2 extends CI_Controller {
                 if ($auth) {
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
-                    $sqltotalData = 'select count(*) as total from db_purchasing.po_create';
-                    $StatusQuery = ($Status == 'All') ? '' : ' where Status = '.$Status;
-                    $sqltotalData .= $StatusQuery;
+                    $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
+                    $sqltotalData = 'select count(*) as total  from (
+                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                    c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                    a.JsonStatus,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode
+                                from db_purchasing.po_create as a
+                                left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                                left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP
+                                left join db_purchasing.po_detail as e on a.Code = e.Code
+                                left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                                left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                group by a.Code     
+                            )aa
+                           ';
+
+                    $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                          or PRCode LIKE "'.$requestData['search']['value'].'%"  
+                        ) '.$StatusQuery ;
+
                     $querytotalData = $this->db->query($sqltotalData)->result_array();
                     $totalData = $querytotalData[0]['total'];
 
                     $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
                     $sql = 'select * from (
-                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
-                                left join db_employees.employees as d on a.CreatedBy = d.NIP     
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP
+                                left join db_purchasing.po_detail as e on a.Code = e.Code
+                                left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                                left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                group by a.Code      
                             )aa
                            ';
 
                     $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
-                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                          or PRCode LIKE "'.$requestData['search']['value'].'%"  
                         ) '.$StatusQuery ;
-                    $sql.= ' ORDER BY Code Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
 
                     $No = $requestData['start'] + 1;
@@ -419,6 +443,38 @@ class C_rest2 extends CI_Controller {
 
                         $nestedData = array_merge($nestedData,$arr);
                         $nestedData[] = $row['NameCreateBy'];
+                        // find PR in po_detail
+                            $arr_temp = array();
+                            $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
+                            from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                            left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                            left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                            where d.Code = ?
+                            ';
+                            $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
+                            for ($j=0; $j < count($query_get_pr); $j++) { 
+                                if (count($arr_temp) == 0) {
+                                    $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                }
+                                else
+                                {
+                                    // check exist
+                                    $bool = true;
+                                    for ($k=0; $k < count($arr_temp); $k++) { 
+                                        if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                            $bool = false;    
+                                            break;
+                                        }
+                                    }
+
+                                    if ($bool) {
+                                        $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    }
+
+                                }
+                            }
+
+                        $nestedData[] = $arr_temp;
                         $data[] = $nestedData;
                         $No++;
                     }
@@ -772,7 +828,9 @@ class C_rest2 extends CI_Controller {
                                         // insert to po_invoice_status
                                             $Code_po_create = $Code;
                                             $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code_po_create);
-                                            $InvoicePO = 0;
+                                            $InvoicePO = 0; // tambah dengan biaya lain-lain
+                                            $AnotherCost = $G_data[0]['AnotherCost'];
+                                            $InvoicePO = $InvoicePO + $AnotherCost;
                                             for ($i=0; $i < count($G_po_detail); $i++) { 
                                                $InvoicePO = $InvoicePO + $G_po_detail[$i]['SubTotal'];
                                             }
@@ -859,5 +917,75 @@ class C_rest2 extends CI_Controller {
                  // handling orang iseng
                  echo '{"status":"999","message":"Not Authorize"}';
             }
+    }
+
+    public function show_info_pr()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $PRCode = $dataToken['PRCode'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.pr_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.PRCode = ?
+                        ';
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs['PR_Process'] = $query;
+
+                $rs['PR_Status_Summary'] = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                $sql = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code
+                        from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                        left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                        left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                        where a.PRCode = ?
+                        '; 
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs['PR_link_PO'] = $query;
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function show_info_po()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $Code = $dataToken['Code'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.po_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.Code = ?
+                        ';
+                $query=$this->db->query($sql, array($Code))->result_array();
+                $rs['po_circulation_sheet'] = $query;
+                $po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code);
+                $rs['po_invoice_status'] = $po_invoice_status;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
     }
 }

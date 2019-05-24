@@ -926,8 +926,9 @@ $route['rest2/__Get_supplier_po_by_Code'] = 'api/c_rest2/Get_supplier_po_by_Code
 $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
 $route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
 $route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
-
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
+$route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
+$route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
 
 
 

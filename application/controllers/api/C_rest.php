@@ -3125,6 +3125,7 @@ class C_rest extends CI_Controller {
                         where a.PRCode = ?
                         ';
                 $query=$this->db->query($sql, array($PRCode))->result_array();
+                // $rs['PR_Process'] = $query;        
                 $rs = $query;        
                 echo json_encode($rs);
             }

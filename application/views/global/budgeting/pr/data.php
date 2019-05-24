@@ -36,7 +36,7 @@ $(document).ready(function() {
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Circulation Sheet</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
 		            '</tr>'+
 		            '<tr>'+
@@ -124,7 +124,7 @@ $(document).ready(function() {
 
 	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
 	    var PRCode = $(this).attr('PRCode');
-	    var url = base_url_js+'rest/__show_circulation_sheet';
+	    var url = base_url_js+'rest2/__show_info_pr';
    		var data = {
    		    PRCode : PRCode,
    		    auth : 's3Cr3T-G4N',
@@ -132,7 +132,8 @@ $(document).ready(function() {
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function (data_json) {
    			var html = '<div class = "row"><div class="col-md-12">';
-   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+   				html += '<div class="well"><table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+   							'<caption><h4>Circulation Sheet</h4></caption>'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -142,23 +143,44 @@ $(document).ready(function() {
 		        html += '</tr>' ;
 		        html += '</thead>' ;
 		        html += '<tbody>' ;
-
-		        // for (var i = 0; i < data_json.length; i++) {
-		        // 	var No = parseInt(i) + 1;
-		        // 	html += '<tr>'+
-		        // 	      '<td>'+ No + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Desc'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Date'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Name'] + '</td>'+
-		        // 	    '<tr>';	
-		        // }
-
 		        html += '</tbody>' ;
-		        html += '</table></div></div>' ;	
+		        html += '</table></div></div></div>';
+
+		        if (data_json['PR_Status_Summary'].length > 0) {
+		        	html +='<div class= "row" style = "margin-top:10px;">'+
+		        				'<div class = "col-md-12">'+
+		        					'<div class="well"><table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal2">'+
+		        						'<caption><h4>PR Status in Purchasing</h4></caption>'+
+		        						'<thead>'+
+		        							'<tr>'+
+		        								'<th>Processing</th>'+
+		        								'<th>Pending</th>'+
+		        								'<th>Done</th>'+
+		        							'</tr>'+
+		        						'</thead>'+
+		        						'<tbody></tbody>'+
+		        						'</table></div></div></div>';
+		        }
+		        
+		        if (data_json['PR_link_PO'].length > 0) {
+		        	html +='<div class= "row" style = "margin-top:10px;">'+
+		        				'<div class = "col-md-12">'+
+		        					'<div class="well"><table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal3">'+
+		        						'<caption><h4>PR Item To PO</h4></caption>'+
+		        						'<thead>'+
+		        							'<tr>'+
+		        								'<th>No</th>'+
+		        								'<th>Catalog</th>'+
+		        								'<th>PO/SPK Code</th>'+
+		        							'</tr>'+
+		        						'</thead>'+
+		        						'<tbody></tbody>'+
+		        						'</table></div></div></div>';
+		        }
 
    			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
    			    '';
-   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Circulation Sheet'+'</h4>');
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info PR '+PRCode+'</h4>');
    			$('#GlobalModalLarge .modal-body').html(html);
    			$('#GlobalModalLarge .modal-footer').html(footer);
    			$('#GlobalModalLarge').modal({
@@ -168,7 +190,7 @@ $(document).ready(function() {
 
    			// make datatable
    				var table = $('#TblModal').DataTable({
-   				      "data" : data_json,
+   				      "data" : data_json['PR_Process'],
    				      'columnDefs': [
    					      {
    					         'targets': 0,
@@ -210,6 +232,88 @@ $(document).ready(function() {
    				        } );
    				} ).draw();
 
+   				if (data_json['PR_Status_Summary'].length > 0) {
+   					var table2 = $('#TblModal2').DataTable({
+   					      "data" : data_json['PR_Status_Summary'],
+   					      "ordering": false,
+   					      "searching": false,
+   					      "paging":   false,
+   					      'columnDefs': [
+   						      {
+   						         'targets': 0,
+   						         'render': function (data, type, full, meta){
+   						             return full.Item_proc;
+   						         }
+   						      },
+   						      {
+   						         'targets': 1,
+   						         'render': function (data, type, full, meta){
+   						             return full.Item_pending;
+   						         }
+   						      },
+   						      {
+   						         'targets': 2,
+   						         'render': function (data, type, full, meta){
+   						             return full.Item_done;
+   						         }
+   						      },
+   					      ],
+   					      'createdRow': function( row, data, dataIndex ) {
+   					      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   					      	
+   					      },
+   					});
+
+   					table2.on( 'order.dt search.dt', function () {
+   					        table2.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   					            cell.innerHTML = i+1;
+   					        } );
+   					} ).draw();
+   				}
+
+
+   				if (data_json['PR_link_PO'].length > 0) {
+	  				var table3 = $('#TblModal3').DataTable({
+	  				      "data" : data_json['PR_link_PO'],
+	  				      'columnDefs': [
+	  					      {
+						         'targets': 0,
+						         'searchable': false,
+						         'orderable': false,
+						         'className': 'dt-body-center',
+						         'render': function (data, type, full, meta){
+						             return '';
+						         }
+						      },
+	  					      {
+	  					         'targets': 1,
+	  					         'render': function (data, type, full, meta){
+	  					             return full.Item;
+	  					         }
+	  					      },
+	  					      {
+	  					         'targets': 2,
+	  					         'render': function (data, type, full, meta){
+	  					         	 var Code = '-';
+	  					         	 if (full.Code != '' && full.Code != null && full.Code != undefined) {
+	  					         	 	Code = full.Code;
+	  					         	 }
+	  					             return Code;
+	  					         }
+	  					      },
+	  				      ],
+	  				      'createdRow': function( row, data, dataIndex ) {
+	  				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+	  				      	
+	  				      },
+	  				});
+
+	  				table3.on( 'order.dt search.dt', function () {
+	  				        table3.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+	  				            cell.innerHTML = i+1;
+	  				        } );
+	  				} ).draw();
+   				}
 
    		});
 	})
