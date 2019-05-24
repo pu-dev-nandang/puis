@@ -54,6 +54,12 @@
 				<div class="col-xs-3">
 				   <input type="text" name="PICName" id= "PICName" placeholder="Input PIC Name" class="form-control">
 				</div>
+				<div class="col-xs-1">
+				    <label class="control-label">Jabatan PIC</label>
+				</div>    
+				<div class="col-xs-3">
+				   <input type="text" name="Jabatan" id= "Jabatan" placeholder="Input Jabatan PIC" class="form-control">
+				</div>
 			</div>
 		</div>
 		<div class="form-group">
@@ -179,6 +185,7 @@
 			$("#NoTelp").val('<?php echo $get[0]['NoTelp'] ?>');
 			$("#NoHp").val('<?php echo $get[0]['NoHp'] ?>');
 			$("#PICName").val('<?php echo $get[0]['PICName'] ?>');
+			$("#Jabatan").val('<?php echo $get[0]['JabatanPIC'] ?>');
 			// $("#PICName").val('<?php echo $get[0]['PICName'] ?>');
 
 			<?php $DetailInfo = $get[0]['DetailInfo'] ?>
@@ -246,7 +253,7 @@
 			<?php endif ?>
 
 			<?php if ($arr_lock > 0): ?>
-				$('#CodeSupplier,#NamaSupplier').prop('disabled',true);
+				$('#CodeSupplier,#NamaSupplier,#PICName,#Jabatan').prop('disabled',true);
 			<?php endif ?>
 
 		<?php endif ?>
@@ -506,6 +513,7 @@
 				var CodeSupplier = $("#CodeSupplier").val();
 				var NamaSupplier = $("#NamaSupplier").val();
 				var PICName = $("#PICName").val();
+				var JabatanPIC = $("#Jabatan").val();
 				var Alamat = $("#Alamat").val();
 				var NoTelp = $("#NoTelp").val();
 				var NoHp = $("#NoHp").val();
@@ -516,6 +524,7 @@
 				            CodeSupplier : CodeSupplier,
 				            NamaSupplier : NamaSupplier,
 				            PICName : PICName,
+				            JabatanPIC : JabatanPIC,
 				            Alamat : Alamat,
 				            Website : Website,
 				            Action : "<?php echo $action ?>",

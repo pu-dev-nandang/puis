@@ -1103,7 +1103,16 @@ class M_pr_po extends CI_Model {
                     where a.Code = ?
                 ';
         $query=$this->db->query($sql, array($Code))->result_array();        
-        $arr['po_detail'] = $query; 
+        $arr['po_detail'] = $query;
+
+        // Data perbandingan supplier
+        $data = array(
+              'Code' => $Code,
+              'auth' => 's3Cr3T-G4N', 
+        ); 
+        $url = url_pas.'rest2/__Get_supplier_po_by_Code';
+        $token = $this->jwt->encode($data,"UAP)(*");
+        $arr['pre_po_supplier'] = $this->m_master->apiservertoserver($url,$token); 
         
         return $arr;       
 

@@ -510,6 +510,7 @@ class C_master extends Purchasing_Controler {
         $Msg = '';
         $NamaSupplier = $Input['NamaSupplier'];
         $PICName = $Input['PICName'];
+        $JabatanPIC = $Input['JabatanPIC'];
         $Alamat = $Input['Alamat'];
         $Website = $Input['Website'];
         $NoTelp = $Input['NoTelp'];
@@ -546,6 +547,7 @@ class C_master extends Purchasing_Controler {
                        'CodeSupplier' => $CodeSupplier,
                        'NamaSupplier' => trim(ucwords($NamaSupplier)),
                        'PICName' => trim(ucwords($PICName)),
+                       'JabatanPIC' => trim(ucwords($JabatanPIC)),
                        'Alamat' => trim($Alamat),
                        'Website' => trim($Website),
                        'NoTelp' => trim($NoTelp),
@@ -569,6 +571,7 @@ class C_master extends Purchasing_Controler {
                    'CodeSupplier' => $CodeSupplier,
                    'NamaSupplier' => trim(ucwords($NamaSupplier)),
                    'PICName' => trim(ucwords($PICName)),
+                   'JabatanPIC' => trim(ucwords($JabatanPIC)),
                    'Alamat' => trim($Alamat),
                    'Website' => trim($Website),
                    'NoTelp' => trim($NoTelp),

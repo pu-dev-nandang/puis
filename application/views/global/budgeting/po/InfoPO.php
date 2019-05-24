@@ -359,6 +359,7 @@
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
+		var btn_cancel = '<button class= "btn btn-danger id="btn_cancel">Cancel PO</button>';
 		var Status = po_create[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -369,9 +370,8 @@
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
 		  	}
-		    
 		    break;
 		  case 1:
 		  case '1':
@@ -389,7 +389,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
 		    	}
 		    }
 
@@ -445,7 +445,7 @@
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'</div>');
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'</div>');
 		  	}
 		    break;
 		  case 4:
@@ -461,7 +461,36 @@
 	function makeFooter()
 	{
 		//r_footer
-		var html = '<div class = "row" style = "margin-top : 10px;">'+
+		// Perbandingan Vendor
+		var dt = ClassDt.po_data;
+		var pre_po_supplier = dt.pre_po_supplier;
+		var html_vendor = '';
+			html_vendor =  '<div class = "row noPrint">'+
+						'<div class = "col-xs-4">'+
+							'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr style = "height : 40px">'+
+											'<td>'+
+												'Vendor : '+
+											'</td>'+
+											'<td>';
+			var t = '';									
+			for (var i = 0; i < pre_po_supplier.length; i++) {
+				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
+				t += '<li><a href="http://localhost/puis/fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+			}
+			
+			html_vendor += t;
+			html_vendor += '</td></tr>';
+			html_vendor += '</tbody></table></div></div>';
+
+		/*
+		End Vendor
+		*/
+		var html = '';
+		html += html_vendor;
+		html += '<div class = "row" style = "margin-top : 10px;">'+
 						'<div class = "col-xs-4">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
@@ -480,7 +509,7 @@
 
 		html += t;
 		html += '</td></tr>';
-		html += '<tr style = "height : 100px">'+
+		html += '<tr style = "height : 80px">'+
 					'<td colspan = "2">'+
 						'<b>Diterima oleh Vendor,'+
 					'</td>'+
@@ -529,7 +558,7 @@
 
 		html += '</thead>'+
 					'<tbody>'+
-						'<tr style = "height : 51px">';
+						'<tr style = "height : 20px">';
 		for (var i = 0; i < JsonStatus.length; i++) {
 			var v = '-';
 			if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
@@ -1074,7 +1103,10 @@
 	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
 		window.print();
 	})
-	
+
+	$(document).off('click', '#btn_cancel	').on('click', '#btn_cancel	',function(e) {
 		
+	})
+	
 </script>
 <?php endif ?>	
