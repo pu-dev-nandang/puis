@@ -155,6 +155,7 @@
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
+		console.log(po_detail);
 
 		__Get_spk_pembukaan(po_create[0]['CreatedAt']).then(function(data){
 			var html = '<div class = "row">'+
@@ -497,7 +498,6 @@
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
-		var btn_cancel = '<button class= "btn btn-danger id="btn_cancel">Cancel PO</button>';
 		var Status = po_create[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -508,7 +508,7 @@
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
 		  	}
 		    
 		    break;
@@ -528,7 +528,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'</div>');
 		    	}
 		    }
 
@@ -584,7 +584,7 @@
 		    JsonStatus = jQuery.parseJSON(JsonStatus);
 		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		    	$('#r_action').html(html);
-		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'</div>');
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'</div>');
 		    }
 		    break;
 		  case 4:

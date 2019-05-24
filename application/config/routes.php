@@ -927,8 +927,6 @@ $route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
 $route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
 
 
-
-
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
 $route['api/__test_data2'] = 'api/c_api/test_data2';

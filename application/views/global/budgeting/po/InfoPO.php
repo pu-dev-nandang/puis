@@ -1104,7 +1104,7 @@
 		window.print();
 	})
 
-	$(document).off('click', '#btn_cancel	').on('click', '#btn_cancel	',function(e) {
+	$(document).off('click', '#btn_cancel').on('click', '#btn_cancel',function(e) {
 		
 	})
 	

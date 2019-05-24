@@ -1059,17 +1059,17 @@
 				arr_pr_detail_selected.push(id_pr_detail);
 			})
 
-		if (action_submit == 'SPK') {
-			if (arr_pr_detail_selected.length >  1) {
-				var data = {
-					status : 0,
-					message : 'Item from PR Selected must be one',
-				}
-				def.resolve(data);
-				$(id_selector).prop('disabled',false).html(nmbtn);
-				return def.promise();
-			}
-		}	
+		// if (action_submit == 'SPK') {
+		// 	if (arr_pr_detail_selected.length >  1) {
+		// 		var data = {
+		// 			status : 0,
+		// 			message : 'Item from PR Selected must be one',
+		// 		}
+		// 		def.resolve(data);
+		// 		$(id_selector).prop('disabled',false).html(nmbtn);
+		// 		return def.promise();
+		// 	}
+		// }	
 
 		var arr_supplier = [];
 		var form_data = new FormData();
