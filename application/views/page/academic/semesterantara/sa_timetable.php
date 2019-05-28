@@ -143,21 +143,22 @@
             var no = 1;
             $.each(dataToken,function (i,v) {
 
-                var StatusBPP = (v.StatusBPP==0 || v.StatusBPP=='0')
-                    ? '<i class="fa fa-times-circle sts-pay" style="color: red;"></i>'
-                    : '<i class="fa fa-check-circle sts-pay" style="color: green;"></i>';
+                var StatusBPP = (v.StatusBPP==1 || v.StatusBPP=='1')
+                    ? '<i class="fa fa-check-circle sts-pay" style="color: green;"></i>'
+                    : '<i class="fa fa-times-circle sts-pay" style="color: red;"></i>';
 
-                var StatusCredit = (v.StatusCredit==0 || v.StatusCredit=='0')
-                    ? '<i class="fa fa-times-circle sts-pay" style="color: red;"></i>'
-                    : '<i class="fa fa-check-circle sts-pay" style="color: green;"></i>';
 
-                var p = ((v.StatusBPP==0 || v.StatusBPP=='0') && (v.StatusCredit==0 || v.StatusCredit=='0'))
-                    ? '-'
-                    : '<div class="checkbox ck-attd">' +
+                var StatusCredit = (v.StatusCredit==1 || v.StatusCredit=='1')
+                    ? '<i class="fa fa-check-circle sts-pay" style="color: green;"></i>'
+                    : '<i class="fa fa-times-circle sts-pay" style="color: red;"></i>';
+
+                var p = ((v.StatusBPP==1 || v.StatusBPP=='1') && (v.StatusCredit==1 || v.StatusCredit=='1'))
+                    ? '<div class="checkbox ck-attd">' +
                     '  <label>' +
                     '    <input type="checkbox" value="">' +
                     '  </label>' +
-                    '</div>';
+                    '</div>'
+                    : '-';
 
                 // var p = '<input type="checkbox " value="1">';
 

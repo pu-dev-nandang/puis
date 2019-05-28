@@ -183,17 +183,17 @@ class M_rest extends CI_Model {
                                                           AND attd.SDID = "'.$dataSchedule[$sds]['SDID'].'"
                                                            AND attd_s.NPM = "'.$NPM.'" ')->result_array();
 
-                                            if(count($dataAttd)>0){
-                                                $presen = 0;
-                                                $ArrPresensi = [];
-                                                for($m=1;$m<=14;$m++){
-                                                    $meeting += 1;
-                                                    if($dataAttd[0]['M'.$m]=='1'){
-                                                        $presen += 1;
-                                                        $Totalpresen += 1;
-                                                    }
-                                                    array_push($ArrPresensi,$dataAttd[0]['M'.$m]);
-                                                }
+                                if(count($dataAttd)>0){
+                                    $presen = 0;
+                                    $ArrPresensi = [];
+                                    for($m=1;$m<=14;$m++){
+                                        $meeting += 1;
+                                        if($dataAttd[0]['M'.$m]=='1'){
+                                            $presen += 1;
+                                            $Totalpresen += 1;
+                                        }
+                                        array_push($ArrPresensi,$dataAttd[0]['M'.$m]);
+                                    }
 
 
                                     $dataSchedule[$sds]['Presensi'] = $presen;
@@ -761,7 +761,7 @@ class M_rest extends CI_Model {
 
         $dataSD = $this->db->select('ID')
             ->get_where('db_academic.schedule_details'
-            ,array('ScheduleID' => $ScheduleID))->result_array();
+                ,array('ScheduleID' => $ScheduleID))->result_array();
 
         $arrDataAttd = [];
         for($t=0;$t<count($dataSD);$t++){
@@ -1542,12 +1542,13 @@ class M_rest extends CI_Model {
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
                                                             WHERE ss.SASemesterID = "'.$dt['SASemesterID'].'" AND ss.NPM = "'.$NPM.'" ')
-                                            ->result_array();
+                        ->result_array();
+
 
                     if(count($dataStd)>0){
                         for ($s=0;$s<count($dataStd);$s++){
                             $d_sa = $dataStd[$s];
-                            if($d_sa['MKID']=='Br'){
+                            if($d_sa['Type']=='Br' && in_array($d_sa['MKID'],$arrTranscriptID)==false){
 
                                 $Score = (isset($d_sa['Score']) && $d_sa['Score']!='' && $d_sa['Score']!=null && $d_sa['Score']!='-')
                                     ? $d_sa['Score'] : 0;
@@ -1570,12 +1571,13 @@ class M_rest extends CI_Model {
                                     'Source' => 'Semester Antara'
 
 
-                            );
+                                );
                                 array_push($arrTranscriptID,$d_sa['MKID']);
                                 array_push($transcript,$arrTr);
 
 
-                            } else {
+                            }
+                            else {
 
                                 for ($i2=0;$i2<count($transcript);$i2++){
 
@@ -1766,9 +1768,9 @@ class M_rest extends CI_Model {
             $countfiles = count($_FILES[$ggFiles ]['name']);
             // Looping all files
             for($i=0;$i<$countfiles;$i++){
-                  $config = array();
-                  if(!empty($_FILES[$ggFiles ]['name'][$i])){
-            
+                $config = array();
+                if(!empty($_FILES[$ggFiles ]['name'][$i])){
+
                     // Define new $_FILES array - $_FILES['file']
                     $_FILES['file']['name'] = $_FILES[$ggFiles]['name'][$i];
                     $_FILES['file']['type'] = $_FILES[$ggFiles]['type'][$i];
@@ -1779,7 +1781,7 @@ class M_rest extends CI_Model {
                     // Set preference
                     $config['upload_path'] = $path.'/';
                     $config['allowed_types'] = '*';
-                    $config['overwrite'] = TRUE; 
+                    $config['overwrite'] = TRUE;
                     $no = $i + 1;
                     $config['file_name'] = $filename.'_'.$no;
 
@@ -1790,29 +1792,29 @@ class M_rest extends CI_Model {
                     $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
                     // print_r($_FILES['file']['type']);
 
-            
+
                     //Load upload library
-                    $this->load->library('upload',$config); 
+                    $this->load->library('upload',$config);
                     $this->upload->initialize($config);
-            
+
                     // File upload
                     if($this->upload->do_upload('file')){
-                      // Get data about the file
-                      $uploadData = $this->upload->data();
-                      $filePath = $uploadData['file_path'];
-                      $filename_uploaded = $uploadData['file_name'];
-                      // rename file
-                      $old = $filePath.'/'.$filename_uploaded;
-                      $new = $filePath.'/'.$filenameNew;
+                        // Get data about the file
+                        $uploadData = $this->upload->data();
+                        $filePath = $uploadData['file_path'];
+                        $filename_uploaded = $uploadData['file_name'];
+                        // rename file
+                        $old = $filePath.'/'.$filename_uploaded;
+                        $new = $filePath.'/'.$filenameNew;
 
-                      rename($old, $new);
+                        rename($old, $new);
 
-                      $output[] = $filenameNew;
+                        $output[] = $filenameNew;
                     }
-                  }
-              }
+                }
+            }
         }
-      
+
         return $output;
     }
 
