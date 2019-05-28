@@ -38,20 +38,69 @@
 		}
 		var token = jwt_encode(data,"UAP)(*");
 		$.post(url,{ token:token },function (resultJson) {
-			var response = jQuery.parseJSON(resultJson);
-
-			var access = response['access'];
-			if (access.length > 0) {
-				ClassDt.RuleAccess = response;
-				load_htmlPR();
-			}
-			else
-			{
-				$("#pageContent").empty();
-				$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
-			}
 			
-		})
+		}).done(function(resultJson) {
+		  var response = jQuery.parseJSON(resultJson);
+
+		  var access = response['access'];
+		  if (access.length > 0) {
+		  	ClassDt.RuleAccess = response;
+		  	load_htmlPR();
+		  }
+		  else
+		  {
+		  	$("#pageContent").empty();
+		  	$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
+		  }
+		});
+	}
+
+
+	function load_data_pr()
+	{
+		var def = jQuery.Deferred();
+		var PRCode = ClassDt.PRCodeVal;
+		var url = base_url_js+'budgeting/GetDataPR';
+		var data = {
+		    PRCode : PRCode,
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			var response = jQuery.parseJSON(resultJson);
+			def.resolve(response);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
+
+	function load_budget_remaining__(Year,Departement)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"budgeting/detail_budgeting_remaining";
+		var data = {
+				    Year : Year,
+					Departement : Departement,
+				};
+		var token = jwt_encode(data,'UAP)(*');
+		$.post(url,{token:token},function (resultJson) {
+			
+		}).done(function(resultJson) {
+			var response2 = jQuery.parseJSON(resultJson);
+			def.resolve(response2);
+		}).fail(function() {
+		  toastr.info('No Result Data'); 
+		  def.reject();
+		}).always(function() {
+		                
+		});
+		return def.promise();
 	}
 
 	function load_htmlPR()
@@ -59,46 +108,38 @@
 		// check data edit or new
 		if (ClassDt.PRCodeVal != '') {
 			// edit
-			var PRCode = ClassDt.PRCodeVal;
-			var url = base_url_js+'budgeting/GetDataPR';
-			var data = {
-			    PRCode : PRCode,
-			};
-			var token = jwt_encode(data,"UAP)(*");
-			$.post(url,{ token:token },function (resultJson) {
-				var response = jQuery.parseJSON(resultJson);
+			load_data_pr().then(function(response){
 				ClassDt.DtExisting = response;
-
-				// Load Budget Department
 				var arr_pr_create = response['pr_create'];
 				var Year = arr_pr_create[0]['Year'];
 				ClassDt.NmDepartement_Existing =  arr_pr_create[0]['NameDepartement'];
 				var Departement = arr_pr_create[0]['Departement'];
-				var url = base_url_js+"budgeting/detail_budgeting_remaining";
-				var data = {
-						    Year : Year,
-							Departement : Departement,
-						};
-				var token = jwt_encode(data,'UAP)(*');
-				$.post(url,{token:token},function (resultJson) {
-					var response2 = jQuery.parseJSON(resultJson);
+
+				load_budget_remaining__(Year,Departement).then(function(response2){
 					var dt = response2.data;
 					ClassDt.PostBudgetDepartment_awal = dt;
 					localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
-					Make_PostBudgetDepartment_existing(dt);
-					// new
-					makeDomExisting();
-				}).fail(function() {
-				  toastr.info('No Result Data'); 
-				}).always(function() {
-				                
+				})
+
+				var bool = 0;
+				var urlInarray = [base_url_js+'budgeting/detail_budgeting_remaining'];
+
+				$( document ).ajaxSuccess(function( event, xhr, settings ) {
+				   if (jQuery.inArray( settings.url, urlInarray )) {
+				       bool++;
+				       if (bool == 1) {
+				           setTimeout(function(){
+				               Make_PostBudgetDepartment_existing();
+				               // // new
+				               makeDomExisting(); 
+
+				            }, 500);
+				          
+				       }
+				   }
 				});
 
-			}).fail(function() {
-			  toastr.info('No Result Data'); 
-			}).always(function() {
-			                
-			});	
+			})
 		}
 		else
 		{
@@ -128,12 +169,13 @@
 		}
 	}
 
-	function Make_PostBudgetDepartment_existing(arr_budget_departement)
+	function Make_PostBudgetDepartment_existing()
 	{
 		/*
 			Note : 
 			Pengembalian Post Budget using ke awal sebelum pr tercreate
 		*/
+		arr_budget_departement = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		var arr = [];
 		var DtExisting = ClassDt.DtExisting;
 		var arr_pr_detail = DtExisting['pr_detail'];
@@ -141,6 +183,9 @@
 			var CodePostRealisasi = arr_budget_departement[i]['CodePostRealisasi'];
 			var Using = arr_budget_departement[i]['Using'];
 			var Value = arr_budget_departement[i]['Value'];
+			// console.log(arr_budget_departement[i]);	
+			// console.log(arr_pr_detail);	
+			// console.log(Using+' Start');	
 
 			for (var j = 0; j < arr_pr_detail.length; j++) {
 				var CodePostRealisasi_ = arr_pr_detail[j].CodePostRealisasi;
@@ -169,10 +214,12 @@
 
 						}
 
+					// console.log(Using+' Before');	
 					Using = parseInt(Using) - Cost1;
+					// console.log(Using+' After');	
 					arr_budget_departement[i]['Using'] = Using;
 
-					break;
+					//break;
 				}
 			}
 
@@ -1938,7 +1985,7 @@
 		       				$('#Status').html('Status : '+Status);
 		       				// Update Variable ClassDt
 		       				ClassDt.PRCodeVal = data['PRCode'];
-		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Log</a>';
+		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Info</a>';
 		       				LoadFirstLoad();
 		       			}
 

@@ -240,7 +240,10 @@ class C_po extends Transaksi_Controler {
                 break;
             case 'modifycreated':
                 $this->modifycreated_submit_po();
-                break;    
+                break;
+            case 'cancel':
+                $this->cancel_created_submit_po();
+                break;         
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -742,7 +745,7 @@ class C_po extends Transaksi_Controler {
             $Code = $po_create[0]['Code'];
 
             // cek circulation sheet
-            if ($po_create[0]['Code'] != 0) {
+            if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
                 // insert to pr_circulation_sheet
                     $this->m_pr_po->po_circulation_sheet($Code,'PO Edited');
             }
@@ -754,6 +757,63 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+        }
+        else
+        {
+            $rs['Change'] = 1;
+        }
+
+        echo json_encode($rs);
+    }
+
+    public function cancel_created_submit_po()
+    {
+        $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+        $Input = $this->getInputToken();
+        $po_data = $Input['po_data']; // data yang di passing awal dari server ke client
+        $arr_post_data_ID_po_detail =$Input['arr_post_data_ID_po_detail'];
+        $PRRejectItem = $Input['PRRejectItem']; // data yang di passing awal dari server ke client
+        $NoteDel = $Input['NoteDel'];
+
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+        $Code = $po_create[0]['Code'];
+        $PRCode = $Input['PRCode'];
+
+        $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
+        if ($CheckPerubahanData) {
+            // check apakah data telah dibuat spb atau belum
+                $G= $this->m_master->caribasedprimary('db_purchasing.spb_created','Code_po_create',$Code);
+                if (count($G) == 0) {
+                    // do change status pr item & kembalikan
+                        $arr_post_data_ID_po_detail = json_decode(json_encode($arr_post_data_ID_po_detail),true);
+                        $this->m_pr_po->ReturnAllBudgetFromPO($arr_post_data_ID_po_detail);
+
+                    // cek circulation sheet
+                    if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
+                        $Desc = 'PO Cancel<br>{'.$NoteDel.'}';
+                        $Desc2 = 'PO '.$Code.'Cancel<br>{'.$NoteDel.'}';
+                        if ($PRRejectItem) {
+                            $Desc = 'PO & ALL ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+                            $Desc2 = 'PO '.$Code.' & ALL ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+                        }
+                        // insert to pr_circulation_sheet
+                            $this->m_pr_po->po_circulation_sheet($Code,$Desc);
+                            $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc);
+                    }
+
+                    $dataSave = array(
+                        'Status' => 4,
+                    );
+                    
+                    $this->db->where('Code',$Code);
+                    $this->db->update('db_purchasing.po_create',$dataSave);
+                }
+                else
+                {
+                    $rs['Status'] = 0;
+                    $rs['msg'] = 'SPB for The PO : '.$Code.' has created, cant action!!!';
+                }
         }
         else
         {
@@ -778,7 +838,10 @@ class C_po extends Transaksi_Controler {
                 break;
             case 'modifycreated':
                 $this->modifycreated_submit_spk();
-                break;    
+                break;
+            case 'cancel':
+                $this->cancel_created_submit_spk();
+                break;          
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -1268,19 +1331,23 @@ class C_po extends Transaksi_Controler {
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
+
             $arr_post_data_detail = json_decode(json_encode($arr_post_data_detail),true);
-            $dataSave = $arr_post_data_detail;
-            $ID = $arr_post_data_detail['ID_po_detail'];
-            unset($dataSave['ID_po_detail']);
-            $this->db->where('ID',$ID);
-            $this->db->update('db_purchasing.po_detail',$dataSave);
+            for ($i=0; $i < count($arr_post_data_detail); $i++) { 
+                $dataSave = $arr_post_data_detail[$i];
+                unset($dataSave['ID_po_detail']);
+                $ID = $arr_post_data_detail[$i]['ID_po_detail'];
+                $this->db->where('ID',$ID);
+                $this->db->update('db_purchasing.po_detail',$dataSave);
+            }
 
             $po_data = json_decode(json_encode($po_data),true);
             $po_create = $po_data['po_create'];
             $Code = $po_create[0]['Code'];
 
             // cek circulation sheet
-            if ($po_create[0]['Code'] != 0) {
+
+            if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
                 // insert to pr_circulation_sheet
                     $this->m_pr_po->po_circulation_sheet($Code,'SPK Edited');
             }

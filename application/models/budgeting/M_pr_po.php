@@ -1183,5 +1183,61 @@ class M_pr_po extends CI_Model {
                   
     }
 
+    public function ReturnAllBudgetFromPO($arr_post_data_ID_po_detail)
+    {
+       for ($i=0; $i < count($arr_post_data_ID_po_detail); $i++) { 
+           $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,b.ID_pr_detail,c.ID_budget_left,c.SubTotal,c.CombineStatus
+                   from db_purchasing.po_detail as a 
+                   join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                   join db_budgeting.pr_detail as c on b.ID_pr_detail = c.ID
+                   where a.ID = ? 
+                  ';
+
+             $query=$this->db->query($sql, array($arr_post_data_ID_po_detail[$i]))->result_array();        
+             // get using id_budget_left
+             $G_ID_budget_left = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$query[0]['ID_budget_left']);
+             $ID_budget_left = $query[0]['ID_budget_left'];
+             $UsingNow = $G_ID_budget_left[0]['Using'];
+
+             // Subtotal
+                $SubtotalNow = $query[0]['SubTotal'];
+                $__BudgetFirstUsing = $SubtotalNow;
+                // cek Combine or not
+                    if ($query[0]['CombineStatus'] == 1) { // combine
+                        $G_ID_budget_left_combine = $this->m_master->caribasedprimary('db_budgeting.pr_detail_combined','ID_pr_detail',$query[0]['ID_pr_detail']);
+                        for ($j=0; $j < count($G_ID_budget_left_combine); $j++) { 
+                            $__BudgetFirstUsing = $__BudgetFirstUsing - $G_ID_budget_left_combine[$j]['Cost'];
+                            // return Budget Combine First
+                                $ID_budget_left_Combine = $G_ID_budget_left_combine[$j]['ID_budget_left'];
+                                $G_ID_budget_left_Combine = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left_Combine);
+                                $UsingCombine = $G_ID_budget_left_Combine[0]['Using'];
+                                // kurangkan dengan cost
+                                $UsingCombine = $UsingCombine - $G_ID_budget_left_combine[$j]['Cost'];
+                                $dataSave = array(
+                                    'Using' => $UsingCombine
+                                );
+
+                                $this->db->where('ID',$ID_budget_left_Combine);
+                                $this->db->update('db_budgeting.budget_left',$dataSave);
+                        }
+                    }
+
+                $Using = $UsingNow - $__BudgetFirstUsing;    
+                $dataSave = array(
+                    'Using' => $Using
+                );
+                $this->db->where('ID',$ID_budget_left);
+                $this->db->update('db_budgeting.budget_left',$dataSave); 
+
+
+                $dataSave = array(
+                    'Status' => -1,
+                );
+                $this->db->where('ID',$query[0]['ID_pr_detail']);
+                $this->db->update('db_budgeting.pr_detail',$dataSave); 
+
+       }
+    }
+
 
 }

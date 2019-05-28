@@ -92,7 +92,7 @@ $(document).ready(function() {
        	    	
        	    	//$( row ).find('td:eq(1)').attr('align','center');
        	    	$( row ).find('td:eq(2)').attr('align','center');
-       	    	$( row ).find('td:eq(4)').attr('align','center');
+       	    	$( row ).find('td:eq(4)').attr('align','left');
        	    	$( row ).find('td:eq(5)').attr('align','center');
        	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Info</a>');
        	    		

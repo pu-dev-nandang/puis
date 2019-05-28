@@ -906,6 +906,11 @@
 					var id_pr_detail = $(this).attr('id_pr_detail');
 					arr_pr_detail_selected.push(id_pr_detail);
 				})
+
+			// lock open po process hanya satu PR
+			var LockOnePR = __LockOnePR(arr_pr_detail_selected);	
+			
+
 			// Select vendor harus ada yang approve = 1
 				var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
 
@@ -938,7 +943,7 @@
 				})
 
 
-				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
 					loading_button('#OpenPO');
 					var action_submit = 'PO';
 					var id_selector = '#OpenPO';
@@ -955,7 +960,7 @@
 				}
 				else
 				{
-					toastr.info('<li>PR Selected must be having less one checked</li>'+
+					toastr.info('<li>PR Selected must be having less one checked & 1 PR in 1 PO</li>'+
 								'<li>Select Vendor must be having less one approve</li>'+
 								'<li>Total Vendor must be same with total selected vendor</li>'
 								);
@@ -977,6 +982,10 @@
 					var id_pr_detail = $(this).attr('id_pr_detail');
 					arr_pr_detail_selected.push(id_pr_detail);
 				})
+
+			// lock open po process hanya satu PR
+			var LockOnePR = __LockOnePR(arr_pr_detail_selected);	
+
 			// Select vendor harus ada yang approve = 1
 				var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
 
@@ -1009,7 +1018,7 @@
 				})
 
 
-				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
 					loading_button('#OpenSPK');
 					var action_submit = 'SPK';
 					var id_selector = '#OpenSPK';
@@ -1058,18 +1067,6 @@
 				var id_pr_detail = $(this).attr('id_pr_detail');
 				arr_pr_detail_selected.push(id_pr_detail);
 			})
-
-		// if (action_submit == 'SPK') {
-		// 	if (arr_pr_detail_selected.length >  1) {
-		// 		var data = {
-		// 			status : 0,
-		// 			message : 'Item from PR Selected must be one',
-		// 		}
-		// 		def.resolve(data);
-		// 		$(id_selector).prop('disabled',false).html(nmbtn);
-		// 		return def.promise();
-		// 	}
-		// }	
 
 		var arr_supplier = [];
 		var form_data = new FormData();
@@ -1178,4 +1175,42 @@
 	   }
 	}	
 
+
+	function __LockOnePR(arr_pr_detail_selected)
+	{
+		var Dt_ChooseSelectPR = ClassDt.Dt_ChooseSelectPR;
+		var arr_pr = [];
+		var bool = false;
+		for (var z = 0; z < arr_pr_detail_selected.length; z++) {
+			var Item = arr_pr_detail_selected[z];
+			// search number PR in Dt_ChooseSelectPR
+			for (var i = 0; i < Dt_ChooseSelectPR.length; i++) {
+				var pr_detail = Dt_ChooseSelectPR[i].pr_detail;
+				for (var j = 0; j < pr_detail.length; j++) {
+					if (Item == pr_detail[j].ID) {
+						var PRCode =pr_detail[j].PRCode;
+						var bool2 = true;
+						for (var x = 0; x < arr_pr.length; x++) {
+							if (arr_pr[x]==PRCode) {
+								bool2 = false;
+								break;
+							}
+						}
+
+						if (bool2) {
+							arr_pr.push(PRCode);
+						}
+					}
+				}
+			}
+		}
+
+		// console.log(arr_pr)
+		if (arr_pr.length == 1) {
+			bool = true;
+			// console.log('__LockOnePR')
+		}
+
+		return bool
+	}
 </script>
