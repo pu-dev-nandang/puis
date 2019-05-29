@@ -517,7 +517,7 @@ class M_pr_po extends CI_Model {
                                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                     ) aa
                     ) as h on d.Departement = h.ID 
-                where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail)
+                where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail) and a.Status = 1
                ';
 
             // for edit in Open PO   
@@ -555,7 +555,7 @@ class M_pr_po extends CI_Model {
                            where a.PRCode = ? and (
                                 a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'") 
                                 or a.ID NOT IN (select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID)
-                            )
+                            ) and a.Status = 1
                           ';
 
                 }
@@ -615,7 +615,7 @@ class M_pr_po extends CI_Model {
                                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                                     ) aa
                     ) as h on d.Departement = h.ID 
-                where a.PRCode in ('.$temp.') and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail)
+                where a.PRCode in ('.$temp.') and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail) and a.Status = 1
                ';
 
             // for edit in Open PO   
@@ -651,6 +651,7 @@ class M_pr_po extends CI_Model {
                                                ) aa
                                ) as h on d.Departement = h.ID 
                            where a.PRCode in ('.$temp.') and a.ID IN(select b.ID_pr_detail from db_purchasing.pre_po_detail as b join db_purchasing.po_detail as a on a.ID_pre_po_detail = b.ID where a.Code = "'.$POCode.'")
+                            and a.Status = 1
                           ';
 
                 }
@@ -1183,6 +1184,38 @@ class M_pr_po extends CI_Model {
                   
     }
 
+    public function CekPRTo_Item_IN_PO($arr_post_data_ID_po_detail,$PRCode)
+    {
+        $Bool = true; // True = sama , false = tidak sama
+        $G_item = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+        $C = 0;
+        for ($i=0; $i < count($arr_post_data_ID_po_detail); $i++) { 
+           $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,b.ID_pr_detail,c.ID_budget_left,c.SubTotal,c.CombineStatus
+                   from db_purchasing.po_detail as a 
+                   join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                   join db_budgeting.pr_detail as c on b.ID_pr_detail = c.ID
+                   where a.ID = ? and c.PRCode = ?
+                  ';
+
+             $query=$this->db->query($sql, array($arr_post_data_ID_po_detail[$i],$PRCode))->result_array();
+
+            // Note : satu  ID_po_detail sama dengan satu item pr detail
+            if (count($query) > 0) {
+                $C++;
+            }
+        }
+
+        if ($C == count($G_item)) {
+            $Bool = true;
+        }
+        else
+        {
+            $Bool = false;
+        }
+
+        return $Bool;
+    }
+
     public function ReturnAllBudgetFromPO($arr_post_data_ID_po_detail)
     {
        for ($i=0; $i < count($arr_post_data_ID_po_detail); $i++) { 
@@ -1190,53 +1223,210 @@ class M_pr_po extends CI_Model {
                    from db_purchasing.po_detail as a 
                    join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
                    join db_budgeting.pr_detail as c on b.ID_pr_detail = c.ID
-                   where a.ID = ? 
+                   where a.ID = ? and c.Status = 1
                   ';
 
-             $query=$this->db->query($sql, array($arr_post_data_ID_po_detail[$i]))->result_array();        
-             // get using id_budget_left
-             $G_ID_budget_left = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$query[0]['ID_budget_left']);
-             $ID_budget_left = $query[0]['ID_budget_left'];
-             $UsingNow = $G_ID_budget_left[0]['Using'];
+             $query=$this->db->query($sql, array($arr_post_data_ID_po_detail[$i]))->result_array();
+             if (count($query) > 0) {
+                 // get using id_budget_left
+                 $G_ID_budget_left = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$query[0]['ID_budget_left']);
+                 $ID_budget_left = $query[0]['ID_budget_left'];
+                 $UsingNow = $G_ID_budget_left[0]['Using'];
 
-             // Subtotal
-                $SubtotalNow = $query[0]['SubTotal'];
-                $__BudgetFirstUsing = $SubtotalNow;
-                // cek Combine or not
-                    if ($query[0]['CombineStatus'] == 1) { // combine
-                        $G_ID_budget_left_combine = $this->m_master->caribasedprimary('db_budgeting.pr_detail_combined','ID_pr_detail',$query[0]['ID_pr_detail']);
-                        for ($j=0; $j < count($G_ID_budget_left_combine); $j++) { 
-                            $__BudgetFirstUsing = $__BudgetFirstUsing - $G_ID_budget_left_combine[$j]['Cost'];
-                            // return Budget Combine First
-                                $ID_budget_left_Combine = $G_ID_budget_left_combine[$j]['ID_budget_left'];
-                                $G_ID_budget_left_Combine = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left_Combine);
-                                $UsingCombine = $G_ID_budget_left_Combine[0]['Using'];
-                                // kurangkan dengan cost
-                                $UsingCombine = $UsingCombine - $G_ID_budget_left_combine[$j]['Cost'];
-                                $dataSave = array(
-                                    'Using' => $UsingCombine
-                                );
+                 // Subtotal
+                    $SubtotalNow = $query[0]['SubTotal'];
+                    $__BudgetFirstUsing = $SubtotalNow;
+                    // cek Combine or not
+                        if ($query[0]['CombineStatus'] == 1) { // combine
+                            $G_ID_budget_left_combine = $this->m_master->caribasedprimary('db_budgeting.pr_detail_combined','ID_pr_detail',$query[0]['ID_pr_detail']);
+                            for ($j=0; $j < count($G_ID_budget_left_combine); $j++) { 
+                                $__BudgetFirstUsing = $__BudgetFirstUsing - $G_ID_budget_left_combine[$j]['Cost'];
+                                // return Budget Combine First
+                                    $ID_budget_left_Combine = $G_ID_budget_left_combine[$j]['ID_budget_left'];
+                                    $G_ID_budget_left_Combine = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left_Combine);
+                                    $UsingCombine = $G_ID_budget_left_Combine[0]['Using'];
+                                    // kurangkan dengan cost
+                                    $UsingCombine = $UsingCombine - $G_ID_budget_left_combine[$j]['Cost'];
+                                    $dataSave = array(
+                                        'Using' => $UsingCombine
+                                    );
 
-                                $this->db->where('ID',$ID_budget_left_Combine);
-                                $this->db->update('db_budgeting.budget_left',$dataSave);
+                                    $this->db->where('ID',$ID_budget_left_Combine);
+                                    $this->db->update('db_budgeting.budget_left',$dataSave);
+                            }
                         }
-                    }
 
-                $Using = $UsingNow - $__BudgetFirstUsing;    
-                $dataSave = array(
-                    'Using' => $Using
-                );
-                $this->db->where('ID',$ID_budget_left);
-                $this->db->update('db_budgeting.budget_left',$dataSave); 
+                    $Using = $UsingNow - $__BudgetFirstUsing;    
+                    $dataSave = array(
+                        'Using' => $Using
+                    );
+                    $this->db->where('ID',$ID_budget_left);
+                    $this->db->update('db_budgeting.budget_left',$dataSave); 
 
 
+                    $dataSave = array(
+                        'Status' => -1,
+                    );
+                    $this->db->where('ID',$query[0]['ID_pr_detail']);
+                    $this->db->update('db_budgeting.pr_detail',$dataSave);
+             }        
+       }
+    }
+
+    public function ReturnAllBudgetFromID_pr_detail($arr_post_data_ID_pr_detail)
+    {
+       for ($i=0; $i < count($arr_post_data_ID_pr_detail); $i++) { 
+           $query= $this->m_master->caribasedprimary('db_budgeting.pr_detail','ID',$arr_post_data_ID_pr_detail[$i]);
+             if (count($query) > 0) {
+                 // get using id_budget_left
+                 $G_ID_budget_left = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$query[0]['ID_budget_left']);
+                 $ID_budget_left = $query[0]['ID_budget_left'];
+                 $UsingNow = $G_ID_budget_left[0]['Using'];
+
+                 // Subtotal
+                    $SubtotalNow = $query[0]['SubTotal'];
+                    $__BudgetFirstUsing = $SubtotalNow;
+                    // cek Combine or not
+                        if ($query[0]['CombineStatus'] == 1) { // combine
+                            $G_ID_budget_left_combine = $this->m_master->caribasedprimary('db_budgeting.pr_detail_combined','ID_pr_detail',$query[0]['ID']);
+                            for ($j=0; $j < count($G_ID_budget_left_combine); $j++) { 
+                                $__BudgetFirstUsing = $__BudgetFirstUsing - $G_ID_budget_left_combine[$j]['Cost'];
+                                // return Budget Combine First
+                                    $ID_budget_left_Combine = $G_ID_budget_left_combine[$j]['ID_budget_left'];
+                                    $G_ID_budget_left_Combine = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left_Combine);
+                                    $UsingCombine = $G_ID_budget_left_Combine[0]['Using'];
+                                    // kurangkan dengan cost
+                                    $UsingCombine = $UsingCombine - $G_ID_budget_left_combine[$j]['Cost'];
+                                    $dataSave = array(
+                                        'Using' => $UsingCombine
+                                    );
+
+                                    $this->db->where('ID',$ID_budget_left_Combine);
+                                    $this->db->update('db_budgeting.budget_left',$dataSave);
+                            }
+                        }
+
+                    $Using = $UsingNow - $__BudgetFirstUsing;    
+                    $dataSave = array(
+                        'Using' => $Using
+                    );
+                    $this->db->where('ID',$ID_budget_left);
+                    $this->db->update('db_budgeting.budget_left',$dataSave); 
+
+
+                    $dataSave = array(
+                        'Status' => -1,
+                    );
+                    $this->db->where('ID',$query[0]['ID']);
+                    $this->db->update('db_budgeting.pr_detail',$dataSave);
+             }        
+       }
+    }
+
+    public function __Cancel_update_pr_status_pr_status_detail($PRCode,$arr_post_data_ID_po_detail)
+    {
+        $G_item = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+        // pr_status kurangi process Item_proc sebanyak yang ditemukan dan tambahkan ke Item Cancel
+        // pr_status_detail update Status menjadi -1
+        $C = 0;
+        for ($i=0; $i < count($arr_post_data_ID_po_detail); $i++) { 
+           $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,b.ID_pr_detail,c.ID_budget_left,c.SubTotal,c.CombineStatus
+                   from db_purchasing.po_detail as a 
+                   join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                   join db_budgeting.pr_detail as c on b.ID_pr_detail = c.ID
+                   where a.ID = ? and c.PRCode = ?
+                  ';
+
+             $query=$this->db->query($sql, array($arr_post_data_ID_po_detail[$i],$PRCode))->result_array();
+
+            // satu  ID_po_detail sama dengan satu item pr detail
+            if (count($query) > 0) {
+                $C++;
+
+                // update pr_status_detail
+                $ID_pr_detail = $query[0]['ID_pr_detail'];
                 $dataSave = array(
                     'Status' => -1,
                 );
-                $this->db->where('ID',$query[0]['ID_pr_detail']);
-                $this->db->update('db_budgeting.pr_detail',$dataSave); 
 
-       }
+                $this->db->where('ID_pr_detail',$ID_pr_detail);
+                $this->db->update('db_purchasing.pr_status_detail',$dataSave);
+            }
+        }
+
+        // update pr_status
+        $G_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+        $Item_proc = $G_pr_status[0]['Item_proc'] - $C;
+        $Item_cancel = $G_pr_status[0]['Item_cancel'] + $C;
+        $dataSave = array(
+            'Item_proc' => $Item_proc,
+            'Item_cancel' => $Item_cancel,
+        );
+
+        $this->db->where('PRCode',$PRCode);
+        $this->db->update('db_purchasing.pr_status',$dataSave);
+
+    }
+
+    public function __cancel_item_by_id_pr_detail($ID_pr_detail,$PRCode)
+    {
+        $C = 1;
+         // update pr_status_detail
+                $dataSave = array(
+                    'Status' => -1,
+                );
+
+                $this->db->where('ID_pr_detail',$ID_pr_detail);
+                $this->db->update('db_purchasing.pr_status_detail',$dataSave);
+        // update pr_status
+                $G_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                $Item_proc = $G_pr_status[0]['Item_proc'] - $C;
+                $Item_cancel = $G_pr_status[0]['Item_cancel'] + $C;
+                $dataSave = array(
+                    'Item_proc' => $Item_proc,
+                    'Item_cancel' => $Item_cancel,
+                );
+
+                $this->db->where('PRCode',$PRCode);
+                $this->db->update('db_purchasing.pr_status',$dataSave);
+    }
+
+    public function check_pr_item_In_po($PRCode)
+    {   
+        $Bool = true;
+        // pr_status = Item Proses, Item Done & Item Cancel harus 0
+        $G_data = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+        // print_r($G_data);
+        // die();
+        for ($i=0; $i < count($G_data); $i++) { 
+            if ($G_data[$i]['Item_proc'] != 0 || $G_data[$i]['Item_cancel'] != 0 || $G_data[$i]['Item_done'] != 0) {
+                $Bool = false;
+                break;
+            }
+        }
+
+        return $Bool;
+    }
+
+    public function check_po_status_by_item_pr_detail($ID_pr_detail)
+    {
+        $sql = 'select a.ID as ID_po_detail, a.Code,a.ID_pre_po_detail,b.ID_pr_detail,c.ID_budget_left,c.SubTotal,c.CombineStatus,
+                d.Status
+                from db_purchasing.po_detail as a 
+                join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                join db_budgeting.pr_detail as c on b.ID_pr_detail = c.ID
+                join db_purchasing.po_create as d on a.Code = d.Code
+                where b.ID_pr_detail = ?
+               ';
+         $query=$this->db->query($sql, array($ID_pr_detail))->result_array();
+         if (count($query) > 0) {
+             return $query[0]['Status'];
+         }
+         else
+         {
+            return '';
+         }
+         
     }
 
 

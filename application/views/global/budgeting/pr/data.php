@@ -156,6 +156,7 @@ $(document).ready(function() {
 		        								'<th>Processing</th>'+
 		        								'<th>Pending</th>'+
 		        								'<th>Done</th>'+
+		        								'<th>Cancel</th>'+
 		        							'</tr>'+
 		        						'</thead>'+
 		        						'<tbody></tbody>'+
@@ -255,6 +256,12 @@ $(document).ready(function() {
    						         'targets': 2,
    						         'render': function (data, type, full, meta){
    						             return full.Item_done;
+   						         }
+   						      },
+   						      {
+   						         'targets': 3,
+   						         'render': function (data, type, full, meta){
+   						             return full.Item_cancel;
    						         }
    						      },
    					      ],

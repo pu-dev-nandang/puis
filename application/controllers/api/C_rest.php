@@ -2215,6 +2215,16 @@ class C_rest extends CI_Controller {
                                 if ($datasave['Status'] == 2) {
                                     $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
                                     // save to db_purchasing pr_status
+                                        // delete first if exist di pr_status dan pr_status_detail
+                                            $G_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                                            $ID_pr_status = $G_pr_status[0]['ID'];
+                                            $this->db->where('PRCode',$PRCode);
+                                            $this->db->delete('db_purchasing.pr_status');
+
+                                            $this->db->where('ID_pr_status',$ID_pr_status);
+                                            $this->db->delete('db_purchasing.pr_status_detail');
+
+
                                     $dataSave = array(
                                         'PRCode' => $PRCode,
                                         'Item_proc' => 0,
@@ -3393,7 +3403,7 @@ class C_rest extends CI_Controller {
                                     ) as b on a.Departement = b.ID
                                 )a
                                     LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
-                                    where a.PRCode in ('.$temp.')    
+                                    where a.PRCode in ('.$temp.') 
                             ) aa
                            ';
                     $sql.= ' where (PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%") ';
