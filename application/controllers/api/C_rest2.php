@@ -988,4 +988,224 @@ class C_rest2 extends CI_Controller {
           echo '{"status":"999","message":"Not Authorize"}';
         }
     }
+
+    public function reject_pr_from_another()
+    {
+        $msg = '';
+        $Reload = 0;
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $BoolReload = false;
+                $this->load->model('budgeting/m_budgeting');
+                $this->load->model('budgeting/m_pr_po');
+                $PRCode = $dataToken['PRCode'];
+                $NIP = $dataToken['NIP'];
+
+                // check PR Item belum di proses pada PO
+                    $Bool = $this->m_pr_po->check_pr_item_In_po($PRCode);
+                    if ($Bool) {
+                        $datasave['Status'] = 3;
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$datasave);
+                        $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                        $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                        $NameFor_NIP = $G_emp[0]['Name'];
+                        $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                        // Send Notif for user 
+                            $data = array(
+                                'auth' => 's3Cr3T-G4N',
+                                'Logging' => array(
+                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                'URLDirect' => 'budgeting_pr',
+                                                'CreatedBy' => $NIP,
+                                              ),
+                                'To' => array(
+                                          'NIP' => array($JsonStatus[0]['NIP']),
+                                        ),
+                                'Email' => 'No', 
+                            );
+
+                            $url = url_pas.'rest2/__send_notif_browser';
+                            $token = $this->jwt->encode($data,"UAP)(*");
+                            $this->m_master->apiservertoserver($url,$token);
+
+                        $Desc = 'Reject by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                        $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+                    }
+                    else
+                    {
+                        $msg = 'PR is being processed, cant action reject';
+                    }
+
+                    echo json_encode($msg);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function cancel_pr_item_from_another()
+    {
+        $rs = array ('msg' => '','reload' => 0);
+        $Reload = 0;
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $BoolReload = false;
+                $this->load->model('budgeting/m_budgeting');
+                $this->load->model('budgeting/m_pr_po');
+                $ID_pr_detail = $dataToken['ID_pr_detail'];
+                $NIP = $dataToken['NIP'];
+                // get PRCode first
+                $G_pr_detail = $this->m_master->caribasedprimary('db_budgeting.pr_detail','ID',$ID_pr_detail);
+                $PRCode = $G_pr_detail[0]['PRCode'];
+
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                $NameFor_NIP = $G_emp[0]['Name'];
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                // yang boleh di cancel adalah item pr yang dalam status po_nya adalah cancel dan item pr yang belum di proses po
+                // jika item pr di cancel yang belum masuk proses po maka status pr akan otomatis reject
+                    $__G_po_detail = $this->m_pr_po->check_po_status_by_item_pr_detail($ID_pr_detail);
+                    if ($__G_po_detail == 4) {
+                        $Bool = $this->m_pr_po->check_pr_item_In_po($PRCode); // auto reject if true
+                        if ($Bool) {
+                            $datasave['Status'] = 3;
+                            $this->db->where('PRCode',$PRCode);
+                            $this->db->update('db_budgeting.pr_create',$datasave);
+
+                            // Send Notif for user 
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                    'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                    'URLDirect' => 'budgeting_pr',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
+
+                                $rs['reload'] = 1;
+
+                        }
+
+                        // cek status first
+                            $Status = $G_pr_detail[0]['Status'];
+                            if ($Status == 1) {
+                                $arr = array($ID_pr_detail);
+                                $this->m_pr_po->ReturnAllBudgetFromID_pr_detail($arr);
+
+                                $ID_m_catalog = $G_pr_detail[0]['ID_m_catalog'];
+                                $G_m_catalog = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$ID_m_catalog);
+                                
+                                $Desc = 'Item '.$G_m_catalog[0]['Item'].' cancel by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                                $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                                // update ke pr_status dan pr_status_detail
+                                    $this->m_pr_po->__cancel_item_by_id_pr_detail($ID_pr_detail,$PRCode);
+                            }
+                            else
+                            {
+                                $rs['msg'] = 'Item has canceled,cant action';
+                            }
+
+                    }
+                    else
+                    {
+                        $G_pr_status_detail= $this->m_master->caribasedprimary('db_purchasing.pr_status_detail','ID_pr_detail',$ID_pr_detail); // auto reject if true
+                        $Bool = ($G_pr_status_detail[0]['Status'] == 0) ? true : false;
+                        if ($Bool) {
+                            $Bool2 = $this->m_pr_po->check_pr_item_In_po($PRCode); // auto reject if true
+                            if ($Bool2) {
+                                $datasave['Status'] = 3;
+                                $this->db->where('PRCode',$PRCode);
+                                $this->db->update('db_budgeting.pr_create',$datasave);
+
+                                // Send Notif for user 
+                                    $data = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Logging' => array(
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                        'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                        'URLDirect' => 'budgeting_pr',
+                                                        'CreatedBy' => $NIP,
+                                                      ),
+                                        'To' => array(
+                                                  'NIP' => array($JsonStatus[0]['NIP']),
+                                                ),
+                                        'Email' => 'No', 
+                                    );
+
+                                    $url = url_pas.'rest2/__send_notif_browser';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver($url,$token);
+
+                                    $rs['reload'] = 1;
+                            }
+                            
+                           // cek status first
+                               $Status = $G_pr_detail[0]['Status'];
+                               if ($Status == 1) {
+                                   $arr = array($ID_pr_detail);
+                                   $this->m_pr_po->ReturnAllBudgetFromID_pr_detail($arr);
+
+                                   $ID_m_catalog = $G_pr_detail[0]['ID_m_catalog'];
+                                   $G_m_catalog = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$ID_m_catalog);
+                                   
+                                   $Desc = 'Item '.$G_m_catalog[0]['Item'].' cancel by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                                   $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                                   // update ke pr_status dan pr_status_detail
+                                       $this->m_pr_po->__cancel_item_by_id_pr_detail($ID_pr_detail,$PRCode);
+                               }
+                               else
+                               {
+                                   $rs['msg'] = 'Item has canceled,cant action';
+                               }     
+
+                        }
+                        else
+                        {
+                            $rs['msg'] = 'Item is being processed';
+                        }
+                    }
+
+                    echo json_encode($rs);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
 }

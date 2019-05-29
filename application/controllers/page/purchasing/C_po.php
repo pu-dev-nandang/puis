@@ -85,6 +85,13 @@ class C_po extends Transaksi_Controler {
        $this->page_po($page); 
     }
 
+
+    public function cancel_reject_pr()
+    {
+       $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/cancel_reject_pr',$this->data,true);
+       $this->page_po($page); 
+    }
+
     public function configuration()
     {
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/configuration',$this->data,true);
@@ -240,7 +247,10 @@ class C_po extends Transaksi_Controler {
                 break;
             case 'modifycreated':
                 $this->modifycreated_submit_po();
-                break;    
+                break;
+            case 'cancel':
+                $this->cancel_created_submit_po();
+                break;         
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -742,7 +752,7 @@ class C_po extends Transaksi_Controler {
             $Code = $po_create[0]['Code'];
 
             // cek circulation sheet
-            if ($po_create[0]['Code'] != 0) {
+            if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
                 // insert to pr_circulation_sheet
                     $this->m_pr_po->po_circulation_sheet($Code,'PO Edited');
             }
@@ -754,6 +764,96 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+        }
+        else
+        {
+            $rs['Change'] = 1;
+        }
+
+        echo json_encode($rs);
+    }
+
+    public function cancel_created_submit_po()
+    {
+        $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+        $Input = $this->getInputToken();
+        $po_data = $Input['po_data']; // data yang di passing awal dari server ke client
+        $arr_post_data_ID_po_detail =$Input['arr_post_data_ID_po_detail'];
+        $PRRejectItem = $Input['PRRejectItem']; // data yang di passing awal dari server ke client
+        $NoteDel = $Input['NoteDel'];
+
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+        $Code = $po_create[0]['Code'];
+        $PRCode = $Input['PRCode'];
+
+        $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
+        if ($CheckPerubahanData) {
+            // check apakah data telah dibuat spb atau belum
+                $G= $this->m_master->caribasedprimary('db_purchasing.spb_created','Code_po_create',$Code);
+                if (count($G) == 0) {
+                    // do change status pr item & kembalikan
+                        $arr_post_data_ID_po_detail = json_decode(json_encode($arr_post_data_ID_po_detail),true);
+
+                    // cek circulation sheet
+                    if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
+                        $Desc = 'PO Cancel<br>{'.$NoteDel.'}';
+                        $Desc2 = 'PO '.$Code.' Cancel<br>{'.$NoteDel.'}';
+                        if ($PRRejectItem) {
+                            $this->m_pr_po->ReturnAllBudgetFromPO($arr_post_data_ID_po_detail);
+                            // cek for some item or all item
+                                $cek_item = $this->m_pr_po->CekPRTo_Item_IN_PO($arr_post_data_ID_po_detail,$PRCode);
+                                $__r = '';
+                                if ($cek_item) {
+                                   $__r = 'All';
+                                }
+                                else
+                                {
+                                    $__r = 'Some'; 
+                                }
+
+                            $Desc = 'PO '.$Code.' & '.$__r.' ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+                            $Desc2 = 'PO '.$Code.' & '.$__r.' ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+
+                            // update status pr jika all item cancel menjadi cancel
+                                $G_item_pr = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+                                $bool = true;
+                                for ($i=0; $i < count($G_item_pr); $i++) { 
+                                     if ($G_item_pr[$i]['Status'] == 1) {
+                                         break;
+                                         $bool = false;
+                                     }
+                                }
+
+                                if ($bool) {
+                                    $arr_save = array(
+                                        'Status' => 4,
+                                    );
+
+                                    $this->db->where('PRCode',$PRCode);
+                                    $this->db->update('db_budgeting.pr_create',$arr_save);
+                                }
+
+                            // update status pr_status dan pr_status_detail
+                                $this->m_pr_po->__Cancel_update_pr_status_pr_status_detail($PRCode,$arr_post_data_ID_po_detail);    
+                        }
+                        // insert to pr_circulation_sheet
+                            $this->m_pr_po->po_circulation_sheet($Code,$Desc);
+                            $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc2);
+                    }
+
+                    $dataSave = array(
+                        'Status' => 4,
+                    );
+                    
+                    $this->db->where('Code',$Code);
+                    $this->db->update('db_purchasing.po_create',$dataSave);
+                }
+                else
+                {
+                    $rs['Status'] = 0;
+                    $rs['msg'] = 'SPB for The PO : '.$Code.' has created, cant action!!!';
+                }
         }
         else
         {
@@ -778,7 +878,10 @@ class C_po extends Transaksi_Controler {
                 break;
             case 'modifycreated':
                 $this->modifycreated_submit_spk();
-                break;    
+                break;
+            case 'cancel':
+                $this->cancel_created_submit_spk();
+                break;          
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -1268,19 +1371,23 @@ class C_po extends Transaksi_Controler {
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
+
             $arr_post_data_detail = json_decode(json_encode($arr_post_data_detail),true);
-            $dataSave = $arr_post_data_detail;
-            $ID = $arr_post_data_detail['ID_po_detail'];
-            unset($dataSave['ID_po_detail']);
-            $this->db->where('ID',$ID);
-            $this->db->update('db_purchasing.po_detail',$dataSave);
+            for ($i=0; $i < count($arr_post_data_detail); $i++) { 
+                $dataSave = $arr_post_data_detail[$i];
+                unset($dataSave['ID_po_detail']);
+                $ID = $arr_post_data_detail[$i]['ID_po_detail'];
+                $this->db->where('ID',$ID);
+                $this->db->update('db_purchasing.po_detail',$dataSave);
+            }
 
             $po_data = json_decode(json_encode($po_data),true);
             $po_create = $po_data['po_create'];
             $Code = $po_create[0]['Code'];
 
             // cek circulation sheet
-            if ($po_create[0]['Code'] != 0) {
+
+            if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
                 // insert to pr_circulation_sheet
                     $this->m_pr_po->po_circulation_sheet($Code,'SPK Edited');
             }
@@ -1297,6 +1404,96 @@ class C_po extends Transaksi_Controler {
         {
             $rs['Change'] = 1;
         }
+        echo json_encode($rs);
+    }
+
+    public function cancel_created_submit_spk()
+    {
+        $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+        $Input = $this->getInputToken();
+        $po_data = $Input['po_data']; // data yang di passing awal dari server ke client
+        $arr_post_data_ID_po_detail =$Input['arr_post_data_ID_po_detail'];
+        $PRRejectItem = $Input['PRRejectItem']; // data yang di passing awal dari server ke client
+        $NoteDel = $Input['NoteDel'];
+
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+        $Code = $po_create[0]['Code'];
+        $PRCode = $Input['PRCode'];
+
+        $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
+        if ($CheckPerubahanData) {
+            // check apakah data telah dibuat spb atau belum
+                $G= $this->m_master->caribasedprimary('db_purchasing.spb_created','Code_po_create',$Code);
+                if (count($G) == 0) {
+                    // do change status pr item & kembalikan
+                        $arr_post_data_ID_po_detail = json_decode(json_encode($arr_post_data_ID_po_detail),true);
+
+                    // cek circulation sheet
+                    if ($po_create[0]['Code'] != 0 || $po_create[0]['Code'] != '') {
+                        $Desc = 'SPK Cancel<br>{'.$NoteDel.'}';
+                        $Desc2 = 'SPK '.$Code.' Cancel<br>{'.$NoteDel.'}';
+                        if ($PRRejectItem) {
+                            $this->m_pr_po->ReturnAllBudgetFromPO($arr_post_data_ID_po_detail);
+                            // cek for some item or all item
+                                $cek_item = $this->m_pr_po->CekPRTo_Item_IN_PO($arr_post_data_ID_po_detail,$PRCode);
+                                $__r = '';
+                                if ($cek_item) {
+                                   $__r = 'All';
+                                }
+                                else
+                                {
+                                    $__r = 'Some'; 
+                                }
+
+                            $Desc = 'SPK '.$Code.' & '.$__r.' ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+                            $Desc2 = 'SPK '.$Code.' & '.$__r.' ITEM PR have been Cancel<br>{'.$NoteDel.'}';
+
+                            // update status pr jika all item cancel menjadi cancel
+                                $G_item_pr = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+                                $bool = true;
+                                for ($i=0; $i < count($G_item_pr); $i++) { 
+                                     if ($G_item_pr[$i]['Status'] == 1) {
+                                         break;
+                                         $bool = false;
+                                     }
+                                }
+
+                                if ($bool) {
+                                    $arr_save = array(
+                                        'Status' => 4,
+                                    );
+
+                                    $this->db->where('PRCode',$PRCode);
+                                    $this->db->update('db_budgeting.pr_create',$arr_save);
+                                }
+
+                            // update status pr_status dan pr_status_detail
+                                $this->m_pr_po->__Cancel_update_pr_status_pr_status_detail($PRCode,$arr_post_data_ID_po_detail);    
+                        }
+                        // insert to pr_circulation_sheet
+                            $this->m_pr_po->po_circulation_sheet($Code,$Desc);
+                            $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc2);
+                    }
+
+                    $dataSave = array(
+                        'Status' => 4,
+                    );
+                    
+                    $this->db->where('Code',$Code);
+                    $this->db->update('db_purchasing.po_create',$dataSave);
+                }
+                else
+                {
+                    $rs['Status'] = 0;
+                    $rs['msg'] = 'SPB for The SPK : '.$Code.' has created, cant action!!!';
+                }
+        }
+        else
+        {
+            $rs['Change'] = 1;
+        }
+
         echo json_encode($rs);
     }
 

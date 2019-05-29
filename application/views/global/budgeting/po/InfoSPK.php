@@ -4,12 +4,15 @@
     border-bottom: none !important;
 }
 
+
 .borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
-	    padding: 8px;
+	    padding: 4px;
 	    line-height: 1.428571429;
 	    vertical-align: top;
 	    border-top: none !important;
 	}
+
+
 .CustomMargin{
 	width:800px; margin:0 auto;
 }	
@@ -28,6 +31,7 @@
         /*top: -60pt;*/
         /*left:0pt;*/
         /*right: 0pt;*/
+        page-break-after: always; /* Set Just One Page */
     }
     table{
     	font-size: 10px; 
@@ -155,6 +159,57 @@
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
+		console.log(po_detail);
+
+		// tulis html untuk mengerjakan dengan penggabungan catalog
+		var U_mengerjakan = '';
+			for (var i = 0; i < po_detail.length; i++) {
+				if ( i == parseInt(po_detail.length - 1)) { // jika loop data terakhir
+					if (po_detail.length != 1) {
+						U_mengerjakan += ' dan '+po_detail[i]['Item'];
+					}
+					else
+					{
+						U_mengerjakan += po_detail[i]['Item'];
+					}
+					
+				}
+				else if (i==0) { // data awal
+					U_mengerjakan += po_detail[i]['Item'];
+				}
+				else
+				{
+					U_mengerjakan += ' , '+po_detail[i]['Item'];
+				}
+
+			}
+
+		var F_isiDeskripsi = function(po_detail) // make function variable
+		{
+			var html = '';
+				for (var i = 0; i < po_detail.length; i++) {
+					html += '<tr id_po_detail = "'+po_detail[i]['ID_po_detail']+'">'+
+								'<td>'+po_detail[i]['Item']+'</td>'+
+								'<td>'+po_detail[i]['QtyPR']+'</td>'+
+								'<td unitcost_po = "'+po_detail[i]['UnitCost_PO']+'">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</td>'+
+								'<td ppn_po = "'+po_detail[i]['PPN_PO']+'">'+parseInt(po_detail[i]['PPN_PO'])+'</td>'+
+								'<td max ="'+po_detail[i]['Subtotal_PR']+'" subtotal= "'+po_detail[i]['Subtotal']+'">'+formatRupiah(po_detail[i]['Subtotal'])+'</td>'+
+							'</tr>';	
+				}
+			return html;
+		};
+
+		var Deskripsi = F_isiDeskripsi(po_detail);	
+
+		var F_harga_total = function(po_detail){
+			var total = 0;
+			for (var i = 0; i < po_detail.length; i++) {
+				total += parseInt(po_detail[i]['Subtotal']);
+			}
+			return(total);
+		};
+
+		var Total = F_harga_total(po_detail);
 
 		__Get_spk_pembukaan(po_create[0]['CreatedAt']).then(function(data){
 			var html = '<div class = "row">'+
@@ -243,29 +298,55 @@
 								'<table class = "table borderless" id = "table_input_spk">'+
 									'<thead></thead>'+
 									'<tbody>'+
-										'<tr id_po_detail = "'+po_detail[0]['ID_po_detail']+'">'+
-											'<td rowspan = "5" style = "width : 45px;"></td>'+
+										'<tr>'+
+											'<td rowspan = "6" style = "width : 45px;"></td>'+
 											'<td colspan = "3"></td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>UNTUK MENGERJAKAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td><b>'+po_detail[0]['Item']+'</br>'+po_detail[0]['Desc']+'</b></td>'+
+											'<td>'+
+												'<div>'+
+													'<b>'+U_mengerjakan+'</b>'+
+												'</div>'+
+											'</td>'+
 										'</tr>'+
+										'<tr>'+
+											'<td colspan="3">'+
+												'<div style = "margin-top : 8px;">'+
+													'<b>Deskripsi</b>'+
+													'<table class = "table table-bordered" id = "Tbl_Deskripsi">'+
+														'<thead>'+
+															'<tr>'+
+																'<th >'+
+																'</th>'+
+																'<th>Qty</th>'+
+																'<th>UnitCost</th>'+
+																'<th width>PPN(%)</th>'+
+																'<th>Total</th>'+
+															'</tr>'+
+														'</thead>'+
+														'<tbody>'+
+															Deskripsi+
+														'</tbody>'+
+													'</table>'+				
+												'</div>'+
+											'</td>'+
+										'</tr>'+		
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>HARGA TOTAL</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td unitcost = "'+po_detail[0]['UnitCost_PO']+'" subtotal = "'+po_detail[0]['Subtotal']+'" ppn = "'+po_detail[0]['PPN_PO']+'" max = "'+po_detail[0]['Subtotal_PR']+'" qty= "'+po_detail[0]['QtyPR']+'"><b>'+formatRupiah(po_detail[0]['Subtotal'])+'</b></br><b>(include PPn '+parseInt(po_detail[0]['PPN_PO'])+'%)</b></td>'+
+											'<td class="TotalSPK"><b>'+formatRupiah(Total)+'</b></td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td notes = "'+po_create[0]['Notes']+'">'+po_create[0]['Notes']+'</td>'+
+											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'">'+po_create[0]['Notes']+'</td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td notes2 = "'+po_create[0]['Notes2']+'">'+po_create[0]['Notes2']+'</td>'+
+											'<td class="tdNotes2" notes2 = "'+po_create[0]['Notes2']+'">'+po_create[0]['Notes2']+'</td>'+
 										'</tr>'+
 									'</tbody>'+
 								'</table>'+
@@ -297,7 +378,6 @@
 			}
 
 
-			
 			makeFooter();
 			makeDocPenawaran();
 			makeSignatures();
@@ -497,7 +577,7 @@
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
-		var btn_cancel = '<button class= "btn btn-danger id="btn_cancel">Cancel PO</button>';
+		var btn_cancel = '<button class= "btn btn-danger" id="btn_cancel">Cancel PO</button>';
 		var Status = po_create[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -528,7 +608,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');;
 		    	}
 		    }
 
@@ -589,7 +669,12 @@
 		    break;
 		  case 4:
 		  case '4':
-		    // code block
+		    var JsonStatus = po_create[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		    	$('#r_action').html(html);
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_re_open+'</div>');
+		    }
 		    break;       
 		  default:
 		    // code block
@@ -608,7 +693,7 @@
 		var pre_po_supplier = dt.pre_po_supplier;
 		var html_vendor = '';
 			html_vendor =  '<div class = "row noPrint">'+
-						'<div class = "col-xs-4">'+
+						'<div class = "col-xs-5">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
@@ -620,7 +705,7 @@
 			var t = '';									
 			for (var i = 0; i < pre_po_supplier.length; i++) {
 				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-				t += '<li><a href="http://localhost/puis/fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
 			}
 			
 			html_vendor += t;
@@ -801,32 +886,27 @@
 
 	function __input_reload()
 	{
+		$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+			var unitcost_po = $(this).find('td:eq(2)').attr('unitcost_po');
+			var n = unitcost_po.indexOf(".");
+			value = unitcost_po.substring(0, n);
+			// write html input
+			$(this).find('td:eq(2)').html('<input type="text" class="form-control UnitCost" value="'+value+'">')
+			$(this).find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$(this).find('.UnitCost').maskMoney('mask', '9894');
 
-		var UnitCost_PO = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('unitcost');
-			var n = UnitCost_PO.indexOf(".");
-			UnitCost_PO = UnitCost_PO.substring(0, n);
-		var PPN = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('ppn');
-			var n = PPN.indexOf(".");
-			PPN = PPN.substring(0, n);
-		var qty = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('qty');
+			var ppn_po = $(this).find('td:eq(3)').attr('ppn_po');
+			var n = ppn_po.indexOf(".");
+			value = ppn_po.substring(0, n);
+			$(this).find('td:eq(3)').html('<input type="number" class="form-control PPN" value="'+value+'">');
+		})
 
-		$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').html('<div class = "form-group"><label>UnitCost</label>'+
-				'<input type="text" class="form-control UnitCost" value="'+UnitCost_PO+'" style = "width : 300px;"></div>'+
-				'<div class = "form-group"><label>Qty</label>'+
-				'<input type="number" class="form-control qty" value="'+qty+'" style = "width : 300px;" disabled></div>'+
-				'<div class = "form-group"><label>PPN</label>'+
-				'<input type="number" class="form-control PPN" value="'+PPN+'" style = "width : 300px;"></div></br>'+
-				'<label class = "Subtotal">'+formatRupiah($('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').attr('subtotal'))+'</label>'
-					);
-			$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			$('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').maskMoney('mask', '9894');
+		var value  = $('#table_input_spk').find('.tdNotes').attr('notes');
+		$('#table_input_spk').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
 
-			var Notes = $('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').attr('notes');
-			$('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').html('<input type="text" class="form-control Notes" value="'+Notes+'" style = "width : 500px;">')
-			var Notes2 = $('#table_input_spk tbody').find('tr:eq(4)').find('td:eq(2)').attr('notes2');
-			$('#table_input_spk tbody').find('tr:eq(4)').find('td:eq(2)').html('<input type="text" class="form-control Notes2" value="'+Notes2+'" style = "width : 500px;">');
-
-			$('.UnitCost').trigger('keyup');
+		var value  = $('#table_input_spk').find('.tdNotes2').attr('notes2');
+		$('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
+		
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {
@@ -850,6 +930,16 @@
 			}
 			
 		}
+		else
+		{
+			// cari all total 
+				var Total = 0;
+				$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+					Total += parseInt($(this).find('td:eq(4)').attr('subtotal'))
+				})
+
+				$('.TotalSPK').html(formatRupiah(Total));
+		}
 	})
 
 	
@@ -865,13 +955,14 @@
 		var bool = true;
 
 		// process
-		var Subtotal_limit = ev.attr('max');
+		var tr = ev.closest('tr');
+		var Subtotal_limit = tr.find('td:eq(4)').attr('max');
 		var n = Subtotal_limit.indexOf(".");
 		Subtotal_limit = Subtotal_limit.substring(0, n);
-		var PPN = ev.find('.PPN').val();
-		var UnitCost = ev.find('.UnitCost').val();
+		var PPN = tr.find('.PPN').val();
+		var UnitCost = tr.find('.UnitCost').val();
 		UnitCost = findAndReplace(UnitCost, ".","");
-		var qty = ev.attr('qty');
+		var qty = tr.find('td:eq(1)').html();
 
 		var total_raw = (parseInt(UnitCost) * parseInt(qty));
 		var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
@@ -885,10 +976,8 @@
 		}
 		else
 		{
-			// 	console.log('asdasd')
-			ev.find('.Subtotal').attr('subtotal',Subtotal);
-			ev.find('.Subtotal').html(formatRupiah(Subtotal));
-
+			tr.find('td:eq(4)').attr('subtotal',Subtotal);
+			tr.find('td:eq(4)').html(formatRupiah(Subtotal));
 		}
 
 		return bool;		
@@ -902,20 +991,24 @@
 		if (confirm('Are you sure ?')) {
 			loadingStart();
 			var po_data = ClassDt.po_data;
-			var UnitCost = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.UnitCost').val();
-			UnitCost = findAndReplace(UnitCost, ".","");
-			var PPN = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.PPN').val();
-			var Subtotal = $('#table_input_spk tbody').find('tr:eq(2)').find('td:eq(2)').find('.Subtotal').attr('subtotal');
-			var ID_po_detail = $('#table_input_spk tbody').find('tr:eq(0)').attr('id_po_detail');
-			var arr_post_data_detail = {
-				ID_po_detail :ID_po_detail,
-				UnitCost : UnitCost,
-				PPN : PPN,
-				Subtotal : Subtotal,
-			};
+			var arr_post_data_detail = [];
+			$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+				var ID_po_detail = $(this).attr('id_po_detail');
+				var UnitCost = $(this).find('.UnitCost').val();
+				UnitCost = findAndReplace(UnitCost, ".","");
+				var PPN = $(this).find('.PPN').val();
+				var Subtotal = $(this).find('td:eq(4)').attr('subtotal');
+				var temp = {
+					ID_po_detail :ID_po_detail,
+					UnitCost : UnitCost,
+					PPN : PPN,
+					Subtotal : Subtotal,
+				};
+				arr_post_data_detail.push(temp);
+			})
 
-			var Notes =  $('#table_input_spk tbody').find('tr:eq(3)').find('td:eq(2)').find('.Notes').val();
-			var Notes2 =  $('#table_input_spk tbody').find('tr:eq(4)').find('.Notes2').val();
+			var Notes =  $('#table_input_spk').find('.Notes').val();
+			var Notes2 =  $('#table_input_spk').find('.Notes2').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
@@ -923,6 +1016,7 @@
 			    Notes : Notes,
 			    Notes2 : Notes2,
 			};
+			
 			var token = jwt_encode(data,"UAP)(*");
 			var action_mode = 'modifycreated';
 				action_mode = jwt_encode(action_mode,"UAP)(*");
@@ -1096,6 +1190,97 @@
 		window.print();
 	})
 
-		
+	$(document).off('click', '#btn_cancel').on('click', '#btn_cancel',function(e) {
+		if (confirm('Are you sure?')) {
+			POCode = ClassDt.Code;
+			var PRRejectItem = false;
+			var arr = ClassDt.PRCode_arr;
+			var PRCode = arr[0];
+			if (confirm('Apakah perlu untuk cancel All ITEM dari '+PRCode+ ' yang berada pada PO ini ?')) {
+				PRRejectItem = true;
+			}
+			else
+			{
+				if (confirm('Konfirmasi!!! SPK '+POCode+ ' akan di cancel dan ITEM PR tidak dicancel?')) {
+					PRRejectItem = false;
+				}else
+				{
+					return;
+				}
+			}
+			
+
+			var url = base_url_js+"po_spk/submit_create";
+			var po_data = ClassDt.po_data;
+			var arr_post_data_ID_po_detail = [];
+			$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+				var ID_po_detail = $(this).attr('id_po_detail');
+				arr_post_data_ID_po_detail.push(ID_po_detail);
+			})
+
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="100"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+			$("#confirmYes").click(function(){
+				var NoteDel = $('#NoteDel').val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});				
+
+				var data = {
+				    po_data : po_data,
+				    arr_post_data_ID_po_detail : arr_post_data_ID_po_detail,
+				    PRRejectItem : PRRejectItem,
+				    NoteDel : NoteDel,
+				    PRCode : PRCode,
+				};
+			
+				var token = jwt_encode(data,"UAP)(*");
+				var action_mode = 'cancel';
+					action_mode = jwt_encode(action_mode,"UAP)(*");
+				var action_submit = 'SPK';
+					action_submit = jwt_encode(action_submit,"UAP)(*");	
+				$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
+					var rs = jQuery.parseJSON(resultJson);
+					if (rs.Status == 1) {
+						Get_data_po().then(function(data){
+								ClassDt.po_data = data;
+								WriteHtml();
+						})
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							Get_data_po().then(function(data){
+									ClassDt.po_data = data;
+									WriteHtml();
+							})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  toastr.error('','!!!Failed');
+				  $('#NotificationModal').modal('hide');
+				})	
+			})	
+
+		}
+	})	
 </script>
 <?php endif ?>	

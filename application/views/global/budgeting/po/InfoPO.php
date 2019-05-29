@@ -5,11 +5,15 @@
 }
 
 .borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
-	    padding: 8px;
+	    padding: 4px;
 	    line-height: 1.428571429;
 	    vertical-align: top;
 	    border-top: none !important;
 	}
+#table_input_po thead>tr>th, #table_input_po tbody>tr>th, #table_input_po tfoot>tr>th, #table_input_po thead>tr>td, #table_input_po tbody>tr>td, #table_input_po tfoot>tr>td {
+	    padding: 4px;
+	}
+
 @page {
   size: A4;
   margin: 0.5;
@@ -18,9 +22,8 @@
     .container { 
       display: block !important;
         font-size: 10px; 
-        top: -40pt;
-        left:0pt;
-        right: 0pt;
+        top: -35pt;
+        page-break-after: always; /* Set Just One Page */
     }
     table{
     	font-size: 10px; 
@@ -44,7 +47,7 @@
 			<?php endif ?>
 	</div>
 </div>
-<div id="DocPenawaran" class="row"></div>
+<div id="DocPenawaran" class="row noPrint"></div>
 <div class="row" style="margin-top: 2px;">
 	<div class="col-xs-12">
 		<table class="table borderless">
@@ -135,7 +138,7 @@
 											'<div>Podomoro City APL Tower, Lantai 5</div>'+
 											'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
 											'<div>Telp 021 29200456</div>'+
-											'<div style = "margin-top:20px;">PIC : '+PICPU+'</div>'+
+											'<div style = "margin-top:20px;margin-left:5px;">PIC : '+PICPU+'</div>'+
 										'</td>'+
 										'<td></td>'+
 										'<td>'+
@@ -359,7 +362,7 @@
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
-		var btn_cancel = '<button class= "btn btn-danger id="btn_cancel">Cancel PO</button>';
+		var btn_cancel = '<button class= "btn btn-danger" id="btn_cancel">Cancel PO</button>';
 		var Status = po_create[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -450,7 +453,12 @@
 		    break;
 		  case 4:
 		  case '4':
-		    // code block
+		    var JsonStatus = po_create[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		    	$('#r_action').html(html);
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_re_open+'</div>');
+		    }
 		    break;       
 		  default:
 		    // code block
@@ -1104,8 +1112,97 @@
 		window.print();
 	})
 
-	$(document).off('click', '#btn_cancel	').on('click', '#btn_cancel	',function(e) {
-		
+	$(document).off('click', '#btn_cancel').on('click', '#btn_cancel',function(e) {
+		if (confirm('Are you sure?')) {
+			POCode = ClassDt.Code;
+			var PRRejectItem = false;
+			var arr = ClassDt.PRCode_arr;
+			var PRCode = arr[0];
+			if (confirm('Apakah perlu untuk cancel All ITEM dari '+PRCode+ ' yang berada pada PO ini ?')) {
+				PRRejectItem = true;
+			}
+			else
+			{
+				if (confirm('Konfirmasi!!! PO '+POCode+ ' akan di cancel dan ITEM PR tidak dicancel?')) {
+					PRRejectItem = false;
+				}else
+				{
+					return;
+				}
+			}
+			
+
+			var url = base_url_js+"po_spk/submit_create";
+			var po_data = ClassDt.po_data;
+			var arr_post_data_ID_po_detail = [];
+			$('#table_input_po tbody').find('tr').each(function(){
+				var ID_po_detail = $(this).attr('id_po_detail');
+				arr_post_data_ID_po_detail.push(ID_po_detail);
+			})
+
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="100"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+			$("#confirmYes").click(function(){
+				var NoteDel = $('#NoteDel').val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});				
+
+				var data = {
+				    po_data : po_data,
+				    arr_post_data_ID_po_detail : arr_post_data_ID_po_detail,
+				    PRRejectItem : PRRejectItem,
+				    NoteDel : NoteDel,
+				    PRCode : PRCode,
+				};
+
+				var token = jwt_encode(data,"UAP)(*");
+				var action_mode = 'cancel';
+					action_mode = jwt_encode(action_mode,"UAP)(*");
+				var action_submit = 'PO';
+					action_submit = jwt_encode(action_submit,"UAP)(*");	
+				$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
+					var rs = jQuery.parseJSON(resultJson);
+					if (rs.Status == 1) {
+						Get_data_po().then(function(data){
+								ClassDt.po_data = data;
+								WriteHtml();
+						})
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							Get_data_po().then(function(data){
+									ClassDt.po_data = data;
+									WriteHtml();
+							})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  toastr.error('','!!!Failed');
+				  $('#NotificationModal').modal('hide');
+				})	
+			})	
+
+		}
 	})
 	
 </script>
