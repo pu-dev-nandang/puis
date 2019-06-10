@@ -1039,12 +1039,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function saveDataToVerification_offline($RegisterID)
+    public function saveDataToVerification_offline($RegisterID,$tgl = null)
     {
         $dataSave = array(
             'RegisterID' => $RegisterID,
             'FileUpload' => '',
-            'CreateAT' => date("Y-m-d"),
+            'CreateAT' => (($tgl == null) ? date("Y-m-d") : $tgl),
         );
 
         $this->db->insert('db_admission.register_verification', $dataSave);
@@ -3040,5 +3040,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
         }
         return $output; // return array and encode to insert to db
+    }
+
+    public function genratePassword($Username,$Password){
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
     }
 }

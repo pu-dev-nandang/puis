@@ -13,6 +13,9 @@ class C_finance extends Finnance_Controler {
         $this->load->model('m_sendemail');
         $this->load->model('admission/m_admission');
         $this->load->model('master/m_master');
+        // get academic year admission
+            $t = $this->m_master->showData_array('db_admission.set_ta');
+            $this->data['academic_year_admission'] = $t[0]['Ta'];
     }
 
 
@@ -1852,12 +1855,21 @@ class C_finance extends Finnance_Controler {
     {
         $input = $this->getInputToken();
         $Year = $input['Year'];
+        $tgl = $input['tgl'];
         $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
         $query=$this->db->query($sql, array())->result_array();
         if (count($query) > 0) {
               $RegID = $input['RegID'];
+              // update token & password sama
+                $getData__ = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
+                $MomenUnix = $getData__[0]['MomenUnix'];
+                $Email = $getData__[0]['Email'];
+                $Pass = $this->m_master->genratePassword($Email,$MomenUnix);
+
               $dataSave = array(
                     'BilingID' => 0,
+                    'Token' => $Pass,
+                    'Password' => $Pass,
                             );
             $this->db->where('ID',$RegID);
             $this->db->update('db_admission.register', $dataSave);
@@ -1866,7 +1878,7 @@ class C_finance extends Finnance_Controler {
             $getData = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
             $Email = $getData[0]['Email'];
             $RegisterID = $getData[0]['ID'];
-            $this->m_master->saveDataToVerification_offline($RegisterID);
+            $this->m_master->saveDataToVerification_offline($RegisterID,$tgl);
             $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
             $RegVerificationID = $getData[0]['ID'];
             $FormulirCode = $this->m_finance->getFormulirCode('online',$Year);
@@ -1876,7 +1888,9 @@ class C_finance extends Finnance_Controler {
             $text = 'Dear Candidate,<br><br>
                         Your payment has been received,<br>
                         Please click link below to login your portal <br>
-                        '.url_registration."login/".'
+                        '.url_registration."login/".' </br>
+                        Username : '.$Email.' </br>
+                        Password / Token : '.$MomenUnix.'
                     ';        
             $to = $Email;
             $subject = "Podomoro University Link Formulir Registration";

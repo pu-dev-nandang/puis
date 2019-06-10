@@ -7,9 +7,9 @@
     		<th>Nama</th>
     		<th>Email</th>
     		<th>Price Formulir</th>
-    		<th>VA Number</th>
+    		<!-- <th>VA Number</th>
     		<th>Biling ID</th>
-    		<th>Deadline Pembayaran</th>
+    		<th>Deadline Pembayaran</th> -->
     		<th>Sekolah</th>
     		<th>Register At</th>
     		<th>Bayar</th>
@@ -60,10 +60,10 @@
 						'<td>'+no+'</td>'+
 						'<td>'+data_json[i]['Name']+'</td>'+
 						'<td>'+data_json[i]['Email']+'</td>'+
-						'<td>'+data_json[i]['PriceFormulir']+'</td>'+
-						'<td>'+data_json[i]['VA_number']+'</td>'+
-						'<td>'+data_json[i]['BilingID']+'</td>'+
-						'<td>'+data_json[i]['Datetime_expired']+'</td>'+
+						'<td>'+formatRupiah(data_json[i]['PriceFormulir'])+'</td>'+
+						// '<td>'+data_json[i]['VA_number']+'</td>'+
+						// '<td>'+data_json[i]['BilingID']+'</td>'+
+						// '<td>'+data_json[i]['Datetime_expired']+'</td>'+
 						// varFileUpload+
 						'<td>'+data_json[i]['SchoolName']+'</td>'+
 						'<td>'+data_json[i]['RegisterAT']+'</td>'+
