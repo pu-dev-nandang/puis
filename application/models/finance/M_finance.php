@@ -88,7 +88,7 @@ class M_finance extends CI_Model {
      $FormulirCode = $query[0]['FormulirCode'];
 
      if ($tipeFormulirCode == 'online') { // online
-       $this->updateStatusFormulirCodeOnline($FormulirCode);
+       $this->updateStatusFormulirCodeOnline($FormulirCode,$year);
      }
      else
      {
@@ -98,10 +98,30 @@ class M_finance extends CI_Model {
      return $FormulirCode;
     }
 
-   public function updateStatusFormulirCodeOnline($FormulirCode)
+   public function updateStatusFormulirCodeOnline($FormulirCode,$year = null)
    {
     $sql = "update db_admission.formulir_number_online_m set Status = 1 where FormulirCode = '".$FormulirCode."'";
     $query=$this->db->query($sql, array());
+
+    // link ke formulir global 
+      if ($year != null) {
+        $sql = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$year."' order by ID asc limit 1";
+        $query=$this->db->query($sql, array())->result_array();
+        $FormulirCodeGlobal = $query[0]['FormulirCodeGlobal'];
+
+        // update No_Ref pada formulir number online dengan FormulirCodeGlobal
+        $dataSave = array(
+          'No_Ref' => $FormulirCodeGlobal
+        );
+
+        $this->db->where('FormulirCode',$FormulirCode);
+        $this->db->update('db_admission.formulir_number_online_m',$dataSave);
+
+        // update status pada formulir_number_global
+           $sql = "update db_admission.formulir_number_global set Status = 1 where FormulirCodeGlobal = '".$FormulirCodeGlobal."'";
+           $query=$this->db->query($sql, array());
+      }
+
    }
 
    public function updateStatusFormulirCodeOffline($FormulirCode)

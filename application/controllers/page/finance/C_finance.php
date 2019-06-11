@@ -1858,7 +1858,10 @@ class C_finance extends Finnance_Controler {
         $tgl = $input['tgl'];
         $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
         $query=$this->db->query($sql, array())->result_array();
-        if (count($query) > 0) {
+
+        $sql2 = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
+        $query2=$this->db->query($sql2, array())->result_array();
+        if (count($query) > 0 && count($query2) > 0) {
               $RegID = $input['RegID'];
               // update token & password sama
                 $getData__ = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
@@ -1878,22 +1881,22 @@ class C_finance extends Finnance_Controler {
             $getData = $this->m_master->caribasedprimary('db_admission.register','ID',$RegID);
             $Email = $getData[0]['Email'];
             $RegisterID = $getData[0]['ID'];
-            $this->m_master->saveDataToVerification_offline($RegisterID,$tgl);
+            $this->m_master->saveDataToVerification_offline($RegisterID);
             $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
             $RegVerificationID = $getData[0]['ID'];
             $FormulirCode = $this->m_finance->getFormulirCode('online',$Year);
             // save data to register_verified
-            $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
+            $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode,$tgl,$this->session->userdata('NIP'));
 
             $text = 'Dear Candidate,<br><br>
                         Your payment has been received,<br>
                         Please click link below to login your portal <br>
-                        '.url_registration."login/".' </br>
-                        Username : '.$Email.' </br>
+                        '.url_registration."login/".' <br><br>
+                        Username : '.$Email.' <br>
                         Password / Token : '.$MomenUnix.'
                     ';        
             $to = $Email;
-            $subject = "Podomoro University Link Formulir Registration";
+            $subject = "Podomoro University Formulir Registration";
             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
             echo json_encode(1);
         }

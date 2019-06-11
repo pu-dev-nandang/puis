@@ -1626,7 +1626,7 @@ class M_api extends CI_Model {
     public function getDataRegisterTelahBayar2($Tahun)
     {
         $sql = "select a.ID,a.Name,a.Email,b.SchoolName,a.PriceFormulir,a.VA_number,a.BilingID,a.Datetime_expired,a.RegisterAT,c.FileUpload,c.CreateAT as uploadAT,c.ID as ver_id,d.FormulirCode,d.VerificationAT,e.name as VerificationBY,
-                d.ID as verified_id
+                d.ID as verified_id,aa.No_Ref
                 from db_admission.register as a LEFT JOIN db_admission.school as b
                 on a.SchoolID = b.ID
                 JOIN db_admission.register_verification as c
@@ -1634,7 +1634,13 @@ class M_api extends CI_Model {
                 join db_admission.register_verified as d
                 on c.ID = d.RegVerificationID
                 LEFT JOIN db_employees.employees as e
-                on e.NIP = d.VerificationBY where a.StatusReg = 0 and a.SetTa = '".$Tahun."'";        
+                on e.NIP = d.VerificationBY 
+                join (
+                    select FormulirCode,No_Ref from db_admission.formulir_number_online_m where Years = '".$Tahun."'
+                    UNION 
+                    select FormulirCode,No_Ref from db_admission.formulir_number_offline_m where Years = '".$Tahun."'
+                ) aa on aa.FormulirCode = d.FormulirCode
+                where a.StatusReg = 0 and a.SetTa = '".$Tahun."'";        
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }

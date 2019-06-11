@@ -1039,18 +1039,18 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function saveDataToVerification_offline($RegisterID,$tgl = null)
+    public function saveDataToVerification_offline($RegisterID)
     {
         $dataSave = array(
             'RegisterID' => $RegisterID,
             'FileUpload' => '',
-            'CreateAT' => (($tgl == null) ? date("Y-m-d") : $tgl),
+            'CreateAT' => date("Y-m-d"),
         );
 
         $this->db->insert('db_admission.register_verification', $dataSave);
     }
 
-    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode)
+    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode,$tgl = null,$PIC = null)
     {
         // $getFormulirCode = $this->getFormulirCode('online');
         $dataSave = array(
@@ -1059,6 +1059,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // 'VerificationBY' => $this->session->userdata('NIP'),
             'VerificationAT' => date('Y-m-d H:i:s'),
         );
+
+        if ($tgl != null) {
+            $dataSave['VerificationAT'] = $tgl.' 00:00:00';
+            $dataSave['VerificationBY'] = $PIC;
+        }
+
         $this->db->insert('db_admission.register_verified', $dataSave);
     }
 

@@ -232,14 +232,14 @@
 				}
 				else
 				{
-					toastr.info('That something wrong')
+					toastr.info('Formulir Number Online atau Formulir Number Global tidak ada');
 				}
 			  
 			}).fail(function() {
 			  toastr.info('No Action...'); 
 			  // toastr.error('The Database connection error, please try again', 'Failed!!');
 			}).always(function() {
-
+				$(".savePay[RegID='"+RegID+"']").prop('disabled',false).html('Submit');
 			});
 		}
 	});

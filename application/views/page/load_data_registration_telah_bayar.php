@@ -58,7 +58,7 @@
 						// '<td>'+data_json[i]['BilingID']+'</td>'+
 						// varFileUpload+
 						'<td>'+data_json[i]['SchoolName']+'</td>'+
-						'<td>'+data_json[i]['FormulirCode']+'</td>'+
+						'<td>'+data_json[i]['FormulirCode']+' / '+data_json[i]['No_Ref']+'</td>'+
 						'<td>'+data_json[i]['RegisterAT']+'</td>'+
 						'<td>'+data_json[i]['VerificationAT']+'</td>'+
 					'</tr>'	
