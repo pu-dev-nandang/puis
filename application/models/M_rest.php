@@ -543,7 +543,7 @@ class M_rest extends CI_Model {
 
                         if($ExamSetting['UASAttd']==1 || $ExamSetting['UASAttd']=='1'){
                             $checkAttendance = true;
-                            $checkAttendanceValue = $ExamSetting['UTSAttdValue'];
+                            $checkAttendanceValue = $ExamSetting['UASAttdValue'];
                         }
 
 
