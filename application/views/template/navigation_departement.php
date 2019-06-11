@@ -109,7 +109,7 @@
                 division="2"
                 data-dpt="rektorat">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/rectorat.png'); ?>"></span>
                     <span class="title">Rektorat</span>
                 </a>
             </li>
@@ -117,7 +117,7 @@
                 division="11"
                 data-dpt="library">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/library.png'); ?>"></span>
                     <span class="title">Library</span>
                 </a>
             </li>
@@ -125,7 +125,7 @@
                 division="34"
                 data-dpt="admin-fakultas">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/admin.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/faculty.png'); ?>"></span>
                     <span class="title">Faculty</span>
                 </a>
             </li>
@@ -133,7 +133,7 @@
                 division="36"
                 data-dpt="other-division">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/rector.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
                     <span class="title">Other</span>
                 </a>
             </li>

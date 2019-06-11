@@ -443,6 +443,24 @@
         $(''+element).prop('disabled',true);
     }
 
+    function loading_modal_show() {
+        $('#NotificationModal .modal-header').addClass('hide');
+        $('#NotificationModal .modal-body').html('<center>' +
+            '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+            '                    <br/>' +
+            '                    Loading Data . . .' +
+            '                </center>');
+        $('#NotificationModal .modal-footer').addClass('hide');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+    }
+
+    function loading_modal_hide() {
+        $('#NotificationModal').modal('hide');
+    }
+
     function loading_data(element) {
         $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw"></i> please, waiting');
     }
@@ -1015,6 +1033,22 @@
                 }
             }
         })
+    }
+
+    function loadSelectOptionCRMPeriod(element,selected) {
+        var data = {
+            action : 'readCRMPeriode'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudCRMPeriode';
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+                var sc = (parseInt(selected)==parseInt(v.ID)) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>Year - '+v.Year+'</option>');
+            })
+
+        });
     }
 
     function getIDSemesterActive(element) {
