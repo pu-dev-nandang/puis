@@ -217,7 +217,7 @@
 </div>
 <script type="text/javascript">
 	window.temp1 = '';
-	window.temp2 = '';
+	window.temp2 = 0;
 		function loadFormulirCodeGlobal()
 		{
 			<?php 
@@ -644,6 +644,10 @@
 					 var tipeChannel = $('input[name=tipeChannel]:checked').val(); 
 					 var TypePay = $('input[name=TypePay]:checked').val(); 
 					 var selectEvent = $("#selectEvent").val();
+					 var regexx =  /^\d+$/;
+					 if (!selectEvent.match(regexx)) {
+					     selectEvent = 0;
+					 }
 					 // var autoCompleteSchoolChanel = $("#autoCompleteSchoolChanel").val();
 					 var autoCompleteSchoolChanel = temp2;
 					 var aksi = $(this).attr('action');
