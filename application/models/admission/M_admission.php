@@ -1026,7 +1026,6 @@ class M_admission extends CI_Model {
       }
       
       $FullName = strtolower($input_arr['Name']);
-
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
               'PIC' => $input_arr['PIC'],
@@ -1040,7 +1039,7 @@ class M_admission extends CI_Model {
               'SchoolID' => $input_arr['autoCompleteSchool'],
               'price_event_ID' => $input_arr['selectEvent'],
               'source_from_event_ID' => $input_arr['selectSourceFrom'],
-              'Channel' => $input_arr['tipeChannel'],
+              'Channel' => ($input_arr['tipeChannel'] == '' ||  empty($input_arr['tipeChannel']) ) ? 0 : $input_arr['tipeChannel'],
               'SchoolIDChanel' => $input_arr['autoCompleteSchoolChanel'],
               'Price_Form' => $input_arr['priceFormulir'],
               'CreateAT' => date('Y-m-d'),
