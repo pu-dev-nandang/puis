@@ -309,7 +309,7 @@ class M_pr_po extends CI_Model {
         $C_ = 0;
         $rs = array();
         for ($i=0; $i < count($arr_dt); $i++) {
-            $data = $arr_dt[$i]; 
+            $data = $arr_dt[$i];
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($data,$key);
             $ID_budget_left = $data_arr['ID_budget_left'];
@@ -336,37 +336,54 @@ class M_pr_po extends CI_Model {
                     }
                 }
         }       
-        
+        // print_r($arr);
         $G = $this->get_approval_pr($Departement);
+        // print_r($G);
         $ID_m_userrole_limit = $arr['Count'] + 1;
+        // print_r($ID_m_userrole_limit.' => ID_m_userrole_limit');
+        $indeksArr = 0;
         for ($i=0; $i < count($G); $i++) { 
             $ID_m_userrole = $G[$i]['ID'];
-            // if ($ID_m_userrole > 1) { // Admin tidak di inputkan dalam approval
-            //     if ($ID_m_userrole <= $ID_m_userrole_limit) {
-            //         $rs[] = array(
-            //             'NIP' => $G[$i]['NIP'],
-            //             'Status' => 0,
-            //             'ApproveAt' => '',
-            //             'Representedby' => '',
-            //             'Visible' => $G[$i]['Visible'],
-            //             'NameTypeDesc' => $G[$i]['NameTypeDesc'],
-            //         );
-            //     }
-            // }
-            if ($ID_m_userrole <= $ID_m_userrole_limit) {
-                $Status = ($ID_m_userrole == 1) ? 1 : 0;
-                $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
-                $rs[] = array(
-                    'NIP' => $G[$i]['NIP'],
-                    'Status' => $Status,
-                    'ApproveAt' => $ApproveAt,
-                    'Representedby' => '',
-                    'Visible' => $G[$i]['Visible'],
-                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
-                );
-            }
-            
+             // print_r($ID_m_userrole.'<br>');
+             $Status = ($ID_m_userrole == 1) ? 1 : 0;
+             $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
+             // check nip ada sebelumnya jika ada maka continue
+             $boolNIP = true;
+             if ($i > 0) {
+                $j = $indeksArr - 1;
+                // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
+                if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
+                    $boolNIP = false;
+                }
+             }
+
+             if ($boolNIP) {
+                  // print_r($ID_m_userrole.'<br>--BoolNIP<br>');
+                 // filter untuk uncheck pada RAD
+                     $BoolRAD = true;
+                     if ($ID_m_userrole > 1) {
+                         $sql = 'select * from db_budgeting.cfg_set_userrole where MaxLimit = ? and CodePost = ? and Approved = 1 and ID_m_userrole = ?';
+                         $query = $this->db->query($sql, array($arr['MaxLimit'],$arr['CodePost'],$ID_m_userrole))->result_array();
+                         // print_r($query);
+                         if (count($query) == 0) {
+                             $BoolRAD = false;
+                         }
+                     }
+                     
+                     if ($BoolRAD) {
+                         $rs[] = array(
+                             'NIP' => $G[$i]['NIP'],
+                             'Status' => $Status,
+                             'ApproveAt' => $ApproveAt,
+                             'Representedby' => '',
+                             'Visible' => $G[$i]['Visible'],
+                             'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+                         );
+                         $indeksArr++;
+                     }  
+             }
         }
+        // print_r($rs);die();
         return $rs;       
     }
 
@@ -829,7 +846,11 @@ class M_pr_po extends CI_Model {
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc,d.Name as NameTypeDesc
                 from db_budgeting.cfg_m_userrole as a join (select * from db_budgeting.cfg_approval_pr where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
-                left join db_employees.employees as b on b.NIP = c.NIP 
+                left join (
+                    select NIP,Name,EmailPU from db_employees.employees
+                    UNION
+                    select NIK as NIP,Name,Email as EmailPU from db_employees.holding
+                ) b on b.NIP = c.NIP 
                 join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
                 order by c.ID asc
                 ';

@@ -117,7 +117,7 @@ class C_pr_po extends Budgeting_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;
@@ -562,7 +562,7 @@ class C_pr_po extends Budgeting_Controler {
                     $StatusPR = 1;
                     // passing show name JsonStatus
                     for ($i=0; $i < count($JsonStatus); $i++) { 
-                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                        $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
                         $Name = $Name[0]['Name'];
                         $JsonStatus[$i]['NameApprovedBy'] = $Name;
                     } 

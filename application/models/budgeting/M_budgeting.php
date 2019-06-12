@@ -402,7 +402,12 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
                 from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_pr where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
-                left join db_employees.employees as b on b.NIP = c.NIP 
+                left join 
+                (
+                     select NIP,Name,EmailPU from db_employees.employees
+                     UNION
+                     select NIK as NIP,Name,Email as EmailPU from db_employees.holding
+                )  b on b.NIP = c.NIP 
                 order by a.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
