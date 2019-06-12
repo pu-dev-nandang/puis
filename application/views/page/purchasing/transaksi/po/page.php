@@ -15,6 +15,9 @@
         <li class="<?php echo ($this->uri->segment(5) == 'open') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/list/open'?>">Open PO / SPK</a>
         </li>
+        <li class="<?php echo ($this->uri->segment(5) == 'cancel_reject_pr') ? 'active' : '' ?>">
+            <a href="<?php echo base_url().'purchasing/transaction/po/list/cancel_reject_pr'?>">Cancel & Reject PR</a>
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >

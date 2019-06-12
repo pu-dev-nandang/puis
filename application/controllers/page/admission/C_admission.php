@@ -13,6 +13,9 @@ class C_admission extends Admission_Controler {
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
+        // get academic year admission
+            $t = $this->m_master->showData_array('db_admission.set_ta');
+            $this->data['academic_year_admission'] = $t[0]['Ta'];
     }
 
     public function index()
@@ -321,13 +324,33 @@ class C_admission extends Admission_Controler {
 
     public function formulir_offline_sale_save()
     {
+      $rs = array('msg'=> '','Status'=> 1);
       $input = $this->getInputToken();
       switch ($input['Action']) {
           case 'add':
-              $this->m_admission->inserData_formulir_offline_sale_save($input);
+              // check email already exist or not
+              $B_email = $this->m_admission->alreadyExistingEmail($input['email']);
+              if ($B_email) {
+                $this->m_admission->inserData_formulir_offline_sale_save($input);
+              }
+              else
+              {
+                $rs['Status'] = 0;
+                $rs['msg'] = 'Email already exist';
+              }
+              
               break;
           case 'edit':
-              $this->m_admission->editData_formulir_offline_sale_save($input);
+              $B_email = $this->m_admission->alreadyExistingEmail($input_arr['email']);
+              if ($B_email) {
+                $this->m_admission->editData_formulir_offline_sale_save($input);
+              }
+              else
+              {
+                $rs['Status'] = 0;
+                $rs['msg'] = 'Email already exist';
+              }
+              
               break;
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
@@ -337,6 +360,8 @@ class C_admission extends Admission_Controler {
               // print_r($FormulirCode);
               break;        
       }
+
+      echo json_encode($rs);
     }
 
     public function formulir_offline_salect_PIC()
@@ -1929,10 +1954,12 @@ class C_admission extends Admission_Controler {
         $queryDiv = "";
         switch ($division) {
           case 10:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           case 18:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           default:
             $queryDiv = "";

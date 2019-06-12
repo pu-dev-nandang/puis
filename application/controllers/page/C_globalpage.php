@@ -68,14 +68,68 @@ class C_globalpage extends Globalclass {
              $data['G_data'] = $G_data;
              if ($G_data[0]['TypeCreate'] == 1) { // PO
                 $content = $this->load->view('global/budgeting/po/InfoPO',$data,true);
+                $this->temp($content);
              }
-             $this->temp($content);
+             else
+             {
+                show_404($log_error = TRUE); 
+             }
+            
          }
          else
          {
             show_404($log_error = TRUE); 
          }
             
+    }
+
+    public function InfoSPK($CodePO)
+    {
+        $Code = str_replace('-','/', $CodePO);
+        /*
+            1.Cek Code PO exist or not
+            2.Cek User memiliki hubungan dengan Code PO tersebut,kecuali Finance & Purchasing
+        */
+
+         $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+         if (count($G_data) > 0 && $G_data[0]['TypeCreate'] == 2) {
+             $bool = true;
+             if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
+                    $bool = true;
+             }
+             else{
+                $bool = false;
+             }
+
+             if (!$bool) { // for user
+                $JsonStatus = $G_data[0]['JsonStatus'];
+                $arr = (array) json_decode($JsonStatus,true);
+                $NIP = $this->session->userdata('NIP');
+                for ($i=0; $i < count($arr); $i++) { 
+                    $NIP_ = $arr[$i]['NIP'];
+                    if ($NIP == $NIP_) {
+                        $bool = true;
+                        break;
+                    }
+                }
+             }
+
+             $data['bool'] = $bool;
+             $data['Code'] = $Code;
+             $data['G_data'] = $G_data;
+             if ($G_data[0]['TypeCreate'] == 2) { // PO
+                $content = $this->load->view('global/budgeting/po/InfoSPK',$data,true);
+                $this->temp($content);
+             }
+             else{
+                show_404($log_error = TRUE); 
+             }
+             
+         }
+         else
+         {
+            show_404($log_error = TRUE); 
+         }
     }
 
 }

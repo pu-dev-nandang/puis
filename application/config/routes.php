@@ -12,7 +12,6 @@ $route['profile'] = 'c_dashboard/profile';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
 
-
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
@@ -925,19 +924,30 @@ $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_Power
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
+$route['rest/__show_pr_detail_multiple_pr_code'] = 'api/c_rest/show_pr_detail_multiple_pr_code';
 
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
 $route['rest2/__Get_data_po_by_Code'] = 'api/c_rest2/Get_data_po_by_Code';
+$route['rest2/__Get_supplier_po_by_Code'] = 'api/c_rest2/Get_supplier_po_by_Code';
 $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
+$route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
+$route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
+
 
 $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
 
 $route['rest2/__crudCRMPeriode'] = 'api/c_rest2/crudCRMPeriode';
 $route['rest2/__crudCRMTeam'] = 'api/c_rest2/crudCRMTeam';
 $route['rest2/__crudMarketingActivity'] = 'api/c_rest2/crudMarketingActivity';
+
+
+$route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
+$route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
+$route['rest2/__reject_pr_from_another'] = 'api/c_rest2/reject_pr_from_another';
+$route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from_another';
 
 
 
@@ -1384,8 +1394,11 @@ $route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Appr
 $route['purchasing/transaction/po/userroledepart_submit'] = 'page/purchasing/c_po/userroledepart_submit';
 $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_po/$1';
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
+$route['purchasing/transaction/po/list/cancel_reject_pr'] = 'page/purchasing/c_po/cancel_reject_pr';
+
 // global lihat PO
 $route['global/purchasing/transaction/po/list/(:any)'] = 'page/C_globalpage/InfoPO/$1';
+$route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/InfoSPK/$1';
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 

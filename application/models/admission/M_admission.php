@@ -533,7 +533,7 @@ class M_admission extends CI_Model {
         $status = ''; 
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed from (
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref from (
           select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
           from db_admission.register as a 
           join db_admission.register_verification as b
@@ -545,7 +545,8 @@ class M_admission extends CI_Model {
           where a.StatusReg = 0
           ) as a right JOIN db_admission.formulir_number_online_m as b
           on a.FormulirCode = b.FormulirCode
-          where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$status.' LIMIT '.$start. ', '.$limit;
+          left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
+          where b.Years = "'.$tahun.'" and (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -989,6 +990,21 @@ class M_admission extends CI_Model {
       return $query->result_array();
     }
 
+    public function alreadyExistingEmail($Email)
+    {
+      $tt = $this->m_master->showData_array('db_admission.set_ta');
+      $yy = $tt[0]['Ta'];
+      $sql = "select count(*) as total from db_admission.register as a where a.Email = ? and SetTa = ?";
+      $query=$this->db->query($sql, array($Email,$yy))->result_array();
+      if ($query[0]['total'] > 0) {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+
     public function inserData_formulir_offline_sale_save($input_arr)
     {
       // get no kwitansi terakhir
@@ -1000,8 +1016,15 @@ class M_admission extends CI_Model {
               where b.Years = ?
               order by a.NoKwitansi desc limit 1';
       $query=$this->db->query($sql, array($getDatax[0]['Ta']))->result_array();
-      $NoKwitansi = $query[0]['NoKwitansi'];
-      $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      if (count($query) > 0) {
+        $NoKwitansi = $query[0]['NoKwitansi'];
+        $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      }
+      else
+      {
+        $NoKwitansi = 1;
+      }
+      
       $FullName = strtolower($input_arr['Name']);
 
       $dataSave = array(
@@ -1597,7 +1620,7 @@ class M_admission extends CI_Model {
       }
       
       if($selectProgramStudy != '%') {
-        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+        // $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
       }
       else
       {
@@ -1652,6 +1675,7 @@ class M_admission extends CI_Model {
 
               and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
             LIMIT '.$start. ', '.$limit;
+            
            $query=$this->db->query($sql, array())->result_array();
            for ($i=0; $i < count($query); $i++) { 
              $dt = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$query[$i]['ID_register_formulir']);
@@ -2539,6 +2563,7 @@ class M_admission extends CI_Model {
 
     public function set_input_tuition_fee_submit($input)
     {
+      $this->load->model('finance/m_finance');
       //save data to payment_register
       $this->load->model('master/m_master');
       $data2 = $input['data2'][0];
@@ -2549,10 +2574,10 @@ class M_admission extends CI_Model {
       $temp['TypeBeasiswa'] = $data2->getBeasiswa;
       $temp['FileBeasiswa'] = $data2->getDokumen;
       $temp['Desc'] = $data2->ket;
-      // print_r($temp);die();
       $temp['CreateAT'] = date('Y-m-d');
       $temp['CreateBY'] = $this->session->userdata('NIP');
       $this->db->insert('db_finance.register_admisi', $temp);
+        
 
       foreach ($data2 as $key => $value) {
             $a = explode('-', $key);
@@ -2583,6 +2608,527 @@ class M_admission extends CI_Model {
         }
 
         $this->db->insert_batch('db_finance.payment_pre', $arr2);
+
+        /* 31-05-2019 
+          Perubahan set tuition fee tanpa approve finance
+          dan PDF langsung cetak by admission
+        */  
+        /* Adding  and update after insert */
+          $No_Surat = $this->m_finance->getNumberSuratTuitionFee($data2->id_formulir);
+          $dataSave__ = array(
+                  'Status' => 'Approved',
+                  'No_Surat' => $No_Surat,
+                  'ApprovedBY' => $this->session->userdata('NIP'),
+                  'ApprovedAT' => date('Y-m-d'),
+                          );
+          $this->db->where('ID_register_formulir',$data2->id_formulir);
+          $this->db->update('db_finance.register_admisi', $dataSave__);
+
+
+          /* Create PDF file */
+          $getData = $this->m_finance->tuition_fee_calon_mhs_by_ID($data2->id_formulir,'Approved');
+          $cicilan = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$data2->id_formulir); 
+          $this->Tuition_PDF_SendEmail($getData,$cicilan);
+        /* End Adding */ 
+
+    }
+
+    public function Tuition_PDF_SendEmail($Personal,$arr_cicilan)
+    {
+        $Sekolah = $Personal[0]['SchoolName'];
+        $TuitionFee = $this->m_finance->getTuitionFee_calon_mhs($Personal[0]['ID_register_formulir']);
+        $arr_temp = array('filename' => '');
+        $filename = 'Tuition_fee_'.$Personal[0]['FormulirCode'].'.pdf';
+        $getData = $this->m_master->showData_array('db_admission.set_label_token_off');
+
+        $config=array('orientation'=>'P','size'=>'A5');
+        $this->load->library('mypdf',$config);
+        $this->mypdf->SetMargins(10,10,10,10);
+        $this->mypdf->SetAutoPageBreak(true, 0);
+        $this->mypdf->AddPage();
+        // Logo
+        $this->mypdf->Image('./images/logo_tr.png',10,10,50);
+
+        $setFont = 8;
+
+        // date
+        $DateIndo = $this->m_master->getIndoBulan(date('Y-m-d'));
+        $this->mypdf->SetXY(150,20);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Jakarta, '.$DateIndo, 0, 0, 'L', 0);
+
+        // Line break
+        $this->mypdf->Ln(20);
+
+        $this->mypdf->SetXY(22,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Nomor', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(22,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Hal', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(42,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, ':', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(42,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, ':', 0, 1, 'L', 0);
+
+        $getNumber = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$Personal[0]['ID_register_formulir']);
+        $No_Surat = $this->m_finance->ShowNumberTuitionFee( $getNumber[0]['No_Surat'] );
+        $this->mypdf->SetXY(45,29);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $No_Surat.'/MKT-PMB-B-19/PU/X/2018', 0, 1, 'L', 0);
+
+        $this->mypdf->SetXY(45,35);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Surat Keputusan Penerimaan Beasiswa di Podomoro University', 0, 1, 'L', 0);
+
+
+        $setXAwal = 22;
+        $setYAwal = 45;
+        $setJarakY = 5;
+        $setJarakX = 40;
+        $setFontIsian = 12;
+
+        // isian
+        $setY = $setYAwal;
+        $setX = $setXAwal;
+
+        // label
+        $this->mypdf->SetXY($setX,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, 'Kepada Yth.', 0, 1, 'L', 0);
+
+        // Nama
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'], 0, 1, 'L', 0); 
+
+        // Address
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['Address'], 0, 1, 'L', 0); 
+
+        // City
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['RegionAddress'].' '.$Personal[0]['ProvinceAddress'], 0, 1, 'L', 0); 
+
+        // School
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, $Personal[0]['SchoolName'], 0, 1, 'L', 0); 
+
+        // Hp
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'No.Tlp/Hp     : '.$Personal[0]['PhoneNumber'], 0, 1, 'L', 0); 
+
+        // Hp
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(0, 0, 'Dengan hormat,', 0, 1, 'L', 0);
+
+        // cek potongan discount
+        $chkDiscount = 0;
+        $arr_discount = array();
+        $arr_discount2 = array();
+        $NameTbl = $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'];
+        foreach ($Personal[0] as $key => $value) {
+            $key = explode('-', $key);
+            if ($key[0] == 'Discount') {
+                if ($value > 0 ) {
+                   $chkDiscount = 1;
+                   $arr_discount[$key[1]] = $value;
+                }
+                $arr_discount2[$key[1]] = $value;
+            }
+        }
+
+        if ($chkDiscount == 1) {
+            $Status = 'rata-rata raport kelas XI';
+            if ($Personal[0]['RangkingRapor'] != 0) {
+                $Status = 'Rangking paralel '.$Personal[0]['RangkingRapor'].' kelas XI';
+            }
+
+            $setXvalue = $setX;
+            $setY = $setY + 2;
+            $this->mypdf->SetXY($setXvalue,$setY);
+            $this->mypdf->SetTextColor(0,0,0);
+            $this->mypdf->SetFont('Arial','',$setFont);
+            // MultiCell( 140, 2, $arr_value[$getRowDB], 0,'L');
+            $this->mypdf->MultiCell(0, 5, 'Selamat, Anda mendapatkan beasiswa potongan di Podomoro University tahun akademik '.$Personal[0]['NamaTahunAkademik'].' berdasarkan '.$Status.', dengan rincian sebagai berikut:', 0,'L');
+
+            $setY = $setY + 10;
+            $height = 5;
+            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetFillColor(255, 255, 255);
+            $this->mypdf->Cell(50,$height,'Nama Lengkap - Nomor Formulir',1,0,'C',true);
+            $this->mypdf->Cell(40,$height,'Program Study',1,0,'C',true);
+            $this->mypdf->Cell(80,$height,'Beasiswa',1,1,'C',true);
+
+            $ProdiTbl = $Personal[0]['NamePrody'];
+            foreach ($arr_discount as $key => $value) {
+                $setY = $setY + $height;
+                $this->mypdf->SetXY($setX,$setY); 
+                $this->mypdf->SetFillColor(255, 255, 255);
+                $this->mypdf->Cell(50,$height,$NameTbl,1,0,'C',true);
+                $this->mypdf->Cell(40,$height,$ProdiTbl,1,0,'C',true);
+                $this->mypdf->Cell(80,$height,'Beasiswa Pot '.$key.' '.(int)$value.'%',1,1,'C',true);
+            } 
+
+        }
+
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Total pembayaran untuk <b>"Semester Pertama"</b> dalam 1x pembayaran :');
+
+        $setY = $setY + 5;
+        $height = 5;
+        
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(50,$height,'Pembayaran Semester 1',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'SPP',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true); 
+        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true); 
+
+        $setY = $setY + $height;
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->Cell(50,$height,'Biaya Normal',1,0,'L',true);
+        
+        // get tuition fee
+        
+           $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
+           $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
+           $totalTuitionFee = 0;
+           $arr_pay = array();
+
+           // get SKS
+           $ID_program_study = $Personal[0]['ID_program_study'];
+           $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ID_program_study);
+           $Credit = $ccc[0]['DefaultCredit'];
+
+            foreach ($query23 as $keya) {
+                $arr_pay[$keya['Abbreviation']] = $keya['Cost'];
+                if ($keya['Abbreviation'] == 'Credit') {
+                    $CreditHarga = $keya['Cost'] * $Credit;
+                    $this->mypdf->Cell(25,$height,number_format($CreditHarga,2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $CreditHarga;
+                }
+                else
+                {
+                    $this->mypdf->Cell(25,$height,number_format($keya['Cost'],2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $keya['Cost'];
+                }
+                
+            }
+            // total
+                 $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
+
+
+            $setY = $setY + $height;
+            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetFillColor(255, 255, 255);
+            $this->mypdf->SetFont('Arial','',$setFont);
+            $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
+
+            $totalTuitionFee = 0;
+            foreach ($arr_discount2 as $key => $value) {
+
+                foreach ($arr_pay as $keya => $valuea) {
+
+                    if ($keya == $key) {
+                        if ($key == 'Credit') {
+                            $cost = $Credit * $valuea;
+                            $cost = $value * $cost / 100;
+                            $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
+                        }
+                        else
+                        {
+                            $cost = $value * $valuea / 100;
+                            $this->mypdf->Cell(25,$height,number_format($cost,2,',','.'),1,0,'L',true);
+                        }
+                        $totalTuitionFee = $totalTuitionFee + $cost;
+                    }
+                }
+                
+            }
+            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+
+
+        $setY = $setY + $height;
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(255, 255, 255);
+        $this->mypdf->SetFont('Arial','B',$setFont);
+        $this->mypdf->Cell(50,$height,'Biaya yang harus dibayar',1,0,'L',true);
+        $totalTuitionFee = 0;
+        $PTIDSelect = $this->m_master->showData_array('db_finance.payment_type');
+        for ($i=0; $i < count($PTIDSelect); $i++) {
+            foreach ($Personal[0] as $key => $value) {
+                if ($PTIDSelect[$i]['Abbreviation'] == $key ) {
+                    $this->mypdf->Cell(25,$height,number_format($Personal[0][$key],2,',','.'),1,0,'L',true);
+                    $totalTuitionFee = $totalTuitionFee + $Personal[0][$key];
+                } 
+            } 
+           
+        }
+
+        $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Jadwal pembayaran untuk semester pertama dengan cicilan :');
+
+         $setY = $setY + $height;
+
+        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetFillColor(226, 226, 226);
+        $this->mypdf->Cell(40,$height,'Pembayaran',1,0,'C',true);
+        $this->mypdf->Cell(60,$height,'Tanggal',1,0,'C',true);
+        $this->mypdf->Cell(70,$height,'Jumlan',1,1,'C',true);
+
+        $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat','Cicilan Kelima','Cicilan Keenam','Cicilan Ketujuh');
+
+        for ($i=0; $i < count($arr_cicilan); $i++) {
+            $setY = $setY + $height; 
+            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetFillColor(255, 255, 255);
+            $this->mypdf->Cell(40,$height,$cicilan_tulis[$i],1,0,'L',true);
+            $Deadline = date('Y-m-d', strtotime($arr_cicilan[$i]['Deadline']));
+            $this->mypdf->Cell(60,$height,$this->m_master->getIndoBulan($Deadline),1,0,'L',true);
+            $this->mypdf->Cell(70,$height,'Rp '.number_format($arr_cicilan[$i]['Invoice'],2,',','.'),1,1,'L',true);
+
+        }
+
+
+        $setXvalue = $setX;
+        $setY = $setY + 7;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Pembayaran dapat dilakukan melalui transfer ke Bank BCA : ');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Atas Nama');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Yayasan Pendidikan Agung Podomro</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Nomor Account');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>161.3888.555</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('-. Keterangan');
+
+        $setXvalue = $setXvalue + 25;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML(':');
+
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>'.$NameTbl.'</b>');
+
+
+        
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Note: Mohon bukti pembayaran difax ke nomor 021-29200455 atau diemail ke admissions@podomorouniversity.com dengan subyek');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Pembayaran Uang Kuliah atas Nama '.$NameTbl.'.');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Untuk info lebih lanjut dapat menghubungi Podomoro University di 021-29200456 ext 101-103/HP : 0821 1256 4900');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Selamat bergabung di Keluarga Besar Podomoro university');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Hormat Kami,');
+
+        $setXvalue = $setX;
+        $setY = $setY + 15;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Dept. of Admissions and Marketing');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<b>Perhatian:</b>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('1.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Beasiswa berlaku untuk pembayaran sesuai dengan tanggal yang telah ditentukan di atas. Apabila melewati batas waktu yang telah ditentukan maka mengikuti program pembayaran pada gelombang tersebut.', 0,'L');
+
+        $setXvalue = $setX;
+        $setY = $setY + 10;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('2.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Pembayaran dianggap valid saat dana efektif pada rekening YPAP, bukan berdasarkan tanggal slip setoran / bukti transfer.', 0,'L');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('3.');
+        $setXvalue = $setXvalue + 3;
+        // $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('Jika sampai kegiatan perkuliahan dimulai masih ada kewajiban biaya studi yang belum diselesaikan, maka mahasiswa tersebut dianggap');
+        $setXvalue = $setX + 3;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('<u>mengundurkan diri</u>');
+
+        $setXvalue = $setX;
+        $setY = $setY + 5;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->writeHTML('4.');
+        $setXvalue = $setXvalue + 3;
+        $this->mypdf->SetXY($setXvalue,$setY);
+        $this->mypdf->SetTextColor(0,0,0);
+        $this->mypdf->SetFont('Arial','',$setFont);
+        $this->mypdf->MultiCell(0, 5, 'Surat ini dicetak otomatis oleh komputer dan tidak memerlukan tanda tangan pejabat yang berwenang.', 0,'L');
+
+         $path = './document';
+         $path = $path.'/'.$filename;
+         $this->mypdf->Output($path,'F');
+         // echo json_encode($filename);
+         $text = 'Dear '.$Personal[0]['Name'].',<br><br>
+                     Plase find attached your Tuition Fee.<br>
+                     For Detail your payment, please see in '.url_registration."login/";
+         if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {            
+            // $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
+            $to = 'admission@podomorouniversity.ac.id';
+         }
+         else
+         {
+            $to = 'alhadirahman22@gmail.com,alhadi.rahman@podomorouniversity.ac.id';
+         }
+         $subject = "Podomoro University Tuition Fee";
+         $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text,$path);
 
     }
 

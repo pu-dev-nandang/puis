@@ -4,35 +4,48 @@
     border-bottom: none !important;
 }
 
+
 .borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
 	    padding: 4px;
 	    line-height: 1.428571429;
 	    vertical-align: top;
 	    border-top: none !important;
 	}
-#table_input_po thead>tr>th, #table_input_po tbody>tr>th, #table_input_po tfoot>tr>th, #table_input_po thead>tr>td, #table_input_po tbody>tr>td, #table_input_po tfoot>tr>td {
-	    padding: 4px;
-	}
 
+
+.CustomMargin{
+	width:800px; margin:0 auto;
+}	
 @page {
   size: A4;
-  margin: 0.5;
+  /*margin: 0.5;*/
+  margin-left: 0.5pt;
+  margin-top: 10pt;
+  margin-bottom : 1pt;
+  margin-right : 1pt;
 }
 @media print {
     .container { 
       display: block !important;
         font-size: 10px; 
-        top: -35pt;
+        /*top: -60pt;*/
+        /*left:0pt;*/
+        /*right: 0pt;*/
         page-break-after: always; /* Set Just One Page */
     }
     table{
     	font-size: 10px; 
     }
     
-    .btn,.noPrint, a { 
+    .btn, .noPrint, a { 
     	display:none !important;
     }
+    .CustomTD
+    {
+    	width: 200px !important;
+    }
 }
+
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="row noPrint">
@@ -55,7 +68,7 @@
 			<tbody>
 				<tr>
 					<td style="text-align :center">
-						<p><h3>Purchase Order</h3></p>
+						<p><h3><u>Surat Perintah Kerja</u></h3></p>
 						<p style="margin-top: -10px;"><?php echo $Code ?></p>
 					</td>
 				</tr>
@@ -64,7 +77,7 @@
 	</div>
 </div>
 <?php if ($bool): ?>
-<div id = "PageContain">
+<div id = "PageContain" class="CustomMargin">
 	
 </div>
 <?php else: ?>
@@ -119,57 +132,259 @@
 		return def.promise();
 	}
 
+	function __Get_spk_pembukaan(Date)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__Get_spk_pembukaan";
+		var data = {
+		    Date : Date,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
+
 	function WriteHtml()
 	{
 		var dt = ClassDt.po_data;
 		var po_create = dt.po_create;
+		var po_detail = dt.po_detail;
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
-		// PageContain
-		var html = '<div class = "row">'+
-						'<div class = "col-xs-12">'+
-							'<table class = "table borderless" style = "margin-left: -8px;">'+
-								'<thead></thead>'+
-								'<tbody>'+
-									'<tr>'+
-										'<td>'+
-											'<div><b>YAY Pendidikan Agung Podomoro</b></div>'+
-											'<div>Podomoro City APL Tower, Lantai 5</div>'+
-											'<div>Jl. Let Jend. S. Parman Kav 28, Jakarta 11470</div>'+
-											'<div>Telp 021 29200456</div>'+
-											'<div style = "margin-top:20px;margin-left:5px;">PIC : '+PICPU+'</div>'+
-										'</td>'+
-										'<td></td>'+
-										'<td>'+
-											'<div style = "margin-left : 50%">'+
-												'<div><u>Jakarta, '+po_create[0]['CreatedAt_Indo']+'</u></div>'+
-												'<div style = "margin-top : 20px;">Kepada Yth :</div>'+
-												'<div><b>'+po_create[0]['NamaSupplier']+'</b></div>'+
-												'<div>'+po_create[0]['PICName']+' ('+po_create[0]['NoTelp']+')'+'</div>'+
-											'</div>'+	
-										'</td>'+
-									'</tr>'+
-								'</tbody>'+
-							'</table>'+
-						'</div>'+						
-					'</div>'+
-					'<div class = "row" style = "margin-top : -5px;">'+
-						'<div class = "col-xs-12">'+
-							'<div>Bersama ini kami meminta untuk dikirim barang-barang sebagai berikut :</div>'+
+		console.log(po_detail);
+
+		// tulis html untuk mengerjakan dengan penggabungan catalog
+		var U_mengerjakan = '';
+			for (var i = 0; i < po_detail.length; i++) {
+				if ( i == parseInt(po_detail.length - 1)) { // jika loop data terakhir
+					if (po_detail.length != 1) {
+						U_mengerjakan += ' dan '+po_detail[i]['Item'];
+					}
+					else
+					{
+						U_mengerjakan += po_detail[i]['Item'];
+					}
+					
+				}
+				else if (i==0) { // data awal
+					U_mengerjakan += po_detail[i]['Item'];
+				}
+				else
+				{
+					U_mengerjakan += ' , '+po_detail[i]['Item'];
+				}
+
+			}
+
+		var F_isiDeskripsi = function(po_detail) // make function variable
+		{
+			var html = '';
+				for (var i = 0; i < po_detail.length; i++) {
+					html += '<tr id_po_detail = "'+po_detail[i]['ID_po_detail']+'">'+
+								'<td>'+po_detail[i]['Item']+'</td>'+
+								'<td>'+po_detail[i]['QtyPR']+'</td>'+
+								'<td unitcost_po = "'+po_detail[i]['UnitCost_PO']+'">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</td>'+
+								'<td ppn_po = "'+po_detail[i]['PPN_PO']+'">'+parseInt(po_detail[i]['PPN_PO'])+'</td>'+
+								'<td max ="'+po_detail[i]['Subtotal_PR']+'" subtotal= "'+po_detail[i]['Subtotal']+'">'+formatRupiah(po_detail[i]['Subtotal'])+'</td>'+
+							'</tr>';	
+				}
+			return html;
+		};
+
+		var Deskripsi = F_isiDeskripsi(po_detail);	
+
+		var F_harga_total = function(po_detail){
+			var total = 0;
+			for (var i = 0; i < po_detail.length; i++) {
+				total += parseInt(po_detail[i]['Subtotal']);
+			}
+			return(total);
+		};
+
+		var Total = F_harga_total(po_detail);
+
+		__Get_spk_pembukaan(po_create[0]['CreatedAt']).then(function(data){
+			var html = '<div class = "row">'+
+							'<div class = "col-xs-12">'+
+								'<div>'+data+'</div>'+
+							'</div>'+
 						'</div>'+
-					'</div>'+
-					'<div id = "r_tblDetail"></div>'+
-					'<div id = "r_terbilang"></div>'+
-					'<div id = "r_signatures"></div>'+
-					'<div id = "r_footer"></div>'+
-					'<div id = "r_action"></div>';
-		$('#PageContain').html(html);
-		makeTblDetail();
-		makeSignatures();
-		makeFooter();
-		makeDocPenawaran();
-		makeAction();						
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "5" style = "width : 45px;">I</td>'+
+											'<td colspan = "3"><b>PEMBERI TUGAS</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>NAMA PERUSAHAAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>YAY PENDIDIKAN AGUNG PODOMORO</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>PENANGGUNG JAWAB</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>SERIAN WIJATNO & WIBOWO NGASERIN</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>JABATAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>SEKRETARIS & KETUA YAYASAN</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>ALAMAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>Jl.S. Parman Kav 28, Tanjung Duren Selatan, Grogol Petamburan,Jakarta Barat</b></td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 15px;">'+
+							'<div class = "col-xs-12">'+
+								'<div>Yang selanjutnya disebut sebagai <b>PIHAK PERTAMA</b></div>'+
+							'</div>'+
+						'</div>'+
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "5" style = "width : 45px;">II</td>'+
+											'<td colspan = "3"><b>PENERIMA TUGAS</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>NAMA PERUSAHAAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['NamaSupplier'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>PENANGGUNG JAWAB</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['PICName'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>JABATAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['JabatanPIC'].toUpperCase()+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>ALAMAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td><b>'+po_create[0]['Alamat']+'</b></td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div class = "row" style = "margin-top : 15px;">'+
+							'<div class = "col-xs-12">'+
+								'<div>Yang selanjutnya disebut sebagai <b>PIHAK KEDUA</b></div>'+
+							'</div>'+
+						'</div>'+
+						'<div class= "row" style = "margin-top : 10px;margin-left:5px;margin-right : 5px;">'+
+							'<div class= "col-xs-12">'+
+								'<table class = "table borderless" id = "table_input_spk">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td rowspan = "6" style = "width : 45px;"></td>'+
+											'<td colspan = "3"></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>UNTUK MENGERJAKAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td>'+
+												'<div>'+
+													'<b>'+U_mengerjakan+'</b>'+
+												'</div>'+
+											'</td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td colspan="3">'+
+												'<div style = "margin-top : 8px;">'+
+													'<b>Deskripsi</b>'+
+													'<table class = "table table-bordered" id = "Tbl_Deskripsi">'+
+														'<thead>'+
+															'<tr>'+
+																'<th >'+
+																'</th>'+
+																'<th>Qty</th>'+
+																'<th>UnitCost</th>'+
+																'<th width>PPN(%)</th>'+
+																'<th>Total</th>'+
+															'</tr>'+
+														'</thead>'+
+														'<tbody>'+
+															Deskripsi+
+														'</tbody>'+
+													'</table>'+				
+												'</div>'+
+											'</td>'+
+										'</tr>'+		
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>HARGA TOTAL</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td class="TotalSPK"><b>'+formatRupiah(Total)+'</b></td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'">'+po_create[0]['Notes']+'</td>'+
+										'</tr>'+
+										'<tr>'+
+											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
+											'<td style = "width : 10px;"><b>:</b></td>'+
+											'<td class="tdNotes2" notes2 = "'+po_create[0]['Notes2']+'">'+po_create[0]['Notes2']+'</td>'+
+										'</tr>'+
+									'</tbody>'+
+								'</table>'+
+							'</div>'+
+						'</div>'+
+						'<div id = "r_footer"></div>'+
+						'<div id = "r_signatures"></div>'+
+						'<div id = "r_action" style = "margin-left : -15px;margin-right:-15px;"></div>';
+
+			$('#PageContain').html(html);
+
+			if (ClassDt.PRCode_arr.length == 0) {
+				ClassDt.PRCode_arr.push(po_detail[0]['PRCode']);
+			}
+			else
+			{
+				var bool = true;
+				for (var j = 0; j < ClassDt.PRCode_arr.length; j++) {
+					var arr = ClassDt.PRCode_arr;
+					if (arr[j] == po_detail[0]['PRCode']) {
+						bool = false;
+						break;
+					}
+				}
+
+				if (bool) {
+					ClassDt.PRCode_arr.push(po_detail[0]['PRCode']);
+				}
+			}
+
+
+			makeFooter();
+			makeDocPenawaran();
+			makeSignatures();
+			makeAction();
+			loadingEnd(1000);									
+
+		})
 	}
 
 	function makeDocPenawaran()
@@ -201,7 +416,7 @@
 				    break;    
 		}
 
-		$('#DocPenawaran').html('<div class="col-xs-12"><div style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
 
 	}
 
@@ -375,6 +590,7 @@
 		  		$('#r_action').html(html);
 		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
 		  	}
+		    
 		    break;
 		  case 1:
 		  case '1':
@@ -392,7 +608,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');;
 		    	}
 		    }
 
@@ -444,12 +660,12 @@
 		    break;
 		  case 2:
 		  case '2':
-		  	var JsonStatus = po_create[0]['JsonStatus'];
-		  	JsonStatus = jQuery.parseJSON(JsonStatus);
-		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
-		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'</div>');
-		  	}
+		    var JsonStatus = po_create[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		    	$('#r_action').html(html);
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'</div>');
+		    }
 		    break;
 		  case 4:
 		  case '4':
@@ -468,13 +684,16 @@
 
 	function makeFooter()
 	{
-		//r_footer
-		// Perbandingan Vendor
 		var dt = ClassDt.po_data;
+		var po_create = dt.po_create;
+		var po_detail = dt.po_detail;
+		//r_footer
+
+		// Perbandingan Vendor
 		var pre_po_supplier = dt.pre_po_supplier;
 		var html_vendor = '';
 			html_vendor =  '<div class = "row noPrint">'+
-						'<div class = "col-xs-4">'+
+						'<div class = "col-xs-5">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
@@ -486,7 +705,7 @@
 			var t = '';									
 			for (var i = 0; i < pre_po_supplier.length; i++) {
 				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-				t += '<li><a href="http://localhost/puis/fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
 			}
 			
 			html_vendor += t;
@@ -498,7 +717,7 @@
 		*/
 		var html = '';
 		html += html_vendor;
-		html += '<div class = "row" style = "margin-top : 10px;">'+
+		html += '<div class = "row">'+
 						'<div class = "col-xs-4">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
@@ -517,18 +736,33 @@
 
 		html += t;
 		html += '</td></tr>';
-		html += '<tr style = "height : 80px">'+
-					'<td colspan = "2">'+
-						'<b>Diterima oleh Vendor,'+
-					'</td>'+
-				'</tr>'+
-				'<tr>'+
-					'<td colspan = "2">'+
-						'<i>(Tandatangan,Nama,Stampel),</br>Note : Copi PO mohon dapat dilampirkan pada kami bersama invoice</i>'+
-					'</td>'+
-				'</tr>';
+		html += '</tbody></table></div></div>';
 
-		html += '</tbody></table></div></div>';		
+		html += '<div class = "row">'+
+					'<div class = "col-xs-12">'+
+						'<table class = "table borderless">'+
+							'<thead></thead>'+
+							'<tbody>'+
+								'<tr>'+
+									'<td><div align = "left"><b>PIHAK I</b></div></td>'+
+									'<td style="text-align :right"><div><b>PIHAK II</b></div></td>'+
+								'<tr>'+
+									'<td><div align = "left"><b>YAY PENDIDIKAN AGUNG PODOMORO</b></div></td>'+
+									'<td style="text-align :right"><div><b>'+po_create[0]['NamaSupplier'].toUpperCase()+'</b></div></td>'+	
+								'<tr>'+
+								'<tr style = "height : 60px;">'+
+									'<td></td>'+
+									'<td></td>'+
+								'</tr>'+
+								'<tr>'+
+									'<td><div align = "left"><b><u>SERIAN WIJATNO & WIBOWO NGASERIN</u></b></br>SEKRETARIS & KETUA YAYASAN</div></td>'+
+									'<td style="text-align :right"><div><b><u>'+po_create[0]['PICName'].toUpperCase()+'</u></b></br>'+po_create[0]['JabatanPIC'].toUpperCase()+'</div></td>'+	
+								'<tr>'+		
+							'</tbody>'+
+						'</table>'+
+					'</div>'+
+				'</div>';		
+
 		$('#r_footer').html(html);
 
 
@@ -538,9 +772,9 @@
 		// r_signatures
 		var dt = ClassDt.po_data;
 		var po_create = dt['po_create'];
-		var html = '<div class= "row" style = "margin-top : 20px;">'+
-						'<div class = "col-xs-12">'+
-							'<table class = "table borderless">'+
+		var html = '<div class= "row noPrint" style = "margin-top : 100px;">'+
+						'<div class = "col-xs-6 col-md-offset-6">'+
+							'<table class = "table">'+
 								'<thead>'+
 									'<tr>'
 				;
@@ -566,7 +800,7 @@
 
 		html += '</thead>'+
 					'<tbody>'+
-						'<tr style = "height : 20px">';
+						'<tr style = "height : 51px">';
 		for (var i = 0; i < JsonStatus.length; i++) {
 			var v = '-';
 			if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
@@ -621,66 +855,6 @@
 
 	}
 
-	function makeTblDetail()
-	{
-		// r_tblDetail
-		var dt = ClassDt.po_data;
-		var po_create = dt['po_create'];
-		htmlBtnAdd =    '';
-		var IsiInputPO = MakeIsiPO();
-		var Subtotal = 	parseInt(ClassDt.total_po_detail)+parseInt(po_create[0]['AnotherCost'])	// 0 adalah persentase		
-		var htmlInputPO = '<div class = "row" style = "margin-top : 5px;">'+
-							'<div class = "col-md-12">'+
-								//'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_po">'+
-									'<thead>'+
-									'<tr>'+
-										'<th width = "3%" style = "text-align: center;background: #67a9a2;color: #FFFFFF;">No</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 350px;">Nama Barang</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 350px;">Spesification</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 200px;">Date Needed</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 100px;">Qty</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Harga</th>'+
-    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">PPN(%)</th>'+
-    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Discount(%)</th>'+
-			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Sub Total</th>'+
-									'</tr></thead>'+
-									'<tbody>'+IsiInputPO+'</tbody>'+
-									'<tfoot>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Total</td>'+
-											'<td colspan = "3" class = "tdTotal" value = "'+ClassDt.total_po_detail+'">'+formatRupiah(ClassDt.total_po_detail)+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Biaya Lain-Lain</td>'+
-											'<td colspan = "3" class = "tdAnotherCost" value = "'+po_create[0]['AnotherCost']+'">'+formatRupiah(po_create[0]['AnotherCost'])+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Sub Total</td>'+
-											'<td colspan = "3" class = "tdSubtotal_All" value = "'+Subtotal+'">'+formatRupiah(Subtotal)+'</td>'+
-										'</tr>'+
-										'<tr>'+
-											'<td colspan = "9" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+po_create[0]['Notes']+'</b></td>'+
-										'</tr>'+		
-									'</table>'+
-								//'</div>'+
-						   '</div></div>';
-
-		_ajax_terbilang(Subtotal).then(function(data){
-			var html = htmlBtnAdd + htmlInputPO;			   
-			$('#r_tblDetail').html(html);
-			$('#r_terbilang').html('<div class = "row" style = "margin-top : 10px;">'+
-										'<div class="col-xs-12">'+
-											'<b>Terbilang (Rupiah) : '+data+' Rupiah</b>'+
-										'</div>'+
-									'</div>'		
-			);
-
-	    	loadingEnd(1000);
-		})		   
-
-	}
-
 	function _ajax_terbilang(bilangan)
 	{
 		var def = jQuery.Deferred();
@@ -700,77 +874,6 @@
 		return def.promise();
 	}
 
-	function MakeIsiPO()
-	{
-		var dt = ClassDt.po_data;
-		var po_detail = dt['po_detail'];
-		var html = '';
-		var total = 0;
-		for (var i = 0; i < po_detail.length; i++) {
-			var Spesification = '';
-			DetailCatalog = jQuery.parseJSON(po_detail[i]['DetailCatalog']);
-			// console.log(Object.entries(DetailCatalog).length);
-			if (typeof(DetailCatalog) == 'object' && Object.entries(DetailCatalog).length > 0) {
-				Spesification = '<div>Detail Catalog</div>';
-				Spesification += '<div>';
-				for (var prop in DetailCatalog) {
-					Spesification += prop + ' :  '+DetailCatalog[prop]+'<br>';
-				}
-
-				Spesification +='</div>';
-			}
-
-			// if (po_detail[i]['Desc'] != '' && po_detail[i]['Desc'] != null && po_detail[i]['Desc'] != undefined) {
-			// 	var st = (Spesification != '') ? 'style = "margin-top : 5px;"' : '';
-			// 	Spesification += '<div '+st+'>Desc</div>';
-			// 	Spesification += '<div>'+po_detail[i]['Desc']+'</div>';
-
-			// }
-
-			if (po_detail[i]['Spec_add'] != '' && po_detail[i]['Spec_add'] != null && po_detail[i]['Spec_add'] != undefined) {
-				Spesification += '<div style = "margin-top : 5px;">Additional</div>';
-				Spesification += '<div>'+po_detail[i]['Spec_add']+'</div>';
-			}
-			
-			html +='<tr ID_po_detail = "'+po_detail[i]['ID_po_detail']+'">'+
-						'<td>'+(i+1)+'</td>'+
-						'<td>'+po_detail[i]['Item']+'<br>'+po_detail[i]['Desc']+'</td>'+
-						'<td>'+Spesification+'</td>'+
-						'<td>'+'<div align="center">'+po_detail[i]['DateNeeded']+'</div></td>'+
-						'<td class = "tdqty" value = "'+po_detail[i]['QtyPR']+'">'+'<div align="center">'+po_detail[i]['QtyPR']+'</div></td>'+
-						'<td class = "tdUnitCost" value = "'+po_detail[i]['UnitCost_PO']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</div></td>'+
-						'<td class = "tdPPN" value = "'+po_detail[i]['PPN_PO']+'">'+'<div align="center">'+po_detail[i]['PPN_PO']+'</div></td>'+
-						'<td class = "tdDiscount" value = "'+po_detail[i]['Discount_PO']+'">'+'<div align="center">'+po_detail[i]['Discount_PO']+'</div></td>'+
-						'<td class = "tdSubtotal" value = "'+po_detail[i]['Subtotal']+'" max = "'+po_detail[i]['Subtotal_PR']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['Subtotal'])+'</div></td>'+
-					'</tr>';
-
-			total = parseInt(total) + parseInt(po_detail[i]['Subtotal']);
-
-			// add PRCode
-			if (ClassDt.PRCode_arr.length == 0) {
-				ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
-			}
-			else
-			{
-				var bool = true;
-				for (var j = 0; j < ClassDt.PRCode_arr.length; j++) {
-					var arr = ClassDt.PRCode_arr;
-					if (arr[j] == po_detail[i]['PRCode']) {
-						bool = false;
-						break;
-					}
-				}
-
-				if (bool) {
-					ClassDt.PRCode_arr.push(po_detail[i]['PRCode']);
-				}
-			}			
-		}
-
-		ClassDt.total_po_detail = total;
-		return html;
-	}
-
 	$(document).off('click', '#BtnEdit').on('click', '#BtnEdit',function(e) {
 		$(this).attr('class','btn btn-danger');
 		$(this).find('i').remove();
@@ -783,35 +886,27 @@
 
 	function __input_reload()
 	{
-		$('#table_input_po tbody').find('tr').each(function(){
-			var value = $(this).find('.tdUnitCost').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdUnitCost').html('<input type="text" class="form-control UnitCost" value="'+value+'">');
+		$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+			var unitcost_po = $(this).find('td:eq(2)').attr('unitcost_po');
+			var n = unitcost_po.indexOf(".");
+			value = unitcost_po.substring(0, n);
+			// write html input
+			$(this).find('td:eq(2)').html('<input type="text" class="form-control UnitCost" value="'+value+'">')
 			$(this).find('.UnitCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 			$(this).find('.UnitCost').maskMoney('mask', '9894');
 
-			var value = $(this).find('.tdPPN').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdPPN').html('<input type="number" class="form-control PPN" value="'+value+'">');
-			
-			var value = $(this).find('.tdDiscount').attr('value');
-			var n = value.indexOf(".");
-			value = value.substring(0, n);
-			$(this).find('.tdDiscount').html('<input type="number" class="form-control Discount" value="'+value+'">');
-
+			var ppn_po = $(this).find('td:eq(3)').attr('ppn_po');
+			var n = ppn_po.indexOf(".");
+			value = ppn_po.substring(0, n);
+			$(this).find('td:eq(3)').html('<input type="number" class="form-control PPN" value="'+value+'">');
 		})
 
-		var value  = $('#table_input_po tfoot').find('.tdAnotherCost').attr('value');
-		var n = value.indexOf(".");
-		value = value.substring(0, n);
-		$('#table_input_po tfoot').find('.tdAnotherCost').html('<input type="text" class="form-control AnotherCost" value="'+value+'">');
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney('mask', '9894');
+		var value  = $('#table_input_spk').find('.tdNotes').attr('notes');
+		$('#table_input_spk').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
 
-		var value  = $('#table_input_po tfoot').find('.tdNotes').attr('value');
-		$('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+		var value  = $('#table_input_spk').find('.tdNotes2').attr('notes2');
+		$('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
+		
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {
@@ -825,15 +920,25 @@
 	})
 
 	$(document).off('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost').on('keyup', '.UnitCost,.Discount,.PPN,.AnotherCost',function(e) {
-		var tr = $(this).closest('tr');
-		var ChangeBool = CountSubTotal_table(tr);
+		var td = $(this).closest('td');
+		var ChangeBool = CountSubTotal_table(td);
 		if (!ChangeBool) {
 			__input_reload();
-			var bool = CountSubTotal_table(tr);
+			var bool = CountSubTotal_table(td);
 			if (bool) {
 				$('#BtnSubmit').prop('disabled',false);
 			}
 			
+		}
+		else
+		{
+			// cari all total 
+				var Total = 0;
+				$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+					Total += parseInt($(this).find('td:eq(4)').attr('subtotal'))
+				})
+
+				$('.TotalSPK').html(formatRupiah(Total));
 		}
 	})
 
@@ -847,56 +952,32 @@
 
 	function CountSubTotal_table(ev)
 	{
-		var SubTotal_All = 0;
 		var bool = true;
-		$('#table_input_po tbody').find('tr').each(function(){
-			if (bool) {
-				var ev = $(this);
-				var qty = ev.find('.tdqty').attr('value');
-				var UnitCost = ev.find('.UnitCost').val();
-				UnitCost = findAndReplace(UnitCost, ".","");
-				var PPN = ev.find('.PPN').val();
-				var Discount = ev.find('.Discount').val();
-				var total_raw = (parseInt(UnitCost) * parseInt(qty));
-				var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
-				var Discount_ = (parseInt(Discount) * parseInt(total_raw)) / 100;
-				var Subtotal = parseInt(total_raw) + parseInt(PPN_) - parseInt(Discount_);
-				var Subtotal_limit = ev.find('.tdSubtotal').attr('max');
-				var n = Subtotal_limit.indexOf(".");
-				Subtotal_limit = Subtotal_limit.substring(0, n);
-				Subtotal_limit = parseInt(Subtotal_limit);
-				if (Subtotal > Subtotal_limit) {
-					var NmBrg = ev.find('td:eq(1)').html();
-					toastr.info('Subtotal '+NmBrg + ' melebihi dari Anggaran PR yaitu '+formatRupiah(Subtotal_limit));
-					bool = false;
-					return;
-				}
-				else
-				{
-					ev.find('.tdSubtotal').attr('value',Subtotal);
-					ev.find('.tdSubtotal').html('<div align="center">'+formatRupiah(Subtotal)+'</div>');
-					SubTotal_All = parseInt(SubTotal_All) + parseInt(Subtotal);
-				}
-			}
 
-		})
+		// process
+		var tr = ev.closest('tr');
+		var Subtotal_limit = tr.find('td:eq(4)').attr('max');
+		var n = Subtotal_limit.indexOf(".");
+		Subtotal_limit = Subtotal_limit.substring(0, n);
+		var PPN = tr.find('.PPN').val();
+		var UnitCost = tr.find('.UnitCost').val();
+		UnitCost = findAndReplace(UnitCost, ".","");
+		var qty = tr.find('td:eq(1)').html();
 
-		if (bool) {
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
-			$('#table_input_po tfoot').find('.tdTotal').html(formatRupiah(SubTotal_All));
-			SubTotal_All = parseInt(SubTotal_All) + parseInt(AnotherCost);
-			$('#table_input_po tfoot').find('.tdSubtotal_All').html(formatRupiah(SubTotal_All));
-			// loading page r_terbilang for ajax later && show total
-				loading_page('#r_terbilang');
-				_ajax_terbilang(SubTotal_All).then(function(data){
-					$('#r_terbilang').html('<div class = "row" style = "margin-top : 20px;">'+
-												'<div class="col-xs-12">'+
-													'<b>Terbilang (Rupiah) : '+data+'</b>'+
-												'</div>'+
-											'</div>'		
-					);
-				})
+		var total_raw = (parseInt(UnitCost) * parseInt(qty));
+		var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
+		var Discount_ = 0;
+		var Subtotal = parseInt(total_raw) + parseInt(PPN_) - parseInt(Discount_);
+
+		if (Subtotal > Subtotal_limit) {
+			toastr.info('Subtotal melebihi dari Anggaran PR yaitu '+formatRupiah(Subtotal_limit));
+			bool = false;
+			return;
+		}
+		else
+		{
+			tr.find('td:eq(4)').attr('subtotal',Subtotal);
+			tr.find('td:eq(4)').html(formatRupiah(Subtotal));
 		}
 
 		return bool;		
@@ -911,38 +992,35 @@
 			loadingStart();
 			var po_data = ClassDt.po_data;
 			var arr_post_data_detail = [];
-			$('#table_input_po tbody').find('tr').each(function(){
+			$('#Tbl_Deskripsi tbody').find('tr').each(function(){
 				var ID_po_detail = $(this).attr('id_po_detail');
 				var UnitCost = $(this).find('.UnitCost').val();
 				UnitCost = findAndReplace(UnitCost, ".","");
-				var Discount = $(this).find('.Discount').val();
 				var PPN = $(this).find('.PPN').val();
-				var Subtotal = $(this).find('.tdSubtotal').attr('value');
+				var Subtotal = $(this).find('td:eq(4)').attr('subtotal');
 				var temp = {
 					ID_po_detail :ID_po_detail,
 					UnitCost : UnitCost,
-					Discount : Discount,
 					PPN : PPN,
 					Subtotal : Subtotal,
 				};
-
 				arr_post_data_detail.push(temp);
 			})
 
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
-			var Notes =  $('#table_input_po tfoot').find('.Notes').val();
+			var Notes =  $('#table_input_spk').find('.Notes').val();
+			var Notes2 =  $('#table_input_spk').find('.Notes2').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
 			    arr_post_data_detail : arr_post_data_detail,
-			    AnotherCost : AnotherCost,
 			    Notes : Notes,
+			    Notes2 : Notes2,
 			};
+			
 			var token = jwt_encode(data,"UAP)(*");
 			var action_mode = 'modifycreated';
 				action_mode = jwt_encode(action_mode,"UAP)(*");
-			var action_submit = 'PO';
+			var action_submit = 'SPK';
 				action_submit = jwt_encode(action_submit,"UAP)(*");	
 			$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
 				var rs = jQuery.parseJSON(resultJson);
@@ -1123,7 +1201,7 @@
 			}
 			else
 			{
-				if (confirm('Konfirmasi!!! PO '+POCode+ ' akan di cancel dan ITEM PR tidak dicancel?')) {
+				if (confirm('Konfirmasi!!! SPK '+POCode+ ' akan di cancel dan ITEM PR tidak dicancel?')) {
 					PRRejectItem = false;
 				}else
 				{
@@ -1135,7 +1213,7 @@
 			var url = base_url_js+"po_spk/submit_create";
 			var po_data = ClassDt.po_data;
 			var arr_post_data_ID_po_detail = [];
-			$('#table_input_po tbody').find('tr').each(function(){
+			$('#Tbl_Deskripsi tbody').find('tr').each(function(){
 				var ID_po_detail = $(this).attr('id_po_detail');
 				arr_post_data_ID_po_detail.push(ID_po_detail);
 			})
@@ -1167,11 +1245,11 @@
 				    NoteDel : NoteDel,
 				    PRCode : PRCode,
 				};
-
+			
 				var token = jwt_encode(data,"UAP)(*");
 				var action_mode = 'cancel';
 					action_mode = jwt_encode(action_mode,"UAP)(*");
-				var action_submit = 'PO';
+				var action_submit = 'SPK';
 					action_submit = jwt_encode(action_submit,"UAP)(*");	
 				$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
 					var rs = jQuery.parseJSON(resultJson);
@@ -1203,7 +1281,6 @@
 			})	
 
 		}
-	})
-	
+	})	
 </script>
 <?php endif ?>	

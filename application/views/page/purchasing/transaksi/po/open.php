@@ -53,6 +53,7 @@
 		Dt_ChooseSelectPR : [],
 		action_mode : '<?php echo $action_mode ?>',
 		POCode : '<?php echo $POCode ?>',
+		POData : [],
 		htmlPage_pr_list : function(){
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
@@ -80,22 +81,120 @@
 	};
 
 	$(document).ready(function() {
+		// Show number PO if edit
+		if (ClassDt.POCode != '') {
+			var r = $('#page_pr_list').closest('.row');
+			var html = '<div class = "row">'+
+							'<div class = "col-xs-12" align="center">'+
+								'<h3><b>Code : '+ClassDt.POCode+'</b></h3>'+
+							'</div>'+
+						'</div>';
+
+			r.before(html);					
+
+		}
 	    $('#page_pr_list').html(ClassDt.htmlPage_pr_list);
 	    skip_error_dt_table();
 		    Get_data_pr().then(function(data){
-		        loadingEnd(500);
-		        $('.C_radio_pr:first').prop('checked',true);
-		        $('.C_radio_pr:first').trigger('change');
+		    	// cek data apakah edit atau new
+		    	if (ClassDt.POCode == '') {
+		    		loadingEnd(500);
+		    		$('.C_radio_pr:first').prop('checked',true);
+		    		$('.C_radio_pr:first').trigger('change');
+		    	}
+		    	else
+		    	{
+		    		Get_data_open_po_created_detail().then(function(data){
+		    			// console.log(data);
+		    			ClassDt.POData = data;
+		    			var resultJson = data['po_detail'];
+		    			var temp = ClassDt.Dt_selection;
+		    			for (var i = 0; i < resultJson.length; i++) {
+		    				temp.push(resultJson[i].ID_pr_detail);
+		    			}
+		    			ClassDt.Dt_selection = temp;
+		    			var waitForEl = function(selector, callback) {
+		    			  if (jQuery(selector).length) {
+		    			    callback();
+		    			  } else {
+		    			    setTimeout(function() {
+		    			      waitForEl(selector, callback);
+		    			    }, 100);
+		    			  }
+		    			};
+
+		    			// get ALL PR
+    						LoadPRSelected(data).then(function(data){
+    							SelectedPR_selection(data);
+    							waitForEl(".id_pr_detail", function() {
+    							  $('.id_pr_detail:first').trigger('change');
+    							});
+
+    							$('.C_radio_pr:first').prop('checked',true);
+    							$('.C_radio_pr:first').trigger('change');
+    							loadingEnd(1000);
+    						})
+		    		})
+		    	}
+		        
 		        
 		    })
 	}); // exit document Function
 
+	function LoadPRSelected(dt)
+	{
+	   var po_detail = dt['po_detail'];
+	   var arr = [];
+	   for (var i = 0; i < po_detail.length; i++) {
+	   	arr.push(po_detail[i].PRCode);
+	   }
+       var def = jQuery.Deferred();
+       var url = base_url_js + 'rest/__show_pr_detail_multiple_pr_code';
+       var data = {
+           PRCode : arr,
+           auth : 's3Cr3T-G4N',
+           POCode : ClassDt.POCode,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       $.post(url,{ token:token },function (resultJson) {
+       		def.resolve(resultJson);
+       }).fail(function() {
+       	  def.reject();
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
+       return def.promise();
+	}
+
+	function Get_data_open_po_created_detail(){
+       var def = jQuery.Deferred();
+       var url = base_url_js + 'rest2/__Get_data_po_by_Code';
+       var data = {
+           auth : 's3Cr3T-G4N',
+           Code : ClassDt.POCode,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       $.post(url,{ token:token },function (resultJson) {
+       		def.resolve(resultJson);
+       }).fail(function() {
+       	  def.reject();
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
+       return def.promise();
+	}
+
 	function Get_data_pr(){
+	   var action_edit = (ClassDt.POCode == '') ? '': 'edit';
        var def = jQuery.Deferred();
        var data = {
            PurchasingStatus : '!=2',
            auth : 's3Cr3T-G4N',
            Item_pending : '>0',
+           action_edit : action_edit,
+           POCode : ClassDt.POCode,
        };
        var token = jwt_encode(data,"UAP)(*");
        	var table = $('#tableData_pr').DataTable({
@@ -158,6 +257,7 @@
    		var data = {
    		    PRCode : PRCode,
    		    auth : 's3Cr3T-G4N',
+   		    POCode : ClassDt.POCode,
    		};
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function () {
@@ -318,6 +418,7 @@
 		var IsiInputPR = '';
 		var Dt_ChooseSelectPR = ClassDt.Dt_ChooseSelectPR;
 		var Dt_selection = ClassDt.Dt_selection;
+
 		for (var i = 0; i < Dt_selection.length; i++) {
 			var ID_pr_detail = Dt_selection[i];
 			for (var j = 0; j < Dt_ChooseSelectPR.length; j++) {
@@ -437,7 +538,82 @@
 				    '</div>'		
 		        	;
 		$('#page_pr_selected_list').html(html);
-		$('#ChooseTotVendor').trigger('change');        	
+		// for edit
+			if (ClassDt.POCode != '') {
+				$('#Clear').remove();
+				var POData = ClassDt.POData;
+				var po_create = POData['po_create'];
+				if (po_create[0]['TypeCode'] == 'PO') {
+					$('#OpenSPK').remove();
+				}
+				else
+				{
+					$('#OpenPO').remove();
+				}
+			
+				Get_data_open_po_created_supplier().then(function(data){
+					var Tot = data.length;
+					
+					$("#ChooseTotVendor option").filter(function() {
+					   //may want to use $.trim in here
+					   return $(this).val() == Tot; 
+					 }).prop("selected", true);
+					$('#ChooseTotVendor').trigger('change'); 
+					// fill isi table supplier
+					var TblTbody = $('#Tbl_selectVendor tbody');
+					for (var i = 0; i < Tot; i++) {
+						var html = '<b>'+data[i].NamaSupplier+'</b>'+'</br>'+data[i].Website+'</br>'+data[i].PICName+'</br>'+data[i].Alamat;
+						TblTbody.find('tr:eq('+i+')').find('td:eq(1)').find('.LblNmVendor').html(html);
+						TblTbody.find('tr:eq('+i+')').find('td:eq(1)').find('.LblNmVendor').attr('idtable',data[i].CodeSupplier);
+						var aa = html;	
+						var arr = '1'+'@@'+'<div align="center"><b>'+data[i].CategoryName+'</b></div>'+'@@'+aa+'@@'+'';
+						TblTbody.find('tr:eq('+i+')').find('.Detail_Vendor').attr('data',arr);
+						var LinkFileOffer = jQuery.parseJSON(data[i].FileOffer);
+						var S_link = TblTbody.find('tr:eq('+i+')').find('td:eq(3)').find('div');
+						html = '';
+						for (var j = 0; j < LinkFileOffer.length; j++) {
+							html += '<li><a href= "'+base_url_js+'fileGetAny/budgeting-po-'+LinkFileOffer[j]+'" target = "_blank">File Offer</a></li>';
+						}
+
+						S_link.after(html);
+
+						if (data[i].ApproveSupplier == 1) {
+							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="1"]').prop('checked',true);
+							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="0"]').prop('checked',false);
+						}
+						else
+						{
+							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="1"]').prop('checked',false);
+							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="0"]').prop('checked',true);
+						}
+					}
+
+				})
+			}
+			else{
+				$('#ChooseTotVendor').trigger('change'); 
+			}	
+		       	
+	}
+
+	function Get_data_open_po_created_supplier()
+	{
+       var def = jQuery.Deferred();
+       var url = base_url_js + 'rest2/__Get_supplier_po_by_Code';
+       var data = {
+           auth : 's3Cr3T-G4N',
+           Code : ClassDt.POCode,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       $.post(url,{ token:token },function (resultJson) {
+       		def.resolve(resultJson);
+       }).fail(function() {
+       	  def.reject();
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
+       return def.promise();
 	}
 
 	$(document).off('click', '#Clear').on('click', '#Clear',function(e) {
@@ -723,129 +899,169 @@
 	})
 
 	$(document).off('click', '#OpenPO').on('click', '#OpenPO',function(e) {
-		// check pr selected harus lebih dari 0
-			var arr_pr_detail_selected = [];
-			$('.id_pr_detail_selected:checked').each(function(){
-				var id_pr_detail = $(this).attr('id_pr_detail');
-				arr_pr_detail_selected.push(id_pr_detail);
-			})
-		// Select vendor harus ada yang approve = 1
-			var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+		if (confirm('Are you sure ?')) {
+			// check pr selected harus lebih dari 0
+				var arr_pr_detail_selected = [];
+				$('.id_pr_detail_selected:checked').each(function(){
+					var id_pr_detail = $(this).attr('id_pr_detail');
+					arr_pr_detail_selected.push(id_pr_detail);
+				})
 
-		// check Choose vendor dengan select vendor
-			var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
-			var c = 0;
-			$('.LblNmVendor').each(function(){
-				var idtable = $(this).attr('idtable');
-				if (idtable != '' && idtable != null && idtable != undefined) {
-					c++;
-				}
-			})
+			// lock open po process hanya satu PR
+			var LockOnePR = __LockOnePR(arr_pr_detail_selected);	
+			
 
-			// validation file
-				var BoolFile = true;
-			$(".BrowseFile").each(function(){
-				var ev = $(this);
-				var tr = ev.closest('tr');
-				if (BoolFile) {
-					BoolFile = file_validation(ev);
-				}
-				
-			})
+			// Select vendor harus ada yang approve = 1
+				var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+
+			// check Choose vendor dengan select vendor
+				var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
+				var c = 0;
+				$('.LblNmVendor').each(function(){
+					var idtable = $(this).attr('idtable');
+					if (idtable != '' && idtable != null && idtable != undefined) {
+						c++;
+					}
+				})
+
+				// validation file
+					var BoolFile = true;
+				$(".BrowseFile").each(function(){
+					var ev = $(this);
+					var tr = ev.closest('tr');
+					var td = ev.closest('td');
+					// cek apakah ada file exist
+					var bool22 = true;
+					if (td.find('li').length) {
+						bool22 = false;
+					}
+
+					if (BoolFile && bool22) {
+						BoolFile = file_validation(ev);
+					}
+					
+				})
 
 
-			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
-				loading_button('#OpenPO');
-				// create po
-				if (ClassDt.action_mode == 'add') {
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
+					loading_button('#OpenPO');
 					var action_submit = 'PO';
 					var id_selector = '#OpenPO';
 					_Create_PO_SPK(action_submit,id_selector).then(function(data){
-					    window.location.href = base_url_js+data['url'];
+						if (data.status == 1) {
+							window.location.href = base_url_js+data['url'];
+						}
+						else
+						{
+							toastr.info(data.message);
+						}
+					    
 					})
 				}
 				else
 				{
-
+					toastr.info('<li>PR Selected must be having less one checked & 1 PR in 1 PO</li>'+
+								'<li>Select Vendor must be having less one approve</li>'+
+								'<li>Total Vendor must be same with total selected vendor</li>'
+								);
 				}
-			}
-			else
-			{
-				toastr.info('<li>PR Selected must be having less one checked</li>'+
-							'<li>Select Vendor must be having less one approve</li>'+
-							'<li>Total Vendor must be same with total selected vendor</li>'
-							);
-			}
+		}
+		else
+		{
+
+		}
 
 		// dapatkan no po dan show page PO created
 	})
 
 	$(document).off('click', '#OpenSPK').on('click', '#OpenSPK',function(e) {
-		// check pr selected harus lebih dari 0
-			var arr_pr_detail_selected = [];
-			$('.id_pr_detail_selected:checked').each(function(){
-				var id_pr_detail = $(this).attr('id_pr_detail');
-				arr_pr_detail_selected.push(id_pr_detail);
-			})
-		// Select vendor harus ada yang approve = 1
-			var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+		if (confirm('Are you sure ?')) {
+			// check pr selected harus lebih dari 0
+				var arr_pr_detail_selected = [];
+				$('.id_pr_detail_selected:checked').each(function(){
+					var id_pr_detail = $(this).attr('id_pr_detail');
+					arr_pr_detail_selected.push(id_pr_detail);
+				})
 
-		// check Choose vendor dengan select vendor
-			var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
-			var c = 0;
-			$('.LblNmVendor').each(function(){
-				var idtable = $(this).attr('idtable');
-				if (idtable != '' && idtable != null && idtable != undefined) {
-					c++;
-				}
-			})
+			// lock open po process hanya satu PR
+			var LockOnePR = __LockOnePR(arr_pr_detail_selected);	
 
-			// validation file
-				var BoolFile = true;
-			$(".BrowseFile").each(function(){
-				var ev = $(this);
-				var tr = ev.closest('tr');
-				if (BoolFile) {
-					if (tr.find('.BrowseFile').length) {
+			// Select vendor harus ada yang approve = 1
+				var count_vendor_ok = $('.C_radio_approve[value="1"]:checked').length;
+
+			// check Choose vendor dengan select vendor
+				var ChooseTotVendor = $('#ChooseTotVendor option:selected').val();
+				var c = 0;
+				$('.LblNmVendor').each(function(){
+					var idtable = $(this).attr('idtable');
+					if (idtable != '' && idtable != null && idtable != undefined) {
+						c++;
+					}
+				})
+
+				// validation file
+					var BoolFile = true;
+				$(".BrowseFile").each(function(){
+					var ev = $(this);
+					var tr = ev.closest('tr');
+					var td = ev.closest('td');
+					// cek apakah ada file exist
+					var bool22 = true;
+					if (td.find('li').length) {
+						bool22 = false;
+					}
+
+					if (BoolFile && bool22) {
 						BoolFile = file_validation(ev);
 					}
-					else
-					{
-						BoolFile = false;
-					}
-				}
-				
-			})
+					
+				})
 
-			if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile) {
-				loading_button('#OpenSPK');
-				if (ClassDt.action_mode == 'add') {
+
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
+					loading_button('#OpenSPK');
 					var action_submit = 'SPK';
 					var id_selector = '#OpenSPK';
 					_Create_PO_SPK(action_submit,id_selector).then(function(data){
-					    window.location.href = base_url_js+data['url'];
+						if (data.status == 1) {
+							window.location.href = base_url_js+data['url'];
+						}
+						else
+						{
+							toastr.info(data.message);
+						}
+					    
 					})
 				}
 				else
 				{
-
+					toastr.info('<li>PR Selected must be having less one checked</li>'+
+								'<li>Select Vendor must be having less one approve</li>'+
+								'<li>Total Vendor must be same with total selected vendor</li>'
+								);
 				}
-				
-			}
-			else
-			{
-				toastr.info('<li>PR Selected must be having less one checked</li>'+
-							'<li>Select Vendor must be having less one approve</li>'+
-							'<li>Total Vendor must be same with total selected vendor</li>'
-							);
-			}
+		}
+		else
+		{
 
-		// dapatkan no SPK dan show page SPK created
+		}
+
+		// dapatkan no po dan show page PO created
 	})
 
 	function _Create_PO_SPK(action_submit,id_selector)
 	{
 		var def = jQuery.Deferred();
+
+		var nmbtn = '';
+		if (id_selector == '#OpenPO') {
+			nmbtn = 'Open PO';
+		}
+		else if(id_selector == '#OpenSPK')
+		{
+			nmbtn = 'Open SPK';
+		}
+		
 		var arr_pr_detail_selected = [];
 			$('.id_pr_detail_selected:checked').each(function(){
 				var id_pr_detail = $(this).attr('id_pr_detail');
@@ -892,6 +1108,11 @@
 		var token = jwt_encode(action_submit,"UAP)(*");
 		form_data.append('action_submit',token);
 
+		var token = jwt_encode(ClassDt.POCode,"UAP)(*");
+		form_data.append('Code',token);
+
+		
+
 		var url = base_url_js + "po_spk/submit_create"
 		$.ajax({
 		  type:"POST",
@@ -904,16 +1125,9 @@
 		  success:function(data)
 		  {
 		    def.resolve(data)
+		    $(id_selector).prop('disabled',false).html(nmbtn);
 		  },
 		  error: function (data) {
-		  	var nmbtn = '';
-		  	if (id_selector == '#OpenPO') {
-		  		nmbtn = 'Open PO';
-		  	}
-		  	else if(id_selector == '#OpenSPK')
-		  	{
-		  		nmbtn = 'Open SPK';
-		  	}
 		  	$(id_selector).prop('disabled',false).html(nmbtn);
 		    def.reject();
 		  }
@@ -961,4 +1175,42 @@
 	   }
 	}	
 
+
+	function __LockOnePR(arr_pr_detail_selected)
+	{
+		var Dt_ChooseSelectPR = ClassDt.Dt_ChooseSelectPR;
+		var arr_pr = [];
+		var bool = false;
+		for (var z = 0; z < arr_pr_detail_selected.length; z++) {
+			var Item = arr_pr_detail_selected[z];
+			// search number PR in Dt_ChooseSelectPR
+			for (var i = 0; i < Dt_ChooseSelectPR.length; i++) {
+				var pr_detail = Dt_ChooseSelectPR[i].pr_detail;
+				for (var j = 0; j < pr_detail.length; j++) {
+					if (Item == pr_detail[j].ID) {
+						var PRCode =pr_detail[j].PRCode;
+						var bool2 = true;
+						for (var x = 0; x < arr_pr.length; x++) {
+							if (arr_pr[x]==PRCode) {
+								bool2 = false;
+								break;
+							}
+						}
+
+						if (bool2) {
+							arr_pr.push(PRCode);
+						}
+					}
+				}
+			}
+		}
+
+		// console.log(arr_pr)
+		if (arr_pr.length == 1) {
+			bool = true;
+			// console.log('__LockOnePR')
+		}
+
+		return bool
+	}
 </script>

@@ -289,7 +289,7 @@ class C_pr_po extends Budgeting_Controler {
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
             // circulation sheet
-            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'">Log</a>';
+            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'">Info</a>';
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
             $arr = array();
             if (count($JsonStatus) > 0) {
@@ -761,7 +761,7 @@ class C_pr_po extends Budgeting_Controler {
                         $StatusPR = 1;
                         // passing show name JsonStatus
                         for ($i=0; $i < count($JsonStatus); $i++) { 
-                            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                            $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
                             $Name = $Name[0]['Name'];
                             $JsonStatus[$i]['NameApprovedBy'] = $Name;
                         } 

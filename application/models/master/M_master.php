@@ -1050,7 +1050,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $this->db->insert('db_admission.register_verification', $dataSave);
     }
 
-    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode)
+    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode,$tgl = null,$PIC = null)
     {
         // $getFormulirCode = $this->getFormulirCode('online');
         $dataSave = array(
@@ -1059,6 +1059,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // 'VerificationBY' => $this->session->userdata('NIP'),
             'VerificationAT' => date('Y-m-d H:i:s'),
         );
+
+        if ($tgl != null) {
+            $dataSave['VerificationAT'] = $tgl.' 00:00:00';
+            $dataSave['VerificationBY'] = $PIC;
+        }
+
         $this->db->insert('db_admission.register_verified', $dataSave);
     }
 
@@ -2527,7 +2533,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         if ($x < 12)
             return " " . $abil[$x];
         elseif ($x < 20)
-            return $this->moneySay($x - 10) . "belas";
+            return $this->moneySay($x - 10) . " belas";
         elseif ($x < 100)
             return $this->moneySay($x / 10) . " puluh" . $this->moneySay($x % 10);
         elseif ($x < 200)
@@ -3040,5 +3046,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
         }
         return $output; // return array and encode to insert to db
+    }
+
+    public function genratePassword($Username,$Password){
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
     }
 }
