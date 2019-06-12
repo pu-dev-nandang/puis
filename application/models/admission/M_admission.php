@@ -533,7 +533,7 @@ class M_admission extends CI_Model {
         $status = ''; 
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed from (
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref from (
           select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
           from db_admission.register as a 
           join db_admission.register_verification as b
@@ -545,7 +545,8 @@ class M_admission extends CI_Model {
           where a.StatusReg = 0
           ) as a right JOIN db_admission.formulir_number_online_m as b
           on a.FormulirCode = b.FormulirCode
-          where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$status.' LIMIT '.$start. ', '.$limit;
+          left join db_admission.formulir_number_global as c on b.No_Ref = c.FormulirCodeGlobal
+          where b.Years = "'.$tahun.'" and (b.FormulirCode like '.$NomorFormulir.' or b.No_Ref like '.$NomorFormulir.')'.$status.' LIMIT '.$start. ', '.$limit;
            $query=$this->db->query($sql, array())->result_array();
            return $query;
     }
@@ -1000,8 +1001,15 @@ class M_admission extends CI_Model {
               where b.Years = ?
               order by a.NoKwitansi desc limit 1';
       $query=$this->db->query($sql, array($getDatax[0]['Ta']))->result_array();
-      $NoKwitansi = $query[0]['NoKwitansi'];
-      $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      if (count($query) > 0) {
+        $NoKwitansi = $query[0]['NoKwitansi'];
+        $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      }
+      else
+      {
+        $NoKwitansi = 1;
+      }
+      
       $FullName = strtolower($input_arr['Name']);
 
       $dataSave = array(

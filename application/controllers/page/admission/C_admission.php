@@ -13,6 +13,9 @@ class C_admission extends Admission_Controler {
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
+        // get academic year admission
+            $t = $this->m_master->showData_array('db_admission.set_ta');
+            $this->data['academic_year_admission'] = $t[0]['Ta'];
     }
 
     public function index()
