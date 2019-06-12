@@ -990,6 +990,21 @@ class M_admission extends CI_Model {
       return $query->result_array();
     }
 
+    public function alreadyExistingEmail($Email)
+    {
+      $tt = $this->m_master->showData_array('db_admission.set_ta');
+      $yy = $tt[0]['Ta'];
+      $sql = "select count(*) as total from db_admission.register as a where a.Email = ? and SetTa = ?";
+      $query=$this->db->query($sql, array($Email,$yy))->result_array();
+      if ($query[0]['total'] > 0) {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+
     public function inserData_formulir_offline_sale_save($input_arr)
     {
       // get no kwitansi terakhir

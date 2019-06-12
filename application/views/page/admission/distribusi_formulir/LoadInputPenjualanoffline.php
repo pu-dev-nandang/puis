@@ -689,13 +689,19 @@
 					     var token = jwt_encode(data,"UAP)(*");
 					     $.post(url,{token:token},function (data_json) {
 					         setTimeout(function () {
-					         	// clearData();
-					         	// LoadListPenjualan();
-					         	 $('.pageAnchor[page = "ListPenjualan"]').trigger('click');
-					            toastr.options.fadeOut = 10000;
-					            toastr.success('Data berhasil disimpan', 'Success!');
-					            $('#btn-proses').prop('disabled',false).html('Save');
-				              // $('a[href="#tab2primary"]').tab('show');
+					         	var obj = JSON.parse(data_json);
+					         	if (obj.Status == 0) {
+					         		toastr.error(obj.msg,'!Failed');
+					         		$('#btn-proses').prop('disabled',false).html('Save');
+					         	}
+					         	else
+					         	{
+					         		   $('.pageAnchor[page = "ListPenjualan"]').trigger('click');
+					         		   toastr.options.fadeOut = 10000;
+					         		   toastr.success('Data berhasil disimpan', 'Success!');
+					         		   $('#btn-proses').prop('disabled',false).html('Save');	
+					         	}
+					         	
 					         },2000);
 					     });
 					 }
