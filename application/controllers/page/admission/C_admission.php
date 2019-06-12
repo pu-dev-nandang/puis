@@ -1929,10 +1929,12 @@ class C_admission extends Admission_Controler {
         $queryDiv = "";
         switch ($division) {
           case 10:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           case 18:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           default:
             $queryDiv = "";
