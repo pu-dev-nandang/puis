@@ -312,6 +312,9 @@
 
 <!-- Socket js -->
 <script type="text/javascript" src="<?php echo base_url('node_modules/socket.io/node_modules/socket.io-client/socket.io.js');?>"></script>
+
+<script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
+
 <!-- Custom -->
 <script type="text/javascript">
     window.base_url_js = "<?php echo base_url(); ?>";
@@ -412,6 +415,18 @@
         "hideMethod": "fadeOut"
     };
 
+    function clearDotMaskMoney(dataPrice) {
+        var Price = '';
+        var arrP = dataPrice.split('.');
+        if(arrP.length>0){
+            for(var i=0;i<arrP.length;i++){
+                Price = Price+''+arrP[i];
+            }
+        }
+
+        return parseFloat(Price);
+    }
+
     function loading_page(element) {
         $(element).html('<div class="row">' +
             '<div class="col-md-12" style="text-align: center;">' +
@@ -441,6 +456,24 @@
     function loading_buttonSm(element) {
         $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
         $(''+element).prop('disabled',true);
+    }
+
+    function loading_modal_show() {
+        $('#NotificationModal .modal-header').addClass('hide');
+        $('#NotificationModal .modal-body').html('<center>' +
+            '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+            '                    <br/>' +
+            '                    Loading Data . . .' +
+            '                </center>');
+        $('#NotificationModal .modal-footer').addClass('hide');
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+    }
+
+    function loading_modal_hide() {
+        $('#NotificationModal').modal('hide');
     }
 
     function loading_data(element) {
@@ -1015,6 +1048,53 @@
                 }
             }
         })
+    }
+
+    function loadSelectOptionCRMPeriod(element,selected) {
+        var data = {
+            action : 'readCRMPeriode'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudCRMPeriode';
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+                var sc = (parseInt(selected)==parseInt(v.ID)) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>Year - '+v.Year+'</option>');
+            })
+
+        });
+    }
+
+    function loadSelectOptionMonthYear_MA(elementMonth,elementYear,selectedMonth,selectedYear) {
+
+        var data = {
+            action : 'readMonthYear_MA'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudMarketingActivity';
+
+        $.post(url,{token:token},function (jsonResult) {
+            console.log(jsonResult);
+            // Month
+            if(jsonResult.Month.length>0){
+                $.each(jsonResult.Month,function (i,v) {
+                    var mm = moment().months(v.Month).format('MMMM');
+                    $(elementMonth).append('<option value="'+v.Month+'">'+mm+'</option>');
+                });
+            }
+
+            // Year
+            if(jsonResult.Year.length>0){
+                $.each(jsonResult.Year,function (i,v) {
+                    // var yy = moment().months(v.Year).format('YYYY');
+                    $(elementYear).append('<option value="'+v.Year+'">Year '+v.Year+'</option>');
+                });
+            }
+
+        });
+
     }
 
     function getIDSemesterActive(element) {

@@ -40,12 +40,15 @@ class C_mobile extends CI_Controller {
         return $data_arr;
     }
 
-    private function getInputToken2($token)
+    private function getInputToken2()
     {
-        $key = "UAP)(*";
+        $token = $this->input->post('token');
+        $key = "s3Cr3T-G4N";
         $data_arr = (array) $this->jwt->decode($token,$key);
         return $data_arr;
     }
+
+
 
     public function login(){
 
@@ -53,7 +56,7 @@ class C_mobile extends CI_Controller {
 
         // Cek setting
         $itSetting = $this->db
-            ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password']))
+            ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password'], 'ID' => 1))
             ->result_array();
 
         if(count($itSetting)>0){
@@ -342,6 +345,46 @@ class C_mobile extends CI_Controller {
 
 
 
+
+    }
+
+    // CRM ====
+    public function loginCRM(){
+        $data_arr = $this->getInputToken2();
+
+        // Cek setting
+        $itSetting = $this->db
+            ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password'], 'ID' => 2))
+            ->result_array();
+
+        $result = array(
+            'Status' => 0
+        );
+
+        if(count($itSetting)>0){
+            $dIT = $itSetting[0];
+            if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
+
+                // Get data student
+                $dataEmp = $this->getEmployees($data_arr['NIP']);
+
+                if(count($dataEmp)>0){
+                    $result = array(
+                        'Status' => 1,
+                        'User' => $dataEmp[0]
+                    );
+                }
+            }
+        }
+
+        return print_r(json_encode($result));
+    }
+
+    private function getEmployees($NIP){
+
+        $data = $this->db->query('SELECT * FROM db_employees.employees em WHERE em.NIP = "'.$NIP.'" ')->result_array();
+
+        return $data;
 
     }
 

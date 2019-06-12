@@ -488,10 +488,19 @@ $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_Pe
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
+
+
 $route['admisssion/crm/(:any)'] = 'page/admission/marketing/c_crm/crmpage/$1';
 $route['admission/crm/import'] = 'page/admission/marketing/c_crm/import_data_crm';
 $route['admission/crm/showdata'] = 'page/admission/marketing/c_crm/showdata_crm';
 $route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_by_id';
+
+
+// New page
+$route['crm/crm-team'] = 'page/admission/marketing/c_crm/CRMTeam';
+$route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_activity';
+
+
 
 
 
@@ -926,10 +935,20 @@ $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
 $route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
 $route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
+
+
+$route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
+
+$route['rest2/__crudCRMPeriode'] = 'api/c_rest2/crudCRMPeriode';
+$route['rest2/__crudCRMTeam'] = 'api/c_rest2/crudCRMTeam';
+$route['rest2/__crudMarketingActivity'] = 'api/c_rest2/crudMarketingActivity';
+
+
 $route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
 $route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
 $route['rest2/__reject_pr_from_another'] = 'api/c_rest2/reject_pr_from_another';
 $route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from_another';
+
 
 
 
@@ -1025,6 +1044,8 @@ $route['api2/__checkConflict_Venue'] = 'api/c_api2/checkConflict_Venue';
 $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';
+
+$route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 
 
 // Penutup API 2 ===

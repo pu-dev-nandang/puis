@@ -16,12 +16,33 @@ class C_crm extends Admission_Controler {
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
     }
 
+    public function menu_crm($page){
+        $data['department'] = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$this->data['department'].'/crm/menu_crm',$data,true);
+        parent::temp($content);
+    }
+
     public function index()
     {
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$this->data['department'].'/crm/page',$this->data,true);
-        $this->temp($content);
-        
+        $page = $this->load->view('page/'.$this->data['department'].'/crm/prospective_students',$this->data,true);
+        $this->menu_crm($page);
+
+        //        $content = $this->load->view('page/'.$this->data['department'].'/crm/page',$this->data,true);
+
+    }
+
+    public function CRMTeam(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->data['department'].'/crm/crmteam',$this->data,true);
+        $this->menu_crm($page);
+    }
+
+    public function marketing_activity(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->data['department'].'/crm/marketing_activity',$this->data,true);
+        $this->menu_crm($page);
     }
 
     public function crmpage()
