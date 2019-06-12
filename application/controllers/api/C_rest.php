@@ -1453,9 +1453,11 @@ class C_rest extends CI_Controller {
                         join db_employees.employees as b on a.CreatedBy = b.NIP
                         join (
                         select * from (
-                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                        select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",NameEng) as NameDepartement from db_academic.program_study
                         UNION
                         select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                        UNION
+                        select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty
                         ) aa
                         ) as c on a.Departement = c.ID
                        ';

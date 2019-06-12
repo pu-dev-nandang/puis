@@ -52,7 +52,7 @@
 											'<thead>'+
 											'<tr>'+
 												'<th width = "10%">Post</th>'+
-					                            '<th>Amount Limit</th>';
+					                            '<th>Limit</th>';
 	        for (var i = 0; i < cfg_m_userrole.length; i++) {
 	        	TableGenerate += '<th>'+cfg_m_userrole[i]['NameUserRole']+'</th>';
 	        }
