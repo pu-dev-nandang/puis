@@ -1001,8 +1001,15 @@ class M_admission extends CI_Model {
               where b.Years = ?
               order by a.NoKwitansi desc limit 1';
       $query=$this->db->query($sql, array($getDatax[0]['Ta']))->result_array();
-      $NoKwitansi = $query[0]['NoKwitansi'];
-      $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      if (count($query) > 0) {
+        $NoKwitansi = $query[0]['NoKwitansi'];
+        $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
+      }
+      else
+      {
+        $NoKwitansi = 1;
+      }
+      
       $FullName = strtolower($input_arr['Name']);
 
       $dataSave = array(

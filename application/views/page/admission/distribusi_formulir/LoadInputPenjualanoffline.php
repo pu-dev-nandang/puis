@@ -93,7 +93,11 @@
 	           			  	            <label class="col-sm-1 control-label">Email </label>
 	           			  	            <div class="col-md-3">
 	           			  	              <input type="text" name="email" id= "email" placeholder="" class="form-control">
+	           			  	              <br/>
+	           			  	              <p style="color: red">* Pastikan email aktif dan benar</p>
+	           			  	              <p style="color: red">* Email yang didaftarkan akan menjadi account login pada user dan pertukaran informasi</p>
 	           			  	            </div>
+
 	           			  	      </div>
 	           			  	      <div class="form-group">
 	           			  	            <label class="col-sm-1 control-label">Sekolah </label>
