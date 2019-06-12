@@ -866,6 +866,135 @@ class C_rest2 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='removeCRMTeam'){
+
+            $CRMTeamID = $data_arr['ID'];
+
+            $dataCk = $this->db->get_where('db_admission.crm',array(
+                'CRMTeamID' => $CRMTeamID
+            ))->result_array();
+
+            $result = array('Status' => '0');
+
+            if(count($dataCk)<=0){
+                // Remove Team
+                $this->db->where('CRMTeamID', $CRMTeamID);
+                $this->db->delete('db_admission.crm_team_member');
+                $this->db->reset_query();
+
+                $this->db->where('ID', $CRMTeamID);
+                $this->db->delete('db_admission.crm_team');
+
+                $result = array('Status' => '1');
+            }
+
+            return print_r(json_encode($result));
+
+
+        }
+    }
+
+    public function crudMarketingActivity(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='ins_MA'){
+
+            $ID = $data_arr['ID'];
+
+
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $dateEvent = $dataForm['Start'];
+            $Month = explode('-',$dateEvent)[1];
+            $Year = explode('-',$dateEvent)[0];
+            $dataForm['Month'] = $Month;
+            $dataForm['Year'] = $Year;
+
+            if($ID!='' && $ID!=null){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_admission.marketing_activity', $dataForm);
+            } else {
+                // Insert
+                $this->db->insert('db_admission.marketing_activity', $dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+
+            // Participant
+            $this->db->where('MAID', $ID);
+            $this->db->delete('db_admission.marketing_activity_participants');
+            $this->db->reset_query();
+
+            $Participants = (array) $data_arr['Participants'];
+            if(count($Participants)>0){
+                for($i=0;$i<count($Participants);$i++){
+                    $arrIns = array(
+                        'MAID' => $ID,
+                        'NIP' => $Participants[$i]
+                    );
+                    $this->db->insert('db_admission.marketing_activity_participants', $arrIns);
+                }
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='readMonthYear_MA'){
+            $dataMonth = $this->db->query('SELECT ma.Month FROM db_admission.marketing_activity ma 
+                                                            GROUP BY ma.Month ORDER BY ma.Month ASC')->result_array();
+
+            $dataYear = $this->db->query('SELECT ma.Year FROM db_admission.marketing_activity ma 
+                                                            GROUP BY ma.Year ORDER BY ma.Year DESC')->result_array();
+
+            $result = array('Month' => $dataMonth,'Year' => $dataYear);
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='filter_MA'){
+
+            $Month = $data_arr['Month'];
+            $Year = $data_arr['Year'];
+
+            $data = $this->db->query('SELECT * FROM db_admission.marketing_activity ma 
+                                                  WHERE ma.Month = "'.$Month.'" 
+                                                  AND ma.Year = "'.$Year.'"  ')->result_array();
+
+            if(count($data)>0){
+                for ($i=0;$i<count($data);$i++){
+                    $data[$i]['Participants'] = $this->db->query('SELECT map.*, em.Name FROM db_admission.marketing_activity_participants map
+                                                                    LEFT JOIN db_employees.employees em ON (em.NIP = map.NIP)
+                                                                    WHERE map.MAID = "'.$data[$i]['ID'].'" ')->result_array();
+                }
+            }
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='remove_MA'){
+            $ID = $data_arr['ID'];
+
+            $dataCheck = $this->db->get_where('db_admission.crm',array(
+                'MAID' => $ID
+            ))->result_array();
+
+            $result = array('Status'=>'0');
+            if(count($dataCheck)<=0){
+                // Remove
+                $this->db->where('MAID', $ID);
+                $this->db->delete('db_admission.marketing_activity_participants');
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_admission.marketing_activity');
+
+                $result = array('Status'=>'1');
+            }
+
+            return print_r(json_encode($result));
+
+        }
     }
 
     // ==== PENUTUP CRM ====

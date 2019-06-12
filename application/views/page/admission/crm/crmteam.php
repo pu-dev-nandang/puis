@@ -90,7 +90,9 @@
         },1000);
 
 
-        loading_modal_hide();
+        setTimeout(function () {
+            loading_modal_hide();
+        },1000);
 
 
     });
@@ -132,6 +134,7 @@
             var url = base_url_js+'rest2/__crudCRMTeam';
 
             $.post(url,{token:token},function (result) {
+                loadTableTeam();
                 $('#btnSaveTeam').html('Save').prop('disabled',true);
                 toastr.success('Data saved','Success');
                 loading_modal_hide();
@@ -178,7 +181,6 @@
             var url = base_url_js+'rest2/__crudCRMTeam';
 
             $.post(url,{token:token},function (jsonResult) {
-                console.log(jsonResult);
                 $('#listTeam').empty();
                 if(jsonResult.length>0){
                     $.each(jsonResult,function (i,v) {
@@ -197,8 +199,8 @@
                             '<td>'+(i+1)+'</td>' +
                             '<td>'+v.Name+'</td>' +
                             '<td><b>(Co) '+v.CoordinatorName+'</b><div>'+listMember+'</div></td>' +
-                            '<td><button class="btn btn-sm btn-default"><i class="fa fa-edit"></i></button> ' +
-                            '<button class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button></td>' +
+                            '<td><button class="btn btn-sm btn-default btnEditTeam hide" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                            '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button></td>' +
                             '</tr>');
                     });
                 } else {
@@ -207,6 +209,31 @@
             });
         }
     }
+
+    $(document).on('click','.btnRemoveTeam',function () {
+
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+
+            var data = {
+                action : 'removeCRMTeam',
+                ID : ID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'rest2/__crudCRMTeam';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                    toastr.success('Team removec','Success');
+                } else {
+                    toastr.warning('Team can not removed','Warning');
+                }
+
+            })
+        }
+
+    });
 
     // == CRUD PERIOD ===
 
