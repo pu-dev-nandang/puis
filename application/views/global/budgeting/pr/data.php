@@ -1,5 +1,12 @@
 <div class="row" style="margin-left: 0px;margin-right: 0px">
 	<div class="col-md-12">
+		<div class="thumbnail" style="padding: 10px;">
+            <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve
+        </div>
+	</div>
+</div>
+<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px;">
+	<div class="col-md-12">
 		<div class="table-responsive" id = "DivTable">
 			
 		</div>
@@ -26,18 +33,18 @@ $(document).ready(function() {
 		var LoopApprover = '';
 		for (var i = 0; i < G_ApproverLength; i++) {
 			var ap = i +1;
-			LoopApprover += '<th style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "thapprover'+ap+'">'+ap+'</th>';
+			LoopApprover += '<th style = "text-align: center;background: #333;color: #FFFFFF;" id = "thapprover'+ap+'">'+ap+'</th>';
 		}
 
 		var table = '<table class="table table-bordered" id = "tableData4">'+
 		            '<thead>'+
 		            '<tr>'+
-		                '<th rowspan = "2" width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
-		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
+		                '<th rowspan = "2" width = "3%" style = "text-align: center;background: #333;color: #FFFFFF;">No</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #333;color: #FFFFFF;">PR Code</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #333;color: #FFFFFF;">Department</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #333;color: #FFFFFF;">Status</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #333;color: #FFFFFF;">Info</th>'+
+		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #333;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
 		            '</tr>'+
 		            '<tr>'+
 		            	LoopApprover+
@@ -86,6 +93,68 @@ $(document).ready(function() {
 		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'">'+data[1]+'</a><br>By : '+ data[endkey]
 		    		 	)
 		    		 $( row ).find('td:eq(4)').attr('align','center');
+
+		    		 /* 
+		    		 	Warna Status oleh admin setelah approve semua menjadi color:#8ED6EA; selainnya default
+						Warna Status oleh approval ketika akan di approval default jika telah approval color:#8ED6EA;
+						Warna Status oleh user selain dua diatas adalah default
+		    		 */
+
+		    		 var keyJsonStatus = (data.length) - 2;
+		    		 var JsonStatus = data[keyJsonStatus];
+		    		 // find NIP
+		    		 	var st = {
+		    		 		Find : 0,
+		    		 		Approval : 0,
+		    		 		Approved : 0,
+		    		 		AllApprove : 0,
+		    		 	};
+
+		    		 	var j_AllApprove = 0;
+		    		 	for (var i = 0; i < JsonStatus.length; i++) {
+		    		 		if (i > 0) {
+		    		 			if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 1 ) {
+		    		 				st.Find = 1;
+		    		 				st.Approval = 1;
+		    		 				st.Approved = 1;
+
+		    		 			}
+		    		 			else if(NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 0 ) {
+		    		 				st.Find = 1;
+		    		 				st.Approval = 1;
+		    		 				st.Approved = 0;
+		    		 			}
+		    		 			else
+		    		 			{
+		    		 				st.Find = 1;
+		    		 			}
+		    		 		}
+
+		    		 		// check all approve or not
+		    		 		if (JsonStatus[i]['Status'] == 0) {
+		    		 			j_AllApprove++;
+		    		 		}
+		    		 	}
+
+		    		 	// check all approve or not
+		    		 		if (j_AllApprove > 0) {
+		    		 			st.AllApprove = 0;
+		    		 		}
+		    		 		else
+		    		 		{
+		    		 			st.AllApprove = 1;
+		    		 		}
+
+		    		 	// html warna
+		    		 		if (st.AllApprove == 1) {
+		    		 			$( row ).attr('style','background-color: #8ED6EA;');
+		    		 		}
+		    		 		else
+		    		 		{
+		    		 			if (st.Find == 1 && st.Approval == 1 && st.Approved == 1) {
+		    		 				$( row ).attr('style','background-color: #8ED6EA;');
+		    		 			}
+		    		 		}	
 		    },
 		} );
 	}

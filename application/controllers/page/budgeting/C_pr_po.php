@@ -319,10 +319,10 @@ class C_pr_po extends Budgeting_Controler {
 
             $nestedData = array_merge($nestedData,$arr);
             $nestedData[] = $row['Departement'];
+            $nestedData[] = $JsonStatus;
             // get name created by
                 $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($row['CreatedBy']);
                 $nestedData[] = $getName[0]['Name'];
-
 
             $data[] = $nestedData;
             $No++;
