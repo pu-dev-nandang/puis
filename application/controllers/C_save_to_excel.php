@@ -2743,6 +2743,231 @@ class C_save_to_excel extends CI_Controller
 
     // ===== PENUTUP DATA STUDENT ======
 
+    public function intake_Excel()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $input = (array) $this->jwt->decode($token,$key);
+        // $this->load->model('master/m_master');
+        $this->load->model('admission/m_admission');
+        // start dari A4
+        $Year = $input['Year'];
+        $getData = $this->m_admission->getIntakeByYear($Year);
+        $this->getExcelIntake_admission($getData,$Year);
+    }
+
+    public function getExcelIntake_admission($getData,$Year)
+    {
+        $GetDateNow = date('Y-m-d');
+        $this->load->model('master/m_master');
+        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/admisi/rekap_intake.xlsx'); // Empty Sheet
+        $excel2->setActiveSheetIndex(0);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_row2 = array(
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // start dari A4
+        $a = 4;
+        $Filaname = 'Rekap_Intake_'.$Year.'.xlsx';
+        $excel3->setCellValue('B3', "Data Intake Marketing per ".$GetDateNow.' Tahun '.($Year - 1).' & '.$Year);
+        $excel3->getStyle('B3')->getFont()->setBold(TRUE);
+        $excel3->getStyle('B3')->getFont()->setSize(12);
+
+        // Write Tahun Akademik di header table
+            $excel3->setCellValue('E6', $getData[0]['Value'][0]['Label'])->getStyle('C6')->getAlignment()->setWrapText(true);
+            $excel3->setCellValue('F6', $getData[0]['Value'][1]['Label'])->getStyle('E6')->getAlignment()->setWrapText(true);
+            $excel3->setCellValue('G6', $getData[0]['Value'][2]['Label'])->getStyle('F6')->getAlignment()->setWrapText(true);
+            $excel3->setCellValue('H6', $getData[0]['Value'][3]['Label'])->getStyle('G6')->getAlignment()->setWrapText(true);
+
+        $No = 1;
+        $r = 8;
+        $arr_total = array();
+        for ($i=0; $i < count($getData); $i++) { 
+           $Faculty =  $getData[$i]['Faculty'];
+           // merge // start di c
+           $C_prodi = count($getData[$i]['Prodi']);
+               $r_merge = $r + $C_prodi - 1 ;
+               $excel3->mergeCells('C'.$r.':'.'C'.$r_merge);
+               $excel3->setCellValue('C'.$r, $Faculty)->getStyle('C'.$r.':'.'C'.$r_merge)->applyFromArray($style_row2);
+
+            // add prodi
+                $G_prodi = $getData[$i]['Prodi'];
+                $r1 = $r;
+                for ($j=0; $j < $C_prodi; $j++) {
+                    $NamePrody =  $G_prodi[$j];
+                    $excel3->setCellValue('D'.$r1, $NamePrody)->getStyle('D'.$r1)->applyFromArray($style_row);
+                    $excel3->setCellValue('B'.$r1, $No)->getStyle('B'.$r1)->applyFromArray($style_row2);
+                    $r1++;
+                    $No++;
+                }
+
+            // add tahun akademik sebelumnya
+                $G_Value = $getData[$i]['Value'][0]['Detail'];
+                $r1 = $r;
+                $tot = 0;
+                for ($j=0; $j < count($G_Value); $j++) {
+                    $v =  $G_Value[$j];
+                    $tot += $v;
+                    $excel3->setCellValue('E'.$r1, $v)->getStyle('E'.$r1)->applyFromArray($style_row2);
+                    $r1++;
+                }
+
+                if (array_key_exists(0, $arr_total)) {
+                    $arr_total[0] += $tot;
+                }
+                else
+                {
+                    $arr_total[] = $tot;
+                }
+                
+
+            // add tahun akademik variable
+                $G_Value = $getData[$i]['Value'][1]['Detail'];
+                $r1 = $r;
+                $tot = 0;
+                for ($j=0; $j < count($G_Value); $j++) {
+                    $v =  $G_Value[$j];
+                    $tot += $v;
+                    $excel3->setCellValue('F'.$r1, $v)->getStyle('F'.$r1)->applyFromArray($style_row2);
+                    $r1++;
+                }
+
+                if (array_key_exists(1, $arr_total)) {
+                    $arr_total[1] += $tot;
+                }
+                else
+                {
+                    $arr_total[] = $tot;
+                }
+
+            // add tahun akademik variable seminggu sebelumnya
+                $G_Value = $getData[$i]['Value'][2]['Detail'];
+                $r1 = $r;
+                $tot = 0;
+                for ($j=0; $j < count($G_Value); $j++) {
+                    $v =  $G_Value[$j];
+                    $tot += $v;
+                    $excel3->setCellValue('G'.$r1, $v)->getStyle('G'.$r1)->applyFromArray($style_row2);
+                    $r1++;
+                }
+                if (array_key_exists(2, $arr_total)) {
+                    $arr_total[2] += $tot;
+                }
+                else
+                {
+                    $arr_total[] = $tot;
+                }
+
+            // add perubahan
+                $G_Value = $getData[$i]['Value'][3]['Detail'];
+                $r1 = $r;
+                $tot = 0;
+                for ($j=0; $j < count($G_Value); $j++) {
+                    $v =  $G_Value[$j];
+                    $tot += $v;
+                    $excel3->setCellValue('H'.$r1, $v)->getStyle('H'.$r1)->applyFromArray($style_row2);
+                    $r1++;
+                }
+                if (array_key_exists(3, $arr_total)) {
+                    $arr_total[3] += $tot;
+                }
+                else
+                {
+                    $arr_total[] = $tot;
+                }                
+
+            $r = $r_merge + 1;   
+        }
+
+        // make total
+            $excel3->mergeCells('B'.$r.':'.'D'.$r);
+            $excel3->setCellValue('B'.$r, 'Total')->getStyle('B'.$r.':'.'D'.$r)->applyFromArray($style_row2);
+            $st = 4; 
+            for ($i=0; $i < count($arr_total); $i++) { 
+                $huruf = $this->m_master->HurufColExcelNumber($st);
+                $excel3->setCellValue($huruf.$r, $arr_total[$i])->getStyle($huruf.$r)->applyFromArray($style_row2);  
+                $st++;
+            }
+
+        // make Keterangan Prodi Bisnis Perhotelan:
+            $r += 2;
+                $style = array(
+                    'font' => array('bold' => true), // Set font nya jadi bold
+                );    
+                $excel3->setCellValue('E'.$r, 'Keterangan Prodi Bisnis Perhotelan:')->getStyle('E'.$r)->applyFromArray($style);
+                $r++;
+                $excel3->setCellValue('E'.$r, 'Untuk prodi Bisnis Perhotelan berikut tambahan data diluar intake:');
+                $r++;
+                $excel3->setCellValue('E'.$r, 'Cetak Surat Penerimaan')->getStyle('E'.$r)->applyFromArray($style_row);
+                $excel3->getStyle('E'.$r)->getAlignment()->setWrapText(true);
+                $excel3->setCellValue('F'.$r, '')->getStyle('F'.$r)->applyFromArray($style_row);
+                $r++;
+                $excel3->setCellValue('E'.$r, 'Mendaftar Proses Tes Interview & Kesehatan')->getStyle('E'.$r)->applyFromArray($style_row);
+                $excel3->getStyle('E'.$r)->getAlignment()->setWrapText(true);
+                $excel3->setCellValue('F'.$r, '')->getStyle('F'.$r)->applyFromArray($style_row);
+                $r++;
+                $excel3->setCellValue('E'.$r, 'Total')->getStyle('E'.$r)->applyFromArray($style_row);
+                $excel3->getStyle('E'.$r)->getAlignment()->setWrapText(true);
+                $excel3->setCellValue('F'.$r, '')->getStyle('F'.$r)->applyFromArray($style_row);
+
+        // foreach(range('A','Z') as $columnID) {
+        //     $excel2->getActiveSheet()->getColumnDimension($columnID)
+        //         ->setAutoSize(true);
+        // }
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename="'.$Filaname.'"'); // jalan ketika tidak menggunakan ajax
+        //$filename = 'PenerimaanPembayaran.xlsx';
+        //$objWriter->save('./document/'.$filename);
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    }
+
     public function export_TuitionFee_Excel()
     {
         $token = $this->input->post('token');
@@ -2786,7 +3011,7 @@ class C_save_to_excel extends CI_Controller
 
         // start dari A4
         $a = 4;
-        $Filaname = 'Intake_'.$Year.'.xlsx';
+        $Filaname = 'Intake_Tuition_fee_'.$Year.'.xlsx';
         $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         // print_r($getData);die();

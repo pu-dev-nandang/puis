@@ -3055,4 +3055,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         return $pass;
     }
+
+    public function facultyActiveByProgramStudy()
+    {
+        $sql = 'select a.FacultyID,b.Name,b.NameEng from db_academic.program_study as a join db_academic.faculty as b on a.FacultyID = b.FacultyID
+                where a.Status = 1
+                GROUP by a.FacultyID';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;  
+
+    }
 }
