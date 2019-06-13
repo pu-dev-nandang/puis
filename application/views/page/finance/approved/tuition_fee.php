@@ -270,6 +270,7 @@
         switch(pageHtml)
         {
          case "tuition_fee" :
+         case  "tuition_fee_approved" :
             var Nama = $(this).attr('nama');
             if(this.checked) {
                var url = base_url_js + "get_detail_cicilan_fee_admisi";
@@ -389,7 +390,7 @@
                 $(".widget_"+Uniformvaluee).remove();
             }  
          break;      
-         case  "tuition_fee_approved" :
+         case  "tuition_fee_approved_old" :
              var Nama = $(this).attr('nama');
              if(this.checked) {
                 var url = base_url_js + "get_detail_cicilan_fee_admisi";

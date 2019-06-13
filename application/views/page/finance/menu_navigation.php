@@ -79,7 +79,7 @@
                     <li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" ){echo "open-default";} ?>">
                         <a href="javascript:void(0);">
                         <i class="icon-angle-right"></i>
-                        Approval
+                        Approval Tagihan & Nilai
                         </a>
                         <ul class="sub-menu">
                             <!--<li class="<?php if($this->uri->segment(2)=='admission' && $this->uri->segment(3) == "approved" && $this->uri->segment(4) == "nilai-rapor" && $this->uri->segment(5) == ""){echo "current";} ?>">
