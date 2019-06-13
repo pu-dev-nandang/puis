@@ -648,7 +648,7 @@ class C_api extends CI_Controller {
                                                       LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
 
                         ';
-
+                        
         if( !empty($requestData['search']['value']) ) {
             if ($dataWhere == '') {
                 $dataWhere = ' where ';
@@ -689,13 +689,13 @@ class C_api extends CI_Controller {
                           ';
 
         if( !empty($requestData['search']['value']) ) {
-            if ($dataWhere == '') {
-                $dataWhere = ' where ';
-            }
-            else
-            {
-                $dataWhere .= ' AND ';
-            }
+            // if ($dataWhere == '') {
+            //     $dataWhere = ' where ';
+            // }
+            // else
+            // {
+            //     $dataWhere .= ' AND ';
+            // }
             $sql.= '  '.$dataWhere.' ( s.NPM LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
