@@ -89,7 +89,8 @@ class M_statistik extends CI_Model {
                             if(a.StatusReg = 1, 
                             (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                             if(a.StatusReg = 1, 
-                            (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate
+                            (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                            (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                             from db_admission.register as a 
                             join db_admission.school as b on a.SchoolID = b.ID 
                             LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
@@ -98,7 +99,7 @@ class M_statistik extends CI_Model {
                             LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                             left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                              where a.SetTa = "'.$Year.'" 
-                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ?';
+                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ? and C_bayar > 0';
                             $query=$this->db->query($sql, array($ProdiID))->result_array();
                             $total = $query[0]['total'];
                             $datasave[$field[$j]] = $total;
@@ -387,7 +388,8 @@ class M_statistik extends CI_Model {
                                         if(a.StatusReg = 1, 
                                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                                         if(a.StatusReg = 1, 
-                                        (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate
+                                        (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                                         from db_admission.register as a 
                                         join db_admission.school as b on a.SchoolID = b.ID 
                                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
@@ -396,7 +398,7 @@ class M_statistik extends CI_Model {
                                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                                          where a.SetTa = "'.$Year.'" and b.ProvinceID = "'.$Prov.'"
-                                        ) cc
+                                        ) cc where C_bayar > 0
             ';
               $query=$this->db_statistik->query($sql, array())->result_array();
               $Qty = $query[0]['total'];

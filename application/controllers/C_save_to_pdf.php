@@ -5349,9 +5349,10 @@ Phone: (021) 29200456';
         
         // check tahun berdasarkan No_Ref
          $G_dt = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['NoFormRef']);
+         $YearsWR_MKT = substr($G_dt[0]['Years'], 2,2); 
 
         // $nomorWr = $InputDate[0].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$NoKwitansi;
-        $nomorWr = $G_dt[0]['Years'].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$NoKwitansi;
+        $nomorWr = $G_dt[0]['Years'].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$YearsWR_MKT.' / '.$NoKwitansi;
 
             $fpdf = new Fpdf('L', 'mm', array(216, 140));
             //$fpdf = new Fpdf('P', 'mm', 'A4');
