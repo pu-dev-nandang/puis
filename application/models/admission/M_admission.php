@@ -3814,6 +3814,7 @@ class M_admission extends CI_Model {
                       ) ccc where ID_program_study = ? and C_bayar > 0';
                       $query=$this->db->query($sql, array($ProdiID))->result_array();
                       $total = $query[0]['total'];
+                      $c2 = $total;
               $temp['Value'][1]['Detail'][] = $total;
 
             // cari intake Tahun by variable Year Minggu sebelumnya
