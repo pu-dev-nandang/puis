@@ -488,6 +488,7 @@ $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_Pe
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
+$route['admission/intake_Excel'] = 'c_save_to_excel/intake_Excel';
 
 
 $route['admisssion/crm/(:any)'] = 'page/admission/marketing/c_crm/crmpage/$1';
