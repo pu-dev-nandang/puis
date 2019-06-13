@@ -997,6 +997,55 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function crudContact(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='insertContat'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_admission.contact',$dataForm);
+            return print_r(json_encode(array('Status'=> '1')));
+
+        }
+        else if($data_arr['action']=='updateContat'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.contact',$dataForm);
+            return print_r(json_encode(array('Status'=> '1')));
+
+        }
+        else if($data_arr['action']=='searchContact'){
+            $key = $data_arr['key'];
+
+            if($key!=''){
+
+                $des = explode('schid:',$key);
+
+                if(count($des)>1){
+                    $data = $this->db->query('SELECT c.*, s.SchoolName FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
+                                              WHERE s.ID = "'.$des[1].'" ORDER BY c.Name ASC LIMIT 20 ')->result_array();
+                } else {
+                    $data = $this->db->query('SELECT c.*, s.SchoolName FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
+                                              WHERE c.Name LIKE "%'.$key.'%" 
+                                              OR c.Phone LIKE "%'.$key.'%"
+                                              OR c.Email LIKE "%'.$key.'%"
+                                              OR s.SchoolName LIKE "%'.$key.'%" ORDER BY c.Name ASC LIMIT 20 ')->result_array();
+                }
+
+
+            } else {
+                $data = $this->db->query('SELECT c.*, s.SchoolName FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
+                                               ORDER BY c.Name ASC LIMIT 7 ')->result_array();
+            }
+
+
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
     // ==== PENUTUP CRM ====
 
 }

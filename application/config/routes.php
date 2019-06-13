@@ -500,6 +500,7 @@ $route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_
 // New page
 $route['crm/crm-team'] = 'page/admission/marketing/c_crm/CRMTeam';
 $route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_activity';
+$route['crm/contact'] = 'page/admission/marketing/c_crm/contact';
 
 
 
@@ -834,6 +835,8 @@ $route['api/__insertSchoolURLJson'] = 'api/c_api/insertSchoolURLJson';
 $route['api/__getWilayahURLJson'] = 'api/c_api/getWilayahURLJson';
 $route['api/__getSMAWilayah'] = 'api/c_api/getSMAWilayah';
 
+$route['api/__getSchoolByCityID/(:num)'] = 'api/c_api/getSchoolByCityID/$1';
+
 // get data untuk finance
 $route['api/__getDataRegisterBelumBayar'] = 'api/c_api/getDataRegisterBelumBayar';
 $route['api/__getDataRegisterTelahBayar'] = 'api/c_api/getDataRegisterTelahBayar';
@@ -938,6 +941,7 @@ $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
 $route['rest2/__crudCRMPeriode'] = 'api/c_rest2/crudCRMPeriode';
 $route['rest2/__crudCRMTeam'] = 'api/c_rest2/crudCRMTeam';
 $route['rest2/__crudMarketingActivity'] = 'api/c_rest2/crudMarketingActivity';
+$route['rest2/__crudContact'] = 'api/c_rest2/crudContact';
 
 
 

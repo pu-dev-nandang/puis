@@ -4018,6 +4018,23 @@ class C_api extends CI_Controller {
         return print_r(json_encode($result));
     }
 
+    public function getSchoolByCityID($CityID){
+
+        $sql = "select * from db_admission.school as a where a.CityID = ? and Approved = 1";
+        $data = $this->db->query($sql, array($CityID))->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+                $data[$i]['Contact'] = $this->db->query('SELECT c.*, em.Name AS CreatedBy_Name FROM db_admission.contact c 
+                                            LEFT JOIN db_employees.employees em ON (c.CreatedBy = em.NIP) 
+                                            WHERE c.SchoolID = "'.$data[$i]['ID'].'" ')->result_array();
+            }
+        }
+
+        return print_r(json_encode($data));
+
+    }
+
     public function getDataRegisterBelumBayar()
     {
         $Tahun = $this->input->post('Tahun');

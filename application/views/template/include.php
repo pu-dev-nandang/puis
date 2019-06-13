@@ -933,6 +933,38 @@
         });
     }
 
+    function loadSelectOptionDistrict_select2(element,selected) {
+        var url = base_url_js+'api/__getWilayahURLJson';
+        $.getJSON(url,function (jsonResult)  {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    $(element).append('<option value="'+v.RegionID+'">'+v.RegionName+'</option>')
+                        .val(selected).trigger('change');
+                });
+            }
+
+        });
+    }
+    
+    function loadSelectOptionScheoolBy(CityID,element,selected) {
+        var url = base_url_js+'api/__getSchoolByCityID/'+CityID;
+        $.getJSON(url,function (jsonResult)  {
+            // console.log(jsonResult);
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var fID = (i==0) ? v.ID : fID;
+                    var sc = (selected!='' && selected!=null && selected!=='undefined')
+                        ? selected : fID;
+                    console.log(sc);
+                    $(element).append('<option value="'+v.ID+'">'+v.SchoolName+'</option>')
+                        .val(sc).trigger('change');
+
+                });
+            }
+        });
+    }
+
     function momentRange(start,end) {
         // var fromDate = moment();
         // var toDate = moment().add(15, 'days');
