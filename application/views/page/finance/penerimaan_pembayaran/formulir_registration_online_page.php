@@ -229,6 +229,7 @@
 				if (rs == 1) {
 					loaddataBelumBayar();
 					loadDataTelahBayar();
+					$('#GlobalModalLarge').modal('hide');
 				}
 				else
 				{

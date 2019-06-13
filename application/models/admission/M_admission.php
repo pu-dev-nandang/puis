@@ -533,8 +533,8 @@ class M_admission extends CI_Model {
         $status = ''; 
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref from (
-          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
+        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
+          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone
           from db_admission.register as a 
           join db_admission.register_verification as b
           on a.ID = b.RegisterID
