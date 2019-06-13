@@ -3772,15 +3772,36 @@ class M_admission extends CI_Model {
            $temp['Prodi'][] = $G_program_study[$j]['Name'];
            // cari intake tahun lalu dulu
               $ProdiID = $G_program_study[$j]['ID'];
-              $G_data = $this->m_master->caribasedprimary('db_statistik.rekapintake_'.($Year-1),'ProdiID',$ProdiID);
-              $c1 = 0;
-              $t = $G_data[0];
-              foreach ($t as $key => $value) {
-                if ($key != 'ID' && $key != 'ProdiID') {
-                  $c1 += $value;
-                }
+              // $G_data = $this->m_master->caribasedprimary('db_statistik.rekapintake_'.($Year-1),'ProdiID',$ProdiID);
+              // $c1 = 0;
+              // $t = $G_data[0];
+              // foreach ($t as $key => $value) {
+              //   if ($key != 'ID' && $key != 'ProdiID') {
+              //     $c1 += $value;
+              //   }
                
-              }
+              // }
+              // $temp['Value'][0]['Detail'][] = $c1;
+              $sql = 'select count(*) as total from (
+                       select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, 
+                      e.ID as ID_register_formulir,
+                      if(a.StatusReg = 1, 
+                      (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
+                      if(a.StatusReg = 1, 
+                      (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                      (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                      from db_admission.register as a 
+                      join db_admission.school as b on a.SchoolID = b.ID 
+                      LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
+                      LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
+                      LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
+                      LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
+                      left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
+                       where a.SetTa = "'.($Year-1).'" 
+                      ) ccc where ID_program_study = ? and C_bayar > 0';
+                      $query=$this->db->query($sql, array($ProdiID))->result_array();
+                      $total = $query[0]['total'];
+                      $c1 = $total;
               $temp['Value'][0]['Detail'][] = $c1;
 
             // cari intake Tahun by variable Year
