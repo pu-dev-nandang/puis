@@ -70,6 +70,7 @@
     //
             define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
             define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+            define("url_library","http://library.podomorouniversity.ac.id/", true);
             
             define("path_register_online","/var/www/html/registeronline/", true);
             define('ENVIRONMENT', 'production',true);
@@ -88,6 +89,7 @@
     //
             define("url_sign_in_lecturers","http://demo.lecturerpu.podomorouniversity.ac.id/", true);
             define("url_sign_in_students","http://demo.studentpu.podomorouniversity.ac.id/", true);
+            define("url_library","http://library.podomorouniversity.ac.id/", true);
             
             define("path_register_online","C:/nginx/html/registeronline/", true);
             define('ENVIRONMENT', 'development',true);
@@ -112,6 +114,7 @@
             // Auth From PCAM
             define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
             define("url_sign_in_students","http://localhost".port."/students/", true);
+            define("url_library","http://library.podomorouniversity.ac.id/", true);
 
             define("url_lecturers",url_sign_in_lecturers."home", true);
             define("url_students",url_sign_in_students."home", true);
