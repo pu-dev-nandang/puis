@@ -842,7 +842,7 @@ class C_save_to_excel extends CI_Controller
             $excel->getActiveSheet()->mergeCells('F6:F7');
             $excel->getActiveSheet()->getStyle('F6:F7')->applyFromArray($style_col);
 
-            $excel->setActiveSheetIndex(0)->setCellValue('G6', "UNIT");
+            $excel->setActiveSheetIndex(0)->setCellValue('G6', "Dept");
             $excel->getActiveSheet()->mergeCells('G6:G7');
             $excel->getActiveSheet()->getStyle('G6:G7')->applyFromArray($style_col);
 
@@ -1284,7 +1284,7 @@ class C_save_to_excel extends CI_Controller
                     $excel->mergeCells('F6:F7');
                     $excel->getStyle('F6:F7')->applyFromArray($style_col);
 
-                    $excel->setCellValue('G6', "UNIT");
+                    $excel->setCellValue('G6', "Dept");
                     $excel->mergeCells('G6:G7');
                     $excel->getStyle('G6:G7')->applyFromArray($style_col);
 
@@ -4118,7 +4118,7 @@ class C_save_to_excel extends CI_Controller
 
                   $st = $st + count($arr_Department);
                   $hurufMerge = $this->m_master->HurufColExcelNumber($st);
-                  $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','UNIT');
+                  $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','Dept');
                   $excel->getActiveSheet()->mergeCells($huruf.'2:'.$hurufMerge.'2');
                   $excel->getActiveSheet()->getStyle($huruf.'2:'.$hurufMerge.'2')->applyFromArray($style_col);
 
