@@ -1053,12 +1053,44 @@ class C_rest2 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='updateCRMTeam'){
+
+            $ID = $data_arr['ID'];
+
+            $team = (array) $data_arr['team'];
+            $member = (array) $data_arr['member'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.crm_team',$team);
+            $this->db->reset_query();
+
+            $this->db->where('CRMTeamID', $ID);
+            $this->db->delete('db_admission.crm_team_member');
+            $this->db->reset_query();
+
+            if(count($member)>0){
+                for($i=0;$i<count($member);$i++){
+
+                    if($member[$i]!=$team['Coordinator']){
+                        $dataIns = array(
+                            'CRMTeamID' => $ID,
+                            'NIP' => $member[$i]
+                        );
+
+                        $this->db->insert('db_admission.crm_team_member',$dataIns);
+                    }
+                }
+            }
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='readCRMTeam'){
             $PeriodID = $data_arr['PeriodID'];
 
-            $data = $this->db->query('SELECT ct.*, em.Name AS CoordinatorName FROM db_admission.crm_team ct 
-                                                LEFT JOIN db_employees.employees em 
-                                                ON (em.NIP = ct.Coordinator)
+            $data = $this->db->query('SELECT ct.*, em.Name AS CoordinatorName, cp.Year, cp.Status FROM db_admission.crm_team ct 
+                                                LEFT JOIN db_employees.employees em  ON (em.NIP = ct.Coordinator)
+                                                LEFT JOIN db_admission.crm_period cp ON (cp.ID = ct.PeriodID)
                                                 WHERE ct.PeriodID = "'.$PeriodID.'" ')->result_array();
 
             if(count($data)>0){
@@ -1203,6 +1235,58 @@ class C_rest2 extends CI_Controller {
 
             return print_r(json_encode($result));
 
+        }
+    }
+
+    public function crudContact(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='insertContat'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_admission.contact',$dataForm);
+            return print_r(json_encode(array('Status'=> '1')));
+
+        }
+        else if($data_arr['action']=='updateContat'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.contact',$dataForm);
+            return print_r(json_encode(array('Status'=> '1')));
+
+        }
+        else if($data_arr['action']=='searchContact'){
+            $key = $data_arr['key'];
+
+            $query = 'SELECT c.*, s.SchoolName, s.CityID, em.Name AS CreatedBy_Name FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = c.CreatedBy)';
+
+            if($key!=''){
+
+                $des = explode('schid:',$key);
+
+                if(count($des)>1){
+                    $data = $this->db->query($query.' WHERE s.ID = "'.$des[1].'" ORDER BY c.Name ASC LIMIT 20 ')->result_array();
+                } else {
+                    $data = $this->db->query($query.' WHERE c.Name LIKE "%'.$key.'%" 
+                                              OR c.Phone LIKE "%'.$key.'%"
+                                              OR c.Email LIKE "%'.$key.'%"
+                                              OR s.SchoolName LIKE "%'.$key.'%" ORDER BY c.Name ASC LIMIT 20 ')->result_array();
+                }
+
+            } else {
+                $data = $this->db->query($query.' ORDER BY c.Name ASC LIMIT 7 ')->result_array();
+            }
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='removeContact'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_admission.contact');
+            return print_r(1);
         }
     }
 

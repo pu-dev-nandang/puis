@@ -45,6 +45,12 @@ class C_crm extends Admission_Controler {
         $this->menu_crm($page);
     }
 
+    public function contact(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$this->data['department'].'/crm/contact',$this->data,true);
+        $this->menu_crm($page);
+    }
+
     public function crmpage()
     {
         $this->auth_ajax();
