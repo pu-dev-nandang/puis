@@ -361,7 +361,85 @@ class C_global extends CI_Controller {
         //         $this->db->insert('db_admission.register_document', $dataSave);
         //     }
         // }
-        
+
+        // untuk data yang tidak sesuai dengan beasiswanya dengan nilai value nya pada table payment_admisi compare dengan tuition_fee
+        $this->load->model('admission/m_admission');
+        $this->load->model('finance/m_finance');
+        $arr = array();
+        // $get = $this->m_master->showData_array('db_finance.payment_admisi');
+        // $sql = 'select * from db_finance.payment_admisi where ID >= 800 and ID_register_formulir != 302';
+        // $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302 order by ID asc limit 200,700';
+        $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302';
+        $get=$this->db->query($sql, array())->result_array();
+        $Filter_ = array();
+        for ($i=0; $i < count($get); $i++) {
+            $ID =  $get[$i]['ID'];
+            $ID_register_formulir = $get[$i]['ID_register_formulir'];
+            $dt = $this->m_admission->getDataPersonal($ID_register_formulir);
+            // get Years and ProdiID
+            $Years = $dt[0]['SetTa'];
+            $ProdiID = $dt[0]['ID_program_study'];
+            // get PTID
+            $PTID = $get[$i]['PTID'];
+            // get tuition fee
+                $G_tuition_fee = $this->m_finance->getPriceBaseBintang($PTID,$ProdiID,$Years,1);
+                $Cost = $G_tuition_fee;
+                $Pay_tuition_fee = $get[$i]['Pay_tuition_fee'];
+                // persen
+                if ($PTID == 3) {
+                    $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                    $Credit = $ccc[0]['DefaultCredit'];
+                    $Cost = $Cost * $Credit;
+                    $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
+                    $persen = abs($persen);
+                }
+                else
+                {
+                    $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
+                    $persen = abs($persen);
+                }
+                
+                if ($persen != $get[$i]['Discount']) {
+                    // get date created and created by
+                    $G_register_admisi = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$ID_register_formulir);
+                    // hitung berapa orang
+                        $b = true;
+                        for ($j=0; $j < count($Filter_); $j++) { 
+                            if ($ID_register_formulir == $Filter_[$j]['ID_register_formulir']) {
+                               $b = false;
+                            }
+                        }
+
+                        if ($b) {
+                            $Filter_[]= array(
+                                'ID_register_formulir' =>$ID_register_formulir,
+                                'FormulirCode' => $dt[0]['FormulirCode'],
+                                'Name' => $dt[0]['Name'],
+                                'CreateAT' => $G_register_admisi[0]['CreateAT'],
+                                'CreateBY' => $G_register_admisi[0]['CreateBY'],
+                            );
+                        }
+
+                    $temp = array(
+                        'ID' => $ID,
+                        'ID_register_formulir' => $ID_register_formulir,
+                        'FormulirCode' => $dt[0]['FormulirCode'],
+                        'Name' => $dt[0]['Name'],
+                        'Discount_seharusnya' => $persen,
+                        'Discount_db' => $get[$i]['Discount'],
+                        'Pay_tuition_fee' => $Pay_tuition_fee,
+                        'CostDefault' => $Cost,
+                        'CreateAT' => $G_register_admisi[0]['CreateAT'],
+                        'CreateBY' => $G_register_admisi[0]['CreateBY'],
+                    );
+                    $arr['dt'][] = $temp;
+                }
+
+
+        }
+        $arr['Count_person'] = count($Filter_);
+        $arr['Person'] = $Filter_;
+        print_r($arr);
     }
 
 

@@ -427,13 +427,12 @@
         {
          case "tuition_fee" :
             var Uniformvaluee = $(this).val();
-            // adiing for while
-            $('.tableData input[type=checkbox]').prop('checked', false);
-            $(this).prop('checked',true);
-            $('.widget_delete').remove();
-            $('.getDom').prop('disabled', false);
-
             if(this.checked) {
+                // adiing for while
+                $('.tableData input[type=checkbox]').prop('checked', false);
+                $(this).prop('checked',true);
+                $('.widget_delete').remove();
+                $('.getDom').prop('disabled', false);
                 $('.getDom[id-formulir="'+Uniformvaluee+'"]').prop('disabled', true);
                 var Nama = $(this).attr('nama');
                 if (Uniformvaluee != 'nothing') {
