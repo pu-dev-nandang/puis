@@ -105,7 +105,7 @@
 
     <div class="col-md-9">
         <div class="row">
-            <div class="col-md-4 col-md-offset-4">
+            <div class="col-md-6 col-md-offset-3">
                 <div class="well">
                     <div class="row">
                         <div class="col-md-7">
@@ -128,7 +128,7 @@
                         <th style="width: 1%;">No</th>
                         <th>Event</th>
                         <th style="width: 30%;">Description</th>
-                        <th style="width: 5%;"><i class="fa fa-cog"></i></th>
+                        <th style="width: 10%;"><i class="fa fa-cog"></i></th>
                     </tr>
                     </thead>
                     <tbody id="listMA">

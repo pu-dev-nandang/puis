@@ -105,6 +105,8 @@
             </div>
 
 
+            <textarea id="viewListContact" class="hide"></textarea>
+
             <div id="divListContact">
                 <table class="table">
                     <tbody id="listContactView"></tbody>
@@ -119,28 +121,22 @@
 <script>
 
     $(document).ready(function () {
+
+        loading_modal_show();
+
         loadSelectOptionDistrict_select2('#filterDistrict');
         loadSelectOptionDistrict_select2('#filterDistrict2');
         searchContact();
         $('#filterDistrict,#filterDistrict2').select2({allowClear: true});
+
+        setTimeout(function () {
+            loading_modal_hide();
+        },1000);
     });
 
     $('#filterDistrict').change(function () {
 
-        var filterDistrict = $('#filterDistrict').val();
-        if(filterDistrict!='' && filterDistrict!=null){
-            $('#viewSchoolName').html('');
-            $('#viewSchoolName').html('<div class="form-group"><label>School Name (Required)</label>' +
-                '                           <select class="select2-select-00 full-width-fix" size="5" id="filterSchool">' +
-                '                            </select></div>');
-
-
-            var filterDistrict = $('#filterDistrict').val();
-            // console.log(filterDistrict);
-            $('#filterSchool').empty();
-            loadSelectOptionScheoolBy(filterDistrict,'#filterSchool','');
-            $('#filterSchool').select2({allowClear: true});
-        }
+        getSchoolList();
 
 
     });
@@ -149,14 +145,19 @@
 
         var formID = $('#formID').val();
 
+        var filterDistrict = $('#filterDistrict').val();
+
         var filterSchool = $('#filterSchool').val();
         var formName = $('#formName').val();
         var formPhone = $('#formPhone').val();
         var formEmail = $('#formEmail').val();
 
-        if(filterSchool!='' && filterSchool!=null &&
+        if(filterDistrict!='' && filterDistrict!=null &&
+            filterSchool!='' && filterSchool!=null &&
             formName!='' && formName!=null &&
         formPhone!='' && formPhone!=null){
+
+            loading_button('#btnSaveContact');
 
 
             var data = {
@@ -176,13 +177,23 @@
             var url = base_url_js+'rest2/__crudContact';
 
             $.post(url,{token:token},function (jsonResult) {
+
                 if(jsonResult.Status=='1' || jsonResult.Status==1){
+
+                    // Rest form
+                    $('#formID,#formName,#formPhone,#formEmail').val('');
+
+                    searchContact();
                     toastr.success('Data saved','Success');
                 } else {
                     toastr.error('Data not yet saved','Error');
                 }
+
+                $('#btnSaveContact').html('Save').prop('disabled',false);
             });
 
+        } else {
+            toastr.warning('Please, Fill in the required form','Warning');
         }
 
 
@@ -248,6 +259,27 @@
         }
     });
 
+    function getSchoolList(SchoolID='') {
+        var filterDistrict = $('#filterDistrict').val();
+        if(filterDistrict!='' && filterDistrict!=null){
+            $('#viewSchoolName').html('');
+            $('#viewSchoolName').html('<div class="form-group"><label>School Name (Required)</label>' +
+                '                           <select class="select2-select-00 full-width-fix" size="5" id="filterSchool">' +
+                '                            </select></div>');
+
+
+            var filterDistrict = $('#filterDistrict').val();
+            // console.log(filterDistrict);
+            $('#filterSchool').empty();
+            loadSelectOptionScheoolBy(filterDistrict,'#filterSchool',SchoolID);
+            $('#filterSchool').select2({allowClear: true});
+
+            if(SchoolID!=''){
+                $('#filterSchool').select2('val',SchoolID);
+            }
+        }
+    }
+
     $('#filterSerchContact').keyup(function () {
         searchContact();
     });
@@ -275,6 +307,7 @@
             $('#listContactView').empty();
 
             if(jsonResult.length>0){
+                $('#viewListContact').val(JSON.stringify(jsonResult));
                 $.each(jsonResult,function (i,v) {
                     var email = (v.Email!='' && v.Email!=null)
                         ? '<li><i class="fa fa-envelope"></i> '+v.Email+'</li>' : '';
@@ -287,6 +320,7 @@
                         '                                    '+email+
                         '                                </ul>' +
                         '                                <div class="footerContact">' +
+                        '<p class="help-block" style="font-size: 10px;">Insert on : '+moment(v.CreatedAt).format('DD MMM YYYY')+' By '+v.CreatedBy_Name+'</p>' +
                         '                                    <button class="btn btn-xs btn-default btnContactEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button>' +
                         '                                    <button class="btn btn-xs btn-danger btnContactRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>' +
                         '                                </div>' +
@@ -299,6 +333,8 @@
 
         });
     }
+
+
 
     $(document).on('click','.btnContactRemove',function () {
        var ID = $(this).attr('data-id');
@@ -313,9 +349,37 @@
            var token = jwt_encode(data,'UAP)(*');
            var url = base_url_js+'rest2/__crudContact';
 
+           $.post(url,{token:token},function (result) {
+                toastr.success('Data removed','Success');
+               searchContact();
+           })
 
 
        }
+
+    });
+
+    $(document).on('click','.btnContactEdit',function () {
+
+
+        var viewListContact = $('#viewListContact').val();
+        var dataContact = JSON.parse(viewListContact);
+        var ID = $(this).attr('data-id');
+
+        var result = $.grep(dataContact, function(e){ return e.ID == ID; });
+
+        var d = result[0];
+
+        // $('#filterDistrict').prop('disabled',true);
+
+        $('#filterDistrict').select2('val',d.CityID);
+
+        getSchoolList(d.SchoolID);
+
+        $('#formID').val(d.ID);
+        $('#formName').val(d.Name);
+        $('#formPhone').val(d.Phone);
+        $('#formEmail').val(d.Email);
 
     });
 

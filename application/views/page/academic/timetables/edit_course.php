@@ -585,7 +585,6 @@
             if(s.TeamTeaching==1) {
                 team = s.detailTeamTeaching;
             }
-
             loadSelectOptionLecturersSingle('#formTeamTeaching',team);
             $('#formTeamTeaching').select2({allowClear: true});
 

@@ -956,7 +956,6 @@
                     var fID = (i==0) ? v.ID : fID;
                     var sc = (selected!='' && selected!=null && selected!=='undefined')
                         ? selected : fID;
-                    console.log(sc);
                     $(element).append('<option value="'+v.ID+'">'+v.SchoolName+'</option>')
                         .val(sc).trigger('change');
 

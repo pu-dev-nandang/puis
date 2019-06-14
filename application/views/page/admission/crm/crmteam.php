@@ -15,6 +15,7 @@
 
                 <div class="alert alert-info" role="alert">
                     <b style="text-align: center;">Year - <span id="viewPeriod"></span></b>
+                    <input class="hide" id="formID">
                     <input class="hide" id="formPeriodID">
                 </div>
 
@@ -64,6 +65,8 @@
                 <tbody id="listTeam"></tbody>
             </table>
 
+            <textarea class="hide" id="viewListTeamSw"></textarea>
+
         </div>
     </div>
 </div>
@@ -107,6 +110,7 @@
 
     $('#btnSaveTeam').click(function () {
 
+        var formID = $('#formID').val();
         var formPeriodID = $('#formPeriodID').val();
         var formName = $('#formName').val();
         var formCoordinator = $('#formCoordinator').val();
@@ -121,7 +125,8 @@
             loading_modal_show();
 
             var data = {
-                action : 'insertCRMTeam',
+                action : (formID!='' && formID!=null) ? 'updateCRMTeam' : 'insertCRMTeam',
+                ID : formID,
                 team : {
                     PeriodID : formPeriodID,
                     Name : formName,
@@ -135,10 +140,11 @@
 
             $.post(url,{token:token},function (result) {
                 loadTableTeam();
-                $('#btnSaveTeam').html('Save').prop('disabled',true);
+                $('#btnSaveTeam').html('Save').prop('disabled',false);
                 toastr.success('Data saved','Success');
                 loading_modal_hide();
-                $('#formName').val('');
+
+                $('#formName,#formID').val('');
                 $('#formCoordinator').select2("val","");
                 $('#formMember').val(null).trigger('change');
             })
@@ -182,6 +188,7 @@
 
             $.post(url,{token:token},function (jsonResult) {
                 $('#listTeam').empty();
+                $('#viewListTeamSw').val(JSON.stringify(jsonResult));
                 if(jsonResult.length>0){
                     $.each(jsonResult,function (i,v) {
 
@@ -195,12 +202,16 @@
 
                         }
 
+                        var btnActionTeam = (v.Status=='1' || v.Status==1)
+                            ? '<button class="btn btn-sm btn-default btnEditTeam" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                            '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>'
+                            : '-' ;
+
                         $('#listTeam').append('<tr>' +
                             '<td>'+(i+1)+'</td>' +
                             '<td>'+v.Name+'</td>' +
                             '<td><b>(Co) '+v.CoordinatorName+'</b><div>'+listMember+'</div></td>' +
-                            '<td><button class="btn btn-sm btn-default btnEditTeam hide" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
-                            '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button></td>' +
+                            '<td>'+btnActionTeam+'</td>' +
                             '</tr>');
                     });
                 } else {
@@ -232,6 +243,36 @@
 
             })
         }
+
+    });
+
+    $(document).on('click','.btnEditTeam',function () {
+
+        var viewListTeamSw = $('#viewListTeamSw').val();
+
+        var viewListTeamSw = JSON.parse(viewListTeamSw);
+        var ID = $(this).attr('data-id');
+
+        var result = $.grep(viewListTeamSw, function(e){ return e.ID == ID; });
+
+        var d = result[0];
+
+        $('#viewPeriod').html(d.Year);
+
+        $('#formID').val(d.ID);
+        $('#formPeriodID').val(d.PeriodID);
+        $('#formName').val(d.Name);
+
+        $('#formCoordinator').select2('val',d.Coordinator);
+
+        var member = [];
+        if(d.Member.length>0){
+            $.each(d.Member,function (i,v) {
+                member.push(v.NIP);
+            });
+        }
+
+        $('#formMember').select2('val',member);
 
     });
 
