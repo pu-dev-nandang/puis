@@ -1050,8 +1050,10 @@ class C_rest2 extends CI_Controller {
         else if($data_arr['action']=='searchContact'){
             $key = $data_arr['key'];
 
-            $query = 'SELECT c.*, s.SchoolName, s.CityID, em.Name AS CreatedBy_Name FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
-                                              LEFT JOIN db_employees.employees em ON (em.NIP = c.CreatedBy)';
+            $query = 'SELECT c.*, s.SchoolName, s.CityID, em.Name AS CreatedBy_Name, s.CityName FROM db_admission.contact c  
+                                              LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID)
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = c.CreatedBy)
+                                              ';
 
             if($key!=''){
 

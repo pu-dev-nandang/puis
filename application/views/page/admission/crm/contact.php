@@ -184,6 +184,7 @@
                     $('#formID,#formName,#formPhone,#formEmail').val('');
 
                     searchContact();
+                    getSchoolList2();
                     toastr.success('Data saved','Success');
                 } else {
                     toastr.error('Data not yet saved','Error');
@@ -219,6 +220,31 @@
 
 
     $('#filterDistrict2').change(function () {
+        getSchoolList2();
+    });
+
+    function getSchoolList(SchoolID='') {
+        var filterDistrict = $('#filterDistrict').val();
+        if(filterDistrict!='' && filterDistrict!=null){
+            $('#viewSchoolName').html('');
+            $('#viewSchoolName').html('<div class="form-group"><label>School Name (Required)</label>' +
+                '                           <select class="select2-select-00 full-width-fix" size="5" id="filterSchool">' +
+                '                            </select></div>');
+
+
+            var filterDistrict = $('#filterDistrict').val();
+            // console.log(filterDistrict);
+            $('#filterSchool').empty();
+            loadSelectOptionScheoolBy(filterDistrict,'#filterSchool',SchoolID);
+            $('#filterSchool').select2({allowClear: true});
+
+            if(SchoolID!=''){
+                $('#filterSchool').select2('val',SchoolID);
+            }
+        }
+    }
+
+    function getSchoolList2() {
         var filterDistrict2 = $('#filterDistrict2').val();
         if(filterDistrict2!='' && filterDistrict2!=null){
             var url = base_url_js+'api/__getSchoolByCityID/'+filterDistrict2;
@@ -257,27 +283,6 @@
 
             });
         }
-    });
-
-    function getSchoolList(SchoolID='') {
-        var filterDistrict = $('#filterDistrict').val();
-        if(filterDistrict!='' && filterDistrict!=null){
-            $('#viewSchoolName').html('');
-            $('#viewSchoolName').html('<div class="form-group"><label>School Name (Required)</label>' +
-                '                           <select class="select2-select-00 full-width-fix" size="5" id="filterSchool">' +
-                '                            </select></div>');
-
-
-            var filterDistrict = $('#filterDistrict').val();
-            // console.log(filterDistrict);
-            $('#filterSchool').empty();
-            loadSelectOptionScheoolBy(filterDistrict,'#filterSchool',SchoolID);
-            $('#filterSchool').select2({allowClear: true});
-
-            if(SchoolID!=''){
-                $('#filterSchool').select2('val',SchoolID);
-            }
-        }
     }
 
     $('#filterSerchContact').keyup(function () {
@@ -315,7 +320,8 @@
                         '                            <h4>'+v.Name+'</h4>' +
                         '                            <div class="detailContact">' +
                         '                                <ul>' +
-                        '                                    <li><i class="fa fa-map-marker"></i> '+v.SchoolName+'</li>' +
+                        '                                    <li><i class="fa fa-building"></i> '+v.SchoolName+'</li>' +
+                        '                                    <li><i class="fa fa-map-marker"></i> '+v.CityName+'</li>' +
                         '                                    <li><i class="fa fa-phone"></i> '+v.Phone+'</li>' +
                         '                                    '+email+
                         '                                </ul>' +
