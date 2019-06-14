@@ -952,6 +952,33 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function loadDataFormulirGlobal_available_new()
+    {
+        // error_reporting(0);
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Ta = $this->m_master->showData_array('db_admission.set_ta');
+                $Ta = $Ta[0]['Ta'];
+                $where = (!array_key_exists("division",$dataToken)) ? ' where a.Status = 0 ' : ' where a.Division ="'.$dataToken['division'].'" and a.Status = 0';
+                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where.' group by a.FormulirCodeGlobal';
+                $query=$this->db->query($sql, array())->result_array();
+                echo json_encode($query);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
     public function rekapintake()
     {
         // error_reporting(0);

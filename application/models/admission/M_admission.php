@@ -1009,13 +1009,15 @@ class M_admission extends CI_Model {
     {
       // get no kwitansi terakhir
       $this->load->model('master/m_master');
-      $getDatax = $this->m_master->showData_array('db_admission.set_ta');
+      // $getDatax = $this->m_master->showData_array('db_admission.set_ta');
+      // get year by Code Formulir
+      $getDatax = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','FormulirCode',$input_arr['selectFormulirCode']);
       $sql = 'select a.* from db_admission.sale_formulir_offline as a
               left join db_admission.formulir_number_offline_m as b
               on a.FormulirCodeOffline = b.FormulirCode
               where b.Years = ?
               order by a.NoKwitansi desc limit 1';
-      $query=$this->db->query($sql, array($getDatax[0]['Ta']))->result_array();
+      $query=$this->db->query($sql, array($getDatax[0]['Years']))->result_array();
       if (count($query) > 0) {
         $NoKwitansi = $query[0]['NoKwitansi'];
         $NoKwitansi = ($NoKwitansi != "") ? (int)$NoKwitansi + 1 : $NoKwitansi;
@@ -2456,7 +2458,7 @@ class M_admission extends CI_Model {
 
     public function getDataPersonal($ID_register_formulir)
     {
-      $sql = "select a.*,c.FormulirCode,e.Name as NameProdyIND,e.NameEng as NameProdyEng from db_admission.register as a join db_admission.register_verification as b
+      $sql = "select a.*,c.FormulirCode,d.ID_program_study,e.Name as NameProdyIND,e.NameEng as NameProdyEng from db_admission.register as a join db_admission.register_verification as b
               on a.ID = b.RegisterID join db_admission.register_verified as c on b.ID = c.RegVerificationID
               join db_admission.register_formulir as d on d.ID_register_verified = c.ID 
               join db_academic.program_study as e on d.ID_program_study = e.ID

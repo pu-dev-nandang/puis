@@ -1062,7 +1062,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         if ($tgl != null) {
             $dataSave['VerificationAT'] = $tgl.' 00:00:00';
-            $dataSave['VerificationBY'] = $PIC;
+            $dataSave['VerificationBY'] = $this->session->userdata('NIP');
         }
 
         $this->db->insert('db_admission.register_verified', $dataSave);

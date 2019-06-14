@@ -233,7 +233,7 @@
 				}
 				else
 				{
-					toastr.info('Formulir Number Online atau Formulir Number Global tidak ada');
+					toastr.info('Formulir Number Online atau Formulir Number Global tidak ada, Silahkan kontak pihak Admisi');
 				}
 			  
 			}).fail(function() {
