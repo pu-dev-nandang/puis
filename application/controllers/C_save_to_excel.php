@@ -2748,9 +2748,7 @@ class C_save_to_excel extends CI_Controller
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $input = (array) $this->jwt->decode($token,$key);
-        // $this->load->model('master/m_master');
         $this->load->model('admission/m_admission');
-        // start dari A4
         $Year = $input['Year'];
         $getData = $this->m_admission->getIntakeByYear($Year);
         $this->getExcelIntake_admission($getData,$Year);
@@ -2909,6 +2907,17 @@ class C_save_to_excel extends CI_Controller
                     $v =  $G_Value[$j];
                     $tot += $v;
                     $excel3->setCellValue('H'.$r1, $v)->getStyle('H'.$r1)->applyFromArray($style_row2);
+                    if ($v > 0) {
+                        $excel3->getStyle('H'.$r1)->applyFromArray(
+                            array(
+                                'fill' => array(
+                                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                                    'color' => array('rgb' => 'F0E68C')
+                                )
+                            )
+                        );
+                    }
+                    
                     $r1++;
                 }
                 if (array_key_exists(3, $arr_total)) {
@@ -3012,7 +3021,7 @@ class C_save_to_excel extends CI_Controller
         // start dari A4
         $a = 4;
         $Filaname = 'Intake_Tuition_fee_'.$Year.'.xlsx';
-        $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);
+        // $getData = $this->m_admission->getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi);
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         // print_r($getData);die();
         $SumTotalTagihan = 0;

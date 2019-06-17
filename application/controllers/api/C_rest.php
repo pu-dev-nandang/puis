@@ -1027,9 +1027,20 @@ class C_rest extends CI_Controller {
                     if ($dataToken['action'] == 'reset') {
                        // drop table
                         $this->m_statistik->droptablerekapintake($Year);
+                        // rekap intake admission
+                        // special untuk data 2018 inject summary to db maka akan di skip
+                        if ($Year != 2018) {
+                            $this->m_statistik->droptablerekapintake_admission($Year);
+                        }
+                            
                     }
                      //$this->m_statistik->droptablerekapintake($Year);
                      $result = $this->m_statistik->ShowRekapIntake($Year);
+                     // rekap intake admission
+                     // special untuk data 2018 inject summary to db maka akan di skip
+                     if ($Year != 2018) {
+                        $result = $this->m_statistik->ShowRekapIntake_admission($Year);
+                     }  
 
                     echo '{"status":"000"}';
                 }

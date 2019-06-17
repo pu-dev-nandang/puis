@@ -3065,4 +3065,33 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;  
 
     }
+
+    public function GetDateAfterOrBefore($date=null,$pass = null)
+    {
+        /* 
+           passing data menggunakan tanda (+) atau (-)
+           return data dalam bentuk format date time mysql
+        */
+        $rs = '';
+       if ($pass != null && $date != null) {
+           if (substr($pass, 0,1) == '+' || substr($pass, 0,1) == '-') {
+            // read length
+            $strlen = strlen($pass);
+            $DayInterval = substr($pass, 1, ($strlen-1) );
+              if (substr($pass, 0,1) == '+') {
+                 $sql = 'select date_add("'.$date.'", INTERVAL '.$DayInterval.' DAY) as DateRs';
+                 $query=$this->db->query($sql, array())->result_array();
+                 $rs = $query[0]['DateRs'];
+              }
+              else if(substr($pass, 0,1) == '-')
+              {
+                $sql = 'select DATE_SUB("'.$date.'", INTERVAL '.$DayInterval.' DAY) as DateRs';
+                $query=$this->db->query($sql, array())->result_array();
+                $rs = $query[0]['DateRs'];
+              }
+           }
+       }
+
+       return $rs;
+    }
 }
