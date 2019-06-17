@@ -76,7 +76,27 @@
     var TaSegment = '<?php echo $this->uri->segment(3) ?>';
     var TableSess = '';
     var TempCheckBoxIDCard = [];
+
+    <?php
+        // Get Session Division 
+        $P = $this->session->userdata('PositionMain'); 
+        $PN = $P['Division'];
+        $PID = $P['IDDivision'];
+    ?>
+    var DivSessionName = '<?php echo $PN ?>'; 
+    var DivSessionID = '<?php echo $PID ?>';
+    // function remove button
+    var waitForEl = function(selector, callback) {
+      if (jQuery(selector).length) {
+        callback();
+      } else {
+        setTimeout(function() {
+          waitForEl(selector, callback);
+        }, 100);
+      }
+    }; 
     $(document).ready(function () {
+        loadingStart(); // start loading
         loadSelectOptionClassOf_ASC('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
         loadSelectOptionStatusStudent('#filterStatus','');
@@ -87,7 +107,6 @@
            if (jQuery.inArray( settings.url, urlInarray )) {
                bool++;
                if (bool == 1) {
-
                    setTimeout(function(){
                         // select filterCurriculum by TaSegment
                             if (TaSegment != '' && TaSegment != null) {
@@ -108,13 +127,12 @@
 
                             }
                         loadStudent(); 
-
+                        loadingEnd(500); // end loading
                     }, 500);
                   
                }
            }
         });
-
     });
 
     $(document).on('change','#filterBaseProdi',function () {
@@ -326,7 +344,7 @@
                 '                    <th style="width: 5%;">No</th>' +
                 '                    <th style="width: 7%;">NIM</th>' +
                 '                    <th style="width: 5%;">Photo</th>' +
-                '                    <th style="">Name</th>' +
+                '                    <th style="">Name,Email & Formulir Number</th>' +
                 '                    <th style="width: 7%;">Class Of</th>' +
                 '                    <th style="width: 15%;">Progamme Study</th>' +
                 '                    <th style="width: 5%;">Upload Photo</th>' +
@@ -362,6 +380,14 @@
                         $(".employee-grid-error").html("");
                         $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                         $("#employee-grid_processing").css("display","none");
+                    }
+                },
+                "drawCallback": function( settings ) {
+                    // trigger remove button
+                    if (DivSessionID != 12 && DivSessionID != 6) { // selain IT dan Academic
+                        waitForEl(".btnLoginPortalStudents", function() { 
+                          $("#btnSelect,#btnPrintIDCard,.btn-upload,.btn-group,.btnLoginPortalStudents").remove();
+                        });
                     }
                 }
             } );
