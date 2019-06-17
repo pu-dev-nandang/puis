@@ -433,6 +433,13 @@ class C_global extends CI_Controller {
                         'CreateBY' => $G_register_admisi[0]['CreateBY'],
                     );
                     $arr['dt'][] = $temp;
+
+                    // update data
+                    // $arr_save_db = array(
+                    //     'Discount' => $persen,
+                    // );
+                    // $this->db->where('ID',$ID);
+                    // $this->db->update('db_finance.payment_admisi',$arr_save_db);
                 }
 
 

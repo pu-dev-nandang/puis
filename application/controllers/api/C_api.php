@@ -679,12 +679,20 @@ class C_api extends CI_Controller {
 
         $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID, 
                           ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
-                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy
+                          ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref
                           FROM '.$db_.'.students s 
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
-                          LEFT JOIN db_admission.to_be_mhs asx ON (ast.NPM = asx.NPM)
+                          LEFT JOIN (
+                            select a.NPM,a.FormulirCode,a.GeneratedBy,a.DateTime as DateTimeGeneratedBy,dd.No_Ref
+                            from db_admission.to_be_mhs as a 
+                            left join (
+                                select FormulirCode,No_Ref from db_admission.formulir_number_offline_m
+                                UNION
+                                select FormulirCode,No_Ref from db_admission.formulir_number_online_m
+                            ) dd on a.FormulirCode = dd.FormulirCode
+                          ) as asx on ast.NPM = asx.NPM
                           LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
                           ';
 
@@ -700,6 +708,7 @@ class C_api extends CI_Controller {
             $sql.= ' OR s.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR s.ClassOf LIKE "'.$requestData['search']['value'].'%"';
             $sql.= ' OR asx.FormulirCode LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' OR asx.No_Ref LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR emp.Name LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= ' ORDER BY s.NPM, s.ProdiID ASC';
         }
@@ -731,7 +740,11 @@ class C_api extends CI_Controller {
 
 //            $nestedData[] = '<div style="text-align: center;">'.$row["NPM"].'</div>';
             // $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
-            $nestedData[] = $row["FormulirCode"];
+
+            // show formulir number
+                $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
+
+            $nestedData[] = $StrFM;
             $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-inverse btn-notification btn-show" NPM="'.$row["NPM"].'" Name = "'.$row["Name"].'">Show</button></div>';
             $nestedData[] = '<div style="text-align: center;">'.$Gender.'</div>';
@@ -7957,7 +7970,6 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
-
         $dataWhere = '';
 
         if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!=''){
@@ -7986,21 +7998,31 @@ class C_api extends CI_Controller {
 
             if($dataWhere!=''){
                 $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
-                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" ';
             } else {
                 $dataSearch = 'WHERE ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
-                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
+                           OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" ';
             }
 
-
+            // adding search Formulir Number
+                $dataSearch .= ' or fma.FormulirCode LIKE "%'.$search.'%" or fma.No_Ref LIKE "%'.$search.'%" )';
         }
 
         $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent,  
-                                      pg.Code AS ProdiGroup
+                                      pg.Code AS ProdiGroup,fma.FormulirCode,fma.No_Ref
                                       FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
                                       LEFT JOIN db_academic.prodi_group pg ON (pg.ID = aut_s.ProdiGroupID)
                                       LEFT JOIN db_academic.status_student ss ON (ss.ID = aut_s.StatusStudentID)
+                                      LEFT JOIN (
+                                        select a.NPM,a.FormulirCode,a.GeneratedBy,a.DateTime as DateTimeGeneratedBy,dd.No_Ref
+                                        from db_admission.to_be_mhs as a 
+                                        left join (
+                                            select FormulirCode,No_Ref from db_admission.formulir_number_offline_m
+                                            UNION
+                                            select FormulirCode,No_Ref from db_admission.formulir_number_online_m
+                                        ) dd on a.FormulirCode = dd.FormulirCode
+                                      ) as fma on fma.NPM = aut_s.NPM
                                       '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -8063,10 +8085,13 @@ class C_api extends CI_Controller {
 
             $gp = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null) ? ' - '.$row['ProdiGroup'] : '';
 
+            // show formulir number
+                $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<br/><span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['Year'].''.$gp.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
