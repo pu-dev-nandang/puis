@@ -2111,7 +2111,7 @@ class M_admission extends CI_Model {
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
               group by a.ID 
-              order by a.ID desc
+              order by p.ID desc
               LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       $this->load->model('master/m_master');
@@ -2168,6 +2168,7 @@ class M_admission extends CI_Model {
               'getFile' => $getFile,
               'Email' => $query[$i]['Email'],
               'Desc' => $query[$i]['Desc'],
+              'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
             );
         }
         else
@@ -2186,6 +2187,7 @@ class M_admission extends CI_Model {
               'getFile' => $getFile,
               'Email' => $query[$i]['Email'],
               'Desc' => $query[$i]['Desc'],
+              'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
             );
         }
 
@@ -2276,7 +2278,7 @@ class M_admission extends CI_Model {
               where ('.$Status.') 
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
-             group by a.ID order by a.ID desc LIMIT '.$start. ', '.$limit;
+             group by a.ID order by p.ID desc LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
      $this->load->model('master/m_master');
      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
@@ -2336,6 +2338,7 @@ class M_admission extends CI_Model {
             'Email' => $query[$i]['Email'],
             'Desc' => $query[$i]['Desc'],
             'Rev' => count($rev),
+            'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
            );
        }
        else
@@ -2355,6 +2358,8 @@ class M_admission extends CI_Model {
              'Email' => $query[$i]['Email'],
              'Desc' => $query[$i]['Desc'],
              'Rev'  =>count($rev),
+             'CreateAT' => $query[$i]['CreateAT'],
+             'CreateAT' => $this->m_master->getIndoBulan($query[$i]['CreateAT']),
            );
        }
 

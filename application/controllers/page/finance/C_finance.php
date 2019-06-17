@@ -686,7 +686,7 @@ class C_finance extends Finnance_Controler {
         $FormulirCode = $input['FormulirCode'];
 
         $this->load->library('pagination');
-        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Approved"'),15,5);
+        $config = $this->config_pagination_default_ajax($this->m_admission->count_getDataCalonMhsTuitionFee_delete($FormulirCode,'p.Status = "Approved"'),10,5);
         $this->pagination->initialize($config);
         $page = $this->uri->segment(5);
         $start = ($page - 1) * $config["per_page"];
