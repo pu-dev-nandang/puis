@@ -28,7 +28,7 @@
 	    	'<thead>'+
 	    	    '<tr>'+
 	    	        '<th style="width: 5px;">No  <!--<input type="checkbox" class="uniform" value="nothing" id ="dataResultCheckAll">--></th>'+
-	    	        '<th style="width: 55px;">Nama,Prodi & Sekolah</th>'+
+	    	        '<th style="width: 55px;">Data & Created</th>'+
 	    	        '<th style="width: 55px;">Formulir Code</th>'+
 	    	        '<th style="width: 10%;">Beasiswa, File & Rangking</th>'
 	    	for (var i = 0; i < payment_type.length; i++) {
@@ -84,7 +84,7 @@
 			$(".tableData tbody").append(
 					'<tr>'+
 						'<td align= "center">'+no+'&nbsp<input type="checkbox" class="uniform" nama ="'+getDataCalonMhs[i]['Name']+'" value ="'+getDataCalonMhs[i]['ID_register_formulir']+'" </td>'+
-						'<td>'+getDataCalonMhs[i]['Name']+'<br>'+getDataCalonMhs[i]['NamePrody']+'<br>'+getDataCalonMhs[i]['SchoolName']+'</td>'+
+						'<td>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['Name']+'</span>'+'<br>'+'<span style="color: #c77905;">'+getDataCalonMhs[i]['NamePrody']+'</span>'+'<br>'+getDataCalonMhs[i]['SchoolName']+'<br>'+'<span style="color: #20525a;">'+getDataCalonMhs[i]['CreateAT']+'</span>'+'</td>'+
 						'<td>'+Code+'</td>'+
 						'<td>'+getDataCalonMhs[i]['getBeasiswa']+'<br><br>'+Rangking+'<br><br>'+showFile+'</td>'+
 						isi_payment+
