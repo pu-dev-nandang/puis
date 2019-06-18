@@ -18,9 +18,9 @@
         <li>
             <a href="<?php echo base_url('academic/semester-antara/students/'.$SASemesterID); ?>">Students</a>
         </li>
-        <li class="hide">
-            <a href="<?php echo base_url('academic/semester-antara/score/'.$SASemesterID); ?>">Score</a>
-        </li>
+<!--        <li class="hide">-->
+<!--            <a href="--><?php //echo base_url('academic/semester-antara/score/'.$SASemesterID); ?><!--">Score</a>-->
+<!--        </li>-->
 
 
 

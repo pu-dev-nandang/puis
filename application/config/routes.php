@@ -948,6 +948,9 @@ $route['rest2/__crudCRMTeam'] = 'api/c_rest2/crudCRMTeam';
 $route['rest2/__crudMarketingActivity'] = 'api/c_rest2/crudMarketingActivity';
 $route['rest2/__crudContact'] = 'api/c_rest2/crudContact';
 
+$route['rest2/__crudProspectiveStudents'] = 'api/c_rest2/crudProspectiveStudents';
+$route['rest2/__getPathway'] = 'api/c_rest2/getPathway';
+
 
 $route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
 $route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';

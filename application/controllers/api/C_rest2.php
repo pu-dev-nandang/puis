@@ -1142,9 +1142,9 @@ class C_rest2 extends CI_Controller {
 
             $ID = $data_arr['ID'];
 
-
-
             $dataForm = (array) $data_arr['dataForm'];
+
+//            print_r($dataForm);exit;
 
             $dateEvent = $dataForm['Start'];
             $Month = explode('-',$dateEvent)[1];
@@ -1236,6 +1236,17 @@ class C_rest2 extends CI_Controller {
             return print_r(json_encode($result));
 
         }
+
+        else if($data_arr['action']=='readActiveNow_MA'){
+
+            $DateNow = $this->m_rest->getDateNow();
+
+            $data = $this->db->query('SELECT * FROM db_admission.marketing_activity ma WHERE ma.Start <= "'.$DateNow.'" AND ma.End >= "'.$DateNow.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
     }
 
     public function crudContact(){
@@ -1259,8 +1270,10 @@ class C_rest2 extends CI_Controller {
         else if($data_arr['action']=='searchContact'){
             $key = $data_arr['key'];
 
-            $query = 'SELECT c.*, s.SchoolName, s.CityID, em.Name AS CreatedBy_Name FROM db_admission.contact c LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID) 
-                                              LEFT JOIN db_employees.employees em ON (em.NIP = c.CreatedBy)';
+            $query = 'SELECT c.*, s.SchoolName, s.CityID, em.Name AS CreatedBy_Name, s.CityName FROM db_admission.contact c  
+                                              LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID)
+                                              LEFT JOIN db_employees.employees em ON (em.NIP = c.CreatedBy)
+                                              ';
 
             if($key!=''){
 
@@ -1288,6 +1301,133 @@ class C_rest2 extends CI_Controller {
             $this->db->delete('db_admission.contact');
             return print_r(1);
         }
+    }
+
+    public function crudProspectiveStudents(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='insert_PS'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->insert('db_admission.crm',$dataForm);
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='update_PS'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.crm',$dataForm);
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='read_PS'){
+
+            $PeriodID = $data_arr['PeriodID'];
+            $data = $this->db->query('SELECT c.*, em.Name AS NameProspect_by FROM db_admission.crm c 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                                WHERE c.PeriodID = "'.$PeriodID.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='read2Full_PS'){
+            $ID = $data_arr['ID'];
+            $data = $this->db->query('SELECT c.*, em.Name AS SalesName, s.CityID, rms.SchoolMajor FROM db_admission.crm c 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                                LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID)
+                                                LEFT JOIN db_admission.register_major_school rms ON (rms.ID = c.PathwayID)
+                                                WHERE c.ID = "'.$ID.'" ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='insertStatus_PS'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_admission.crm_status', $dataForm);
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateStatus_PS'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.crm_status',$dataForm);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='removeCRM_PS'){
+
+
+
+        }
+        else if($data_arr['action']=='status_PS'){
+
+            $data = $this->db->query('SELECT cs.*,csl.Name AS LabelName, csl.Class AS LabelClass FROM db_admission.crm_status cs 
+                                                LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='removeStatus_PS'){
+
+            $ID = $data_arr['ID'];
+            // Cek apakah IDnya di pakai
+            $dataCheck = $this->db->get_where('db_admission.crm',array('Status'=>$ID))->result_array();
+
+            if(count($dataCheck)>0){
+                $Status = '0';
+            } else {
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_admission.crm_status');
+                $Status = '1';
+            }
+
+            return print_r(json_encode(array('Status' => $Status)));
+
+
+
+        }
+        else if($data_arr['action']=='insertCommentF_SP'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_admission.crm_followup', $dataForm);
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateCommentF_SP'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.crm_followup',$dataForm);
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='viewFollowUp_SP'){
+            $CRMID = $data_arr['CRMID'];
+            $data = $this->db->get_where('db_admission.crm_followup',array('CRMID' => $CRMID))->result_array();
+
+            return print_r(json_encode($data));
+        }
+
+    }
+
+    public function getPathway(){
+        $data = $this->db->get_where('db_admission.register_major_school',array(
+            'Active' => 1
+        ))->result_array();
+
+        return print_r(json_encode($data));
+
     }
 
     // ==== PENUTUP CRM ====
