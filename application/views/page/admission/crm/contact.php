@@ -326,7 +326,7 @@
                         '                                    '+email+
                         '                                </ul>' +
                         '                                <div class="footerContact">' +
-                        '<p class="help-block" style="font-size: 10px;">Insert on : '+moment(v.CreatedAt).format('DD MMM YYYY')+' By '+v.CreatedBy_Name+'</p>' +
+                        '<p class="help-block" style="font-size: 10px;">Updated on : '+moment(v.CreatedAt).format('DD MMM YYYY')+' By '+v.CreatedBy_Name+'</p>' +
                         '                                    <button class="btn btn-xs btn-default btnContactEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button>' +
                         '                                    <button class="btn btn-xs btn-danger btnContactRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>' +
                         '                                </div>' +

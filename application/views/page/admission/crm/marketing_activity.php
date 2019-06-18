@@ -158,7 +158,7 @@
         loadSelectOptionEmployeesSingle('#formParticipants','');
         $('#formParticipants').select2({allowClear: true});
 
-        $( "#formStart,#formEnd" )
+        $( "#formStart,#formEnd")
             .datepicker({
                 showOtherMonths:true,
                 autoSize: true,
@@ -360,7 +360,7 @@
         $('#formTimeStart').val(d.TimeStart);
         $('#formTimeEnd').val(d.TimeEnd);
 
-        $('#formPrice').val(d.Price);
+        $('#formPrice').val(parseFloat(d.Price));
         $('#formPrice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
         $('#formPrice').maskMoney('mask', '9894');
 
@@ -395,6 +395,7 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 if(jsonResult.Status=='1' || jsonResult.Status==1){
+                    loadMarketingAct();
                     toastr.success('Data removed','Success');
                 } else {
                     toastr.warning('Data can not removed','Warning');
