@@ -1009,5 +1009,13 @@ class M_budgeting extends CI_Model {
                 ';
         $query=$this->db->query($sql, array($Departement,$Year))->result_array();
         return (int)$query[0]['Total'];        
+    }
+
+    public function __tbl_cfg_set_userrole()
+    {
+        $sql = 'select * from db_budgeting.cfg_set_userrole order by MaxLimit asc
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
     }  
 }

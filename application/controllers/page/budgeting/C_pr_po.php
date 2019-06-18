@@ -289,7 +289,7 @@ class C_pr_po extends Budgeting_Controler {
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
             // circulation sheet
-            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'">Info</a>';
+            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'" style = "    background-color: #2f5ad4;">Info</a>';
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
             $arr = array();
             if (count($JsonStatus) > 0) {
@@ -752,6 +752,7 @@ class C_pr_po extends Budgeting_Controler {
                             $SubTotal = $data_arr['SubTotal'];
                             $Amount = $Amount + $SubTotal;
                         }
+                        
             $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
                 if (count($JsonStatus2) > 1) {
                     $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);

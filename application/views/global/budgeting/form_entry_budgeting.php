@@ -1459,6 +1459,8 @@ $(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',
 	    	    //allowClear: true
 	    	});	
 
+	    	evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
 	    });
 	    break;
 	  case 'delete':

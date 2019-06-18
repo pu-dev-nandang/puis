@@ -87,6 +87,7 @@ class C_master extends Purchasing_Controler {
                            'Approval' => 1,
                            'ApprovalBy' => $this->session->userdata('NIP'),
                            'ApprovalAt' => date('Y-m-d H:i:s'),
+                           'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
                        $this->db->insert('db_purchasing.m_catalog', $dataSave);
                        echo json_encode(array('msg' => 'Saved','status' => 1));
@@ -109,6 +110,7 @@ class C_master extends Purchasing_Controler {
                         'Approval' => 1,
                         'ApprovalBy' => $this->session->userdata('NIP'),
                         'ApprovalAt' => date('Y-m-d H:i:s'),
+                        'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
                     $this->db->insert('db_purchasing.m_catalog', $dataSave);
                     echo json_encode(array('msg' => 'Saved','status' => 1));
@@ -200,6 +202,7 @@ class C_master extends Purchasing_Controler {
                     'ApprovalBy' => $this->session->userdata('NIP'),
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                     'Reason' => '',
+                    'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_catalog', $dataSave);
@@ -211,6 +214,7 @@ class C_master extends Purchasing_Controler {
                     'ApprovalBy' => $this->session->userdata('NIP'),
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                     'Reason' => $Input['Reason'],
+                    'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_catalog', $dataSave);

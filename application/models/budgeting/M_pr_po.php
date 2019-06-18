@@ -316,7 +316,8 @@ class M_pr_po extends CI_Model {
             $G = $this->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
             $CodePost = $G[0]['CodePost'];
             // search in by CodePost and by Amount
-                $G1 = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','CodePost',$CodePost);
+                // $G1 = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','CodePost',$CodePost);
+                $G1 = $this->__Get_Limit_CodePost_OrderBy($CodePost);
                 for ($j=0; $j < count($G1); $j++) { 
                     $CodePost_ = $G1[$j]['CodePost'];
                     $MaxLimit = $G1[$j]['MaxLimit'];
@@ -336,9 +337,8 @@ class M_pr_po extends CI_Model {
                     }
                 }
         }       
-        // print_r($arr);
+        // print_r($arr);die();
         $G = $this->get_approval_pr($Departement);
-        // print_r($G);
         $ID_m_userrole_limit = $arr['Count'] + 1;
         // print_r($ID_m_userrole_limit.' => ID_m_userrole_limit');
         $indeksArr = 0;
@@ -740,11 +740,26 @@ class M_pr_po extends CI_Model {
                 where a.NIP = "'.$NIP.'" and a.Departement = "'.$Departement.'" limit 1';
         $query = $this->db->query($sql, array())->result_array();
         if (count($query) > 0) {
-            $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
+            // $arr_result['rule'] = $this->m_master->caribasedprimary('db_budgeting.cfg_set_userrole','ID_m_userrole',$query[0]['ID_m_userrole']);
+            $arr_result['rule'] = $this->__Get_Limit_userRole_OrderBy($query[0]['ID_m_userrole']);
             $arr_result['access'] = $query;
         }
         
         return $arr_result; 
+    }
+
+    private function __Get_Limit_userRole_OrderBy($ID_m_userrole)
+    {
+        $sql = 'select * from db_budgeting.cfg_set_userrole where ID_m_userrole = ? order by MaxLimit asc';
+        $query = $this->db->query($sql, array($ID_m_userrole))->result_array();
+        return $query; 
+    }
+
+    private function __Get_Limit_CodePost_OrderBy($CodePost)
+    {
+        $sql = 'select * from db_budgeting.cfg_set_userrole where CodePost = ? order by MaxLimit asc';
+        $query = $this->db->query($sql, array($CodePost))->result_array();
+        return $query; 
     }
 
     public function Get_m_Approver()
