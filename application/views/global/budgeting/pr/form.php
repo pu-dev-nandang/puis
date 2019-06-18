@@ -1215,8 +1215,10 @@
 		var UnitCost = tr.find('.UnitCost').val();
 		UnitCost = findAndReplace(UnitCost, ".","");
 		var hitung = qty * UnitCost;
-		var PPH = (tr.find('.PPH').val() / 100 ) * hitung;
-		hitung = hitung + PPH;
+		var PPH = ((tr.find('.PPH').val() / 100 ) * hitung).toFixed(2);
+		// console.log(PPH);
+		hitung = parseInt(hitung) + parseInt(PPH);
+		// console.log(hitung);
 		tr.find('.SubTotal').val(hitung);
 		tr.find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		tr.find('.SubTotal').maskMoney('mask', '9894');
