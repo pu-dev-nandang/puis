@@ -437,9 +437,12 @@ class M_master extends CI_Model {
             }*/
 
             // get last formulir code
-            $sql = 'select * from db_admission.formulir_number_offline_m order by FormulirCode desc limit 1';
-            $query=$this->db->query($sql, array())->result_array();
-            $start = $query[0]['ID'] + 1;
+            $sql = 'select * from db_admission.formulir_number_offline_m where Years = ? order by FormulirCode desc limit 1';
+            $query=$this->db->query($sql, array($tahun))->result_array();
+            $start = $query[0]['FormulirCode'];
+            $Number = substr($start, 3,4);
+            $Number = $Number + 1;
+            $start = $Number;
             for ($i=0; $i < $count_account; $i++) {
                 $this->insertDataFormulirOffline($tahun,$start);
                 $start++;
@@ -463,7 +466,7 @@ class M_master extends CI_Model {
         $this->load->library('JWT');
         $key = "UAP)(*";
         // $url = $this->jwt->encode($yy.$code.$increment.";".$tahun,$key);
-        $url = substr(md5(uniqid(mt_rand(), true)), 0, 8);
+        $url = $yy.substr(md5(uniqid(mt_rand(), true)), 0, 8).$increment;
         $baseURL = url_registration."formulir-registration-offline/".$url;
         $dataSave = array(
             'Years' => $tahun,
