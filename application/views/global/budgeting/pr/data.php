@@ -87,10 +87,11 @@ $(document).ready(function() {
 		        }
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
+		    		// console.log(data);
 		    		 var endkey = (data.length) - 1;
-		    		 var keydepartment = (data.length) - 2;
+		    		 var keydepartment = (data.length) - 3;
 		    		 $( row ).find('td:eq(1)').html(
-		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'">'+data[1]+'</a><br>By : '+ data[endkey]
+		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'" style = "color : #d41c1c">'+data[1]+'</a><br>By : '+ data[endkey]
 		    		 	)
 		    		 $( row ).find('td:eq(4)').attr('align','center');
 

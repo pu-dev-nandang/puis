@@ -1589,6 +1589,7 @@
 		var dt = ClassDt.RuleAccess;
 		var access = dt.access;
 		var rule = dt.rule;
+		console.log(rule);
 		for (var i = 0; i < access.length; i++) {
 			var NIP_ = access[i].NIP;
 			if (NIP_ == NIP) {
@@ -1620,7 +1621,6 @@
 						temp.push(temp2);
 				}
 
-				
 				// var temp = [
 				// 	{
 				// 		MaxLimit : 20000,
@@ -1657,7 +1657,6 @@
 				break;
 			}
 		}
-
 		return MaxLimit;
 	}
 

@@ -2965,6 +2965,7 @@ class C_rest extends CI_Controller {
                                    'Approval' => ($chk) ? 1 : 0,
                                    'ApprovalBy' => ($chk) ? $user : '',
                                    'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                                   'LastUpdateAt' => date('Y-m-d H:i:s'),
                                );
                                $this->db->insert('db_purchasing.m_catalog', $dataSave);
 
@@ -3012,6 +3013,7 @@ class C_rest extends CI_Controller {
                                'Approval' => ($chk) ? 1 : 0,
                                'ApprovalBy' => ($chk) ? $user : '',
                                'ApprovalAt' => ($chk) ? date('Y-m-d H:i:s') : NULL,
+                               'LastUpdateAt' => date('Y-m-d H:i:s'),
                             );
                             $this->db->insert('db_purchasing.m_catalog', $dataSave);
 
@@ -3126,6 +3128,7 @@ class C_rest extends CI_Controller {
                             'ApprovalBy' => $user,
                             'ApprovalAt' => date('Y-m-d H:i:s'),
                             'Reason' => '',
+                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                         );
                         $this->db->where('ID', $Input['ID']);
                         $this->db->update('db_purchasing.m_catalog', $dataSave);
@@ -3137,6 +3140,7 @@ class C_rest extends CI_Controller {
                             'ApprovalBy' => $this->session->userdata('NIP'),
                             'ApprovalAt' => date('Y-m-d H:i:s'),
                             'Reason' => $Input['Reason'],
+                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                         );
                         $this->db->where('ID', $Input['ID']);
                         $this->db->update('db_purchasing.m_catalog', $dataSave);
