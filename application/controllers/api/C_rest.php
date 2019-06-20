@@ -1516,7 +1516,7 @@ class C_rest extends CI_Controller {
                        $nestedData=array();
                        $row = $query[$i];
                         $nestedData[] = $i + 1;
-                        $nestedData[] = $row['Item'];
+                        $nestedData[] = $row['Item'].'<br><span style = "color : red" >'.$row['NameCategory'].'</span>';
                         $nestedData[] = $row['Desc'];
                         $EstimaValue = $row['EstimaValue'];
                         $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.').'<br>'.'<span style = "color : red">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
@@ -2934,6 +2934,7 @@ class C_rest extends CI_Controller {
                 $Detail = $Input['Detail'];
                 $user = $Input['user'];
                 $Detail = json_encode($Detail);
+                $ID_category_catalog = $Input['ID_category_catalog'];
 
                 $filename = $Input['Item'].'_Uploaded';
                 $filename = str_replace(" ", '_', $filename);
@@ -2961,6 +2962,7 @@ class C_rest extends CI_Controller {
                                    'Item' => $Item,
                                    'Desc' => $Desc,
                                    'EstimaValue' => $EstimaValue,
+                                   'ID_category_catalog' => $ID_category_catalog,
                                    'Photo' => $uploadFile,
                                    'Departement' => $Departement,
                                    'DetailCatalog' => $Detail,
@@ -3009,6 +3011,7 @@ class C_rest extends CI_Controller {
                                 'Item' => $Item,
                                 'Desc' => $Desc,
                                 'EstimaValue' => $EstimaValue,
+                                'ID_category_catalog' => $ID_category_catalog,
                                 'Photo' => '',
                                 'Departement' => $Departement,
                                 'DetailCatalog' => $Detail,
@@ -3052,6 +3055,7 @@ class C_rest extends CI_Controller {
                     case 'edit':
                         $Get_Data = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
                         $Status = $Get_Data[0]['Status'];
+                        $ApprovalGet = $Get_Data[0]['Approval'];
                         if ($Status == 1) {
                             if (array_key_exists('fileData',$_FILES)) {
                                $path = './uploads/budgeting/catalog';
@@ -3067,9 +3071,11 @@ class C_rest extends CI_Controller {
                                        'Item' => $Item,
                                        'Desc' => $Desc,
                                        'EstimaValue' => $EstimaValue,
+                                       'ID_category_catalog' => $ID_category_catalog,
                                        'Photo' => $uploadFile,
                                        'Departement' => $Departement,
                                        'DetailCatalog' => $Detail,
+                                       'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                        'LastUpdateBy' => $user,
                                        'LastUpdateAt' => date('Y-m-d H:i:s'),
                                    );
@@ -3087,8 +3093,10 @@ class C_rest extends CI_Controller {
                                     'Item' => $Item,
                                     'Desc' => $Desc,
                                     'EstimaValue' => $EstimaValue,
+                                    'ID_category_catalog' => $ID_category_catalog,
                                     'Departement' => $Departement,
                                     'DetailCatalog' => $Detail,
+                                    'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                     'LastUpdateBy' => $user,
                                     'LastUpdateAt' => date('Y-m-d H:i:s'),
                                 );

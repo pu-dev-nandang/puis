@@ -14,7 +14,7 @@
 	               '<thead>'+
 	                  '<tr>'+
 	                     '<th>No</th>'+
-	                     '<th>Item</th>'+
+	                     '<th>Item & Category</th>'+
 	                     '<th>Desc</th>'+
 	                     '<th>Estimate Value</th>'+
 	                     '<th>Photo</th>'+
@@ -57,7 +57,7 @@
 	          	      		 var status = '';
 	          	      		 if (full[8]== 1 || full[8]== 0) {
 	          	      		 	btn = '';
-	          	      		 	status = (full[8]== 1) ? 'Approve' : 'Not Approve';
+	          	      		 	status = (full[8]== 1) ? 'Approve' : 'Awaiting Approval';
 	          	      		 }
 	          	      		 else{
 	          	      		 	status = 'Reject';

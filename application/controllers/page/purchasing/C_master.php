@@ -64,6 +64,9 @@ class C_master extends Purchasing_Controler {
         $Departement = $Input['Departement'];
         $Detail = $Input['Detail'];
         $Detail = json_encode($Detail);
+        if (array_key_exists('ID_category_catalog', $Input)) {
+          $ID_category_catalog = $Input['ID_category_catalog'];
+        }
 
         $filename = $Input['Item'].'_Uploaded';
         $filename = str_replace(" ", '_', $filename);
@@ -79,6 +82,7 @@ class C_master extends Purchasing_Controler {
                            'Item' => $Item,
                            'Desc' => $Desc,
                            'EstimaValue' => $EstimaValue,
+                           'ID_category_catalog' => $ID_category_catalog,
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
@@ -102,6 +106,7 @@ class C_master extends Purchasing_Controler {
                         'Item' => $Item,
                         'Desc' => $Desc,
                         'EstimaValue' => $EstimaValue,
+                        'ID_category_catalog' => $ID_category_catalog,
                         'Photo' => '',
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
@@ -133,6 +138,7 @@ class C_master extends Purchasing_Controler {
                            'Item' => $Item,
                            'Desc' => $Desc,
                            'EstimaValue' => $EstimaValue,
+                           'ID_category_catalog' => $ID_category_catalog,
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
@@ -153,6 +159,7 @@ class C_master extends Purchasing_Controler {
                         'Item' => $Item,
                         'Desc' => $Desc,
                         'EstimaValue' => $EstimaValue,
+                        'ID_category_catalog' => $ID_category_catalog,
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
                         'LastUpdateBy' => $this->session->userdata('NIP'),
@@ -371,8 +378,9 @@ class C_master extends Purchasing_Controler {
         $totalData = $query[0]['total'];
         $No = $requestData['start'] + 1;
 
-        $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
-                from db_purchasing.m_catalog as a 
+        $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement,mcc.Name as NameCategory
+                from db_purchasing.m_catalog as a
+                join db_purchasing.m_category_catalog as mcc on mcc.ID = a.ID_category_catalog 
                 join db_employees.employees as b on a.CreatedBy = b.NIP
                 join (
                 select * from (
@@ -386,6 +394,7 @@ class C_master extends Purchasing_Controler {
                ';
 
         $sql.= ' where ( a.Item LIKE "'.$requestData['search']['value'].'%" or a.Desc LIKE "'.$requestData['search']['value'].'%" or c.NameDepartement LIKE "'.$requestData['search']['value'].'%" or a.DetailCatalog LIKE "%'.$requestData['search']['value'].'%"
+          or mcc.Name LIKE "'.$requestData['search']['value'].'%"
                 ) and a.Active = 1 '.$condition;
         $sql.= ' ORDER BY a.ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
@@ -395,7 +404,7 @@ class C_master extends Purchasing_Controler {
             $nestedData=array();
             $row = $query[$i];
             $nestedData[] = $No;
-            $nestedData[] = $row['Item'];
+            $nestedData[] = $row['Item'].'<br><span style = "color : red" >'.$row['NameCategory'].'</span>';
             $nestedData[] = $row['Desc'];
             $EstimaValue = $row['EstimaValue'];
             $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.');
@@ -444,7 +453,7 @@ class C_master extends Purchasing_Controler {
             $st = '';
             switch ($row['Approval']) {
               case 0:
-                $st = 'Not Approval';
+                $st = 'Awaiting Approval';
                 break;
               case 1:
                 $st = 'Approve';

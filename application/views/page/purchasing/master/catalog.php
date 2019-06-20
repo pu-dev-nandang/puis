@@ -76,6 +76,15 @@
 </div>
 
 <script type="text/javascript">
+    var waitForEl = function(selector, callback) {
+      if (jQuery(selector).length) {
+        callback();
+      } else {
+        setTimeout(function() {
+          waitForEl(selector, callback);
+        }, 100);
+      }
+    };
     $(document).ready(function() {
         LoadPage('InputCatalog');
 
@@ -84,6 +93,13 @@
             $(".MenuCatalog li").removeClass('active');
             $(this).parent().addClass('active');
             LoadPage(Page)
+
+            // jika approval catalog remove PageImport
+            if (Page == 'ApprovalCatalog') {
+              waitForEl("#PageImport", function() {
+                $("#PageImport").remove();
+              });
+            }
         });
     }); // exit document Function
 

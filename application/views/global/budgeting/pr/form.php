@@ -1031,7 +1031,7 @@
                '<thead>'+
                   '<tr>'+
                      '<th>No</th>'+
-                     '<th>Item</th>'+
+                     '<th>Item & Category</th>'+
                      '<th>Desc</th>'+
                      '<th>Estimate Value</th>'+
                      '<th>Photo</th>'+

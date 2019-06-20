@@ -1,5 +1,5 @@
 
-<div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
+<div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id ="PageImport">
 	<div class="well">
 		<div class="row">
 			<div class="col-md-2">
@@ -24,7 +24,7 @@
 				<thead>
 					<tr>
 						<th width = "3%">No</th>
-						<th>Item</th>
+						<th>Item & Category</th>
 						<th>Desc</th>
 						<th>Estimate Value</th>
 						<th>Photo</th>
