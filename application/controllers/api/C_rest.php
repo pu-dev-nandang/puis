@@ -1494,8 +1494,9 @@ class C_rest extends CI_Controller {
                    }
                 }
 
-                $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
-                        from db_purchasing.m_catalog as a 
+                $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement,mcc.Name as NameCategory,mcc.Days
+                        from db_purchasing.m_catalog as a
+                        join db_purchasing.m_category_catalog as mcc on mcc.ID =  a.ID_category_catalog
                         join db_employees.employees as b on a.CreatedBy = b.NIP
                         join (
                         select * from (
@@ -1551,6 +1552,8 @@ class C_rest extends CI_Controller {
                         $nestedData[] = $row['Approval'];
                         $nestedData[] = $row['Reason'];
                         $nestedData[] = $row['LastUpdateAt'];
+                        $nestedData[] = $row['NameCategory'];
+                        $nestedData[] = $row['Days'];
                         $data[] = $nestedData;
                     }
                    $json_data = array(
