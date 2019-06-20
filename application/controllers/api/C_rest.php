@@ -1518,7 +1518,7 @@ class C_rest extends CI_Controller {
                         $nestedData[] = $row['Item'];
                         $nestedData[] = $row['Desc'];
                         $EstimaValue = $row['EstimaValue'];
-                        $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.');
+                        $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.').'<br>'.'<span style = "color : red">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
                         $nestedData[] = $EstimaValue;
                         $Photo = $row['Photo'];
                          // print_r($Photo);
@@ -1550,6 +1550,7 @@ class C_rest extends CI_Controller {
                         $nestedData[] = $row['EstimaValue'];
                         $nestedData[] = $row['Approval'];
                         $nestedData[] = $row['Reason'];
+                        $nestedData[] = $row['LastUpdateAt'];
                         $data[] = $nestedData;
                     }
                    $json_data = array(

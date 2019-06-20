@@ -265,7 +265,7 @@
 		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
 							'<div class = "col-md-12">'+
 								'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_pr">'+
+									'<table class="table table-bordered tableData" id ="table_input_pr" style = "min-width: 1200px;">'+
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
@@ -401,7 +401,7 @@
 					htmlDetailCatalog += prop + ' :  '+DetailCatalog[prop]+'<br>';
 				}
 				var Item = pr_detail[i]['Item'];
-				var arr = Item+'@@'+Desc+'@@'+EstimaValue+'@@'+htmlPhoto+'@@'+htmlDetailCatalog;
+				var arr = Item+'@@'+Desc+'@@'+formatRupiah(EstimaValue)+'@@'+htmlPhoto+'@@'+htmlDetailCatalog;
 				arr = findAndReplace(arr, "\"","'");
 
 			var SpecAdd = (pr_detail[i]['Spec_add'] == '' || pr_detail[i]['Spec_add'] == null || pr_detail[i]['Spec_add'] == 'null') ? '' : pr_detail[i]['Spec_add'];
@@ -1082,6 +1082,14 @@
 			             return '';
 			         }
 			      }],
+			      // 'columnDefs': [{
+			      //    'targets': 3,
+			      //    'className': 'dt-body-center',
+			      //    'render': function (data, type, full, meta){
+			      //    	 // console.log(full);
+			      //        return full[3]+'<br>'+'<span style = "color : red">Last Updated<br>'+full[10]+'</span>';
+			      //    }
+			      // }],
 			      'createdRow': function( row, data, dataIndex ) {
 			      		$(row).attr('id_m_catalog', data[6]);
 			      		$(row).attr('estprice', data[7]);
@@ -1107,7 +1115,7 @@
 
 			var Item = row.find('td:eq(1)').text();
 			var Desc = row.find('td:eq(2)').text();
-			var Est = row.find('td:eq(3)').text();
+			var Est = row.find('td:eq(3)').html();
 			var Photo = row.find('td:eq(4)').html();
 			var DetailCatalog =  row.find('td:eq(5)').html();
 			var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
