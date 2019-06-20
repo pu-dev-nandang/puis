@@ -339,7 +339,8 @@ class M_pr_po extends CI_Model {
         }       
         // print_r($arr);die();
         $G = $this->get_approval_pr($Departement);
-        $ID_m_userrole_limit = $arr['Count'] + 1;
+        // print_r($G);die();
+        $ID_m_userrole_limit = $arr['Count'] + 1; // dengan admin
         // print_r($ID_m_userrole_limit.' => ID_m_userrole_limit');
         $indeksArr = 0;
         for ($i=0; $i < count($G); $i++) { 
@@ -867,7 +868,7 @@ class M_pr_po extends CI_Model {
                     select NIK as NIP,Name,Email as EmailPU from db_employees.holding
                 ) b on b.NIP = c.NIP 
                 join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
-                order by c.ID asc
+                order by c.ID_m_userrole asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
@@ -1120,7 +1121,7 @@ class M_pr_po extends CI_Model {
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
                 join db_purchasing.cfg_m_type_approval as d on d.ID = c.TypeDesc
-                order by c.ID asc
+                order by c.ID_m_userrole asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
