@@ -77,17 +77,17 @@ $(document).ready(function() {
        	    'createdRow': function( row, data, dataIndex ) {
        	    	$( row ).find('td:eq(0)').attr('align','center');
        	    	var code_url = findAndReplace(data[1],'/','-');
-              var ListPR = data[9];
+              var ListPR = data[parseInt(data.length) - 1];
               var PRHTML = '';
               for (var i = 0; i < ListPR.length; i++) {
                 PRHTML += '<li>'+ListPR[i]+'</li>';
               }
        	    	if (data[2] == 'PO') {
-       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[8]+'<br>'+PRHTML+'</div>');
+       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
        	    	}
        	    	else
        	    	{
-       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/spk/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[8]+'<br>'+PRHTML+'</div>');
+       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/spk/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
        	    	}
        	    	
        	    	//$( row ).find('td:eq(1)').attr('align','center');

@@ -125,7 +125,11 @@
 		var po_create = dt.po_create;
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
-		var PICPU = JsonStatus[0]['Name'];
+		var PICPU = '';
+		if (JsonStatus.length > 0) {
+			var PICPU = JsonStatus[0]['Name'];
+		}
+		
 		// PageContain
 		var html = '<div class = "row">'+
 						'<div class = "col-xs-12">'+
@@ -628,7 +632,7 @@
 		var po_create = dt['po_create'];
 		htmlBtnAdd =    '';
 		var IsiInputPO = MakeIsiPO();
-		var Subtotal = 	parseInt(ClassDt.total_po_detail)+parseInt(po_create[0]['AnotherCost'])	// 0 adalah persentase		
+		var Subtotal = 	parseInt(ClassDt.total_po_detail)	// 0 adalah persentase		
 		var htmlInputPO = '<div class = "row" style = "margin-top : 5px;">'+
 							'<div class = "col-md-12">'+
 								//'<div class="table-responsive">'+
@@ -643,24 +647,21 @@
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Harga</th>'+
     		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">PPN(%)</th>'+
     		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Discount(%)</th>'+
+    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Another Cost</th>'+
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Sub Total</th>'+
 									'</tr></thead>'+
 									'<tbody>'+IsiInputPO+'</tbody>'+
 									'<tfoot>'+
+										// '<tr style = "background-color: #3c6560;color: #FFFFFF">'+
+										// 	'<td colspan = "7">Total</td>'+
+										// 	'<td colspan = "3" class = "tdTotal" value = "'+ClassDt.total_po_detail+'">'+formatRupiah(ClassDt.total_po_detail)+'</td>'+
+										// '</tr>'+
 										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Total</td>'+
-											'<td colspan = "3" class = "tdTotal" value = "'+ClassDt.total_po_detail+'">'+formatRupiah(ClassDt.total_po_detail)+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Biaya Lain-Lain</td>'+
-											'<td colspan = "3" class = "tdAnotherCost" value = "'+po_create[0]['AnotherCost']+'">'+formatRupiah(po_create[0]['AnotherCost'])+'</td>'+
-										'</tr>'+
-										'<tr style = "background-color: #3c6560;color: #FFFFFF">'+
-											'<td colspan = "6">Sub Total</td>'+
+											'<td colspan = "7">Sub Total</td>'+
 											'<td colspan = "3" class = "tdSubtotal_All" value = "'+Subtotal+'">'+formatRupiah(Subtotal)+'</td>'+
 										'</tr>'+
 										'<tr>'+
-											'<td colspan = "9" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+po_create[0]['Notes']+'</b></td>'+
+											'<td colspan = "10" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+po_create[0]['Notes']+'</b></td>'+
 										'</tr>'+		
 									'</table>'+
 								//'</div>'+
@@ -741,6 +742,7 @@
 						'<td class = "tdUnitCost" value = "'+po_detail[i]['UnitCost_PO']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</div></td>'+
 						'<td class = "tdPPN" value = "'+po_detail[i]['PPN_PO']+'">'+'<div align="center">'+po_detail[i]['PPN_PO']+'</div></td>'+
 						'<td class = "tdDiscount" value = "'+po_detail[i]['Discount_PO']+'">'+'<div align="center">'+po_detail[i]['Discount_PO']+'</div></td>'+
+						'<td class = "tdAnotherCost" value = "'+po_detail[i]['AnotherCost']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['AnotherCost'])+'</div></td>'+
 						'<td class = "tdSubtotal" value = "'+po_detail[i]['Subtotal']+'" max = "'+po_detail[i]['Subtotal_PR']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['Subtotal'])+'</div></td>'+
 					'</tr>';
 
@@ -801,14 +803,21 @@
 			value = value.substring(0, n);
 			$(this).find('.tdDiscount').html('<input type="number" class="form-control Discount" value="'+value+'">');
 
+			var value = $(this).find('.tdAnotherCost').attr('value');
+			var n = value.indexOf(".");
+			value = value.substring(0, n);
+			$(this).find('.tdAnotherCost').html('<input type="text" class="form-control AnotherCost" value="'+value+'">');
+			$(this).find('.AnotherCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$(this).find('.AnotherCost').maskMoney('mask', '9894');
+
 		})
 
-		var value  = $('#table_input_po tfoot').find('.tdAnotherCost').attr('value');
-		var n = value.indexOf(".");
-		value = value.substring(0, n);
-		$('#table_input_po tfoot').find('.tdAnotherCost').html('<input type="text" class="form-control AnotherCost" value="'+value+'">');
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-		$('#table_input_po tfoot').find('.AnotherCost').maskMoney('mask', '9894');
+		// var value  = $('#table_input_po tfoot').find('.tdAnotherCost').attr('value');
+		// var n = value.indexOf(".");
+		// value = value.substring(0, n);
+		// $('#table_input_po tfoot').find('.tdAnotherCost').html('<input type="text" class="form-control AnotherCost" value="'+value+'">');
+		// $('#table_input_po tfoot').find('.AnotherCost').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+		// $('#table_input_po tfoot').find('.AnotherCost').maskMoney('mask', '9894');
 
 		var value  = $('#table_input_po tfoot').find('.tdNotes').attr('value');
 		$('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
@@ -861,6 +870,11 @@
 				var PPN_ = (parseInt(PPN) * parseInt(total_raw) ) / 100;
 				var Discount_ = (parseInt(Discount) * parseInt(total_raw)) / 100;
 				var Subtotal = parseInt(total_raw) + parseInt(PPN_) - parseInt(Discount_);
+				// another cost
+				var AnotherCost = ev.find('.AnotherCost').val();
+				AnotherCost = findAndReplace(AnotherCost, ".","");
+				Subtotal = parseInt(Subtotal) + parseInt(AnotherCost);
+
 				var Subtotal_limit = ev.find('.tdSubtotal').attr('max');
 				var n = Subtotal_limit.indexOf(".");
 				Subtotal_limit = Subtotal_limit.substring(0, n);
@@ -882,10 +896,10 @@
 		})
 
 		if (bool) {
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
-			$('#table_input_po tfoot').find('.tdTotal').html(formatRupiah(SubTotal_All));
-			SubTotal_All = parseInt(SubTotal_All) + parseInt(AnotherCost);
+			// var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
+			// AnotherCost = findAndReplace(AnotherCost, ".","");
+			// $('#table_input_po tfoot').find('.tdTotal').html(formatRupiah(SubTotal_All));
+			SubTotal_All = parseInt(SubTotal_All);
 			$('#table_input_po tfoot').find('.tdSubtotal_All').html(formatRupiah(SubTotal_All));
 			// loading page r_terbilang for ajax later && show total
 				loading_page('#r_terbilang');
@@ -917,26 +931,29 @@
 				UnitCost = findAndReplace(UnitCost, ".","");
 				var Discount = $(this).find('.Discount').val();
 				var PPN = $(this).find('.PPN').val();
+				var AnotherCost = $(this).find('.AnotherCost').val();
+				AnotherCost = findAndReplace(AnotherCost, ".","");
 				var Subtotal = $(this).find('.tdSubtotal').attr('value');
 				var temp = {
 					ID_po_detail :ID_po_detail,
 					UnitCost : UnitCost,
 					Discount : Discount,
 					PPN : PPN,
+					AnotherCost : AnotherCost,
 					Subtotal : Subtotal,
 				};
 
 				arr_post_data_detail.push(temp);
 			})
 
-			var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
-			AnotherCost = findAndReplace(AnotherCost, ".","");
+			// var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
+			// AnotherCost = findAndReplace(AnotherCost, ".","");
 			var Notes =  $('#table_input_po tfoot').find('.Notes').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
 			    arr_post_data_detail : arr_post_data_detail,
-			    AnotherCost : AnotherCost,
+			    // AnotherCost : AnotherCost,
 			    Notes : Notes,
 			};
 			var token = jwt_encode(data,"UAP)(*");

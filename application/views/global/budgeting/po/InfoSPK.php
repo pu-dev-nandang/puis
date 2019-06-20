@@ -159,7 +159,7 @@
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
-		console.log(po_detail);
+		// console.log(po_detail);
 
 		// tulis html untuk mengerjakan dengan penggabungan catalog
 		var U_mengerjakan = '';

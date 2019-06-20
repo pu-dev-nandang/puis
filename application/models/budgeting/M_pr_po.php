@@ -998,15 +998,27 @@ class M_pr_po extends CI_Model {
         }
     }
 
+    private function __Get_Limit_PO_CodePost_OrderBy()
+    {
+        $sql = 'select * from db_purchasing.cfg_set_userrole order by MaxLimit asc';
+        $query = $this->db->query($sql, array())->result_array();
+        return $query; 
+    }
+
     public function GetRuleApproval_PO_JsonStatus($Amount)
     {
         $Departement = 'NA.4'; // Purchasing
 
-        $arr = array();
+        $arr = array(
+            'MaxLimit' => 0,
+            'Count' => 0,
+        );
         $C_ = 0;
         $rs = array();
 
-        $G1 = $this->m_master->showData_array('db_purchasing.cfg_set_userrole');
+        // search in by CodePost and by Amount
+        // $G1 = $this->m_master->showData_array('db_purchasing.cfg_set_userrole');
+        $G1 = $this->__Get_Limit_PO_CodePost_OrderBy();
         for ($j=0; $j < count($G1); $j++) { 
             $MaxLimit = $G1[$j]['MaxLimit'];
             if ($MaxLimit >= $Amount) {
@@ -1026,22 +1038,51 @@ class M_pr_po extends CI_Model {
 
         $G = $this->get_approval_po($Departement);
         $ID_m_userrole_limit = $arr['Count'] + 1;
+        $indeksArr = 0;
         for ($i=0; $i < count($G); $i++) { 
             $ID_m_userrole = $G[$i]['ID'];
             if ($ID_m_userrole <= $ID_m_userrole_limit) {
                 $Status = ($ID_m_userrole == 1) ? 1 : 0;
                 $ApproveAt = ($ID_m_userrole == 1) ? date('Y-m-d H:i:s') : '';
-                if ($i == 0) {
-                    $G[$i]['NIP'] = $this->session->userdata('NIP');
+
+                // check nip ada sebelumnya jika ada maka continue
+                $boolNIP = true;
+                if ($i > 0) {
+                   $j = $indeksArr - 1;
+                   // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
+                   if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
+                       $boolNIP = false;
+                   }
                 }
-                $rs[] = array(
-                    'NIP' => $G[$i]['NIP'],
-                    'Status' => $Status,
-                    'ApproveAt' => $ApproveAt,
-                    'Representedby' => '',
-                    'Visible' => $G[$i]['Visible'],
-                    'NameTypeDesc' => $G[$i]['NameTypeDesc'],
-                );
+
+                if ($boolNIP) {
+                    // filter untuk uncheck pada RAD
+                        $BoolRAD = true;
+                        if ($ID_m_userrole > 1) {
+                            $sql = 'select * from db_purchasing.cfg_set_userrole where MaxLimit = ? and Approved = 1 and ID_m_userrole = ?';
+                            $query = $this->db->query($sql, array($arr['MaxLimit'],$ID_m_userrole))->result_array();
+                            // print_r($query);
+                            if (count($query) == 0) {
+                                $BoolRAD = false;
+                            }
+                        }
+
+                        if ($BoolRAD) {
+                            if ($i == 0) {
+                                $G[$i]['NIP'] = $this->session->userdata('NIP');
+                            }
+                            $rs[] = array(
+                                'NIP' => $G[$i]['NIP'],
+                                'Status' => $Status,
+                                'ApproveAt' => $ApproveAt,
+                                'Representedby' => '',
+                                'Visible' => $G[$i]['Visible'],
+                                'NameTypeDesc' => $G[$i]['NameTypeDesc'],
+                            );
+                            $indeksArr++;
+                        }
+                }
+                
             }
             
         }
@@ -1089,7 +1130,7 @@ class M_pr_po extends CI_Model {
     {
         $arr = array();
         $sql = 'select a.ID_pre_po,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,b.FileOffer,
-                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.AnotherCost,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,
+                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,
                 a.PostingDate,a.CreatedBy,a.CreatedAt
                 from db_purchasing.po_create as a 
                 join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
@@ -1113,7 +1154,7 @@ class M_pr_po extends CI_Model {
 
        $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,a.UnitCost as UnitCost_PO,a.Discount as Discount_PO,a.PPN as PPN_PO,a.SubTotal as Subtotal,
                 b.ID_pr_detail,c.Qty as QtyPR,c.Item,c.Desc,c.DateNeeded,c.Spec_add,c.UnitCost as UnitCost_PR,c.Subtotal as Subtotal_PR,
-                c.ID_budget_left,c.ID_creator_budget,c.CodePostRealisasi,c.CodeHeadAccount,c.CodePost,c.RealisasiPostName,c.Departement as Departement_HA,c.PostName,c.NameHeadAccount,c.PPH as PPH_PR,c.PRCode,c.DetailCatalog
+                c.ID_budget_left,c.ID_creator_budget,c.CodePostRealisasi,c.CodeHeadAccount,c.CodePost,c.RealisasiPostName,c.Departement as Departement_HA,c.PostName,c.NameHeadAccount,c.PPH as PPH_PR,c.PRCode,c.DetailCatalog,a.AnotherCost
                 from db_purchasing.po_detail as a 
                 join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
                 join (
@@ -1163,7 +1204,6 @@ class M_pr_po extends CI_Model {
         $po_detail = $po_data['po_detail'];
         $ID_pre_po_supplier = $po_create[0]['ID_pre_po_supplier'];
         $Status = $po_create[0]['Status'];
-        $AnotherCost = $po_create[0]['AnotherCost'];
         $Notes = $po_create[0]['Notes'];
         /*
             1.Compare dengan data po sekarang
@@ -1171,7 +1211,7 @@ class M_pr_po extends CI_Model {
 
          $Code = $po_create[0]['Code'];
          $G_po_create = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
-         if ($G_po_create[0]['Status'] != $Status || $G_po_create[0]['ID_pre_po_supplier'] != $ID_pre_po_supplier || $G_po_create[0]['AnotherCost'] != $AnotherCost || $G_po_create[0]['Notes'] != $Notes ) {
+         if ($G_po_create[0]['Status'] != $Status || $G_po_create[0]['ID_pre_po_supplier'] != $ID_pre_po_supplier || $G_po_create[0]['Notes'] != $Notes ) {
                $bool = false;
          }
 
@@ -1194,9 +1234,10 @@ class M_pr_po extends CI_Model {
                                 $UnitCost_PO = $po_detail[$i]['UnitCost_PO'];
                                 $Discount_PO = $po_detail[$i]['Discount_PO'];
                                 $PPN_PO = $po_detail[$i]['PPN_PO'];
+                                $AnotherCost = $po_detail[$i]['AnotherCost'];
                                 $Subtotal = $po_detail[$i]['Subtotal'];
                                 $ID_pre_po_detail = $po_detail[$i]['ID_pre_po_detail'];
-                                if ($UnitCost_PO != $G_po_detail[$j]['UnitCost'] || $Discount_PO !=  $G_po_detail[$j]['Discount'] || $PPN_PO != $G_po_detail[$j]['PPN']  ||  $Subtotal != $G_po_detail[$j]['SubTotal'] || $ID_pre_po_detail != $G_po_detail[$j]['ID_pre_po_detail'] ) {
+                                if ($UnitCost_PO != $G_po_detail[$j]['UnitCost'] || $Discount_PO !=  $G_po_detail[$j]['Discount'] || $PPN_PO != $G_po_detail[$j]['PPN']  ||  $Subtotal != $G_po_detail[$j]['SubTotal'] || $ID_pre_po_detail != $G_po_detail[$j]['ID_pre_po_detail'] || $AnotherCost !=  $G_po_detail[$j]['AnotherCost']) {
                                    $bool2 = false;
                                 }
                                 else
