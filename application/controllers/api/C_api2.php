@@ -4321,5 +4321,77 @@ class C_api2 extends CI_Controller {
 
     }
 
+    public function getTableProspectiveStudents(){
+
+        $requestData= $_REQUEST;
+
+        $data_arr = $this->getInputToken();
+
+        $PeriodID = $data_arr['PeriodID'];
+
+        $whereP = '' ;
+
+        $orderBy = '';
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+
+            $search = $requestData['search']['value'];
+            $dataSearch = '';
+        }
+
+
+
+        $queryDefault = 'SELECT c.*, em.Name AS NameProspect_by, cs.Description AS StatusDesc, csl.Class AS StatusClass FROM db_admission.crm c 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                                LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
+                                                LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
+                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$dataSearch.' '.$orderBy;
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+
+
+        $dataTable = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $query = $dataTable;
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        if(count($dataTable)>0) {
+            for ($i = 0; $i < count($dataTable); $i++) {
+
+                $nestedData=array();
+                $row = $query[$i];
+
+                $btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit" data-id="'.$row['ID'].'"><i class="fa fa-edit"></i></button> 
+                                    <button class="btn btn-sm btn-danger btnActCRMRemovet hide" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button> 
+                                    <button class="btn btn-sm btn-default btnFullForm" data-id="'.$row['ID'].'">Full Form</button>';
+
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b><br/>'.$row['Email'].', '.$row['Phone'].', '.$row['LineID'];
+                $nestedData[] = $row['NameProspect_by'];
+                $nestedData[] = '<span class="'.$row['StatusClass'].'">'.$row['StatusDesc'].'</span>';
+                $nestedData[] = $btnAct;
+
+
+                $no++;
+
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
 
 }

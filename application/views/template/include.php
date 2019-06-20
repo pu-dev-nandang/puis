@@ -962,7 +962,7 @@
 
                     var sc = (selected!='' && selected!=null && selected!=='undefined' && selected==v.ID)
                         ? 'selected' : '';
-                    $(element).append('<option id="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
 
                 });
             }

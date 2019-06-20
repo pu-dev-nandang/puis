@@ -2905,9 +2905,7 @@ class C_api extends CI_Controller {
     public function getScheduleExam(){
         $requestData= $_REQUEST;
 
-        $token = $this->input->post('token');
-        $key = "UAP)(*";
-        $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = $this->getInputToken();
 
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
             ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '
