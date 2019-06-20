@@ -1324,7 +1324,7 @@ class C_rest2 extends CI_Controller {
             $this->db->where('ID', $ID);
             $this->db->update('db_admission.crm',$dataForm);
 
-            return print_r(1);
+            return print_r($ID);
 
         }
         else if($data_arr['action']=='read_PS'){

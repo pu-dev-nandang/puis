@@ -79,19 +79,7 @@
 
         <div class="thumbnail" style="min-height: 100px;">
             <textarea class="hide" id="viewProspectiveStudents"></textarea>
-            <div id="showTable">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th style="width: 1%;">No</th>
-                        <th>Prospective Students</th>
-                        <th style="width: 20%;">Prospect By</th>
-                        <th style="width: 15%;"><i class="fa fa-cog"></i></th>
-                    </tr>
-                    </thead>
-                    <tbody id="listStd"></tbody>
-                </table>
-            </div>
+            <div id="showTableServerSide"></div>
         </div>
     </div>
 </div>
@@ -110,6 +98,7 @@
             if(filterPeriod!='' && filterPeriod!=null){
 
                 loadDataCRM();
+                loadCRMData();
                 clearInterval(firsLoad);
 
             }
@@ -267,7 +256,7 @@
             var url = base_url_js+'rest2/__crudProspectiveStudents';
 
             $.post(url,{token:token},function (jsonResult) {
-                loadDataCRM();
+                loadCRMData();
                 toastr.success('Data saved','Success');
 
                 $('#formMarketingActivity').val('');
@@ -465,9 +454,11 @@
                 '            <label>Address</label>' +
                 '            <textarea class="form-control" id="formAddress" rows="3">'+ifNullChecking(d_v.Address)+'</textarea>' +
                 '        </div>' +
-                '        <div class="form-group">' +
+                '        <div class="form-group" id="divFormUpload">' +
+                '           <form id="formAttchFull" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
                 '            <label>Attachment</label>' +
-                '            <input type="file">' +
+                '            <input type="file" id="dataFormAttch" accept="application/pdf" name="userfile" >' +
+                '           </form>' +
                 '        </div>' +
                 '    </div>' +
                 '' +
@@ -518,7 +509,7 @@
                 '    <div class="col-md-3">' +
                 '        <div class="form-group">' +
                 '            <label>Status</label>' +
-                '            <select class="form-control" id="formStatusPS"><option></option></select>' +
+                '            <select class="form-control" id="formStatusPS"></select>' +
                 '        </div>' +
                 '        <div id="viewListComment"></div>' +
                 '        <div class="well">' +
@@ -538,7 +529,14 @@
                 '<h4 class="modal-title">Full Form CRM</h4>');
             $('#GlobalModalLarge .modal-body').html(body);
 
-            loadSelectOptionStatusMarketing('#formStatusPS');
+            var StatusMart = (d_v.Status!='' && d_v.Status!=null) ? d_v.Status : '';
+            loadSelectOptionStatusMarketing('#formStatusPS',StatusMart);
+
+            // Cek File
+            if(d_v.File!='' && d_v.File!=null){
+                $('#divFormUpload').append('<div id="dataListFileUpload"><hr/><a target="_blank" href="'+base_url_js+'uploads/crm/'+d_v.File+'" class="btn btn-default">Download File</a></div>');
+            }
+
             loadFollowUp();
 
             $( "#formDateOfBirth")
@@ -659,6 +657,9 @@
 
         var formStatusPS = $('#formStatusPS').val();
 
+
+        var dataFormAttch = $('#dataFormAttch').val();
+
         var data = {
             action : 'update_PS',
             ID : formID,
@@ -694,6 +695,11 @@
         
         $.post(url,{token:token},function (result) {
 
+
+            if(dataFormAttch!='' && dataFormAttch!=null){
+                uploadDocumentPS(result);
+            }
+
             toastr.success('Data saved','Success');
             setTimeout(function () {
                 $('#btnSaveFullPS').html('Save').prop('disabled',false);
@@ -709,7 +715,7 @@
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Status</h4>');
 
-        var body = '<div class="row">' +
+        var body = '<div class="row hide">' +
             '    <div class="col-md-12">' +
             '        <div class="well">' +
             '            <div class="row">' +
@@ -901,28 +907,35 @@
         var formFollowUp = $('#formFollowUp').val();
         var formComment = $('#formComment').val();
 
-        var data = {
-            action : (formFollowUpID!='') ? 'updateCommentF_SP' : 'insertCommentF_SP',
-            ID : formFollowUpID,
-            dataForm : {
-                CRMID : CRMID,
-                No : formFollowUp,
-                Comment : formComment,
-                UpdatedBy : sessionNIP
-            }
-        };
+        if(formFollowUp<6){
+            var data = {
+                action : (formFollowUpID!='') ? 'updateCommentF_SP' : 'insertCommentF_SP',
+                ID : formFollowUpID,
+                dataForm : {
+                    CRMID : CRMID,
+                    No : formFollowUp,
+                    Comment : formComment,
+                    UpdatedBy : sessionNIP
+                }
+            };
 
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'rest2/__crudProspectiveStudents';
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'rest2/__crudProspectiveStudents';
 
-        $.post(url,{token:token},function (result) {
+            $.post(url,{token:token},function (result) {
 
-            loadFollowUp();
-            toastr.success('Data saved','Success');
-            $('#formFollowUpID').val('');
+                loadFollowUp();
+                toastr.success('Data saved','Success');
+                $('#formFollowUpID').val('');
+                $('#formComment').val('');
+
+            });
+        } else {
             $('#formComment').val('');
+            toastr.warning('Maximum follow up 5','Warning');
+        }
 
-        });
+
 
     });
 
@@ -983,5 +996,87 @@
         $('#formComment').val(d.Comment);
 
     });
+
+
+    // ==== Load Data CRM ====
+    function loadCRMData() {
+        $('#showTableServerSide').html('<table class="table table-bordered" id="tableProspectiveStudents">' +
+            '                    <thead>' +
+            '                    <tr>' +
+            '                        <th style="width: 1%;">No</th>' +
+            '                        <th>Prospective Students</th>' +
+            '                        <th style="width: 20%;">Prospect By</th>' +
+            '                        <th style="width: 20%;">Status</th>' +
+            '                        <th style="width: 15%;"><i class="fa fa-cog"></i></th>' +
+            '                    </tr>' +
+            '                    </thead>' +
+            '                    <tbody id="listStd"></tbody>' +
+            '                </table>');
+
+        var filterPeriod = $('#filterPeriod').val();
+
+        var data = {
+            PeriodID : filterPeriod
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+
+        var dataTable = $('#tableProspectiveStudents').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "Day, Room, Name / NIP Invigilator"
+            },
+            "ajax":{
+                url : base_url_js+"api2/__getTableProspectiveStudents", // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    // $(".employee-grid-error").html("");
+                    // $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    // $("#employee-grid_processing").css("display","none");
+                }
+            }
+        } );
+    }
+
+
+
+    // Upload attechment
+    function uploadDocumentPS(ID) {
+
+        var formData =  new FormData( $("#formAttchFull")[0]);
+
+        var name = sessionNIP+'_'+moment().unix();
+        var url = base_url_js+'crm/uploadDocumentPS?id='+ID+'&name='+name;
+
+        $.ajax({
+            url : url,  // Controller URL
+            type : 'POST',
+            data : formData,
+            async : false,
+            cache : false,
+            contentType : false,
+            processData : false,
+            success : function(data) {
+
+                var jsonData = JSON.parse(data);
+
+                if(typeof jsonData.success=='undefined'){
+                    toastr.error(jsonData.error,'Error Upload File');
+                    // alert(jsonData.error);
+                }
+                else {
+                    $('#dataListFileUpload').empty();
+                    $('#divFormUpload').append('<div id="dataListFileUpload"><hr/><a target="_blank" href="'+base_url_js+'uploads/crm/'+name+'.pdf" class="btn btn-default">Download File</a></div>');
+                }
+
+            }
+        });
+
+    }
 
 </script>

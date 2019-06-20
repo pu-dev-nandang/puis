@@ -1695,7 +1695,7 @@ class C_master extends Admission_Controler {
            $this->data['tahun'] = $t[0]['Ta'];
         }
         
-        $content = $this->load->view('page/'.$this->data['department'].'/master/set_tahun_ajaran',$this->data,true);
+        $content = $this->load->view('page/'.$this->data['department'].'/master/set_tahun_ajaran2',$this->data,true);
         $this->temp($content);
     }
 

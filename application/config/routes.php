@@ -501,6 +501,7 @@ $route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_
 $route['crm/crm-team'] = 'page/admission/marketing/c_crm/CRMTeam';
 $route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_activity';
 $route['crm/contact'] = 'page/admission/marketing/c_crm/contact';
+$route['crm/uploadDocumentPS'] = 'page/admission/marketing/c_crm/uploadDocumentPS';
 
 
 
@@ -858,6 +859,8 @@ $route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
 
 $route['api2/_updateCurriculum'] = 'api/c_api2/updateCurriculum';
 $route['api2/_checkEdom'] = 'api/c_api2/checkEdom';
+
+$route['api2/__getTableProspectiveStudents'] = 'api/c_api2/getTableProspectiveStudents';
 
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
