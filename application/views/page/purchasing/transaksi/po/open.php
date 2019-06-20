@@ -1110,7 +1110,6 @@
 
 		var token = jwt_encode(ClassDt.POCode,"UAP)(*");
 		form_data.append('Code',token);
-
 		
 
 		var url = base_url_js + "po_spk/submit_create"

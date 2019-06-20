@@ -463,6 +463,30 @@ class C_login extends CI_Controller {
         );
 
         $this->session->set_userdata($setSession);
+
+        // adding for budgeting
+        $PositionMain = $this->session->userdata('PositionMain');
+        $Position = $PositionMain['IDPosition'];
+        switch ($Position) {
+          case 5: // Dekan
+            $this->load->model('faculty/m_faculty');
+            $this->session->set_userdata('IDdepartementNavigation','34');
+            $this->session->set_userdata('departementNavigation','admin-fakultas');
+            $this->m_faculty->auth(); // get session
+            break;
+          case 6: // KAPRODI
+            $this->load->model('prodi/m_prodi');
+            $this->session->set_userdata('IDdepartementNavigation','15');
+            $this->session->set_userdata('departementNavigation','admin-prodi');
+            $this->m_prodi->auth(); // get session
+            break;
+          case 7: // DOSEN
+            $this->session->set_userdata('IDdepartementNavigation','36');
+            $this->session->set_userdata('departementNavigation','other-division');
+            break;  
+          default:
+            break;
+        }
     }
 
 

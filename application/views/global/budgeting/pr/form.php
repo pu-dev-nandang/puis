@@ -2220,7 +2220,8 @@
 	   	    	{
 	   	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
 	   	    		if (JsonStatus[i]['Status'] != 1) {
-	   	    			action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+	   	    			// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+	   	    			action += '';
 	   	    		}
 	   	    	}
 	   	    	
@@ -2282,7 +2283,6 @@
 		var dtApproval = pr_create;
 		switch(action) {
 		  case 'add':
-		  case 'edit':
 		    var url = base_url_js + 'api/__crudEmployees';
 		    var data = {
 		    	action : 'read',
@@ -2346,6 +2346,40 @@
 
 		    });
 		    break;
+		  case 'edit':
+		  	var url = base_url_js + 'api/__crudEmployees';
+		  	var data = {
+		  		action : 'read',
+		  	}
+		  	var token = jwt_encode(data,"UAP)(*");
+		  	$.post(url,{ token:token },function (data_json) {
+		  		var OP = '';
+		  			for (var i = 0; i < data_json.length; i++) {
+		  				OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
+		  			}
+		  		var OP2 = '';
+		  			for (var i = 0; i < m_type_user.length; i++) {
+		  				OP2 += '<option value="'+m_type_user[i].ID+'" '+''+'>'+m_type_user[i].Name+'</option>';
+		  			}
+		  		
+		  		evtr.find('td:eq(3)').attr('style','width : 20%');	
+		  		evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
+		  							'</select>');
+		  		evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+		  								'<option value = "Yes" selected >Yes</option>'+
+		  								'<option value = "No" selected >No</option>'+
+		  							'</select>');
+		  		
+		  		evtd.html('<button class = "btn btn-primary saveapprover" prcode = "'+prcode+'" indexjson = "'+indexjson+'" action = "'+action+'">Save</button>'+
+		  						'');
+		  		$('.listemployees[tabindex!="-1"]').select2({
+		  		    //allowClear: true
+		  		});
+
+		  		evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
+		  	});	
+		  	break; 
 		  case 'delete':
 		  	 if (confirm('Are you sure ?')) {
 		  	 	loading_button('.btn-edit-approver[indexjson="'+indexjson+'"][action="'+action+'"]');
@@ -2437,7 +2471,7 @@
 		}
 		else
 		{
-			if (dtApproval[0].Status == '1' || dtApproval[0].Status == '3') {
+			if (action == 'add') {
 				if (NIP_ != '' && NIP_ != undefined && NIP_ != null && NIP_ != 0) {
 					loading_button('.saveapprover[indexjson="'+indexjson+'"]');
 					// var url = base_url_js + 'budgeting/update_approval_budgeting';
@@ -2473,7 +2507,8 @@
 							evtr.find('td:eq(4)').html(vt);
 
 							action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-							action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+							// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+							action += '';
 							evtr.find('td:eq(5)').html(action);
 						}
 						else
@@ -2495,6 +2530,7 @@
 				var data = {
 					NIP : NIP_,
 					prcode : prcode,
+					NameTypeDesc : NameTypeDesc,
 					Visible : Visible,
 					action : action,
 					indexjson : indexjson,
@@ -2511,6 +2547,8 @@
 						var st = 'Approve';
 						evtr.find('td:eq(2)').html(st);
 						evtr.find('td:eq(4)').html(vt);
+						var tu = NameTypeDesc;
+						evtr.find('td:eq(3)').html(tu);
 
 						action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
 						evtr.find('td:eq(5)').html(action);
