@@ -1723,4 +1723,18 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function getCategoryCatalog($Active = null)
+    {
+        $sql = 'select * from db_purchasing.m_category_catalog';
+        if ($Active == 'All') {
+            $sql.= '';
+        }
+        elseif ($Active == 1 || $Active == 0) {
+            $sql.= ' where Active = '.$Active;
+        }
+
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+    }
+
 }

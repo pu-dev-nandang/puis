@@ -873,7 +873,7 @@
 					'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
 					'<td>'+
 						'<div class="input-group input-append date datetimepicker">'+
-                            '<input data-format="yyyy-MM-dd" class="form-control" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+                            '<input data-format="yyyy-MM-dd" class="form-control" type=" text" readonly="" value = "">'+
                             '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
                 		'</div>'+
                 	'</td>'+
@@ -882,9 +882,9 @@
                 	action
                 '</tr>';
         $('#table_input_pr tbody').append(html);
-        $('.datetimepicker').datetimepicker({
-        	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-        });
+        // $('.datetimepicker').datetimepicker({
+        // 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+        // });
         MakeAutoNumbering();        	
 	}
 
@@ -1031,7 +1031,7 @@
                '<thead>'+
                   '<tr>'+
                      '<th>No</th>'+
-                     '<th>Item</th>'+
+                     '<th>Item & Category</th>'+
                      '<th>Desc</th>'+
                      '<th>Estimate Value</th>'+
                      '<th>Photo</th>'+
@@ -1093,6 +1093,7 @@
 			      'createdRow': function( row, data, dataIndex ) {
 			      		$(row).attr('id_m_catalog', data[6]);
 			      		$(row).attr('estprice', data[7]);
+			      		$(row).attr('days', data[12]);
 			      	
 			      },
 			      // 'order': [[1, 'asc']]
@@ -1109,6 +1110,9 @@
 			var row = $(this);
 			var fillItem = ev.closest('tr');
 			var id_m_catalog = row.attr('id_m_catalog');
+			// add days untuk
+			var days__ = row.attr('days');
+
 			var estprice = row.attr('estprice');
 			var n = estprice.indexOf(".");
 			estprice = estprice.substring(0, n);
@@ -1134,6 +1138,35 @@
 			}
 
 			fillItem.find('td:eq(6)').find('.qty').trigger('change');
+
+			// add set DateNeeded datetimepicker
+				Date.prototype.addDays = function(days) {
+			          var date = new Date(this.valueOf());
+			          date.setDate(date.getDate() + days);
+			          return date;
+			    }
+		        
+		        var date = new Date();
+
+		        var aa = date.addDays(parseInt(days__));
+		        // var bb = moment(aa).format('YYYY-MM-DD');
+		        var bb = moment(aa).format('YYYY-MM-DD');
+		        // add moment in days
+		        // var bb = moment().add(30,'days').format('YYYY-MM-DD');
+		        fillItem.find('td:eq(10)').find('input').val(bb);
+
+				fillItem.find('td:eq(10)').find('.datetimepicker').datetimepicker({
+					useCurrent: false,
+					startDate: date.addDays(parseInt(days__)),
+					format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+				});
+
+				if (fillItem.find('td:eq(10)').find('.span').length) {
+					fillItem.find('td:eq(10)').find('.spanClass').remove();
+				}
+				
+				fillItem.find('td:eq(10)').append('<span style = "color : red" class = "spanClass"><br>Estimated due date minimal : '+bb+'</span>'	);
+
 			$('#GlobalModalLarge').modal('hide');
 		} );    	
 	})
@@ -1691,6 +1724,13 @@
 				if (Item == '') {
 					find = false;
 					toastr.error("Item is required",'!!!Error');
+					return false;
+				}
+
+				var DateNeeded = fillItem.find('td:eq(10)').find('input').val();
+				if (DateNeeded == '') {
+					find = false;
+					toastr.error("Date Needed is required",'!!!Error');
 					return false;
 				}
 
