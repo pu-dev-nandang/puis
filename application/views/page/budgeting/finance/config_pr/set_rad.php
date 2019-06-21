@@ -1,23 +1,3 @@
-<style type="text/css">
-	#tableData9 thead th,#tableData9 tfoot td {
-
-	    text-align: center;
-	    background: #20485A;
-	    color: #FFFFFF;
-
-	}
-
-	#tableData9>thead>tr>th, #tableData9>tbody>tr>th, #tableData9>tfoot>tr>th, #tableData9>thead>tr>td, #tableData9>tbody>tr>td, #tableData9>tfoot>tr>td {
-	    border: 1px solid #b7b7b7
-	}
-
-	.btn span.glyphicon {    			
-		opacity: 0;				
-	}
-	.btn.active span.glyphicon {				
-		opacity: 1;				
-	}
-</style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id = "loadPageTable">
 	
 </div>
@@ -51,7 +31,7 @@
 											'<table class="table table-bordered tableData" id ="tableData9">'+
 											'<thead>'+
 											'<tr>'+
-												'<th width = "10%">Post</th>'+
+												'<th>Post</th>'+
 					                            '<th>Limit</th>';
 	        for (var i = 0; i < cfg_m_userrole.length; i++) {
 	        	TableGenerate += '<th>'+cfg_m_userrole[i]['NameUserRole']+'</th>';

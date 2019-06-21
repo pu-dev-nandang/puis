@@ -11,22 +11,22 @@
 					 </select>
 				</div>	 
 				<div class="col-xs-2">
-				    <label class="control-label">Item Name</label>
+				    <label class="control-label">Description</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="35">
-				   <span id="charsItemName">35</span> characters remaining
+				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
+				   <span id="charsDesc">50</span> characters remaining
 				</div>
 			</div>
 		</div>
 		<div class="form-group">
 			<div class="row">
 				<div class="col-xs-2">
-				    <label class="control-label">Description</label>
+				    <label class="control-label">Item Name</label>
 				</div>    
 				<div class="col-xs-3">
-				   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
-				   <span id="charsDesc">50</span> characters remaining
+				   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="35">
+				   <span id="charsItemName">35</span> characters remaining
 				</div>
 				<div class="col-xs-2">
 				    <label class="control-label">Est Value</label>

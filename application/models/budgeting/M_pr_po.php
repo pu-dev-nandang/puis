@@ -352,9 +352,11 @@ class M_pr_po extends CI_Model {
              $boolNIP = true;
              if ($i > 0) {
                 $j = $indeksArr - 1;
-                // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
-                if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
-                    $boolNIP = false;
+                if ($j > 0) {
+                    // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
+                    if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
+                        $boolNIP = false;
+                    }
                 }
              }
 
@@ -1050,10 +1052,13 @@ class M_pr_po extends CI_Model {
                 $boolNIP = true;
                 if ($i > 0) {
                    $j = $indeksArr - 1;
-                   // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
-                   if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
-                       $boolNIP = false;
+                   if ($j > 0) {
+                       // print_r($G[$i]['NIP'].'=='.$rs[$j]['NIP']);
+                       if ($G[$i]['NIP'] == $rs[$j]['NIP']) {
+                           $boolNIP = false;
+                       }
                    }
+                   
                 }
 
                 if ($boolNIP) {

@@ -8,6 +8,11 @@
        background-color:#71d1eb !important;
        cursor: pointer;
     }
+
+    #table_input_pr {
+        width:1700px;
+        overflow: auto;
+    }
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
