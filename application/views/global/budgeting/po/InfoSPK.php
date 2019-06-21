@@ -720,7 +720,7 @@
 		var html = '';
 		html += html_vendor;
 		html += '<div class = "row">'+
-						'<div class = "col-xs-4">'+
+						'<div class = "col-xs-5">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+

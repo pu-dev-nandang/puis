@@ -1117,7 +1117,9 @@
 			var n = estprice.indexOf(".");
 			estprice = estprice.substring(0, n);
 
-			var Item = row.find('td:eq(1)').text();
+			var Item = row.find('td:eq(1)').html();
+			n = Item.indexOf("<br>");
+			Item = Item.substring(0, n);
 			var Desc = row.find('td:eq(2)').text();
 			var Est = row.find('td:eq(3)').html();
 			var Photo = row.find('td:eq(4)').html();
@@ -1161,7 +1163,7 @@
 					format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 				});
 
-				if (fillItem.find('td:eq(10)').find('.span').length) {
+				if (fillItem.find('td:eq(10)').find('.spanClass').length) {
 					fillItem.find('td:eq(10)').find('.spanClass').remove();
 				}
 				

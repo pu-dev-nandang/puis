@@ -479,7 +479,7 @@
 		var pre_po_supplier = dt.pre_po_supplier;
 		var html_vendor = '';
 			html_vendor =  '<div class = "row noPrint">'+
-						'<div class = "col-xs-4">'+
+						'<div class = "col-xs-5">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
@@ -491,7 +491,7 @@
 			var t = '';									
 			for (var i = 0; i < pre_po_supplier.length; i++) {
 				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-				t += '<li><a href="http://localhost/puis/fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
 			}
 			
 			html_vendor += t;
@@ -504,7 +504,7 @@
 		var html = '';
 		html += html_vendor;
 		html += '<div class = "row" style = "margin-top : 10px;">'+
-						'<div class = "col-xs-4">'+
+						'<div class = "col-xs-5">'+
 							'<table class = "table borderless">'+
 									'<thead></thead>'+
 									'<tbody>'+
