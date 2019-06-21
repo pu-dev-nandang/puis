@@ -421,7 +421,7 @@ class M_budgeting extends CI_Model {
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
                 join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
-                order by c.ID asc
+                order by c.ID_m_userrole asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;

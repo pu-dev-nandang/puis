@@ -1734,10 +1734,31 @@ class C_budgeting extends Budgeting_Controler {
                 $creator_budget_approval = $Input['creator_budget_approval'];
                 // get Json Status to set All Status to 0
                     $G_data = $this->m_master->caribasedprimary('db_budgeting.creator_budget_approval','ID',$ID);
-                    $JsonStatus =(array) json_decode($G_data[0]['JsonStatus'],true);
-                    for ($i=1; $i < count($JsonStatus); $i++) { 
-                        $JsonStatus[$i]['Status'] = 0;
-                    }
+                    // $JsonStatus =(array) json_decode($G_data[0]['JsonStatus'],true);
+                    // for ($i=1; $i < count($JsonStatus); $i++) { 
+                    //     $JsonStatus[$i]['Status'] = 0;
+                    // }
+
+                    // after edit get all JsonStatus
+                     $Approval = $this->m_budgeting->get_approval_budgeting($creator_budget_approval->Departement);
+                     $JsonStatus = array();
+                     for ($i=0; $i < count($Approval); $i++) { 
+                         $Status = ($i==0) ? 1 : 0;
+                         $NIP = $Approval[$i]['NIP'];
+                         $Visible = $Approval[$i]['Visible'];
+                         $NameTypeDesc = $Approval[$i]['NameTypeDesc'];
+                         $ApproveAt = '';
+                         $Representedby = '';
+                         $JsonStatus[] = array(
+                             'NIP' => $NIP,
+                             'Status' => $Status,
+                             'ApproveAt' => $ApproveAt,
+                             'Representedby' => $Representedby,
+                             'Visible' => $Visible,
+                             'NameTypeDesc' => $NameTypeDesc,
+                         );
+
+                     }
 
                 $dataSave = array(
                     'Note' => $creator_budget_approval->Note,

@@ -754,6 +754,8 @@ class C_pr_po extends Budgeting_Controler {
                         }
                         
             $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // new approval
+            $dataSave['JsonStatus'] = json_encode($JsonStatus2);
                 if (count($JsonStatus2) > 1) {
                     $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                     if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
