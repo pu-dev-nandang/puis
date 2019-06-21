@@ -241,6 +241,13 @@ class C_pr_po extends Budgeting_Controler {
     public function DataPR()
     {
         $requestData= $_REQUEST;
+        // filter by department dan nip approver, untuk finance show semua pr
+        // $WhereFiltering = '';
+        // $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        // if ($IDDepartementPUBudget != 'NA.9') {
+        //     # code...
+        // }
+
         $sqltotalData = 'select count(*) as total from db_budgeting.pr_create';
         $querytotalData = $this->db->query($sqltotalData)->result_array();
         $totalData = $querytotalData[0]['total'];
