@@ -480,6 +480,11 @@ abstract class Budgeting_Controler extends Globalclass{
             $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
         }
 
+        if ($MenuDepartement == 'NA.36') { // other division
+            $PositionMain = $this->session->userdata('PositionMain');
+            $MenuDepartement = 'NA.'.$PositionMain['IDDivision'];
+        }
+
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);
         $this->session->set_userdata('IDDepartementPUBudget',$MenuDepartement);
         $data_sess = array();
