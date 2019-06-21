@@ -1131,7 +1131,7 @@ class M_pr_po extends CI_Model {
     {
         $arr = array();
         $sql = 'select a.ID_pre_po,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,b.FileOffer,
-                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,
+                c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,a.JobSpk,
                 a.PostingDate,a.CreatedBy,a.CreatedAt
                 from db_purchasing.po_create as a 
                 join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID

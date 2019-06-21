@@ -159,29 +159,30 @@
 		var JsonStatus = po_create[0]['JsonStatus'];
 		JsonStatus = jQuery.parseJSON(JsonStatus);
 		var PICPU = JsonStatus[0]['Name'];
-		// console.log(po_detail);
 
 		// tulis html untuk mengerjakan dengan penggabungan catalog
-		var U_mengerjakan = '';
-			for (var i = 0; i < po_detail.length; i++) {
-				if ( i == parseInt(po_detail.length - 1)) { // jika loop data terakhir
-					if (po_detail.length != 1) {
-						U_mengerjakan += ' dan '+po_detail[i]['Item'];
+		var U_mengerjakan = po_create[0]['JobSpk'];
+			if (U_mengerjakan == '') {
+				for (var i = 0; i < po_detail.length; i++) {
+					if ( i == parseInt(po_detail.length - 1)) { // jika loop data terakhir
+						if (po_detail.length != 1) {
+							U_mengerjakan += ' dan '+po_detail[i]['Item'];
+						}
+						else
+						{
+							U_mengerjakan += po_detail[i]['Item'];
+						}
+						
+					}
+					else if (i==0) { // data awal
+						U_mengerjakan += po_detail[i]['Item'];
 					}
 					else
 					{
-						U_mengerjakan += po_detail[i]['Item'];
+						U_mengerjakan += ' , '+po_detail[i]['Item'];
 					}
-					
-				}
-				else if (i==0) { // data awal
-					U_mengerjakan += po_detail[i]['Item'];
-				}
-				else
-				{
-					U_mengerjakan += ' , '+po_detail[i]['Item'];
-				}
 
+				}
 			}
 
 		var F_isiDeskripsi = function(po_detail) // make function variable
@@ -305,7 +306,7 @@
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>UNTUK MENGERJAKAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td>'+
+											'<td class = "U_mengerjakan" dt = "'+U_mengerjakan+'">'+
 												'<div>'+
 													'<b>'+U_mengerjakan+'</b>'+
 												'</div>'+
@@ -577,7 +578,8 @@
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
-		var btn_cancel = '<button class= "btn btn-danger" id="btn_cancel">Cancel PO</button>';
+		var btn_cancel = '<button class= "btn btn-danger" id="btn_cancel" style = "background-color: #150909;">Cancel SPK</button>';
+		var btn_cancel_po_pr = '<button class= "btn btn-danger" id="btn_cancel2">Cancel SPK & PR</button>';
 		var Status = po_create[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -588,7 +590,7 @@
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
 		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		  		$('#r_action').html(html);
-		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');
+		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'&nbsp'+btn_cancel_po_pr+'</div>');
 		  	}
 		    
 		    break;
@@ -608,7 +610,7 @@
 
 		    	if (booledit2) {
 		    		$('#r_action').html(html);
-		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'</div>');;
+		    		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_re_open+'&nbsp'+btn_submit+'&nbsp'+btn_cancel+'&nbsp'+btn_cancel_po_pr+'</div>');;
 		    	}
 		    }
 
@@ -664,7 +666,7 @@
 		    JsonStatus = jQuery.parseJSON(JsonStatus);
 		    if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
 		    	$('#r_action').html(html);
-		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'</div>');
+		    	$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'&nbsp'+btn_create_spb+'&nbsp'+btn_cancel+'&nbsp'+btn_cancel_po_pr+'</div>');
 		    }
 		    break;
 		  case 4:
@@ -877,7 +879,7 @@
 	$(document).off('click', '#BtnEdit').on('click', '#BtnEdit',function(e) {
 		$(this).attr('class','btn btn-danger');
 		$(this).find('i').remove();
-		$(this).html('Cancel');
+		$(this).html('Reset');
 		$(this).attr('id','BtnCancel');
 		__input_reload();
 		$('#BtnSubmit').prop('disabled',false);
@@ -906,6 +908,10 @@
 
 		var value  = $('#table_input_spk').find('.tdNotes2').attr('notes2');
 		$('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
+
+		// Untuk Mengerjakan
+		var value  = $('.U_mengerjakan').attr('dt');
+		$('#table_input_spk').find('.U_mengerjakan').html('<input type="text" class="form-control Inp_U_mengerjakan" value="'+value+'">');
 		
 	}
 
@@ -1009,12 +1015,14 @@
 
 			var Notes =  $('#table_input_spk').find('.Notes').val();
 			var Notes2 =  $('#table_input_spk').find('.Notes2').val();
+			var JobSpk = $('.Inp_U_mengerjakan').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
 			    arr_post_data_detail : arr_post_data_detail,
 			    Notes : Notes,
 			    Notes2 : Notes2,
+			    JobSpk : JobSpk,
 			};
 			
 			var token = jwt_encode(data,"UAP)(*");
@@ -1196,20 +1204,85 @@
 			var PRRejectItem = false;
 			var arr = ClassDt.PRCode_arr;
 			var PRCode = arr[0];
-			if (confirm('Apakah perlu untuk cancel All ITEM dari '+PRCode+ ' yang berada pada PO ini ?')) {
-				PRRejectItem = true;
-			}
-			else
-			{
-				if (confirm('Konfirmasi!!! SPK '+POCode+ ' akan di cancel dan ITEM PR tidak dicancel?')) {
-					PRRejectItem = false;
-				}else
-				{
-					return;
-				}
-			}
-			
+			var url = base_url_js+"po_spk/submit_create";
+			var po_data = ClassDt.po_data;
+			var arr_post_data_ID_po_detail = [];
+			$('#Tbl_Deskripsi tbody').find('tr').each(function(){
+				var ID_po_detail = $(this).attr('id_po_detail');
+				arr_post_data_ID_po_detail.push(ID_po_detail);
+			})
 
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="100"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+			$("#confirmYes").click(function(){
+				var NoteDel = $('#NoteDel').val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});				
+
+				var data = {
+				    po_data : po_data,
+				    arr_post_data_ID_po_detail : arr_post_data_ID_po_detail,
+				    PRRejectItem : PRRejectItem,
+				    NoteDel : NoteDel,
+				    PRCode : PRCode,
+				};
+			
+				var token = jwt_encode(data,"UAP)(*");
+				var action_mode = 'cancel';
+					action_mode = jwt_encode(action_mode,"UAP)(*");
+				var action_submit = 'SPK';
+					action_submit = jwt_encode(action_submit,"UAP)(*");	
+				$.post(url,{token:token,action_mode:action_mode,action_submit:action_submit},function (resultJson) {
+					var rs = jQuery.parseJSON(resultJson);
+					if (rs.Status == 1) {
+						Get_data_po().then(function(data){
+								ClassDt.po_data = data;
+								WriteHtml();
+						})
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							Get_data_po().then(function(data){
+									ClassDt.po_data = data;
+									WriteHtml();
+							})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  toastr.error('','!!!Failed');
+				  $('#NotificationModal').modal('hide');
+				})	
+			})	
+
+		}
+	})
+
+	$(document).off('click', '#btn_cancel2').on('click', '#btn_cancel2',function(e) {
+		POCode = ClassDt.Code;
+		var PRRejectItem = true;
+		var arr = ClassDt.PRCode_arr;
+		var PRCode = arr[0];
+		if (confirm('Apakah perlu untuk cancel All ITEM dari '+PRCode+ ' yang berada pada PO ini ?')) {
 			var url = base_url_js+"po_spk/submit_create";
 			var po_data = ClassDt.po_data;
 			var arr_post_data_ID_po_detail = [];

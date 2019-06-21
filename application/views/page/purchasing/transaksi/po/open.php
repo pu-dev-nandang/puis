@@ -105,7 +105,6 @@
 		    	else
 		    	{
 		    		Get_data_open_po_created_detail().then(function(data){
-		    			// console.log(data);
 		    			ClassDt.POData = data;
 		    			var resultJson = data['po_detail'];
 		    			var temp = ClassDt.Dt_selection;
@@ -125,7 +124,7 @@
 
 		    			// get ALL PR
     						LoadPRSelected(data).then(function(data){
-    							SelectedPR_selection(data);
+    							// SelectedPR_selection(data);
     							waitForEl(".id_pr_detail", function() {
     							  $('.id_pr_detail:first').trigger('change');
     							});
@@ -351,7 +350,8 @@
 							'</div>';
 
 		$('#page_pr_item_list').html(htmlInputPR);
-		SelectedPR_selection(dt)							
+		SelectedPR_selection(dt);
+							
 	}
 
 	function SelectedPR_selection(data)
@@ -378,6 +378,7 @@
 		{
 			Dt_ChooseSelectPR.push(data);
 		}
+
 	}
 
 	$(document).off('change', '.id_pr_detail').on('change', '.id_pr_detail',function(e) {
@@ -408,7 +409,6 @@
 			Dt_selection = arr;
 			ClassDt.Dt_selection = Dt_selection;
 		}
-
 		ShowClassDt_selection();
 	})
 
