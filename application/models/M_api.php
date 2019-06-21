@@ -2350,7 +2350,7 @@ class M_api extends CI_Model {
 
     public function getSchoolbyNameAC($school)
     {
-      $sql = 'select ID, SchoolName from db_admission.school where SchoolName like "%'.$school.'%"';
+      $sql = 'select ID, SchoolName from db_admission.school where SchoolName like "%'.$school.'%" limit 200';
       $query=$this->db->query($sql, array())->result_array();
       return $query;
     }
