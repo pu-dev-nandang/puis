@@ -43,7 +43,7 @@ class C_po extends Transaksi_Controler {
                         */
                         if (in_array($G_data[0]['Status'], array(0,1,-1,4)) ) {
                               $bool = true;
-                             // special untuk status = 1, trigger belum di lakukan proses apprval oleh approver\
+                             // special untuk status = 1, trigger belum di lakukan proses approval oleh approver
                              if ($G_data[0]['Status'] == 1) {
                                   $JsonStatus = json_decode($G_data[0]['JsonStatus'],true) ;
                                   for ($i=1; $i < count($JsonStatus) ; $i++) { 
@@ -655,6 +655,7 @@ class C_po extends Transaksi_Controler {
                                     'UnitCost' => $G[0]['UnitCost'],
                                     'Discount' => 0,
                                     'PPN' => $G[0]['PPH'],
+                                    'AnotherCost' => 0.0,
                                     'SubTotal' => $G[0]['SubTotal'],
                                 );
                                 $dt_po_detail[] = $temp;
@@ -694,7 +695,6 @@ class C_po extends Transaksi_Controler {
                            $dataSave = array(
                                'TypeCreate' => 1,
                                'ID_pre_po_supplier' => $ID_pre_po_supplier,
-                               'AnotherCost' => 0,
                                'JsonStatus' => json_encode($JsonStatus),
                                'Status' => 0,
                                'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
@@ -748,8 +748,6 @@ class C_po extends Transaksi_Controler {
             {
                 $arr_rs = array('status' => '0','message' => 'Nominal '.$Amount.' tidak di set di RAD','url'=> '','Code');
             }
-
-            
 
         echo json_encode($arr_rs);
     }
@@ -1307,6 +1305,7 @@ class C_po extends Transaksi_Controler {
                                 'UnitCost' => $G[0]['UnitCost'],
                                 'Discount' => 0,
                                 'PPN' => $G[0]['PPH'],
+                                'AnotherCost' => 0.0,
                                 'SubTotal' => $G[0]['SubTotal'],
                             );
                             $dt_po_detail[] = $temp;
@@ -1347,7 +1346,6 @@ class C_po extends Transaksi_Controler {
                        $dataSave = array(
                            'TypeCreate' => 2,
                            'ID_pre_po_supplier' => $ID_pre_po_supplier,
-                           'AnotherCost' => 0,
                            'JsonStatus' => json_encode($JsonStatus),
                            'Status' => 0,
                            'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
@@ -1409,6 +1407,7 @@ class C_po extends Transaksi_Controler {
         $arr_post_data_detail =$Input['arr_post_data_detail'];
         $Notes = $Input['Notes'];
         $Notes2 = $Input['Notes2'];
+        $JobSpk = $Input['JobSpk'];
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
@@ -1434,6 +1433,7 @@ class C_po extends Transaksi_Controler {
             }
 
             $dataSave = array(
+                'JobSpk' => $JobSpk,
                 'Notes' => $Notes,
                 'Notes2' => $Notes2,
                 'Status' => 1,

@@ -3449,8 +3449,8 @@ class C_rest extends CI_Controller {
                                     ) as b on a.Departement = b.ID
                                 )a
                                     LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
-                                    where a.PRCode like "%%" '.$StatusQuery.' 
-                                UNION
+                                    where a.PRCode in ('.$temp.') 
+                                    UNION
                                 select a.*,b.Item_proc,b.Item_done,Item_pending,b.Status as StatusPRPO from 
                                 (
                                     select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
@@ -3468,12 +3468,15 @@ class C_rest extends CI_Controller {
                                     ) as b on a.Departement = b.ID
                                 )a
                                     LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
-                                    where a.PRCode in ('.$temp.') 
+                                    where a.PRCode like "%%" '.$StatusQuery.' 
                             ) aa
                            ';
                     $sql.= ' where (PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%") ';
                     
-                    $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    // $sql.= ' ORDER BY PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $sql.= ' LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
+                    // print_r($sql);die();
                 }
 
                 $query = $this->db->query($sql)->result_array();
