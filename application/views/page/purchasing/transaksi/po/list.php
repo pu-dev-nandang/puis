@@ -97,11 +97,30 @@ $(document).ready(function() {
        	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Info</a>');
        	    		
        	    },
+            dom: 'l<"toolbar">frtip',
        	    "initComplete": function(settings, json) {
-       	        
+                // auth purchasing
+                <?php $P = $this->session->userdata('PositionMain'); 
+                       $DivisionID = $P['IDDivision'];
+                ?>
+                var DivSession = "<?php echo $DivisionID ?>";
+                if (DivSession == '4') {
+                          $("div.toolbar")
+                           .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+                        '<span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">'+
+                            '<i class="icon-plus"></i> New PO / SPK'+
+                       '</span>'+
+                    '</div>');
+                }
+	                 
        	    }
 		});
 	}
+
+  $(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
+    var page = $(this).attr('page');
+    window.location.href = base_url_js+page;
+  })  
 
 	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
 	    var url = base_url_js+'rest2/__show_info_po';

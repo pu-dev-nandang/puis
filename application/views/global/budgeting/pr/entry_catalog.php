@@ -85,6 +85,10 @@
 				<div class="row">
 					<div class="col-md-3 col-md-offset-9">
 						<button type="button" id="btnSaveForm" class="btn btn-success" action = "">Save</button>
+						&nbsp
+						 <span data-smt="" class="btn btn-add-new-catalog" page = "entry_catalog">
+						     <i class="icon-plus"></i> New Catalog
+						</span>
 					</div>
 				</div>
 			</div>

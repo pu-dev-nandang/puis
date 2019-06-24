@@ -59,6 +59,15 @@
 
 			<?php endif ?>
 	</div>
+	<?php if ($bool): ?>
+	<div class="col-xs-2 col-md-offset-8">
+		<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">
+            <span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">
+                <i class="icon-plus"></i> New PO / SPK
+           </span>
+        </div>
+	</div>
+	<?php endif ?>
 </div>
 <div id="DocPenawaran" class="row noPrint"></div>
 <div class="row" style="margin-top: 2px;">
@@ -1354,6 +1363,11 @@
 			})	
 
 		}
-	})	
+	})
+
+	$(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
+	  var page = $(this).attr('page');
+	  window.location.href = base_url_js+page;
+	}) 	
 </script>
 <?php endif ?>	

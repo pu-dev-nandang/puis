@@ -157,6 +157,15 @@ $(document).ready(function() {
 		    		 			}
 		    		 		}	
 		    },
+		    dom: 'l<"toolbar">frtip',
+	        initComplete: function(){
+	          $("div.toolbar")
+	             .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+				    '<span data-smt="" class="btn btn-add-new-pr" page = "form">'+
+				        '<i class="icon-plus"></i> New PR'+
+				   '</span>'+
+				'</div>');           
+	       }  
 		} );
 	}
 

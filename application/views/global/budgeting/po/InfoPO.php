@@ -40,12 +40,23 @@
 		<?php if ($this->session->userdata('IDdepartementNavigation') == 4): ?>
 			<div><a href="<?php echo base_url().'purchasing/transaction/po/list' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
 		<?php else: ?>
-			<div><a href="<?php echo base_url().'budgeting_po' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
+			<div>
+				<a href="<?php echo base_url().'budgeting_po' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a>
+			</div>
 		<?php endif ?>
 			<?php if ($bool): ?>
-
+		
 			<?php endif ?>
 	</div>
+	<?php if ($bool): ?>
+	<div class="col-xs-2 col-md-offset-8">
+		<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">
+            <span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">
+                <i class="icon-plus"></i> New PO / SPK
+           </span>
+        </div>
+	</div>
+	<?php endif ?>
 </div>
 <div id="DocPenawaran" class="row noPrint"></div>
 <div class="row" style="margin-top: 2px;">
@@ -1287,6 +1298,11 @@
 
 		}
 	})
+
+	$(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
+	  var page = $(this).attr('page');
+	  window.location.href = base_url_js+page;
+	}) 
 	
 </script>
 <?php endif ?>	
