@@ -136,14 +136,15 @@
                 for(var i=0;i<jsonResult.length;i++){
                     var data = jsonResult[i];
                     var status = (data.Status==1) ? '<span class="label label-success">Publish</span>' : '<span class="label label-danger">Unpublish</span>';
+                    var btnAct = (data.Status==1) ? '<li><a href="javascript:void(0);" class="btnUnpublish" data-id="'+data.ID+'">Unpublish</a></li>'
+                        : '<li><a href="javascript:void(0);" class="btnPublish" data-id="'+data.ID+'">Publish</a></li>';
 
                     var btnAct = '<div class="btn-group">' +
                         '    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
                         '        <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '    </button>' +
                         '    <ul class="dropdown-menu">' +
-                        '        <li><a href="javascript:void(0);" class="btnPublish" data-id="'+data.ID+'">Publish</a></li>' +
-                        // '        <li><a href="#">Remove</a></li>' +
+                        '      '+btnAct+
                         '    </ul>' +
                         '</div>';
 
@@ -188,6 +189,24 @@
 
             var url = base_url_js+'api/__crudTahunAkademik';
             var token = jwt_encode({action:'publishSemesterAntara',ID:ID},'UAP)(*');
+
+            $.post(url,{token:token},function () {
+                toastr.success('Published','Success');
+                setTimeout(function () {
+                    loadDataSemesterAntara();
+                },500);
+            });
+        }
+
+    });
+
+    $(document).on('click','.btnUnpublish',function () {
+
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+
+            var url = base_url_js+'api/__crudTahunAkademik';
+            var token = jwt_encode({action:'UnpublishSemesterAntara',ID:ID},'UAP)(*');
 
             $.post(url,{token:token},function () {
                 toastr.success('Published','Success');
