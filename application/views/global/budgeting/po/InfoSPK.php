@@ -317,7 +317,7 @@
 											'<td style = "width : 10px;"><b>:</b></td>'+
 											'<td class = "U_mengerjakan" dt = "'+U_mengerjakan+'">'+
 												'<div>'+
-													'<b>'+U_mengerjakan+'</b>'+
+													'<b>'+nl2br(U_mengerjakan)+'</b>'+
 												'</div>'+
 											'</td>'+
 										'</tr>'+
@@ -351,12 +351,12 @@
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'">'+po_create[0]['Notes']+'</td>'+
+											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'">'+nl2br(po_create[0]['Notes'])+'</td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td class="tdNotes2" notes2 = "'+po_create[0]['Notes2']+'">'+po_create[0]['Notes2']+'</td>'+
+											'<td class="tdNotes2" notes2 = "'+po_create[0]['Notes2']+'">'+nl2br(po_create[0]['Notes2'])+'</td>'+
 										'</tr>'+
 									'</tbody>'+
 								'</table>'+
@@ -913,14 +913,17 @@
 		})
 
 		var value  = $('#table_input_spk').find('.tdNotes').attr('notes');
-		$('#table_input_spk').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+		// $('#table_input_spk').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+		$('#table_input_spk').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
 
 		var value  = $('#table_input_spk').find('.tdNotes2').attr('notes2');
-		$('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
+		// $('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
+		$('#table_input_spk').find('.tdNotes2').html('<textarea class = "form-control Notes2">'+value+'</textarea>');
 
 		// Untuk Mengerjakan
 		var value  = $('.U_mengerjakan').attr('dt');
-		$('#table_input_spk').find('.U_mengerjakan').html('<input type="text" class="form-control Inp_U_mengerjakan" value="'+value+'">');
+		// $('#table_input_spk').find('.U_mengerjakan').html('<input type="text" class="form-control Inp_U_mengerjakan" value="'+value+'">');
+		$('#table_input_spk').find('.U_mengerjakan').html('<textarea class = "form-control Inp_U_mengerjakan">'+value+'</textarea>');
 		
 	}
 

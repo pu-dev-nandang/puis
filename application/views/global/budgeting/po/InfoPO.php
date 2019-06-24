@@ -673,7 +673,7 @@
 											'<td colspan = "3" class = "tdSubtotal_All" value = "'+Subtotal+'">'+formatRupiah(Subtotal)+'</td>'+
 										'</tr>'+
 										'<tr>'+
-											'<td colspan = "10" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+po_create[0]['Notes']+'</b></td>'+
+											'<td colspan = "10" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+nl2br(po_create[0]['Notes'])+'</b></td>'+
 										'</tr>'+		
 									'</table>'+
 								//'</div>'+
@@ -832,7 +832,8 @@
 		// $('#table_input_po tfoot').find('.AnotherCost').maskMoney('mask', '9894');
 
 		var value  = $('#table_input_po tfoot').find('.tdNotes').attr('value');
-		$('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+		// $('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
+		$('#table_input_po tfoot').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {

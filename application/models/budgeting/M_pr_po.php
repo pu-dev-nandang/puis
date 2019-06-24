@@ -1155,6 +1155,10 @@ class M_pr_po extends CI_Model {
            $query[$i]['JsonStatus']= json_encode($JsonStatus);
            $CreatedAt = $TimeStart = date("Y-m-d", strtotime($query[$i]['CreatedAt']));
            $query[$i]['CreatedAt_Indo'] = $this->m_master->getIndoBulan($CreatedAt);
+           // show textarea jobspk,notes & notes2 
+           // $query[$i]['JobSpk'] = nl2br($query[$i]['JobSpk']);
+           // $query[$i]['Notes'] = nl2br($query[$i]['Notes']);
+           // $query[$i]['Notes2'] = nl2br($query[$i]['Notes2']);
        }
        $arr['po_create'] = $query;
 
