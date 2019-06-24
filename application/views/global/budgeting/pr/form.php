@@ -331,9 +331,41 @@
 		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$(".UnitCost").maskMoney('mask', '9894');
 
-		$('.datetimepicker').datetimepicker({
-			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-		});
+		// $('.datetimepicker').datetimepicker({
+		// 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		// });
+
+		// datetimepicker berdasarkan days
+		$('.datetimepicker').each(function(){
+			var dt = $(this);
+			var fillItem = $(this).closest('tr');
+			var days = fillItem.find('.Item').attr('days');
+				// add set DateNeeded datetimepicker
+					Date.prototype.addDays = function(days) {
+				          var date = new Date(this.valueOf());
+				          date.setDate(date.getDate() + days);
+				          return date;
+				    }
+			        
+			        var date = new Date();
+
+			        var aa = date.addDays(parseInt(days));
+			        // var bb = moment(aa).format('YYYY-MM-DD');
+			        var bb = moment(aa).format('YYYY-MM-DD');
+
+					fillItem.find('td:eq(10)').find('.datetimepicker').datetimepicker({
+						useCurrent: false,
+						startDate: date.addDays(parseInt(days)),
+						format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+					});
+
+					if (fillItem.find('td:eq(10)').find('.spanClass').length) {
+						fillItem.find('td:eq(10)').find('.spanClass').remove();
+					}
+					
+					fillItem.find('td:eq(10)').append('<span style = "color : red" class = "spanClass"><br>Estimated due date minimal : '+bb+'</span>'	);
+		})
+
 		__BudgetRemaining();
 
 		// Show Supporting_documents if exist
@@ -453,7 +485,7 @@
 						'</td>'+
 						'<td>'+
 							'<div class="input-group">'+
-								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['EstimaValue']+'" value = "'+pr_detail[i]['Item']+'">'+
+								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['EstimaValue']+'" value = "'+pr_detail[i]['Item']+'" days = "'+pr_detail[i]['Days']+'">'+
 								'<span class="input-group-btn">'+
 									'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
 								'</span>'+
