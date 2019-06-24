@@ -242,16 +242,41 @@ class C_pr_po extends Budgeting_Controler {
     {
         $requestData= $_REQUEST;
         // filter by department dan nip approver, untuk finance show semua pr
-        // $WhereFiltering = '';
-        // $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
-        // if ($IDDepartementPUBudget != 'NA.9') {
-        //     # code...
-        // }
+        $WhereFiltering = '';
+        $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        $NIP = $this->session->userdata('NIP');
+        if ($IDDepartementPUBudget != 'NA.9') {
+            $WhereFiltering .= ' where a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
+        }
 
-        $sqltotalData = 'select count(*) as total from db_budgeting.pr_create';
+        // $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a';
+        // $querytotalData = $this->db->query($sqltotalData)->result_array();
+        // $totalData = $querytotalData[0]['total'];
+
+        $sqltotalData = 'select count(*) as total from 
+                (
+                    select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                    as StatusName, a.JsonStatus,a.PostingDate 
+                                    from db_budgeting.pr_create as a 
+                    join (
+                    select * from (
+                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                    UNION
+                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                    ) aa
+                    ) as b on a.Departement = b.ID
+                    '.$WhereFiltering.'
+                )aa
+               ';
+
+        $sqltotalData.= ' where PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%" or StatusName LIKE "'.$requestData['search']['value'].'%" 
+                ';
         $querytotalData = $this->db->query($sqltotalData)->result_array();
-        $totalData = $querytotalData[0]['total'];
-
+        $totalData = $querytotalData[0]['total'];      
+        // --- //
         $sql = 'select * from 
                 (
                     select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
@@ -267,6 +292,7 @@ class C_pr_po extends Budgeting_Controler {
                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                     ) aa
                     ) as b on a.Departement = b.ID
+                    '.$WhereFiltering.'
                 )aa
                ';
 

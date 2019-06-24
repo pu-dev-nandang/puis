@@ -3398,7 +3398,7 @@ class C_rest extends CI_Controller {
                         (
                             select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
                                             if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                            as StatusName, a.JsonStatus,a.PostingDate
+                                            as StatusName, a.JsonStatus,a.PostingDate,a.Supporting_documents
                                             from db_budgeting.pr_create as a 
                             join (
                             select * from (
@@ -3436,7 +3436,7 @@ class C_rest extends CI_Controller {
                                 (
                                     select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
                                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                                    as StatusName, a.JsonStatus,a.PostingDate
+                                                    as StatusName, a.JsonStatus,a.PostingDate,a.Supporting_documents
                                                     from db_budgeting.pr_create as a 
                                     join (
                                     select * from (
@@ -3455,7 +3455,7 @@ class C_rest extends CI_Controller {
                                 (
                                     select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
                                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                                    as StatusName, a.JsonStatus,a.PostingDate
+                                                    as StatusName, a.JsonStatus,a.PostingDate,a.Supporting_documents
                                                     from db_budgeting.pr_create as a 
                                     join (
                                     select * from (

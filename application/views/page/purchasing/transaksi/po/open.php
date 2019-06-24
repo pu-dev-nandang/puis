@@ -68,6 +68,7 @@
 					 				'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">PR Code</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">File</th>'+
 					 			'</tr>'+
 					 		'<thead>'+
 					 		'<tbody id="dataRow" style="background-color: #8ED6EA;"></tbody>'+
@@ -220,11 +221,18 @@
        	                { "data": "No" },
        	                { "data": "PRCode" },
        	                { "data": "NameDepartement" },
+       	                { "data": "Supporting_documents" },
        	    ],
        	    'createdRow': function( row, data, dataIndex ) {
        	    		$(row).find('td:eq(1)').html('<label><input type="radio" name="optradio" prcode = "'+data['PRCode']+'" class = "C_radio_pr">&nbsp'+data['PRCode']+'</label>');
        	    		$( row ).find('td:eq(2)').attr('align','center');
        	    		$( row ).find('td:eq(0)').attr('align','center');
+       	    		var FileJson = jQuery.parseJSON(data['Supporting_documents']);
+       	    		var html = '';
+       	    		for (var i = 0; i < FileJson.length; i++) {
+       	    			html += '<li>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+FileJson[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>'+'</li>';
+       	    		}
+       	    		$( row ).find('td:eq(3)').html(html);
        	    },
        	    "initComplete": function(settings, json) {
        	        def.resolve(json);
@@ -307,7 +315,14 @@
 					checked = 'checked';
 					break;
 				}
-			}	
+			}
+
+			// fileupload
+			var Jsonfileupload = jQuery.parseJSON(pr_detail[i]['UploadFile']);
+			var Htmlfileupload = '';
+			for (var k = 0; k < Jsonfileupload.length; k++) {
+					Htmlfileupload += '<li>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-pr-'+Jsonfileupload[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>'+'</li>';
+				}	
 			IsiInputPR += '<tr>'+
 							'<td>'+(i+1)+'</td>'+
 							'<td>'+	'<input type = "checkbox" id_pr_detail = "'+pr_detail[i]['ID']+'" '+checked+' class = "id_pr_detail"> '+pr_detail[i]['Item']+'</td>'+
@@ -319,6 +334,7 @@
 							'<td>'+	parseInt(pr_detail[i]['PPH'])+'</td>'+
 							'<td>'+	formatRupiah(pr_detail[i]['SubTotal'])+'</td>'+
 							'<td>'+	pr_detail[i]['DateNeeded']+'</td>'+
+							'<td>'+	Htmlfileupload+'</td>'+
 						  '</tr>';	
 
 		}
@@ -342,6 +358,7 @@
 				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 78px;">PPN(%)</th>'+
 				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;width : 150px;">Sub Total</th>'+
 				                            '<th width = "150px" style = "text-align: center;background: #607D8B;color: #FFFFFF;">Date Needed</th>'+
+				                            '<th style = "text-align: center;background: #607D8B;color: #FFFFFF;">File</th>'+
 										'</tr>'+
 										'</thead>'+
 										'<tbody style = "background-color : #eade8e;">'+IsiInputPR+'</tbody></table>'+

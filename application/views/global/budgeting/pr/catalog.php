@@ -25,6 +25,14 @@
         });
     }); // exit document Function
 
+    $(document).off('click', '.btn-add-new-catalog').on('click', '.btn-add-new-catalog',function(e) {
+        var Page = $(this).attr('page');
+        $(".menuCatalog li").removeClass('active');
+        $('.pageAnchorCatalog[page="'+Page+'"]').parent().addClass('active');
+        $("#pageContentCatalog").empty();
+        LoadPageCatalog(Page);
+    });
+
     function LoadPageCatalog(page)
     {
         loading_page("#pageContentCatalog");

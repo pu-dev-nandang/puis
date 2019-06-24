@@ -1682,6 +1682,22 @@
         $(classHeader).find(elmChild).addClass(classActiveName);
     }
 
+    // for text area
+    function nl2br (str, replaceMode, isXhtml) {
+
+      var breakTag = (isXhtml) ? '<br />' : '<br>';
+      var replaceStr = (replaceMode) ? '$1'+ breakTag : '$1'+ breakTag +'$2';
+      return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, replaceStr);
+    }
+
+    function br2nl (str, replaceMode) {   
+        
+      var replaceStr = (replaceMode) ? "\n" : '';
+      // Includes <br>, <BR>, <br />, </br>
+     str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
+      return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
+    }
+  
     $(document).on('blur','input[typeof=number][data-form=phone]',function () {
         var formPhone = $(this).val();
 
