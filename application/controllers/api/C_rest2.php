@@ -824,10 +824,18 @@ class C_rest2 extends CI_Controller {
             $this->db->insert('db_admission.crm_team',$team);
             $CRMTeamID = $this->db->insert_id();
 
+            $dataIns = array(
+                'CRMTeamID' => $CRMTeamID,
+                'NIP' => $data_arr['Coordinator'],
+                'Status' => '1'
+            );
+
+            $this->db->insert('db_admission.crm_team_member',$dataIns);
+
             if(count($member)>0){
                 for($i=0;$i<count($member);$i++){
 
-                    if($member[$i]!=$team['Coordinator']){
+                    if($member[$i]!=$data_arr['Coordinator']){
                         $dataIns = array(
                             'CRMTeamID' => $CRMTeamID,
                             'NIP' => $member[$i]
@@ -859,10 +867,22 @@ class C_rest2 extends CI_Controller {
             $this->db->delete('db_admission.crm_team_member');
             $this->db->reset_query();
 
+
+
+            $dataIns = array(
+                'CRMTeamID' => $ID,
+                'NIP' => $data_arr['Coordinator'],
+                'Status' => '1'
+            );
+
+            $this->db->insert('db_admission.crm_team_member',$dataIns);
+
             if(count($member)>0){
+
+
                 for($i=0;$i<count($member);$i++){
 
-                    if($member[$i]!=$team['Coordinator']){
+                    if($member[$i]!=$data_arr['Coordinator']){
                         $dataIns = array(
                             'CRMTeamID' => $ID,
                             'NIP' => $member[$i]
@@ -879,8 +899,7 @@ class C_rest2 extends CI_Controller {
         else if($data_arr['action']=='readCRMTeam'){
             $PeriodID = $data_arr['PeriodID'];
 
-            $data = $this->db->query('SELECT ct.*, em.Name AS CoordinatorName, cp.Year, cp.Status FROM db_admission.crm_team ct 
-                                                LEFT JOIN db_employees.employees em  ON (em.NIP = ct.Coordinator)
+            $data = $this->db->query('SELECT ct.*, cp.Year, cp.Status FROM db_admission.crm_team ct 
                                                 LEFT JOIN db_admission.crm_period cp ON (cp.ID = ct.PeriodID)
                                                 WHERE ct.PeriodID = "'.$PeriodID.'" ')->result_array();
 
@@ -890,7 +909,8 @@ class C_rest2 extends CI_Controller {
                     $data[$i]['Member'] = $this->db->query('SELECT ctm.*, em.Name AS MemberName FROM db_admission.crm_team_member ctm 
                                                                       LEFT JOIN db_employees.employees em 
                                                                       ON (em.NIP = ctm.NIP) 
-                                                                      WHERE ctm.CRMTeamID = "'.$data[$i]['ID'].'" ')->result_array();
+                                                                      WHERE ctm.CRMTeamID = "'.$data[$i]['ID'].'" 
+                                                                      ORDER BY ctm.Status DESC ')->result_array();
 
                 }
             }
