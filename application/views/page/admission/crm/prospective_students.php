@@ -163,11 +163,16 @@
                if(jsonResult.length>0){
                    $.each(jsonResult,function (i,v) {
 
-                       var opt = '<option value="'+v.ID+'.'+v.Coordinator+'" style="color: blue;background: #f5f5f5;">(Co) '+v.CoordinatorName+'</option>';
+                       var opt = '';
                        var Member = v.Member;
                        if(Member.length>0){
                            $.each(Member,function (i2,v2) {
-                               opt = opt+'<option value="'+v.ID+'.'+v2.NIP+'">'+v2.MemberName+'</option>';
+                               if(v2.Status=='1'){
+                                   opt = opt+'<option style="color: blue;background: #f5f5f5;" value="'+v.ID+'.'+v2.NIP+'">(Co) '+v2.MemberName+'</option>';
+                               } else {
+                                   opt = opt+'<option value="'+v.ID+'.'+v2.NIP+'">'+v2.MemberName+'</option>';
+                               }
+
                            });
                        }
 

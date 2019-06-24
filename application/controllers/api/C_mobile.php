@@ -137,6 +137,25 @@ class C_mobile extends CI_Controller {
         return $rest;
     }
 
+    private function checkUserEmployees($NIP,$Password){
+        $pass = $this->genratePassword($NIP,$Password);
+
+        $data = $this->db->limit(1)->get_where('db_employees.employees'
+            ,array(
+                'NIP' => $NIP,
+                'Password' => $pass
+            ))->result_array();
+
+        $rest = [];
+        if(count($data)>0){
+            $rest = $this->getEmployees($NIP);
+        }
+
+
+
+        return $rest;
+    }
+
     public function test_mobile(){
         $data = $this->getdataStudent('21150001');
         print_r($data);
@@ -363,21 +382,68 @@ class C_mobile extends CI_Controller {
 
         if(count($itSetting)>0){
             $dIT = $itSetting[0];
+
+            // Mode development
             if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
 
                 // Get data student
                 $dataEmp = $this->getEmployees($data_arr['NIP']);
 
                 if(count($dataEmp)>0){
+                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
                     $result = array(
-                        'Status' => 1,
-                        'User' => $dataEmp[0]
+                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+                        'User' => $dataEmp[0],
+                        'Team' => $dataTeam
+                    );
+                }
+            }
+            else {
+
+                $dataEmp = $this->checkUserEmployees($data_arr['NIP'],$data_arr['Password']);
+                if(count($dataEmp)>0){
+                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
+                    $result = array(
+                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+                        'User' => $dataEmp[0],
+                        'Team' => $dataTeam
                     );
                 }
             }
         }
 
         return print_r(json_encode($result));
+    }
+
+    private function checkUserCRM($NIP){
+        $data = $this->db->get_where('db_admission.crm_period',array('Status' => '1'))->result_array();
+
+        $result = array('Status' => 0);
+
+        if(count($data)>0){
+            $PeriodID = $data[0]['ID'];
+
+            $dataCheck = $this->db->query('SELECT ct.* FROM db_admission.crm_team_member ctm 
+                                                      LEFT JOIN db_admission.crm_team ct ON (ct.ID = ctm.CRMTeamID)
+                                                      WHERE ct.PeriodID = "'.$PeriodID.'"
+                                                       AND ctm.NIP = "'.$NIP.'" ')->result_array();
+
+            if(count($dataCheck)>0){
+
+                // Get Member
+                $dataMember = $this->db->order_by('Status','DESC')->get_where('db_admission.crm_team_member',array(
+                    'CRMTeamID' => $dataCheck[0]['ID']
+                ))->result_array();
+
+                $result = array('Status' => 1,
+                    'Team' => $dataCheck[0],
+                    'TeamMember' => $dataMember
+                );
+            }
+        }
+
+        return $result;
+
     }
 
     private function getEmployees($NIP){

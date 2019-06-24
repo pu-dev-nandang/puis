@@ -3339,11 +3339,16 @@ class C_api2 extends CI_Controller {
             $ProdiID = $data_arr['ProdiID'];
             $SASemesterID = $data_arr['SASemesterID'];
 
-            $dataCourse = $this->db->query('SELECT ss.*, mk.NameEng AS CourseEng, mk.MKCode, say.EndInputUAS FROM db_academic.sa_schedule_course ssc
+            $q = 'SELECT ss.*, mk.NameEng AS CourseEng, mk.MKCode, say.EndInputUAS FROM db_academic.sa_schedule_course ssc
                                                       LEFT JOIN db_academic.sa_schedule ss ON (ssc.ScheduleIDSA = ss.ID)
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
                                                       LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = ss.SASemesterID)
-                                                      WHERE ssc.ProdiID = "'.$ProdiID.'" AND ss.SASemesterID = "'.$SASemesterID.'"')->result_array();
+                                                      LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssc.CDID)
+                                                      WHERE cd.ProdiID = "'.$ProdiID.'" AND ss.SASemesterID = "'.$SASemesterID.'"
+                                                      GROUP BY ssc.ScheduleIDSA';
+
+
+            $dataCourse = $this->db->query($q)->result_array();
 
             return print_r(json_encode($dataCourse));
 
