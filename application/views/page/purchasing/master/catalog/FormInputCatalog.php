@@ -81,6 +81,21 @@
 		</div>
 		<div class="form-group">
 			<div class="row">
+				<div class="col-xs-2">
+					<label class="control-label">Add Department</label>
+				</div>
+				<div class="col-xs-2">
+					<button class="btn btn-primary btn-default" id = "addDepartment"><i class="icon-plus"></i> Add</button>
+				</div>
+			</div>
+			<div class="row" id = "pageAddDepartment" style="margin-right: 0px;margin-left: 0px;margin-top: 10px;">
+				<div class="col-md-6 col-md-offset-2">
+
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="row">
 				<div class="col-md-3 col-md-offset-9">
 					<button type="button" id="btnSaveForm" class="btn btn-success" action = "">Save</button>
 				</div>
@@ -512,4 +527,8 @@
 		return arr;
 		
 	}
+
+	$(document).off('click', '#addDepartment').on('click', '#addDepartment',function(e) {
+		
+	})
 </script>
