@@ -331,6 +331,45 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.register', $dataSave);
         // }
 
+        //get all payment dengan PTID 5 & 6
+        $arr = array();
+        $sql = 'select * from db_finance.payment where PTID in (5,6) limit 100';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $dt = array(); 
+            $ID_payment = $query[$i]['ID'];
+            $NPM = $query[$i]['NPM'];
+            $Invoice = $query[$i]['Invoice'];
+            $Status = $query[$i]['Status'];
+
+            // update Status = 1 & UpdatedBy,UpdateAt based ID = ID_payment
+
+            // cek ke payment_student
+            $sql2 = 'select * from db_finance.payment_students where ID_payment = ?';
+            $query2=$this->db->query($sql2, array($ID_payment))->result_array();
+            for ($k=0; $k < count($query2); $k++) { 
+                $ID_payment_std = $query2[$k]['ID'];
+                $InvoiceBill = $query2[$k]['Invoice'];
+                $StatusBill = $query2[$k]['Status'];
+                $dt[] = array(
+                    'ID_payment_std' => $ID_payment_std,
+                    'InvoiceBill' => $InvoiceBill,
+                    'StatusBill' => $StatusBill
+                );
+
+                // update Status = '1' & UpdatedBy,UpdateAt based ID = ID_payment_std
+            }
+
+            $arr[] = array(
+                'ID_payment' => $ID_payment,
+                'NPM' => $NPM,
+                'Invoice' => $Invoice,
+                'Status' => $Status,
+                'dt' =>$dt
+            );
+        }
+
+        print_r($arr);
 
     }
 
