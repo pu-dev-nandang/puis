@@ -313,4 +313,47 @@ class C_crm extends Admission_Controler {
         echo json_encode(array('asd','asdas','asdsad'));
     }
 
+    public function uploadDocumentPS(){
+
+        $ID = $this->input->get('id');
+        $name = $this->input->get('name').'.pdf';
+
+        // Cek apakah sudah ada filenya atau blm
+        $dataFile = $this->db->select('File')->get_where('db_admission.crm',array(
+            'ID' => $ID
+        ))->result_array();
+
+        if($dataFile[0]['File']!=null || $dataFile[0]['File']!=''){
+            $file = './uploads/crm/'.$dataFile[0]['File'];
+            if(file_exists($file)){
+                unlink($file);
+            }
+        }
+
+
+        $config['upload_path']          = './uploads/crm/';
+        $config['allowed_types']        = 'pdf';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $name;
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            $success = array('success' => $this->upload->data());
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_admission.crm',array(
+                'File' => $name
+            ));
+
+
+            return print_r(json_encode($success));
+        }
+
+    }
+
 }

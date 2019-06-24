@@ -1502,6 +1502,7 @@ class M_rest extends CI_Model {
                                 $GradeValue = (isset($dataScore[0]['GradeValue']) && $dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null && $dataScore[0]['GradeValue']!='-') ? $dataScore[0]['GradeValue'] : 0;
 
                                 $arrTr = array(
+                                    'SemesterID' => $data[$i]['ID'],
                                     'MKID' => $d['MKID'],
                                     'MKCode' => $d['MKCode'],
                                     'Course' => $d['Name'],
@@ -1529,7 +1530,8 @@ class M_rest extends CI_Model {
             // Cek semester antara
             $dataSemesterAntara = $this->db->query('SELECT say.SASemesterID, say.UpdateTranscript FROM db_academic.semester_antara sa 
                                                                               LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
-                                                                              WHERE sa.SemesterID = "'.$dataSmtActive['SemesterID'].'" ')->result_array();
+                                                                              WHERE sa.SemesterID = "'.$data[$i]['ID'].'" ')->result_array();
+
 
             if(count($dataSemesterAntara)>0){
 
@@ -1550,15 +1552,16 @@ class M_rest extends CI_Model {
                             $d_sa = $dataStd[$s];
                             if($d_sa['Type']=='Br' && in_array($d_sa['MKID'],$arrTranscriptID)==false){
 
-                                $Score = (isset($d_sa['Score']) && $d_sa['Score']!='' && $d_sa['Score']!=null && $d_sa['Score']!='-')
-                                    ? $d_sa['Score'] : 0;
-                                $Grade = (isset($d_sa['Grade']) && $d_sa['Grade']!='' && $d_sa['Grade']!=null && $d_sa['Grade']!='-')
-                                    ? $d_sa['Grade'] : 'E';
-                                $GradeValue = (isset($d_sa['GradeValue']) && $d_sa['GradeValue']!='' && $d_sa['GradeValue']!=null && $d_sa['GradeValue']!='-')
-                                    ? $d_sa['GradeValue'] : 0;
+                                $Score = (isset($d_sa['ScoreNew']) && $d_sa['ScoreNew']!='' && $d_sa['ScoreNew']!=null && $d_sa['ScoreNew']!='-')
+                                    ? $d_sa['ScoreNew'] : 0;
+                                $Grade = (isset($d_sa['GradeNew']) && $d_sa['GradeNew']!='' && $d_sa['GradeNew']!=null && $d_sa['GradeNew']!='-')
+                                    ? $d_sa['GradeNew'] : 'E';
+                                $GradeValue = (isset($d_sa['GradeValueNew']) && $d_sa['GradeValueNew']!='' && $d_sa['GradeValueNew']!=null && $d_sa['GradeValueNew']!='-')
+                                    ? $d_sa['GradeValueNew'] : 0;
 
 
                                 $arrTr = array(
+                                    'SemesterID' => $data[$i]['ID'],
                                     'MKID' => $d_sa['MKID'],
                                     'MKCode' => $d_sa['MKCode'],
                                     'Course' => $d_sa['Name'],

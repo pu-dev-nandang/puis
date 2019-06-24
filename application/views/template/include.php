@@ -946,6 +946,29 @@
 
         });
     }
+
+    function loadSelectOptionStatusMarketing(element,selected) {
+        var data = {
+            action : 'status_PS'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudProspectiveStudents';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (selected!='' && selected!=null && selected!=='undefined' && selected==v.ID)
+                        ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+
+                });
+            }
+
+        });
+    }
     
     function loadSelectOptionScheoolBy(CityID,element,selected) {
         var url = base_url_js+'api/__getSchoolByCityID/'+CityID;
@@ -1466,6 +1489,21 @@
             }
         });
     }
+    
+    function loadSelectOptionPathway(element,selected) {
+        
+        var url = base_url_js+'rest2/__getPathway';
+        $.getJSON(url,function (jsonResult) {
+           console.log(jsonResult);
+           if(jsonResult.length>0){
+               $.each(jsonResult,function (i,v) {
+                   var sc = (selected!='' && selected==v.ID) ? 'selected' : '';
+                   $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.SchoolMajor+'</option>');
+               })
+           }
+        });
+        
+    }
 
     function loadYearOfBirth(element,selected){
         $(element).empty();
@@ -1644,7 +1682,6 @@
         $(classHeader).find(elmChild).addClass(classActiveName);
     }
 
-
     // for text area
     function nl2br (str, replaceMode, isXhtml) {
 
@@ -1659,5 +1696,35 @@
       // Includes <br>, <BR>, <br />, </br>
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
+    }
+  
+    $(document).on('blur','input[typeof=number][data-form=phone]',function () {
+        var formPhone = $(this).val();
+
+        if(formPhone!=''){
+
+            var v = formatPhone(formPhone);
+
+            $(this).val(v);
+
+        }
+    });
+
+    function formatPhone(number) {
+
+        number = parseInt(number);
+
+        number = ''+number;
+
+        var d = number.substr(0,2);
+        var l = number.substr(2,number.length);
+        var v = '';
+        if(d=='62' || d==62){
+            v = number;
+        } else {
+            v = '628'+l;
+        }
+
+        return v;
     }
 </script>

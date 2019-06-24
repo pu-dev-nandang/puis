@@ -355,7 +355,7 @@
 
                     if($.inArray(''+v.IDSSD,arrIDSSD)!=-1){
                         fillListCourse.push(v.IDSSD);
-                        $('#showSelectedCourse').append('<li style="margin-bottom:5px;" id="listSelc'+v.IDSSD+'">'+v.CourseEng+' ' +
+                        $('#showSelectedCourse').append('<li style="margin-bottom:5px;" id="listSelc'+v.IDSSD+'">'+v.MKCode+' - '+v.CourseEng+' ' +
                             '| <a href="javascript:void(0);" class="btnShowStd" data-id="'+v.IDSSD+'">'+Students.length+' student</a> ' +
                             '| <button class="btn btn-sm btn-danger btn-sm-round btn-act removeCourse" data-id="'+v.IDSSD+'"><i class="fa fa-trash"></i></button></li>');
                     }
