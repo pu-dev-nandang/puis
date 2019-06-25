@@ -89,7 +89,7 @@
 				</div>
 			</div>
 			<div class="row" id = "pageAddDepartment" style="margin-right: 0px;margin-left: 0px;margin-top: 10px;">
-				<div class="col-md-6 col-md-offset-2">
+				<div class="col-md-6 col-md-offset-2" style="height: 200px;width: 350px;overflow: auto;">
 					
 				</div>
 			</div>
@@ -193,6 +193,11 @@
 					})	
 				}
 			<?php endif ?>
+
+			var AssignDepart = <?php echo json_encode($AssignDepart); ?>;
+			HtmlPageAddDepart(AssignDepart);
+				
+
 		<?php endif ?>
 
 	}
@@ -418,6 +423,16 @@
 	{
 		var form_data = new FormData();
 		var url = base_url_js + "purchasing/page/catalog/saveFormInput";
+
+		// assing department
+		var listDepartmentSelected = [];
+		if ($('#AddDepartSelected').length) {
+			$('#AddDepartSelected li').each(function(){
+				var c = $(this).attr('code');
+				listDepartmentSelected.push(c);
+			})
+		}
+
 		var DataArr = {
 		                Detail : Detail,
 		                Action : "<?php echo $action ?>",
@@ -426,6 +441,7 @@
 		                Desc : $("#Desc").val(),
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
 		                ID_category_catalog : $('#CategoryCatalog').val(),
+		                listDepartmentSelected : listDepartmentSelected,
 		                <?php if ($action == 'edit'): ?>
 		                	ID : "<?php echo $get[0]['ID'] ?>",
 		                <?php endif ?>
@@ -555,7 +571,7 @@
 					'<table id="example_budget" class="table table-bordered display select" cellspacing="0" width="100%">'+
            '<thead>'+
               '<tr>'+
-                 '<th>Select</th>'+
+                 '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
                  '<th>Departement</th>'+
               '</tr>'+
            '</thead>'+
@@ -605,6 +621,14 @@
 		S_Table_example_ = table;
 
 	}
+
+	// Handle click on "Select all" control
+	$(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
+	   // Get all rows with search applied
+	   var rows = S_Table_example_.rows({ 'search': 'applied' }).nodes();
+	   // Check/uncheck checkboxes for all rows in the table
+	   $('input[type="checkbox"]', rows).prop('checked', this.checked);
+	});
 
 	$(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
 		var checkboxArr = [];

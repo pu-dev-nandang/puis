@@ -642,6 +642,21 @@ class M_budgeting extends CI_Model {
         return $query;
     }
 
+    public function SearchDepartementBudgeting2($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",Name) as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Facultas ",Name) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                ) aa
+                where ID = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
+    }
+
     public function SearchDepartementBudgetingByName($DepartementBudgeting)
     {
         $sql = 'select * from (

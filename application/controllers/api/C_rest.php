@@ -1481,6 +1481,11 @@ class C_rest extends CI_Controller {
                 }
 
                 $condition = ($dataToken['department'] == 'all') ? '' : ' and a.Departement = "'.$dataToken['department'].'"';
+                // get to assign department
+                if ($dataToken['action'] == 'choices' && $dataToken['department'] != 'all') {
+                    $condition = ' and ( a.ID in (select ID_m_catalog from db_purchasing.m_catalog_division where Departement = "'.$dataToken['department'].'" ) or a.Departement = "'.$dataToken['department'].'" )';
+                }
+
                 $add_approval = '';    
                 if (array_key_exists('approval', $dataToken)) {
                     $add_approval = ' and a.Approval ='.$dataToken['approval']; 
