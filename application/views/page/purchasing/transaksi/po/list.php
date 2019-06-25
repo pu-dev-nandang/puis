@@ -10,6 +10,9 @@
 	var m_type_user = <?php echo json_encode($m_type_user) ?>;
 	var G_ApproverLength = G_Approver.length;
 	var JsonStatus = [];
+  // get Departmentpu
+  var IDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+
 
 $(document).ready(function() {
 		LoadFirstLoad();
@@ -49,6 +52,8 @@ $(document).ready(function() {
 		$("#DivTable").html(table_html);
 
 		var data = {
+        IDDepartementPUBudget : IDDepartementPUBudget,
+        sessionNIP : sessionNIP,
 		    auth : 's3Cr3T-G4N',
 		    length : G_ApproverLength,
 		};
