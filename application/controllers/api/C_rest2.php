@@ -829,8 +829,8 @@ class C_rest2 extends CI_Controller {
                                             $Code_po_create = $Code;
                                             $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code_po_create);
                                             $InvoicePO = 0; // tambah dengan biaya lain-lain
-                                            $AnotherCost = $G_data[0]['AnotherCost'];
-                                            $InvoicePO = $InvoicePO + $AnotherCost;
+                                            // $AnotherCost = $G_data[0]['AnotherCost'];
+                                            // $InvoicePO = $InvoicePO + $AnotherCost;
                                             for ($i=0; $i < count($G_po_detail); $i++) { 
                                                $InvoicePO = $InvoicePO + $G_po_detail[$i]['SubTotal'];
                                             }

@@ -841,16 +841,17 @@ class C_po extends Transaksi_Controler {
                             $Desc2 = 'PO '.$Code.' & '.$__r.' ITEM PR have been Cancel<br>{'.$NoteDel.'}';
 
                             // update status pr jika all item cancel menjadi cancel
-                                $G_item_pr = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
-                                $bool = true;
-                                for ($i=0; $i < count($G_item_pr); $i++) { 
-                                     if ($G_item_pr[$i]['Status'] == 1) {
-                                         break;
-                                         $bool = false;
-                                     }
-                                }
+                                // $G_item_pr = $this->m_master->caribasedprimary('db_budgeting.pr_detail','PRCode',$PRCode);
+                                // $bool = true;
+                                // for ($i=0; $i < count($G_item_pr); $i++) { 
+                                //      if ($G_item_pr[$i]['Status'] == 1) {
+                                //          break;
+                                //          $bool = false;
+                                //      }
+                                // }
 
-                                if ($bool) {
+                                // if ($bool) {
+                                if ($cek_item) { // jika all item
                                     $arr_save = array(
                                         'Status' => 4,
                                     );
