@@ -341,8 +341,15 @@ class C_global extends CI_Controller {
             $NPM = $query[$i]['NPM'];
             $Invoice = $query[$i]['Invoice'];
             $Status = $query[$i]['Status'];
+            $PTID = $query[$i]['PTID'];
 
-            // update Status = 1 & UpdatedBy,UpdateAt based ID = ID_payment
+            // update Invoice = 0.0 Status = 1 based ID = ID_payment
+            // $arr_upd = array(
+            //     'Invoice' => 0.0,
+            //     'Status' => '1',
+            // );
+            // $this->db->where('ID',$ID_payment);
+            // $this->db->update('db_finance.payment',$arr_upd);
 
             // cek ke payment_student
             $sql2 = 'select * from db_finance.payment_students where ID_payment = ?';
@@ -357,7 +364,14 @@ class C_global extends CI_Controller {
                     'StatusBill' => $StatusBill
                 );
 
-                // update Status = '1' & UpdatedBy,UpdateAt based ID = ID_payment_std
+                // update Status = '1' based ID = ID_payment_std
+                // $arr_upd2 = array(
+                //     'Invoice' => 0.0,
+                //     'Status' => 1,
+                // );
+
+                // $this->db->where('ID',$ID_payment_std);
+                // $this->db->update('db_finance.payment_students',$arr_upd2);
             }
 
             $arr[] = array(
@@ -365,6 +379,7 @@ class C_global extends CI_Controller {
                 'NPM' => $NPM,
                 'Invoice' => $Invoice,
                 'Status' => $Status,
+                'PTID' => $PTID,
                 'dt' =>$dt
             );
         }
