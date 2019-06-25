@@ -81,6 +81,21 @@
 		</div>
 		<div class="form-group">
 			<div class="row">
+				<div class="col-xs-2">
+					<label class="control-label">Add Department</label>
+				</div>
+				<div class="col-xs-2">
+					<button class="btn btn-primary btn-default" id = "addDepartment"><i class="icon-plus"></i> Add</button>
+				</div>
+			</div>
+			<div class="row" id = "pageAddDepartment" style="margin-right: 0px;margin-left: 0px;margin-top: 10px;">
+				<div class="col-md-6 col-md-offset-2" style="height: 200px;width: 350px;overflow: auto;">
+					
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="row">
 				<div class="col-md-3 col-md-offset-9">
 					<button type="button" id="btnSaveForm" class="btn btn-success" action = "">Save</button>
 				</div>
@@ -90,6 +105,7 @@
 </div>
 
 <script type="text/javascript">
+	var S_Table_example_ = '';
 	$(document).ready(function() {
 		LoadFirst();
 	}); // exit document Function
@@ -177,6 +193,11 @@
 					})	
 				}
 			<?php endif ?>
+
+			var AssignDepart = <?php echo json_encode($AssignDepart); ?>;
+			HtmlPageAddDepart(AssignDepart);
+				
+
 		<?php endif ?>
 
 	}
@@ -402,6 +423,16 @@
 	{
 		var form_data = new FormData();
 		var url = base_url_js + "purchasing/page/catalog/saveFormInput";
+
+		// assing department
+		var listDepartmentSelected = [];
+		if ($('#AddDepartSelected').length) {
+			$('#AddDepartSelected li').each(function(){
+				var c = $(this).attr('code');
+				listDepartmentSelected.push(c);
+			})
+		}
+
 		var DataArr = {
 		                Detail : Detail,
 		                Action : "<?php echo $action ?>",
@@ -410,6 +441,7 @@
 		                Desc : $("#Desc").val(),
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
 		                ID_category_catalog : $('#CategoryCatalog').val(),
+		                listDepartmentSelected : listDepartmentSelected,
 		                <?php if ($action == 'edit'): ?>
 		                	ID : "<?php echo $get[0]['ID'] ?>",
 		                <?php endif ?>
@@ -511,5 +543,121 @@
 
 		return arr;
 		
+	}
+
+	$(document).off('click', '#addDepartment').on('click', '#addDepartment',function(e) {
+		var PRCode = $(this).attr('PRCode');
+	    var url = base_url_js+'api/__getAllDepartementPU';
+   		$.post(url,function (data_json) {
+   			ModalTblDepartment(data_json);
+		});
+		
+	})
+
+	function ModalTblDepartment(dt)
+	{
+		// get all list department existing first for edit
+			var listDepartmentSelected = [];
+			if ($('#AddDepartSelected').length) {
+				$('#AddDepartSelected li').each(function(){
+					var c = $(this).attr('code');
+					listDepartmentSelected.push(c);
+				})
+			}
+			
+		var html = '';
+		html ='<div class = "row">'+
+				'<div class = "col-md-12">'+
+					'<table id="example_budget" class="table table-bordered display select" cellspacing="0" width="100%">'+
+           '<thead>'+
+              '<tr>'+
+                 '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                 '<th>Departement</th>'+
+              '</tr>'+
+           '</thead>'+
+      '</table></div></div>';
+
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Budget'+'</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+			'<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+
+		var table = $('#example_budget').DataTable({
+		      "data" : dt,
+		      'columnDefs': [
+			      {
+			         'targets': 0,
+			         'searchable': false,
+			         'orderable': false,
+			         'className': 'dt-body-center',
+			         'render': function (data, type, full, meta){
+			         	 var checked = '';
+			         	 for (var i = 0; i < listDepartmentSelected.length; i++) {
+			         	 	if (full.Code == listDepartmentSelected[i]) {
+			         	 		checked = 'checked';
+			         	 		break;
+			         	 	}
+			         	 }
+			             return '<input type="checkbox" name="id[]" value="' + full.Code + '" dt = "'+full.Name1+'" '+checked+'>';
+			         }
+			      },
+			      {
+			         'targets': 1,
+			         'render': function (data, type, full, meta){
+			             return full.Name1;
+			         }
+			      },
+		      ],
+		      'createdRow': function( row, data, dataIndex ) {
+		      		
+		      },
+		      // 'order': [[1, 'asc']]
+		});
+
+		S_Table_example_ = table;
+
+	}
+
+	// Handle click on "Select all" control
+	$(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
+	   // Get all rows with search applied
+	   var rows = S_Table_example_.rows({ 'search': 'applied' }).nodes();
+	   // Check/uncheck checkboxes for all rows in the table
+	   $('input[type="checkbox"]', rows).prop('checked', this.checked);
+	});
+
+	$(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+		var checkboxArr = [];
+		S_Table_example_.$('input[type="checkbox"]').each(function(){
+			if(this.checked){
+				var v = $(this).val();
+				var n = $(this).attr('dt');
+				var temp = {
+					Code : v,
+					Name : n,
+				};
+
+				checkboxArr.push(temp);
+			}
+		}); // exit each function
+
+		// write html di pageAddDepartment
+		HtmlPageAddDepart(checkboxArr);
+		$('#GlobalModalLarge').modal('hide');
+
+	})
+
+	function HtmlPageAddDepart(arr)
+	{
+		var html = '<ul id ="AddDepartSelected">';
+		for (var i = 0; i < arr.length; i++) {
+			html += '<li code = "'+arr[i].Code+'">'+arr[i].Name+'</li>';
+		}
+		html += '</ul>';
+		$('#pageAddDepartment').find('.col-md-6').html(html);
 	}
 </script>

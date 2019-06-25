@@ -42,6 +42,13 @@ class C_master extends Purchasing_Controler {
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
             $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+            $__Depart= $this->m_master->caribasedprimary('db_purchasing.m_catalog_division','ID_m_catalog',$Input['ID']);
+            for ($i=0; $i < count($__Depart); $i++) { 
+              $__G_name = $this->m_budgeting->SearchDepartementBudgeting2($__Depart[$i]['Departement']);
+              $__Depart[$i]['Name'] = $__G_name[0]['NameDepartement'];
+              $__Depart[$i]['Code'] = $__G_name[0]['ID'];
+            }
+            $this->data['AssignDepart'] = $__Depart;
 
             // lock beberapa field untuk tidak bisa diedit
                 $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
@@ -94,6 +101,19 @@ class C_master extends Purchasing_Controler {
                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
                        $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                       // get last insert  id
+                         $insert_id = $this->db->insert_id();
+                         // assign department
+                         $listDepartmentSelected = $Input['listDepartmentSelected'];
+                         for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                           $Departement__ = $listDepartmentSelected[$i];
+                           $dataSave__ =array(
+                            'ID_m_catalog' => $insert_id,
+                            'Departement' => $Departement__,
+                           );
+                           $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                         }
+
                        echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
@@ -118,6 +138,19 @@ class C_master extends Purchasing_Controler {
                         'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
                     $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                    // get last insert  id
+                      $insert_id = $this->db->insert_id();
+                      // assign department
+                      $listDepartmentSelected = $Input['listDepartmentSelected'];
+                      for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                        $Departement__ = $listDepartmentSelected[$i];
+                        $dataSave__ =array(
+                         'ID_m_catalog' => $insert_id,
+                         'Departement' => $Departement__,
+                        );
+                        $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                      }
+
                     echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
 
@@ -147,6 +180,22 @@ class C_master extends Purchasing_Controler {
                        );
                        $this->db->where('ID', $Input['ID']);
                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+
+                       // assign department
+                       $listDepartmentSelected = $Input['listDepartmentSelected'];
+                       // delete first and insert again
+                       $this->db->where('ID_m_catalog',$Input['ID']);
+                       $this->db->delete('db_purchasing.m_catalog_division');
+                       // insert
+                       for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                         $Departement__ = $listDepartmentSelected[$i];
+                         $dataSave__ =array(
+                          'ID_m_catalog' => $Input['ID'],
+                          'Departement' => $Departement__,
+                         );
+                         $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                       }
+
                        echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
@@ -167,6 +216,22 @@ class C_master extends Purchasing_Controler {
                     );
                     $this->db->where('ID', $Input['ID']);
                     $this->db->update('db_purchasing.m_catalog', $dataSave);
+
+                    // assign department
+                    $listDepartmentSelected = $Input['listDepartmentSelected'];
+                    // delete first and insert again
+                    $this->db->where('ID_m_catalog',$Input['ID']);
+                    $this->db->delete('db_purchasing.m_catalog_division');
+                    // insert
+                    for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                      $Departement__ = $listDepartmentSelected[$i];
+                      $dataSave__ =array(
+                       'ID_m_catalog' => $Input['ID'],
+                       'Departement' => $Departement__,
+                      );
+                      $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                    }
+
                     echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
                 break;
@@ -195,7 +260,11 @@ class C_master extends Purchasing_Controler {
                         for ($i=0; $i < count($F); $i++) { 
                             unlink($path.$F[$i]);
                         }
-                  
+
+                  // delete m_catalog_division
+                  $this->db->where('ID_m_catalog',$Input['ID']);
+                  $this->db->delete('db_purchasing.m_catalog_division');
+
                   echo json_encode(array(''));
                 }
                 else
@@ -425,7 +494,15 @@ class C_master extends Purchasing_Controler {
                 $htmlPhoto = '';
             }
             $nestedData[] = $htmlPhoto;
-            $nestedData[] = $row['NameDepartement'];
+
+            $btnViewDepart = '';
+            // $__G_data = $this->m_master->caribasedprimary('db_purchasing.m_catalog_division','ID_m_catalog',$row['ID']);
+            // if (count($__G_data) > 0) {
+            //   $btnViewDepart = '<button class = "btn btn-default btnViewDepart" rowid = "'.$row['ID'].'">Another</button>';
+            // }
+
+            // $nestedData[] = '<div align = "center" >'.$row['NameDepartement'].'<br>'.$btnViewDepart.'</div>';
+            $nestedData[] = '<div align = "center" >'.$row['NameDepartement'].'</div>';
             $DetailCatalog = $row['DetailCatalog'];
             $DetailCatalog = json_decode($DetailCatalog);
             $temp = '';

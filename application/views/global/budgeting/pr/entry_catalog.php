@@ -4,7 +4,7 @@
 			<div class="form-group">
 				<div class="row">
 					<div class="col-xs-2">
-					    <label class="control-label">For Departement</label>
+					    <label class="control-label">For Department</label>
 					</div>
 					<div class="col-xs-3">
 						<select class="select2-select-00 full-width-fix" id="Departement">

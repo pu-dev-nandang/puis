@@ -28,7 +28,7 @@
 						<th>Desc</th>
 						<th>Estimate Value</th>
 						<th>Photo</th>
-						<th>Departement</th>
+						<th>Department</th>
 						<th>DetailCatalog</th>
 						<th>CreatedBy</th>
 						<th>Status</th>

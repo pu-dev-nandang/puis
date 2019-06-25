@@ -467,7 +467,8 @@ class M_pr_po extends CI_Model {
     {
         $sql = 'select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
                 e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
-                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue
+                a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue,
+                i.Days
                 from db_budgeting.pr_detail as a
                 join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
                 join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
@@ -475,6 +476,7 @@ class M_pr_po extends CI_Model {
                                 join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
                 join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
                 join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                join db_purchasing.m_category_catalog as i on g.ID_category_catalog = i.ID
                 join (
                     select * from (
                                     select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
