@@ -616,6 +616,10 @@ class C_pr_po extends Budgeting_Controler {
                                     $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$PassNumber);
                                     $data_arr['UploadFile'] = json_encode($uploadFile); 
                                 }
+                                else
+                                {
+                                    $data_arr['UploadFile'] = json_encode(array()); 
+                                }
 
                                 // exclude 
                                     $Combine =  (array)  json_decode(json_encode($data_arr['FormInsertCombine']),true);

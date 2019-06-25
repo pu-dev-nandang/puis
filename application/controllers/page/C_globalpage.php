@@ -5,7 +5,8 @@ include_once APPPATH.'vendor/autoload.php';
 use ElephantIO\Client;
 use ElephantIO\Engine\SocketIO\Version1X;
 
-class C_globalpage extends Globalclass {
+// class C_globalpage extends Globalclass {
+class C_globalpage extends Budgeting_Controler {
 
     public function temp($content)
     {

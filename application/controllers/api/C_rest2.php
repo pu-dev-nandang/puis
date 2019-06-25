@@ -344,6 +344,15 @@ class C_rest2 extends CI_Controller {
                 $dataToken = $this->getInputToken2();
                 $auth = $this->m_master->AuthAPI($dataToken);
                 if ($auth) {
+                    // get Department
+                    $IDDepartementPUBudget = $dataToken['IDDepartementPUBudget'];
+                    $WhereFiltering = '';
+                    // $WhereFiltering2 = '';
+                    if ($IDDepartementPUBudget != 'NA.4') {
+                        $NIP = $dataToken['sessionNIP'];
+                        $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                        // $WhereFiltering2 .= ' or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
+                    }
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
                     $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
@@ -351,7 +360,7 @@ class C_rest2 extends CI_Controller {
                                 select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -359,6 +368,7 @@ class C_rest2 extends CI_Controller {
                                 left join db_purchasing.po_detail as e on a.Code = e.Code
                                 left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
                                 left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                                 group by a.Code     
                             )aa
                            ';
@@ -366,7 +376,7 @@ class C_rest2 extends CI_Controller {
                     $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                           or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
                           or PRCode LIKE "'.$requestData['search']['value'].'%"  
-                        ) '.$StatusQuery ;
+                        ) '.$StatusQuery.$WhereFiltering ;
 
                     $querytotalData = $this->db->query($sqltotalData)->result_array();
                     $totalData = $querytotalData[0]['total'];
@@ -376,7 +386,7 @@ class C_rest2 extends CI_Controller {
                                 select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -384,6 +394,7 @@ class C_rest2 extends CI_Controller {
                                 left join db_purchasing.po_detail as e on a.Code = e.Code
                                 left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
                                 left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                                 group by a.Code      
                             )aa
                            ';
@@ -391,7 +402,7 @@ class C_rest2 extends CI_Controller {
                     $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                           or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
                           or PRCode LIKE "'.$requestData['search']['value'].'%"  
-                        ) '.$StatusQuery ;
+                        ) '.$StatusQuery.$WhereFiltering ;
                     $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
 
