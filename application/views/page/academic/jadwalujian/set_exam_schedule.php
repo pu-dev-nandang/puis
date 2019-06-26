@@ -114,7 +114,7 @@
                 <th>Pengawas 1</th>
                 <td>:</td>
                 <td style="text-align: left;">
-                    <select class="select2-select-00 form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
+                    <select class="form-exam" style="max-width: 300px !important;" size="5" id="formPengawas1">
                         <option value=""></option>
                     </select>
                 </td>

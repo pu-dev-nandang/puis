@@ -77,7 +77,7 @@
             </div>
         </div>
 
-        <div class="thumbnail" style="min-height: 100px;">
+        <div class="thumbnail" style="min-height: 100px;padding: 15px;">
             <textarea class="hide" id="viewProspectiveStudents"></textarea>
             <div id="showTableServerSide"></div>
         </div>
