@@ -159,6 +159,7 @@ class C_globalpage extends Budgeting_Controler {
                   $sql = 'select * from db_purchasing.spb_created where Code_po_create = ? order by ID desc limit 1';
                   $query=$this->db->query($sql, array($POCode))->result_array();
                   $data['DT_SPB_Exist'] = $query;
+                  $data['POCode'] = $POCode;
                   $content = $this->load->view('global/budgeting/spb/create_new_spb',$data,true);
                   $this->temp($content);
               }
