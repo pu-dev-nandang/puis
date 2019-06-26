@@ -299,6 +299,85 @@ class C_rest extends CI_Controller {
 
     }
 
+    // Nandang - Get HighSchool digunakan khusus untuk selec2.js
+    public function getHighSchool_ServerSide(){
+
+        $term = $this->input->get('term');
+
+
+        $q = 'SELECT sch.ID, sch.CityID, sch.SchoolName, r.RegionName AS CityName FROM db_admission.school sch 
+                                                LEFT JOIN db_admission.region r ON (r.RegionID = sch.CityID)
+                                                WHERE sch.CityID IS NOT NULL AND sch.CityID != ""  AND (
+                                                  sch.SchoolName LIKE "%'.$term.'%" 
+                                                  OR sch.CityName LIKE "%'.$term.'%" )
+                                                   GROUP BY sch.ID
+                                                   ORDER BY sch.CityID ASC 
+                                                   LIMIT 25';
+
+        $data = $this->db->query($q)->result_array();
+
+
+        $result = [];
+        if(count($data)>0){
+            $CityIDNow = '';
+            $CityNameNow = '';
+            $chang = true;
+            $arrChildren = [];
+            for($i=0;$i<count($data);$i++){
+                $d = $data[$i];
+
+                $children = array(
+                    'id' => $d['ID'],
+                    'text' => $d['SchoolName']
+                );
+
+                if($chang==true){
+                    $arrChildren = [];
+                    $CityIDNow = $d['CityID'];
+                    $CityNameNow = strtoupper($d['CityName']);
+                    $chang = false;
+                }
+
+
+                if($d['CityID']==$CityIDNow){
+                    array_push($arrChildren,$children);
+                } else {
+
+                    $arrRest = array(
+                        'text' => $CityNameNow,
+                        'children' => $arrChildren
+                    );
+
+                    array_push($result,$arrRest);
+
+                    $chang = true;
+
+                }
+
+                if(count($data)==($i+1)){
+                    $arrRest = array(
+                        'text' => $CityNameNow,
+                        'children' => $arrChildren
+                    );
+
+                    array_push($result,$arrRest);
+                }
+
+
+
+            }
+        }
+
+//        print_r($arrChildren);
+
+        $data_result = array(
+            'results' => $result
+        );
+
+        return print_r(json_encode($data_result));
+
+    }
+
     // Nandang - Get Lecturer digunakan khusus untuk selec2.js
     public function getLecturer_ServerSide(){
 

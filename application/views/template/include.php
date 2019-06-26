@@ -258,6 +258,26 @@
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/uniform/jquery.uniform.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/select2/select2.min.js"></script>
 
+<!-- Select 2 -->
+<!--<link href="--><?php //echo base_url('assets/select2/css/select2.css'); ?><!--" rel="stylesheet" />-->
+<!--<link href="--><?php //echo base_url('assets/select2/select2-bootstrap.min.css'); ?><!--" rel="stylesheet" />-->
+<!--<style>-->
+<!--    .select2-container--bootstrap .select2-results__group{-->
+<!--        background: #efefef;-->
+<!--    }-->
+<!--    .select2-container--bootstrap .select2-selection {-->
+<!--        border-radius: 0px;-->
+<!--        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-->
+<!--        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-->
+<!---->
+<!--    }-->
+<!--    .select2-dropdown--below , .select2-container--bootstrap {-->
+<!--        min-width: 300px;-->
+<!--    }-->
+<!--</style>-->
+<!--<script  type="text/javascript" charset="UTF-8" src="--><?php //echo base_url('assets/select2/js/select2.js') ?><!--"></script>-->
+<!--<script>$.fn.select2.defaults.set( "theme", "bootstrap" );</script>-->
+
 <!-- Pickers -->
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/pickadate/picker.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/pickadate/picker.date.js"></script>

@@ -885,6 +885,7 @@ $route['rest/__crudCounseling'] = 'api/c_rest/crudCounseling';
 $route['rest/__getPaymentStudent'] = 'api/c_rest/getPaymentStudent';
 
 $route['rest/__getStudent_ServerSide'] = 'api/c_rest/getStudent_ServerSide';
+$route['rest/__getHighSchool_ServerSide'] = 'api/c_rest/getHighSchool_ServerSide';
 $route['rest/__getLecturer_ServerSide'] = 'api/c_rest/getLecturer_ServerSide';
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
 $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
