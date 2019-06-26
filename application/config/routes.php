@@ -1408,6 +1408,10 @@ $route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/Inf
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
+// global spb
+$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+
+
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');

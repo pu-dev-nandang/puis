@@ -1303,7 +1303,15 @@
 	$(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
 	  var page = $(this).attr('page');
 	  window.location.href = base_url_js+page;
-	}) 
+	})
+
+	$(document).off('click', '#btn_create_spb').on('click', '#btn_create_spb',function(e) {
+		var POCode = ClassDt.Code;
+		POCode = findAndReplace(POCode, "/","-");
+		var url = base_url_js+'global/purchasing/transaction/create_spb_by_po/'+POCode;
+		window.location.href = url;
+	})
+	 
 	
 </script>
 <?php endif ?>	

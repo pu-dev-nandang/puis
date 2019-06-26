@@ -2344,7 +2344,7 @@ class C_rest extends CI_Controller {
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
                                                             'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
-                                                            'URLDirect' => 'purchasing/transaction/po/open',
+                                                            'URLDirect' => 'purchasing/transaction/po/list/open',
                                                             'CreatedBy' => $NIP,
                                                           ),
                                             'To' => array(

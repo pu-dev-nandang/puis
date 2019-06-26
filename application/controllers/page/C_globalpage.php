@@ -42,7 +42,7 @@ class C_globalpage extends Budgeting_Controler {
         */
 
          $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
-         if (count($G_data) > 0) {
+         if (count($G_data) > 0 && $G_data[0]['TypeCreate'] == 1) {
              $bool = true;
              if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
                     $bool = true;
@@ -131,6 +131,46 @@ class C_globalpage extends Budgeting_Controler {
          {
             show_404($log_error = TRUE); 
          }
+    }
+
+    public function create_spb_by_po($POCode)
+    {
+        /*
+            Syarat halaman bisa di buka
+            1.Code PO ada pada database
+            2.POCode dengan status all approve
+            3.Cek User memiliki hubungan dengan Code PO tersebut,kecuali Finance & Purchasing
+
+            Note : untuk PO yang sudah dibuat spbnya diperbolehkan untuk create spb dengan function ini dan auto TypeInvoice
+        */
+          $POCode = str_replace('-','/', $POCode);  
+          $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$POCode);
+          // status all aprove dengan value 2
+          $bool = true;
+          if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
+                 $bool = true;
+          }
+          else{
+             $bool = false;
+          }
+
+          if (count($G_data) > 0  && $bool  ) {
+              if ($G_data[0]['Status'] == 2) {
+                  $sql = 'select * from db_purchasing.spb_created where Code_po_create = ? order by ID desc limit 1';
+                  $query=$this->db->query($sql, array($POCode))->result_array();
+                  $data['DT_SPB_Exist'] = $query;
+                  $content = $this->load->view('global/budgeting/spb/create_new_spb',$data,true);
+                  $this->temp($content);
+              }
+              else
+              {
+                show_404($log_error = TRUE); 
+              }
+          }
+          else
+          {
+            show_404($log_error = TRUE); 
+          }
     }
 
 }
