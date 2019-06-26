@@ -2765,7 +2765,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
              $Start = $query[$i]['Start'];
              $End = $query[$i]['End'];
              $Room = $query[$i]['Room'];
-             $chk = $this->checkBentrok($Start,$End,'',$Room);
+             $chk = $this->checkBentrok($Start,$End,'',$Room,$query[$i]['ID']);
              if (!$chk) {
                  $bool = false;
                  // break;
@@ -2830,7 +2830,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
              //    }
         }
 
-        // die();
+        // print_r($arr_result);die();
         return $arr_result;
 
     }
