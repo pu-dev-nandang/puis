@@ -3722,4 +3722,20 @@ class C_rest extends CI_Controller {
              echo '{"status":"999","message":"Not Authorize"}';
         }
     }
+
+    public function getAdminCRM(){
+
+        $data = $this->db->get('db_admission.crm_admin')->result_array();
+
+        $result = [];
+        if(count($data)>0){
+            foreach ($data AS $item){
+                array_push($result,$item['NIP']);
+            }
+        }
+
+        return print_r(json_encode($result));
+
+    }
+
 }

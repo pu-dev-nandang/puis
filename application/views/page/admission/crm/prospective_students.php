@@ -4,6 +4,12 @@
         color: #333;
         background-color: #fff;
     }
+
+    input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
+        cursor: not-allowed;
+        background-color: #ffffff;
+        color: #333;
+    }
 </style>
 
 <div class="row">
@@ -89,18 +95,15 @@
 
         loadMarketingActNow();
         loadActivePeriod();
-
         localWilayah();
 
         var firsLoad = setInterval(function () {
 
             var filterPeriod = $('#filterPeriod').val();
             if(filterPeriod!='' && filterPeriod!=null){
-
-                loadDataCRM();
+                // Datatables
                 loadCRMData();
                 clearInterval(firsLoad);
-
             }
 
         },1000);
@@ -163,16 +166,21 @@
                if(jsonResult.length>0){
                    $.each(jsonResult,function (i,v) {
 
+
                        var opt = '';
                        var Member = v.Member;
                        if(Member.length>0){
                            $.each(Member,function (i2,v2) {
-                               if(v2.Status=='1'){
-                                   opt = opt+'<option style="color: blue;background: #f5f5f5;" value="'+v.ID+'.'+v2.NIP+'">(Co) '+v2.MemberName+'</option>';
-                               } else {
-                                   opt = opt+'<option value="'+v.ID+'.'+v2.NIP+'">'+v2.MemberName+'</option>';
-                               }
 
+                               var sc = (adminPanel=='0' && sessionNIP==v2.NIP) ? 'selected' : '';
+
+                               var allDisabled = (adminPanel=='0') ? 'disabled' : '';
+
+                               if(v2.Status=='1'){
+                                   opt = opt+'<option style="color: blue;background: #f5f5f5;" value="'+v.ID+'.'+v2.NIP+'" '+sc+' '+allDisabled+'>(Co) '+v2.MemberName+'</option>';
+                               } else {
+                                   opt = opt+'<option value="'+v.ID+'.'+v2.NIP+'" '+sc+' '+allDisabled+'>'+v2.MemberName+'</option>';
+                               }
                            });
                        }
 
@@ -184,6 +192,10 @@
 
         }
     }
+
+    $('#filterPeriod').change(function () {
+        loadCRMData();
+    });
     
     // ====
     
@@ -282,56 +294,6 @@
 
 
     });
-    
-    function loadDataCRM() {
-
-        var filterPeriod = $('#filterPeriod').val();
-
-        if(filterPeriod!='' && filterPeriod!=null){
-
-            var data = {
-                action : 'read_PS',
-                PeriodID : filterPeriod
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'rest2/__crudProspectiveStudents';
-
-            $.post(url,{token:token},function (jsonResult) {
-
-                $('#viewProspectiveStudents').val(JSON.stringify(jsonResult));
-
-
-                $('#listStd').empty();
-                if(jsonResult.length>0){
-                    $.each(jsonResult,function (i,v) {
-
-
-                        var btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
-                            '<button class="btn btn-sm btn-danger btnActCRMRemovet hide" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button> ' +
-                            '<button class="btn btn-sm btn-default btnFullForm" data-id="'+v.ID+'">Full Form</button>';
-
-                        $('#listStd').append('<tr>' +
-                            '<td>'+(i+1)+'</td>' +
-                            '<td>'+v.Name+'' +
-                            '<div>' +
-                            '   '+v.Email+', '+
-                            '   '+v.Phone+', ' +
-                            '    '+v.LineID+' '+
-                            '</div>' +
-                            '</td>' +
-                            '<td>'+v.NameProspect_by+'</td>' +
-                            '<td>'+btnAct+'</td>' +
-                            '</tr>');
-                    });
-                }
-
-            });
-
-        }
-
-
-    }
 
     $(document).on('click','.btnActCRMEdit',function () {
 
@@ -1002,9 +964,9 @@
 
     });
 
-
     // ==== Load Data CRM ====
     function loadCRMData() {
+
         $('#showTableServerSide').html('<table class="table table-bordered" id="tableProspectiveStudents">' +
             '                    <thead>' +
             '                    <tr>' +
@@ -1026,6 +988,8 @@
 
         var token = jwt_encode(data,'UAP)(*');
 
+        var btnEdit = (adminPanel=='1') ? '1' : '0';
+
         var dataTable = $('#tableProspectiveStudents').DataTable( {
             "processing": true,
             "serverSide": true,
@@ -1035,7 +999,7 @@
                 "searchPlaceholder": "Day, Room, Name / NIP Invigilator"
             },
             "ajax":{
-                url : base_url_js+"api2/__getTableProspectiveStudents", // json datasource
+                url : base_url_js+"api2/__getTableProspectiveStudents?btnedit="+btnEdit, // json datasource
                 data : {token:token},
                 ordering : false,
                 type: "post",  // method  , by default get
@@ -1045,10 +1009,9 @@
                     // $("#employee-grid_processing").css("display","none");
                 }
             }
-        } );
+        });
+
     }
-
-
 
     // Upload attechment
     function uploadDocumentPS(ID) {

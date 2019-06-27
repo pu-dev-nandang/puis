@@ -4318,10 +4318,6 @@ class C_api2 extends CI_Controller {
 
         }
 
-//        $result = array(
-//            'Edom' => 1
-//        );
-
         return print_r(json_encode($result));
 
     }
@@ -4334,6 +4330,8 @@ class C_api2 extends CI_Controller {
 
         $PeriodID = $data_arr['PeriodID'];
 
+        $btnedit = $this->input->get('btnedit');
+
         $whereP = '' ;
 
         $orderBy = '';
@@ -4344,13 +4342,13 @@ class C_api2 extends CI_Controller {
             $dataSearch = '';
         }
 
-
+        $btnNIP = ($btnedit=='1') ? '' : 'AND c.CreatedBy = "'.$this->session->userdata('NIP').'" ';
 
         $queryDefault = 'SELECT c.*, em.Name AS NameProspect_by, cs.Description AS StatusDesc, csl.Class AS StatusClass FROM db_admission.crm c 
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
                                                 LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
                                                 LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
-                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$dataSearch.' '.$orderBy;
+                                                WHERE c.PeriodID = "'.$PeriodID.'" '.$btnNIP.'  '.$dataSearch.' '.$orderBy;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -4370,7 +4368,8 @@ class C_api2 extends CI_Controller {
                 $nestedData=array();
                 $row = $query[$i];
 
-                $btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit" data-id="'.$row['ID'].'"><i class="fa fa-edit"></i></button> 
+                $btnBiru = ($btnedit=='1') ? '' : 'hide';
+                $btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit '.$btnBiru.'" data-id="'.$row['ID'].'"><i class="fa fa-edit"></i></button> 
                                     <button class="btn btn-sm btn-danger btnActCRMRemovet hide" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button> 
                                     <button class="btn btn-sm btn-default btnFullForm" data-id="'.$row['ID'].'">Full Form</button>';
 

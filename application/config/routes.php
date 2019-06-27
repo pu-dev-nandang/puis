@@ -934,6 +934,8 @@ $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
 $route['rest/__show_pr_detail_multiple_pr_code'] = 'api/c_rest/show_pr_detail_multiple_pr_code';
 
+$route['rest/__getAdminCRM'] = 'api/c_rest/getAdminCRM';
+
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
