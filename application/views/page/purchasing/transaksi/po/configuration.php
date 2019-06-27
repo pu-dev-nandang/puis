@@ -39,7 +39,10 @@
                     <a href="javascript:void(0)" class="pageAnchor" page = "Set_Rad">RAD</a>
                 </li>
                 <li class="">
-                    <a href="javascript:void(0)" class="pageAnchor" page = "Set_Approval">Approval</a>
+                    <a href="javascript:void(0)" class="pageAnchor" page = "Set_Approval">Approval PO</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0)" class="pageAnchor" page = "Set_Approval_SPK">Approval SPK</a>
                 </li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">

@@ -152,11 +152,33 @@ class C_po extends Transaksi_Controler {
        echo json_encode($arr_result);
     }
 
+    public function Set_Approval_SPK()
+    {
+        $this->auth_ajax();
+       $arr_result = array('html' => '','jsonPass' => '');
+       $this->data['cfg_m_type_approval'] = $this->m_master->showData_array('db_purchasing.cfg_m_type_approval');
+       $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/config/Set_Approval_SPK',$this->data,true);
+       echo json_encode($arr_result);
+    }
+
     public function get_cfg_set_roleuser_po($Departement)
     {
         $this->auth_ajax();
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
                 from db_purchasing.cfg_m_userrole as a left join (select * from db_purchasing.cfg_approval where Departement = ? ) as c
+                on a.ID = c.ID_m_userrole
+                left join db_employees.employees as b on b.NIP = c.NIP 
+                order by a.ID asc
+                ';
+        $query=$this->db->query($sql, array($Departement))->result_array();
+        echo json_encode($query);
+    }
+
+    public function get_cfg_set_roleuser_spk($Departement)
+    {
+        $this->auth_ajax();
+        $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
+                from db_purchasing.cfg_m_userrole as a left join (select * from db_purchasing.cfg_approval_spk where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
                 order by a.ID asc
@@ -203,6 +225,55 @@ class C_po extends Transaksi_Controler {
             case "delete":
                 $ID = $Input['ID_set_roleuser'];
                 $this->m_master->delete_id_table_all_db($ID,'db_purchasing.cfg_approval');
+                $msg['status'] = 1;
+                break;
+            default:
+                # code...
+                break;
+        }
+        
+
+        echo json_encode($msg);
+    }
+
+    public function save_cfg_set_roleuser_spk()
+    {
+        $this->auth_ajax();
+        $msg = array('status' => 0,'msg' => '');
+        $Input = $this->getInputToken();
+        $Action = $Input['Action'];
+        switch ($Action) {
+            case "":
+                $dt = $Input['dt'];
+                $dt = (array) json_decode(json_encode($dt),true);
+                for ($i=0; $i < count($dt); $i++) { 
+                    $FormInsert = $dt[$i]['FormInsert'];
+                    // check NIM already exist in employees
+                    $NIP = $FormInsert['NIP'];
+                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    if (count($G) == 0) {
+                        $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
+                        break;
+                    }
+                    $Method = $dt[$i]['Method'];
+                    $subAction = $Method['Action'];
+                    if ($subAction == 'add') {
+                        $this->db->insert('db_purchasing.cfg_approval_spk',$FormInsert);
+                    }
+                    else
+                    {
+                        $ID = $Method['ID'];
+                        $this->db->where('ID', $ID);
+                        $this->db->update('db_purchasing.cfg_approval_spk', $FormInsert);
+                    }
+                }
+                if ($msg['msg'] == '') {
+                   $msg['status'] = 1;
+                }
+                break;
+            case "delete":
+                $ID = $Input['ID_set_roleuser'];
+                $this->m_master->delete_id_table_all_db($ID,'db_purchasing.cfg_approval_spk');
                 $msg['status'] = 1;
                 break;
             default:
