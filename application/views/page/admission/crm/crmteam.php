@@ -1,11 +1,6 @@
 
 <div class="row">
-    <div class="col-md-4" style="border-right: 1px solid #CCCCCC;">
-
-<!--        <div style="text-align: right;">-->
-<!--            <button class="btn btn-primary" id="btnCRMPeriode">CRM Period</button>-->
-<!--            <hr/>-->
-<!--        </div>-->
+    <div class="col-md-4 panel-admin" style="border-right: 1px solid #CCCCCC;">
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -215,6 +210,8 @@
                             ? '<button class="btn btn-sm btn-default btnEditTeam" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
                             '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>'
                             : '-' ;
+
+                        btnActionTeam = (adminPanel=='1') ? btnActionTeam : '-';
 
                         $('#listTeam').append('<tr>' +
                             '<td>'+(i+1)+'</td>' +
