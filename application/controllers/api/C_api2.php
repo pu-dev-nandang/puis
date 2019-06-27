@@ -4342,7 +4342,16 @@ class C_api2 extends CI_Controller {
             $dataSearch = '';
         }
 
-        $btnNIP = ($btnedit=='1') ? '' : 'AND c.CreatedBy = "'.$this->session->userdata('NIP').'" ';
+        if($btnedit=='0'){
+            // Get ID team
+            $dataIDteam = $this->db->select('CRMTeamID')->get_where('db_admission.crm_team_member',array(
+                'NIP' => $this->session->userdata('NIP')
+            ))->result_array();
+
+            $CRMTeamID = $dataIDteam[0]['CRMTeamID'];
+        }
+
+        $btnNIP = ($btnedit=='1') ? '' : ' AND c.CRMTeamID = "'.$CRMTeamID.'" ';
 
         $queryDefault = 'SELECT c.*, em.Name AS NameProspect_by, cs.Description AS StatusDesc, csl.Class AS StatusClass FROM db_admission.crm c 
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
