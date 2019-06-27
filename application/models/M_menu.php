@@ -292,10 +292,16 @@ class M_menu extends CI_Model {
                  $(".btn-add").remove();
                });
 
+               waitForEl(".btn-write", function() {
+                 $(".btn-write").remove();
+               });
+
                $(document).ready(function () {
                    $(".btn-add").remove();
+                   $(".btn-write").remove();
                    $(document).ajaxComplete(function () {
                       $(".btn-add").remove();
+                      $(".btn-write").remove();
                    });
                });
                </script>
