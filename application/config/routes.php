@@ -1372,12 +1372,21 @@ foreach( $result as $row )
 	}
 
 }
-
+$route['purchasing/page/catalog/InputCategory'] = 'page/purchasing/c_master/InputCategory';
 $route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
+
+$route['purchasing/page/catalog/FormInputCategory'] = 'page/purchasing/c_master/InputCategory_FormInput';
 $route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
+
+$route['purchasing/page/catalog/saveFormInput_category'] = 'page/purchasing/c_master/InputCatalog_saveFormInput_category';
 $route['purchasing/page/catalog/saveFormInput'] = 'page/purchasing/c_master/InputCatalog_saveFormInput';
+
+$route['purchasing/page/catalog/DataIntableCategory'] = 'page/purchasing/c_master/Catalog_DataIntableCategory';
 $route['purchasing/page/catalog/DataIntable'] = 'page/purchasing/c_master/Catalog_DataIntable';
+
+$route['purchasing/page/catalog/DataIntableCategory/server_side'] = 'page/purchasing/c_master/Catalog_DataIntableCategory_server_side';
 $route['purchasing/page/catalog/DataIntable/server_side'] = 'page/purchasing/c_master/Catalog_DataIntable_server_side';
+
 $route['purchasing/page/catalog/ApprovalCatalog'] = 'page/purchasing/c_master/ApprovalCatalog';
 $route['purchasing/page/supplier/InputSupplier'] = 'page/purchasing/c_master/InputSupplier';
 $route['purchasing/page/supplier/FormInput'] = 'page/purchasing/c_master/InputSupplier_FormInput';
@@ -1397,9 +1406,13 @@ $route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
 $route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
 $route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';
 $route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Approval';
+$route['purchasing/transaction/po/Set_Approval_SPK']= 'page/purchasing/c_po/Set_Approval_SPK';
 $route['purchasing/transaction/po/userroledepart_submit'] = 'page/purchasing/c_po/userroledepart_submit';
 $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_po/$1';
+$route['purchasing/transaction/po/get_cfg_set_roleuser_spk/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_spk/$1';
+
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
+$route['purchasing/transaction/po/save_cfg_set_roleuser_spk'] = 'page/purchasing/c_po/save_cfg_set_roleuser_spk';
 $route['purchasing/transaction/po/list/cancel_reject_pr'] = 'page/purchasing/c_po/cancel_reject_pr';
 
 // global lihat PO

@@ -339,8 +339,8 @@
 
 	function ClickFunctionBtnSave()
 	{
-		$("#btnSaveForm").click(function()
-		{	
+		// $("#btnSaveForm").click(function()
+		$(document).off('click', '#btnSaveForm').on('click', '#btnSaveForm',function(e) {
 			if (confirm("Are you sure?") == true) {
 				loading_button('#btnSaveForm');
 				var checkAddDetail = getAddDetail();

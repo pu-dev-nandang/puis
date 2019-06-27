@@ -27,6 +27,29 @@ class C_master extends Purchasing_Controler {
         $this->temp($content);
     }
 
+    public function InputCategory()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function InputCategory_FormInput()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $this->data['action'] = $Input['action'];
+        if ($Input['action'] == 'edit') {
+            $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_category_catalog','ID',$Input['ID']);
+        }
+
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/FormInputCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+
     public function InputCatalog()
     {
         $this->auth_ajax();
@@ -59,6 +82,48 @@ class C_master extends Purchasing_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/FormInputCatalog',$this->data,true);
         echo json_encode($arr_result);
+    }
+
+    public function InputCatalog_saveFormInput_category()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        switch ($Input['Action']) {
+            case 'add':
+            $Name = $Input['Name'];
+            $Days = $Input['Days'];
+                $dataSave = array(
+                    'Name' => $Name,
+                    'Days' => $Days,
+                    'Active' => 1,
+                );
+                $this->db->insert('db_purchasing.m_category_catalog', $dataSave);
+
+                break;
+            case 'edit':
+            $Name = $Input['Name'];
+            $Days = $Input['Days'];
+                $dataSave = array(
+                    'Name' => $Name,
+                    'Days' => $Days,
+                    'Active' => 1,
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_purchasing.m_category_catalog', $dataSave);
+                echo json_encode(array('msg' => 'Saved','status' => 1));
+                break;
+            case 'status':
+                $dataSave = array(
+                    'Active' => $Input['Active'],
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_purchasing.m_category_catalog', $dataSave);
+                echo json_encode(array(''));
+                break;
+            default:
+                # code...
+                break;
+        }
     }
 
     public function InputCatalog_saveFormInput()
@@ -368,6 +433,15 @@ class C_master extends Purchasing_Controler {
         echo json_encode($arr_result);
     }
 
+    public function Catalog_DataIntableCategory($action = "All")
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['action'] = $action;
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/Catalog_DataIntableCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
     public function allow_division_catalog()
     {
       $this->auth_ajax();
@@ -427,6 +501,80 @@ class C_master extends Purchasing_Controler {
 
       echo json_encode('');
 
+    }
+
+    public function Catalog_DataIntableCategory_server_side()
+    {
+        $this->auth_ajax();
+        $action = $this->input->post('action');
+        $condition = '';
+        if ($action == 'All') {
+           $condition = '';
+        }
+        elseif ($action == 'non_approval') {
+            $condition = ' where Active = '.$action;
+        }
+
+        $requestData= $_REQUEST;
+        $sql = 'select count(*) as total from db_purchasing.m_category_catalog '.$condition;
+        $query = $this->db->query($sql)->result_array();
+        $totalData = $query[0]['total'];
+        $No = $requestData['start'] + 1;
+
+        if ($action == 'All') {
+           $condition = '';
+        }
+        elseif ($action == 'non_approval') {
+            $condition = ' and Active = '.$action;
+        }
+
+        $sql = 'select * from db_purchasing.m_category_catalog 
+               ';
+
+        $sql.= ' where ( Name LIKE "'.$requestData['search']['value'].'%" ) '.$condition;
+        $sql.= ' ORDER BY ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['Name'];
+            $nestedData[] = '<div align = "center">'.$row['Days'].'</div>';
+            $nestedData[] = ($row['Active'] == 1 ) ? '<div align = "center">'.'Active'.'</div>' : '<div align = "center">'.'Not Active'.'</div>';
+            
+            if ($action == 'All') {
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog-category" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+
+            }
+            else
+            {
+                $btn = '';
+            }
+
+            if ($row['Active'] == 1) {
+              $btn .= '&nbsp<button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'" active = "0"> <i class="fa fa-trash" aria-hidden="true"></i> Set Not Active</button>';
+            }
+            else
+            {
+              $btn .= '&nbsp<button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'" active = "1"> <i class="fa fa-trash" aria-hidden="true"></i> Set Active</button>';
+            }
+            
+            $nestedData[] = $btn;
+            $nestedData[] = $row['Active'];
+            $nestedData[] = $row['Days'];
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
     }
 
     public function Catalog_DataIntable_server_side()

@@ -53,8 +53,11 @@
                <div class="panel-body" id = "pageContentCatalog">
                     <div class="tabbable tabbable-custom tabbable-full-width btn-read MenuCatalog">
                         <ul class="nav nav-tabs">
+                          <li class="">
+                              <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCategory">Category</a>
+                          </li>
                             <li class="active">
-                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Entry</a>
+                                <a href="javascript:void(0)" class="pageAnchorCatalog" page = "InputCatalog">Catalog</a>
                             </li>
                             <li class="">
                                 <a href="javascript:void(0)" class="pageAnchorCatalog" page = "ApprovalCatalog">Approval<b style="color: red;" id= "CountApproval"></b></a>

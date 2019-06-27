@@ -61,6 +61,20 @@
 						</td>
 						<td>
 							[NO Invoice]
+							<br>
+							<label style="color: red">Upload Invoice</label>
+							<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf">
+							<div id = "FileInvoice">
+								
+							</div>
+							<br>
+							[NO Tanda Terima]
+							<br>
+							<label style="color: red">Upload Tanda Terima</label>
+							<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">
+							<div id = "FileTT">
+								
+							</div>
 						</td>				
 					</tr>
 					<tr>
@@ -169,10 +183,41 @@
 				</tfoot>
 			</table>
 			<div id="r_signatures">
-				
+				<div class="row">
+					<div class="col-md-12">
+						<table class="table table-striped table-bordered table-hover table-checkable tableApproval" style="margin-top : 5px">
+							<thead>
+								<tr>
+									<th>Requested by</th>
+									<th>Approval by</th>
+									<th>Approval by</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr style="height : 51px">
+									<td><i class="fa fa-check" style="color: green;"></i></td>
+									<td><i class="fa fa-check" style="color: green;"></i></td>
+									<td><i class="fa fa-check" style="color: green;"></i></td>
+								</tr>	
+								<tr>
+									<td>Alhadi Rahman</td>
+									<td>Nandang Mulyadi</td>
+									<td>Irfan Firdaus</td>
+								</tr>
+							</tbody>
+						</table>			
+					</div>
+				</div>
 			</div>
 			<div id = "r_action">
-				
+				<div class="row">
+					<div class="col-md-12">
+						<div class="pull-right">
+							<button class="btn btn-primary" id="btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp
+							<button class="btn btn-success"> Submit</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

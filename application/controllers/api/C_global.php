@@ -296,6 +296,86 @@ class C_global extends CI_Controller {
         // );
         // $this->db->where('Approver2','["8"]');
         // $this->db->update('db_reservation.category_room',$datasave);
+
+        // insert auth budgeting
+        // $sql = 'select NIP,PositionMain from db_employees.employees where StatusEmployeeID = 1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     $PositionMain = $query[$i]['PositionMain'];
+        //     $P = explode('.', $PositionMain);
+        //     if (count($P) > 1) {
+        //         $P = $P[1];
+        //         $array_admin2 = array(13,14,8,21,7);
+        //             $G_user = 3;
+        //         if (in_array($P, $array_admin2) ) {
+        //              $G_user = 4;
+        //         }
+
+        //         // find data di previleges_guser db_budgeting
+        //         $G__ = $this->m_master->caribasedprimary('db_budgeting.previleges_guser','NIP',$NIP);
+        //         if (count($G__) == 0) {
+        //             $datasave = array(
+        //                 'NIP' => $NIP,
+        //                 'G_user' => $G_user,    
+        //             );
+
+        //             $this->db->insert('db_budgeting.previleges_guser',$datasave);
+        //         }
+        //     }
+            
+        // }
+
+        // insert auth purchasing
+        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
+        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
+        //              a.StatusEmployeeID
+        // FROM   db_employees.employees as a
+        // where (SPLIT_STR(a.PositionMain, ".", 1) = 4 or  SPLIT_STR(a.PositionMain, ".", 1) = 12 ) and a.StatusEmployeeID != -1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //    if ($query[$i]['PositionMain1'] == 4) {
+        //       $array_admin2 = array(13,14,8,21,7);
+        //        if (in_array($query[$i]['PositionMain2'], $array_admin2) ) {
+        //             $G_user = 4;
+        //         }
+        //         else
+        //         {
+        //             $G_user = 3;
+        //         }
+
+        //    }
+        //    else
+        //    {
+        //     $G_user = 1;
+        //    }
+        //    $NIP = $query[$i]['NIP'];
+        //   $G__ = $this->m_master->caribasedprimary('db_purchasing.previleges_guser','NIP',$NIP);
+        //   if (count($G__) == 0) {
+        //       $datasave = array(
+        //           'NIP' => $NIP,
+        //           'G_user' => $G_user,    
+        //       );
+
+        //       $this->db->insert('db_purchasing.previleges_guser',$datasave);
+        //   }
+        // }
+
+        // inject cfg_rule_g_user purchasing 
+        // $sql = 'select * from db_purchasing.cfg_rule_g_user';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $r = $query[$i];
+        //     unset($r['ID']);
+        //     $r['cfg_group_user'] = 3;
+        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
+        //     $r['cfg_group_user'] = 4;
+        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
+
+        // }
+
+
+
     }
 
     public function testInject2()
