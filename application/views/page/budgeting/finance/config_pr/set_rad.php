@@ -17,7 +17,7 @@
 			$("#loadPageTable").empty();
 			var ActionAdd = '<div class = "row">'+
 								'<div class = "col-xs-2">'+
-									'<span data-smt="" class="btn btn-add">'+
+									'<span data-smt="" class="btn btn-add btn-write">'+
 	                    				'<i class="icon-plus"></i> Add'+
 	               					'</span>'+
 	               				'</div>'+
@@ -41,7 +41,7 @@
 			TableGenerate += '<tbody></tbody></table></div></div></div>';
 			var ActionSave = '<div class = "row sdsadasd" style = "margin-top : 10px;margin-left : 0px ; margin-right : 0px">'+
 								'<div class = "col-md-2 col-md-offset-10" align = "right">'+
-									'<button type="button" id="SaveForm" class="btn btn-success">Save</button>'+
+									'<button type="button" id="SaveForm" class="btn btn-success btn-write">Save</button>'+
 								'</div>'+
 							'</div>';		
 			$("#loadPageTable").html(ActionAdd+TableGenerate+ActionSave);
@@ -202,7 +202,7 @@
 					}
 					fill += '<td align = "center">'+chk+'</td>';
 				} // end loop user type
-				var action = '<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+				var action = '<button type="button" class="btn btn-danger btn-delete btn-write"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				fill += '<td>'+action+'</td>';
 				fill += '</tr>';
 				$('#tableData9 tbody').append(fill);
@@ -258,7 +258,7 @@
 						  '</div>';		  		  
 				fill += '<td align = "center">'+chk+'</td>';
 			}
-			var action = '<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+			var action = '<button type="button" class="btn btn-danger btn-delete btn-write"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 			fill += '<td>'+action+'</td>';
 			fill += '</tr>';
 		$('#tableData9 tbody').append(fill);

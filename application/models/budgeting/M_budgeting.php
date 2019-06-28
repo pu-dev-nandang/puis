@@ -26,7 +26,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select * from db_budgeting.cfg_menu where IDDepartement = "0"
                 ) as b
-                where a.NIP = ? GROUP by b.id';
+                where a.NIP = ? GROUP by b.id order by b.Sort asc';
         $query=$this->db->query($sql, array($MenuDepartement,$NIP))->result_array();
         return $query;
     }
@@ -35,7 +35,7 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
         from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-        where a.ID_Menu = ? group by a.SubMenu1';
+        where a.ID_Menu = ? group by a.SubMenu1 order by a.Sort1 asc';
         $query=$this->db->query($sql, array($ID_Menu))->result_array();
         return $query;
     }
@@ -45,14 +45,14 @@ class M_budgeting extends CI_Model {
         if ($IDmenu != null) {
             $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-             where a.SubMenu1 = ? and a.ID_Menu = ?';
+             where a.SubMenu1 = ? and a.ID_Menu = ? order by a.Sort2 asc';
             $query=$this->db->query($sql, array($submenu1,$IDmenu))->result_array();
         }
         else
         {
             $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-             where a.SubMenu1 = ?';
+             where a.SubMenu1 = ? order by a.Sort2 asc';
             $query=$this->db->query($sql, array($submenu1))->result_array();
         }
         
