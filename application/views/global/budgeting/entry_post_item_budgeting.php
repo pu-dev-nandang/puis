@@ -20,7 +20,7 @@
         <div class="panel-heading clearfix">
             <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Sub Account</h4>
             <div class="toolbar no-padding pull-right">
-                <span data-smt="" class="btn btn-add btn-add-realization-Post">
+                <span data-smt="" class="btn btn-add btn-add-realization-Post btn-write">
                     <i class="icon-plus"></i> Add
                </span>
             </div>
@@ -195,8 +195,8 @@ $(document).ready(function() {
                 var CodeDepartment = dataForTable[i].Departement;
                 var sessIDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
                 if (CodeDepartment == sessIDDepartementPUBudget) {
-                  var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-postrealization" code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-                  var btn_del = ' <button type="button" class="btn btn-danger btn-delete btn-delete-postrealization"  code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+                  var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-postrealization btn-write" code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+                  var btn_del = ' <button type="button" class="btn btn-danger btn-delete btn-delete-postrealization btn-write"  code = "'+dataForTable[i].CodePostRealisasi+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
                   TableGenerate += '<tr>'+
                                       '<td width = "3%">'+ No+'</td>'+
                                       '<td>'+ dataForTable[i].CodePostRealisasi+'<br>'+dataForTable[i].RealisasiPostName+'</td>'+

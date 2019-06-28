@@ -14,31 +14,8 @@
 	         </div>
 	         <div class="widget-content">
 	             <div class="row">
-	             	<div class="col-md-12">
-	             		<table class="table table-striped table-bordered table-hover table-checkable" id = "example_budget">
-	             			<thead>
-	             				<tr>
-	             					<th style = "text-align: center;background: #20485A;color: #FFFFFF;">
-	             						MENU
-	             					</th>
-	             					<th style = "text-align: center;background: #20485A;color: #FFFFFF;">
-	             						ICON (https://fontawesome.com/v4.7.0/icons/)
-	             					</th>
-	             					<th style = "text-align: center;background: #20485A;color: #FFFFFF;">
-	             						DEPARTMENT
-	             					</th>
-	             					<th style = "text-align: center;background: #20485A;color: #FFFFFF;">
-	             						SORT
-	             					</th>
-	             					<th style = "text-align: center;background: #20485A;color: #FFFFFF;">
-	             						Action
-	             					</th>
-	             				</tr>
-	             			</thead>
-	             			<tbody id = "Tbodydatatable">
-	             				
-	             			</tbody>
-	             		</table>
+	             	<div class="col-md-12" id = "PageTables">
+	             		
 	             	</div>
 	             </div>
 	         </div>
@@ -56,14 +33,36 @@
 	Arr_Department.push(temp); // add item all department
 	var Arr_Menu =  <?php echo json_encode($Arr_Menu) ?>;
 	var S_Table_example_budget = '';
+	var HTMLTbl = '<table class="table table-striped table-bordered table-hover table-checkable" id = "example_budget">'+
+	             			'<thead>'+
+	             				'<tr>'+
+	             					'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+
+	             						'MENU'+
+	             					'</th>'+
+	             					'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+
+	             						'ICON (https://fontawesome.com/v4.7.0/icons/)'+
+	             					'</th>'+
+	             					'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+
+	             						'DEPARTMENT'+
+	             					'</th>'+
+	             					'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+
+	             						'SORT'+
+	             					'</th>'+
+	             					'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">'+
+	             						'Action'+
+	             					'</th>'+
+	             				'</tr>'+
+	             			'</thead>'+
+	             			'<tbody id = "Tbodydatatable">'+
+	             				
+	             			'</tbody>'
+	             		'</table>';
 	$(document).ready(function () {
        LoadData(Arr_Menu);
 	});
 
 	function LoadData(dt)
 	{
-		// console.log(Arr_Department);
-
 		var html = '';
 		var OPD = function(IDDepartement)
 		{
@@ -77,6 +76,10 @@
 
 			return h;
 		}
+
+		// create table
+		$('#PageTables').empty();
+		$('#PageTables').html(HTMLTbl);
 
 		var table = $('#example_budget').DataTable({
 		      "data" : dt,
@@ -116,7 +119,7 @@
 			       {
 			         'targets': 4,
 			         'render': function (data, type, full, meta){
-			             return '<button class = "btn btn-primary btn-save btn-write" action = "edit">Save</button>&nbsp'+'<button class = "btn btn-danger btn-delete btn-write">Delete</button>';
+			             return '<button class = "btn btn-primary btn-save btn-write" action = "edit"> <i class="fa fa-floppy-o" aria-hidden="true"></i> </button>&nbsp'+'<button class = "btn btn-danger btn-delete btn-write"><i class="fa fa-trash"></i> </button>';
 			         }
 			      },
 		      ],
@@ -146,28 +149,36 @@
 			thiss.prop('disabled',true);
 
 		   var ID = ev.attr('id-key');
-		   var Name = ev.find('.NameMenu');
-		   var Icon = ev.find('.NameIcon');
-		   var IDDepartement = ev.find('.IDDepartement option:selected');
-		   var Sort = ev.find('.Sort');
+		   var Name = ev.find('.NameMenu').val();
+		   var Icon = ev.find('.NameIcon').val();
+		   var IDDepartement = ev.find('.IDDepartement option:selected').val();
+		   var Sort = ev.find('.Sort').val();
 		   var action = thiss.attr('action');
 		   var url = base_url_js+"budgeting/menu/menu/save";
 		   var data = {
 			    action : action,
 			    ID : ID,
-			    Name : Name,
+			    Menu : Name,
 			    Icon : Icon,
 			    IDDepartement : IDDepartement,
 			    Sort : Sort,
 			};
-			var token = jwt_encode(data,"UAP)(*");
-			$.post(url,{ token:token },function (resultJson) {
+			if (validation(data)) {
+					var token = jwt_encode(data,"UAP)(*");
+					$.post(url,{ token:token },function (resultJson) {
 
-		    }).fail(function() {
-			  toastr.info('No Result Data'); 
-			}).always(function() {
-			    thiss.prop('disabled',false).html('Save');          
-			});
+							toastr.success('Saved');
+				    }).fail(function() {
+					  toastr.info('No Result Data'); 
+					}).always(function() {
+					   thiss.prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i> ');          
+					});
+			}
+			else
+			{
+				thiss.prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i> ');   
+			}
+			
 		}
 	});
 
@@ -175,7 +186,7 @@
 		var OPD = function(IDDepartement)
 		{
 			var h = '';
-			h = '<select class = " form-control Department" style = "width : 80%">';
+			h = '<select class = " form-control Department_" style = "width : 100%">';
 				for (var i = 0; i < Arr_Department.length; i++) {
 					var selected = (IDDepartement == Arr_Department[i].Code) ? 'selected' : '';
 					h += '<option value = "'+Arr_Department[i].Code+'" '+selected+' >'+Arr_Department[i].Name1+'</option>';
@@ -185,23 +196,171 @@
 			return h;
 		}
 
-		$( S_Table_example_budget.table().body() )
-		    .append('<tr>'+
-		    			'<td>'+'<input type="text" class="form-control NameMenu" value=""><div class = "hide"></div>'+'</td>'+
-		    			'<td>'+'<input type="text" class="form-control NameIcon" value=""><div class = "hide"></div>'+'</td>'+
-		    			'<td>'+OPD(0)+'<div class = "hide"></div>'+'</td>'+
-		    			'<td>'+'<input type="text" class="form-control Sort" value=""><div class = "hide"></div>'+'</td>'+
-		    			'<td>'+'<button class = "btn btn-primary btn-save btn-write" action = "add">Save</button>&nbsp'+'<button class = "btn btn-danger btn-delete btn-write">Delete</button>'+'</td>'+
-		    		'</tr>'	
-		    			);
-
-		    $('.Department[tabindex!="-1"]').select2({
-			    		    //allowClear: true
+			// create new using modal
+			var html = '';
+				html = '<form class="form-horizontal" id="formModal">'+
+		'<div class="form-group">'+ 
+		     '<div class="row">   '+
+		        '<div class="col-sm-4">'+
+		            '<label class="control-label">Menu:</label>'+
+		        '</div>'+    
+		        '<div class="col-sm-6">'+
+		            '<input type="text" class="form-control NameMenu_">'+
+		        '</div>'+
+		    '</div>'+
+		'</div> '+
+		'<div class="form-group">'+ 
+		     '<div class="row">   '+
+		        '<div class="col-sm-4">'+
+		            '<label class="control-label">Icon:</label>'+
+		        '</div>'+    
+		        '<div class="col-sm-6">'+
+		            '<input type="text" class="form-control NameIcon_">'+
+		        '</div>'+
+		    '</div>'+
+		'</div> '+		
+        '<div class="form-group">'+ 
+             '<div class="row">   '+
+                '<div class="col-sm-4">'+
+                    '<label class="control-label">Department:</label>'+
+                '</div>'+    
+                '<div class="col-sm-6">'+
+                    OPD(0)+
+                '</div>'+
+            '</div>'+
+        '</div> '+
+        '<div class="form-group">'+ 
+             '<div class="row">   '+
+                '<div class="col-sm-4">'+
+                    '<label class="control-label">Sort:</label>'+
+                '</div>'+    
+                '<div class="col-sm-6">'+
+                    '<input type="text" class="form-control Sort_">'+
+                '</div>'+
+            '</div>'+
+        '</div> '+
+        '<div style="text-align: center;">  '+     
+    		'<div class="col-sm-12" id="BtnFooter">'+
+                '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>'+
+    		'</div>'+
+        '</div> '+   
+    '</form>';
+			$('#GlobalModal .modal-header').html('<h4 class="modal-title">'+'Add Menu'+'</h4>');
+			$('#GlobalModal .modal-body').html(html);
+			$('#GlobalModal .modal-footer').html(' ');
+			$('#GlobalModal').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
 			});
 
-			$('.Sort').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
-			$('.Sort').maskMoney('mask', '9894');    
-		
+			    $('.Department_[tabindex!="-1"]').select2({
+				    		    //allowClear: true
+				});
 
+				$('.Sort_').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+				$('.Sort_').maskMoney('mask', '9894');
+
+		    //LoadData(Arr_Menu);
 	});
+
+	$(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#ModalbtnSaveForm');
+			var IDDepartement  =$('.Department_ option:selected').val();
+			var Name =$('.NameMenu_').val();
+			var Icon =$('.NameIcon_').val();
+			var Sort =$('.Sort_').val();
+			var ID = '';
+			var action = 'add';
+			   var url = base_url_js+"budgeting/menu/menu/save";
+			   var data = {
+				    action : action,
+				    ID : ID,
+				    Menu : Name,
+				    Icon : Icon,
+				    IDDepartement : IDDepartement,
+				    Sort : Sort,
+				};
+				if (validation(data)) {
+					var token = jwt_encode(data,"UAP)(*");
+					$.post(url,{ token:token },function (resultJson) {
+						response = jQuery.parseJSON(resultJson);
+						Arr_Menu = response.data;
+						LoadData(Arr_Menu);
+						toastr.success('Saved');
+						$('#GlobalModal').modal('hide');
+				    }).fail(function() {
+					  toastr.info('No Result Data'); 
+					}).always(function() {
+					    $('#ModalbtnSaveForm').prop('disabled',false).html('Save');         
+					});
+				}
+				else
+				{
+					$('#ModalbtnSaveForm').prop('disabled',false).html('Save');    
+				}
+				
+		}
+	})
+
+	$(document).off('click', '.btn-delete').on('click', '.btn-delete',function(e) {
+		var ev = $(this).closest('tr');
+		var thiss = $(this);
+		if (confirm('Are you sure ?')) {
+			thiss.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+			thiss.prop('disabled',true);
+
+		   var ID = ev.attr('id-key');
+		   var Name = ev.find('.NameMenu').val();
+		   var Icon = ev.find('.NameIcon').val();
+		   var IDDepartement = ev.find('.IDDepartement option:selected').val();
+		   var Sort = ev.find('.Sort').val();
+		   var action = 'delete';
+		   var url = base_url_js+"budgeting/menu/menu/save";
+		   var data = {
+			    action : action,
+			    ID : ID,
+			    Menu : Name,
+			    Icon : Icon,
+			    IDDepartement : IDDepartement,
+			    Sort : Sort,
+			};
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				S_Table_example_budget
+				        .row( ev )
+				        .remove()
+				        .draw();
+		    }).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			    thiss.prop('disabled',false).html('<i class="fa fa-trash"></i> ');          
+			});
+		}
+	})
+
+	function validation(arr)
+	{
+	  var toatString = "";
+	  var result = "";
+	  for(var key in arr) {
+	     switch(key)
+	     {
+	      case  "Menu" :
+	            result = Validation_required(arr[key],key);
+	              if (result['status'] == 0) {
+	                toatString += result['messages'] + "<br>";
+	            }
+	            break;
+	     }
+
+	  }
+	  if (toatString != "") {
+	    toastr.error(toatString, 'Failed!!');
+	    return false;
+	  }
+
+	  return true;
+	}
 </script>

@@ -1341,6 +1341,15 @@ $route['budgeting/EntryBudget/report_anggaran_per_years'] = 'page/budgeting/c_bu
 
 $route['budgeting/report_anggaran_per_years'] = 'c_save_to_excel/report_anggaran_per_years';
 
+$route['budgeting/menu/menu/save'] = 'page/budgeting/c_menu/save_menu';
+$route['budgeting/menu/sub_menu/save'] = 'page/budgeting/c_menu/save_sub_menu';
+$route['budgeting/menu/group_previleges/crud'] = 'page/budgeting/c_menu/group_previleges_crud';
+$route['budgeting/menu/group_previleges/get_submenu_by_menu'] = 'page/budgeting/c_menu/get_submenu_by_menu';
+$route['budgeting/menu/group_previleges/save_submenu_by_menu'] = 'page/budgeting/c_menu/save_submenu_by_menu';
+$route['budgeting/menu/group_previleges/rud'] = 'page/budgeting/c_menu/group_previleges_rud';
+$route['budgeting/config/getAuthDataTables'] = 'page/budgeting/c_menu/getAuthDataTables';
+$route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');

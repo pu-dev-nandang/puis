@@ -418,4 +418,32 @@ class M_menu extends CI_Model {
       return $html;
   }
 
+  public function get_submenu_by_menu($input,$db)
+  {
+      $ID_Menu = $input['Menu'];
+      $GroupUser = $input['GroupUser'];
+      // print_r($input);die();
+      $sql = "select a.Menu,b.* from ".$db.".cfg_menu as a
+    join ".$db.".cfg_sub_menu as b
+    on a.ID = b.ID_Menu where b.ID_Menu = ?
+    and b.ID not in (select ID_cfg_sub_menu from ".$db.".cfg_rule_g_user where cfg_group_user = ?)";
+    // print_r($sql);die();
+      $query=$this->db->query($sql, array($ID_Menu,$GroupUser))->result_array();
+      return $query;
+  }
+
+  public function get_previleges_group_show($GroupID,$db)
+    {
+        $sql = 'SELECT d.GroupAuth, b.Menu,c.SubMenu1,c.SubMenu2,c.ID_Menu,a.ID_cfg_sub_menu,a.ID as ID_previleges,a.`read`,a.`write`,a.`update`,
+a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,c.`delete` as deleteMenu from '.$db.'.cfg_rule_g_user as a
+            join '.$db.'.cfg_group_user as d
+            on a.cfg_group_user = d.ID
+            join '.$db.'.cfg_sub_menu as c
+            on a.ID_cfg_sub_menu = c.ID
+            join '.$db.'.cfg_menu as b
+            on b.ID = c.ID_Menu where d.ID = ? ';
+        $query=$this->db->query($sql, array($GroupID))->result_array();
+        return $query;
+    }
+
 }
