@@ -411,6 +411,60 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.register', $dataSave);
         // }
 
+        //get all payment dengan PTID 5 & 6
+        $arr = array();
+        $sql = 'select * from db_finance.payment where PTID in (5,6) limit 100';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $dt = array(); 
+            $ID_payment = $query[$i]['ID'];
+            $NPM = $query[$i]['NPM'];
+            $Invoice = $query[$i]['Invoice'];
+            $Status = $query[$i]['Status'];
+            $PTID = $query[$i]['PTID'];
+
+            // update Invoice = 0.0 Status = 1 based ID = ID_payment
+            // $arr_upd = array(
+            //     'Invoice' => 0.0,
+            //     'Status' => '1',
+            // );
+            // $this->db->where('ID',$ID_payment);
+            // $this->db->update('db_finance.payment',$arr_upd);
+
+            // cek ke payment_student
+            $sql2 = 'select * from db_finance.payment_students where ID_payment = ?';
+            $query2=$this->db->query($sql2, array($ID_payment))->result_array();
+            for ($k=0; $k < count($query2); $k++) { 
+                $ID_payment_std = $query2[$k]['ID'];
+                $InvoiceBill = $query2[$k]['Invoice'];
+                $StatusBill = $query2[$k]['Status'];
+                $dt[] = array(
+                    'ID_payment_std' => $ID_payment_std,
+                    'InvoiceBill' => $InvoiceBill,
+                    'StatusBill' => $StatusBill
+                );
+
+                // update Status = '1' based ID = ID_payment_std
+                // $arr_upd2 = array(
+                //     'Invoice' => 0.0,
+                //     'Status' => 1,
+                // );
+
+                // $this->db->where('ID',$ID_payment_std);
+                // $this->db->update('db_finance.payment_students',$arr_upd2);
+            }
+
+            $arr[] = array(
+                'ID_payment' => $ID_payment,
+                'NPM' => $NPM,
+                'Invoice' => $Invoice,
+                'Status' => $Status,
+                'PTID' => $PTID,
+                'dt' =>$dt
+            );
+        }
+
+        print_r($arr);
 
     }
 

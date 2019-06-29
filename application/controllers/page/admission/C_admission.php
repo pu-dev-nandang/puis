@@ -350,22 +350,39 @@ class C_admission extends Admission_Controler {
               
               break;
           case 'edit':
-              $B_email = $this->m_admission->alreadyExistingEmail($input_arr['email']);
-              $G_formulirGlobal = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['No_Ref']);
-              if ($G_formulirGlobal[0]['Status'] == 0) {
-                if ($B_email) {
-                  $this->m_admission->editData_formulir_offline_sale_save($input);
-                }
-                else
-                {
-                  $rs['Status'] = 0;
-                  $rs['msg'] = 'Email already exist';
-                }
+            /* 
+              Note :
+              Tidak boleh ganti No_Ref
+            */
+              // get old data first
+              $G_dt = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
+              // get Email
+              $Email_ =  $G_dt[0]['Email'];
+
+              $B_email = $this->m_admission->alreadyExistingEmail($input['email']);
+              // $G_formulirGlobal = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['No_Ref']);
+              // if ($G_formulirGlobal[0]['Status'] == 0) {
+              //   if ($B_email) {
+              //     $this->m_admission->editData_formulir_offline_sale_save($input);
+              //   }
+              //   else
+              //   {
+              //     $rs['Status'] = 0;
+              //     $rs['msg'] = 'Email already exist';
+              //   }
+              // }
+              // else
+              // {
+              //   $rs['Status'] = 0;
+              //   $rs['msg'] = 'No_Ref is used, Please reload your browser';
+              // }
+              if ($B_email || $Email_ == $input['email']) {
+                $this->m_admission->editData_formulir_offline_sale_save($input);
               }
               else
               {
                 $rs['Status'] = 0;
-                $rs['msg'] = 'No_Ref is used, Please reload your browser';
+                $rs['msg'] = 'Email already exist';
               }
               break;
           case 'delete':

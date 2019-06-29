@@ -15,7 +15,7 @@
 
 <div class="row">
 
-    <div class="col-md-3" style="border-right: 1px solid #CCCCCC;">
+    <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">Create / Update Form Marketing Activity</h4>
@@ -158,7 +158,7 @@
         loadSelectOptionEmployeesSingle('#formParticipants','');
         $('#formParticipants').select2({allowClear: true});
 
-        $( "#formStart,#formEnd" )
+        $( "#formStart,#formEnd")
             .datepicker({
                 showOtherMonths:true,
                 autoSize: true,
@@ -320,12 +320,16 @@
 
                         var comment = (v.Comment!=null && v.Comment!='') ? '<div style="background: lightyellow;padding: 5px;margin-top: 15px;border: 1px solid orangered;"><b>Comment :</b> '+v.Comment+'</div>' : '';
 
+                        var btnActionMA = (adminPanel=='1')
+                            ? '<button class="btn btn-default btn-sm btnEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> <button class="btn btn-danger btn-sm btnRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>'
+                            : '-';
+
                         $('#listMA').append('<tr>' +
                             '<td>'+(i+1)+'</td>' +
                             '<td><b>'+v.Title+'</b>' +
                             '<div><span class="label label-success">'+formatRupiah(v.Price)+'</span> | '+viewtime+'</div><p class="help-block">'+p+'</p></td>' +
                             '<td>'+v.Description+' '+comment+'</td>' +
-                            '<td><button class="btn btn-default btn-sm btnEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> <button class="btn btn-danger btn-sm btnRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button></td>' +
+                            '<td>'+btnActionMA+'</td>' +
                             '</tr>');
                     });
                 } else {
@@ -360,7 +364,7 @@
         $('#formTimeStart').val(d.TimeStart);
         $('#formTimeEnd').val(d.TimeEnd);
 
-        $('#formPrice').val(d.Price);
+        $('#formPrice').val(parseFloat(d.Price));
         $('#formPrice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
         $('#formPrice').maskMoney('mask', '9894');
 
@@ -395,6 +399,7 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 if(jsonResult.Status=='1' || jsonResult.Status==1){
+                    loadMarketingAct();
                     toastr.success('Data removed','Success');
                 } else {
                     toastr.warning('Data can not removed','Warning');

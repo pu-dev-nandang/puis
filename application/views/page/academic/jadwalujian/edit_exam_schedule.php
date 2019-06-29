@@ -777,6 +777,42 @@
         }
 
         function saveEditSchedule(token) {
+
+            // Cek bentrok dengan venue
+            var url2 = base_url_js+'api2/__checkConflict_Venue';
+
+            var formInputDate = $('#formInputDate').val();
+            var formStart = $('#formStart').val();
+            var formEnd = $('#formEnd').val();
+
+            var textRoom = $('#formClassroom option:selected').text();
+            var RoomName = textRoom.split('|');
+            var data2 = {
+                Start : formInputDate+' '+formStart+':00',
+                End : formInputDate+' '+formEnd+':00',
+                RoomName : RoomName[0].trim()
+            };
+            var token2 = jwt_encode(data2,"UAP)(*");
+
+            $.post(url2,{token:token2},function (result) {
+                var bool = result.bool;
+                if (bool) {
+                    saveEditSchedule_2(token)
+                } else {
+                    if(confirm('Conflict with Venue, are you sure?')){
+                        saveEditSchedule_2(token)
+                    }
+                }
+            });
+
+
+
+
+
+        }
+
+        function saveEditSchedule_2(token) {
+            $.getJSON(base_url_js+'api/__checkBentrokScheduleAPI');
             var url = base_url_js+'api/__crudJadwalUjian';
 
             $.post(url,{token:token},function (result) {

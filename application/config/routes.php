@@ -501,6 +501,7 @@ $route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_
 $route['crm/crm-team'] = 'page/admission/marketing/c_crm/CRMTeam';
 $route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_activity';
 $route['crm/contact'] = 'page/admission/marketing/c_crm/contact';
+$route['crm/uploadDocumentPS'] = 'page/admission/marketing/c_crm/uploadDocumentPS';
 
 
 
@@ -859,6 +860,8 @@ $route['api2/__getDetailCurriculum'] = 'api/c_api2/getDetailCurriculum';
 $route['api2/_updateCurriculum'] = 'api/c_api2/updateCurriculum';
 $route['api2/_checkEdom'] = 'api/c_api2/checkEdom';
 
+$route['api2/__getTableProspectiveStudents'] = 'api/c_api2/getTableProspectiveStudents';
+
 $route['api/__crudScheduleExchange'] = 'api/c_api/crudScheduleExchange';
 $route['api/__crudLimitCredit'] = 'api/c_api/crudLimitCredit';
 $route['api/__crudAcademicData'] = 'api/c_api/crudAcademicData'; //add bismar
@@ -882,6 +885,7 @@ $route['rest/__crudCounseling'] = 'api/c_rest/crudCounseling';
 $route['rest/__getPaymentStudent'] = 'api/c_rest/getPaymentStudent';
 
 $route['rest/__getStudent_ServerSide'] = 'api/c_rest/getStudent_ServerSide';
+$route['rest/__getHighSchool_ServerSide'] = 'api/c_rest/getHighSchool_ServerSide';
 $route['rest/__getLecturer_ServerSide'] = 'api/c_rest/getLecturer_ServerSide';
 $route['rest/__geTimetable'] = 'api/c_rest/geTimetable';
 $route['rest/__getExamSchedule'] = 'api/c_rest/getExamSchedule';
@@ -930,6 +934,8 @@ $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
 $route['rest/__show_pr_detail_multiple_pr_code'] = 'api/c_rest/show_pr_detail_multiple_pr_code';
 
+$route['rest/__getAdminCRM'] = 'api/c_rest/getAdminCRM';
+
 $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
@@ -947,6 +953,11 @@ $route['rest2/__crudCRMPeriode'] = 'api/c_rest2/crudCRMPeriode';
 $route['rest2/__crudCRMTeam'] = 'api/c_rest2/crudCRMTeam';
 $route['rest2/__crudMarketingActivity'] = 'api/c_rest2/crudMarketingActivity';
 $route['rest2/__crudContact'] = 'api/c_rest2/crudContact';
+
+$route['rest2/__crudProspectiveStudents'] = 'api/c_rest2/crudProspectiveStudents';
+$route['rest2/__getPathway'] = 'api/c_rest2/getPathway';
+
+$route['rest2/__getPathway'] = 'api/c_rest2/getPathway';
 
 
 $route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';

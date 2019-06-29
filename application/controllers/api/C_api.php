@@ -1387,6 +1387,14 @@ class C_api extends CI_Controller {
 
 
             }
+            else if($data_arr['action']=='UnpublishSemesterAntara'){
+
+                $ID = $data_arr['ID'];
+                $this->db->query('UPDATE db_academic.semester_antara s SET s.Status= "0" WHERE s.ID="'.$ID.'"');
+                return print_r($ID);
+
+
+            }
             else if($data_arr['action']=='checkSemesterAntara'){
                 $data = $this->db
                     ->get_where('db_academic.semester_antara',array('Status'=>'1'))
@@ -2918,9 +2926,7 @@ class C_api extends CI_Controller {
     public function getScheduleExam(){
         $requestData= $_REQUEST;
 
-        $token = $this->input->post('token');
-        $key = "UAP)(*";
-        $data_arr = (array) $this->jwt->decode($token,$key);
+        $data_arr = $this->getInputToken();
 
         $whereP = ($data_arr['ExamDate']!=null && $data_arr['ExamDate']!='')
             ? 'ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "1" AND ex.ExamDate LIKE "'.$data_arr['ExamDate'].'" '

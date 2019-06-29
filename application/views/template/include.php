@@ -258,6 +258,26 @@
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/uniform/jquery.uniform.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/select2/select2.min.js"></script>
 
+<!-- Select 2 -->
+<!--<link href="--><?php //echo base_url('assets/select2/css/select2.css'); ?><!--" rel="stylesheet" />-->
+<!--<link href="--><?php //echo base_url('assets/select2/select2-bootstrap.min.css'); ?><!--" rel="stylesheet" />-->
+<!--<style>-->
+<!--    .select2-container--bootstrap .select2-results__group{-->
+<!--        background: #efefef;-->
+<!--    }-->
+<!--    .select2-container--bootstrap .select2-selection {-->
+<!--        border-radius: 0px;-->
+<!--        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-->
+<!--        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-->
+<!---->
+<!--    }-->
+<!--    .select2-dropdown--below , .select2-container--bootstrap {-->
+<!--        min-width: 300px;-->
+<!--    }-->
+<!--</style>-->
+<!--<script  type="text/javascript" charset="UTF-8" src="--><?php //echo base_url('assets/select2/js/select2.js') ?><!--"></script>-->
+<!--<script>$.fn.select2.defaults.set( "theme", "bootstrap" );</script>-->
+
 <!-- Pickers -->
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/pickadate/picker.js"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/template/'); ?>plugins/pickadate/picker.date.js"></script>
@@ -946,6 +966,29 @@
 
         });
     }
+
+    function loadSelectOptionStatusMarketing(element,selected) {
+        var data = {
+            action : 'status_PS'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudProspectiveStudents';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (selected!='' && selected!=null && selected!=='undefined' && selected==v.ID)
+                        ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+
+                });
+            }
+
+        });
+    }
     
     function loadSelectOptionScheoolBy(CityID,element,selected) {
         var url = base_url_js+'api/__getSchoolByCityID/'+CityID;
@@ -1466,6 +1509,21 @@
             }
         });
     }
+    
+    function loadSelectOptionPathway(element,selected) {
+        
+        var url = base_url_js+'rest2/__getPathway';
+        $.getJSON(url,function (jsonResult) {
+           console.log(jsonResult);
+           if(jsonResult.length>0){
+               $.each(jsonResult,function (i,v) {
+                   var sc = (selected!='' && selected==v.ID) ? 'selected' : '';
+                   $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.SchoolMajor+'</option>');
+               })
+           }
+        });
+        
+    }
 
     function loadYearOfBirth(element,selected){
         $(element).empty();
@@ -1644,7 +1702,6 @@
         $(classHeader).find(elmChild).addClass(classActiveName);
     }
 
-
     // for text area
     function nl2br (str, replaceMode, isXhtml) {
 
@@ -1660,6 +1717,35 @@
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
     }
-
     // for text area
+  
+    $(document).on('blur','input[typeof=number][data-form=phone]',function () {
+        var formPhone = $(this).val();
+
+        if(formPhone!=''){
+
+            var v = formatPhone(formPhone);
+
+            $(this).val(v);
+
+        }
+    });
+
+    function formatPhone(number) {
+
+        number = parseInt(number);
+
+        number = ''+number;
+
+        var d = number.substr(0,2);
+        var l = number.substr(2,number.length);
+        var v = '';
+        if(d=='62' || d==62){
+            v = number;
+        } else {
+            v = '628'+l;
+        }
+
+        return v;
+    }
 </script>

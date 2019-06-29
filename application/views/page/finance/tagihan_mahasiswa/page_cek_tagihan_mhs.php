@@ -96,6 +96,11 @@
                           </div>
                         </div> -->
                       </div>
+                      <div class="row" style="margin-top: 10px;">
+                        <div class="col-md-6">
+                          <b>Tagihan Mahasiswa yang ditampilkan adalah status mahasiswa  : Aktif,Cuti dan Cuti Akademik</b> <br>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

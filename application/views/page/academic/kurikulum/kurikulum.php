@@ -1,64 +1,67 @@
 
 
 <div class="row" style="margin-top: 30px;">
-    <div class="col-md-10 col-md-offset-1">
-        <div class="thumbnail">
-            <div class="row">
-                <div class="col-xs-3" style="">
-                    <select class="form-control" id="selectKurikulum">
-<!--                        <option value="" disabled selected>--- Select Curriculum ---</option>-->
-                    </select>
-                </div>
-                <div class="col-xs-3">
-                    <select class="form-control" id="selectProdi">
-<!--                        <option value="">--- All Programme Study ---</option>-->
-                    </select>
-                </div>
-                <div class="col-xs-6" style="text-align: right;">
-                    <div class="btn-group">
-                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Add Curriculum
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="yearAddKurikulum">
-                        </ul>
-                    </div>
-
-                    <div class="btn-group">
-                        <button class="btn btn-default btn-default-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Add Semester
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="addSmt">
-                        </ul>
-                    </div>
-
-                    <div class="btn-group">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <i class="fa fa-cog" aria-hidden="true"></i>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                            <li><a href="javascript:void(0)" data-action="ConfProgram" data-header="Campus Programme" class="btn-conf">Campus Programme</a></li>
-                            <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Curriculum Type" class="btn-conf">Curriculum Type</a></li>
-                            <li><a href="javascript:void(0)" data-action="ConfJenisKelompok" data-header="Course Group" class="btn-conf">Course Group</a></li>
-<!--                            <li><a href="javascript:void(0)" data-action="ClassGroup" data-header="Group Kelas" class="btn-conf">Group Kelas</a></li>-->
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-
-
+    <div class="col-md-12" style="text-align: right;">
+        <div class="btn-group">
+            <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Add Curriculum
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" id="yearAddKurikulum">
+            </ul>
         </div>
 
+        <div class="btn-group">
+            <button class="btn btn-default btn-default-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Add Semester
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" id="addSmt">
+            </ul>
+        </div>
 
+        <div class="btn-group">
+            <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <i class="fa fa-cog" aria-hidden="true"></i>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="javascript:void(0)" data-action="ConfProgram" data-header="Campus Programme" class="btn-conf">Campus Programme</a></li>
+                <li><a href="javascript:void(0)" data-action="ConfJenisKurikulum" data-header="Curriculum Type" class="btn-conf">Curriculum Type</a></li>
+                <li><a href="javascript:void(0)" data-action="ConfJenisKelompok" data-header="Course Group" class="btn-conf">Course Group</a></li>
+                <!--                            <li><a href="javascript:void(0)" data-action="ClassGroup" data-header="Group Kelas" class="btn-conf">Group Kelas</a></li>-->
+            </ul>
+        </div>
+
+        <hr/>
     </div>
 </div>
 
+<div class="row" style="">
+
+    <div class="col-xs-6 col-md-offset-3">
+        <div class="well">
+            <div class="row">
+                <div class="col-md-5">
+                    <select class="form-control" id="selectKurikulum"></select>
+                </div>
+                <div class="col-md-5">
+                    <select class="form-control" id="selectProdi"></select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-success" id="btnSubmitSearch">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
 <div class="row">
     <div class="col-md-12">
-        <hr/>
         <div id="pageKurikulum"></div>
     </div>
 </div>
@@ -80,7 +83,7 @@
         },1000);
     });
 
-    $(document).on('change','#selectKurikulum, #selectProdi',function () {
+    $(document).on('click','#btnSubmitSearch',function () {
         pageKurikulum();
     });
 
@@ -134,6 +137,7 @@
             var prodi = $('#selectProdi').find(':selected').val().split('.');
             var prodiID = prodi[0];
             loading_page('#pageKurikulum');
+            loading_modal_show();
             var url = base_url_js+'academic/kurikulum-detail';
             var data = {
                 SemesterSearch : '',

@@ -1095,7 +1095,7 @@ class M_admission extends CI_Model {
               'DateSale' => $input_arr['tanggal'],
               'UpdateAT' => date('Y-m-d'),
               'UpdatedBY' => $this->session->userdata('NIP'),
-              'ID_Crm' => $input['ID_Crm'],
+              'ID_Crm' => $input_arr['ID_Crm'],
       );
 
       $this->db->where('ID',$input_arr['CDID']);

@@ -48,8 +48,6 @@
                     $('#DataMataKuliah').html('--- Mata Kuliah Belum Ditambahkan ---');
                 }
                 loadSemesterAdd();
-            } else {
-                log('Data JSON Kosong');
             }
 
 
@@ -149,6 +147,8 @@
 
             LoaddataTable(i);
         }
+
+        loading_modal_hide();
 
 
     }

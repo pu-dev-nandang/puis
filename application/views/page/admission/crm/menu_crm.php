@@ -26,8 +26,31 @@
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
             <?= $page; ?>
-
         </div>
     </div>
 </div>
+
+<script>
+    
+    $(document).ready(function () {
+        getAdminCrm();
+        window.adminPanel = '1';
+    });
+    
+    function getAdminCrm() {
+
+        var url = base_url_js+'rest/__getAdminCRM';
+        $.getJSON(url,function (jsonResult) {
+
+            if($.inArray(sessionNIP,jsonResult)==-1){
+
+                adminPanel = '0';
+                $('.panel-admin').remove();
+
+            }
+
+        });
+
+    }
+</script>
 
