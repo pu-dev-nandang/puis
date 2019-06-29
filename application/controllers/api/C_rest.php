@@ -3159,12 +3159,40 @@ class C_rest extends CI_Controller {
                                        'Photo' => $uploadFile,
                                        'Departement' => $Departement,
                                        'DetailCatalog' => $Detail,
-                                       'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
+                                       // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
+                                       'Approval' => ($chk) ? 1 : 0,
                                        'LastUpdateBy' => $user,
                                        'LastUpdateAt' => date('Y-m-d H:i:s'),
                                    );
                                    $this->db->where('ID', $Input['ID']);
                                    $this->db->update('db_purchasing.m_catalog', $dataSave);
+
+                                   if (!$chk) {
+                                       // Send Notif for Purchasing 
+                                            $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$user);
+                                            $NameFor_NIP = $G_emp[0]['Name'];
+                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                                            $NameDepartement = $G_div[0]['NameDepartement'];
+                                            $Code = $G_div[0]['Code'];
+                                           $data = array(
+                                               'auth' => 's3Cr3T-G4N',
+                                               'Logging' => array(
+                                                               'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$Code.' has been edited',
+                                                               'Description' => 'Catalog '.$Code.' has been added by '.$NameFor_NIP,
+                                                               'URLDirect' => 'purchasing/master/catalog',
+                                                               'CreatedBy' => $user,
+                                                             ),
+                                               'To' => array(
+                                                         'Div' => array(4),
+                                                       ),
+                                               'Email' => 'No', 
+                                           );
+
+                                           $url = url_pas.'rest2/__send_notif_browser';
+                                           $token = $this->jwt->encode($data,"UAP)(*");
+                                           $this->m_master->apiservertoserver($url,$token); 
+                                   }
+
                                    echo json_encode(array('msg' => 'Saved','status' => 1));
                                }
                                else
@@ -3180,12 +3208,38 @@ class C_rest extends CI_Controller {
                                     'ID_category_catalog' => $ID_category_catalog,
                                     'Departement' => $Departement,
                                     'DetailCatalog' => $Detail,
-                                    'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
+                                    // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
+                                    'Approval' => ($chk) ? 1 : 0,
                                     'LastUpdateBy' => $user,
                                     'LastUpdateAt' => date('Y-m-d H:i:s'),
                                 );
                                 $this->db->where('ID', $Input['ID']);
                                 $this->db->update('db_purchasing.m_catalog', $dataSave);
+                                if (!$chk) {
+                                    // Send Notif for Purchasing 
+                                         $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$user);
+                                         $NameFor_NIP = $G_emp[0]['Name'];
+                                         $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                                         $NameDepartement = $G_div[0]['NameDepartement'];
+                                         $Code = $G_div[0]['Code'];
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Catalog '.$Code.' has been edited',
+                                                            'Description' => 'Catalog '.$Code.' has been added by '.$NameFor_NIP,
+                                                            'URLDirect' => 'purchasing/master/catalog',
+                                                            'CreatedBy' => $user,
+                                                          ),
+                                            'To' => array(
+                                                      'Div' => array(4),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                                }
                                 echo json_encode(array('msg' => 'Saved','status' => 1));
                             }
                         }

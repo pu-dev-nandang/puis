@@ -909,7 +909,10 @@
 			var ppn_po = $(this).find('td:eq(3)').attr('ppn_po');
 			var n = ppn_po.indexOf(".");
 			value = ppn_po.substring(0, n);
-			$(this).find('td:eq(3)').html('<input type="number" class="form-control PPN" value="'+value+'">');
+			// $(this).find('td:eq(3)').html('<input type="number" class="form-control PPN" value="'+value+'">');
+			$(this).find('td:eq(3)').html('<input type="text" class="form-control PPN" value="'+value+'">');
+			$(this).find('.PPN').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+			$(this).find('.PPN').maskMoney('mask', '9894');
 		})
 
 		var value  = $('#table_input_spk').find('.tdNotes').attr('notes');

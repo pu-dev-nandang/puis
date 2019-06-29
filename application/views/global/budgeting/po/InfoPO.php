@@ -808,12 +808,18 @@
 			var value = $(this).find('.tdPPN').attr('value');
 			var n = value.indexOf(".");
 			value = value.substring(0, n);
-			$(this).find('.tdPPN').html('<input type="number" class="form-control PPN" value="'+value+'">');
+			// $(this).find('.tdPPN').html('<input type="number" class="form-control PPN" value="'+value+'">');
+			$(this).find('.tdPPN').html('<input type="text" class="form-control PPN" value="'+value+'">');
+			$(this).find('.PPN').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+			$(this).find('.PPN').maskMoney('mask', '9894');
 			
 			var value = $(this).find('.tdDiscount').attr('value');
 			var n = value.indexOf(".");
 			value = value.substring(0, n);
-			$(this).find('.tdDiscount').html('<input type="number" class="form-control Discount" value="'+value+'">');
+			// $(this).find('.tdDiscount').html('<input type="number" class="form-control Discount" value="'+value+'">');
+			$(this).find('.tdDiscount').html('<input type="text" class="form-control Discount" value="'+value+'">');
+			$(this).find('.Discount').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+			$(this).find('.Discount').maskMoney('mask', '9894');
 
 			var value = $(this).find('.tdAnotherCost').attr('value');
 			var n = value.indexOf(".");
