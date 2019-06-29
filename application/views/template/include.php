@@ -1660,4 +1660,6 @@
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
     }
+
+    // for text area
 </script>

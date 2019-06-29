@@ -4767,7 +4767,7 @@ class C_save_to_excel extends CI_Controller
         // We'll be outputting an excel file  
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
-        header('Content-Disposition: attachment; filename=template_import_supplier.xlsx'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename=supplier.xlsx'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 
@@ -4846,7 +4846,7 @@ class C_save_to_excel extends CI_Controller
         // We'll be outputting an excel file  
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
-        header('Content-Disposition: attachment; filename=template_import_catalog.xlsx'); // jalan ketika tidak menggunakan ajax
+        header('Content-Disposition: attachment; filename=catalog.xlsx'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 }

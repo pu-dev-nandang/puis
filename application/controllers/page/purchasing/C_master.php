@@ -960,7 +960,7 @@ class C_master extends Purchasing_Controler {
             // $nestedData[] = $row['Website'];
             // $nestedData[] = $row['PICName'];
             // $nestedData[] = $row['Alamat'];
-            $nestedData[] = $row['NoTelp'].' & '.$row['NoHp'];
+            $nestedData[] = 'Telp : '.$row['NoTelp'].' <br> Hp : '.$row['NoHp'];
             $nestedData[] = $row['CategoryName'];
             
             $DetailInfo = $row['DetailInfo'];

@@ -179,8 +179,9 @@
         var error = '';
         var msgStr = '';
        var name = files[0].name;
-        console.log(name);
+        // console.log(name);
         var extension = name.split('.').pop().toLowerCase();
+        console.log(extension);
         if(jQuery.inArray(extension, ['xlsm','xlsx']) == -1)
         {
          msgStr += 'Invalid Type File<br>';
@@ -190,7 +191,7 @@
         oFReader.readAsDataURL(files[0]);
         var f = files[0];
         var fsize = f.size||f.fileSize;
-        console.log(fsize);
+        // console.log(fsize);
 
         if(fsize > 2000000) // 2mb
         {
