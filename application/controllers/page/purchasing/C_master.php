@@ -98,7 +98,7 @@ class C_master extends Purchasing_Controler {
                     'Active' => 1,
                 );
                 $this->db->insert('db_purchasing.m_category_catalog', $dataSave);
-
+                echo json_encode(array('msg' => 'Saved','status' => 1));
                 break;
             case 'edit':
             $Name = $Input['Name'];
@@ -674,7 +674,7 @@ class C_master extends Purchasing_Controler {
             }
             
             $nestedData[] = $temp;
-            $nestedData[] = $row['NameCreated'];
+            $nestedData[] = $row['NameCreated'].'<br><span style = "color : red;">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
             $st = '';
             switch ($row['Approval']) {
               case 0:

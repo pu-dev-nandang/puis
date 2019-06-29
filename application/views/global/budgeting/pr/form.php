@@ -254,8 +254,8 @@
 				'</div>'+
 				'<div class="col-md-4">'+
 					'<div class="toolbar no-padding pull-right">'+
-					    '<span data-smt="" class="btn btn-add-new-pr" page = "form">'+
-					        '<i class="icon-plus"></i> New PR'+
+					    '<span data-smt="" class="btn btn-add-new-pr hide" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+					        '<i class="icon-plus"></i> Create New PR'+
 					   '</span>'+
 					'</div>'+
 				'</div>';
@@ -263,7 +263,7 @@
 
 		var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
 							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add Item</button>'+
 							'</div>'+
 						'</div>';
 
@@ -330,6 +330,9 @@
 		$(".SubTotal").maskMoney('mask', '9894');
 		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$(".UnitCost").maskMoney('mask', '9894');
+
+		$(".qty,.PPH").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		$(".qty,.PPH").maskMoney('mask', '9894');
 
 		// $('.datetimepicker').datetimepicker({
 		// 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
@@ -499,9 +502,11 @@
 						'<td>'+
 							'<textarea class = "form-control Need" rows = "2">'+Need+'</textarea>'+
 						'</td>'+
-						'<td><input type="number" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
+						// '<td><input type="number" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
+						'<td><input type="text" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
 						'<td><input type="text" class="form-control UnitCost" value="'+parseInt(pr_detail[i]['UnitCost'])+'" disabled></td>'+
-						'<td><input type="number" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
+						// '<td><input type="number" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
+						'<td><input type="text" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
 						'<td><input type="text" class="form-control SubTotal" disabled value = "'+parseInt(pr_detail[i]['SubTotal'])+'"></td>'+
 						'<td>'+
 							'<div class="input-group input-append date datetimepicker">'+
@@ -539,8 +544,8 @@
 					'</div>'+
 					'<div class="col-md-4">'+
 						'<div class="toolbar no-padding pull-right">'+
-						    '<span data-smt="" class="btn btn-add-new-pr" page = "form">'+
-						        '<i class="icon-plus"></i> New PR'+
+						    '<span data-smt="" class="btn btn-add-new-pr hide" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+						        '<i class="icon-plus"></i> Create New PR'+
 						   '</span>'+
 						'</div>'+
 					'</div>';
@@ -548,7 +553,7 @@
 
         var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
 							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add Item</button>'+
 							'</div>'+
 						'</div>';
 		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
@@ -808,6 +813,9 @@
 				}
 			}
 
+			// show button add new pr
+			$('.btn-add-new-pr').removeClass('hide');
+
 		}
 		else
 		{
@@ -913,9 +921,11 @@
 					'<td>'+
 						'<textarea class = "form-control Need" rows = "2"></textarea>'+
 					'</td>'+
-					'<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
+					// '<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
+					'<td><input type="text" min = "1" class="form-control qty"  value="1" disabled></td>'+
 					'<td><input type="text" class="form-control UnitCost" disabled></td>'+
-					'<td><input type="number" class="form-control PPH" value = "10"></td>'+
+					// '<td><input type="number" class="form-control PPH" value = "10"></td>'+
+					'<td><input type="text" class="form-control PPH" value = "10"></td>'+
 					'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
 					'<td>'+
 						'<div class="input-group input-append date datetimepicker">'+
@@ -931,7 +941,10 @@
         // $('.datetimepicker').datetimepicker({
         // 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
         // });
-        MakeAutoNumbering();        	
+        MakeAutoNumbering(); 
+        // qty & pph
+        $(".qty,.PPH").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+        $(".qty,.PPH").maskMoney('mask', '9894');       	
 	}
 
 	function MakeAutoNumbering()
