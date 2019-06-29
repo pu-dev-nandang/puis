@@ -1,14 +1,14 @@
-
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id ="PageImport">
 	<div class="well">
 		<div class="row">
 			<div class="col-md-2">
 				<label>Import</label>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<input type="file" data-style="fileinput" id="ImportFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsm">
 				<br>
-				<a href="<?php echo base_url('download_template/budgeting-catalog-m_catalog.xlsm') ?>">Template</a>
+				<!-- <a href="<?php echo base_url('download_template/budgeting-catalog-m_catalog.xlsm') ?>">Template</a> -->
+				<a href="javascript:void(0)" url = "<?php echo base_url('purchasing/template_export_catalog') ?>" id= "template_catalog">Template</a>
 			</div>
 			<div class="col-md-2">
 				<button class="btn btn-inverse" id = "sbmtimportfile">Import</button>
@@ -283,4 +283,11 @@
 		});
 
 	}); // exit document Function
+
+	$(document).off('click', '#template_catalog').on('click', '#template_catalog',function(e) {
+		var url = $(this).attr('url');
+		FormSubmitAuto(url, 'POST', [
+		    {},
+		]);
+	})
 </script>

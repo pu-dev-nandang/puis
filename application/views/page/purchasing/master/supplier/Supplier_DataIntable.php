@@ -11,6 +11,24 @@
 	    border: 1px solid #b7b7b7
 	}
 </style>
+<div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id ="PageImport">
+	<div class="well">
+		<div class="row">
+			<div class="col-md-2">
+				<label>Import</label>
+			</div>
+			<div class="col-md-3">
+				<input type="file" data-style="fileinput" id="ImportFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsm">
+				<br>
+				<a href="javascript:void(0)" url = "<?php echo base_url('purchasing/template_export_supplier') ?>" id= "template_supplier">Template</a>
+			</div>
+			<div class="col-md-2">
+				<button class="btn btn-inverse" id = "sbmtimportfile">Import</button>
+			</div>
+		</div>
+	</div>
+	
+</div>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
 	<div class="col-xs-12">
 		<div class="table-responsive">
@@ -222,4 +240,11 @@
 		});
 
 	}); // exit document Function
+
+	$(document).off('click', '#template_supplier').on('click', '#template_supplier',function(e) {
+		var url = $(this).attr('url');
+		FormSubmitAuto(url, 'POST', [
+		    {},
+		]);
+	})
 </script>

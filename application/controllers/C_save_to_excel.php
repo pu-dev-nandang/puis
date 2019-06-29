@@ -160,7 +160,8 @@ class C_save_to_excel extends CI_Controller
 //        $excel2->setActiveSheetIndex(0);
 //
 //        $excel3 = $excel2->getActiveSheet();
-        $excel3 =  new PHPExcel();;
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel3 =  new PHPExcel();
         $excel3->setCellValue('A2', 'Rekap Penerimaan & AGING ');
 
         // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
@@ -4703,5 +4704,149 @@ class C_save_to_excel extends CI_Controller
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
+    }
+
+    public function template_export_supplier()
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $this->load->model('master/m_master');
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/budgeting/supplier/m_supplier.xlsx'); // Empty Sheet
+        $excel = $excel2->createSheet(1); 
+        $excel->setTitle('CategorySupplier');
+        $excel2->setActiveSheetIndex(1);
+
+        $excel3 = $excel2->getActiveSheet();
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        // load data category supplier
+        $G_header = $this->m_master->getColumnTable('db_purchasing.m_categorysupplier');
+        $col = 0;
+        for ($i=0; $i < count($G_header['field']); $i++) {
+           $huruf = $this->m_master->HurufColExcelNumber($col); 
+           $excel3->setCellValue($huruf.'1', $G_header['field'][$i]);
+           $col++;
+        }
+
+        $G_data = $this->m_master->showData_array('db_purchasing.m_categorysupplier');
+        $row = 2;
+        for ($i=0; $i < count($G_data); $i++) { 
+            $dt = $G_data[$i];
+            $col = 0;
+            foreach ($dt as $key => $value) {
+                $huruf = $this->m_master->HurufColExcelNumber($col);
+                $excel3->setCellValue($huruf.$row, $value);
+                $col++; 
+            }
+            $row++;
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel2->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        $excel2->setActiveSheetIndex(0);
+        $excel3 = $excel2->getActiveSheet();
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename=template_import_supplier.xlsx'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
+    }
+
+    public function template_export_catalog()
+    {
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $this->load->model('master/m_master');
+        $objPHPExcel = new PHPExcel;
+        $sheet = $objPHPExcel->getActiveSheet();
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load('./uploads/budgeting/catalog/m_catalog.xlsx'); // Empty Sheet
+        $excel = $excel2->createSheet(1); 
+        // $excel->setTitle('CategorySupplier');
+        $excel2->setActiveSheetIndex(1);
+        $excel3 = $excel2->getActiveSheet();
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+          'alignment' => array(
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+          ),
+          'borders' => array(
+            'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+            'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+            'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+            'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+          )
+        );
+
+        // get All Department
+         $r = 2;
+        $excel3->setCellValue('B'.$r, 'ID');    
+        $excel3->setCellValue('C'.$r, 'Name');    
+        $excel3->setCellValue('D'.$r, 'Code');  
+
+        $arr_Department = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
+        $r = 3;
+        for ($i=0; $i < count($arr_Department); $i++) { 
+            $excel3->setCellValue('B'.$r, $arr_Department[$i]['Code']);    
+            $excel3->setCellValue('C'.$r, $arr_Department[$i]['Name2']);    
+            $excel3->setCellValue('D'.$r, $arr_Department[$i]['Abbr']);    
+            $r++;
+        }
+
+        $G_header = $this->m_master->getColumnTable('db_purchasing.m_category_catalog');
+        $r+= 3;
+        $col = 1;
+        for ($i=0; $i < count($G_header['field']); $i++) {
+           $huruf = $this->m_master->HurufColExcelNumber($col); 
+           $excel3->setCellValue($huruf.$r, $G_header['field'][$i]);
+           $col++;
+        }
+
+        $G_data = $this->m_master->showData_array('db_purchasing.m_category_catalog');
+        $row = $r+1;
+        for ($i=0; $i < count($G_data); $i++) { 
+            $dt = $G_data[$i];
+            $col = 1;
+            foreach ($dt as $key => $value) {
+                $huruf = $this->m_master->HurufColExcelNumber($col);
+                $excel3->setCellValue($huruf.$row, $value);
+                $col++; 
+            }
+            $row++;
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel2->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        $excel2->setActiveSheetIndex(0);
+        $excel3 = $excel2->getActiveSheet();
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
+        // We'll be outputting an excel file  
+        header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
+        // It will be called file.xlss
+        header('Content-Disposition: attachment; filename=template_import_catalog.xlsx'); // jalan ketika tidak menggunakan ajax
+        $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
 }
