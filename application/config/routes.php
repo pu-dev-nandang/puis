@@ -1407,6 +1407,9 @@ $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import_data_catalog';
+$route['purchasing/page/supplier/import_data'] = 'page/purchasing/c_master/import_data_supplier';
+
+
 $route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/allow_division_catalog';
 $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
@@ -1433,6 +1436,9 @@ $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 // global spb
 $route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
 
+// template import supplier
+$route['purchasing/template_export_supplier'] = 'c_save_to_excel/template_export_supplier';
+$route['purchasing/template_export_catalog'] = 'c_save_to_excel/template_export_catalog';
 
 
 // IT

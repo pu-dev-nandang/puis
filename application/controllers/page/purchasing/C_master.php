@@ -1057,6 +1057,7 @@ class C_master extends Purchasing_Controler {
             }
           }
           $DetailCatalog = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+          $ID_category_catalog = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
 
           $dataSave = array(
             'Item' => $Item,
@@ -1064,6 +1065,7 @@ class C_master extends Purchasing_Controler {
             'EstimaValue' => $EstimaValue,
             'Departement' => $Departement,
             'DetailCatalog' => $DetailCatalog,
+            'ID_category_catalog' => $ID_category_catalog,
             'Approval' => 1,
             'ApprovalAt' => date("Y-m-d H:i:s"),
             'ApprovalBy' => $this->session->userdata("NIP"),
@@ -1075,7 +1077,55 @@ class C_master extends Purchasing_Controler {
            $rs['status'] = 1;
         }
         echo json_encode($rs);
+      }
+    }
 
+    public function import_data_supplier()
+    {
+      $rs = array(
+          'status' => 0,
+          'msg' => '',
+      );
+      if(isset($_FILES["fileData"]["name"]))
+      { 
+        $path = $_FILES["fileData"]["tmp_name"];
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+        for ($i=2; $i < ($CountRow + 1); $i++) {
+          $CodeSupplier = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+          $NamaSupplier = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+          $PICName = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          $JabatanPIC = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+          $Alamat = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+          $Website = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          $NoTelp = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+          $NoHp = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
+          $CategorySupplier = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
+          $DetailItem = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
+  
+          $dataSave = array(
+            'CodeSupplier' => $CodeSupplier,
+            'NamaSupplier' => $NamaSupplier,
+            'PICName' => $PICName,
+            'JabatanPIC' => $JabatanPIC,
+            'Alamat' => $Alamat,
+            'Website' => $Website,
+            'NoTelp' => $NoTelp,
+            'NoHp' => $NoHp,
+            'CategorySupplier' => $CategorySupplier,
+            'DetailItem' => $DetailItem,
+            'Approval' => 1,
+            'CreatedBy' => $this->session->userdata('NIP'),
+            'CreatedAt' => date('Y-m-d'),
+          );
+
+          $this->db->insert('db_purchasing.m_supplier',$dataSave);
+           $rs['status'] = 1;
+        }
+        echo json_encode($rs);
       }
     }
 
