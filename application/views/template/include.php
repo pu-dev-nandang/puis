@@ -1717,6 +1717,7 @@
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
     }
+    // for text area
   
     $(document).on('blur','input[typeof=number][data-form=phone]',function () {
         var formPhone = $(this).val();

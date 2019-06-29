@@ -78,13 +78,25 @@
 					<label class="control-label">NoTelp</label>
 				</div>
 				<div class="col-xs-3">
-				   <input type="text" name="NoTelp" id= "NoTelp" placeholder="Input NoTelp" class="form-control">
+					<div class="input-group">
+						<span class="input-group-btn">
+							<button class="btn btn-default SearchPostBudget" type="button">+
+							</button>
+						</span>
+						<input type="text" name="NoTelp" id= "NoTelp" placeholder="Input NoTelp" class="form-control" value="62">
+					</div>
 				</div>
 				<div class="col-xs-1">
 					<label class="control-label">NoHp</label>
 				</div>
 				<div class="col-xs-3">
-				   <input type="text" name="NoHp" id= "NoHp" placeholder="Input NoHp" class="form-control">
+					<div class="input-group">
+						<span class="input-group-btn">
+							<button class="btn btn-default SearchPostBudget" type="button">+
+							</button>
+						</span>
+						<input type="text" name="NoHp" id= "NoHp" placeholder="Input NoHp" class="form-control" value="62">
+					</div>
 				</div>
 			</div>
 		</div>
@@ -170,6 +182,8 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		LoadFirst();
+		$('#NoTelp,#NoHp').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		$('#NoTelp,#NoHp').maskMoney('mask', '9894');
 	}); // exit document Function
 
 	function LoadFirst()
@@ -515,8 +529,8 @@
 				var PICName = $("#PICName").val();
 				var JabatanPIC = $("#Jabatan").val();
 				var Alamat = $("#Alamat").val();
-				var NoTelp = $("#NoTelp").val();
-				var NoHp = $("#NoHp").val();
+				var NoTelp = '+'+$("#NoTelp").val();
+				var NoHp = '+'+$("#NoHp").val();
 				var Website = $("#Website").val();
 				var CategorySupplier = $("#CategorySupplier").val();
 				var data = {
@@ -679,4 +693,5 @@
 		return arr;
 		
 	}
+
 </script>
