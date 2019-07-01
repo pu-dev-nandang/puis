@@ -60,6 +60,7 @@
 			<?php endif ?>
 	</div>
 	<?php if ($bool): ?>
+	<?php if ($this->session->userdata('IDdepartementNavigation') == 4): ?>
 	<div class="col-xs-2 col-md-offset-8">
 		<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">
             <span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">
@@ -67,6 +68,7 @@
            </span>
         </div>
 	</div>
+	<?php endif ?>
 	<?php endif ?>
 </div>
 <div id="DocPenawaran" class="row noPrint"></div>
@@ -244,12 +246,12 @@
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>PENANGGUNG JAWAB</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td><b>SERIAN WIJATNO & WIBOWO NGASERIN</b></td>'+
+											'<td><b>LILY B. PUTRI & WIBOWO NGASERIN</b></td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>JABATAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td><b>SEKRETARIS & KETUA YAYASAN</b></td>'+
+											'<td><b>WAKIL BENDAHARA & KETUA YAYASAN</b></td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>ALAMAT</b></td>'+
@@ -1212,6 +1214,20 @@
 	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
 		window.print();
 	})
+
+	// $(document).off('click', '#print_page').on('click', '#print_page',function(e) {
+	// 	// print pdf
+	// 	var url = base_url_js+'save2pdf/print/spk_or_po';
+	// 	var PRCode = $(this).attr('prcode');
+	// 	data = {
+	// 	  Code : ClassDt.Code,
+	// 	  type : 'spk',
+	// 	}
+	// 	var token = jwt_encode(data,"UAP)(*");
+	// 	FormSubmitAuto(url, 'POST', [
+	// 	    { name: 'token', value: token },
+	// 	]);
+	// })
 
 	$(document).off('click', '#btn_cancel').on('click', '#btn_cancel',function(e) {
 		if (confirm('Are you sure?')) {

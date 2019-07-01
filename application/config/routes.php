@@ -696,6 +696,8 @@ $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
 $route['save2pdf/print/tuitionFeeAdmission'] =  'C_save_to_pdf2/tuitionFeeAdmission';
 $route['save2pdf/PrintIDCard'] =  'c_save_to_pdf/PrintIDCard';
+$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
+$route['save2pdf/print/spk_or_po'] =  'C_save_to_pdf3/spk_or_po';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
@@ -1505,7 +1507,7 @@ $route['loginToAdminFaculty'] = 'c_login/loginToAdminFaculty';
 // general affair
 $route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
 $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
-$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
+
 
 // help
 $route['help'] =  'dashboard/C_dashboard/Help';
