@@ -76,7 +76,7 @@
                 <div class = "row">
                     <div id='LoadSubMenu'></div> 
                 </div>
-                <div class="row" id='LoadBtnSbmt'></div>
+                <div class="row" id='LoadBtnSbmt2'></div>
             </div>
         </div>
     </div>
@@ -572,7 +572,7 @@
 	function loadSubMenu_to_group()
 	{
 	    $("#LoadSubMenu").empty();
-	    $("#LoadBtnSbmt").empty();
+	    $("#LoadBtnSbmt2").empty();
 	    var value = $("#selectMenuUser").val();
 	    var GroupUser = $("#selectGroupuUser").val();
 
@@ -619,7 +619,7 @@
 	        var tmp2 = '</div>';
 	        $("#LoadSubMenu").html(tmp1+tbl1+isi+tbl2+tmp2);
 	        if (obj.length > 0) {
-	            $("#LoadBtnSbmt").html('<div class="col-xs-12" align = "right"><button class="btn btn-inverse btn-notification btn-approve  btn-write" id="btn-sbmt-user">Submit</button></div>');
+	            $("#LoadBtnSbmt2").html('<div class="col-xs-12" align = "right"><button class="btn btn-inverse btn-notification btn-approve  btn-write" id="btn-sbmt-user">Submit</button></div>');
 	        }
 	        if (obj.length == 0) {
 	            $("#LoadSubMenu").html('<br><p align="center">---No Result Data---</p>');
