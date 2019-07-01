@@ -72,18 +72,258 @@ class C_save_to_pdf3 extends CI_Controller {
         $token = $this->jwt->encode($data,$key);
         $G_data_po = $this->m_master->apiservertoserver(base_url().'rest2/__Get_data_po_by_Code',$token);
         $po_create = $G_data_po['po_create'];
+        $po_detail = $G_data_po['po_detail'];
         // $JobSpk = $po_create[0]['JobSpk'];
         // $aa =  nl2br($JobSpk);
-        $fpdf = new Pdf_mc_table('L', 'mm', 'A4');
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
         $fpdf->SetMargins(10,10,10,10);
         $fpdf->AddPage();
         $x = 10;
-        $y = 30;
+        $y = 35;
         $FontIsianHeader = 8;
         $FontIsian = 7;
 
-        $fpdf->SetFont('Arial','b',$FontIsianHeader);
-        $fpdf->Cell(0, 0, 'Notes From Finance : ', 0, 1, 'L', 0);
+        // Logo
+        $fpdf->Image('./images/YPAP_logo_L.png',10,10,160);
+        // Header
+        $fpdf->SetXY($x,$y);
+        $fpdf->SetFont('Arial','BU',12);
+        $fpdf->Cell(0,0, 'Surat Perintah Kerja', 0, 1, 'C', 0);
+        $fpdf->SetFont('Arial','B',$FontIsianHeader);
+        $fpdf->Cell(0, 10, $Code, 0, 1, 'C', 0);
+
+        // isi
+            // Create Terbilang
+            $data = array(
+                'Date' => $po_create[0]['CreatedAt'],
+                'auth' => 's3Cr3T-G4N', 
+            );
+            $key = "UAP)(*";
+            $token = $this->jwt->encode($data,$key);
+            $CreatedAt_terbilang  =$this->m_master->apiservertoserver(base_url().'rest2/__Get_spk_pembukaan',$token);
+            $fpdf->SetFont('Arial','',$FontIsian);
+            $fpdf->Cell(0, 10, $CreatedAt_terbilang[0], 0, 1, 'L', 0);
+
+            // Pemberi Tugas
+            $w_no = 15;
+            $border = 0; 
+            $w_col_tugas = 45;  
+            $w_col_titik2 = 5;  
+            $w_col_value = 75;
+            $h=6;
+            $y = 55;
+            $x +=5;
+            $fpdf->SetXY($x,$y); 
+            $fpdf->SetFillColor(255, 255, 255);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,$h,'I',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas,$h,'PEMBERI TUGAS',$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'NAMA PERUSAHAAN',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,'YAY PENDIDIKAN AGUNG PODOMORO',$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'PENANGGUNG JAWAB',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,'LILY B. PUTRI & WIBOWO NGASERIN',$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'JABATAN',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,'WAKIL BENDAHARA & KETUA YAYASAN',$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'ALAMAT',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,'Jl.S. Parman Kav 28, Tanjung Duren Selatan, Grogol Petamburan,Jakarta Barat',$border,1,'L',true);
+
+
+            // PIHAK PERTAMA
+            $x -=5;
+            $fpdf->SetFont('Arial','',$FontIsian);
+            $fpdf->Cell(37.5, 10, 'Yang selanjutnya disebut sebagai ', 0, 0, 'L', 0);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell(0, 10, 'PIHAK PERTAMA', 0, 1, 'L', 0);
+
+            // PENERIMA TUGAS
+            $x +=5;
+            $fpdf->SetX($x); 
+            $fpdf->SetFillColor(255, 255, 255);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,$h,'II',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas,$h,'PENERIMA TUGAS',$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'NAMA PERUSAHAAN',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,strtoupper($po_create[0]['NamaSupplier']),$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'PENANGGUNG JAWAB',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,strtoupper($po_create[0]['PICName']),$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'JABATAN',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,strtoupper($po_create[0]['JabatanPIC']),$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
+            $fpdf->Cell($w_col_tugas,$h,'ALAMAT',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,$h,strtoupper($po_create[0]['Alamat']),$border,1,'L',true);
+
+            // PIHAK KEDUA
+            $x -=5;
+            $fpdf->SetFont('Arial','',$FontIsian);
+            $fpdf->Cell(37.5, 10, 'Yang selanjutnya disebut sebagai ', 0, 0, 'L', 0);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell(0, 10, 'PIHAK KEDUA', 0, 1, 'L', 0);
+
+            // UNTUK MENGERJAKAN
+            $U_mengerjakan = $po_create[0]['JobSpk'];
+                if ($U_mengerjakan == '') {
+                    for ($i = 0; $i < count($po_detail); $i++) {
+                        if ( $i == count($po_detail) - 1) { // jika loop data terakhir
+                            if (count($po_detail) != 1) {
+                                $U_mengerjakan += ' dan '+$po_detail[$i]['Item'];
+                            }
+                            else
+                            {
+                                $U_mengerjakan += $po_detail[$i]['Item'];
+                            }
+                            
+                        }
+                        else if (i==0) { // data awal
+                            $U_mengerjakan += $po_detail[$i]['Item'];
+                        }
+                        else
+                        {
+                            $U_mengerjakan += ' , '+$po_detail[$i]['Item'];
+                        }
+
+                    }
+                }
+
+            $x +=5;
+            $fpdf->SetX($x); 
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,$h,'',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas,$h,'UNTUK MENGERJAKAN',$border,0,'L',true);
+            $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
+            // split untuk br
+            $__w = $w_no+$w_col_tugas+$w_col_titik2+$x;
+            $U_mengerjakan = nl2br($U_mengerjakan);
+            $__mengerjakan = function($U_mengerjakan,$__w,$w_col_value,$border,$fpdf,$FontIsian,$h)
+            {
+                $arr = explode('<br />', $U_mengerjakan);
+                for ($i=0; $i < count($arr); $i++) { 
+                   $fpdf->SetX($__w);
+                   $fpdf->SetFont('Arial','B',$FontIsian);
+                   $fpdf->Cell($w_col_value,$h,trim($arr[$i]),$border,1 ,'L',true);
+                }
+            };
+
+            $__mengerjakan($U_mengerjakan,$__w,$w_col_value,$border,$fpdf,$FontIsian,$h);
+            // end split untuk br
+
+            $fpdf->SetX($x);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,$h,'',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas,$h,'Deskripsi',$border,1,'L',true);
+
+            // table deskripsi
+              /*
+                first top border
+                last bottom border
+                else
+                LR
+              */
+                $w1 = 40;
+                $w2 = 15;
+                $w3 = 35;
+                $w4 = 15;
+                $w5 = 35;
+
+                $fpdf->SetX($x);
+                $fpdf->Cell($w_no,$h,'',$border,0,'L',true);
+                $fpdf->SetFont('Arial','',$FontIsian);
+                $fpdf->Cell($w1,$h,'','TRL',0,'L',true);
+                $fpdf->Cell($w2,$h,'Qty','TR',0,'L',true);
+                $fpdf->Cell($w3,$h,'UnitCost','TR',0,'L',true);
+                $fpdf->Cell($w4,$h,'PPN(%)','TR',0,'L',true);
+                $fpdf->Cell($w5,$h,'Total','TR',1,'L',true);
+
+                $total = 0;
+                for ($i=0; $i < count($po_detail); $i++) {
+                    $fpdf->SetX($x); 
+                    $fpdf->Cell($w_no,$h,'',$border,0,'L',true);
+                    $fpdf->Cell($w1,$h,$po_detail[$i]['Item'],'BRL',0,'L',true);
+                    $fpdf->Cell($w2,$h,$po_detail[$i]['QtyPR'],'BR',0,'L',true);
+                    $fpdf->Cell($w3,$h,'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),'BR',0,'L',true);
+                    $fpdf->Cell($w4,$h,(int)$po_detail[$i]['PPN_PO'],'BR',0,'L',true);
+                    $fpdf->Cell($w5,$h,'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),'BR',1,'L',true);
+                    $total += $po_detail[$i]['Subtotal'];
+                }
+
+            // $x -=5;
+            $fpdf->SetX($x); 
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,10,'',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas, 10, 'HARGA TOTAL', 0, 0, 'L', 0);
+            $fpdf->Cell($w_col_titik2,10,':',$border,0,'C',true);
+            $fpdf->Cell($w_col_value,10,'Rp '.number_format($total,2,',','.'),$border,1,'L',true);
+
+            $fpdf->SetX($x); 
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,10,'',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas, 5, 'CARA PEMBAYARAN', 0, 0, 'L', 0);
+            $fpdf->Cell($w_col_titik2,5,':',$border,0,'C',true);
+            $U_mengerjakan = nl2br($po_create[0]['Notes']);
+            $__mengerjakan($U_mengerjakan,$__w,$w_col_value,$border,$fpdf,$FontIsian,5);
+
+            $fpdf->SetX($x); 
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell($w_no,10,'',$border,0,'L',true);
+            $fpdf->Cell($w_col_tugas, 5, 'SYARAT - SYARAT', 0, 0, 'L', 0);
+            $fpdf->Cell($w_col_titik2,5,':',$border,0,'C',true);
+            $U_mengerjakan = nl2br($po_create[0]['Notes2']);
+            $__mengerjakan($U_mengerjakan,$__w,$w_col_value,$border,$fpdf,$FontIsian,5);
+            
+            // NO PR
+            $fpdf->SetFont('Arial','',$FontIsian);
+            $fpdf->Cell(37.5, 20, 'No.PR        :        '.$po_detail[0]['PRCode'], 0, 1, 'L', 0);
+
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell(135, 5, 'PIHAK I', 0, 0, 'L', 0);
+            $fpdf->Cell(37.5, 5, 'PIHAK II', 0, 1, 'L', 0);
+            $fpdf->Cell(135, 5, 'YAY PENDIDIKAN AGUNG PODOMORO', 0, 0, 'L', 0);
+            $fpdf->Cell(37.5, 5, strtoupper($po_create[0]['NamaSupplier']), 0, 1, 'L', 0);
+            $fpdf->SetFont('Arial','BU',$FontIsian);
+            $fpdf->ln(20);
+            $fpdf->Cell(135, 0, 'LILY B. PUTRI & WIBOWO NGASERIN', 0, 0, 'L', 0);
+            $fpdf->Cell(37.5, 0, strtoupper($po_create[0]['PICName']), 0, 1, 'L', 0);
+            $fpdf->SetFont('Arial','B',$FontIsian);
+            $fpdf->Cell(135, 5, 'WAKIL BENDAHARA & KETUA YAYASAN', 0, 0, 'L', 0);
+            $fpdf->Cell(37.5, 5, strtoupper($po_create[0]['JabatanPIC']), 0, 1, 'L', 0);
+
+            // footer
+            $y = 265;
+            $h = 2;
+            $fpdf->SetXY($x,$y);
+            $fpdf->SetFont('Arial','',$FontIsian);
+            $fpdf->Cell(180,$h,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28',0,1,'C');
+            $fpdf->Cell(180,$h,'Tlp: 021 292 00456 Fax: 021 292 00455',0,1,'C'); 
 
         $fpdf->Output($filename,'I');
         // print_r($G_data_po);die();

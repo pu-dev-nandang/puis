@@ -1211,23 +1211,23 @@
 
 	})
 
-	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
-		window.print();
-	})
-
 	// $(document).off('click', '#print_page').on('click', '#print_page',function(e) {
-	// 	// print pdf
-	// 	var url = base_url_js+'save2pdf/print/spk_or_po';
-	// 	var PRCode = $(this).attr('prcode');
-	// 	data = {
-	// 	  Code : ClassDt.Code,
-	// 	  type : 'spk',
-	// 	}
-	// 	var token = jwt_encode(data,"UAP)(*");
-	// 	FormSubmitAuto(url, 'POST', [
-	// 	    { name: 'token', value: token },
-	// 	]);
+	// 	window.print();
 	// })
+
+	$(document).off('click', '#print_page').on('click', '#print_page',function(e) {
+		// print pdf
+		var url = base_url_js+'save2pdf/print/spk_or_po';
+		var PRCode = $(this).attr('prcode');
+		data = {
+		  Code : ClassDt.Code,
+		  type : 'spk',
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 
 	$(document).off('click', '#btn_cancel').on('click', '#btn_cancel',function(e) {
 		if (confirm('Are you sure?')) {
