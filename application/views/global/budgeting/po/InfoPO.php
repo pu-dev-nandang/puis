@@ -49,13 +49,15 @@
 			<?php endif ?>
 	</div>
 	<?php if ($bool): ?>
-	<div class="col-xs-2 col-md-offset-8">
-		<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">
-            <span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">
-                <i class="icon-plus"></i> New PO / SPK
-           </span>
-        </div>
-	</div>
+	<?php if ($this->session->userdata('IDdepartementNavigation') == 4): ?>
+		<div class="col-xs-2 col-md-offset-8">
+			<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">
+	            <span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">
+	                <i class="icon-plus"></i> New PO / SPK
+	           </span>
+	        </div>
+		</div>
+	<?php endif ?>
 	<?php endif ?>
 </div>
 <div id="DocPenawaran" class="row noPrint"></div>

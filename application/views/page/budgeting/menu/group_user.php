@@ -609,7 +609,7 @@
 	            // var deletee = (obj[i]['delete'] == 1) ? '<input type="checkbox" name="chkPrevilegesUser" class = "chkPrevilegesUser" value="Delete" id-key= "'+obj[i]['ID']+'">&nbsp Delete' : '';
 
 	            isi += '<tr id-key= "'+obj[i]['ID']+'">'+
-	                        '<td>Submenu 1 :'+obj[i].SubMenu1+'</td>'+
+	                        '<td><input type = "checkbox"> '+'Submenu 1 :'+obj[i].SubMenu1+'</td>'+
 	                        '<td>Submenu 2 :'+obj[i].SubMenu2+'</td>'+
 	                        '<td>'+OPAction(obj[i]['write'])+'</td>'+
 	                    '</tr>'    
@@ -650,6 +650,7 @@
 				}).done(function() {
 				  $('#btn-sbmt-user').prop('disabled',false).html('Submit');
 				  loadSubMenu_to_group();
+				  loadDatamenuPrevilegesGroupUser();
 				  toastr.success('Saved');
 				}).fail(function() {
 				  toastr.error('The Database connection error, please try again', 'Failed!!');
@@ -666,13 +667,14 @@
 	{
 	    var allVals = [];
 	    $('#tbl_set_submenu tbody tr').each(function() {
-	       var data = {
-	            value : $(this).find('.actionCh_ option:selected').val(),
-	            ID : $(this).attr('id-key')
-	       };
-	       allVals.push(data);
+	    	if ($(this).find('input').is(':checked')) {
+	    		var data = {
+	    		     value : $(this).find('.actionCh_ option:selected').val(),
+	    		     ID : $(this).attr('id-key')
+	    		};
+	    		allVals.push(data);
+	    	}
 	    });
-
 	    return allVals;
 
 	}
@@ -723,7 +725,13 @@
 	                );
 	        }
 	    }).done(function() {
-	        LoaddataTableStandard('#MenuPrevilegesGroupUser');
+	        // LoaddataTableStandard('#MenuPrevilegesGroupUser');
+	        var table = $('#MenuPrevilegesGroupUser').DataTable({
+	            'iDisplayLength' : 10,
+	            'ordering' : true,
+	            // "sDom": "<'row'<'dataTables_header clearfix'<'col-md-3'l><'col-md-9'Tf>r>>t<'row'<'dataTables_footer clearfix'<'col-md-6'i><'col-md-6'p>>>", // T is new
+	        });
+	        S_Table_example_budget = table;
 	    })
 	}
 
@@ -745,6 +753,38 @@
 			    // jsonData = data_json;
 			    // var obj = JSON.parse(data_json); 
 			    // console.log(obj);
+			}).done(function() {
+			 	toastr.success('Saved');
+			}).fail(function() {
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+				thiss.prop('disabled',false).html('<i class="fa fa-floppy-o" aria-hidden="true"></i> '); 
+			}); 
+		}
+	    
+	});
+
+	$(document).on('click','.btn-delete-previleges', function (e) {
+		var thiss = $(this);
+		if (confirm('Are you sure ?')) {
+			thiss.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+			thiss.prop('disabled',true);
+			var ID = $(this).closest('tr').attr('id-key');
+			var url = base_url_js+'budgeting/menu/group_previleges/rud';
+			var data = {
+			            ID : ID,
+			            action : 'delete',
+			            };
+			var token = jwt_encode(data,"UAP)(*");          
+			$.post(url,{token:token},function (data_json) {
+			    // jsonData = data_json;
+			    // var obj = JSON.parse(data_json); 
+			    // console.log(obj);
+			   S_Table_example_budget
+			           .row( thiss.closest('tr') )
+			           .remove()
+			           .draw();
+			    loadSubMenu_to_group();
 			}).done(function() {
 			 	toastr.success('Saved');
 			}).fail(function() {

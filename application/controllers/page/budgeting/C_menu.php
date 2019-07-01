@@ -288,6 +288,11 @@ class C_menu extends Budgeting_Controler {
     			$this->db->where('ID',$ID);
     			$this->db->update('db_budgeting.cfg_rule_g_user',$t);
     			break;
+            case 'delete':
+                $ID = $Input['ID'];
+                $this->db->where('ID',$ID);
+                $this->db->delete('db_budgeting.cfg_rule_g_user');
+                break;    
     		default:
     			# code...
     			break;
