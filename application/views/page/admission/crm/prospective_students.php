@@ -4,12 +4,6 @@
         color: #333;
         background-color: #fff;
     }
-
-    input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {
-        cursor: not-allowed;
-        background-color: #ffffff;
-        color: #333;
-    }
 </style>
 
 <div class="row">
@@ -175,6 +169,7 @@
                                var sc = (adminPanel=='0' && sessionNIP==v2.NIP) ? 'selected' : '';
 
                                var allDisabled = (adminPanel=='0') ? 'disabled' : '';
+                               allDisabled = (sessionNIP!=v2.NIP) ? 'disabled' : '';
 
                                if(v2.Status=='1'){
                                    opt = opt+'<option style="color: blue;background: #f5f5f5;" value="'+v.ID+'.'+v2.NIP+'" '+sc+' '+allDisabled+'>(Co) '+v2.MemberName+'</option>';
@@ -262,7 +257,7 @@
                     MAID : MAID,
                     Name : formName,
                     Email : formEmail,
-                    Phone : formatPhone(formPhone),
+                    Mobile : formatPhone(formPhone),
                     LineID : formLineID,
                     NIP : arrTeam[1],
                     CreatedBy : sessionNIP
@@ -641,7 +636,7 @@
                 Class : formClass,
                 PathwayID : formPathwayID,
                 PlaceOfBirth : formPlaceOfBirth,
-                DateOfBirth : moment(formDateOfBirth).format('YYYY-MM-DD'),
+                DateOfBirth : (formDateOfBirth!='' && formDateOfBirth!=null) ? moment(formDateOfBirth).format('YYYY-MM-DD') : '',
                 Address : formAddress,
                 FatherName : formFatherName,
                 FatherEduLevel : formFatherEduLevel,
@@ -666,7 +661,7 @@
             if(dataFormAttch!='' && dataFormAttch!=null){
                 uploadDocumentPS(result);
             }
-
+            loadCRMData();
             toastr.success('Data saved','Success');
             setTimeout(function () {
                 $('#btnSaveFullPS').html('Save').prop('disabled',false);

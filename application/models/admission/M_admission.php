@@ -1030,6 +1030,7 @@ class M_admission extends CI_Model {
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
       $No_Ref = $input_arr['No_Ref'];
+
       if ($No_Ref == "") {
         $sql = 'select * from db_admission.formulir_number_offline_m order by No_Ref desc limit 1';
         $query=$this->db->query($sql, array())->result_array();
@@ -1045,11 +1046,43 @@ class M_admission extends CI_Model {
         }
       }
       $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$No_Ref);
+
+        // UPDATE STATUS crm
+        $this->db->reset_query();
+        $this->db->set('Status', 7);
+        $this->db->where('ID', $input_arr['ID_Crm']);
+        $this->db->update('db_admission.crm');
+        $this->db->reset_query();
+
       // print_r($input_arr);
     }
 
     public function editData_formulir_offline_sale_save($input_arr)
     {
+
+        // Get ID CRM to update status
+        $dataCRM = $this->db->select('ID_Crm')->get_where('db_admission.sale_formulir_offline',array(
+            'ID' => $input_arr['CDID']
+        ))->result_array();
+
+        $ID_CRM = (count($dataCRM)>0 && $dataCRM[0]['ID_Crm']!='' && $dataCRM[0]['ID_Crm']!=null)
+            ? $dataCRM[0]['ID_Crm']
+            : '';
+
+        if($ID_CRM!='' && $input_arr['ID_Crm']!=$ID_CRM){
+            $this->db->set('Status', 6);
+            $this->db->where('ID', $ID_CRM);
+            $this->db->update('db_admission.crm');
+            $this->db->reset_query();
+
+            $this->db->set('Status', 7);
+            $this->db->where('ID', $input_arr['ID_Crm']);
+            $this->db->update('db_admission.crm');
+            $this->db->reset_query();
+        }
+
+
+
       $FullName = strtolower($input_arr['Name']);
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
@@ -1071,7 +1104,7 @@ class M_admission extends CI_Model {
               'DateSale' => $input_arr['tanggal'],
               'UpdateAT' => date('Y-m-d'),
               'UpdatedBY' => $this->session->userdata('NIP'),
-              'ID_Crm' => $input['ID_Crm'],
+              'ID_Crm' => $input_arr['ID_Crm'],
       );
 
       $this->db->where('ID',$input_arr['CDID']);

@@ -248,7 +248,7 @@ class C_crm extends Admission_Controler {
         echo json_encode($msg);
     }
 
-    public function showdata_crm()
+    public function showdata_crm2()
     {
         $requestData= $_REQUEST;
         $where = ' where ID_Numbering LIKE "%'.$requestData['search']['value'].'%" or Candidate_Name LIKE "'.$requestData['search']['value'].'%" or Regional LIKE "'.$requestData['search']['value'].'%"
@@ -298,6 +298,63 @@ class C_crm extends Admission_Controler {
             "draw"            => intval( $requestData['draw'] ),
             "recordsTotal"    => intval($totalData),
             "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function showdata_crm(){
+        $requestData= $_REQUEST;
+
+        $orderBy = ' GROUP BY c.Name ASC ';
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( sc.ClassGroup LIKE "%'.$search.'%" 
+            OR mk.Name LIKE "%'.$search.'%"
+             OR mk.NameEng LIKE "%'.$search.'%"
+              OR em.Name LIKE "%'.$search.'%" ) ';
+        }
+
+        $queryDefault = 'SELECT c.*, s.SchoolName, r.RegionName, rms.SchoolMajor, cp.Year AS PeriodYear, em.Name AS PICName FROM db_admission.crm c 
+                                  LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID)
+                                  LEFT JOIN db_admission.region r ON (r.RegionID = s.CityID)
+                                  LEFT JOIN db_admission.register_major_school rms ON (rms.ID = c.PathwayID)
+                                  LEFT JOIN db_admission.crm_period cp ON (cp.ID = c.PeriodID)
+                                  LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                  WHERE c.Status = 6 '.$dataSearch.' '.$orderBy.' ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+
+            $dataDetail = '<textarea class="hide" id="det_'.$no.'">'.json_encode($row).'</textarea>';
+            $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div>'.$row['Name'].'<br/>'.$row['Phone'].' | '.$row['Email'].'</div>';
+            $nestedData[] = '<div>'.$row['SchoolName'].'<br/>'.$row['RegionName'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['SchoolMajor'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['Gender'].'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.$row['PeriodYear'].'</div>';
+            $nestedData[] = '<div>Ayah : '.$row['FatherName'].'<br/>Ibu : '.$row['MotherName'].'</div>';
+            $nestedData[] = '<div style="text-align: center;"><button class="btn btn-default btnShowDet" data-no="'.$no.'">Choose</button>'.$dataDetail.'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+        }
+
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
             "data"            => $data
         );
         echo json_encode($json_data);

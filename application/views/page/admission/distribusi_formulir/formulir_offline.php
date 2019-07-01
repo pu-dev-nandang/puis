@@ -66,8 +66,8 @@
     var url = base_url_js+'admission/distribusi-formulir/offline/LoadInputPenjualan';
     data = {
       action : action ,
-      ID : ID ,
-    }
+      ID : ID
+    };
     var token = jwt_encode(data,"UAP)(*");
     $.post(url,{token:token},function (resultJson) {
         var response = jQuery.parseJSON(resultJson);

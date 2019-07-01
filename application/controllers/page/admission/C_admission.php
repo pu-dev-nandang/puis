@@ -2095,8 +2095,12 @@ class C_admission extends Admission_Controler {
           $this->data['get2'] = $get2;
           $get3 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolID']);
           $get4 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolIDChanel']);
+
+          $getPICName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get1[0]['PIC']);
+
           $this->data['get3'] = (count($get3) > 0 ) ? $get3 : $get3 = array(array('SchoolName' => ''));
           $this->data['get4'] = (count($get4) > 0 ) ? $get4 : $get4 = array(array('SchoolName' => ''));
+          $this->data['PICName'] = (count($getPICName) > 0 ) ? $getPICName[0] : $getPICName = array('Name' => '');
           break;
         default:
           # code...

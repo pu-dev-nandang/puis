@@ -186,6 +186,10 @@
         bottom: 50% !important;
     }
 
+    .panel-primary>.panel-heading {
+        border-radius: 0px;
+    }
+
 
 </style>
 
@@ -982,7 +986,10 @@
 
                     var sc = (selected!='' && selected!=null && selected!=='undefined' && selected==v.ID)
                         ? 'selected' : '';
-                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+
+                    var dsc = (v.Status=='1') ? 'disabled' : '';
+
+                    $(element).append('<option value="'+v.ID+'" '+sc+' '+dsc+'>'+v.Description+'</option>');
 
                 });
             }
