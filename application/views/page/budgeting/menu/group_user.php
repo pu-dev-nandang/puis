@@ -176,7 +176,7 @@
 	        "destroy": true,
 	        "serverSide": true,
 	        "iDisplayLength" : 10,
-	        // "lengthMenu": [[10, 25, 50, 1000], [10, 25, 50, "All"]],
+	        "lengthMenu": [[10, 25, 50], [10, 25, 50]],
 	        "ordering" : false,
 	        "ajax":{
 	            url : base_url_js+"budgeting/config/getAuthDataTables", // json datasource
@@ -286,7 +286,7 @@
 	$(document).on('click','#btn-save-previleges-add', function () {
 	    loading_button('#btn-save-previleges-add');
 	    var NIP = temp__;
-	    var GroupUser = $("#selectGroupuUser").val();
+	    var GroupUser = $("#selectGroupuUser3").val();
 	    result = Validation_required(NIP,'The Name');
 	    if (result['status'] == 0) {
 	        toastr.error(result['messages'], 'Failed!!');
