@@ -125,10 +125,10 @@
                 '<tr>'+
                     '<th style="width: 106px;">Group Name</th>'+
                     '<th style="width: 106px;">Menu</th>'+
-                    '<th style="width: 15px;" class = "btn-edit">Sub Menu 1</th>'+
-                    '<th style="width: 15px;" class = "btn-edit">Sub Menu 2</th>'+
-                    '<th style="width: 15px;" class = "btn-edit">Akses</th>'+
-                    '<th style="width: 15px;" class = "btn-delete-menu-auth">Action</th>'+
+                    '<th style="width: 15px;">Sub Menu 1</th>'+
+                    '<th style="width: 15px;">Sub Menu 2</th>'+
+                    '<th style="width: 15px;">Akses</th>'+
+                    '<th style="width: 15px;">Action</th>'+
                 '</tr>'+
             '</thead>'+
             '<tbody>'+
@@ -139,8 +139,8 @@
             '<tr>'+
                 '<th style="width: 106px;">NIP</th>'+
                 '<th style="width: 106px;">Name</th>'+
-                '<th style="width: 15px;" class = "btn-edit">Group Previleges</th>'+
-                '<th style="width: 15px;" class = "btn-delete">Action</th>'+
+                '<th style="width: 15px;">Group Previleges</th>'+
+                '<th style="width: 15px;">Action</th>'+
             '</tr>'+
         '</thead>'+
         '<tbody>'+
@@ -176,6 +176,7 @@
 	        "destroy": true,
 	        "serverSide": true,
 	        "iDisplayLength" : 10,
+	        // "lengthMenu": [[10, 25, 50, 1000], [10, 25, 50, "All"]],
 	        "ordering" : false,
 	        "ajax":{
 	            url : base_url_js+"budgeting/config/getAuthDataTables", // json datasource
@@ -463,7 +464,6 @@
 	            $('#NotificationModal').modal('hide');
 	        }).done(function() {
 	          load_data_GroupPrevileges();
-	          loadSelectGroupUser();
 	          $('#NotificationModal').modal('hide');
 	        }).fail(function() {
 	          toastr.error('The Database connection error, please try again', 'Failed!!');
