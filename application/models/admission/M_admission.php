@@ -1054,6 +1054,7 @@ class M_admission extends CI_Model {
       );
       $this->db->insert('db_admission.sale_formulir_offline', $dataSave);
       $No_Ref = $input_arr['No_Ref'];
+
       if ($No_Ref == "") {
         $sql = 'select * from db_admission.formulir_number_offline_m order by No_Ref desc limit 1';
         $query=$this->db->query($sql, array())->result_array();
@@ -1069,11 +1070,43 @@ class M_admission extends CI_Model {
         }
       }
       $this->updateSellOUTFormulirOffline($input_arr['selectFormulirCode'],$No_Ref);
+
+        // UPDATE STATUS crm
+        $this->db->reset_query();
+        $this->db->set('Status', 7);
+        $this->db->where('ID', $input_arr['ID_Crm']);
+        $this->db->update('db_admission.crm');
+        $this->db->reset_query();
+
       // print_r($input_arr);
     }
 
     public function editData_formulir_offline_sale_save($input_arr)
     {
+
+        // Get ID CRM to update status
+        $dataCRM = $this->db->select('ID_Crm')->get_where('db_admission.sale_formulir_offline',array(
+            'ID' => $input_arr['CDID']
+        ))->result_array();
+
+        $ID_CRM = (count($dataCRM)>0 && $dataCRM[0]['ID_Crm']!='' && $dataCRM[0]['ID_Crm']!=null)
+            ? $dataCRM[0]['ID_Crm']
+            : '';
+
+        if($ID_CRM!='' && $input_arr['ID_Crm']!=$ID_CRM){
+            $this->db->set('Status', 6);
+            $this->db->where('ID', $ID_CRM);
+            $this->db->update('db_admission.crm');
+            $this->db->reset_query();
+
+            $this->db->set('Status', 7);
+            $this->db->where('ID', $input_arr['ID_Crm']);
+            $this->db->update('db_admission.crm');
+            $this->db->reset_query();
+        }
+
+
+
       $FullName = strtolower($input_arr['Name']);
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
@@ -2463,10 +2496,13 @@ class M_admission extends CI_Model {
 
     public function getDataPersonal($ID_register_formulir)
     {
+
       $sql = "select a.*,c.FormulirCode,d.ID_program_study,e.Name as NameProdyIND,e.NameEng as NameProdyEng from db_admission.register as a join db_admission.register_verification as b
+
               on a.ID = b.RegisterID join db_admission.register_verified as c on b.ID = c.RegVerificationID
               join db_admission.register_formulir as d on d.ID_register_verified = c.ID 
               join db_academic.program_study as e on d.ID_program_study = e.ID
+              LEFT JOIN db_admission.sale_formulir_offline AS sfo ON (sfo.FormulirCodeOffline = c.FormulirCode)
               where d.ID = ?
             ";
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();

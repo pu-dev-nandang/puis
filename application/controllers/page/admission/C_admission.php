@@ -1314,7 +1314,19 @@ class C_admission extends Admission_Controler {
           
           for ($i=0; $i < count($arrInputID); $i++) {
             $data = $this->m_master->caribasedprimary('db_admission.register_formulir','ID',$arrInputID[$i]);
+
+
             $data2 = $this->m_admission->getDataPersonal($arrInputID[$i]);
+
+            // Update Intake CRM
+              $ID_Crm = $data2[0]['ID_Crm'];
+              if($ID_Crm!=null && $ID_Crm!=0 && $ID_Crm!='' && $ID_Crm!='0'){
+                  $this->db->set('Status', 8);
+                  $this->db->where('ID', $ID_Crm);
+                  $this->db->update('db_admission.crm');
+                  $this->db->reset_query();
+              }
+
             $ProdiID = $data[0]['ID_program_study'];
             $aa = 1;
             $bb = 1;
@@ -2155,8 +2167,12 @@ class C_admission extends Admission_Controler {
           $this->data['get2'] = $get2;
           $get3 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolID']);
           $get4 = $this->m_master->caribasedprimary('db_admission.school','ID',$get1[0]['SchoolIDChanel']);
+
+          $getPICName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$get1[0]['PIC']);
+
           $this->data['get3'] = (count($get3) > 0 ) ? $get3 : $get3 = array(array('SchoolName' => ''));
           $this->data['get4'] = (count($get4) > 0 ) ? $get4 : $get4 = array(array('SchoolName' => ''));
+          $this->data['PICName'] = (count($getPICName) > 0 ) ? $getPICName[0] : $getPICName = array('Name' => '');
           break;
         default:
           # code...

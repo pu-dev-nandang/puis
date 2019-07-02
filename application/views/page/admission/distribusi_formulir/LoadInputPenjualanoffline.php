@@ -1,52 +1,55 @@
 <div class="row">
-	<div class="col-md-12">
-		<div class="panel panel-primary">
-	        <div class="panel-heading clearfix">
-	            <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Input Penjualan Formulir</h4>
-	        </div>
-	        <div class="panel-body">
-	           <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-	           		<div class="col-md-12">
-	           			<div class="panel panel-primary">
-	           			  <div class="panel-heading clearfix">
-	           			      <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Formulir</h4>
-	           			  </div>
-	           			  <div class="panel-body">
-           			  		<div class="form-group">
-           			  			<div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
-           			  				<div class="col-md-2">
-           			  					  <label>Formulir Code</label>
-           			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
-           			  				          <option></option>
-           			  				      </select>
-           			  				</div>
-           			  				<div class="col-md-2">
-           			  					  <label>Program Study 1</label>
-           			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
-           			  				          <option></option>
-           			  				      </select>
-           			  				</div>
-           			  				<div class="col-md-2">
-           			  				      <label>Program Study 2</label>
-           			  				      <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy2">
-           			  				          <option></option>
-           			  				      </select>
-           			  				</div>
-           			  				<div class="col-md-2">
-           			  				      <label>Tanggal</label>
-           			  				      <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
-           			  				</div>
-           			  				<div class="col-md-2">
-	           			  					<label>No Ref</label>
-	           			  					<select class="select2-select-00 col-md-4 full-width-fix" id="No_Ref">
-	           			  					    <option></option>
-	           			  					</select>
-           			  				</div>
-           			  				<div class="col-md-2">
-           			  					<label>From CRM</label>
-           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="0" checked>No
-           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="1"> Yes
-           			  					<div class="input-group hide" id = "SearchFromCrm">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading clearfix">
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Input Penjualan Formulir</h4>
+            </div>
+            <div class="panel-body">
+                <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                    <div class="col-md-12">
+
+
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading clearfix">
+                                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Formulir</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
+                                        <div class="col-md-2">
+                                            <label>Formulir Code</label>
+                                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectFormulirCode">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>Program Study 1</label>
+                                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>Program Study 2</label>
+                                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectProgramStudy2">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>Tanggal</label>
+                                            <input type="text" name="tanggal" id= "tanggal" data-date-format="yyyy-mm-dd" placeholder="Date..." class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>No Ref</label>
+                                            <select class="select2-select-00 col-md-4 full-width-fix" id="No_Ref">
+                                                <option></option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>From CRM</label>
+                                            <!--           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="0" checked>No-->
+                                            <!--           			  					<input type="checkbox" class="FromCrm" name="FromCrm" value="1"> Yes-->
+                                            <div class="input-group" id = "SearchFromCrm">
            			  					    <span class="input-group-addon" id = 'BtnSelectCRM'>
            			  					    	<i class="fa fa-search" aria-hidden="true"></i>
            			  					    </span>
@@ -903,4 +906,5 @@
 
 		  return true;
 		}
+
 </script>

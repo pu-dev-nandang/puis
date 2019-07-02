@@ -6304,6 +6304,21 @@ class C_api extends CI_Controller {
 
                     $this->db->where('ID', $ID);
                     $this->db->update($DB_Student.'.study_planning',$dataToUpdate);
+                    $this->db->reset_query();
+
+                    // get2Log
+                    $dataLog = $this->db->get_where($DB_Student.'.study_planning',
+                        array('ID' => $ID))->result_array();
+                    $ins = array(
+                        'NPM' => $dataLog[0]['NPM'],
+                        'SemesterID' => $dataLog[0]['SemesterID'],
+                        'ScheduleID' => $dataLog[0]['ScheduleID'],
+                        'Description' => json_encode($dataToUpdate),
+                        'UpdatedBy' => $this->session->userdata('NIP'),
+                    );
+                    $this->db->insert('db_academic.log_score', $ins);
+                    $this->db->reset_query();
+
                 }
 
                 return print_r(1);

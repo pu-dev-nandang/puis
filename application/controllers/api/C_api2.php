@@ -4378,7 +4378,7 @@ class C_api2 extends CI_Controller {
                 $row = $query[$i];
 
                 $btnBiru = ($btnedit=='1') ? '' : 'hide';
-                $btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit '.$btnBiru.'" data-id="'.$row['ID'].'"><i class="fa fa-edit"></i></button> 
+                $btnAct = '<button class="btn btn-sm btn-primary btnActCRMEdit hide '.$btnBiru.'" data-id="'.$row['ID'].'"><i class="fa fa-edit"></i></button> 
                                     <button class="btn btn-sm btn-danger btnActCRMRemovet hide" data-id="'.$row['ID'].'"><i class="fa fa-trash"></i></button> 
                                     <button class="btn btn-sm btn-default btnFullForm" data-id="'.$row['ID'].'">Full Form</button>';
 
