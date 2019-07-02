@@ -25,9 +25,11 @@
 				<tr>
 					<th>Tahun</th>
 					<th>Formulir Code</th>
+					<th>No Ref</th>
 					<th style="width: 100px;">Activated by Candidate</th>
 					<th>Nama Candidate</th>
 					<th>Email</th>
+					<th>Phone</th>
 					<th>Sekolah</th>
 				</tr>
 			</thead>
@@ -36,6 +38,7 @@
 							 <tr>
 							 	<td><?php echo $datadb[$i]['Years'] ?></td>
 							 	<td><?php echo $datadb[$i]['FormulirCode'] ?></td>
+							 	<td><?php echo $datadb[$i]['No_Ref'] ?></td>
 							 	<?php if ($datadb[$i]['StatusUsed'] == 0): ?>
 							 		<?php $status_used = '<td style="color:  green;">No</td>'; ?>
 							 	<?php else: ?>
@@ -44,6 +47,7 @@
 							 	<?php echo $status_used ?>
 							 	<td><?php echo $datadb[$i]['NameCandidate'] ?></td>
 							 	<td><?php echo $datadb[$i]['Email'] ?></td>
+							 	<td><?php echo ($datadb[$i]['Phone'] != '') ? '+'.$datadb[$i]['Phone'] : '' ?></td>
 							 	<td><?php echo $datadb[$i]['SchoolName'] ?></td>
 							 </tr>
 				<?php endfor; ?>

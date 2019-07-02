@@ -27,6 +27,29 @@ class C_master extends Purchasing_Controler {
         $this->temp($content);
     }
 
+    public function InputCategory()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function InputCategory_FormInput()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        $this->data['action'] = $Input['action'];
+        if ($Input['action'] == 'edit') {
+            $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_category_catalog','ID',$Input['ID']);
+        }
+
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/FormInputCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+
     public function InputCatalog()
     {
         $this->auth_ajax();
@@ -42,6 +65,13 @@ class C_master extends Purchasing_Controler {
         $this->data['action'] = $Input['action'];
         if ($Input['action'] == 'edit') {
             $this->data['get'] = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$Input['ID']);
+            $__Depart= $this->m_master->caribasedprimary('db_purchasing.m_catalog_division','ID_m_catalog',$Input['ID']);
+            for ($i=0; $i < count($__Depart); $i++) { 
+              $__G_name = $this->m_budgeting->SearchDepartementBudgeting2($__Depart[$i]['Departement']);
+              $__Depart[$i]['Name'] = $__G_name[0]['NameDepartement'];
+              $__Depart[$i]['Code'] = $__G_name[0]['ID'];
+            }
+            $this->data['AssignDepart'] = $__Depart;
 
             // lock beberapa field untuk tidak bisa diedit
                 $sql = 'select * from db_budgeting.pr_detail where ID_m_catalog = ? limit 1';
@@ -54,6 +84,48 @@ class C_master extends Purchasing_Controler {
         echo json_encode($arr_result);
     }
 
+    public function InputCatalog_saveFormInput_category()
+    {
+        $this->auth_ajax();
+        $Input = $this->getInputToken();
+        switch ($Input['Action']) {
+            case 'add':
+            $Name = $Input['Name'];
+            $Days = $Input['Days'];
+                $dataSave = array(
+                    'Name' => $Name,
+                    'Days' => $Days,
+                    'Active' => 1,
+                );
+                $this->db->insert('db_purchasing.m_category_catalog', $dataSave);
+                echo json_encode(array('msg' => 'Saved','status' => 1));
+                break;
+            case 'edit':
+            $Name = $Input['Name'];
+            $Days = $Input['Days'];
+                $dataSave = array(
+                    'Name' => $Name,
+                    'Days' => $Days,
+                    'Active' => 1,
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_purchasing.m_category_catalog', $dataSave);
+                echo json_encode(array('msg' => 'Saved','status' => 1));
+                break;
+            case 'status':
+                $dataSave = array(
+                    'Active' => $Input['Active'],
+                );
+                $this->db->where('ID', $Input['ID']);
+                $this->db->update('db_purchasing.m_category_catalog', $dataSave);
+                echo json_encode(array(''));
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
     public function InputCatalog_saveFormInput()
     {
         $this->auth_ajax();
@@ -64,6 +136,9 @@ class C_master extends Purchasing_Controler {
         $Departement = $Input['Departement'];
         $Detail = $Input['Detail'];
         $Detail = json_encode($Detail);
+        if (array_key_exists('ID_category_catalog', $Input)) {
+          $ID_category_catalog = $Input['ID_category_catalog'];
+        }
 
         $filename = $Input['Item'].'_Uploaded';
         $filename = str_replace(" ", '_', $filename);
@@ -79,6 +154,7 @@ class C_master extends Purchasing_Controler {
                            'Item' => $Item,
                            'Desc' => $Desc,
                            'EstimaValue' => $EstimaValue,
+                           'ID_category_catalog' => $ID_category_catalog,
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
@@ -87,8 +163,22 @@ class C_master extends Purchasing_Controler {
                            'Approval' => 1,
                            'ApprovalBy' => $this->session->userdata('NIP'),
                            'ApprovalAt' => date('Y-m-d H:i:s'),
+                           'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
                        $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                       // get last insert  id
+                         $insert_id = $this->db->insert_id();
+                         // assign department
+                         $listDepartmentSelected = $Input['listDepartmentSelected'];
+                         for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                           $Departement__ = $listDepartmentSelected[$i];
+                           $dataSave__ =array(
+                            'ID_m_catalog' => $insert_id,
+                            'Departement' => $Departement__,
+                           );
+                           $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                         }
+
                        echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
@@ -101,6 +191,7 @@ class C_master extends Purchasing_Controler {
                         'Item' => $Item,
                         'Desc' => $Desc,
                         'EstimaValue' => $EstimaValue,
+                        'ID_category_catalog' => $ID_category_catalog,
                         'Photo' => '',
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
@@ -109,8 +200,22 @@ class C_master extends Purchasing_Controler {
                         'Approval' => 1,
                         'ApprovalBy' => $this->session->userdata('NIP'),
                         'ApprovalAt' => date('Y-m-d H:i:s'),
+                        'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
                     $this->db->insert('db_purchasing.m_catalog', $dataSave);
+                    // get last insert  id
+                      $insert_id = $this->db->insert_id();
+                      // assign department
+                      $listDepartmentSelected = $Input['listDepartmentSelected'];
+                      for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                        $Departement__ = $listDepartmentSelected[$i];
+                        $dataSave__ =array(
+                         'ID_m_catalog' => $insert_id,
+                         'Departement' => $Departement__,
+                        );
+                        $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                      }
+
                     echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
 
@@ -131,6 +236,7 @@ class C_master extends Purchasing_Controler {
                            'Item' => $Item,
                            'Desc' => $Desc,
                            'EstimaValue' => $EstimaValue,
+                           'ID_category_catalog' => $ID_category_catalog,
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
@@ -139,6 +245,22 @@ class C_master extends Purchasing_Controler {
                        );
                        $this->db->where('ID', $Input['ID']);
                        $this->db->update('db_purchasing.m_catalog', $dataSave);
+
+                       // assign department
+                       $listDepartmentSelected = $Input['listDepartmentSelected'];
+                       // delete first and insert again
+                       $this->db->where('ID_m_catalog',$Input['ID']);
+                       $this->db->delete('db_purchasing.m_catalog_division');
+                       // insert
+                       for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                         $Departement__ = $listDepartmentSelected[$i];
+                         $dataSave__ =array(
+                          'ID_m_catalog' => $Input['ID'],
+                          'Departement' => $Departement__,
+                         );
+                         $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                       }
+
                        echo json_encode(array('msg' => 'Saved','status' => 1));
                    }
                    else
@@ -151,6 +273,7 @@ class C_master extends Purchasing_Controler {
                         'Item' => $Item,
                         'Desc' => $Desc,
                         'EstimaValue' => $EstimaValue,
+                        'ID_category_catalog' => $ID_category_catalog,
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
                         'LastUpdateBy' => $this->session->userdata('NIP'),
@@ -158,6 +281,22 @@ class C_master extends Purchasing_Controler {
                     );
                     $this->db->where('ID', $Input['ID']);
                     $this->db->update('db_purchasing.m_catalog', $dataSave);
+
+                    // assign department
+                    $listDepartmentSelected = $Input['listDepartmentSelected'];
+                    // delete first and insert again
+                    $this->db->where('ID_m_catalog',$Input['ID']);
+                    $this->db->delete('db_purchasing.m_catalog_division');
+                    // insert
+                    for ($i=0; $i < count($listDepartmentSelected); $i++) { 
+                      $Departement__ = $listDepartmentSelected[$i];
+                      $dataSave__ =array(
+                       'ID_m_catalog' => $Input['ID'],
+                       'Departement' => $Departement__,
+                      );
+                      $this->db->insert('db_purchasing.m_catalog_division', $dataSave__);
+                    }
+
                     echo json_encode(array('msg' => 'Saved','status' => 1));
                 }
                 break;
@@ -186,7 +325,11 @@ class C_master extends Purchasing_Controler {
                         for ($i=0; $i < count($F); $i++) { 
                             unlink($path.$F[$i]);
                         }
-                  
+
+                  // delete m_catalog_division
+                  $this->db->where('ID_m_catalog',$Input['ID']);
+                  $this->db->delete('db_purchasing.m_catalog_division');
+
                   echo json_encode(array(''));
                 }
                 else
@@ -200,6 +343,7 @@ class C_master extends Purchasing_Controler {
                     'ApprovalBy' => $this->session->userdata('NIP'),
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                     'Reason' => '',
+                    'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_catalog', $dataSave);
@@ -211,6 +355,7 @@ class C_master extends Purchasing_Controler {
                     'ApprovalBy' => $this->session->userdata('NIP'),
                     'ApprovalAt' => date('Y-m-d H:i:s'),
                     'Reason' => $Input['Reason'],
+                    'LastUpdateAt' => date('Y-m-d H:i:s'),
                 );
                 $this->db->where('ID', $Input['ID']);
                 $this->db->update('db_purchasing.m_catalog', $dataSave);
@@ -288,6 +433,15 @@ class C_master extends Purchasing_Controler {
         echo json_encode($arr_result);
     }
 
+    public function Catalog_DataIntableCategory($action = "All")
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $this->data['action'] = $action;
+        $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/Catalog_DataIntableCategory',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
     public function allow_division_catalog()
     {
       $this->auth_ajax();
@@ -349,6 +503,80 @@ class C_master extends Purchasing_Controler {
 
     }
 
+    public function Catalog_DataIntableCategory_server_side()
+    {
+        $this->auth_ajax();
+        $action = $this->input->post('action');
+        $condition = '';
+        if ($action == 'All') {
+           $condition = '';
+        }
+        elseif ($action == 'non_approval') {
+            $condition = ' where Active = '.$action;
+        }
+
+        $requestData= $_REQUEST;
+        $sql = 'select count(*) as total from db_purchasing.m_category_catalog '.$condition;
+        $query = $this->db->query($sql)->result_array();
+        $totalData = $query[0]['total'];
+        $No = $requestData['start'] + 1;
+
+        if ($action == 'All') {
+           $condition = '';
+        }
+        elseif ($action == 'non_approval') {
+            $condition = ' and Active = '.$action;
+        }
+
+        $sql = 'select * from db_purchasing.m_category_catalog 
+               ';
+
+        $sql.= ' where ( Name LIKE "'.$requestData['search']['value'].'%" ) '.$condition;
+        $sql.= ' ORDER BY ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['Name'];
+            $nestedData[] = '<div align = "center">'.$row['Days'].'</div>';
+            $nestedData[] = ($row['Active'] == 1 ) ? '<div align = "center">'.'Active'.'</div>' : '<div align = "center">'.'Not Active'.'</div>';
+            
+            if ($action == 'All') {
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog-category" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+
+            }
+            else
+            {
+                $btn = '';
+            }
+
+            if ($row['Active'] == 1) {
+              $btn .= '&nbsp<button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'" active = "0"> <i class="fa fa-trash" aria-hidden="true"></i> Set Not Active</button>';
+            }
+            else
+            {
+              $btn .= '&nbsp<button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'" active = "1"> <i class="fa fa-trash" aria-hidden="true"></i> Set Active</button>';
+            }
+            
+            $nestedData[] = $btn;
+            $nestedData[] = $row['Active'];
+            $nestedData[] = $row['Days'];
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
     public function Catalog_DataIntable_server_side()
     {
         $this->auth_ajax();
@@ -367,19 +595,23 @@ class C_master extends Purchasing_Controler {
         $totalData = $query[0]['total'];
         $No = $requestData['start'] + 1;
 
-        $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement
-                from db_purchasing.m_catalog as a 
+        $sql = 'select a.*,b.Name as NameCreated,c.NameDepartement,mcc.Name as NameCategory
+                from db_purchasing.m_catalog as a
+                join db_purchasing.m_category_catalog as mcc on mcc.ID = a.ID_category_catalog 
                 join db_employees.employees as b on a.CreatedBy = b.NIP
                 join (
                 select * from (
-                select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study
+                select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",NameEng)  as NameDepartement from db_academic.program_study
                 UNION
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement from db_academic.faculty
                 ) aa
                 ) as c on a.Departement = c.ID
                ';
 
         $sql.= ' where ( a.Item LIKE "'.$requestData['search']['value'].'%" or a.Desc LIKE "'.$requestData['search']['value'].'%" or c.NameDepartement LIKE "'.$requestData['search']['value'].'%" or a.DetailCatalog LIKE "%'.$requestData['search']['value'].'%"
+          or mcc.Name LIKE "'.$requestData['search']['value'].'%"
                 ) and a.Active = 1 '.$condition;
         $sql.= ' ORDER BY a.ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
         $query = $this->db->query($sql)->result_array();
@@ -389,7 +621,7 @@ class C_master extends Purchasing_Controler {
             $nestedData=array();
             $row = $query[$i];
             $nestedData[] = $No;
-            $nestedData[] = $row['Item'];
+            $nestedData[] = $row['Item'].'<br><span style = "color : red" >'.$row['NameCategory'].'</span>';
             $nestedData[] = $row['Desc'];
             $EstimaValue = $row['EstimaValue'];
             $EstimaValue = 'Rp '.number_format($EstimaValue,2,',','.');
@@ -410,7 +642,15 @@ class C_master extends Purchasing_Controler {
                 $htmlPhoto = '';
             }
             $nestedData[] = $htmlPhoto;
-            $nestedData[] = $row['NameDepartement'];
+
+            $btnViewDepart = '';
+            // $__G_data = $this->m_master->caribasedprimary('db_purchasing.m_catalog_division','ID_m_catalog',$row['ID']);
+            // if (count($__G_data) > 0) {
+            //   $btnViewDepart = '<button class = "btn btn-default btnViewDepart" rowid = "'.$row['ID'].'">Another</button>';
+            // }
+
+            // $nestedData[] = '<div align = "center" >'.$row['NameDepartement'].'<br>'.$btnViewDepart.'</div>';
+            $nestedData[] = '<div align = "center" >'.$row['NameDepartement'].'</div>';
             $DetailCatalog = $row['DetailCatalog'];
             $DetailCatalog = json_decode($DetailCatalog);
             $temp = '';
@@ -434,11 +674,11 @@ class C_master extends Purchasing_Controler {
             }
             
             $nestedData[] = $temp;
-            $nestedData[] = $row['NameCreated'];
+            $nestedData[] = $row['NameCreated'].'<br><span style = "color : red;">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
             $st = '';
             switch ($row['Approval']) {
               case 0:
-                $st = 'Not Approval';
+                $st = 'Awaiting Approval';
                 break;
               case 1:
                 $st = 'Approve';
@@ -510,6 +750,7 @@ class C_master extends Purchasing_Controler {
         $Msg = '';
         $NamaSupplier = $Input['NamaSupplier'];
         $PICName = $Input['PICName'];
+        $JabatanPIC = $Input['JabatanPIC'];
         $Alamat = $Input['Alamat'];
         $Website = $Input['Website'];
         $NoTelp = $Input['NoTelp'];
@@ -546,6 +787,7 @@ class C_master extends Purchasing_Controler {
                        'CodeSupplier' => $CodeSupplier,
                        'NamaSupplier' => trim(ucwords($NamaSupplier)),
                        'PICName' => trim(ucwords($PICName)),
+                       'JabatanPIC' => trim(ucwords($JabatanPIC)),
                        'Alamat' => trim($Alamat),
                        'Website' => trim($Website),
                        'NoTelp' => trim($NoTelp),
@@ -569,6 +811,7 @@ class C_master extends Purchasing_Controler {
                    'CodeSupplier' => $CodeSupplier,
                    'NamaSupplier' => trim(ucwords($NamaSupplier)),
                    'PICName' => trim(ucwords($PICName)),
+                   'JabatanPIC' => trim(ucwords($JabatanPIC)),
                    'Alamat' => trim($Alamat),
                    'Website' => trim($Website),
                    'NoTelp' => trim($NoTelp),
@@ -717,7 +960,7 @@ class C_master extends Purchasing_Controler {
             // $nestedData[] = $row['Website'];
             // $nestedData[] = $row['PICName'];
             // $nestedData[] = $row['Alamat'];
-            $nestedData[] = $row['NoTelp'].' & '.$row['NoHp'];
+            $nestedData[] = 'Telp : '.$row['NoTelp'].' <br> Hp : '.$row['NoHp'];
             $nestedData[] = $row['CategoryName'];
             
             $DetailInfo = $row['DetailInfo'];
@@ -814,6 +1057,7 @@ class C_master extends Purchasing_Controler {
             }
           }
           $DetailCatalog = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+          $ID_category_catalog = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
 
           $dataSave = array(
             'Item' => $Item,
@@ -821,6 +1065,7 @@ class C_master extends Purchasing_Controler {
             'EstimaValue' => $EstimaValue,
             'Departement' => $Departement,
             'DetailCatalog' => $DetailCatalog,
+            'ID_category_catalog' => $ID_category_catalog,
             'Approval' => 1,
             'ApprovalAt' => date("Y-m-d H:i:s"),
             'ApprovalBy' => $this->session->userdata("NIP"),
@@ -832,7 +1077,55 @@ class C_master extends Purchasing_Controler {
            $rs['status'] = 1;
         }
         echo json_encode($rs);
+      }
+    }
 
+    public function import_data_supplier()
+    {
+      $rs = array(
+          'status' => 0,
+          'msg' => '',
+      );
+      if(isset($_FILES["fileData"]["name"]))
+      { 
+        $path = $_FILES["fileData"]["tmp_name"];
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
+        $excel2 = $excel2->load($path); // Empty Sheet
+        $objWorksheet = $excel2->setActiveSheetIndex(0);
+        $CountRow = $objWorksheet->getHighestRow();
+        for ($i=2; $i < ($CountRow + 1); $i++) {
+          $CodeSupplier = $objWorksheet->getCellByColumnAndRow(0, $i)->getCalculatedValue();
+          $NamaSupplier = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
+          $PICName = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
+          $JabatanPIC = $objWorksheet->getCellByColumnAndRow(3, $i)->getCalculatedValue();
+          $Alamat = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
+          $Website = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          $NoTelp = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
+          $NoHp = $objWorksheet->getCellByColumnAndRow(7, $i)->getCalculatedValue();
+          $CategorySupplier = $objWorksheet->getCellByColumnAndRow(8, $i)->getCalculatedValue();
+          $DetailItem = $objWorksheet->getCellByColumnAndRow(9, $i)->getCalculatedValue();
+  
+          $dataSave = array(
+            'CodeSupplier' => $CodeSupplier,
+            'NamaSupplier' => $NamaSupplier,
+            'PICName' => $PICName,
+            'JabatanPIC' => $JabatanPIC,
+            'Alamat' => $Alamat,
+            'Website' => $Website,
+            'NoTelp' => $NoTelp,
+            'NoHp' => $NoHp,
+            'CategorySupplier' => $CategorySupplier,
+            'DetailItem' => $DetailItem,
+            'Approval' => 1,
+            'CreatedBy' => $this->session->userdata('NIP'),
+            'CreatedAt' => date('Y-m-d'),
+          );
+
+          $this->db->insert('db_purchasing.m_supplier',$dataSave);
+           $rs['status'] = 1;
+        }
+        echo json_encode($rs);
       }
     }
 

@@ -4,13 +4,25 @@
 			<div class="form-group">
 				<div class="row">
 					<div class="col-xs-2">
-					    <label class="control-label">For Departement</label>
+					    <label class="control-label">For Department</label>
 					</div>
 					<div class="col-xs-3">
 						<select class="select2-select-00 full-width-fix" id="Departement">
 						     <!-- <option></option> -->
 						 </select>
+					</div>
+					<div class="col-xs-2">
+					    <label class="control-label">Description</label>
+					</div>    
+					<div class="col-xs-3">
+					   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
+					   <span id="charsDesc">50</span> characters remaining
 					</div>	 
+					
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="row">
 					<div class="col-xs-2">
 					    <label class="control-label">Item Name</label>
 					</div>    
@@ -18,22 +30,23 @@
 					   <input type="text" name="ItemName" id= "ItemName" placeholder="Input ItemName" class="form-control" maxlength="35">
 					   <span id="charsItemName">35</span> characters remaining
 					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<div class="row">
-					<div class="col-xs-2">
-					    <label class="control-label">Description</label>
-					</div>    
-					<div class="col-xs-3">
-					   <input type="text" name="Desc" id= "Desc" placeholder="Input Desc" class="form-control" maxlength="50">
-					   <span id="charsDesc">50</span> characters remaining
-					</div>
 					<div class="col-xs-2">
 					    <label class="control-label">Est Value</label>
 					</div> 
 					<div class="col-xs-3">
 					   <input type="text" name="EstValue" id= "EstValue" class="form-control">
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="row">
+					<div class="col-xs-2">
+					    <label class="control-label">Category</label>
+					</div> 
+					<div class="col-xs-3">
+						<select class="select2-select-00 full-width-fix" id="CategoryCatalog">
+						     <!-- <option></option> -->
+						 </select>
 					</div>
 				</div>
 			</div>
@@ -72,6 +85,10 @@
 				<div class="row">
 					<div class="col-md-3 col-md-offset-9">
 						<button type="button" id="btnSaveForm" class="btn btn-success" action = "">Save</button>
+						<!-- &nbsp
+						 <span data-smt="" class="btn btn-add-new-catalog" page = "entry_catalog">
+						     <i class="icon-plus"></i> New Catalog
+						</span> -->
 					</div>
 				</div>
 			</div>
@@ -101,6 +118,7 @@
 		})
 
 		getAllDepartementPU();
+		getCategoryCatalog();
 		ClickFunctionAdd();
 		ClickFunctionBtnSave();
 		$('#EstValue').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
@@ -228,6 +246,34 @@
 	    	 }).prop("selected", true);
 	    	$("#Departement").prop('disabled',true);
 	    	$('#Departement').select2({
+	    	   //allowClear: true
+	    	});
+	    <?php endif ?>
+
+	  })
+	}
+
+	function getCategoryCatalog()
+	{
+	  var url = base_url_js+"rest2/__getCategoryCatalog/1";
+	  $('#CategoryCatalog').empty();
+	  $.post(url,function (data_json) {
+	    for (var i = 0; i < data_json.length; i++) {
+	        var selected = (i==0) ? 'selected' : '';
+	        $('#CategoryCatalog').append('<option value="'+ data_json[i]['ID']  +'" '+selected+'>'+data_json[i]['Name']+'</option>');
+	    }
+	   
+	    $('#CategoryCatalog').select2({
+	       //allowClear: true
+	    });
+
+	    <?php if ($action == 'edit'): ?>
+	    	$("#CategoryCatalog option").filter(function() {
+	    	   //may want to use $.trim in here
+	    	   return $(this).val() == '<?php echo $get[0]['ID_category_catalog'] ?>'; 
+	    	 }).prop("selected", true);
+
+	    	$('#CategoryCatalog').select2({
 	    	   //allowClear: true
 	    	});
 	    <?php endif ?>
@@ -384,6 +430,7 @@
 		                Item : $("#ItemName").val(),
 		                Desc : $("#Desc").val(),
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
+		                ID_category_catalog : $('#CategoryCatalog').val(),
 		                user : "<?php echo $this->session->userdata('NIP') ?>",
 		                <?php if ($action == 'edit'): ?>
 		                	ID : "<?php echo $get[0]['ID'] ?>",

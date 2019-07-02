@@ -8,6 +8,11 @@
        background-color:#71d1eb !important;
        cursor: pointer;
     }
+
+    #table_input_pr {
+        width:1700px;
+        overflow: auto;
+    }
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
@@ -78,6 +83,8 @@
 
     function LoadPage(page)
     {
+        // change page & 
+
         loading_page("#pageContent");
         var url = base_url_js+'budgeting/page_pr/'+page;
         $.post(url,function (resultJson) {
@@ -91,6 +98,14 @@
             
         }); // exit spost
     }
+
+    $(document).off('click', '.btn-add-new-pr').on('click', '.btn-add-new-pr',function(e) {
+        var Page = $(this).attr('page');
+        $(".menuEBudget li").removeClass('active');
+        $("#pageContent").empty();
+        $('.pageAnchor[page="'+Page+'"]').parent().addClass('active');
+        LoadPage(Page);
+    });
 
     $(document).off('click', '.btn-delete-file').on('click', '.btn-delete-file',function(e) {
         var Sthis = $(this);

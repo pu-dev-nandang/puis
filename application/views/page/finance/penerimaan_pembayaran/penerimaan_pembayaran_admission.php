@@ -42,11 +42,12 @@
 
     function loadTahun()
     {
+      var academic_year_admission = "<?php echo $academic_year_admission ?>";  
         var thisYear = (new Date()).getFullYear();
         var startTahun = parseInt(thisYear);
         var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
         for (var i = 0; i <= selisih; i++) {
-          var selected = (i==1) ? 'selected' : '';
+          var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
           $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
         }
 
@@ -243,7 +244,7 @@
          for (var j = 0; j < DetailPaymentArr.length; j++) {
            var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
            var status = (DetailPaymentArr[j]['Status'] == 0) ? 'Belum Bayar' : 'Sudah Bayar';
-           var btn_bayar = '';
+           var btn_bayar = 'Already Generated';
            if(action == 1)
            {
             btn_bayar = (DetailPaymentArr[j]['Status'] == 0) ? '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "1">Bayar</button>' : '<button class = "bayar" IDStudent = "'+DetailPaymentArr[j]['ID']+'" bayar = "0">Tidak Bayar</button>';

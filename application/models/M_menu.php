@@ -160,7 +160,7 @@ class M_menu extends CI_Model {
           $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
           from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-           where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ?';
+           where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ? order by a.SubMenu2 asc';
           $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP'),$IDmenu))->result_array();
       }
       else
@@ -168,7 +168,7 @@ class M_menu extends CI_Model {
           $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
           from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-           where a.SubMenu1 = ? and c.NIP = ?';
+           where a.SubMenu1 = ? and c.NIP = ? order by a.SubMenu2 asc';
           $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
       }
       
@@ -292,10 +292,16 @@ class M_menu extends CI_Model {
                  $(".btn-add").remove();
                });
 
+               waitForEl(".btn-write", function() {
+                 $(".btn-write").remove();
+               });
+
                $(document).ready(function () {
                    $(".btn-add").remove();
+                   $(".btn-write").remove();
                    $(document).ajaxComplete(function () {
                       $(".btn-add").remove();
+                      $(".btn-write").remove();
                    });
                });
                </script>
@@ -411,5 +417,33 @@ class M_menu extends CI_Model {
       }
       return $html;
   }
+
+  public function get_submenu_by_menu($input,$db)
+  {
+      $ID_Menu = $input['Menu'];
+      $GroupUser = $input['GroupUser'];
+      // print_r($input);die();
+      $sql = "select a.Menu,b.* from ".$db.".cfg_menu as a
+    join ".$db.".cfg_sub_menu as b
+    on a.ID = b.ID_Menu where b.ID_Menu = ?
+    and b.ID not in (select ID_cfg_sub_menu from ".$db.".cfg_rule_g_user where cfg_group_user = ?)";
+    // print_r($sql);die();
+      $query=$this->db->query($sql, array($ID_Menu,$GroupUser))->result_array();
+      return $query;
+  }
+
+  public function get_previleges_group_show($GroupID,$db)
+    {
+        $sql = 'SELECT d.GroupAuth, b.Menu,c.SubMenu1,c.SubMenu2,c.ID_Menu,a.ID_cfg_sub_menu,a.ID as ID_previleges,a.`read`,a.`write`,a.`update`,
+a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,c.`delete` as deleteMenu from '.$db.'.cfg_rule_g_user as a
+            join '.$db.'.cfg_group_user as d
+            on a.cfg_group_user = d.ID
+            join '.$db.'.cfg_sub_menu as c
+            on a.ID_cfg_sub_menu = c.ID
+            join '.$db.'.cfg_menu as b
+            on b.ID = c.ID_Menu where d.ID = ? ';
+        $query=$this->db->query($sql, array($GroupID))->result_array();
+        return $query;
+    }
 
 }

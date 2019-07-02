@@ -13,6 +13,9 @@ class C_admission extends Admission_Controler {
         $this->data['department'] = parent::__getDepartement(); 
         $this->load->model('m_api');
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
+        // get academic year admission
+            $t = $this->m_master->showData_array('db_admission.set_ta');
+            $this->data['academic_year_admission'] = $t[0]['Ta'];
     }
 
     public function index()
@@ -321,13 +324,66 @@ class C_admission extends Admission_Controler {
 
     public function formulir_offline_sale_save()
     {
+      $rs = array('msg'=> '','Status'=> 1);
       $input = $this->getInputToken();
       switch ($input['Action']) {
           case 'add':
-              $this->m_admission->inserData_formulir_offline_sale_save($input);
+              // check email already exist or not
+              $B_email = $this->m_admission->alreadyExistingEmail($input['email']);
+              // check No_Ref is available
+              $G_formulirGlobal = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['No_Ref']);
+              if ($G_formulirGlobal[0]['Status'] == 0) {
+                if ($B_email) {
+                  $this->m_admission->inserData_formulir_offline_sale_save($input);
+                }
+                else
+                {
+                  $rs['Status'] = 0;
+                  $rs['msg'] = 'Email already exist';
+                }
+              }
+              else
+              {
+                $rs['Status'] = 0;
+                $rs['msg'] = 'No_Ref is used, Please reload your browser';
+              }
+              
               break;
           case 'edit':
-              $this->m_admission->editData_formulir_offline_sale_save($input);
+            /* 
+              Note :
+              Tidak boleh ganti No_Ref
+            */
+              // get old data first
+              $G_dt = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
+              // get Email
+              $Email_ =  $G_dt[0]['Email'];
+
+              $B_email = $this->m_admission->alreadyExistingEmail($input['email']);
+              // $G_formulirGlobal = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['No_Ref']);
+              // if ($G_formulirGlobal[0]['Status'] == 0) {
+              //   if ($B_email) {
+              //     $this->m_admission->editData_formulir_offline_sale_save($input);
+              //   }
+              //   else
+              //   {
+              //     $rs['Status'] = 0;
+              //     $rs['msg'] = 'Email already exist';
+              //   }
+              // }
+              // else
+              // {
+              //   $rs['Status'] = 0;
+              //   $rs['msg'] = 'No_Ref is used, Please reload your browser';
+              // }
+              if ($B_email || $Email_ == $input['email']) {
+                $this->m_admission->editData_formulir_offline_sale_save($input);
+              }
+              else
+              {
+                $rs['Status'] = 0;
+                $rs['msg'] = 'Email already exist';
+              }
               break;
           case 'delete':
               $query = $this->m_master->caribasedprimary('db_admission.sale_formulir_offline','ID',$input['CDID']);
@@ -337,6 +393,8 @@ class C_admission extends Admission_Controler {
               // print_r($FormulirCode);
               break;        
       }
+
+      echo json_encode($rs);
     }
 
     public function formulir_offline_salect_PIC()
@@ -1651,7 +1709,7 @@ class C_admission extends Admission_Controler {
                   $text = 'Dear '.$Name.',<br><br>
                               Congarulations, You were admitted to Podomoro University,<br>
                               Your Nim is '.$NPM.'.<br><br>
-                              For Details, Please open your portal '.url_sign_out.' with :<br>
+                              For Details, Please open your portal '.url_sign_out.' and Portal Library '.url_library.' with :<br>
                               Username : '.$NPM.'<br>
                               Password : '.$pasword_old.'<br><br>
                           ';
@@ -1670,7 +1728,7 @@ class C_admission extends Admission_Controler {
           // $this->db->insert_batch($ta.'.students', $arr);
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
           $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
-          if($_SERVER['SERVER_NAME']!='localhost') {
+          if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
             $this->m_admission->insert_to_Library($arr_insert_auth);
           }
 
@@ -1941,10 +1999,12 @@ class C_admission extends Admission_Controler {
         $queryDiv = "";
         switch ($division) {
           case 10:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           case 18:
-            $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            // $queryDiv = ' where LEFT(c.PositionMain ,INSTR(c.PositionMain ,".")-1) = "'.$division.'"';
+            $queryDiv = '';
             break;
           default:
             $queryDiv = "";

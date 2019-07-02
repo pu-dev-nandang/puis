@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row btn-read">
 	<div class="col-md-12">
 		<div class="table-responsive" id = "DivTable">
 			
@@ -10,6 +10,9 @@
 	var m_type_user = <?php echo json_encode($m_type_user) ?>;
 	var G_ApproverLength = G_Approver.length;
 	var JsonStatus = [];
+  // get Departmentpu
+  var IDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+
 
 $(document).ready(function() {
 		LoadFirstLoad();
@@ -37,7 +40,7 @@ $(document).ready(function() {
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Type</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Supplier</th>'+
 		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Circulation Sheet</th>'+
+		                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 		                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
 		            '</tr>'+
 		            '<tr>'+
@@ -49,6 +52,8 @@ $(document).ready(function() {
 		$("#DivTable").html(table_html);
 
 		var data = {
+        IDDepartementPUBudget : IDDepartementPUBudget,
+        sessionNIP : sessionNIP,
 		    auth : 's3Cr3T-G4N',
 		    length : G_ApproverLength,
 		};
@@ -77,22 +82,53 @@ $(document).ready(function() {
        	    'createdRow': function( row, data, dataIndex ) {
        	    	$( row ).find('td:eq(0)').attr('align','center');
        	    	var code_url = findAndReplace(data[1],'/','-');
-       	    	$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[8]+'</div>');
+              var ListPR = data[parseInt(data.length) - 1];
+              var PRHTML = '';
+              for (var i = 0; i < ListPR.length; i++) {
+                PRHTML += '<li>'+ListPR[i]+'</li>';
+              }
+       	    	if (data[2] == 'PO') {
+       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/po/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+       	    	}
+       	    	else
+       	    	{
+       	    		$( row ).find('td:eq(1)').html('<div align = "left"><a href="'+base_url_js+'global/purchasing/transaction/spk/list/'+code_url+'" code="'+data[1]+'">'+data[1]+'</a><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+       	    	}
+       	    	
        	    	//$( row ).find('td:eq(1)').attr('align','center');
        	    	$( row ).find('td:eq(2)').attr('align','center');
-       	    	$( row ).find('td:eq(4)').attr('align','center');
+       	    	$( row ).find('td:eq(4)').attr('align','left');
        	    	$( row ).find('td:eq(5)').attr('align','center');
-       	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Log</a>');
+       	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Info</a>');
        	    		
        	    },
+            dom: 'l<"toolbar">frtip',
        	    "initComplete": function(settings, json) {
-       	        
+                // auth purchasing
+                <?php $P = $this->session->userdata('PositionMain'); 
+                       $DivisionID = $P['IDDivision'];
+                ?>
+                var DivSession = "<?php echo $DivisionID ?>";
+                if (DivSession == '4') {
+                          $("div.toolbar")
+                           .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+                        '<span data-smt="" class="btn btn-add-new-po" page = "purchasing/transaction/po/list/open">'+
+                            '<i class="icon-plus"></i> New PO / SPK'+
+                       '</span>'+
+                    '</div>');
+                }
+	                 
        	    }
 		});
 	}
 
+  $(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
+    var page = $(this).attr('page');
+    window.location.href = base_url_js+page;
+  })  
+
 	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
-	    var url = base_url_js+'rest/__show_circulation_sheet_po';
+	    var url = base_url_js+'rest2/__show_info_po';
 	    var Code = $(this).attr('code');
    		var data = {
    		    Code : Code,
@@ -100,8 +136,9 @@ $(document).ready(function() {
    		};
    		var token = jwt_encode(data,"UAP)(*");
    		$.post(url,{ token:token },function (data_json) {
-   			var html = '<div class = "row"><div class="col-md-12">';
+   			var html = '<div class = "row"><div class="col-md-12"><div class="well">';
    				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<caption><h4>Circulation Sheet</h4></caption>'+
                       '<thead>'+
                           '<tr>'+
                               '<th style="width: 5px;">No</th>'+
@@ -111,23 +148,28 @@ $(document).ready(function() {
 		        html += '</tr>' ;
 		        html += '</thead>' ;
 		        html += '<tbody>' ;
-
-		        // for (var i = 0; i < data_json.length; i++) {
-		        // 	var No = parseInt(i) + 1;
-		        // 	html += '<tr>'+
-		        // 	      '<td>'+ No + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Desc'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Date'] + '</td>'+
-		        // 	      '<td>'+ data_json[i]['Name'] + '</td>'+
-		        // 	    '<tr>';	
-		        // }
-
 		        html += '</tbody>' ;
-		        html += '</table></div></div>' ;	
+		        html += '</table></div></div></div>' ;
+
+            if (data_json['po_invoice_status'].length > 0) {
+              html += '<div class = "row" style = "margin-top:10px;"><div class="col-md-12"><div class="well">';
+          html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal2">'+
+                      '<caption><h4>Invoice Status</h4></caption>'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">Invoice PO</th>'+
+                              '<th style="width: 55px;">Paid</th>'+
+                              '<th style="width: 55px;">Left</th>';
+            html += '</tr>' ;
+            html += '</thead>' ;
+            html += '<tbody>' ;
+            html += '</tbody>' ;
+            html += '</table></div></div></div>' ;
+            }	
 
    			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
    			    '';
-   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Circulation Sheet'+'</h4>');
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info PO/SPK Code : '+Code+'</h4>');
    			$('#GlobalModalLarge .modal-body').html(html);
    			$('#GlobalModalLarge .modal-footer').html(footer);
    			$('#GlobalModalLarge').modal({
@@ -137,7 +179,7 @@ $(document).ready(function() {
 
    			// make datatable
    				var table = $('#TblModal').DataTable({
-   				      "data" : data_json,
+   				      "data" : data_json['po_circulation_sheet'],
    				      'columnDefs': [
    					      {
    					         'targets': 0,
@@ -178,6 +220,46 @@ $(document).ready(function() {
    				            cell.innerHTML = i+1;
    				        } );
    				} ).draw();
+
+
+          if (data_json['po_invoice_status'].length > 0) {
+            var table2 = $('#TblModal2').DataTable({
+                  "data" : data_json['po_invoice_status'],
+                  "ordering": false,
+                  "searching": false,
+                  "paging":   false,
+                  'columnDefs': [
+                    {
+                       'targets': 0,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoicePO);
+                       }
+                    },
+                    {
+                       'targets': 1,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoicePayPO);
+                       }
+                    },
+                    {
+                       'targets': 2,
+                       'render': function (data, type, full, meta){
+                           return formatRupiah(full.InvoiceLeftPO);
+                       }
+                    },
+                  ],
+                  'createdRow': function( row, data, dataIndex ) {
+                      $(row).find('td:eq(0)').attr('style','width : 10px;')
+                    
+                  },
+            });
+
+            table2.on( 'order.dt search.dt', function () {
+                    table2.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                        cell.innerHTML = i+1;
+                    } );
+            } ).draw();
+          }
 
    		});
 	})

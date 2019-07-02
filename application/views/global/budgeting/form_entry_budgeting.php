@@ -361,7 +361,7 @@ function makeRowAdd_del(dt)
 			html += '<div class = "col-md-1 Custom-PostBudget">'+
 						'<span class = "numberNO">'+''+'</span>&nbsp'+
 						'<select class="select2-select-00 full-width-fix PostBudget Custom-select2">'+
-							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['RealisasiPostName']+'</option>'+
+							'<option value ="'+dt[i]['CodePostRealisasi']+'" selected CodePost = "'+dt[i]['CodePost']+'" CodeHeadAccount="'+dt[i]['CodeHeadAccount']+'">'+dt[i]['NameHeadAccount']+'-'+dt[i]['RealisasiPostName']+'</option>'+
 						 '</select>'+
 					'</div>'+
 					'<div class = "col-md-1 Custom-UnitCost">'+
@@ -1338,7 +1338,8 @@ $(document).off('click', '#add_approver').on('click', '#add_approver',function(e
    	    	{
    	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
    	    		if (JsonStatus[i]['Status'] != 1) {
-   	    			action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+   	    			// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+   	    			action += '';
    	    		}
    	    	}
    	    	
@@ -1399,7 +1400,6 @@ $(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',
 	var dtApproval = ClassDt.creator_budget_approval;
 	switch(action) {
 	  case 'add':
-	  case 'edit':
 	    var url = base_url_js + 'api/__crudEmployees';
 	    var data = {
 	    	action : 'read',
@@ -1459,7 +1459,43 @@ $(document).off('click', '.btn-edit-approver').on('click', '.btn-edit-approver',
 	    	    //allowClear: true
 	    	});	
 
+	    	evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
 	    });
+	    break;
+	  case 'edit':
+	    var url = base_url_js + 'api/__crudEmployees';
+	    var data = {
+	    	action : 'read',
+	    }
+	    var token = jwt_encode(data,"UAP)(*");
+	    $.post(url,{ token:token },function (data_json) {
+	    	var OP = '';
+	    		for (var i = 0; i < data_json.length; i++) {
+	    			OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
+	    		}
+	    	var OP2 = '';
+	    		for (var i = 0; i < m_type_user.length; i++) {
+	    			OP2 += '<option value="'+m_type_user[i].ID+'" '+''+'>'+m_type_user[i].Name+'</option>';
+	    		}
+	    	
+	    	evtr.find('td:eq(3)').attr('style','width : 20%');	
+	    	evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
+	    						'</select>');
+	    	evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+	    							'<option value = "Yes" selected >Yes</option>'+
+	    							'<option value = "No" selected >No</option>'+
+	    						'</select>');
+	    	
+	    	evtd.html('<button class = "btn btn-primary saveapprover" id_creator_budget_approval = "'+id_creator_budget_approval+'" indexjson = "'+indexjson+'" action = "'+action+'">Save</button>'+
+	    					'');
+	    	$('.listemployees[tabindex!="-1"]').select2({
+	    	    //allowClear: true
+	    	});
+
+	    	evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
+	    });	
 	    break;
 	  case 'delete':
 	  	 if (confirm('Are you sure ?')) {
@@ -1548,7 +1584,7 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 	}
 	else
 	{
-		if (dtApproval[0].Status == '0' || dtApproval[0].Status == '3') {
+		if (action == 'add') {
 			if (NIP != '' && NIP != undefined && NIP != null && NIP != 0) {
 				loading_button('.saveapprover[indexjson="'+indexjson+'"]');
 				var url = base_url_js + 'budgeting/update_approval_budgeting';
@@ -1579,7 +1615,8 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 						evtr.find('td:eq(4)').html(vt);
 
 						action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-						action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+						// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+						action += '';
 						evtr.find('td:eq(5)').html(action);
 					}
 					else
@@ -1593,13 +1630,14 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 			}
 		}
 		else
-		{
+		{ // edit
 			NIP = evtr.find('td:eq(1)').attr('nip');
 			loading_button('.saveapprover[indexjson="'+indexjson+'"]');
 			var url = base_url_js + 'budgeting/update_approval_budgeting';
 			var data = {
 				NIP : NIP,
 				id_creator_budget_approval : id_creator_budget_approval,
+				NameTypeDesc : NameTypeDesc,
 				Visible : Visible,
 				action : action,
 				indexjson : indexjson,
@@ -1616,6 +1654,8 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 					var st = 'Approve';
 					evtr.find('td:eq(2)').html(st);
 					evtr.find('td:eq(4)').html(vt);
+					var tu = NameTypeDesc;
+					evtr.find('td:eq(3)').html(tu);
 
 					action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" id_creator_budget_approval = "'+id_creator_budget_approval+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
 					evtr.find('td:eq(5)').html(action);
@@ -1627,7 +1667,6 @@ $(document).off('click', '.saveapprover').on('click', '.saveapprover',function(e
 				$('.saveapprover[indexjson="'+indexjson+'"]').prop('disabled',false).html('Save');
 			});	
 		}
-		
 	} // exit if indexjson
 	
 	

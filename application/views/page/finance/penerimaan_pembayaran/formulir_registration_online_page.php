@@ -2,7 +2,7 @@
     <div class="col-xs-12" >
         <div class="panel panel-primary">
             <div class="panel-heading clearfix">
-                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Pembayaran Formulir Verify By Virtual Account (VA)</h4>
+                <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Pembayaran Formulir Online</h4>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -106,11 +106,12 @@
 
 	function loadTahun()
 	  {
+	  	var academic_year_admission = "<?php echo $academic_year_admission ?>";  
 	      var thisYear = (new Date()).getFullYear();
           var startTahun = parseInt(thisYear);
           var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
           for (var i = 0; i <= selisih; i++) {
-            var selected = (i==1) ? 'selected' : '';
+            var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
             $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
           }
 
@@ -184,36 +185,63 @@
 	}
 
 	$(document).on('click','.btn_bayar', function () {
-		if (confirm('Are you sure you want to save this thing into the database?')) {
-		    // Save it!
-		    var RegID = $(this).attr('RegID');
-		    var Year = $('#selectTahun option:selected').val();
-		    loading_button(".btn_bayar[RegID='"+RegID+"']");
-		    var url = base_url_js+'finance/bayar_manual_mahasiswa_formulironline';
-		    var data = {
-		        RegID : RegID,
-		        Year : Year,
-		    };
-		    var token = jwt_encode(data,'UAP)(*');
-		    $.post(url,{token:token},function (resultJson) {
-		    	var rs = jQuery.parseJSON(resultJson);
-		    	if (rs == 1) {
-		    		loaddataBelumBayar();
-		    		loadDataTelahBayar();
-		    	}
-		    	else
-		    	{
-		    		toastr.info('That something wrong')
-		    	}
-		      
-		    }).fail(function() {
-		      toastr.info('No Action...'); 
-		      // toastr.error('The Database connection error, please try again', 'Failed!!');
-		    }).always(function() {
+		var regid = $(this).attr('regid');
+		// show modal verifikasi bayar
+			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+            '';
+            var html = '<div class = "row">'+
+            				'<div class = "col-md-12">'+
+            					'<div id="datetimepicker1'+'" class="input-group input-append date datetimepicker"  style = "width : 210px;">'+
+            					    '<input data-format="yyyy-MM-dd" class="form-control" id="tgl" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+            					    '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+            					'</div>'+
+            				'</div>'+
+            			'</div>'+
+            			'<div class = "row" style = "margin-top : 10px"><div class = "col-xs-12"><button class = "btn btn-success savePay" regid = "'+regid+'">Save</button>'+
+            			'</div></div>';
+			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Action'+'</h4>');
+			$('#GlobalModalLarge .modal-body').html(html);
+			$('#GlobalModalLarge .modal-footer').html(footer);
+			$('#GlobalModalLarge').modal({
+			    'show' : true,
+			    'backdrop' : 'static'
+			});
 
-		    }); 
-		} else {
-		    // Do nothing!
+			$('#datetimepicker1').datetimepicker({
+			  format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+			});
+	});
+
+	$(document).on('click','.savePay', function () {
+		if (confirm('Are you sure you want to save this thing into the database?')) {
+			var RegID = $(this).attr('RegID');
+			var Year = $('#selectTahun option:selected').val();
+			loading_button(".savePay[RegID='"+RegID+"']");
+			var url = base_url_js+'finance/bayar_manual_mahasiswa_formulironline';
+			var data = {
+			    RegID : RegID,
+			    Year : Year,
+			    tgl : $('#tgl').val(),
+			};
+			var token = jwt_encode(data,'UAP)(*');
+			$.post(url,{token:token},function (resultJson) {
+				var rs = jQuery.parseJSON(resultJson);
+				if (rs == 1) {
+					loaddataBelumBayar();
+					loadDataTelahBayar();
+					$('#GlobalModalLarge').modal('hide');
+				}
+				else
+				{
+					toastr.info('Formulir Number Online atau Formulir Number Global tidak ada, Silahkan kontak pihak Admisi');
+				}
+			  
+			}).fail(function() {
+			  toastr.info('No Action...'); 
+			  // toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+				$(".savePay[RegID='"+RegID+"']").prop('disabled',false).html('Submit');
+			});
 		}
 	});
 

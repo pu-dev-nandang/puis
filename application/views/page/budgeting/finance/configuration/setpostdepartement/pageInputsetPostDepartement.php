@@ -153,12 +153,12 @@
 				var Action = '';
 				if(CodePostBudget == 'Unset')
 				{
-					Action = '<button class = "btn btn-success btn-default getBudgetLastYear" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'">Load Budget Last Year</button>&nbsp'+
-							 '<button class = "btn btn-default btn-add" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>';	
+					Action = '<button class = "btn btn-success btn-default getBudgetLastYear btn-write" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'">Load Budget Last Year</button>&nbsp'+
+							 '<button class = "btn btn-default btn-add btn-write" CodeHeadAccount = "'+dataDB[i].CodeHeadAccount+'" trno = "'+(parseInt(i) + 1)+'"><i class="fa fa-plus" aria-hidden="true"></i> Add</button>';	
 				}
 				else
 				{
-					Action = '<button type="button" class="btn btn-warning btn-edit btn-edit-postbudget" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'" budget = "'+dataDB[i].Budget+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-postbudget" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+					Action = '<button type="button" class="btn btn-warning btn-edit btn-edit-postbudget btn-write" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'" budget = "'+dataDB[i].Budget+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-postbudget btn-write" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				}
 
 				var BG = (CodePostBudget == 'Unset') ? 'style="background-color: #eade8e; color: black;"' : 'style="background-color: #8ED6EA; color: black;"';
@@ -341,7 +341,7 @@
 			$('.Budget'+codepostrealisasi).html(input);
 			$('.BudgetInput'+codepostrealisasi).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 			var trno = $(this).attr('trno');
-			var ActionSave = '<button class="btn btn-primary btn-save-add"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
+			var ActionSave = '<button class="btn btn-primary btn-save-add btn-write"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
 			$(".No"+trno).html(ActionSave);
 			$('.BudgetInput'+codepostrealisasi).focus();
 			$(".btn-save-add").click(function(){
@@ -399,7 +399,7 @@
 			$('.BudgetInput'+codepostbudget).maskMoney('mask', '9894');
 
 			var trno = $(this).attr('trno');
-			var ActionSave = '<button class="btn btn-primary btn-save'+codepostbudget+'"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
+			var ActionSave = '<button class="btn btn-primary btn-save'+codepostbudget+' btn-write"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>';
 			$(".No"+trno).html(ActionSave);
 			$('.BudgetInput'+codepostbudget).focus(); 
 

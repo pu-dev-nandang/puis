@@ -1,3 +1,44 @@
+<style type="text/css">
+    #tableData9 thead th,#tableData9 tfoot td {
+
+        text-align: center;
+        background: #20485A;
+        color: #FFFFFF;
+
+    }
+
+    #tableData9>thead>tr>th, #tableData9>tbody>tr>th, #tableData9>tfoot>tr>th, #tableData9>thead>tr>td, #tableData9>tbody>tr>td, #tableData9>tfoot>tr>td {
+        border: 1px solid #b7b7b7
+    }
+
+    .btn span.glyphicon {               
+        opacity: 0;             
+    }
+    .btn.active span.glyphicon {                
+        opacity: 1;             
+    }
+
+    #tableData9 tbody {
+        display:block;
+        height:520px;
+        overflow:auto;
+    }
+    #tableData9 thead,#tableData9 tbody tr {
+        display:table;
+        width:100%;
+        table-layout:fixed; /* even columns width , fix width of table too*/
+    }
+    #tableData9 thead {
+        /*width: calc( 100% - 1.2em );*/
+        width: calc( 100% - 9.45em );
+        /*width: calc( 100% - 0em );*/
+        /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
+    }
+    #tableData9 {
+        width:1500px;
+        overflow: auto;
+    }
+</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuConfig">
     <ul class="nav nav-tabs">

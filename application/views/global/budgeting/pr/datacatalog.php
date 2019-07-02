@@ -14,7 +14,7 @@
 	               '<thead>'+
 	                  '<tr>'+
 	                     '<th>No</th>'+
-	                     '<th>Item</th>'+
+	                     '<th>Item & Category</th>'+
 	                     '<th>Desc</th>'+
 	                     '<th>Estimate Value</th>'+
 	                     '<th>Photo</th>'+
@@ -49,37 +49,46 @@
 	          	         'searchable': false,
 	          	         'orderable': false,
 	          	      },
-	          	      {
-	          	      	'targets': 6,
-	          	      	'className': 'dt-body-center',
-	          	      	'render': function (data, type, full, meta){
-	          	      		 var btn = '';
-	          	      		 var status = '';
-	          	      		 if (full[8]== 1 || full[8]== 0) {
-	          	      		 	btn = '';
-	          	      		 	status = (full[8]== 1) ? 'Approve' : 'Not Approve';
-	          	      		 }
-	          	      		 else{
-	          	      		 	status = 'Reject';
-	          	      		 	btn = '<br><br><button type="button" class="btn btn-default btn-edit btn-reason" reason= "'+full[9]+'"> Reason</button>';
-	          	      		 }
-	          	      		
-	          	      		status = status+btn
+		          	      {
+		          	      	'targets': 6,
+		          	      	'className': 'dt-body-center',
+		          	      	'render': function (data, type, full, meta){
+		          	      		 var btn = '';
+		          	      		 var status = '';
+		          	      		 if (full[8]== 1 || full[8]== 0) {
+		          	      		 	btn = '';
+		          	      		 	status = (full[8]== 1) ? 'Approve' : 'Awaiting Approval';
+		          	      		 }
+		          	      		 else{
+		          	      		 	status = 'Reject';
+		          	      		 	btn = '<br><br><button type="button" class="btn btn-default btn-edit btn-reason" reason= "'+full[9]+'"> Reason</button>';
+		          	      		 }
+		          	      		
+		          	      		status = status+btn
 
-	          	      	    return status;
-	          	      	    // return no;
-	          	      	}
-	          	      },
-	          	      {
-	          	      	'targets': 7,
-	          	      	'className': 'dt-body-center',
-	          	      	'render': function (data, type, full, meta){
-	          	      		 // console.log(meta);
-	          	      	    return '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'+full[6]+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'+full[6]+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-	          	      	    // return no;
-	          	      	}
-	          	      },
+		          	      	    return status;
+		          	      	    // return no;
+		          	      	}
+		          	      },
+		          	      {
+		          	      	'targets': 7,
+		          	      	'className': 'dt-body-center',
+		          	      	'render': function (data, type, full, meta){
+		          	      		 // console.log(meta);
+		          	      	    return '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'+full[6]+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'+full[6]+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+		          	      	    // return no;
+		          	      	}
+		          	      },
 	          	      ],
+	          	      	    dom: 'l<"toolbar">frtip',
+	          	              initComplete: function(){
+	          	                $("div.toolbar")
+	          	                   .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+	          	      			    '<span data-smt="" class="btn btn-add-new-catalog" page = "entry_catalog">'+
+	          	      			        '<i class="icon-plus"></i> New Catalog'+
+	          	      			   '</span>'+
+	          	      			'</div>');           
+	          	             },  
 	          	      'order': [[1, 'asc']]
 	          	   });
 

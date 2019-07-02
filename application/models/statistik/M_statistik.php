@@ -19,6 +19,12 @@ class M_statistik extends CI_Model {
         $this->db_statistik->query('DROP TABLE IF EXISTS '.$Table);
     }
 
+    public function droptablerekapintake_admission($Year)
+    {
+        $Table = 'rekapintakeadm_'.$Year;
+        $this->db_statistik->query('DROP TABLE IF EXISTS '.$Table);
+    }
+
     public function droptable($tblname)
     {
         $this->db_statistik->query('DROP TABLE IF EXISTS '.$tblname);
@@ -43,6 +49,30 @@ class M_statistik extends CI_Model {
             // insert data 
             $this->insert_data();
             $arr_result = $this->m_master->showData_array('db_statistik.rekapintake_'.$this->Year);
+        }
+
+        return $arr_result;
+    }
+
+    public function ShowRekapIntake_admission($Year)
+    {
+        $arr_result = array();
+        // passing variable to global
+        $this->Year = $Year;
+
+        //check table rekap exist
+        $chk = $this->tableRekap_admissionExist($Year);
+        if ($chk) {
+            //show data in table
+            $arr_result = $this->m_master->showData_array('db_statistik.rekapintakeadm_'.$this->Year);
+        }
+        else
+        {
+            // create table
+            $this->create_table_Rekap_admission();
+            // insert data 
+            $this->insert_data_Rekap_admission();
+            $arr_result = $this->m_master->showData_array('db_statistik.rekapintakeadm_'.$this->Year);
         }
 
         return $arr_result;
@@ -89,7 +119,8 @@ class M_statistik extends CI_Model {
                             if(a.StatusReg = 1, 
                             (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                             if(a.StatusReg = 1, 
-                            (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate
+                            (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                            (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                             from db_admission.register as a 
                             join db_admission.school as b on a.SchoolID = b.ID 
                             LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
@@ -98,7 +129,7 @@ class M_statistik extends CI_Model {
                             LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                             left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                              where a.SetTa = "'.$Year.'" 
-                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ?';
+                            ) ccc where MONTH(intakedate) = "'.$monthQ.'" and Year(intakedate) = "'.$YearQ.'" and ID_program_study = ? and C_bayar > 0';
                             $query=$this->db->query($sql, array($ProdiID))->result_array();
                             $total = $query[0]['total'];
                             $datasave[$field[$j]] = $total;
@@ -110,6 +141,44 @@ class M_statistik extends CI_Model {
                 }
             }
             // print_r($datasave);die();
+            $this->db_statistik->insert($Table, $datasave);
+        }
+        $this->saveLastUpdated($Table);
+    }
+
+    private function insert_data_Rekap_admission()
+    {
+        $Year = $this->Year;
+        $Table = 'rekapintakeadm_'.$Year;
+        $getColoumn = $this->m_master->getColumnTable('db_statistik.'.$Table);
+        $getProdi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $arr_bulan = array(
+            'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
+        );
+        for ($i=0; $i < count($getProdi); $i++) { 
+            $ProdiID = $getProdi[$i]['ID'];
+           // get per month
+            $datasave = array('ProdiID' => $ProdiID);
+            $sql = 'select count(*) as total from (
+                     select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, 
+                    e.ID as ID_register_formulir,
+                    if(a.StatusReg = 1, 
+                    (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
+                    if(a.StatusReg = 1, 
+                    (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                    (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                    from db_admission.register as a 
+                    join db_admission.school as b on a.SchoolID = b.ID 
+                    LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
+                    LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
+                    LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
+                    LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
+                    left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
+                     where a.SetTa = "'.$Year.'" 
+                    ) ccc where ID_program_study = ? and C_bayar > 0';
+                    $query=$this->db->query($sql, array($ProdiID))->result_array();
+                    $total = $query[0]['total'];
+                    $datasave['Total'] = $total;
             $this->db_statistik->insert($Table, $datasave);
         }
         $this->saveLastUpdated($Table);
@@ -161,9 +230,35 @@ class M_statistik extends CI_Model {
                                 ) ENGINE=InnoDB DEFAULT CHARSET=latin1');
     }
 
+    private function create_table_Rekap_admission()
+    {
+        $Year = $this->Year;
+        $Table = 'rekapintakeadm_'.$Year;
+        $this->db_statistik->query('CREATE TABLE '.$Table.' (
+                                  `ID` int(11) NOT NULL AUTO_INCREMENT,
+                                  `ProdiID` int(11) DEFAULT NULL,
+                                  `Total` int(11) DEFAULT NULL,
+                                  PRIMARY KEY (`ID`)
+                                ) ENGINE=InnoDB DEFAULT CHARSET=latin1');
+    }
+
     public function tableRekapExist($Year)
     {
         $sql = 'show tables like "rekapintake_'.$Year.'";';
+        $query=$this->db_statistik->query($sql, array())->result_array();
+        if (count($query) > 0) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    public function tableRekap_admissionExist($Year)
+    {
+        $sql = 'show tables like "rekapintakeadm_'.$Year.'";';
         $query=$this->db_statistik->query($sql, array())->result_array();
         if (count($query) > 0) {
             return true;
@@ -387,7 +482,8 @@ class M_statistik extends CI_Model {
                                         if(a.StatusReg = 1, 
                                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                                         if(a.StatusReg = 1, 
-                                        (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate
+                                        (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
+                                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
                                         from db_admission.register as a 
                                         join db_admission.school as b on a.SchoolID = b.ID 
                                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
@@ -396,7 +492,7 @@ class M_statistik extends CI_Model {
                                         LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
                                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
                                          where a.SetTa = "'.$Year.'" and b.ProvinceID = "'.$Prov.'"
-                                        ) cc
+                                        ) cc where C_bayar > 0
             ';
               $query=$this->db_statistik->query($sql, array())->result_array();
               $Qty = $query[0]['total'];

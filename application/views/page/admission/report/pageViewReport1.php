@@ -130,7 +130,17 @@
 			        						<button class="btn btn-primary" id= "btnTuitionFee"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
 			        					</div>	
 			        				</div>
-			        			</div>	
+			        			</div>
+			        			<div class="form-group">
+			        				<div class="row" style="margin-top: 10px">
+			        					<div class="col-xs-4">
+			        						<label>Intake</label>
+			        					</div>
+			        					<div class="col-xs-4">
+			        						<button class="btn btn-primary" id= "btnIntake"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel</button>
+			        					</div>	
+			        				</div>
+			        			</div>		
 			        		</div>
 			        	</div>
 			        </div>
@@ -150,7 +160,25 @@
 		FuncClickbtnPenjualanFormulirFinance();
 		FuncClickbtnPengembalianFormulirData();
 		FuncClickBtnTuitionFee();
+		FuncClickBtnIntake();
 	});
+
+	function FuncClickBtnIntake()
+	{
+		$("#btnIntake").click(function(){
+			var url = base_url_js+'admission/intake_Excel';
+			var SelectYearDataMHS = $("#SelectYearDataMHS").val();
+			var Prodi = $("#Prodi").val();
+			data = {
+			  Year : SelectYearDataMHS,
+			  Prodi : Prodi,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			FormSubmitAuto(url, 'POST', [
+			    { name: 'token', value: token },
+			]);
+		})
+	}
 
 	function FuncClickBtnTuitionFee()
 	{

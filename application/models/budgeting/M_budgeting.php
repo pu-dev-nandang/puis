@@ -26,7 +26,7 @@ class M_budgeting extends CI_Model {
                 UNION
                 select * from db_budgeting.cfg_menu where IDDepartement = "0"
                 ) as b
-                where a.NIP = ? GROUP by b.id';
+                where a.NIP = ? GROUP by b.id order by b.Sort asc';
         $query=$this->db->query($sql, array($MenuDepartement,$NIP))->result_array();
         return $query;
     }
@@ -35,7 +35,7 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
         from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-        where a.ID_Menu = ? group by a.SubMenu1';
+        where a.ID_Menu = ? group by a.SubMenu1 order by a.Sort1 asc';
         $query=$this->db->query($sql, array($ID_Menu))->result_array();
         return $query;
     }
@@ -45,14 +45,14 @@ class M_budgeting extends CI_Model {
         if ($IDmenu != null) {
             $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-             where a.SubMenu1 = ? and a.ID_Menu = ?';
+             where a.SubMenu1 = ? and a.ID_Menu = ? order by a.Sort2 asc';
             $query=$this->db->query($sql, array($submenu1,$IDmenu))->result_array();
         }
         else
         {
             $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-             where a.SubMenu1 = ?';
+             where a.SubMenu1 = ? order by a.Sort2 asc';
             $query=$this->db->query($sql, array($submenu1))->result_array();
         }
         
@@ -402,7 +402,12 @@ class M_budgeting extends CI_Model {
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
                 from db_budgeting.cfg_m_userrole as a left join (select * from db_budgeting.cfg_approval_pr where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
-                left join db_employees.employees as b on b.NIP = c.NIP 
+                left join 
+                (
+                     select NIP,Name,EmailPU from db_employees.employees
+                     UNION
+                     select NIK as NIP,Name,Email as EmailPU from db_employees.holding
+                )  b on b.NIP = c.NIP 
                 order by a.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
@@ -416,7 +421,7 @@ class M_budgeting extends CI_Model {
                 on a.ID = c.ID_m_userrole
                 left join db_employees.employees as b on b.NIP = c.NIP 
                 join db_budgeting.cfg_m_type_approval as d on d.ID = c.TypeDesc
-                order by c.ID asc
+                order by c.ID_m_userrole asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
         return $query;
@@ -471,7 +476,7 @@ class M_budgeting extends CI_Model {
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                ) as dp on b.UnitDiv = dp.ID
                where a.ID_creator_budget_approval = ?
-               order by b.CodeHeadAccount asc
+               order by a.ID asc
        ';
         $query=$this->db->query($sql, array($ID_creator_budget_approval))->result_array();
         return $query;
@@ -630,6 +635,21 @@ class M_budgeting extends CI_Model {
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                ) aa
+                where ID = ?
+                ';
+        $query=$this->db->query($sql, array($DepartementBudgeting))->result_array();
+        return $query;
+    }
+
+    public function SearchDepartementBudgeting2($DepartementBudgeting)
+    {
+        $sql = 'select * from (
+                select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",Name) as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Facultas ",Name) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                 ) aa
                 where ID = ?
                 ';
@@ -1004,5 +1024,13 @@ class M_budgeting extends CI_Model {
                 ';
         $query=$this->db->query($sql, array($Departement,$Year))->result_array();
         return (int)$query[0]['Total'];        
+    }
+
+    public function __tbl_cfg_set_userrole()
+    {
+        $sql = 'select * from db_budgeting.cfg_set_userrole order by MaxLimit asc
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
     }  
 }
