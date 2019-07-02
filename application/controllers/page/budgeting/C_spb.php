@@ -13,4 +13,63 @@ class C_spb extends Budgeting_Controler {
         parent::__construct();
     }
 
+    public function menu_horizontal($page)
+    {
+    	$data['content'] = $page;
+    	$content = $this->load->view('global/budgeting/spb/menu_horizontal',$data,true);
+    	$this->temp($content);
+    }
+
+    public function index()
+    {
+    	/*
+			1.filtering by pr
+    	*/
+		$page = $this->load->view('global/budgeting/spb/list',$this->data,true);
+		$this->menu_horizontal($page);
+    }
+
+    public function create_spb()
+    {
+    	/*
+			1.SPB bisa dicreate dari user manapun dengan trigerr PO / SPK done
+			2.Show PO dengan status Done.
+			3.filtering by pr
+    	*/
+
+        if (empty($_GET)) {
+           $this->data['action_mode'] = 'add';
+           $this->data['SPBCode'] = '';
+        }
+        else{
+            try {
+                // read token
+            }
+            //catch exception
+            catch(Exception $e) {
+                 show_404($log_error = TRUE); 
+            }
+            
+        }     
+
+		$page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
+		$this->menu_horizontal($page);
+    }
+
+    public function configuration()
+    {
+    	/*
+			1.Only auth finance
+    	*/
+    	if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9') {
+    		$page = $this->load->view('global/budgeting/spb/configuration',$this->data,true);
+    		$this->menu_horizontal($page);
+    	}
+    	else
+    	{
+    		show_404($log_error = TRUE);
+    	}
+    	
+    }
+
 }

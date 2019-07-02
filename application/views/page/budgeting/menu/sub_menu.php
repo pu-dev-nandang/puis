@@ -485,8 +485,8 @@
 	            var sl = arr[key];
 	            var aa = sl.split('/');
 	            if (SubMenu2 == 'Empty' && SubMenu1 != 'Empty') {
-	            	if (aa.length != 3) {
-	            		toatString += key + ' harus memiliki 3 uri segment' + "<br>";
+	            	if (aa.length < 3) {
+	            		toatString += key + ' harus memiliki minimal 3 uri segment' + "<br>";
 	            	}
 	            }
 	            else if(SubMenu2 != 'Empty' && SubMenu1 == 'Empty')
@@ -503,7 +503,7 @@
 	            }
 	            else if(SubMenu1 != 'Empty' && SubMenu2 != 'Empty')
 	            {
-	            	if (aa.length != 4) {
+	            	if (aa.length < 4) {
 	            		toatString += key + ' harus memiliki 4 uri segment' + "<br>";
 	            	}
 	            }
