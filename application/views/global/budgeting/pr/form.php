@@ -38,20 +38,69 @@
 		}
 		var token = jwt_encode(data,"UAP)(*");
 		$.post(url,{ token:token },function (resultJson) {
-			var response = jQuery.parseJSON(resultJson);
-
-			var access = response['access'];
-			if (access.length > 0) {
-				ClassDt.RuleAccess = response;
-				load_htmlPR();
-			}
-			else
-			{
-				$("#pageContent").empty();
-				$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
-			}
 			
-		})
+		}).done(function(resultJson) {
+		  var response = jQuery.parseJSON(resultJson);
+
+		  var access = response['access'];
+		  if (access.length > 0) {
+		  	ClassDt.RuleAccess = response;
+		  	load_htmlPR();
+		  }
+		  else
+		  {
+		  	$("#pageContent").empty();
+		  	$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
+		  }
+		});
+	}
+
+
+	function load_data_pr()
+	{
+		var def = jQuery.Deferred();
+		var PRCode = ClassDt.PRCodeVal;
+		var url = base_url_js+'budgeting/GetDataPR';
+		var data = {
+		    PRCode : PRCode,
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			var response = jQuery.parseJSON(resultJson);
+			def.resolve(response);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
+
+	function load_budget_remaining__(Year,Departement)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"budgeting/detail_budgeting_remaining";
+		var data = {
+				    Year : Year,
+					Departement : Departement,
+				};
+		var token = jwt_encode(data,'UAP)(*');
+		$.post(url,{token:token},function (resultJson) {
+			
+		}).done(function(resultJson) {
+			var response2 = jQuery.parseJSON(resultJson);
+			def.resolve(response2);
+		}).fail(function() {
+		  toastr.info('No Result Data'); 
+		  def.reject();
+		}).always(function() {
+		                
+		});
+		return def.promise();
 	}
 
 	function load_htmlPR()
@@ -59,46 +108,38 @@
 		// check data edit or new
 		if (ClassDt.PRCodeVal != '') {
 			// edit
-			var PRCode = ClassDt.PRCodeVal;
-			var url = base_url_js+'budgeting/GetDataPR';
-			var data = {
-			    PRCode : PRCode,
-			};
-			var token = jwt_encode(data,"UAP)(*");
-			$.post(url,{ token:token },function (resultJson) {
-				var response = jQuery.parseJSON(resultJson);
+			load_data_pr().then(function(response){
 				ClassDt.DtExisting = response;
-
-				// Load Budget Department
 				var arr_pr_create = response['pr_create'];
 				var Year = arr_pr_create[0]['Year'];
 				ClassDt.NmDepartement_Existing =  arr_pr_create[0]['NameDepartement'];
 				var Departement = arr_pr_create[0]['Departement'];
-				var url = base_url_js+"budgeting/detail_budgeting_remaining";
-				var data = {
-						    Year : Year,
-							Departement : Departement,
-						};
-				var token = jwt_encode(data,'UAP)(*');
-				$.post(url,{token:token},function (resultJson) {
-					var response2 = jQuery.parseJSON(resultJson);
+
+				load_budget_remaining__(Year,Departement).then(function(response2){
 					var dt = response2.data;
 					ClassDt.PostBudgetDepartment_awal = dt;
 					localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
-					Make_PostBudgetDepartment_existing(dt);
-					// new
-					makeDomExisting();
-				}).fail(function() {
-				  toastr.info('No Result Data'); 
-				}).always(function() {
-				                
+				})
+
+				var bool = 0;
+				var urlInarray = [base_url_js+'budgeting/detail_budgeting_remaining'];
+
+				$( document ).ajaxSuccess(function( event, xhr, settings ) {
+				   if (jQuery.inArray( settings.url, urlInarray )) {
+				       bool++;
+				       if (bool == 1) {
+				           setTimeout(function(){
+				               Make_PostBudgetDepartment_existing();
+				               // // new
+				               makeDomExisting(); 
+
+				            }, 500);
+				          
+				       }
+				   }
 				});
 
-			}).fail(function() {
-			  toastr.info('No Result Data'); 
-			}).always(function() {
-			                
-			});	
+			})
 		}
 		else
 		{
@@ -128,12 +169,13 @@
 		}
 	}
 
-	function Make_PostBudgetDepartment_existing(arr_budget_departement)
+	function Make_PostBudgetDepartment_existing()
 	{
 		/*
 			Note : 
 			Pengembalian Post Budget using ke awal sebelum pr tercreate
 		*/
+		arr_budget_departement = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		var arr = [];
 		var DtExisting = ClassDt.DtExisting;
 		var arr_pr_detail = DtExisting['pr_detail'];
@@ -141,6 +183,9 @@
 			var CodePostRealisasi = arr_budget_departement[i]['CodePostRealisasi'];
 			var Using = arr_budget_departement[i]['Using'];
 			var Value = arr_budget_departement[i]['Value'];
+			// console.log(arr_budget_departement[i]);	
+			// console.log(arr_pr_detail);	
+			// console.log(Using+' Start');	
 
 			for (var j = 0; j < arr_pr_detail.length; j++) {
 				var CodePostRealisasi_ = arr_pr_detail[j].CodePostRealisasi;
@@ -169,10 +214,12 @@
 
 						}
 
+					// console.log(Using+' Before');	
 					Using = parseInt(Using) - Cost1;
+					// console.log(Using+' After');	
 					arr_budget_departement[i]['Using'] = Using;
 
-					break;
+					//break;
 				}
 			}
 
@@ -204,12 +251,19 @@
 							''+
 						'</div>'+
 					'</div>'+
+				'</div>'+
+				'<div class="col-md-4">'+
+					'<div class="toolbar no-padding pull-right">'+
+					    '<span data-smt="" class="btn btn-add-new-pr hide" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+					        '<i class="icon-plus"></i> Create New PR'+
+					   '</span>'+
+					'</div>'+
 				'</div>';
 		html += '</div>';
 
 		var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
 							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add Item</button>'+
 							'</div>'+
 						'</div>';
 
@@ -218,7 +272,7 @@
 		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
 							'<div class = "col-md-12">'+
 								'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_pr">'+
+									'<table class="table table-bordered tableData" id ="table_input_pr" style = "min-width: 1200px;">'+
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
@@ -277,9 +331,44 @@
 		$(".UnitCost").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$(".UnitCost").maskMoney('mask', '9894');
 
-		$('.datetimepicker').datetimepicker({
-			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-		});
+		$(".qty,.PPH").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		$(".qty,.PPH").maskMoney('mask', '9894');
+
+		// $('.datetimepicker').datetimepicker({
+		// 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		// });
+
+		// datetimepicker berdasarkan days
+		$('.datetimepicker').each(function(){
+			var dt = $(this);
+			var fillItem = $(this).closest('tr');
+			var days = fillItem.find('.Item').attr('days');
+				// add set DateNeeded datetimepicker
+					Date.prototype.addDays = function(days) {
+				          var date = new Date(this.valueOf());
+				          date.setDate(date.getDate() + days);
+				          return date;
+				    }
+			        
+			        var date = new Date();
+
+			        var aa = date.addDays(parseInt(days));
+			        // var bb = moment(aa).format('YYYY-MM-DD');
+			        var bb = moment(aa).format('YYYY-MM-DD');
+
+					fillItem.find('td:eq(10)').find('.datetimepicker').datetimepicker({
+						useCurrent: false,
+						startDate: date.addDays(parseInt(days)),
+						format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+					});
+
+					if (fillItem.find('td:eq(10)').find('.spanClass').length) {
+						fillItem.find('td:eq(10)').find('.spanClass').remove();
+					}
+					
+					fillItem.find('td:eq(10)').append('<span style = "color : red" class = "spanClass"><br>Estimated due date minimal : '+bb+'</span>'	);
+		})
+
 		__BudgetRemaining();
 
 		// Show Supporting_documents if exist
@@ -354,7 +443,7 @@
 					htmlDetailCatalog += prop + ' :  '+DetailCatalog[prop]+'<br>';
 				}
 				var Item = pr_detail[i]['Item'];
-				var arr = Item+'@@'+Desc+'@@'+EstimaValue+'@@'+htmlPhoto+'@@'+htmlDetailCatalog;
+				var arr = Item+'@@'+Desc+'@@'+formatRupiah(EstimaValue)+'@@'+htmlPhoto+'@@'+htmlDetailCatalog;
 				arr = findAndReplace(arr, "\"","'");
 
 			var SpecAdd = (pr_detail[i]['Spec_add'] == '' || pr_detail[i]['Spec_add'] == null || pr_detail[i]['Spec_add'] == 'null') ? '' : pr_detail[i]['Spec_add'];
@@ -399,7 +488,7 @@
 						'</td>'+
 						'<td>'+
 							'<div class="input-group">'+
-								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['EstimaValue']+'" value = "'+pr_detail[i]['Item']+'">'+
+								'<input type="text" class="form-control Item" readonly id_m_catalog = "'+pr_detail[i]['ID_m_catalog']+'" estprice = "'+pr_detail[i]['EstimaValue']+'" value = "'+pr_detail[i]['Item']+'" days = "'+pr_detail[i]['Days']+'">'+
 								'<span class="input-group-btn">'+
 									'<button class="btn btn-default SearchItem" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
 								'</span>'+
@@ -413,9 +502,11 @@
 						'<td>'+
 							'<textarea class = "form-control Need" rows = "2">'+Need+'</textarea>'+
 						'</td>'+
-						'<td><input type="number" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
+						// '<td><input type="number" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
+						'<td><input type="text" min = "1" class="form-control qty"  value="'+pr_detail[i]['Qty']+'"></td>'+
 						'<td><input type="text" class="form-control UnitCost" value="'+parseInt(pr_detail[i]['UnitCost'])+'" disabled></td>'+
-						'<td><input type="number" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
+						// '<td><input type="number" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
+						'<td><input type="text" class="form-control PPH" value = "'+parseInt(pr_detail[i]['PPH'])+'"></td>'+
 						'<td><input type="text" class="form-control SubTotal" disabled value = "'+parseInt(pr_detail[i]['SubTotal'])+'"></td>'+
 						'<td>'+
 							'<div class="input-group input-append date datetimepicker">'+
@@ -450,12 +541,19 @@
 								''+
 							'</div>'+
 						'</div>'+
+					'</div>'+
+					'<div class="col-md-4">'+
+						'<div class="toolbar no-padding pull-right">'+
+						    '<span data-smt="" class="btn btn-add-new-pr hide" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+						        '<i class="icon-plus"></i> Create New PR'+
+						   '</span>'+
+						'</div>'+
 					'</div>';
 			html += '</div>';
 
         var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
 							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add</button>'+
+								'<button type="button" class="btn btn-default btn-add-pr"> <i class="icon-plus"></i> Add Item</button>'+
 							'</div>'+
 						'</div>';
 		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
@@ -715,6 +813,9 @@
 				}
 			}
 
+			// show button add new pr
+			$('.btn-add-new-pr').removeClass('hide');
+
 		}
 		else
 		{
@@ -820,13 +921,15 @@
 					'<td>'+
 						'<textarea class = "form-control Need" rows = "2"></textarea>'+
 					'</td>'+
-					'<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
+					// '<td><input type="number" min = "1" class="form-control qty"  value="1" disabled></td>'+
+					'<td><input type="text" min = "1" class="form-control qty"  value="1" disabled></td>'+
 					'<td><input type="text" class="form-control UnitCost" disabled></td>'+
-					'<td><input type="number" class="form-control PPH" value = "10"></td>'+
+					// '<td><input type="number" class="form-control PPH" value = "10"></td>'+
+					'<td><input type="text" class="form-control PPH" value = "10"></td>'+
 					'<td><input type="text" class="form-control SubTotal" disabled value = "0"></td>'+
 					'<td>'+
 						'<div class="input-group input-append date datetimepicker">'+
-                            '<input data-format="yyyy-MM-dd" class="form-control" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+                            '<input data-format="yyyy-MM-dd" class="form-control" type=" text" readonly="" value = "">'+
                             '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
                 		'</div>'+
                 	'</td>'+
@@ -835,10 +938,13 @@
                 	action
                 '</tr>';
         $('#table_input_pr tbody').append(html);
-        $('.datetimepicker').datetimepicker({
-        	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-        });
-        MakeAutoNumbering();        	
+        // $('.datetimepicker').datetimepicker({
+        // 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+        // });
+        MakeAutoNumbering(); 
+        // qty & pph
+        $(".qty,.PPH").maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+        $(".qty,.PPH").maskMoney('mask', '9894');       	
 	}
 
 	function MakeAutoNumbering()
@@ -984,7 +1090,7 @@
                '<thead>'+
                   '<tr>'+
                      '<th>No</th>'+
-                     '<th>Item</th>'+
+                     '<th>Item & Category</th>'+
                      '<th>Desc</th>'+
                      '<th>Estimate Value</th>'+
                      '<th>Photo</th>'+
@@ -1035,9 +1141,18 @@
 			             return '';
 			         }
 			      }],
+			      // 'columnDefs': [{
+			      //    'targets': 3,
+			      //    'className': 'dt-body-center',
+			      //    'render': function (data, type, full, meta){
+			      //    	 // console.log(full);
+			      //        return full[3]+'<br>'+'<span style = "color : red">Last Updated<br>'+full[10]+'</span>';
+			      //    }
+			      // }],
 			      'createdRow': function( row, data, dataIndex ) {
 			      		$(row).attr('id_m_catalog', data[6]);
 			      		$(row).attr('estprice', data[7]);
+			      		$(row).attr('days', data[12]);
 			      	
 			      },
 			      // 'order': [[1, 'asc']]
@@ -1054,13 +1169,18 @@
 			var row = $(this);
 			var fillItem = ev.closest('tr');
 			var id_m_catalog = row.attr('id_m_catalog');
+			// add days untuk
+			var days__ = row.attr('days');
+
 			var estprice = row.attr('estprice');
 			var n = estprice.indexOf(".");
 			estprice = estprice.substring(0, n);
 
-			var Item = row.find('td:eq(1)').text();
+			var Item = row.find('td:eq(1)').html();
+			n = Item.indexOf("<br>");
+			Item = Item.substring(0, n);
 			var Desc = row.find('td:eq(2)').text();
-			var Est = row.find('td:eq(3)').text();
+			var Est = row.find('td:eq(3)').html();
 			var Photo = row.find('td:eq(4)').html();
 			var DetailCatalog =  row.find('td:eq(5)').html();
 			var arr = Item+'@@'+Desc+'@@'+Est+'@@'+Photo+'@@'+DetailCatalog;
@@ -1079,6 +1199,35 @@
 			}
 
 			fillItem.find('td:eq(6)').find('.qty').trigger('change');
+
+			// add set DateNeeded datetimepicker
+				Date.prototype.addDays = function(days) {
+			          var date = new Date(this.valueOf());
+			          date.setDate(date.getDate() + days);
+			          return date;
+			    }
+		        
+		        var date = new Date();
+
+		        var aa = date.addDays(parseInt(days__));
+		        // var bb = moment(aa).format('YYYY-MM-DD');
+		        var bb = moment(aa).format('YYYY-MM-DD');
+		        // add moment in days
+		        // var bb = moment().add(30,'days').format('YYYY-MM-DD');
+		        fillItem.find('td:eq(10)').find('input').val(bb);
+
+				fillItem.find('td:eq(10)').find('.datetimepicker').datetimepicker({
+					useCurrent: false,
+					startDate: date.addDays(parseInt(days__)),
+					format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+				});
+
+				if (fillItem.find('td:eq(10)').find('.spanClass').length) {
+					fillItem.find('td:eq(10)').find('.spanClass').remove();
+				}
+				
+				fillItem.find('td:eq(10)').append('<span style = "color : red" class = "spanClass"><br>Estimated due date minimal : '+bb+'</span>'	);
+
 			$('#GlobalModalLarge').modal('hide');
 		} );    	
 	})
@@ -1168,8 +1317,10 @@
 		var UnitCost = tr.find('.UnitCost').val();
 		UnitCost = findAndReplace(UnitCost, ".","");
 		var hitung = qty * UnitCost;
-		var PPH = (tr.find('.PPH').val() / 100 ) * hitung;
-		hitung = hitung + PPH;
+		var PPH = ((tr.find('.PPH').val() / 100 ) * hitung).toFixed(2);
+		// console.log(PPH);
+		hitung = parseInt(hitung) + parseInt(PPH);
+		// console.log(hitung);
 		tr.find('.SubTotal').val(hitung);
 		tr.find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		tr.find('.SubTotal').maskMoney('mask', '9894');
@@ -1540,6 +1691,7 @@
 		var dt = ClassDt.RuleAccess;
 		var access = dt.access;
 		var rule = dt.rule;
+		console.log(rule);
 		for (var i = 0; i < access.length; i++) {
 			var NIP_ = access[i].NIP;
 			if (NIP_ == NIP) {
@@ -1571,7 +1723,6 @@
 						temp.push(temp2);
 				}
 
-				
 				// var temp = [
 				// 	{
 				// 		MaxLimit : 20000,
@@ -1608,7 +1759,6 @@
 				break;
 			}
 		}
-
 		return MaxLimit;
 	}
 
@@ -1635,6 +1785,13 @@
 				if (Item == '') {
 					find = false;
 					toastr.error("Item is required",'!!!Error');
+					return false;
+				}
+
+				var DateNeeded = fillItem.find('td:eq(10)').find('input').val();
+				if (DateNeeded == '') {
+					find = false;
+					toastr.error("Date Needed is required",'!!!Error');
 					return false;
 				}
 
@@ -1938,7 +2095,7 @@
 		       				$('#Status').html('Status : '+Status);
 		       				// Update Variable ClassDt
 		       				ClassDt.PRCodeVal = data['PRCode'];
-		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Log</a>';
+		       				btn_see_pass = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'+ClassDt.PRCodeVal+'">Info</a>';
 		       				LoadFirstLoad();
 		       			}
 
@@ -1984,6 +2141,10 @@
 	       case "3":
 	       case 3:
 	       	Status = 'Reject';
+	       break;
+	       case "4":
+	       case 4:
+	       	Status = 'Cancel';
 	       break;
 	       default: 
 	           alert('No Status');
@@ -2036,7 +2197,7 @@
 			var approval_number = $(this).attr('approval_number');
 			// show modal insert reason
 			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
-			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="100"><br>'+
 			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
 			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
 			    '</div>');
@@ -2172,7 +2333,8 @@
 	   	    	{
 	   	    		action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
 	   	    		if (JsonStatus[i]['Status'] != 1) {
-	   	    			action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+	   	    			// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+i+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+	   	    			action += '';
 	   	    		}
 	   	    	}
 	   	    	
@@ -2234,7 +2396,6 @@
 		var dtApproval = pr_create;
 		switch(action) {
 		  case 'add':
-		  case 'edit':
 		    var url = base_url_js + 'api/__crudEmployees';
 		    var data = {
 		    	action : 'read',
@@ -2298,6 +2459,40 @@
 
 		    });
 		    break;
+		  case 'edit':
+		  	var url = base_url_js + 'api/__crudEmployees';
+		  	var data = {
+		  		action : 'read',
+		  	}
+		  	var token = jwt_encode(data,"UAP)(*");
+		  	$.post(url,{ token:token },function (data_json) {
+		  		var OP = '';
+		  			for (var i = 0; i < data_json.length; i++) {
+		  				OP += '<option value="'+data_json[i].NIP+'" '+''+'>'+data_json[i].NIP+' | '+data_json[i].Name+'</option>';
+		  			}
+		  		var OP2 = '';
+		  			for (var i = 0; i < m_type_user.length; i++) {
+		  				OP2 += '<option value="'+m_type_user[i].ID+'" '+''+'>'+m_type_user[i].Name+'</option>';
+		  			}
+		  		
+		  		evtr.find('td:eq(3)').attr('style','width : 20%');	
+		  		evtr.find('td:eq(3)').html('<select class=" form-control listTypeUser">'+OP2+
+		  							'</select>');
+		  		evtr.find('td:eq(4)').html('<select class=" form-control listVisible">'+
+		  								'<option value = "Yes" selected >Yes</option>'+
+		  								'<option value = "No" selected >No</option>'+
+		  							'</select>');
+		  		
+		  		evtd.html('<button class = "btn btn-primary saveapprover" prcode = "'+prcode+'" indexjson = "'+indexjson+'" action = "'+action+'">Save</button>'+
+		  						'');
+		  		$('.listemployees[tabindex!="-1"]').select2({
+		  		    //allowClear: true
+		  		});
+
+		  		evtr.find('td:eq(4)').find('.select2-container').attr('style','width: 94px !important;');	
+
+		  	});	
+		  	break; 
 		  case 'delete':
 		  	 if (confirm('Are you sure ?')) {
 		  	 	loading_button('.btn-edit-approver[indexjson="'+indexjson+'"][action="'+action+'"]');
@@ -2389,7 +2584,7 @@
 		}
 		else
 		{
-			if (dtApproval[0].Status == '1' || dtApproval[0].Status == '3') {
+			if (action == 'add') {
 				if (NIP_ != '' && NIP_ != undefined && NIP_ != null && NIP_ != 0) {
 					loading_button('.saveapprover[indexjson="'+indexjson+'"]');
 					// var url = base_url_js + 'budgeting/update_approval_budgeting';
@@ -2425,7 +2620,8 @@
 							evtr.find('td:eq(4)').html(vt);
 
 							action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
-							action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+							// action += '<button class="btn btn-default btn-default-danger btn-edit-approver" data-action="delete" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+							action += '';
 							evtr.find('td:eq(5)').html(action);
 						}
 						else
@@ -2447,6 +2643,7 @@
 				var data = {
 					NIP : NIP_,
 					prcode : prcode,
+					NameTypeDesc : NameTypeDesc,
 					Visible : Visible,
 					action : action,
 					indexjson : indexjson,
@@ -2463,6 +2660,8 @@
 						var st = 'Approve';
 						evtr.find('td:eq(2)').html(st);
 						evtr.find('td:eq(4)').html(vt);
+						var tu = NameTypeDesc;
+						evtr.find('td:eq(3)').html(tu);
 
 						action = '<button class="btn btn-default btn-default-success btn-edit-approver" data-action="edit" indexjson="'+indexjson+'" prcode = "'+prcode+'"><i class="fa fa-pencil" aria-hidden="true"></i></button>';
 						evtr.find('td:eq(5)').html(action);

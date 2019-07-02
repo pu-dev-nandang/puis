@@ -90,7 +90,7 @@
 		$.post(url,function (resultJson) {
 			var response = jQuery.parseJSON(resultJson);
 			for (var i = 0; i < response.length; i++) {
-				var input = '<button class = "btn btn-default btnInput" ID_m_userrole = "'+response[i]['ID']+'">Set Input</button>';
+				var input = '<button class = "btn btn-default btnInput btn-write" ID_m_userrole = "'+response[i]['ID']+'">Set Input</button>';
 				var btnDelete = '';
 				var cmb = '';
 				var visible = '';
@@ -134,7 +134,7 @@
 								}
 					visible += '</select>';
 
-					btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser" code="'+response[i]['ID_set_roleuser']+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+					btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUser btn-write" code="'+response[i]['ID_set_roleuser']+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				}
 				TableGenerate += '<tr>'+
 									'<td width = "3%">'+ (parseInt(i) + 1)+'</td>'+
@@ -149,7 +149,7 @@
 			TableGenerate += '</tbody></table></div></div></div>';
 			var divSave = '<div class = "row">'+
 								'<div class = "col-md-12" align = "right">'+
-									'<button class="btn btn-primary btn-save-approval">Save</button>'+
+									'<button class="btn btn-primary btn-save-approval btn-write">Save</button>'+
 								'</div>'+
 							'</div>';		
 			$("#loadPageTable").html(TableGenerate+divSave);

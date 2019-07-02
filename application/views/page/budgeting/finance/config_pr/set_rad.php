@@ -1,23 +1,3 @@
-<style type="text/css">
-	#tableData9 thead th,#tableData9 tfoot td {
-
-	    text-align: center;
-	    background: #20485A;
-	    color: #FFFFFF;
-
-	}
-
-	#tableData9>thead>tr>th, #tableData9>tbody>tr>th, #tableData9>tfoot>tr>th, #tableData9>thead>tr>td, #tableData9>tbody>tr>td, #tableData9>tfoot>tr>td {
-	    border: 1px solid #b7b7b7
-	}
-
-	.btn span.glyphicon {    			
-		opacity: 0;				
-	}
-	.btn.active span.glyphicon {				
-		opacity: 1;				
-	}
-</style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id = "loadPageTable">
 	
 </div>
@@ -37,7 +17,7 @@
 			$("#loadPageTable").empty();
 			var ActionAdd = '<div class = "row">'+
 								'<div class = "col-xs-2">'+
-									'<span data-smt="" class="btn btn-add">'+
+									'<span data-smt="" class="btn btn-add btn-write">'+
 	                    				'<i class="icon-plus"></i> Add'+
 	               					'</span>'+
 	               				'</div>'+
@@ -51,8 +31,8 @@
 											'<table class="table table-bordered tableData" id ="tableData9">'+
 											'<thead>'+
 											'<tr>'+
-												'<th width = "10%">Post</th>'+
-					                            '<th>Amount Limit</th>';
+												'<th>Post</th>'+
+					                            '<th>Limit</th>';
 	        for (var i = 0; i < cfg_m_userrole.length; i++) {
 	        	TableGenerate += '<th>'+cfg_m_userrole[i]['NameUserRole']+'</th>';
 	        }
@@ -61,7 +41,7 @@
 			TableGenerate += '<tbody></tbody></table></div></div></div>';
 			var ActionSave = '<div class = "row sdsadasd" style = "margin-top : 10px;margin-left : 0px ; margin-right : 0px">'+
 								'<div class = "col-md-2 col-md-offset-10" align = "right">'+
-									'<button type="button" id="SaveForm" class="btn btn-success">Save</button>'+
+									'<button type="button" id="SaveForm" class="btn btn-success btn-write">Save</button>'+
 								'</div>'+
 							'</div>';		
 			$("#loadPageTable").html(ActionAdd+TableGenerate+ActionSave);
@@ -222,7 +202,7 @@
 					}
 					fill += '<td align = "center">'+chk+'</td>';
 				} // end loop user type
-				var action = '<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+				var action = '<button type="button" class="btn btn-danger btn-delete btn-write"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 				fill += '<td>'+action+'</td>';
 				fill += '</tr>';
 				$('#tableData9 tbody').append(fill);
@@ -278,7 +258,7 @@
 						  '</div>';		  		  
 				fill += '<td align = "center">'+chk+'</td>';
 			}
-			var action = '<button type="button" class="btn btn-danger btn-delete"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+			var action = '<button type="button" class="btn btn-danger btn-delete btn-write"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
 			fill += '<td>'+action+'</td>';
 			fill += '</tr>';
 		$('#tableData9 tbody').append(fill);

@@ -117,7 +117,7 @@ class C_pr_po extends Budgeting_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;
@@ -241,10 +241,42 @@ class C_pr_po extends Budgeting_Controler {
     public function DataPR()
     {
         $requestData= $_REQUEST;
-        $sqltotalData = 'select count(*) as total from db_budgeting.pr_create';
-        $querytotalData = $this->db->query($sqltotalData)->result_array();
-        $totalData = $querytotalData[0]['total'];
+        // filter by department dan nip approver, untuk finance show semua pr
+        $WhereFiltering = '';
+        $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        $NIP = $this->session->userdata('NIP');
+        if ($IDDepartementPUBudget != 'NA.9') {
+            $WhereFiltering .= ' where a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
+        }
 
+        // $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a';
+        // $querytotalData = $this->db->query($sqltotalData)->result_array();
+        // $totalData = $querytotalData[0]['total'];
+
+        $sqltotalData = 'select count(*) as total from 
+                (
+                    select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
+                                    as StatusName, a.JsonStatus,a.PostingDate 
+                                    from db_budgeting.pr_create as a 
+                    join (
+                    select * from (
+                    select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                    UNION
+                    select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                    ) aa
+                    ) as b on a.Departement = b.ID
+                    '.$WhereFiltering.'
+                )aa
+               ';
+
+        $sqltotalData.= ' where PRCode LIKE "%'.$requestData['search']['value'].'%" or NameDepartement LIKE "'.$requestData['search']['value'].'%" or StatusName LIKE "'.$requestData['search']['value'].'%" 
+                ';
+        $querytotalData = $this->db->query($sqltotalData)->result_array();
+        $totalData = $querytotalData[0]['total'];      
+        // --- //
         $sql = 'select * from 
                 (
                     select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
@@ -260,6 +292,7 @@ class C_pr_po extends Budgeting_Controler {
                     select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                     ) aa
                     ) as b on a.Departement = b.ID
+                    '.$WhereFiltering.'
                 )aa
                ';
 
@@ -289,7 +322,7 @@ class C_pr_po extends Budgeting_Controler {
             $nestedData[] = $row['NameDepartement'];
             $nestedData[] = $row['StatusName'];
             // circulation sheet
-            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'">Log</a>';
+            $nestedData[] = '<a href="javascript:void(0)" class = "btn btn-info btn_circulation_sheet" prcode = "'.$row['PRCode'].'" style = "    background-color: #2f5ad4;">Info</a>';
             $JsonStatus = (array)json_decode($row['JsonStatus'],true);
             $arr = array();
             if (count($JsonStatus) > 0) {
@@ -319,10 +352,10 @@ class C_pr_po extends Budgeting_Controler {
 
             $nestedData = array_merge($nestedData,$arr);
             $nestedData[] = $row['Departement'];
+            $nestedData[] = $JsonStatus;
             // get name created by
                 $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($row['CreatedBy']);
                 $nestedData[] = $getName[0]['Name'];
-
 
             $data[] = $nestedData;
             $No++;
@@ -562,7 +595,7 @@ class C_pr_po extends Budgeting_Controler {
                     $StatusPR = 1;
                     // passing show name JsonStatus
                     for ($i=0; $i < count($JsonStatus); $i++) { 
-                        $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                        $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
                         $Name = $Name[0]['Name'];
                         $JsonStatus[$i]['NameApprovedBy'] = $Name;
                     } 
@@ -582,6 +615,10 @@ class C_pr_po extends Budgeting_Controler {
                                     // do upload file
                                     $uploadFile = $this->uploadDokumenMultiple(mt_rand(),'UploadFile'.$PassNumber);
                                     $data_arr['UploadFile'] = json_encode($uploadFile); 
+                                }
+                                else
+                                {
+                                    $data_arr['UploadFile'] = json_encode(array()); 
                                 }
 
                                 // exclude 
@@ -752,7 +789,10 @@ class C_pr_po extends Budgeting_Controler {
                             $SubTotal = $data_arr['SubTotal'];
                             $Amount = $Amount + $SubTotal;
                         }
+                        
             $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // new approval
+            $dataSave['JsonStatus'] = json_encode($JsonStatus2);
                 if (count($JsonStatus2) > 1) {
                     $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                     if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
@@ -761,7 +801,7 @@ class C_pr_po extends Budgeting_Controler {
                         $StatusPR = 1;
                         // passing show name JsonStatus
                         for ($i=0; $i < count($JsonStatus); $i++) { 
-                            $Name = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
+                            $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
                             $Name = $Name[0]['Name'];
                             $JsonStatus[$i]['NameApprovedBy'] = $Name;
                         } 
@@ -986,86 +1026,125 @@ class C_pr_po extends Budgeting_Controler {
                     }
                     else
                     {
+                        // $PRCode = $Input['prcode'];
+                        // $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                        // if ($G_data[0]['Status'] == 1 || $G_data[0]['Status'] == 3) {
+                        //     $JsonStatus = $G_data[0]['JsonStatus'];
+                        //     $JsonStatus = (array)json_decode($JsonStatus,true);
+                        //     $Approver = $Input['NIP'];
+                        //     $indexjson = $Input['indexjson'];
+                        //     $Visible = $Input['Visible'];
+                        //     $NameTypeDesc = $Input['NameTypeDesc'];
+
+                        //     $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
+
+                        //     $JsonStatus[$indexjson] = array(
+                        //         'NIP' => $Approver,
+                        //         'Status' => 0,
+                        //         'ApproveAt' => $ApproveAt,
+                        //         'Representedby' => '',
+                        //         'Visible' => $Visible,
+                        //         'NameTypeDesc' => $NameTypeDesc,
+                        //     );
+                        //     $JsonPassHtml = $JsonStatus;
+                        //     // search name NameAprrovedBy
+                        //     for ($i=0; $i < count($JsonPassHtml); $i++) { 
+                        //         $NIP = $JsonPassHtml[$i]['NIP'];
+                        //         $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                        //         $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
+                        //     }
+
+                        //     $JsonStatusSave = json_encode($JsonStatus);
+                        //     $dataSave = array(
+                        //         'JsonStatus' => $JsonStatusSave,
+                        //     );    
+                        //     $this->db->where('PRCode',$PRCode);
+                        //     $this->db->update('db_budgeting.pr_create',$dataSave);
+                            
+                        //     $rs['data']= $JsonPassHtml;
+                        //     // save to log
+                        //         $this->m_pr_po->pr_circulation_sheet($PRCode,'Custom Approval',$By = $this->session->userdata('NIP'));
+                        // }
+                        // else
+                        // {
+                        //     $PRCode = $Input['prcode'];
+                        //     $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                        //     $JsonStatus = $G_data[0]['JsonStatus'];
+                        //     $JsonStatus = (array)json_decode($JsonStatus,true);
+                        //     $Approver = $Input['NIP'];
+                        //     $indexjson = $Input['indexjson'];
+                        //     $Visible = $Input['Visible'];
+                        //     $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
+                        //     $Status = $JsonStatus[$indexjson]['Status'];
+
+                        //     $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
+                            
+                        //     $JsonStatus[$indexjson] = array(
+                        //         'NIP' => $Approver,
+                        //         'Status' => $Status,
+                        //         'ApproveAt' => $ApproveAt,
+                        //         'Representedby' => '',
+                        //         'Visible' => $Visible,
+                        //         'NameTypeDesc' => $NameTypeDesc,
+                        //     );
+                        //     $JsonPassHtml = $JsonStatus;
+                        //     // search name NameAprrovedBy
+                        //     for ($i=0; $i < count($JsonPassHtml); $i++) { 
+                        //         $NIP = $JsonPassHtml[$i]['NIP'];
+                        //         $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                        //         $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
+                        //     }
+
+                        //     $JsonStatusSave = json_encode($JsonStatus);
+                        //     $dataSave = array(
+                        //         'JsonStatus' => $JsonStatusSave,
+                        //     );    
+                        //     $this->db->where('PRCode',$PRCode);
+                        //     $this->db->update('db_budgeting.pr_create',$dataSave);
+                                
+                        //     $rs['data']= $JsonPassHtml;
+                        //     // save to log
+                        //         $this->m_pr_po->pr_circulation_sheet($PRCode,'Custom Approval',$By = $this->session->userdata('NIP')); 
+                        // }
+                        
                         $PRCode = $Input['prcode'];
                         $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
-                        if ($G_data[0]['Status'] == 1 || $G_data[0]['Status'] == 3) {
-                            $JsonStatus = $G_data[0]['JsonStatus'];
-                            $JsonStatus = (array)json_decode($JsonStatus,true);
-                            $Approver = $Input['NIP'];
-                            $indexjson = $Input['indexjson'];
-                            $Visible = $Input['Visible'];
-                            $NameTypeDesc = $Input['NameTypeDesc'];
+                        $JsonStatus = $G_data[0]['JsonStatus'];
+                        $JsonStatus = (array)json_decode($JsonStatus,true);
+                        $Approver = $Input['NIP'];
+                        $indexjson = $Input['indexjson'];
+                        $Visible = $Input['Visible'];
+                        $NameTypeDesc = $Input['NameTypeDesc'];
+                        $Status = $JsonStatus[$indexjson]['Status'];
 
-                            $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
-
-                            $JsonStatus[$indexjson] = array(
-                                'NIP' => $Approver,
-                                'Status' => 0,
-                                'ApproveAt' => $ApproveAt,
-                                'Representedby' => '',
-                                'Visible' => $Visible,
-                                'NameTypeDesc' => $NameTypeDesc,
-                            );
-                            $JsonPassHtml = $JsonStatus;
-                            // search name NameAprrovedBy
-                            for ($i=0; $i < count($JsonPassHtml); $i++) { 
-                                $NIP = $JsonPassHtml[$i]['NIP'];
-                                $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
-                                $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
-                            }
-
-                            $JsonStatusSave = json_encode($JsonStatus);
-                            $dataSave = array(
-                                'JsonStatus' => $JsonStatusSave,
-                            );    
-                            $this->db->where('PRCode',$PRCode);
-                            $this->db->update('db_budgeting.pr_create',$dataSave);
-                            
-                            $rs['data']= $JsonPassHtml;
-                            // save to log
-                                $this->m_pr_po->pr_circulation_sheet($PRCode,'Custom Approval',$By = $this->session->userdata('NIP'));
+                        $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
+                        
+                        $JsonStatus[$indexjson] = array(
+                            'NIP' => $Approver,
+                            'Status' => $Status,
+                            'ApproveAt' => $ApproveAt,
+                            'Representedby' => '',
+                            'Visible' => $Visible,
+                            'NameTypeDesc' => $NameTypeDesc,
+                        );
+                        $JsonPassHtml = $JsonStatus;
+                        // search name NameAprrovedBy
+                        for ($i=0; $i < count($JsonPassHtml); $i++) { 
+                            $NIP = $JsonPassHtml[$i]['NIP'];
+                            $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                            $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
                         }
-                        else
-                        {
-                            $PRCode = $Input['prcode'];
-                            $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
-                            $JsonStatus = $G_data[0]['JsonStatus'];
-                            $JsonStatus = (array)json_decode($JsonStatus,true);
-                            $Approver = $Input['NIP'];
-                            $indexjson = $Input['indexjson'];
-                            $Visible = $Input['Visible'];
-                            $NameTypeDesc = $JsonStatus[$indexjson]['NameTypeDesc'];
-                            $Status = $JsonStatus[$indexjson]['Status'];
 
-                            $ApproveAt = $JsonStatus[$indexjson]['ApproveAt'];
+                        $JsonStatusSave = json_encode($JsonStatus);
+                        $dataSave = array(
+                            'JsonStatus' => $JsonStatusSave,
+                        );    
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$dataSave);
                             
-                            $JsonStatus[$indexjson] = array(
-                                'NIP' => $Approver,
-                                'Status' => $Status,
-                                'ApproveAt' => $ApproveAt,
-                                'Representedby' => '',
-                                'Visible' => $Visible,
-                                'NameTypeDesc' => $NameTypeDesc,
-                            );
-                            $JsonPassHtml = $JsonStatus;
-                            // search name NameAprrovedBy
-                            for ($i=0; $i < count($JsonPassHtml); $i++) { 
-                                $NIP = $JsonPassHtml[$i]['NIP'];
-                                $EMPL = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
-                                $JsonPassHtml[$i]['NameAprrovedBy'] = $EMPL[0]['Name'];
-                            }
-
-                            $JsonStatusSave = json_encode($JsonStatus);
-                            $dataSave = array(
-                                'JsonStatus' => $JsonStatusSave,
-                            );    
-                            $this->db->where('PRCode',$PRCode);
-                            $this->db->update('db_budgeting.pr_create',$dataSave);
-                                
-                            $rs['data']= $JsonPassHtml;
-                            // save to log
-                                $this->m_pr_po->pr_circulation_sheet($PRCode,'Custom Approval',$By = $this->session->userdata('NIP')); 
-                        }
+                        $rs['data']= $JsonPassHtml;
+                        // save to log
+                            $this->m_pr_po->pr_circulation_sheet($PRCode,'Custom Approval',$By = $this->session->userdata('NIP'));
                         
                     }
                     

@@ -432,6 +432,19 @@ abstract class Budgeting_Controler extends Globalclass{
         $this->data['IDdepartment'] = $PositionMain['IDDivision'];
         // set session division 
         $this->session->set_userdata('IDDepartement',$PositionMain['IDDivision']);
+
+        // adding menu department
+        $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
+
+        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
+            $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
+        }
+
+        if ($MenuDepartement == 'NA.34') {
+            $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
+        }
+
+        $this->getAuthSession($MenuDepartement);
     }
 
     public function temp($content)
@@ -478,6 +491,11 @@ abstract class Budgeting_Controler extends Globalclass{
 
         if ($MenuDepartement == 'NA.34') {
             $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
+        }
+
+        if ($MenuDepartement == 'NA.36') { // other division
+            $PositionMain = $this->session->userdata('PositionMain');
+            $MenuDepartement = 'NA.'.$PositionMain['IDDivision'];
         }
 
         $getDataMenu = $this->m_budgeting->getMenuGroupUser($this->session->userdata('NIP'),$MenuDepartement);

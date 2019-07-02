@@ -108,11 +108,12 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
 
     function loadTahun()
     {
+      var academic_year_admission = "<?php echo $academic_year_admission ?>";
       var thisYear = (new Date()).getFullYear();
       var startTahun = parseInt(thisYear);
       var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
       for (var i = 0; i <= selisih; i++) {
-          var selected = (i==1) ? 'selected' : '';
+          var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
           $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
       }
 
@@ -185,9 +186,9 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                                    '<td>'+no+'</td>'+
                                    '<td>'+data_json[i]['Years']+'</td>'+
                                    '<td>'+data_json[i]['FormulirCodeGlobal']+'</td>'+
-                                   '<td>'+data_json[i]['FormulirCode']+'</td>'+
+                                   '<td>'+((data_json[i]['FormulirCode'] == null) ? '' : data_json[i]['FormulirCode'])+'</td>'+
                                    status+
-                                   '<td>'+''+'</td>'+
+                                   '<td>'+data_json[i]['Division']+'</td>'+
                                '</tr>' 
                                );
                               no++;
@@ -242,9 +243,9 @@ $Division = $this->session->userdata('PositionMain')['IDDivision'];
                             '<td>'+no+'</td>'+
                             '<td>'+data_json[i]['Years']+'</td>'+
                             '<td>'+data_json[i]['FormulirCodeGlobal']+'</td>'+
-                            '<td>'+data_json[i]['FormulirCode']+'</td>'+
+                            '<td>'+((data_json[i]['FormulirCode'] == null) ? '' : data_json[i]['FormulirCode'])+'</td>'+
                             status+
-                           '<td>'+''+'</td>'+
+                           '<td>'+data_json[i]['Division']+'</td>'+
                         '</tr>' 
                         );
                        no++;

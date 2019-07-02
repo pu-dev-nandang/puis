@@ -7,13 +7,13 @@
     		<th>Nama</th>
     		<th>Email</th>
     		<th>Price Formulir</th>
-    		<th>VA Number</th>
-    		<th>Biling ID</th>
+    		<!-- <th>VA Number</th>
+    		<th>Biling ID</th> -->
     		<!-- <th>File Upload</th> -->
     		<th>Sekolah</th>
     		<th>Formulir Code</th>
     		<th>Register At</th>
-    		<th>Waktu Bayar</th>
+    		<th>Verifikasi Bayar</th>
     		</tr>
     	</thead>
     	<tbody>
@@ -53,12 +53,12 @@
 						'<td>'+no+'</td>'+
 						'<td>'+data_json[i]['Name']+'</td>'+
 						'<td>'+data_json[i]['Email']+'</td>'+
-						'<td>'+data_json[i]['PriceFormulir']+'</td>'+
-						'<td>'+data_json[i]['VA_number']+'</td>'+
-						'<td>'+data_json[i]['BilingID']+'</td>'+
+						'<td>'+formatRupiah(data_json[i]['PriceFormulir'])+'</td>'+
+						// '<td>'+data_json[i]['VA_number']+'</td>'+
+						// '<td>'+data_json[i]['BilingID']+'</td>'+
 						// varFileUpload+
 						'<td>'+data_json[i]['SchoolName']+'</td>'+
-						'<td>'+data_json[i]['FormulirCode']+'</td>'+
+						'<td>'+data_json[i]['FormulirCode']+' / '+data_json[i]['No_Ref']+'</td>'+
 						'<td>'+data_json[i]['RegisterAT']+'</td>'+
 						'<td>'+data_json[i]['VerificationAT']+'</td>'+
 					'</tr>'	

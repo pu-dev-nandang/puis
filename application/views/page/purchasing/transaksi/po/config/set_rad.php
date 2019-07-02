@@ -1,3 +1,25 @@
+<style type="text/css">
+	#tableData9 tbody {
+	    display:block;
+	    height:520px;
+	    overflow:auto;
+	}
+	#tableData9 thead,#tableData9 tbody tr {
+	    display:table;
+	    width:100%;
+	    table-layout:fixed; /* even columns width , fix width of table too*/
+	}
+	#tableData9 thead {
+		/*width: calc( 100% - 1.2em );*/
+		width: calc( 100% - 16.4em );
+		/*width: calc( 100% - 0em );*/
+	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
+	}
+	#tableData9 {
+	    width:1500px;
+	    overflow: auto;
+	}
+</style>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px" id = "loadPageTable">
 	
 </div>
@@ -29,7 +51,7 @@
 										'<table class="table table-bordered tableData" id ="tableData9">'+
 										'<thead>'+
 										'<tr>'+
-				                            '<th>Amount Limit</th>';
+				                            '<th>Limit</th>';
         for (var i = 0; i < cfg_m_userrole.length; i++) {
         	TableGenerate += '<th>'+cfg_m_userrole[i]['NameUserRole']+'</th>';
         }

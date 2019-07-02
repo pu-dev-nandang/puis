@@ -296,6 +296,86 @@ class C_global extends CI_Controller {
         // );
         // $this->db->where('Approver2','["8"]');
         // $this->db->update('db_reservation.category_room',$datasave);
+
+        // insert auth budgeting
+        // $sql = 'select NIP,PositionMain from db_employees.employees where StatusEmployeeID = 1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $NIP = $query[$i]['NIP'];
+        //     $PositionMain = $query[$i]['PositionMain'];
+        //     $P = explode('.', $PositionMain);
+        //     if (count($P) > 1) {
+        //         $P = $P[1];
+        //         $array_admin2 = array(13,14,8,21,7);
+        //             $G_user = 3;
+        //         if (in_array($P, $array_admin2) ) {
+        //              $G_user = 4;
+        //         }
+
+        //         // find data di previleges_guser db_budgeting
+        //         $G__ = $this->m_master->caribasedprimary('db_budgeting.previleges_guser','NIP',$NIP);
+        //         if (count($G__) == 0) {
+        //             $datasave = array(
+        //                 'NIP' => $NIP,
+        //                 'G_user' => $G_user,    
+        //             );
+
+        //             $this->db->insert('db_budgeting.previleges_guser',$datasave);
+        //         }
+        //     }
+            
+        // }
+
+        // insert auth purchasing
+        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
+        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
+        //              a.StatusEmployeeID
+        // FROM   db_employees.employees as a
+        // where (SPLIT_STR(a.PositionMain, ".", 1) = 4 or  SPLIT_STR(a.PositionMain, ".", 1) = 12 ) and a.StatusEmployeeID != -1';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //    if ($query[$i]['PositionMain1'] == 4) {
+        //       $array_admin2 = array(13,14,8,21,7);
+        //        if (in_array($query[$i]['PositionMain2'], $array_admin2) ) {
+        //             $G_user = 4;
+        //         }
+        //         else
+        //         {
+        //             $G_user = 3;
+        //         }
+
+        //    }
+        //    else
+        //    {
+        //     $G_user = 1;
+        //    }
+        //    $NIP = $query[$i]['NIP'];
+        //   $G__ = $this->m_master->caribasedprimary('db_purchasing.previleges_guser','NIP',$NIP);
+        //   if (count($G__) == 0) {
+        //       $datasave = array(
+        //           'NIP' => $NIP,
+        //           'G_user' => $G_user,    
+        //       );
+
+        //       $this->db->insert('db_purchasing.previleges_guser',$datasave);
+        //   }
+        // }
+
+        // inject cfg_rule_g_user purchasing 
+        // $sql = 'select * from db_purchasing.cfg_rule_g_user';
+        // $query=$this->db->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $r = $query[$i];
+        //     unset($r['ID']);
+        //     $r['cfg_group_user'] = 3;
+        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
+        //     $r['cfg_group_user'] = 4;
+        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
+
+        // }
+
+
+
     }
 
     public function testInject2()
@@ -331,6 +411,60 @@ class C_global extends CI_Controller {
         //     $this->db->update('db_admission.register', $dataSave);
         // }
 
+        //get all payment dengan PTID 5 & 6
+        $arr = array();
+        $sql = 'select * from db_finance.payment where PTID in (5,6) limit 100';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $dt = array(); 
+            $ID_payment = $query[$i]['ID'];
+            $NPM = $query[$i]['NPM'];
+            $Invoice = $query[$i]['Invoice'];
+            $Status = $query[$i]['Status'];
+            $PTID = $query[$i]['PTID'];
+
+            // update Invoice = 0.0 Status = 1 based ID = ID_payment
+            // $arr_upd = array(
+            //     'Invoice' => 0.0,
+            //     'Status' => '1',
+            // );
+            // $this->db->where('ID',$ID_payment);
+            // $this->db->update('db_finance.payment',$arr_upd);
+
+            // cek ke payment_student
+            $sql2 = 'select * from db_finance.payment_students where ID_payment = ?';
+            $query2=$this->db->query($sql2, array($ID_payment))->result_array();
+            for ($k=0; $k < count($query2); $k++) { 
+                $ID_payment_std = $query2[$k]['ID'];
+                $InvoiceBill = $query2[$k]['Invoice'];
+                $StatusBill = $query2[$k]['Status'];
+                $dt[] = array(
+                    'ID_payment_std' => $ID_payment_std,
+                    'InvoiceBill' => $InvoiceBill,
+                    'StatusBill' => $StatusBill
+                );
+
+                // update Status = '1' based ID = ID_payment_std
+                // $arr_upd2 = array(
+                //     'Invoice' => 0.0,
+                //     'Status' => 1,
+                // );
+
+                // $this->db->where('ID',$ID_payment_std);
+                // $this->db->update('db_finance.payment_students',$arr_upd2);
+            }
+
+            $arr[] = array(
+                'ID_payment' => $ID_payment,
+                'NPM' => $NPM,
+                'Invoice' => $Invoice,
+                'Status' => $Status,
+                'PTID' => $PTID,
+                'dt' =>$dt
+            );
+        }
+
+        print_r($arr);
 
     }
 
@@ -361,7 +495,92 @@ class C_global extends CI_Controller {
         //         $this->db->insert('db_admission.register_document', $dataSave);
         //     }
         // }
-        
+
+        // untuk data yang tidak sesuai dengan beasiswanya dengan nilai value nya pada table payment_admisi compare dengan tuition_fee
+        $this->load->model('admission/m_admission');
+        $this->load->model('finance/m_finance');
+        $arr = array();
+        // $get = $this->m_master->showData_array('db_finance.payment_admisi');
+        // $sql = 'select * from db_finance.payment_admisi where ID >= 800 and ID_register_formulir != 302';
+        // $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302 order by ID asc limit 200,700';
+        $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302';
+        $get=$this->db->query($sql, array())->result_array();
+        $Filter_ = array();
+        for ($i=0; $i < count($get); $i++) {
+            $ID =  $get[$i]['ID'];
+            $ID_register_formulir = $get[$i]['ID_register_formulir'];
+            $dt = $this->m_admission->getDataPersonal($ID_register_formulir);
+            // get Years and ProdiID
+            $Years = $dt[0]['SetTa'];
+            $ProdiID = $dt[0]['ID_program_study'];
+            // get PTID
+            $PTID = $get[$i]['PTID'];
+            // get tuition fee
+                $G_tuition_fee = $this->m_finance->getPriceBaseBintang($PTID,$ProdiID,$Years,1);
+                $Cost = $G_tuition_fee;
+                $Pay_tuition_fee = $get[$i]['Pay_tuition_fee'];
+                // persen
+                if ($PTID == 3) {
+                    $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                    $Credit = $ccc[0]['DefaultCredit'];
+                    $Cost = $Cost * $Credit;
+                    $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
+                    $persen = abs($persen);
+                }
+                else
+                {
+                    $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
+                    $persen = abs($persen);
+                }
+                
+                if ($persen != $get[$i]['Discount']) {
+                    // get date created and created by
+                    $G_register_admisi = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$ID_register_formulir);
+                    // hitung berapa orang
+                        $b = true;
+                        for ($j=0; $j < count($Filter_); $j++) { 
+                            if ($ID_register_formulir == $Filter_[$j]['ID_register_formulir']) {
+                               $b = false;
+                            }
+                        }
+
+                        if ($b) {
+                            $Filter_[]= array(
+                                'ID_register_formulir' =>$ID_register_formulir,
+                                'FormulirCode' => $dt[0]['FormulirCode'],
+                                'Name' => $dt[0]['Name'],
+                                'CreateAT' => $G_register_admisi[0]['CreateAT'],
+                                'CreateBY' => $G_register_admisi[0]['CreateBY'],
+                            );
+                        }
+
+                    $temp = array(
+                        'ID' => $ID,
+                        'ID_register_formulir' => $ID_register_formulir,
+                        'FormulirCode' => $dt[0]['FormulirCode'],
+                        'Name' => $dt[0]['Name'],
+                        'Discount_seharusnya' => $persen,
+                        'Discount_db' => $get[$i]['Discount'],
+                        'Pay_tuition_fee' => $Pay_tuition_fee,
+                        'CostDefault' => $Cost,
+                        'CreateAT' => $G_register_admisi[0]['CreateAT'],
+                        'CreateBY' => $G_register_admisi[0]['CreateBY'],
+                    );
+                    $arr['dt'][] = $temp;
+
+                    // update data
+                    // $arr_save_db = array(
+                    //     'Discount' => $persen,
+                    // );
+                    // $this->db->where('ID',$ID);
+                    // $this->db->update('db_finance.payment_admisi',$arr_save_db);
+                }
+
+
+        }
+        $arr['Count_person'] = count($Filter_);
+        $arr['Person'] = $Filter_;
+        print_r($arr);
     }
 
 

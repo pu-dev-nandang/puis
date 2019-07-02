@@ -12,7 +12,6 @@ $route['profile'] = 'c_dashboard/profile';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
 
-
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
@@ -489,6 +488,7 @@ $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_Pe
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
 $route['admission/export_PengembalianFormulirData'] = 'c_save_to_excel/export_PengembalianFormulirData';
 $route['admission/TuitionFee_Excel'] = 'c_save_to_excel/export_TuitionFee_Excel';
+$route['admission/intake_Excel'] = 'c_save_to_excel/intake_Excel';
 
 
 $route['admisssion/crm/(:any)'] = 'page/admission/marketing/c_crm/crmpage/$1';
@@ -696,6 +696,8 @@ $route['save2pdf/report-uts'] =  'c_save_to_pdf/report_uts';
 $route['save2pdf/getpdfkwitansi/(:any)'] =  'c_save_to_pdf/getpdfkwitansi/$1';
 $route['save2pdf/print/tuitionFeeAdmission'] =  'C_save_to_pdf2/tuitionFeeAdmission';
 $route['save2pdf/PrintIDCard'] =  'c_save_to_pdf/PrintIDCard';
+$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
+$route['save2pdf/print/spk_or_po'] =  'C_save_to_pdf3/spk_or_po';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
@@ -899,7 +901,7 @@ $route['rest/__rule_service'] = 'api/c_rest/rule_service';
 $route['rest/__rule_users'] = 'api/c_rest/rule_users';
 $route['rest/__getEmployees/(:any)'] = 'api/c_rest/getEmployees/$1';
 $route['rest/__loadDataFormulirGlobal'] = 'api/c_rest/loadDataFormulirGlobal';
-$route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available';
+$route['rest/__loadDataFormulirGlobal_available'] = 'api/c_rest/loadDataFormulirGlobal_available_new';
 $route['rest/__rekapintake'] = 'api/c_rest/rekapintake';
 $route['rest/__rekapintake_reset_client'] = 'api/c_rest/rekapintake_reset_client';
 
@@ -932,6 +934,7 @@ $route['rest/__TestpostdataFrom_PowerApps'] = 'api/c_rest/TestpostdataFrom_Power
 $route['rest/__budgeting/getAllBudget'] = 'api/c_rest/getAllBudget';
 $route['rest/__get_data_pr/(:any)'] = 'api/c_rest/get_data_pr/$1';
 $route['rest/__show_pr_detail'] = 'api/c_rest/show_pr_detail';
+$route['rest/__show_pr_detail_multiple_pr_code'] = 'api/c_rest/show_pr_detail_multiple_pr_code';
 
 $route['rest/__getAdminCRM'] = 'api/c_rest/getAdminCRM';
 
@@ -939,8 +942,12 @@ $route['rest2/__send_notif_browser'] = 'api/c_rest2/send_notif_browser';
 $route['rest2/__remove_file'] = 'api/c_rest2/remove_file';
 $route['rest2/__get_data_po/(:any)'] = 'api/c_rest2/get_data_po/$1';
 $route['rest2/__Get_data_po_by_Code'] = 'api/c_rest2/Get_data_po_by_Code';
+$route['rest2/__Get_supplier_po_by_Code'] = 'api/c_rest2/Get_supplier_po_by_Code';
 $route['rest2/__ajax_terbilang'] = 'api/c_rest2/ajax_terbilang';
+$route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
+$route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
+
 
 $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
 
@@ -951,6 +958,13 @@ $route['rest2/__crudContact'] = 'api/c_rest2/crudContact';
 
 $route['rest2/__crudProspectiveStudents'] = 'api/c_rest2/crudProspectiveStudents';
 $route['rest2/__getPathway'] = 'api/c_rest2/getPathway';
+
+
+$route['rest2/__show_info_pr'] = 'api/c_rest2/show_info_pr';
+$route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
+$route['rest2/__reject_pr_from_another'] = 'api/c_rest2/reject_pr_from_another';
+$route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from_another';
+$route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1';
 
 
 
@@ -1338,6 +1352,15 @@ $route['budgeting/EntryBudget/report_anggaran_per_years'] = 'page/budgeting/c_bu
 
 $route['budgeting/report_anggaran_per_years'] = 'c_save_to_excel/report_anggaran_per_years';
 
+$route['budgeting/menu/menu/save'] = 'page/budgeting/c_menu/save_menu';
+$route['budgeting/menu/sub_menu/save'] = 'page/budgeting/c_menu/save_sub_menu';
+$route['budgeting/menu/group_previleges/crud'] = 'page/budgeting/c_menu/group_previleges_crud';
+$route['budgeting/menu/group_previleges/get_submenu_by_menu'] = 'page/budgeting/c_menu/get_submenu_by_menu';
+$route['budgeting/menu/group_previleges/save_submenu_by_menu'] = 'page/budgeting/c_menu/save_submenu_by_menu';
+$route['budgeting/menu/group_previleges/rud'] = 'page/budgeting/c_menu/group_previleges_rud';
+$route['budgeting/config/getAuthDataTables'] = 'page/budgeting/c_menu/getAuthDataTables';
+$route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
@@ -1369,12 +1392,21 @@ foreach( $result as $row )
 	}
 
 }
-
+$route['purchasing/page/catalog/InputCategory'] = 'page/purchasing/c_master/InputCategory';
 $route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
+
+$route['purchasing/page/catalog/FormInputCategory'] = 'page/purchasing/c_master/InputCategory_FormInput';
 $route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
+
+$route['purchasing/page/catalog/saveFormInput_category'] = 'page/purchasing/c_master/InputCatalog_saveFormInput_category';
 $route['purchasing/page/catalog/saveFormInput'] = 'page/purchasing/c_master/InputCatalog_saveFormInput';
+
+$route['purchasing/page/catalog/DataIntableCategory'] = 'page/purchasing/c_master/Catalog_DataIntableCategory';
 $route['purchasing/page/catalog/DataIntable'] = 'page/purchasing/c_master/Catalog_DataIntable';
+
+$route['purchasing/page/catalog/DataIntableCategory/server_side'] = 'page/purchasing/c_master/Catalog_DataIntableCategory_server_side';
 $route['purchasing/page/catalog/DataIntable/server_side'] = 'page/purchasing/c_master/Catalog_DataIntable_server_side';
+
 $route['purchasing/page/catalog/ApprovalCatalog'] = 'page/purchasing/c_master/ApprovalCatalog';
 $route['purchasing/page/supplier/InputSupplier'] = 'page/purchasing/c_master/InputSupplier';
 $route['purchasing/page/supplier/FormInput'] = 'page/purchasing/c_master/InputSupplier_FormInput';
@@ -1386,6 +1418,9 @@ $route['purchasing/page/supplier/ApprovalSupplier'] = 'page/purchasing/c_master/
 $route['purchasing/table_all/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/table_all/(:any)/(:any)'] = 'page/purchasing/c_purchasing/LoadTable_db_purchasing_all/$1/$2';
 $route['purchasing/page/catalog/import_data'] = 'page/purchasing/c_master/import_data_catalog';
+$route['purchasing/page/supplier/import_data'] = 'page/purchasing/c_master/import_data_supplier';
+
+
 $route['purchasing/page/catalog/allow_division'] = 'page/purchasing/c_master/allow_division_catalog';
 $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/table_allow_div';
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
@@ -1394,13 +1429,27 @@ $route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
 $route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
 $route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';
 $route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Approval';
+$route['purchasing/transaction/po/Set_Approval_SPK']= 'page/purchasing/c_po/Set_Approval_SPK';
 $route['purchasing/transaction/po/userroledepart_submit'] = 'page/purchasing/c_po/userroledepart_submit';
 $route['purchasing/transaction/po/get_cfg_set_roleuser_po/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_po/$1';
+$route['purchasing/transaction/po/get_cfg_set_roleuser_spk/(:any)'] = 'page/purchasing/c_po/get_cfg_set_roleuser_spk/$1';
+
 $route['purchasing/transaction/po/save_cfg_set_roleuser_po'] = 'page/purchasing/c_po/save_cfg_set_roleuser_po';
+$route['purchasing/transaction/po/save_cfg_set_roleuser_spk'] = 'page/purchasing/c_po/save_cfg_set_roleuser_spk';
+$route['purchasing/transaction/po/list/cancel_reject_pr'] = 'page/purchasing/c_po/cancel_reject_pr';
+
 // global lihat PO
 $route['global/purchasing/transaction/po/list/(:any)'] = 'page/C_globalpage/InfoPO/$1';
+$route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/InfoSPK/$1';
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
+
+// global spb
+$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+
+// template import supplier
+$route['purchasing/template_export_supplier'] = 'c_save_to_excel/template_export_supplier';
+$route['purchasing/template_export_catalog'] = 'c_save_to_excel/template_export_catalog';
 
 
 // IT
@@ -1456,7 +1505,7 @@ $route['loginToAdminFaculty'] = 'c_login/loginToAdminFaculty';
 // general affair
 $route['ga_schedule_exchange'] = 'page/ga/C_schedule_exchange/schedule_exchange_action';
 $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchange/submit_change_status';
-$route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
+
 
 // help
 $route['help'] =  'dashboard/C_dashboard/Help';

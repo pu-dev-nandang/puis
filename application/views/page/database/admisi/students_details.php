@@ -39,7 +39,7 @@
             '                <thead>' +
             '                <tr class="tr-center" style="background: #20525a;color: #ffffff;">' +
             '<!--                    <th style="width: 10%;">NIM</th>-->' +
-            '                    <th style="width: 5%;">Formulir Number</th>' +
+            '                    <th style="width: 10%;">Formulir Number</th>' +
             '                    <th>Name</th>' +
             '                    <th>Document</th>' +
             '                    <th style="width: 5%;">Gender</th>' +

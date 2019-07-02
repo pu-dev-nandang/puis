@@ -229,6 +229,7 @@
             <?php else: ?>
                 var division = <?php echo $Division ?>;
             <?php endif ?>
+
             var selectTahun = '<?php echo $Ta ?>';
             var url = base_url_js+'rest/__loadDataFormulirGlobal_available';
             var data = {
@@ -238,6 +239,7 @@
             };
             var token = jwt_encode(data,"UAP)(*");
             $.post(url,{token:token},function (data_json) {
+
                 for (var i = 0; i < data_json.length; i++) {
                     var selected = (i==0) ? 'selected' : '';
                     $('#No_Ref').append('<option value="'+data_json[i].FormulirCodeGlobal+'" '+selected+'>'+data_json[i].FormulirCodeGlobal+'</option>');
@@ -903,4 +905,5 @@
 
           return true;
         }
+
 </script>

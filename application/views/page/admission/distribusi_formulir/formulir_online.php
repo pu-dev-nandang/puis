@@ -24,7 +24,7 @@
 						    <option value= "1">Yes</option>
 						</select>
 					</div>
-					<div  class="col-md-4" align="right" id="pagination_link"></div>	
+					<div  class="col-md-4 col-md-offset-2" align="right" id="pagination_link"></div>	
 					<!-- <div class = "table-responsive" id= "register_document_table"></div> -->
 				</div>
 				<div class="row" style="margin-top: 10px">
@@ -104,11 +104,12 @@
 
 	function loadTahun()
     {
+    	var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
     	var thisYear = (new Date()).getFullYear();
       	var startTahun = parseInt(thisYear);
      	 var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
      	 for (var i = 0; i <= selisih; i++) {
-          var selected = (i==1) ? 'selected' : '';
+          var selected = (( parseInt(startTahun) + parseInt(i) )==academic_year_admission) ? 'selected' : '';
           $('#selectTahun').append('<option value="'+ ( parseInt(startTahun) + parseInt(i) ) +'" '+selected+'>'+( parseInt(startTahun) + parseInt(i) )+'</option>');
      	 }
 

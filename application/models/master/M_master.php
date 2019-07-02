@@ -437,9 +437,12 @@ class M_master extends CI_Model {
             }*/
 
             // get last formulir code
-            $sql = 'select * from db_admission.formulir_number_offline_m order by FormulirCode desc limit 1';
-            $query=$this->db->query($sql, array())->result_array();
-            $start = $query[0]['ID'] + 1;
+            $sql = 'select * from db_admission.formulir_number_offline_m where Years = ? order by FormulirCode desc limit 1';
+            $query=$this->db->query($sql, array($tahun))->result_array();
+            $start = $query[0]['FormulirCode'];
+            $Number = substr($start, 3,4);
+            $Number = $Number + 1;
+            $start = $Number;
             for ($i=0; $i < $count_account; $i++) {
                 $this->insertDataFormulirOffline($tahun,$start);
                 $start++;
@@ -463,7 +466,7 @@ class M_master extends CI_Model {
         $this->load->library('JWT');
         $key = "UAP)(*";
         // $url = $this->jwt->encode($yy.$code.$increment.";".$tahun,$key);
-        $url = substr(md5(uniqid(mt_rand(), true)), 0, 8);
+        $url = $yy.substr(md5(uniqid(mt_rand(), true)), 0, 8).$increment;
         $baseURL = url_registration."formulir-registration-offline/".$url;
         $dataSave = array(
             'Years' => $tahun,
@@ -1050,7 +1053,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $this->db->insert('db_admission.register_verification', $dataSave);
     }
 
-    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode)
+    public function saveDataRegisterVerified($RegVerificationID,$FormulirCode,$tgl = null,$PIC = null)
     {
         // $getFormulirCode = $this->getFormulirCode('online');
         $dataSave = array(
@@ -1059,6 +1062,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // 'VerificationBY' => $this->session->userdata('NIP'),
             'VerificationAT' => date('Y-m-d H:i:s'),
         );
+
+        if ($tgl != null) {
+            $dataSave['VerificationAT'] = $tgl.' 00:00:00';
+            $dataSave['VerificationBY'] = $this->session->userdata('NIP');
+        }
+
         $this->db->insert('db_admission.register_verified', $dataSave);
     }
 
@@ -2527,7 +2536,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         if ($x < 12)
             return " " . $abil[$x];
         elseif ($x < 20)
-            return $this->moneySay($x - 10) . "belas";
+            return $this->moneySay($x - 10) . " belas";
         elseif ($x < 100)
             return $this->moneySay($x / 10) . " puluh" . $this->moneySay($x % 10);
         elseif ($x < 200)
@@ -3040,5 +3049,52 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
         }
         return $output; // return array and encode to insert to db
+    }
+
+    public function genratePassword($Username,$Password){
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+
+        return $pass;
+    }
+
+    public function facultyActiveByProgramStudy()
+    {
+        $sql = 'select a.FacultyID,b.Name,b.NameEng from db_academic.program_study as a join db_academic.faculty as b on a.FacultyID = b.FacultyID
+                where a.Status = 1
+                GROUP by a.FacultyID';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;  
+
+    }
+
+    public function GetDateAfterOrBefore($date=null,$pass = null)
+    {
+        /* 
+           passing data menggunakan tanda (+) atau (-)
+           return data dalam bentuk format date time mysql
+        */
+        $rs = '';
+       if ($pass != null && $date != null) {
+           if (substr($pass, 0,1) == '+' || substr($pass, 0,1) == '-') {
+            // read length
+            $strlen = strlen($pass);
+            $DayInterval = substr($pass, 1, ($strlen-1) );
+              if (substr($pass, 0,1) == '+') {
+                 $sql = 'select date_add("'.$date.'", INTERVAL '.$DayInterval.' DAY) as DateRs';
+                 $query=$this->db->query($sql, array())->result_array();
+                 $rs = $query[0]['DateRs'];
+              }
+              else if(substr($pass, 0,1) == '-')
+              {
+                $sql = 'select DATE_SUB("'.$date.'", INTERVAL '.$DayInterval.' DAY) as DateRs';
+                $query=$this->db->query($sql, array())->result_array();
+                $rs = $query[0]['DateRs'];
+              }
+           }
+       }
+
+       return $rs;
     }
 }

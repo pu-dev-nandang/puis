@@ -344,31 +344,66 @@ class C_rest2 extends CI_Controller {
                 $dataToken = $this->getInputToken2();
                 $auth = $this->m_master->AuthAPI($dataToken);
                 if ($auth) {
+                    // get Department
+                    $IDDepartementPUBudget = $dataToken['IDDepartementPUBudget'];
+                    $WhereFiltering = '';
+                    // $WhereFiltering2 = '';
+                    if ($IDDepartementPUBudget != 'NA.4') {
+                        $NIP = $dataToken['sessionNIP'];
+                        $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                        // $WhereFiltering2 .= ' or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
+                    }
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
-                    $sqltotalData = 'select count(*) as total from db_purchasing.po_create';
-                    $StatusQuery = ($Status == 'All') ? '' : ' where Status = '.$Status;
-                    $sqltotalData .= $StatusQuery;
+                    $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
+                    $sqltotalData = 'select count(*) as total  from (
+                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                    c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                    a.JsonStatus,
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
+                                from db_purchasing.po_create as a
+                                left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                                left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP
+                                left join db_purchasing.po_detail as e on a.Code = e.Code
+                                left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                                left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                                group by a.Code     
+                            )aa
+                           ';
+
+                    $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                          or PRCode LIKE "'.$requestData['search']['value'].'%"  
+                        ) '.$StatusQuery.$WhereFiltering ;
+
                     $querytotalData = $this->db->query($sqltotalData)->result_array();
                     $totalData = $querytotalData[0]['total'];
 
                     $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
                     $sql = 'select * from (
-                                select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
-                                left join db_employees.employees as d on a.CreatedBy = d.NIP     
+                                left join db_employees.employees as d on a.CreatedBy = d.NIP
+                                left join db_purchasing.po_detail as e on a.Code = e.Code
+                                left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                                left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                                join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                                group by a.Code      
                             )aa
                            ';
 
                     $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
-                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%"  
-                        ) '.$StatusQuery ;
-                    $sql.= ' ORDER BY Code Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                          or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                          or PRCode LIKE "'.$requestData['search']['value'].'%"  
+                        ) '.$StatusQuery.$WhereFiltering ;
+                    $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
 
                     $No = $requestData['start'] + 1;
@@ -419,6 +454,38 @@ class C_rest2 extends CI_Controller {
 
                         $nestedData = array_merge($nestedData,$arr);
                         $nestedData[] = $row['NameCreateBy'];
+                        // find PR in po_detail
+                            $arr_temp = array();
+                            $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
+                            from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                            left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                            left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                            where d.Code = ?
+                            ';
+                            $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
+                            for ($j=0; $j < count($query_get_pr); $j++) { 
+                                if (count($arr_temp) == 0) {
+                                    $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                }
+                                else
+                                {
+                                    // check exist
+                                    $bool = true;
+                                    for ($k=0; $k < count($arr_temp); $k++) { 
+                                        if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                            $bool = false;    
+                                            break;
+                                        }
+                                    }
+
+                                    if ($bool) {
+                                        $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    }
+
+                                }
+                            }
+
+                        $nestedData[] = $arr_temp;
                         $data[] = $nestedData;
                         $No++;
                     }
@@ -466,15 +533,130 @@ class C_rest2 extends CI_Controller {
             }
     }
 
+    public function Get_supplier_po_by_Code()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $Code = $dataToken['Code'];
+                    $data = $this->m_pr_po->Get_supplier_po_by_Code($Code);
+                    echo json_encode($data);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
     public function ajax_terbilang()
     {
         try {
                 $dataToken = $this->getInputToken2();
                 $auth = $this->m_master->AuthAPI($dataToken);
                 if ($auth) {
-                    $terbilang = $this->m_master->moneySay($dataToken['bilangan']).'Rupiah';
+                    $terbilang = $this->m_master->moneySay($dataToken['bilangan']);
                     $terbilang = trim(ucwords($terbilang));
                     echo json_encode($terbilang);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function ajax_dayOfDate()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = '';
+                    $hari = array ( 1 =>    'Senin',
+                                'Selasa',
+                                'Rabu',
+                                'Kamis',
+                                'Jumat',
+                                'Sabtu',
+                                'Minggu'
+                            );
+                    $Date = $dataToken['Date'];
+                    $Date = date("Y-m-d", strtotime($Date));
+                    $num = date('N', strtotime($Date)); 
+                    $NameDay = $hari[$num];
+                    echo json_encode($NameDay);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function Get_spk_pembukaan()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = '';
+                    $Date = $dataToken['Date'];
+                    // get hari
+                        $data = array(
+                              'Date' => $Date,
+                              'auth' => 's3Cr3T-G4N', 
+                        ); 
+                        $url = url_pas.'rest2/__ajax_dayOfDate';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        // $this->m_master->apiservertoserver($url,$token);
+                        $NameDay = $this->m_master->apiservertoserver($url,$token);
+                    // terbilang tanggal
+                         $bilangan = date("d", strtotime($Date));
+                         $data = array(
+                               'bilangan' => $bilangan,
+                               'auth' => 's3Cr3T-G4N', 
+                         ); 
+                         $url = url_pas.'rest2/__ajax_terbilang';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         // $this->m_master->apiservertoserver($url,$token);
+                         $Tanggal = $this->m_master->apiservertoserver($url,$token);
+
+                    // Nama Bulan
+                        $Date_ = date("Y-m-d", strtotime($Date));
+                        $DateIndo = $this->m_master->getIndoBulan($Date_);
+                        $DateIndo = explode(' ', $DateIndo);
+                        $NmBulan = $DateIndo[1];
+
+                    // terbilang tahun
+                         $bilangan = date("Y", strtotime($Date));
+                         $data = array(
+                               'bilangan' => $bilangan,
+                               'auth' => 's3Cr3T-G4N', 
+                         ); 
+                         $url = url_pas.'rest2/__ajax_terbilang';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         // $this->m_master->apiservertoserver($url,$token);
+                         $Tahun = $this->m_master->apiservertoserver($url,$token);          
+                    $rs = 'Pada hari ini '.$NameDay[0].', tanggal '.$Tanggal[0].' Bulan '.$NmBulan.', tahun '.$Tahun[0].', kami yang bertanda tangan dibawah ini :';     
+                    echo json_encode($rs);
                 }
                 else
                 {
@@ -509,6 +691,7 @@ class C_rest2 extends CI_Controller {
 
                         // get data
                         $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+                        $urlS = ($G_data[0]['TypeCreate'] == 1) ? 'po' : 'spk';
 
                         $keyJson = $approval_number - 1; // get array index json
                         $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
@@ -565,9 +748,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO : '.$Code,
-                                                                'Description' => 'Please approve PO '.$Code,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                                                'Description' => 'Please approve PO/SPK '.$Code,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -584,9 +767,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PO '.$Code.' has been Approved',
-                                                                'Description' => 'PR '.$Code.' has been approved by '.$NameFor_NIP,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PO/SPK '.$Code.' has been Approved',
+                                                                'Description' => 'PO/SPK '.$Code.' has been approved by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -619,9 +802,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
-                                                                'Description' => 'PO '.$Code.' has been done',
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been done',
+                                                                'Description' => 'PO/SPK '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -638,9 +821,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been done',
-                                                                'Description' => 'PO '.$Code.' has been done',
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been done',
+                                                                'Description' => 'PO/SPK '.$Code.' has been done',
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -651,7 +834,43 @@ class C_rest2 extends CI_Controller {
 
                                             $url = url_pas.'rest2/__send_notif_browser';
                                             $token = $this->jwt->encode($data,"UAP)(*");
-                                            $this->m_master->apiservertoserver($url,$token);   
+                                            $this->m_master->apiservertoserver($url,$token);
+
+                                        // insert to po_invoice_status
+                                            $Code_po_create = $Code;
+                                            $G_po_detail = $this->m_master->caribasedprimary('db_purchasing.po_detail','Code',$Code_po_create);
+                                            $InvoicePO = 0; // tambah dengan biaya lain-lain
+                                            // $AnotherCost = $G_data[0]['AnotherCost'];
+                                            // $InvoicePO = $InvoicePO + $AnotherCost;
+                                            for ($i=0; $i < count($G_po_detail); $i++) { 
+                                               $InvoicePO = $InvoicePO + $G_po_detail[$i]['SubTotal'];
+                                            }
+                                        // check po_invoice_status already exist or not
+                                             $G_po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
+                                             if (count($G_po_invoice_status) > 0 ) {
+                                                  $InvoicePayPO = $G_po_invoice_status[0]['InvoicePayPO']; 
+                                                  $InvoiceLeftPO = $InvoicePO - $InvoicePayPO;
+
+                                                  $dtSave = array(
+                                                    'InvoicePO' => $InvoicePO,
+                                                    'InvoicePayPO' => $InvoicePayPO,
+                                                    'InvoiceLeftPO' => $InvoiceLeftPO,
+                                                  );
+                                                  $this->db->where('Code_po_create',$Code_po_create);
+                                                  $this->db->update('db_purchasing.po_invoice_status',$dtSave); 
+                                              }
+                                              else{
+                                                $InvoicePayPO = 0; 
+                                                $InvoiceLeftPO = $InvoicePO;
+                                                $dtSave = array(
+                                                  'Code_po_create' => $Code_po_create,  
+                                                  'InvoicePO' => $InvoicePO,
+                                                  'InvoicePayPO' => $InvoicePayPO,
+                                                  'InvoiceLeftPO' => $InvoiceLeftPO,
+                                                );
+                                                $this->db->insert('db_purchasing.po_invoice_status',$dtSave);
+                                              }   
+
                                     }
                                 }
 
@@ -665,9 +884,9 @@ class C_rest2 extends CI_Controller {
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO '.$Code.' has been Rejected',
-                                                                'Description' => 'PO '.$Code.' has been Rejected by '.$NameFor_NIP,
-                                                                'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PO/SPK '.$Code.' has been Rejected',
+                                                                'Description' => 'PO/SPK '.$Code.' has been Rejected by '.$NameFor_NIP,
+                                                                'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
                                                 'To' => array(
@@ -710,6 +929,7 @@ class C_rest2 extends CI_Controller {
                  echo '{"status":"999","message":"Not Authorize"}';
             }
     }
+
 
 
     // ==== CRM ====
@@ -1245,5 +1465,310 @@ class C_rest2 extends CI_Controller {
     }
 
     // ==== PENUTUP CRM ====
+
+
+    public function show_info_pr()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $PRCode = $dataToken['PRCode'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_budgeting.pr_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.PRCode = ?
+                        ';
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs['PR_Process'] = $query;
+
+                $rs['PR_Status_Summary'] = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+                $sql = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code
+                        from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                        left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                        left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                        where a.PRCode = ?
+                        '; 
+                $query=$this->db->query($sql, array($PRCode))->result_array();
+                $rs['PR_link_PO'] = $query;
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function show_info_po()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $Code = $dataToken['Code'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.po_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.Code = ?
+                        ';
+                $query=$this->db->query($sql, array($Code))->result_array();
+                $rs['po_circulation_sheet'] = $query;
+                $po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code);
+                $rs['po_invoice_status'] = $po_invoice_status;        
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function reject_pr_from_another()
+    {
+        $msg = '';
+        $Reload = 0;
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $BoolReload = false;
+                $this->load->model('budgeting/m_budgeting');
+                $this->load->model('budgeting/m_pr_po');
+                $PRCode = $dataToken['PRCode'];
+                $NIP = $dataToken['NIP'];
+
+                // check PR Item belum di proses pada PO
+                    $Bool = $this->m_pr_po->check_pr_item_In_po($PRCode);
+                    if ($Bool) {
+                        $datasave['Status'] = 3;
+                        $this->db->where('PRCode',$PRCode);
+                        $this->db->update('db_budgeting.pr_create',$datasave);
+                        $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                        $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                        $NameFor_NIP = $G_emp[0]['Name'];
+                        $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                        // Send Notif for user 
+                            $data = array(
+                                'auth' => 's3Cr3T-G4N',
+                                'Logging' => array(
+                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                'URLDirect' => 'budgeting_pr',
+                                                'CreatedBy' => $NIP,
+                                              ),
+                                'To' => array(
+                                          'NIP' => array($JsonStatus[0]['NIP']),
+                                        ),
+                                'Email' => 'No', 
+                            );
+
+                            $url = url_pas.'rest2/__send_notif_browser';
+                            $token = $this->jwt->encode($data,"UAP)(*");
+                            $this->m_master->apiservertoserver($url,$token);
+
+                        $Desc = 'Reject by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                        $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+                    }
+                    else
+                    {
+                        $msg = 'PR is being processed, cant action reject';
+                    }
+
+                    echo json_encode($msg);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function cancel_pr_item_from_another()
+    {
+        $rs = array ('msg' => '','reload' => 0);
+        $Reload = 0;
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $BoolReload = false;
+                $this->load->model('budgeting/m_budgeting');
+                $this->load->model('budgeting/m_pr_po');
+                $ID_pr_detail = $dataToken['ID_pr_detail'];
+                $NIP = $dataToken['NIP'];
+                // get PRCode first
+                $G_pr_detail = $this->m_master->caribasedprimary('db_budgeting.pr_detail','ID',$ID_pr_detail);
+                $PRCode = $G_pr_detail[0]['PRCode'];
+
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                $NameFor_NIP = $G_emp[0]['Name'];
+                $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                // yang boleh di cancel adalah item pr yang dalam status po_nya adalah cancel dan item pr yang belum di proses po
+                // jika item pr di cancel yang belum masuk proses po maka status pr akan otomatis reject
+                    $__G_po_detail = $this->m_pr_po->check_po_status_by_item_pr_detail($ID_pr_detail);
+                    if ($__G_po_detail == 4) {
+                        $Bool = $this->m_pr_po->check_pr_item_In_po($PRCode); // auto reject if true
+                        if ($Bool) {
+                            $datasave['Status'] = 3;
+                            $this->db->where('PRCode',$PRCode);
+                            $this->db->update('db_budgeting.pr_create',$datasave);
+
+                            // Send Notif for user 
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Logging' => array(
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                    'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                    'URLDirect' => 'budgeting_pr',
+                                                    'CreatedBy' => $NIP,
+                                                  ),
+                                    'To' => array(
+                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                            ),
+                                    'Email' => 'No', 
+                                );
+
+                                $url = url_pas.'rest2/__send_notif_browser';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
+
+                                $rs['reload'] = 1;
+
+                        }
+
+                        // cek status first
+                            $Status = $G_pr_detail[0]['Status'];
+                            if ($Status == 1) {
+                                $arr = array($ID_pr_detail);
+                                $this->m_pr_po->ReturnAllBudgetFromID_pr_detail($arr);
+
+                                $ID_m_catalog = $G_pr_detail[0]['ID_m_catalog'];
+                                $G_m_catalog = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$ID_m_catalog);
+                                
+                                $Desc = 'Item '.$G_m_catalog[0]['Item'].' cancel by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                                $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                                // update ke pr_status dan pr_status_detail
+                                    $this->m_pr_po->__cancel_item_by_id_pr_detail($ID_pr_detail,$PRCode);
+                            }
+                            else
+                            {
+                                $rs['msg'] = 'Item has canceled,cant action';
+                            }
+
+                    }
+                    else
+                    {
+                        $G_pr_status_detail= $this->m_master->caribasedprimary('db_purchasing.pr_status_detail','ID_pr_detail',$ID_pr_detail); // auto reject if true
+                        $Bool = ($G_pr_status_detail[0]['Status'] == 0) ? true : false;
+                        if ($Bool) {
+                            $Bool2 = $this->m_pr_po->check_pr_item_In_po($PRCode); // auto reject if true
+                            if ($Bool2) {
+                                $datasave['Status'] = 3;
+                                $this->db->where('PRCode',$PRCode);
+                                $this->db->update('db_budgeting.pr_create',$datasave);
+
+                                // Send Notif for user 
+                                    $data = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Logging' => array(
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                        'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
+                                                        'URLDirect' => 'budgeting_pr',
+                                                        'CreatedBy' => $NIP,
+                                                      ),
+                                        'To' => array(
+                                                  'NIP' => array($JsonStatus[0]['NIP']),
+                                                ),
+                                        'Email' => 'No', 
+                                    );
+
+                                    $url = url_pas.'rest2/__send_notif_browser';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver($url,$token);
+
+                                    $rs['reload'] = 1;
+                            }
+                            
+                           // cek status first
+                               $Status = $G_pr_detail[0]['Status'];
+                               if ($Status == 1) {
+                                   $arr = array($ID_pr_detail);
+                                   $this->m_pr_po->ReturnAllBudgetFromID_pr_detail($arr);
+
+                                   $ID_m_catalog = $G_pr_detail[0]['ID_m_catalog'];
+                                   $G_m_catalog = $this->m_master->caribasedprimary('db_purchasing.m_catalog','ID',$ID_m_catalog);
+                                   
+                                   $Desc = 'Item '.$G_m_catalog[0]['Item'].' cancel by '.$NameFor_NIP.'<br>{'.$dataToken['NoteDel'].'}';    
+                                   $this->m_pr_po->pr_circulation_sheet($PRCode,$Desc,$NIP);
+
+                                   // update ke pr_status dan pr_status_detail
+                                       $this->m_pr_po->__cancel_item_by_id_pr_detail($ID_pr_detail,$PRCode);
+                               }
+                               else
+                               {
+                                   $rs['msg'] = 'Item has canceled,cant action';
+                               }     
+
+                        }
+                        else
+                        {
+                            $rs['msg'] = 'Item is being processed';
+                        }
+                    }
+
+                    echo json_encode($rs);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function getCategoryCatalog($Active = null)
+    {
+        $sql = 'select * from db_purchasing.m_category_catalog';
+        if ($Active == 'All') {
+            $sql.= '';
+        }
+        elseif ($Active == 1 || $Active == 0) {
+            $sql.= ' where Active = '.$Active;
+        }
+
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+    }
 
 }

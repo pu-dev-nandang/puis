@@ -121,9 +121,9 @@ function loadTable()
 	    dataForTable = response;
 	    // console.log(dataForTable);
 	    for (var i = 0; i < dataForTable.length; i++) {
-	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-time" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-	    	var btn_del = '<button type="button" class="btn btn-danger btn-deleteTime"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-minus-circle" style="color: red;"></i> Deactivated</button>';
+	    	var btn_edit = '<button type="button" class="btn btn-warning btn-edit btn-edit-time btn-write" Year = "'+dataForTable[i].Year+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+	    	var btn_del = '<button type="button" class="btn btn-danger btn-deleteTime btn-write"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+            var Activated = '&nbsp<button type="button" class="btn btn-default btn-activated btn-write"  Year = "'+dataForTable[i].Year+'"> <i class="fa fa-minus-circle" style="color: red;"></i> Deactivated</button>';
             var StActivated = '<i class="fa fa-check-circle" style="color: green;"></i>';
             if(dataForTable[i].Activated == 0)
             {
