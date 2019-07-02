@@ -14,34 +14,36 @@
                 <h4 class="panel-title">Create / Update Form CRM</h4>
             </div>
             <div class="panel-body">
+                <input class="hide" id="formID">
 
-                <div class="alert alert-info" role="alert">
-                    <b style="text-align: center;">Year - <span id="viewPeriod"></span></b>
-                    <input class="hide" id="formID">
-                    <input class="hide" id="formPeriodID">
+                <div class="form-group">
+                    <label>Periode <span class="required">*</span></label>
+                    <select class="form-control" id="formPeriodID"></select>
                 </div>
+
+                <hr/>
 
                 <div class="form-group">
                     <label>Marketing Activity</label>
                     <select class="form-control" id="formMarketingActivity"></select>
                 </div>
                 <div class="form-group">
-                    <label>Select Team</label>
+                    <label>Select Team <span class="required">*</span></label>
                     <select class="form-control" id="formTeam"></select>
                 </div>
 
                 <hr/>
 
                 <div class="form-group">
-                    <label>Full Name</label>
+                    <label>Full Name <span class="required">*</span></label>
                     <input class="form-control" id="formName"/>
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>Email <span class="required">*</span></label>
                     <input typeof="email" class="form-control" id="formEmail"/>
                 </div>
                 <div class="form-group">
-                    <label>Phone</label>
+                    <label>Phone <span class="required">*</span></label>
                     <input typeof="number" data-form="phone" class="form-control" id="formPhone"/>
                 </div>
                 <div class="form-group">
@@ -133,17 +135,24 @@
         $.post(url,{token:token},function (jsonResult) {
             var y = jsonResult[0].Year;
             var i = jsonResult[0].ID;
-            $('#viewPeriod').html(y);
-            $('#formPeriodID').val(i);
 
             loadTeamCRM(i);
 
             loadSelectOptionCRMPeriod('#filterPeriod',i);
+            loadSelectOptionCRMPeriod('#formPeriodID',i);
 
 
         });
 
     }
+
+    $('#formPeriodID').change(function () {
+        var formPeriodID = $('#formPeriodID').val();
+        if(formPeriodID!='' && formPeriodID!=null){
+            loadTeamCRM(formPeriodID);
+        }
+
+    });
 
     function loadTeamCRM(filterPeriod) {
 
@@ -157,6 +166,7 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
+                $('#formTeam').empty();
                if(jsonResult.length>0){
                    $.each(jsonResult,function (i,v) {
 
@@ -169,7 +179,7 @@
                                var sc = (adminPanel=='0' && sessionNIP==v2.NIP) ? 'selected' : '';
 
                                var allDisabled = (adminPanel=='0') ? 'disabled' : '';
-                               allDisabled = (sessionNIP!=v2.NIP) ? 'disabled' : '';
+                               allDisabled = (adminPanel=='0' && sessionNIP!=v2.NIP) ? 'disabled' : '';
 
                                if(v2.Status=='1'){
                                    opt = opt+'<option style="color: blue;background: #f5f5f5;" value="'+v.ID+'.'+v2.NIP+'" '+sc+' '+allDisabled+'>(Co) '+v2.MemberName+'</option>';
@@ -182,6 +192,8 @@
                        $('#formTeam').append('<optgroup label="'+v.Name+'">'+opt+'</optgroup>');
 
                    });
+               } else {
+                   $('#formTeam').append('<option selected disabled>-- Team not yet Set --</option>');
                }
             });
 
@@ -224,11 +236,15 @@
 
     $('#btnSavePS').click(function () {
 
-        var formTeam = $('#formTeam').val();
         var formPeriodID = $('#formPeriodID').val();
+        var formTeam = $('#formTeam').val();
+        checkFormRequired('#formTeam',formTeam);
         var formName = $('#formName').val();
+        checkFormRequired('#formName',formName);
         var formEmail = $('#formEmail').val();
+        checkFormRequired('#formEmail',formEmail);
         var formPhone = $('#formPhone').val();
+        checkFormRequired('#formPhone',formPhone);
         var formLineID = $('#formLineID').val();
 
         if(formTeam!='' && formTeam!=null &&
@@ -237,7 +253,7 @@
         formEmail!='' && formEmail!=null &&
         formPhone!='' && formPhone!=null){
 
-            loading_buttonSm('#btnSavePS')
+            loading_buttonSm('#btnSavePS');
 
             var arrTeam = formTeam.split('.');
 
@@ -284,6 +300,8 @@
                 },500);
             });
 
+        } else {
+            toastr.warning('Please fill in the form required','Warning');
         }
 
 
@@ -294,12 +312,16 @@
 
         var viewProspectiveStudents = $('#viewProspectiveStudents').val();
 
+        console.log(viewProspectiveStudents);
+
         var viewProspectiveStudents = JSON.parse(viewProspectiveStudents);
         var ID = $(this).attr('data-id');
 
         var result = $.grep(viewProspectiveStudents, function(e){ return e.ID == ID; });
 
         var d = result[0];
+
+        console.log(d);
 
         $('#formID').val(d.ID);
         $('#formName').val(d.Name);
@@ -338,18 +360,19 @@
 
             var d_v = jsonResult[0];
 
+
             var body = '<div class="row">' +
                 '    <div class="col-md-5" style="border-right: 1px solid #CCCCCC;">' +
                 '' +
                 '        <div class="form-group">' +
-                '            <label>Name</label>' +
+                '            <label>Name <span class="required">*</span></label>' +
                 '            <input type="text" value="'+ifNullChecking(d_v.ID)+'" class="hide" id="formID" />' +
                 '            <input type="text" value="'+ifNullChecking(d_v.Name)+'" class="form-control" id="formName" />' +
                 '        </div>' +
                 '       <div class="row">' +
                 '           <div class="col-xs-5">' +
                 '               <div class="form-group">' +
-                '                   <label>Gender</label>' +
+                '                   <label>Gender <span class="required">*</span></label>' +
                 '                   <select class="form-control" id="formGender">' +
                 '                       <option value="Male">Male</option>' +
                 '                       <option value="Female">Female</option>' +
@@ -358,14 +381,14 @@
                 '           </div>' +
                 '           <div class="col-xs-7">' +
                 '               <div class="form-group">' +
-                '                   <label>Phone</label>' +
+                '                   <label>Phone <span class="required">*</span></label>' +
                 '                   <input type="number" data-form="phone" value="'+ifNullChecking(d_v.Phone)+'" id="formPhone" class="form-control"/>' +
                 '               </div>' +
                 '           </div>' +
                 '       </div>' +
 
                 '        <div class="form-group">' +
-                '            <label>Email</label>' +
+                '            <label>Email <span class="required">*</span></label>' +
                 '            <input type="email" value="'+ifNullChecking(d_v.Email)+'" id="formEmail" class="form-control"/>' +
                 '        </div>' +
                 '       <div class="row">' +
@@ -392,28 +415,28 @@
                 '       <div class="row">' +
                 '           <div class="col-xs-5">' +
                 '               <div class="form-group">' +
-                '                   <label>Class</label>' +
+                '                   <label>Class <span class="required">*</span></label>' +
                 '                  <input type="number" value="'+ifNullChecking(d_v.Class)+'" id="formClass" class="form-control"/>' +
                 '               </div>' +
                 '           </div>' +
                 '           <div class="col-xs-7">' +
                 '               <div class="form-group">' +
-                '                   <label>Pathway</label>' +
+                '                   <label>Pathway <span class="required">*</span></label>' +
                 '                   <select class="form-control" id="formPathwayID"><option></option></select>' +
                 '               </div>' +
                 '           </div>' +
                 '       </div>' +
                 '' +
                 '        <div class="form-group">' +
-                '            <label>Place Of Birth</label>' +
+                '            <label>Place Of Birth <span class="required">*</span></label>' +
                 '            <input type="text" value="'+ifNullChecking(d_v.PlaceOfBirth)+'" id="formPlaceOfBirth" class="form-control"/>' +
                 '        </div>' +
                 '        <div class="form-group">' +
-                '            <label>Date Of Birth</label>' +
+                '            <label>Date Of Birth <span class="required">*</span></label>' +
                 '            <input type="text" value="" id="formDateOfBirth" readonly class="form-control"/>' +
                 '        </div>' +
                 '        <div class="form-group">' +
-                '            <label>Address</label>' +
+                '            <label>Address <span class="required">*</span></label>' +
                 '            <textarea class="form-control" id="formAddress" rows="3">'+ifNullChecking(d_v.Address)+'</textarea>' +
                 '        </div>' +
                 '        <div class="form-group" id="divFormUpload">' +
@@ -471,16 +494,18 @@
                 '    <div class="col-md-3">' +
                 '        <div class="form-group">' +
                 '            <label>Status</label>' +
-                '            <select class="form-control" id="formStatusPS"></select>' +
+                '            <div id="viewStatus">' +
+                '               <select class="form-control" id="formStatusPS"></select>' +
+                '           </div>' +
                 '        </div>' +
                 '        <div id="viewListComment"></div>' +
-                '        <div class="well">' +
+                '        <div class="well" id="viewListCommentForm">' +
                 '            <label>Follow Up <span id="viewFollowUp"></span></label>' +
                 '            <input class="hide" value="" id="formFollowUpID"/>' +
                 '            <input class="hide" value="0" id="formFollowUp"/>' +
                 '            <textarea class="form-control" id="formComment"></textarea>' +
                 '            <textarea class="hide" id="dataListComment"></textarea>' +
-                '<hr/>' +
+                '               <hr/>' +
                 '            <div style="text-align: right;"><button id="btnSaveComment" class="btn btn-xs btn-primary">Save</button></div>' +
                 '        </div>' +
                 '        ' +
@@ -492,7 +517,13 @@
             $('#GlobalModalLarge .modal-body').html(body);
 
             var StatusMart = (d_v.Status!='' && d_v.Status!=null) ? d_v.Status : '';
-            loadSelectOptionStatusMarketing('#formStatusPS',StatusMart);
+            if(parseInt(StatusMart)!=7 && parseInt(StatusMart)!=8){
+                loadSelectOptionStatusMarketing('#formStatusPS',StatusMart);
+            } else {
+                $('#viewStatus').html('<label class="'+d_v.StatusClass+'">'+d_v.StatusDesc+'</label>');
+                $('#viewListCommentForm').remove();
+            }
+
 
             // Cek File
             if(d_v.File!='' && d_v.File!=null){
@@ -590,20 +621,29 @@
 
     $(document).on('click','#btnSaveFullPS',function () {
 
-        loading_button('#btnSaveFullPS');
+
         
         var formID = $('#formID').val();
         var formName = $('#formName').val();
+        checkFormRequired('#formName',formName);
         var formGender = $('#formGender').val();
+        checkFormRequired('#formGender',formGender);
         var formPhone = $('#formPhone').val();
+        checkFormRequired('#formPhone',formPhone);
         var formEmail = $('#formEmail').val();
+        checkFormRequired('#formEmail',formEmail);
         var formLineID = $('#formLineID').val();
         var formInstagram = $('#formInstagram').val();
         var formClass = $('#formClass').val();
+        checkFormRequired('#formClass',formClass);
         var formPathwayID = $('#formPathwayID').val();
+        checkFormRequired('#formPathwayID',formPathwayID);
         var formPlaceOfBirth = $('#formPlaceOfBirth').val();
+        checkFormRequired('#formPlaceOfBirth',formPlaceOfBirth);
         var formDateOfBirth = $('#formDateOfBirth').datepicker("getDate");
+        checkFormRequired('#formDateOfBirth',formDateOfBirth);
         var formAddress = $('#formAddress').val();
+        checkFormRequired('#formAddress',formAddress);
         var formFatherName = $('#formFatherName').val();
         var formFatherEduLevel = $('#formFatherEduLevel').val();
         var formFatherJob = $('#formFatherJob').val();
@@ -617,57 +657,75 @@
 
         var filterSchool = $('#filterSchool').val();
 
+
         var formStatusPS = $('#formStatusPS').val();
 
 
         var dataFormAttch = $('#dataFormAttch').val();
 
-        var data = {
-            action : 'update_PS',
-            ID : formID,
-            dataForm : {
-                Name : formName,
-                Gender : formGender,
-                Phone : formPhone,
-                Email : formEmail,
-                LineID : formLineID,
-                Instagram : formInstagram,
-                SchoolID : filterSchool,
-                Class : formClass,
-                PathwayID : formPathwayID,
-                PlaceOfBirth : formPlaceOfBirth,
-                DateOfBirth : (formDateOfBirth!='' && formDateOfBirth!=null) ? moment(formDateOfBirth).format('YYYY-MM-DD') : '',
-                Address : formAddress,
-                FatherName : formFatherName,
-                FatherEduLevel : formFatherEduLevel,
-                FatherJob : formFatherJob,
-                FatherPhone : formFatherPhone,
-                FatherAddress : formFatherAddress,
-                MotherName : formMotherName,
-                MotherEduLevel : formMotherEduLevel,
-                MotherJob : formMotherJob,
-                MotherPhone : formMotherPhone,
-                MotherAddress : formMotherAddress,
-                Status : formStatusPS
-            }
-        };
-        
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'rest2/__crudProspectiveStudents';
-        
-        $.post(url,{token:token},function (result) {
+
+        if(formName!='' && formName!=null &&
+            formGender!='' && formGender!=null &&
+            formPhone!='' && formPhone!=null &&
+            formEmail!='' && formEmail!=null &&
+            formClass!='' && formClass!=null &&
+            formPathwayID!='' && formPathwayID!=null &&
+            formPlaceOfBirth!='' && formPlaceOfBirth!=null &&
+            formDateOfBirth!='' && formDateOfBirth!=null &&
+            formAddress!='' && formAddress!=null){
+
+            loading_button('#btnSaveFullPS');
+            var data = {
+                action : 'update_PS',
+                ID : formID,
+                dataForm : {
+                    Name : formName,
+                    Gender : formGender,
+                    Phone : formPhone,
+                    Email : formEmail,
+                    LineID : formLineID,
+                    Instagram : formInstagram,
+                    SchoolID : filterSchool,
+                    Class : formClass,
+                    PathwayID : formPathwayID,
+                    PlaceOfBirth : formPlaceOfBirth,
+                    DateOfBirth : (formDateOfBirth!='' && formDateOfBirth!=null) ? moment(formDateOfBirth).format('YYYY-MM-DD') : '',
+                    Address : formAddress,
+                    FatherName : formFatherName,
+                    FatherEduLevel : formFatherEduLevel,
+                    FatherJob : formFatherJob,
+                    FatherPhone : formFatherPhone,
+                    FatherAddress : formFatherAddress,
+                    MotherName : formMotherName,
+                    MotherEduLevel : formMotherEduLevel,
+                    MotherJob : formMotherJob,
+                    MotherPhone : formMotherPhone,
+                    MotherAddress : formMotherAddress,
+                    Status : formStatusPS
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'rest2/__crudProspectiveStudents';
+
+            $.post(url,{token:token},function (result) {
 
 
-            if(dataFormAttch!='' && dataFormAttch!=null){
-                uploadDocumentPS(result);
-            }
-            loadCRMData();
-            toastr.success('Data saved','Success');
-            setTimeout(function () {
-                $('#btnSaveFullPS').html('Save').prop('disabled',false);
-            },500);
-            
-        })
+                if(dataFormAttch!='' && dataFormAttch!=null){
+                    uploadDocumentPS(result);
+                }
+                loadCRMData();
+                toastr.success('Data saved','Success');
+                setTimeout(function () {
+                    $('#btnSaveFullPS').html('Save').prop('disabled',false);
+                },500);
+
+            })
+        } else {
+            toastr.warning('Please, fill in the required from');
+        }
+
+
         
     });
 

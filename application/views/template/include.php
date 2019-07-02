@@ -1141,7 +1141,7 @@
 
             $.each(jsonResult,function (i,v) {
                 var sc = (parseInt(selected)==parseInt(v.ID)) ? 'selected' : '';
-                $(element).append('<option value="'+v.ID+'" '+sc+'>Year - '+v.Year+'</option>');
+                $(element).append('<option value="'+v.ID+'" '+sc+'>Period - '+v.Name+'</option>');
             })
 
         });
@@ -1157,11 +1157,12 @@
         var url = base_url_js+'rest2/__crudMarketingActivity';
 
         $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
+
             // Month
             if(jsonResult.Month.length>0){
                 $.each(jsonResult.Month,function (i,v) {
-                    var mm = moment().months(v.Month).format('MMMM');
+                    var mm = moment().months(parseInt(v.Month)-1).format('MMMM');
+
                     $(elementMonth).append('<option value="'+v.Month+'">'+mm+'</option>');
                 });
             }
@@ -1521,7 +1522,6 @@
         
         var url = base_url_js+'rest2/__getPathway';
         $.getJSON(url,function (jsonResult) {
-           console.log(jsonResult);
            if(jsonResult.length>0){
                $.each(jsonResult,function (i,v) {
                    var sc = (selected!='' && selected==v.ID) ? 'selected' : '';
@@ -1691,6 +1691,16 @@
 
 
         return parseFloat(result);
+    }
+
+    function checkFormRequired(elm,value) {
+        if(value!='' && value!=null){
+            $(elm).css('border','1px solid green');
+        } else {
+            $(elm).css('border','1px solid red');
+        }
+
+        setTimeout(function () { $(elm).css('border','1px solid #ccc'); },5000);
     }
 
 

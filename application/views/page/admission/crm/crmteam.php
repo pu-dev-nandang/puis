@@ -8,11 +8,13 @@
             </div>
             <div class="panel-body" style="min-height: 100px;">
 
-                <div class="alert alert-info" role="alert">
-                    <b style="text-align: center;">Year - <span id="viewPeriod"></span></b>
+
+                <div class="form-group">
                     <input class="hide" id="formID">
-                    <input class="hide" id="formPeriodID">
+                    <label>Period</label>
+                    <select id="formPeriodID" class="form-control"></select>
                 </div>
+                <hr/>
 
                 <div class="form-group">
                     <label>Team Name</label>
@@ -54,7 +56,7 @@
                     <th style="width: 1%;">No</th>
                     <th style="width: 15%;">Team</th>
                     <th>Member</th>
-                    <th style="width: 10%;">Aksi</th>
+                    <th style="width: 15%;">Aksi</th>
                 </tr>
                 </thead>
                 <tbody id="listTeam"></tbody>
@@ -161,10 +163,8 @@
         $.post(url,{token:token},function (jsonResult) {
             var y = jsonResult[0].Year;
             var i = jsonResult[0].ID;
-            $('#viewPeriod').html(y);
-            $('#formPeriodID').val(i);
-
             loadSelectOptionCRMPeriod('#filterPeriod',i);
+            loadSelectOptionCRMPeriod('#formPeriodID',i);
 
         });
 
@@ -206,10 +206,13 @@
 
                         }
 
-                        var btnActionTeam = (v.Status=='1' || v.Status==1)
-                            ? '<button class="btn btn-sm btn-default btnEditTeam" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
-                            '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>'
-                            : '-' ;
+                        // var btnActionTeam = (v.Status=='1' || v.Status==1)
+                        //     ? '<button class="btn btn-sm btn-default btnEditTeam" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                        //     '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>'
+                        //     : '-' ;
+
+                        var btnActionTeam = '<button class="btn btn-sm btn-default btnEditTeam" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                            '<button class="btn btn-sm btn-danger btnRemoveTeam" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>';
 
                         btnActionTeam = (adminPanel=='1') ? btnActionTeam : '-';
 

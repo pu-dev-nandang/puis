@@ -14,7 +14,7 @@
             '    <div class="col-md-12">' +
             '        <div class="well">' +
             '            <div class="row">' +
-            '                <div class="col-md-8">' +
+            '                <div class="col-md-4">' +
             '                    <div class="">' +
             '                        <select class="form-control" id="formYear">' +
             '                        <option>'+moment().format('YYYY')+'</option>' +
@@ -25,6 +25,9 @@
             '                        </select>' +
             '                    </div>' +
             '                </div>' +
+            '                <div class="col-md-4">' +
+            '                   <input class="form-control" style="color: #333131;" readonly id="formName">' +
+            '               </div>' +
             '                <div class="col-md-4">' +
             '                    <button class="btn btn-block btn-success" id="btnAddPeriod">Add</button>' +
             '                </div>' +
@@ -37,7 +40,8 @@
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th></th>' +
+            '                <th>Year</th>' +
+            '                <th>Name</th>' +
             '                <th style="width: 25%;"><i class="fa fa-cog"></i></th>' +
             '            </tr>' +
             '            </thead>' +
@@ -48,15 +52,25 @@
 
         $('#loadPage').html(body);
 
-        $('#btnAddPeriod').click(function () {
+        var firsLoad = setInterval(function () {
             var formYear = $('#formYear').val();
             if(formYear!='' && formYear!=null){
+                formNameAs();
+                clearInterval(firsLoad);
+            }
+        },1000);
+
+        $('#btnAddPeriod').click(function () {
+            var formYear = $('#formYear').val();
+            var formName = $('#formName').val();
+            if(formYear!='' && formYear!=null && formName!='' && formName!=null){
 
                 loading_button('#btnAddPeriod');
 
                 var data = {
                     action : 'insertCRMPeriode',
-                    Year : formYear
+                    Year : formYear,
+                    Name : formName
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
@@ -71,7 +85,7 @@
                     }
 
                     $('#btnAddPeriod').html('Add').prop('disabled',false);
-                    loadRowPeriod();
+                    loadCRMPeriode();
 
                 });
 
@@ -82,6 +96,18 @@
 
     });
 
+    $(document).on('change','#formYear',function () {
+        formNameAs();
+    });
+
+    function formNameAs() {
+        var formYear = $('#formYear').val();
+        if(formYear!=''){
+            var yN = moment().year(formYear).add(1,'year').format('YYYY');
+            $('#formName').val(formYear+'/'+yN);
+        }
+    }
+
     function loadCRMPeriode() {
         var data = {
             action : 'readCRMPeriode'
@@ -91,6 +117,7 @@
         var url = base_url_js+'rest2/__crudCRMPeriode';
 
         $.post(url,{token:token},function (jsonResult) {
+            $('#listTR').empty();
             var tr = '<td colspan="3">Data not yet</td>';
             if(jsonResult.length>0){
                 tr = '';
@@ -107,6 +134,7 @@
                     tr = tr+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></td>' +
+                        '<td>'+v.Name+'</td>' +
                         '<td style="text-align: right;">'+btn+'</td>' +
                         '</tr>';
                 });
@@ -116,37 +144,37 @@
         });
     }
 
-    function loadRowPeriod() {
-
-        var data = {
-            action : 'readCRMPeriode'
-        };
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'rest2/__crudCRMPeriode';
-
-        $.post(url,{token:token},function (jsonResult2) {
-
-            $('#listTR').empty();
-            var tr = '';
-            $.each(jsonResult2,function (i,v) {
-                var sts = (v.Status=='1' || v.Status==1)
-                    ? '<span class="label label-success">Publish</span>'
-                    : '<span class="label label-danger">Unpublish</span>';
-
-                var btn = (v.Status=='1' || v.Status==1) ? ''
-                    : '<button class="btn btn-default btn-sm btnPublish" data-id="'+v.ID+'">Publish</button> ' +
-                    '<button class="btn btn-sm btn-danger btn-sm btnRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>' ;
-
-                tr = tr+'<tr>' +
-                    '<td>'+(i+1)+'</td>' +
-                    '<td><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></td>' +
-                    '<td style="text-align: right;">'+btn+'</td>' +
-                    '</tr>';
-            });
-            $('#listTR').html(tr);
-
-        });
-    }
+    // function loadRowPeriod() {
+    //
+    //     var data = {
+    //         action : 'readCRMPeriode'
+    //     };
+    //     var token = jwt_encode(data,'UAP)(*');
+    //     var url = base_url_js+'rest2/__crudCRMPeriode';
+    //
+    //     $.post(url,{token:token},function (jsonResult2) {
+    //
+    //         $('#listTR').empty();
+    //         var tr = '';
+    //         $.each(jsonResult2,function (i,v) {
+    //             var sts = (v.Status=='1' || v.Status==1)
+    //                 ? '<span class="label label-success">Publish</span>'
+    //                 : '<span class="label label-danger">Unpublish</span>';
+    //
+    //             var btn = (v.Status=='1' || v.Status==1) ? ''
+    //                 : '<button class="btn btn-default btn-sm btnPublish" data-id="'+v.ID+'">Publish</button> ' +
+    //                 '<button class="btn btn-sm btn-danger btn-sm btnRemove" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>' ;
+    //
+    //             tr = tr+'<tr>' +
+    //                 '<td>'+(i+1)+'</td>' +
+    //                 '<td><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></td>' +
+    //                 '<td style="text-align: right;">'+btn+'</td>' +
+    //                 '</tr>';
+    //         });
+    //         $('#listTR').html(tr);
+    //
+    //     });
+    // }
 
     $(document).on('click','.btnPublish',function () {
         var ID = $(this).attr('data-id');
@@ -162,7 +190,7 @@
         $.post(url,{token:token},function (result) {
             toastr.success('Published','Succedd');
             updateTA(year);
-            loadRowPeriod();
+            loadCRMPeriode();
         });
 
     });
@@ -188,7 +216,7 @@
                     toastr.warning('Cannot be deleted','Warning');
                 } else {
                     toastr.success('Removed','Succedd');
-                    loadRowPeriod();
+                    loadCRMPeriode();
                 }
 
             });

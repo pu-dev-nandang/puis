@@ -2466,10 +2466,11 @@ class M_admission extends CI_Model {
 
     public function getDataPersonal($ID_register_formulir)
     {
-      $sql = "select a.*,c.FormulirCode,e.Name as NameProdyIND,e.NameEng as NameProdyEng from db_admission.register as a join db_admission.register_verification as b
+      $sql = "select a.*,c.FormulirCode,e.Name as NameProdyIND,e.NameEng as NameProdyEng, sfo.ID_Crm from db_admission.register as a join db_admission.register_verification as b
               on a.ID = b.RegisterID join db_admission.register_verified as c on b.ID = c.RegVerificationID
               join db_admission.register_formulir as d on d.ID_register_verified = c.ID 
               join db_academic.program_study as e on d.ID_program_study = e.ID
+              LEFT JOIN db_admission.sale_formulir_offline AS sfo ON (sfo.FormulirCodeOffline = c.FormulirCode)
               where d.ID = ?
             ";
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
