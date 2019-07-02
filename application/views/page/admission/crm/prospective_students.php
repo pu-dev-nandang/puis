@@ -89,7 +89,7 @@
 <script>
     $(document).ready(function () {
 
-        loadMarketingActNow();
+        loadSelectOptionMarketingActNow('#formMarketingActivity','');
         loadActivePeriod();
         localWilayah();
 
@@ -206,33 +206,7 @@
     
     // ====
     
-    function loadMarketingActNow() {
 
-        var data = {
-          action : 'readActiveNow_MA'
-        };
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'rest2/__crudMarketingActivity';
-
-        $.post(url,{token:token},function (jsonResult) {
-
-            $('#formMarketingActivity').empty();
-            $('#formMarketingActivity').append('<option value="">-- Not yet select --</option>');
-
-            if(jsonResult.length>0){
-                $.each(jsonResult,function (i,v) {
-
-                    $('#formMarketingActivity').append('<option value="'+v.ID+'">'+v.Title+'</option>');
-
-
-                });
-            }
-
-
-        });
-
-    }
 
     $('#btnSavePS').click(function () {
 

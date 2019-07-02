@@ -1147,6 +1147,33 @@
         });
     }
 
+    function loadSelectOptionMarketingActNow(element,selected) {
+
+        var data = {
+            action : 'readActiveNow_MA'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudMarketingActivity';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $(element).append('<option value="">-- Not yet select --</option>');
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    $(element).append('<option value="'+v.ID+'">'+v.Title+'</option>');
+
+
+                });
+            }
+
+
+        });
+
+    }
+
     function loadSelectOptionMonthYear_MA(elementMonth,elementYear,selectedMonth,selectedYear) {
 
         var data = {
