@@ -37,29 +37,41 @@ class C_spb extends Budgeting_Controler {
 			3.filtering by pr
     	*/
 
+            // get data bank rest/__Databank
+                $data = array(
+                    'auth' => 's3Cr3T-G4N', 
+                );
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($data,$key);
+                $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+                $this->data['G_data_bank'] = $G_data_bank;
+
         if (empty($_GET)) {
            $this->data['action_mode'] = 'add';
            $this->data['SPBCode'] = '';
         }
         else{
             try {
-                // check purchasing & non purchasing
-                if ($this->session->userdata('IDDepartementPUBudget') == 'NA.4') { // purchasing
-                    $page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
-                    $this->menu_horizontal($page);
-                }
-                else
-                {
-                    $page = $this->load->view('global/budgeting/spb/create_spb_user',$this->data,true);
-                    $this->menu_horizontal($page);
-                }
+                // read token
             }
             //catch exception
             catch(Exception $e) {
                  show_404($log_error = TRUE); 
             }
             
-        }     
+        }   
+
+        // check purchasing & non purchasing
+        if ($this->session->userdata('IDDepartementPUBudget') == 'NA.4') { // purchasing
+            $page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
+            
+        }
+        else
+        {
+            $page = $this->load->view('global/budgeting/spb/create_spb_user',$this->data,true);
+        }
+
+        $this->menu_horizontal($page);  
 
 		
     }

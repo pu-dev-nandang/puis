@@ -956,6 +956,7 @@ $route['rest2/__show_info_po'] = 'api/c_rest2/show_info_po';
 $route['rest2/__reject_pr_from_another'] = 'api/c_rest2/reject_pr_from_another';
 $route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from_another';
 $route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1';
+$route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 
 
 
