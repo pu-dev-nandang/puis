@@ -868,9 +868,19 @@
 	})
 
 	$(document).off('keydown', '.qty,.PPH').on('keydown', '.qty,.PPH',function(e) {
-		if (e.keyCode === 190) {
-		    e.preventDefault();
-		}
+		// if (e.keyCode === 190) {
+		//     e.preventDefault();
+		// }
+		var tr = $(this).closest('tr');
+		CountSubTotal_table(tr);
+	})
+
+	$(document).off('keyup', '.qty,.PPH').on('keyup', '.qty,.PPH',function(e) {
+		// if (e.keyCode === 190) {
+		//     e.preventDefault();
+		// }
+		var tr = $(this).closest('tr');
+		CountSubTotal_table(tr);
 	})
 
 	$(document).off('click', '.btn-add-pr').on('click', '.btn-add-pr',function(e) {

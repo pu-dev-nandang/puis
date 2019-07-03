@@ -344,6 +344,20 @@ class C_rest2 extends CI_Controller {
                 $dataToken = $this->getInputToken2();
                 $auth = $this->m_master->AuthAPI($dataToken);
                 if ($auth) {
+
+                    //check action
+                    $whereaction = '';
+                    $joinaction = '';
+                    $fieldaction = '';
+                    if (array_key_exists('action', $dataToken)) {
+                        if ($dataToken['action'] == 'forspb') {
+                           $fieldaction = ', poi.InvoicePO,poi.InvoicePayPO,InvoiceLeftPO,poi.Status as StatusPOI,poi.ID as ID_poi ';
+                           $joinaction = ' join db_purchasing.po_invoice_status as poi on a.Code = poi.Code_po_create ';
+                           $whereaction = ' and StatusPOI = 0';
+                        }
+                        
+                    }
+
                     // get Department
                     $IDDepartementPUBudget = $dataToken['IDDepartementPUBudget'];
                     $WhereFiltering = '';
@@ -360,7 +374,7 @@ class C_rest2 extends CI_Controller {
                                 select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -369,6 +383,7 @@ class C_rest2 extends CI_Controller {
                                 left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
                                 left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                                 join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                                '.$joinaction.'
                                 group by a.Code     
                             )aa
                            ';
@@ -376,7 +391,7 @@ class C_rest2 extends CI_Controller {
                     $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                           or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
                           or PRCode LIKE "'.$requestData['search']['value'].'%"  
-                        ) '.$StatusQuery.$WhereFiltering ;
+                        ) '.$StatusQuery.$WhereFiltering.$whereaction ;
 
                     $querytotalData = $this->db->query($sqltotalData)->result_array();
                     $totalData = $querytotalData[0]['total'];
@@ -386,7 +401,7 @@ class C_rest2 extends CI_Controller {
                                 select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -395,6 +410,7 @@ class C_rest2 extends CI_Controller {
                                 left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
                                 left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                                 join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                                '.$joinaction.'
                                 group by a.Code      
                             )aa
                            ';
@@ -402,7 +418,7 @@ class C_rest2 extends CI_Controller {
                     $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                           or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
                           or PRCode LIKE "'.$requestData['search']['value'].'%"  
-                        ) '.$StatusQuery.$WhereFiltering ;
+                        ) '.$StatusQuery.$WhereFiltering.$whereaction ;
                     $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
 
@@ -483,6 +499,17 @@ class C_rest2 extends CI_Controller {
                                     }
 
                                 }
+                            }
+
+                            // pass Invoice PO
+                            if (array_key_exists('InvoicePO', $row)) {
+                                $arr_temp[] = array(
+                                    'InvoicePO' => $row['InvoicePO'],
+                                    'InvoicePayPO' => $row['InvoicePayPO'],
+                                    'InvoiceLeftPO' => $row['InvoiceLeftPO'],
+                                    'StatusPOI' => $row['StatusPOI'],
+                                    'ID_poi' => $row['ID_poi'],
+                                );
                             }
 
                         $nestedData[] = $arr_temp;
@@ -1769,6 +1796,40 @@ class C_rest2 extends CI_Controller {
 
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);
+    }
+
+    public function spb_for_po()
+    {
+        $rs = array ('msg' => '','dt' => array());
+        $Reload = 0;
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Code = $dataToken['Code'];
+                $sql = 'select * from db_purchasing.spb_created where Code = ? and Status = 2 order by ID asc';
+                $query=$this->db->query($sql, array($Code))->result_array();
+                $rs['dt'] = $query; 
+                // check SPB on process or not
+                $sql = 'select * from db_purchasing.spb_created where Code = ? and Status in(0,1-1)';
+                $query=$this->db->query($sql, array($Code))->result_array();
+                if (count($query) > 0) {
+                   $rs['msg'] = 'SPB pada po ini lagi on process, tidak bisa buat SPB'; 
+                }            
+                echo json_encode($rs);
+                
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
     }
 
 }
