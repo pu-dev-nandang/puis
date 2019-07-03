@@ -588,7 +588,8 @@
 		var btn_reject = '<button class="btn btn-inverse" id="Reject" action="reject">Reject</button>';
 		var btn_pdf = '<button class="btn btn-default" id="pdfprint"> <i class="fa fa-file-pdf-o"></i> PDF</button>';
 		var btn_print = '<button class="btn btn-default" id="print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
-		var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
+		// var btn_create_spb = '<button class="btn btn-default" id="btn_create_spb"> <i class="fa fa-file-text" aria-hidden="true"></i> Create SPB</button>';
+		var btn_create_spb = '';
 		var btn_cancel = '<button class= "btn btn-danger" id="btn_cancel" style = "background-color: #150909;">Cancel SPK</button>';
 		var btn_cancel_po_pr = '<button class= "btn btn-danger" id="btn_cancel2">Cancel SPK & PR</button>';
 		var Status = po_create[0]['Status'];
