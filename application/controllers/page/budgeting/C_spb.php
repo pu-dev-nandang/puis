@@ -43,7 +43,16 @@ class C_spb extends Budgeting_Controler {
         }
         else{
             try {
-                // read token
+                // check purchasing & non purchasing
+                if ($this->session->userdata('IDDepartementPUBudget') == 'NA.4') { // purchasing
+                    $page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
+                    $this->menu_horizontal($page);
+                }
+                else
+                {
+                    $page = $this->load->view('global/budgeting/spb/create_spb_user',$this->data,true);
+                    $this->menu_horizontal($page);
+                }
             }
             //catch exception
             catch(Exception $e) {
@@ -52,8 +61,7 @@ class C_spb extends Budgeting_Controler {
             
         }     
 
-		$page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
-		$this->menu_horizontal($page);
+		
     }
 
     public function configuration()
