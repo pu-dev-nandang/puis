@@ -216,6 +216,19 @@
             -
         </td>
     </tr>
+
+    <tr>
+        <td>Penilaian Sarana Prasarana</td>
+        <td>
+            <input type="text" id="edom2_start" nextelement="edom2_end" name="regular" class="form-control form-tahun-akademik">
+        </td>
+        <td>
+            <input type="text" id="edom2_end" name="regular" class="form-control form-tahun-akademik form-next">
+        </td>
+        <td>
+            -
+        </td>
+    </tr>
     </tbody>
 </table>
 
@@ -376,7 +389,7 @@
         window.ID = '<?php echo $ID; ?>';
         loadData(ID);
         $('.form-tahun-akademik').prop('readonly',true);
-        $( "#bpp_start,#krs_start ,#bayar_start,#kuliah_start,#edom_start," +
+        $( "#bpp_start,#krs_start ,#bayar_start,#kuliah_start,#edom_start,#edom2_start," +
             "#uts_start,#show_nilai_uts,#nilaiuts_start," +
             "#uas_start,#nilaiuas_start,#nilaitugas_end,#show_nilai_uas,#show_nilai_h,#show_nilai_t," +
             "#updateTranscript,#ModifyAttendance" )
@@ -439,7 +452,9 @@
                 showNilai_T : ($('#show_nilai_t').datepicker("getDate")!=null) ? moment($('#show_nilai_t').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 updateTranscript : ($('#updateTranscript').datepicker("getDate")!=null) ? moment($('#updateTranscript').datepicker("getDate")).format('YYYY-MM-DD') : '',
                 edomStart : ($('#edom_start').datepicker("getDate")!=null) ? moment($('#edom_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
-                edomEnd : ($('#edom_end').datepicker("getDate")!=null) ? moment($('#edom_end').datepicker("getDate")).format('YYYY-MM-DD') : ''
+                edomEnd : ($('#edom_end').datepicker("getDate")!=null) ? moment($('#edom_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                edom2Start : ($('#edom2_start').datepicker("getDate")!=null) ? moment($('#edom2_start').datepicker("getDate")).format('YYYY-MM-DD') : '',
+                edom2End : ($('#edom2_end').datepicker("getDate")!=null) ? moment($('#edom2_end').datepicker("getDate")).format('YYYY-MM-DD') : '',
             },
             dataFormAttd : {
                 In_Session_Std : $('#form_In_Session_Std').val(),
@@ -535,6 +550,10 @@
             (data.DetailTA.edomStart !=='0000-00-00' && data.DetailTA.edomStart!==null) ? $('#edom_start').datepicker('setDate',new Date(data.DetailTA.edomStart)) : '';
             (data.DetailTA.edomEnd !=='0000-00-00' && data.DetailTA.edomEnd !==null) ? $('#edom_end').datepicker({showOtherMonths:true,autoSize: true,dateFormat: 'dd MM yy',
                 minDate: new Date(data.DetailTA.edomStart)}).datepicker('setDate',new Date(data.DetailTA.edomEnd)) : '';
+
+            (data.DetailTA.edom2Start !=='0000-00-00' && data.DetailTA.edom2Start!==null) ? $('#edom2_start').datepicker('setDate',new Date(data.DetailTA.edom2Start)) : '';
+            (data.DetailTA.edom2End !=='0000-00-00' && data.DetailTA.edom2End !==null) ? $('#edom2_end').datepicker({showOtherMonths:true,autoSize: true,dateFormat: 'dd MM yy',
+                minDate: new Date(data.DetailTA.edom2Start)}).datepicker('setDate',new Date(data.DetailTA.edom2End)) : '';
 
 
             $('#form_In_Time_Lec').val(0);
