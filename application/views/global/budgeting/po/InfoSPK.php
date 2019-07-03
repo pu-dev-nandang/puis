@@ -768,7 +768,7 @@
 									'<td></td>'+
 								'</tr>'+
 								'<tr>'+
-									'<td><div align = "left"><b><u>SERIAN WIJATNO & WIBOWO NGASERIN</u></b></br>SEKRETARIS & KETUA YAYASAN</div></td>'+
+									'<td><div align = "left"><b><u>LILY B. PUTRI & WIBOWO NGASERIN</u></b></br>WAKIL BENDAHARA & KETUA YAYASAN</div></td>'+
 									'<td style="text-align :right"><div><b><u>'+po_create[0]['PICName'].toUpperCase()+'</u></b></br>'+po_create[0]['JabatanPIC'].toUpperCase()+'</div></td>'+	
 								'<tr>'+		
 							'</tbody>'+

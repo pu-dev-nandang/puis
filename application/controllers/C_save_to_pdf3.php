@@ -78,12 +78,12 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->AddPage();
         $fpdf->SetMargins(10,0,10,0);
         $x = 10;
-        $y = 35;
+        $y = 30;
         $FontIsianHeader = 8;
         $FontIsian = 7;
 
         // Logo
-        $fpdf->Image('./images/YPAP_logo_L.png',10,10,160);
+        $fpdf->Image('./images/YPAP_logo_L.png',10,5,160);
         // Header
         $fpdf->SetXY($x,$y);
         $fpdf->SetFont('Arial','BU',12);
@@ -331,12 +331,12 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->AddPage();
         $fpdf->SetMargins(10,0,10,0);
         $x = 10;
-        $y = 35;
+        $y = 30;
         $FontIsianHeader = 8;
         $FontIsian = 7;
 
         // Logo
-        $fpdf->Image('./images/YPAP_logo_L.png',10,10,160);
+        $fpdf->Image('./images/YPAP_logo_L.png',10,5,160);
         // Header
         $fpdf->SetXY($x,$y);
         $fpdf->SetFont('Arial','BU',12);

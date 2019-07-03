@@ -1361,6 +1361,18 @@ $route['budgeting/menu/group_previleges/rud'] = 'page/budgeting/c_menu/group_pre
 $route['budgeting/config/getAuthDataTables'] = 'page/budgeting/c_menu/getAuthDataTables';
 $route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
 
+// spb
+$route['budgeting_menu/pembayaran/spb/create_spb'] = 'page/budgeting/c_spb/create_spb';
+$route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/configuration';
+
+
+// cashadvance
+$route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
+$route['budgeting_menu/pembayaran/cashadvance/configuration'] = 'page/budgeting/c_cashadvance/configuration';
+
+// petty cash
+$route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
+$route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
