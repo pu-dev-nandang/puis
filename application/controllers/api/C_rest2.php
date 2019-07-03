@@ -812,6 +812,41 @@ class C_rest2 extends CI_Controller {
                 ))->result_array();
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']=='getAllTeamListCRMPeriode'){
+            $PeriodID = $data_arr['PeriodID'];
+            $NIP = $data_arr['NIP'];
+
+            // Get data Team
+            $dataTeam = $this->db->query('SELECT ct.* FROM db_admission.crm_team ct 
+                                            LEFT JOIN db_admission.crm_team_member ctm ON (ct.ID = ctm.CRMTeamID) 
+                                            WHERE ctm.NIP = "'.$NIP.'" LIMIT 1')->result_array();
+
+            $result = [];
+            if(count($dataTeam)>0){
+                $d = $dataTeam[0];
+                $data = $this->db->query('SELECT c.*, em.Name AS SalesName, cs.Description AS StatusDesc, csl.ClassMobile AS StatusCalss FROM db_admission.crm c 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
+                                                LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
+                                                LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
+                                                WHERE  c.PeriodID = "'.$PeriodID.'" 
+                                                AND c.CRMTeamID = "'.$d['ID'].'" ')->result_array();
+
+                if(count($data)>0){
+                    $res = array(
+                        'dataTeam' => $dataTeam,
+                        'dataCRM' => $data
+                    );
+
+                    array_push($result,$res);
+                }
+
+            }
+
+
+
+            return print_r(json_encode($result));
+
+        }
     }
 
     public function crudCRMTeam(){
@@ -900,21 +935,31 @@ class C_rest2 extends CI_Controller {
         else if($data_arr['action']=='readCRMTeam'){
             $PeriodID = $data_arr['PeriodID'];
 
-            $data = $this->db->query('SELECT ct.*, cp.Year, cp.Status FROM db_admission.crm_team ct 
+            // Apakah ada NIP, jika ada nip artinya hanya untuk satu team
+            if(isset($data_arr['NIP'])){
+                $NIP = $data_arr['NIP'];
+
+
+
+            } else {
+                $data = $this->db->query('SELECT ct.*, cp.Year, cp.Status FROM db_admission.crm_team ct 
                                                 LEFT JOIN db_admission.crm_period cp ON (cp.ID = ct.PeriodID)
                                                 WHERE ct.PeriodID = "'.$PeriodID.'" ')->result_array();
 
-            if(count($data)>0){
-                for($i=0;$i<count($data);$i++){
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
 
-                    $data[$i]['Member'] = $this->db->query('SELECT ctm.*, em.Name AS MemberName FROM db_admission.crm_team_member ctm 
+                        $data[$i]['Member'] = $this->db->query('SELECT ctm.*, em.Name AS MemberName FROM db_admission.crm_team_member ctm 
                                                                       LEFT JOIN db_employees.employees em 
                                                                       ON (em.NIP = ctm.NIP) 
                                                                       WHERE ctm.CRMTeamID = "'.$data[$i]['ID'].'" 
                                                                       ORDER BY ctm.Status DESC ')->result_array();
 
+                    }
                 }
             }
+
+
 
             return print_r(json_encode($data));
 

@@ -4383,7 +4383,7 @@ class C_api2 extends CI_Controller {
                                     <button class="btn btn-sm btn-default btnFullForm" data-id="'.$row['ID'].'">Full Form</button>';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
-                $nestedData[] = '<b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b><br/>'.$row['Email'].', '.$row['Phone'].', '.$row['LineID'];
+                $nestedData[] = '<b><i class="fa fa-user margin-right"></i> '.$row['Name'].'</b><br/>'.$row['Email'].', '.$row['Mobile'].', '.$row['LineID'];
                 $nestedData[] = $row['NameProspect_by'];
                 $nestedData[] = '<span class="'.$row['StatusClass'].'">'.$row['StatusDesc'].'</span>';
                 $nestedData[] = $btnAct;
