@@ -1178,9 +1178,19 @@ class C_rest2 extends CI_Controller {
                                                           ORDER BY cnt.Name ASC ')->result_array();
             }
 
+            return print_r(json_encode($data));
 
+        }
+        else if($data_arr['action']=='viewDetailContact'){
+
+            $ID = $data_arr['ID'];
+            $data = $this->db->query('SELECT cnt.*, r.RegionName, s.SchoolName FROM db_admission.contact cnt
+                                                          LEFT JOIN db_admission.school s ON (s.ID = cnt.SchoolID)
+                                                          LEFT JOIN db_admission.region r ON (s.CityID = r.RegionID)
+                                                          WHERE cnt.ID = "'.$ID.'" ')->result_array();
 
             return print_r(json_encode($data));
+
 
         }
     }
