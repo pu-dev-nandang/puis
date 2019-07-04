@@ -655,8 +655,10 @@ class C_rest2 extends CI_Controller {
                         $token = $this->jwt->encode($data,"UAP)(*");
                         // $this->m_master->apiservertoserver($url,$token);
                         $NameDay = $this->m_master->apiservertoserver($url,$token);
+                        // print_r($NameDay);die();
                     // terbilang tanggal
                          $bilangan = date("d", strtotime($Date));
+                         $bilangan = (int) $bilangan;
                          $data = array(
                                'bilangan' => $bilangan,
                                'auth' => 's3Cr3T-G4N', 
@@ -665,6 +667,7 @@ class C_rest2 extends CI_Controller {
                          $token = $this->jwt->encode($data,"UAP)(*");
                          // $this->m_master->apiservertoserver($url,$token);
                          $Tanggal = $this->m_master->apiservertoserver($url,$token);
+                         // print_r($bilangan);die();
 
                     // Nama Bulan
                         $Date_ = date("Y-m-d", strtotime($Date));

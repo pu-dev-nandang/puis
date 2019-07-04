@@ -428,7 +428,8 @@
 				    break;    
 		}
 
-		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		// $('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
 
 	}
 
@@ -719,7 +720,11 @@
 			var t = '';									
 			for (var i = 0; i < pre_po_supplier.length; i++) {
 				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
+				var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
+					Reason+
+					'</li>';
 			}
 			
 			html_vendor += t;

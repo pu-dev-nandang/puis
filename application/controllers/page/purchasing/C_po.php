@@ -1610,4 +1610,10 @@ class C_po extends Transaksi_Controler {
         echo json_encode($rs);
     }
 
+    public function pembayaran()
+    {
+       $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/pembayaran',$this->data,true);
+       $this->page_po($page); 
+    }
+
 }
