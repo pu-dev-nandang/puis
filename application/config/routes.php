@@ -1365,6 +1365,7 @@ $route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
 // spb
 $route['budgeting_menu/pembayaran/spb/create_spb'] = 'page/budgeting/c_spb/create_spb';
 $route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/configuration';
+$route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 
 
 // cashadvance
@@ -1440,6 +1441,7 @@ $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/
 $route['purchasing/transaction/po/list/open'] = 'page/purchasing/c_po/open';
 $route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
 $route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
+$route['purchasing/transaction/po/list/pembayaran'] = 'page/purchasing/c_po/pembayaran';
 $route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';
 $route['purchasing/transaction/po/Set_Approval']= 'page/purchasing/c_po/Set_Approval';
 $route['purchasing/transaction/po/Set_Approval_SPK']= 'page/purchasing/c_po/Set_Approval_SPK';

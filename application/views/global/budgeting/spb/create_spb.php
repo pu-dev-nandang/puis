@@ -318,7 +318,7 @@
        	    "processing": true,
        	    "destroy": true,
        	    "serverSide": true,
-       	    "iDisplayLength" : 10,
+       	    "iDisplayLength" : 5,
        	    "ordering" : false,
        	    "ajax":{
        	        url : base_url_js+"rest2/__get_data_po/2", // json datasource
@@ -801,8 +801,9 @@
 	    }
 	}
 
-	function submit(elementbtn,action="add")
+	function SubmitSPB(elementbtn,action="add")
 	{
+		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
 		var Departement = IDDepartementPUBudget;
 		var ID_budget_left = 0;
@@ -841,6 +842,15 @@
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
 
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
 		// var url = base_url_js + "budgeting/submit"
 		var url = base_url_js + "budgeting/submitspb"
 		$.ajax({
@@ -853,8 +863,32 @@
 		  dataType: "json",
 		  success:function(data)
 		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_po().then(function(data){
+		  					$('.C_radio_pr:first').prop('checked',true);
+		  					$('.C_radio_pr:first').trigger('change');
+		  					loadingEnd(500);
+		  				})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
 		    
-
+		    
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');

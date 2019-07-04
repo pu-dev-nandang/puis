@@ -114,6 +114,7 @@
 		po_data : [],
 		PRCode_arr : [],
 		total_po_detail : 0,
+		G_pay_type : <?php echo json_encode($G_pay_type) ?>,
 	};
 	$(document).ready(function() {
 	   loadingStart();
@@ -353,7 +354,7 @@
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>CARA PEMBAYARAN</b></td>'+
 											'<td style = "width : 10px;"><b>:</b></td>'+
-											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'">'+nl2br(po_create[0]['Notes'])+'</td>'+
+											'<td class= "tdNotes" notes = "'+po_create[0]['Notes']+'" id_pay_type = "'+po_create[0]['ID_pay_type']+'">'+nl2br(po_create[0]['Notes'])+'</td>'+
 										'</tr>'+
 										'<tr>'+
 											'<td style = "width : 300px;" class = "CustomTD"><b>SYARAT - SYARAT</b></td>'+
@@ -428,7 +429,8 @@
 				    break;    
 		}
 
-		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		// $('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="'+base_url_js+'fileGetAny/budgeting-po-'+FileOffer[0]+'" target="_blank"> Doc Penawaran</a></div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		$('#DocPenawaran').html('<div class="col-xs-12 No"><div class = "noPrint" style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
 
 	}
 
@@ -719,7 +721,11 @@
 			var t = '';									
 			for (var i = 0; i < pre_po_supplier.length; i++) {
 				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
+				var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
+					Reason+
+					'</li>';
 			}
 			
 			html_vendor += t;
@@ -898,6 +904,20 @@
 		
 	})
 
+	function __OPpay_type(ID=0)
+	{
+		var html = '';
+		html = '<select class = "form-control pay_type">';
+		var G_pay_type = ClassDt.G_pay_type;
+		for (var i = 0; i < G_pay_type.length; i++) {
+			var selected = (ID==G_pay_type[i].ID) ? 'selected' : '';
+			html += '<option value ="'+G_pay_type[i].ID+'" '+selected+' >'+G_pay_type[i].Name+'</option>';
+		}
+
+		html += '<select>';
+		return html;
+	}
+
 	function __input_reload()
 	{
 		$('#Tbl_Deskripsi tbody').find('tr').each(function(){
@@ -920,7 +940,10 @@
 
 		var value  = $('#table_input_spk').find('.tdNotes').attr('notes');
 		// $('#table_input_spk').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
-		$('#table_input_spk').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
+		// $('#table_input_spk').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
+		var ID_pay_type = $('#table_input_spk').find('.tdNotes').attr('id_pay_type');
+		var htmlPayType = __OPpay_type(ID_pay_type);
+		$('#table_input_spk').find('.tdNotes').html(htmlPayType);
 
 		var value  = $('#table_input_spk').find('.tdNotes2').attr('notes2');
 		// $('#table_input_spk').find('.tdNotes2').html('<input type="text" class="form-control Notes2" value="'+value+'">');
@@ -1031,7 +1054,9 @@
 				arr_post_data_detail.push(temp);
 			})
 
-			var Notes =  $('#table_input_spk').find('.Notes').val();
+			// var Notes =  $('#table_input_spk').find('.Notes').val();
+			var Notes =  $('#table_input_spk').find('.pay_type option:selected').text();
+			var ID_pay_type =  $('#table_input_spk').find('.pay_type option:selected').val();
 			var Notes2 =  $('#table_input_spk').find('.Notes2').val();
 			var JobSpk = $('.Inp_U_mengerjakan').val();
 			var url = base_url_js+"po_spk/submit_create";
@@ -1041,6 +1066,7 @@
 			    Notes : Notes,
 			    Notes2 : Notes2,
 			    JobSpk : JobSpk,
+			    ID_pay_type : ID_pay_type,
 			};
 			
 			var token = jwt_encode(data,"UAP)(*");

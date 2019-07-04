@@ -63,7 +63,8 @@ class C_globalpage extends Budgeting_Controler {
                     }
                 }
              }
-
+             $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+             $data['G_pay_type'] = $G_pay_type;
              $data['bool'] = $bool;
              $data['Code'] = $Code;
              $data['G_data'] = $G_data;
@@ -115,6 +116,8 @@ class C_globalpage extends Budgeting_Controler {
                 }
              }
 
+             $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+             $data['G_pay_type'] = $G_pay_type;
              $data['bool'] = $bool;
              $data['Code'] = $Code;
              $data['G_data'] = $G_data;

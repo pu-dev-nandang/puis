@@ -715,7 +715,7 @@ class M_pr_po extends CI_Model {
         $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
         $ID_pre_po = $G_data[0]['ID_pre_po'];
         $sql = 'select b.CreatedBy as CreatedBy_pre_po,b.CreatedAt as CreatedAt_pre_po,
-                c.CodeSupplier as CodeSupplier1,c.FileOffer,c.Approve as ApproveSupplier,d.*,e.CategoryName
+                c.CodeSupplier as CodeSupplier1,c.FileOffer,c.Approve as ApproveSupplier,c.Desc,d.*,e.CategoryName
                 from db_purchasing.pre_po as b 
                 join db_purchasing.pre_po_supplier as c on c.ID_pre_po = b.ID
                 join db_purchasing.m_supplier as d on c.CodeSupplier = d.CodeSupplier
@@ -1139,7 +1139,7 @@ class M_pr_po extends CI_Model {
         $arr = array();
         $sql = 'select a.ID_pre_po,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,b.FileOffer,
                 c.NamaSupplier,c.PICName,c.NoTelp,c.NoHp,c.JabatanPIC,c.Alamat,a.JsonStatus,a.Status,a.Notes,a.Notes2,a.Supporting_documents,a.POPrint_Approve,a.JobSpk,
-                a.PostingDate,a.CreatedBy,a.CreatedAt
+                a.PostingDate,a.CreatedBy,a.CreatedAt,a.ID_pay_type
                 from db_purchasing.po_create as a 
                 join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                 join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier

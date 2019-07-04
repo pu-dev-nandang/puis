@@ -18,12 +18,15 @@
         <li class="<?php echo ($this->uri->segment(5) == 'cancel_reject_pr') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/list/cancel_reject_pr'?>">Cancel & Reject PR</a>
         </li>
+        <li class="<?php echo ($this->uri->segment(5) == 'pembayaran') ? 'active' : '' ?>">
+            <a href="<?php echo base_url().'purchasing/transaction/po/list/pembayaran'?>">Pembayaran</a>
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
-            <div class="panel panel-primary">
+            <div class="panel panel-primary" style="min-width: 1200px;overflow: auto;">
                 <div class="panel-heading clearfix">
-                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Purchase Order</h4>
+                    <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Purchase Order, SPK & Pembayaran</h4>
                 </div>
                 <div class="panel-body">
                     <?php echo $content; ?>   

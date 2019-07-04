@@ -11,6 +11,7 @@ class C_spb extends Budgeting_Controler {
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('budgeting/m_spb');
     }
 
     public function menu_horizontal($page)
@@ -90,6 +91,18 @@ class C_spb extends Budgeting_Controler {
     		show_404($log_error = TRUE);
     	}
     	
+    }
+
+    public function submitspb()
+    {
+        $rs = array('Status' => 0,'Change' => 0);
+        $Input = $this->getInputToken();
+        // verify data spb
+        $token2 = $this->input->post('token2');
+        $key = "UAP)(*";
+        $data_verify = (array) $this->jwt->decode($token2,$key);
+        $__checkdt = $this->m_spb->checkdt_spb_before_submit($data_verify);
+
     }
 
 }

@@ -442,6 +442,10 @@ class C_po extends Transaksi_Controler {
                        }
                    }
 
+                   // get pay_type
+                   $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+                   $ID_pay_type = $G_pay_type[0]['ID'];
+
                  // 5 PO & 6
                    $dataSave = array(
                        'ID_pre_po' => $ID_pre_po,
@@ -450,7 +454,9 @@ class C_po extends Transaksi_Controler {
                        'ID_pre_po_supplier' => $ID_pre_po_supplier,
                        'JsonStatus' => json_encode($JsonStatus),
                        'Status' => 0,
-                       'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                       // 'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                       'Notes' => $G_pay_type[0]['Name'],
+                       'ID_pay_type' => $ID_pay_type,
                        'Supporting_documents' => json_encode($arr = array()),
                        'CreatedBy' => $this->session->userdata('NIP'),
                        'CreatedAt' => date('Y-m-d H:i:s'), 
@@ -762,13 +768,19 @@ class C_po extends Transaksi_Controler {
                                 }
                             }
 
+                        // get pay_type
+                        $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+                        $ID_pay_type = $G_pay_type[0]['ID'];    
+
                         // 9
                            $dataSave = array(
                                'TypeCreate' => 1,
                                'ID_pre_po_supplier' => $ID_pre_po_supplier,
                                'JsonStatus' => json_encode($JsonStatus),
                                'Status' => 0,
-                               'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                               // 'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                               'Notes' => $G_pay_type[0]['Name'],
+                               'ID_pay_type' => $ID_pay_type,
                                'Supporting_documents' => json_encode($arr = array()),
                            );
 
@@ -831,6 +843,7 @@ class C_po extends Transaksi_Controler {
         $arr_post_data_detail =$Input['arr_post_data_detail'];
         // $AnotherCost = $Input['AnotherCost'];
         $Notes = $Input['Notes'];
+        $ID_pay_type = $Input['ID_pay_type'];
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
@@ -856,6 +869,7 @@ class C_po extends Transaksi_Controler {
             $dataSave = array(
                 // 'AnotherCost' => $AnotherCost,
                 'Notes' => $Notes,
+                'ID_pay_type' => $ID_pay_type,
                 'Status' => 1,
             );
             $this->db->where('Code',$Code);
@@ -1099,6 +1113,10 @@ class C_po extends Transaksi_Controler {
                        }
                    }
 
+                   // get pay_type
+                   $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+                   $ID_pay_type = $G_pay_type[0]['ID'];    
+
                  // 5 PO & 6
                    $dataSave = array(
                        'ID_pre_po' => $ID_pre_po,
@@ -1107,7 +1125,9 @@ class C_po extends Transaksi_Controler {
                        'ID_pre_po_supplier' => $ID_pre_po_supplier,
                        'JsonStatus' => json_encode($JsonStatus),
                        'Status' => 0,
-                       'Notes' => '2 minggu setelah barang & INV diterima',
+                       // 'Notes' => '2 minggu setelah barang & INV diterima',
+                       'Notes' => $G_pay_type[0]['Name'],
+                       'ID_pay_type' => $ID_pay_type,
                        'Notes2' => '-',
                        'Supporting_documents' => json_encode($arr = array()),
                        'CreatedBy' => $this->session->userdata('NIP'),
@@ -1413,6 +1433,10 @@ class C_po extends Transaksi_Controler {
                             }
                         }
 
+                        // get pay_type
+                        $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
+                        $ID_pay_type = $G_pay_type[0]['ID'];   
+
                     // 9
                        $JsonStatus = $this->m_pr_po->GetRuleApproval_SPK_JsonStatus();
                        $dataSave = array(
@@ -1420,7 +1444,9 @@ class C_po extends Transaksi_Controler {
                            'ID_pre_po_supplier' => $ID_pre_po_supplier,
                            'JsonStatus' => json_encode($JsonStatus),
                            'Status' => 0,
-                           'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                           // 'Notes' => 'Syarat Pembayaran : 2 minggu setelah barang & INV diterima',
+                           'Notes' => $G_pay_type[0]['Name'],
+                           'ID_pay_type' => $ID_pay_type,
                            'Supporting_documents' => json_encode($arr = array()),
                        );
 
@@ -1480,6 +1506,7 @@ class C_po extends Transaksi_Controler {
         $Notes = $Input['Notes'];
         $Notes2 = $Input['Notes2'];
         $JobSpk = $Input['JobSpk'];
+        $ID_pay_type = $Input['ID_pay_type'];
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
@@ -1507,6 +1534,7 @@ class C_po extends Transaksi_Controler {
             $dataSave = array(
                 'JobSpk' => $JobSpk,
                 'Notes' => $Notes,
+                'ID_pay_type' => $ID_pay_type,
                 'Notes2' => $Notes2,
                 'Status' => 1,
             );
@@ -1608,6 +1636,12 @@ class C_po extends Transaksi_Controler {
         }
 
         echo json_encode($rs);
+    }
+
+    public function pembayaran()
+    {
+       $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/pembayaran',$this->data,true);
+       $this->page_po($page); 
     }
 
 }

@@ -593,10 +593,14 @@
 						}
 
 						S_link.after(html);
-
+						// console.log(data[i]);
 						if (data[i].ApproveSupplier == 1) {
 							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="1"]').prop('checked',true);
 							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="0"]').prop('checked',false);
+							TblTbody.find('tr:eq('+i+')').find('.C_radio_approve[value="1"]').closest('td').append('<div class = "DivNote">'+
+									'<label>Reason</label>'+
+									'<textarea class = "form-control Notes">'+data[i].Desc+'</textarea>'+
+							  '</div>');
 						}
 						else
 						{
@@ -725,7 +729,8 @@
 								// 		'<option value = "1">Yes</option>'+
 								// 	 '</select></div>'+
 								// '</td>'+	
-								'<td><div align = "center"><label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "0" checked> No</label> &nbsp <label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "1"> Yes</label></div></td>'+ 	
+								'<td><div align = "center"><label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "0" checked> No</label> &nbsp <label><input type="radio" name="optradio'+No+'" class="C_radio_approve" value = "1"> Yes</label></div>'+
+								'</td>'+ 	
 							'</tr>';	
 				return html;
 			}
@@ -750,9 +755,29 @@
 	$(document).off('click', '.C_radio_approve').on('click', '.C_radio_approve',function(e) {
 		var v = $(this).val();
 		if (v == 1) {
-			$('.C_radio_approve[value="1"]').prop('checked',false);
+			var htmlDivNote = '<div class = "DivNote">'+
+									'<label>Reason</label>'+
+									'<textarea class = "form-control Notes"></textarea>'+
+							  '</div>';	
+			//$('.C_radio_approve[value="1"]').prop('checked',false);
 			$('.C_radio_approve[value="0"]').prop('checked',true);
 			$(this).prop('checked',true);
+			var ev = $(this).closest('td');
+			if (ev.find('.DivNote').length) {
+				ev.find('.DivNote').remove();
+			}
+
+			$('.C_radio_approve').each(function(){
+				var td = $(this).closest('td');
+				td.find('.DivNote').remove();
+			})
+			ev.append(htmlDivNote);
+
+		}
+		else
+		{
+			var td = $(this).closest('td');
+			td.find('.DivNote').remove();
 		}
 	})
 
@@ -959,8 +984,20 @@
 					
 				})
 
+				// validation Notes
+					var __vnotes = true;
+					if ($('.Notes').length) {
+						if ($('.Notes').val() == '') {
+							__vnotes = false;
+						}
+					}
+					else
+					{
+						__vnotes = false;
+					}
 
-				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
+
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR && __vnotes) {
 					loading_button('#OpenPO');
 					var action_submit = 'PO';
 					var id_selector = '#OpenPO';
@@ -979,7 +1016,8 @@
 				{
 					toastr.info('<li>PR Selected must be having less one checked & 1 PR in 1 PO</li>'+
 								'<li>Select Vendor must be having less one approve</li>'+
-								'<li>Total Vendor must be same with total selected vendor</li>'
+								'<li>Total Vendor must be same with total selected vendor</li>'+
+								'<li>Reason is required</li>'
 								);
 				}
 		}
@@ -1034,8 +1072,20 @@
 					
 				})
 
+				// validation Notes
+					var __vnotes = true;
+					if ($('.Notes').length) {
+						if ($('.Notes').val() == '') {
+							__vnotes = false;
+						}
+					}
+					else
+					{
+						__vnotes = false;
+					}
 
-				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR) {
+
+				if (arr_pr_detail_selected.length > 0 && count_vendor_ok > 0 && ChooseTotVendor == c && BoolFile && LockOnePR && __vnotes) {
 					loading_button('#OpenSPK');
 					var action_submit = 'SPK';
 					var id_selector = '#OpenSPK';
@@ -1054,7 +1104,8 @@
 				{
 					toastr.info('<li>PR Selected must be having less one checked</li>'+
 								'<li>Select Vendor must be having less one approve</li>'+
-								'<li>Total Vendor must be same with total selected vendor</li>'
+								'<li>Total Vendor must be same with total selected vendor</li>'+
+								'<li>Reason is required</li>'
 								);
 				}
 		}
@@ -1102,10 +1153,15 @@
 
 					// approve
 						var approve = fillItem.find('.C_radio_approve:checked').val();
+						var Desc = '';
+						if (fillItem.find('.Notes').length) {
+							Desc = $('.Notes').val();
+						}
 
 					var temp = {
 						CodeSupplier : idtable,
 						Approve : approve,
+						Desc : Desc,
 					}
 					arr_supplier.push(temp);
 				}
