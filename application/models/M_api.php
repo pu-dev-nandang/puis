@@ -2343,7 +2343,8 @@ class M_api extends CI_Model {
         // $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
         $Years = '';
 
-        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;        
+        // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;        
+        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = ".$StatusJual." and StatusJual = ".$StatusJual." ".$Years;        
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }

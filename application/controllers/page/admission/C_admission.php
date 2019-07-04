@@ -2134,6 +2134,7 @@ class C_admission extends Admission_Controler {
           }
 
           $nestedData[] = $action;
+          $nestedData[] = $row['Link'];
           $data[] = $nestedData;
           $No++;
       }

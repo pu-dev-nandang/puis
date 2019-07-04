@@ -10,11 +10,12 @@
 					<th>Formulir Code</th>
 					<!-- <th>Ref</th> -->
 					<!-- <th>Link</th> -->
-					<th>Status</th>
+					<th>Status Link</th>
+					<th>Status Jual</th>
 					<th>Print</th>
 					<th>Create At</th>
 					<th>Created By</th>
-					<th>Action</th>
+					<!-- <th>Action</th> -->
 					</tr>
 				</thead>
 				<tbody>
@@ -49,10 +50,20 @@
 				var print = 'Belum di Print';
 				var status = '<td style="'+
     							'color:  green;'+
-								'">IN'+
+								'">Not Activated'+
 							  '</td>';
 				if (response[i]['Status'] == 1 ) {
 					status = '<td style="'+
+    							'color:  red;'+
+								'">Activated'+
+							  '</td>';
+				}
+				var status_jual = '<td style="'+
+    							'color:  green;'+
+								'">IN'+
+							  '</td>';
+				if (response[i]['Status'] == 1 ) {
+					status_jual = '<td style="'+
     							'color:  red;'+
 								'">Sold Out'+
 							  '</td>';
@@ -69,10 +80,11 @@
 						// '<td>'+response[i]['No_Ref']+'</td>'+
 						// '<td>'+response[i]['Link']+'</td>'+
 						status+
+						status_jual+
 						'<td>'+print+'</td>'+
 						'<td>'+response[i]['CreateAT']+'</td>'+
 						'<td>'+response[i]['Name']+'</td>'+
-						'<td>'+btn_print+'</td>'+
+						// '<td>'+btn_print+'</td>'+
 					'</tr>'	
 					);
 				no++;
