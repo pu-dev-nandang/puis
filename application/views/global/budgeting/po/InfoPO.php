@@ -103,6 +103,7 @@
 		po_data : [],
 		PRCode_arr : [],
 		total_po_detail : 0,
+		G_pay_type : <?php echo json_encode($G_pay_type) ?>,
 	};
 	$(document).ready(function() {
 	   loadingStart();
@@ -682,7 +683,7 @@
 											'<td colspan = "3" class = "tdSubtotal_All" value = "'+Subtotal+'">'+formatRupiah(Subtotal)+'</td>'+
 										'</tr>'+
 										'<tr>'+
-											'<td colspan = "10" class = "tdNotes" value = "'+po_create[0]['Notes']+'"><b>'+nl2br(po_create[0]['Notes'])+'</b></td>'+
+											'<td colspan = "10" class = "tdNotes" value = "'+po_create[0]['Notes']+'" id_pay_type = "'+po_create[0]['ID_pay_type']+'" ><b>'+nl2br(po_create[0]['Notes'])+'</b></td>'+
 										'</tr>'+		
 									'</table>'+
 								//'</div>'+
@@ -804,6 +805,20 @@
 		
 	})
 
+	function __OPpay_type(ID=0)
+	{
+		var html = '';
+		html = '<select class = "form-control pay_type" style="width:70%;">';
+		var G_pay_type = ClassDt.G_pay_type;
+		for (var i = 0; i < G_pay_type.length; i++) {
+			var selected = (ID==G_pay_type[i].ID) ? 'selected' : '';
+			html += '<option value ="'+G_pay_type[i].ID+'" '+selected+' >'+G_pay_type[i].Name+'</option>';
+		}
+
+		html += '<select>';
+		return html;
+	}
+
 	function __input_reload()
 	{
 		$('#table_input_po tbody').find('tr').each(function(){
@@ -848,7 +863,10 @@
 
 		var value  = $('#table_input_po tfoot').find('.tdNotes').attr('value');
 		// $('#table_input_po tfoot').find('.tdNotes').html('<input type="text" class="form-control Notes" value="'+value+'">');
-		$('#table_input_po tfoot').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
+		// $('#table_input_po tfoot').find('.tdNotes').html('<textarea class = "form-control Notes">'+value+'</textarea>');
+		var ID_pay_type = $('#table_input_po tfoot').find('.tdNotes').attr('id_pay_type');
+		var htmlPayType = __OPpay_type(ID_pay_type);
+		$('#table_input_po tfoot').find('.tdNotes').html(htmlPayType);
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {
@@ -976,13 +994,16 @@
 
 			// var AnotherCost = $('#table_input_po tfoot').find('.AnotherCost').val();
 			// AnotherCost = findAndReplace(AnotherCost, ".","");
-			var Notes =  $('#table_input_po tfoot').find('.Notes').val();
+			// var Notes =  $('#table_input_po tfoot').find('.Notes').val();
+			var Notes =  $('#table_input_po tfoot').find('.pay_type option:selected').text();
+			var ID_pay_type =  $('#table_input_po tfoot').find('.pay_type option:selected').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
 			    arr_post_data_detail : arr_post_data_detail,
 			    // AnotherCost : AnotherCost,
 			    Notes : Notes,
+			    ID_pay_type : ID_pay_type,
 			};
 			var token = jwt_encode(data,"UAP)(*");
 			var action_mode = 'modifycreated';
