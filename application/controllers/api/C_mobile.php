@@ -450,6 +450,14 @@ class C_mobile extends CI_Controller {
 
         $data = $this->db->query('SELECT * FROM db_employees.employees em WHERE em.NIP = "'.$NIP.'" ')->result_array();
 
+        if(count($data)>0){
+
+            $photo = ($data[0]['Photo']!=null && $data[0]['Photo']!='')
+                ? base_url('uploads/employees/'.$data[0]['Photo']) : '';
+
+            $data[0]['PhotoURL'] = $photo;
+        }
+
         return $data;
 
     }

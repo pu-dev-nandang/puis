@@ -829,7 +829,7 @@ class C_rest2 extends CI_Controller {
                                                 LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
                                                 LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
                                                 WHERE  c.PeriodID = "'.$PeriodID.'" 
-                                                AND c.CRMTeamID = "'.$d['ID'].'" ')->result_array();
+                                                AND c.CRMTeamID = "'.$d['ID'].'" ORDER BY c.Name ASC ')->result_array();
 
                 if(count($data)>0){
                     $res = array(
