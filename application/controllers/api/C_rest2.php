@@ -1158,6 +1158,16 @@ class C_rest2 extends CI_Controller {
             $this->db->delete('db_admission.contact');
             return print_r(1);
         }
+        else if($data_arr['action']=='listAllContact'){
+
+            $data = $this->db->query('SELECT cnt.*, r.RegionName, s.SchoolName FROM db_admission.contact cnt
+                                                          LEFT JOIN db_admission.school s ON (s.ID = cnt.SchoolID)
+                                                          LEFT JOIN db_admission.region r ON (s.CityID = r.RegionID)
+                                                          ORDER BY cnt.Name ASC ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
     }
 
     public function crudProspectiveStudents(){
