@@ -139,6 +139,8 @@
 		        }
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
+		    		var btn_print = '<span data-smt="'+data[1]+'" class="btn btn-xs btn-print-link btn-read" data-token = "'+data[13]+'"><i class="fa fa-print"></i> Print</span>';
+		    		$(row).find('td:eq(1)').html(data[1]+'<br>'+btn_print);
 		          // if(data[6] == 'Lunas')
 		          // {
 		          //   $(row).attr('style', 'background-color: #8ED6EA; color: black;');
@@ -280,4 +282,18 @@
 		});		
 
     }
+
+    $(document).off('click', '.btn-print-link').on('click', '.btn-print-link',function(e) {
+       var formulir_code = $(this).attr('data-smt');
+       var url_token = $(this).attr('data-token');
+       var url = base_url_js+'admission/master-registration/DataFormulirOffline/downloadPDFToken';
+       var data = {
+         formulir_code : formulir_code,
+         url_token : url_token
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       FormSubmitAuto(url, 'POST', [
+           { name: 'token', value: token },
+       ]);
+    });
 </script>
