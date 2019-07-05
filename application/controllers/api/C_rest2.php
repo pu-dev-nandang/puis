@@ -1203,9 +1203,25 @@ class C_rest2 extends CI_Controller {
 
             $dataForm = (array) $data_arr['dataForm'];
 
-            $this->db->insert('db_admission.crm',$dataForm);
+            //cek email
+            $dataEmail = $dataForm['Email'];
+            $dataEm = $this->db->query('SELECT * FROM db_admission.crm WHERE Email LIKE "'.$dataEmail.'" ')->result_array();
 
-            return print_r(1);
+            $result = array(
+                'Status' => 0,
+                'Message' => 'Email already exists'
+            );
+            if(count($dataEm)<=0){
+                $this->db->insert('db_admission.crm',$dataForm);
+                $result = array(
+                    'Status' => 1,
+                    'Message' => 'Data saved'
+                );
+            }
+
+
+
+            return print_r(json_encode($result));
 
         }
         else if($data_arr['action']=='update_PS'){
@@ -1216,7 +1232,12 @@ class C_rest2 extends CI_Controller {
             $this->db->where('ID', $ID);
             $this->db->update('db_admission.crm',$dataForm);
 
-            return print_r($ID);
+            $result = array(
+                'Status' => 1,
+                'Message' => 'Data saved'
+            );
+
+            return print_r(json_encode($result));
 
         }
         else if($data_arr['action']=='read_PS'){
