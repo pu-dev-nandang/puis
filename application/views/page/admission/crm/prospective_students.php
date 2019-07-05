@@ -258,16 +258,22 @@
             var url = base_url_js+'rest2/__crudProspectiveStudents';
 
             $.post(url,{token:token},function (jsonResult) {
-                loadCRMData();
-                toastr.success('Data saved','Success');
 
-                $('#formMarketingActivity').val('');
-                $('#formTeam').val('');
-                $('#formID').val('');
-                $('#formName').val('');
-                $('#formEmail').val('');
-                $('#formPhone').val('');
-                $('#formLineID').val('');
+                var sts = parseInt(jsonResult.Status);
+                if(sts>0){
+                    loadCRMData();
+                    toastr.success('Data saved','Success');
+
+                    $('#formMarketingActivity').val('');
+                    $('#formTeam').val('');
+                    $('#formID').val('');
+                    $('#formName').val('');
+                    $('#formEmail').val('');
+                    $('#formPhone').val('');
+                    $('#formLineID').val('');
+                } else {
+                    toastr.error(jsonResult.Message,'Error');
+                }
 
                 setTimeout(function () {
                     $('#btnSavePS').html('Save').prop('disabled',false);
