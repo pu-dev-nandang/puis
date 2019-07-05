@@ -133,7 +133,6 @@
 		Get_data_po().then(function(data){
 			$('.C_radio_pr:first').prop('checked',true);
 			$('.C_radio_pr:first').trigger('change');
-			loadingEnd(500);
 		})
 	});
 
@@ -198,6 +197,7 @@
 	}
 
 	$(document).off('change', '.C_radio_pr:checked').on('change', '.C_radio_pr:checked',function(e) {
+		loadingStart();
 		var Code = $(this).attr('code');
 		Get_data_spb_grpo(Code).then(function(data){
 			ClassDt.Dataselected = data;
@@ -205,6 +205,7 @@
 				// Define data
 				ClassDt.po_data = data2;
 				MakeDomHtml(data);
+				loadingEnd(500);
 			})
 
 		})
@@ -589,7 +590,7 @@
 				}
 				if (bool) {
 					var selected = (IDselected == po_detail[i].ID_po_detail) ? 'selected' : '';
-					h += '<option value = "'+po_detail[i].ID_po_detail+'" '+selected+' >'+po_detail[i].Item+'</option>';
+					h += '<option value = "'+po_detail[i].ID_po_detail+'" '+selected+' qtypr="'+po_detail[i].QtyPR+'">'+po_detail[i].Item+'</option>';
 				}
 				
 			}
@@ -650,6 +651,571 @@
 					'</div>'+												
 				'</div></div>';
 
-		se_content.html(html);		
+		se_content.html(html);
+		se_content.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		se_content.find('.QtyDiterima').maskMoney('mask', '9894');
+		se_content.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});		
 	}
+
+	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var arr_selected = [];
+		var po_data = ClassDt.po_data;
+		var po_detail= po_data.po_detail;
+		ev.find('.Item').each(function(){
+			var v = $(this).find('option:selected').val();
+			arr_selected.push(v);
+		})
+		if (arr_selected.length != po_detail.length	) {
+			var html = OPPo_detail(null,arr_selected);
+			$('#page_po_item').append(html);
+			ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+			ev.find('.QtyDiterima').maskMoney('mask', '9894');
+		}	
+		// console.log(arr_selected);
+	})
+
+	$(document).off('change', '.Item').on('change', '.Item',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var vv = $(this).find('option:selected').val();
+		ev.find('.Item').not(this).each(function(){
+			$(this).find('option[value="'+vv+'"]').remove();
+		})
+
+		ev.find('.QtyDiterima').each(function(){
+			$(this).trigger('keyup');
+			$(this).trigger('keydown');
+		})
+	})
+
+	$(document).off('click', '.btn-delete-item	').on('click', '.btn-delete-item	',function(e) {
+		var ev = $(this).closest('.GroupingItem');
+		if (ev.find('.Item').length > 1) {
+			$(this).closest('.GroupingItem').remove();
+		}
+	})
+
+	$(document).off('keyup keydown', '.QtyDiterima').on('keyup keydown', '.QtyDiterima',function(e) {
+		var ev = $(this).closest('.GroupingItem');
+		var QtyPR = ev.find('.Item').find('option:selected').attr('qtypr');
+		var ID_po_detail = $(this).find('option:selected').val();
+		var qtyExisting = __GetQtyDiterima(ID_po_detail);
+		var v = $(this).val();
+		v = findAndReplace(v, ".","");
+		var sisa = parseInt(QtyPR)-parseInt(qtyExisting);
+		if (sisa==0) {
+			toastr.info('Qty telah mencukupi, silahkan hapus Item ini');
+		}
+		else
+		{
+			if (v>sisa) {
+				$(this).val(sisa);
+				$(this).maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+				$(this).maskMoney('mask', '9894');
+				toastr.info('Tidak boleh melebihi sisa qty('+sisa+')');
+			}
+		}
+		
+	})
+
+	function __GetQtyDiterima(ID_po_detail)
+	{
+		var rs = 0;
+		var data = ClassDt.Dataselected.dtgood_receipt_detail;
+		for (var i = 0; i < data.length; i++) {
+			if (ID_po_detail==data[i].ID_po_detail) {
+				rs += data[i].QtyDiterima;
+			}
+		}
+
+		return rs;
+	}
+
+	$(document).off('click', '.submitGRPO').on('click', '.submitGRPO',function(e) {
+		// validation
+		var ev = $(this).closest('.FormPage');
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_GRPO(ev);
+			if (validation) {
+				SubmitGRPO('.submitGRPO',ev);
+			}
+		}
+	})
+
+	function validation_input_GRPO(ev)
+	{
+		var find = true;
+		var data = {
+			NoDocument : ev.find('.NoDocument').val(),
+			NoTandaTerimaGRPO : ev.find('.NoTandaTerimaGRPO').val(),
+			TglGRPO : ev.find('.TglGRPO').val(),
+		};
+		if (validation(data) ) {
+			// Upload Document
+			ev.find(".BrowseDocument").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev2 = $(this);
+				if (!file_validation2(ev2,'Upload Document ') ) {
+				  ev.find(".submitGRPO").prop('disabled',false);
+				  find = false;
+				  return false;
+				}
+			})
+
+			// Upload Tanda Terima GRPO
+			ev.find(".BrowseTTGRPO").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev2 = $(this);
+				if (!file_validation2(ev2,'Tanda Terima ') ) {
+				  ev.find(".submitGRPO").prop('disabled',false);
+				  find = false;
+				  return false;
+				}
+			})
+		}
+		else
+		{
+			find = false;
+		}
+
+		// check item
+		var arr = [];
+		ev.find('.Item').each(function(){
+			var v = $(this).val();
+			arr.push(v);
+		})
+
+		var arr_qty_diterima = [];
+		ev.find('.QtyDiterima').each(function(){
+			var v = $(this).val();
+			arr_qty_diterima.push(v);
+		})
+
+		for (var i = 0; i < arr_qty_diterima.length; i++) {
+			if (arr_qty_diterima[i] == 0) {
+				toastr.error('Qty tidak boleh 0','!!!Error');
+				find=false;
+				break;
+			}
+		}
+
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i]=='' || arr[i]==null || arr[i]==undefined) {
+				toastr.error('Item belum dipilih','!!!Error');
+				find=false;
+				break;
+
+			}
+			else
+			{
+				for (var k = i+1; k < arr.length; k++) {
+					if (arr[i]==arr[k]) {
+						toastr.error('Item yang dipilih tidak boleh sama','!!!Error');
+						find=false;
+						break;
+					}
+				}
+
+				if (!find) {
+					break;
+				}
+			}
+		}
+		
+		return find;
+	}
+
+	function SubmitGRPO(elementbtn,ev,action="add")
+	{
+		loadingStart();
+		var Code_po_create = $('.C_radio_pr:checked').attr('code');
+		var Departement = IDDepartementPUBudget;
+		var ID_spb_created = ev.attr('id_spb_created');
+		var form_data = new FormData();
+
+		var UploadFile = ev.find('.BrowseDocument')[0].files;
+		form_data.append("FileDocument", UploadFile[0]);
+
+		var UploadFile = ev.find('.BrowseTTGRPO')[0].files;
+		form_data.append("FileTandaTerima", UploadFile[0]);
+
+		var NoDocument = ev.find('.NoDocument').val();
+		var NoTandaTerima = ev.find('.NoTandaTerimaGRPO').val();
+		var ID_budget_left = 0;
+
+		var arr_item = [];
+		ev.find('.Item').each(function(){
+			var ID_po_detail = $(this).find('option:selected').val();
+			var ev2 = $(this).closest('.GroupingItem');
+			var QtyDiterima = ev2.find('.QtyDiterima').val();
+			var temp = {
+				ID_po_detail : ID_po_detail,
+				QtyDiterima : QtyDiterima,
+			}
+			arr_item.push(temp);
+		})
+
+		var data = {
+			Code_po_create : Code_po_create,
+			Departement : Departement,
+			ID_budget_left : ID_budget_left,
+			NoDocument : NoDocument,
+			NoTandaTerima :NoTandaTerima,
+			ID_spb_created : ID_spb_created,
+			action : action,
+			arr_item : arr_item,
+			TglGRPO : ev.find('.TglGRPO').val(),
+			po_data : ClassDt.po_data,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
+		// var url = base_url_js + "budgeting/submit"
+		var url = base_url_js + "budgeting/submitgrpo"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_po().then(function(data){
+		  					$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+		  					$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+		  					loadingEnd(500);
+		  				})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			Get_data_po().then(function(data){
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+		  				loadingEnd(500);
+		  			})
+		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
+		    
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    nmbtn = 'Submit';
+		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+		  }
+		})
+	}
+
+	// spb action
+	$(document).off('keyup keydown', '.Money_Pembayaran').on('keyup keydown', '.Money_Pembayaran',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var v = $(this).val();
+		v = findAndReplace(v, ".","");
+		var InvoiceleftPO = $(this).attr('invoiceleftpo');
+		var n = InvoiceleftPO.indexOf(".");
+		InvoiceleftPO = InvoiceleftPO.substring(0, n);
+		var sisa = parseInt(InvoiceleftPO) - parseInt(v);
+		if (sisa < 0) {
+			ev.find('.submit').prop('disabled',true);
+			toastr.info('Pembayaran melebihi harga');
+			v = InvoiceleftPO;
+			$(this).val(v);
+			$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$(this).maskMoney('mask', '9894');
+			sisa = 0;
+			ev.find('.submit').prop('disabled',false);
+		}
+		ev.find('.Sisa_Pembayaran').html(formatRupiah(sisa));
+		// ajax terbilang
+		setTimeout(function () {
+		    _ajax_terbilang(v).then(function(data){
+		    	ev.find('.terbilang').html('Terbilang (Rupiah) : '+data+' Rupiah');
+		    })
+		},500);
+
+	})
+
+	function _ajax_terbilang(bilangan)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__ajax_terbilang";
+		var data = {
+		    bilangan : bilangan,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
+
+	$(document).off('click', '.submit').on('click', '.submit',function(e) {
+		// validation
+		var ev = $(this).closest('.FormPage');
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_spb(ev);
+			if (validation) {
+				SubmitSPB('.submit',ev);
+			}
+		}
+
+	})
+
+	function validation_input_spb(ev)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			TglSPB : ev.find('.TglSPB').val(),
+			Perihal : ev.find('.Perihal').val(),
+			NoRekening : ev.find('.NoRekening').val(),
+			Pembayaran : ev.find('.Money_Pembayaran').val(),
+		};
+		if (validation(data) ) {
+			// Upload Tanda Terima 
+			ev.find(".BrowseTT").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev2 = $(this);
+				if (!file_validation2(ev2,'Tanda Terima ') ) {
+				  ev.find(".submit").prop('disabled',false);
+				  find = false;
+				  return false;
+				}
+			})
+
+			// Upload Invoice 
+			ev.find(".BrowseInvoice").each(function(){
+				var IDFile = $(this).attr('id');
+				var ev2 = $(this);
+				if (!file_validation2(ev2,'Invoice ') ) {
+				  ev.find(".submit").prop('disabled',false);
+				  find = false;
+				  return false;
+				}
+			})
+		}
+		else
+		{
+			find = false;
+		}
+		
+		return find;
+	}
+
+	function validation(arr)
+	{
+	  var toatString = "";
+	  var result = "";
+	  for(var key in arr) {
+	     switch(key)
+	     {
+	      case  "Pembayaran" :
+	            if (arr[key] <= 0) {
+	            	toatString += 'Pembayaran tidak boleh kecil sama dengan nol' + "<br>";
+	            }
+	            break;
+	      default :
+	            result = Validation_required(arr[key],key);
+	            if (result['status'] == 0) {
+	              toatString += result['messages'] + "<br>";
+	            }       
+	     }
+
+	  }
+	  if (toatString != "") {
+	    toastr.error(toatString, 'Failed!!');
+	    return false;
+	  }
+
+	  return true;
+	}
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
+
+	function SubmitSPB(elementbtn,ev,action="add")
+	{
+		loadingStart();
+		var Code_po_create = $('.C_radio_pr:checked').attr('code');
+		var Departement = IDDepartementPUBudget;
+		var ID_budget_left = 0;
+		var form_data = new FormData();
+
+		var UploadFile = ev.find('.BrowseInvoice')[0].files;
+		form_data.append("UploadInvoice", UploadFile[0]);
+
+		var UploadFile = ev.find('.BrowseTT')[0].files;
+		form_data.append("UploadTandaTerima", UploadFile[0]);
+
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Datee = ev.find('.TglSPB').val();
+		var Perihal = ev.find('.Perihal').val();
+		var No_Rekening = ev.find('.NoRekening').val();
+		var ID_bank = ev.find('.dtbank option:selected').val();
+		var Invoice = ev.find('.Money_Pembayaran').val();
+		Invoice = findAndReplace(Invoice, ".","");
+		var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+
+		var data = {
+			Code_po_create : Code_po_create,
+			Departement : Departement,
+			ID_budget_left : ID_budget_left,
+			NoInvoice : NoInvoice,
+			NoTandaTerima :NoTandaTerima,
+			Datee :Datee,
+			Perihal : Perihal,
+			No_Rekening : No_Rekening,
+			ID_bank : ID_bank,
+			Invoice : Invoice,
+			TypeInvoice  : TypeInvoice,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
+		// var url = base_url_js + "budgeting/submit"
+		var url = base_url_js + "budgeting/submitspb"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_po().then(function(data){
+		  					$('.C_radio_pr:first').prop('checked',true);
+		  					$('.C_radio_pr:first').trigger('change');
+		  					loadingEnd(500);
+		  				})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
+		    
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    nmbtn = 'Submit';
+		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+		  }
+		})
+	}
+	
 </script>

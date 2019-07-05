@@ -15,11 +15,27 @@ class M_spb extends CI_Model {
 
     public function checkdt_spb_before_submit($data_verify)
     {
+        $bool = true;
         $Code_po_create = $data_verify['Code_po_create'];
         $InvoicePO = $data_verify['InvoicePO'];
         $InvoiceLeftPO = $data_verify['InvoiceLeftPO'];
 
-        $G_dt = $this->m_master->caribasedprimary('db_purchasing.');
+        $G_dt = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
+        if (count($G_dt) == 0) {
+            $bool = false;
+        }
+        else
+        {
+            if ($InvoicePO != $G_dt[0]['InvoicePO'] || $InvoiceLeftPO != $G_dt[0]['InvoiceLeftPO']) {
+                $bool = false;
+            }
+        }
+
+        if ($G_dt[0]['Status'] == 1) {
+            $bool = false;
+        }
+
+        return $bool;
     }
 
     public function get_spb_gr_by_po($Code_po_create)
@@ -65,6 +81,21 @@ class M_spb extends CI_Model {
         }
         
         return $arr;
+    }
+
+    public function spb_grpo_circulation_sheet($Code,$Desc,$By = '')
+    {
+        if ($By ==  '') {
+            $By = $this->session->userdata('NIP');
+        }
+        $dataSave = array(
+            'Code' => $Code,
+            'Desc' => $Desc,
+            'Date' => date('Y-m-d'),
+            'By' => $By,
+        );
+
+        $this->db->insert('db_purchasing.spb_circulation_sheet',$dataSave);
     }
 
 }
