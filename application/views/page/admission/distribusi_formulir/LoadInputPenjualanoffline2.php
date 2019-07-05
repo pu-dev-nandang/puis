@@ -70,48 +70,6 @@
                             </div>
                             <div class="panel-body">
 
-<!--                                <table class="table table-striped">-->
-<!--                                    <tr>-->
-<!--                                        <td style="width: 25%;">Name</td>-->
-<!--                                        <td style="width: 1%;">:</td>-->
-<!--                                        <td id="viewStdName"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Gender</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td id="viewStdGender"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Email</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td id="viewStdEmail"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>HP</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td id="viewStdMobile"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Phone</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td id="viewStdPhone"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>School</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td id="viewStdSchool"></td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Advertising source</td>-->
-<!--                                        <td>:</td>-->
-<!--                                        <td>-->
-<!--                                            <select class="select2-select-00 col-md-4 full-width-fix" id="selectSourceFrom">-->
-<!--                                                <option></option>-->
-<!--                                            </select>-->
-<!--                                        </td>-->
-<!--                                    </tr>-->
-<!--                                </table>-->
-
                                 <div class="form-horizontal">
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Nama </label>
@@ -142,6 +100,9 @@
                                         <label class="col-sm-3 control-label">Email </label>
                                         <div class="col-md-9">
                                             <input type="text" name="email" id= "email" placeholder="" class="form-control">
+                                            <br/>
+                                            <p style="color: red">* Pastikan email aktif dan benar</p>
+                                            <p style="color: red">* Email yang didaftarkan akan menjadi account login pada user dan pertukaran informasi</p>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -162,7 +123,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-6">
                         <div class="panel panel-primary">
                             <div class="panel-heading clearfix">
@@ -250,6 +210,11 @@
                                 </div>
                             </div>
                         </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <div class ="form-group">
                             <div align="right">
                                 <button class="btn btn-inverse btn-notification" id="btn-proses" action = "<?php echo $action ?>" kode-unique = "<?php echo $CDID ?>">Save</button>
@@ -700,15 +665,28 @@
 
                     var token = jwt_encode(data,"UAP)(*");
                     $.post(url,{token:token},function (data_json) {
-                        setTimeout(function () {
-                            // clearData();
-                            // LoadListPenjualan();
-                            $('.pageAnchor[page = "ListPenjualan"]').trigger('click');
-                            toastr.options.fadeOut = 10000;
-                            toastr.success('Data berhasil disimpan', 'Success!');
+
+                        data_json = JSON.parse(data_json);
+
+                        if(parseInt(data_json.Status)<=0) {
+
+
+                            toastr.error(data_json.msg, 'Error');
                             $('#btn-proses').prop('disabled',false).html('Save');
-                            // $('a[href="#tab2primary"]').tab('show');
-                        },2000);
+
+                        } else {
+                            setTimeout(function () {
+                                // clearData();
+                                // LoadListPenjualan();
+                                $('.pageAnchor[page = "ListPenjualan"]').trigger('click');
+                                toastr.options.fadeOut = 10000;
+                                toastr.success('Data berhasil disimpan', 'Success!');
+                                $('#btn-proses').prop('disabled',false).html('Save');
+                                // $('a[href="#tab2primary"]').tab('show');
+                            },2000);
+                        }
+
+
                     });
                 }
                 else
