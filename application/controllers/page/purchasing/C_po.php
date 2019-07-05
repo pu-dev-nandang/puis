@@ -1640,6 +1640,14 @@ class C_po extends Transaksi_Controler {
 
     public function pembayaran()
     {
+      // get data bank rest/__Databank
+          $data = array(
+              'auth' => 's3Cr3T-G4N', 
+          );
+          $key = "UAP)(*";
+          $token = $this->jwt->encode($data,$key);
+          $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+          $this->data['G_data_bank'] = $G_data_bank;
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/pembayaran',$this->data,true);
        $this->page_po($page); 
     }

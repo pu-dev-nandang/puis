@@ -1672,4 +1672,30 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function Get_data_spb_grpo()
+    {
+        $rs = array ('msg' => '','dt' => array(),'change'=>0);
+        try {
+            $this->load->model('budgeting/m_spb');
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $Code = $dataToken['Code'];
+                $dt = $this->m_spb->get_spb_gr_by_po($Code);
+                echo json_encode($dt);
+
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
 }
