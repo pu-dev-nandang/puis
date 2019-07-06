@@ -299,6 +299,10 @@
 				if (action=='add') {
 					makeDomGRPOAdd(action,ID_spb_created,number,se_content);
 				}
+				else
+				{
+					makeDomGRPOView(action,ID_spb_created,number,se_content);
+				}
 			}
 
 			// se_content.html('asdasd'); 
@@ -575,7 +579,7 @@
 
 	}
 
-	function OPPo_detail(IDselected = null,arr_IDPass=[])
+	function OPPo_detail(IDselected = null,arr_IDPass=[],value_qty=0,action_btn='')
 	{
 		var h = '';
 		var po_data = ClassDt.po_data;
@@ -584,7 +588,7 @@
 				'<div class="form-group">'+
 					'<label class = "col-sm-2">Pilih Item</label>'
 			;
-		h += '<div class="col-sm-6"><select class = " form-control Item">'+
+		h += '<div class="col-sm-6"><select class = " form-control Item" '+action_btn+'>'+
 				'<option value = "" disabled selected>--Pilih Item--</option>';
 			for (var i = 0; i < po_detail.length; i++) {
 				var bool = true;
@@ -595,6 +599,8 @@
 					}
 				}
 				if (bool) {
+					// get qty left
+
 					var selected = (IDselected == po_detail[i].ID_po_detail) ? 'selected' : '';
 					h += '<option value = "'+po_detail[i].ID_po_detail+'" '+selected+' qtypr="'+po_detail[i].QtyPR+'">'+po_detail[i].Item+'</option>';
 				}
@@ -602,10 +608,135 @@
 			}
 		h += '</select></div>';	
 
-		h += '<div class="col-sm-2"><input type="text" class="form-control QtyDiterima"></div>';
-		h += '<div class="col-sm-1"><button class="btn btn-danger btn-delete-item"><i class="fa fa-trash"></i> </button></div>';
+		h += '<div class="col-sm-2"><input type="text" class="form-control QtyDiterima" value="'+value_qty+'" '+action_btn+'></div>';
+		h += '<div class="col-sm-1"><button class="btn btn-danger btn-delete-item" '+action_btn+'><i class="fa fa-trash"></i> </button></div>';
 		h += '</div></div>';
 		return h;
+	}
+
+	function __getRsViewGRPO(ID_spb_created)
+	{
+		var arr=[];
+		var Dataselected = ClassDt.Dataselected;
+		var dtspb = Dataselected.dtspb;
+		var dtspb_rs = [];
+		// get indeks array
+		for (var i = 0; i < dtspb.length; i++) {
+			if (ID_spb_created == dtspb[i].ID) {
+				break;
+			}
+		}
+
+		dtspb_rs[0] = dtspb[i];
+
+		var dtgood_receipt_spb = Dataselected.dtgood_receipt_spb;
+		var dtgood_receipt_spb_rs = [];
+		// get dtgood_receipt_spb from ID_spb_created
+		dtgood_receipt_spb_rs[0] = dtgood_receipt_spb[i];
+		var ID_good_receipt_spb = dtgood_receipt_spb_rs[0].ID;
+		// get dtgood_receipt_detail from ID_good_receipt_spb
+		var dtgood_receipt_detail_rs = [];
+		var dtgood_receipt_detail = Dataselected.dtgood_receipt_detail;
+		for (var i = 0; i < dtgood_receipt_detail.length; i++) {
+			if (dtgood_receipt_detail[i].ID_good_receipt_spb == ID_good_receipt_spb) {
+				dtgood_receipt_detail_rs.push(dtgood_receipt_detail[i]);
+			}
+		}
+
+		arr = {
+			dtspb : dtspb_rs,
+			dtgood_receipt_spb : dtgood_receipt_spb_rs,
+			dtgood_receipt_detail : dtgood_receipt_detail_rs,
+		};
+
+		return arr;
+	}
+
+	function makeDomGRPOView(action,ID_spb_created,number,se_content)
+	{
+		var Dataselected = ClassDt.Dataselected;
+		var dtspb = Dataselected.dtspb;
+		var ev = se_content.closest('.FormPage');
+		var ID_spb_created = ev.attr('id_spb_created');
+		var dt_arr = __getRsViewGRPO(ID_spb_created);
+		console.log(dt_arr);
+
+		var html = '';
+		var po_data = ClassDt.po_data;
+		var OPPo_detail_edit = '';
+		var dtspb = dt_arr.dtspb;
+		var dtgood_receipt_spb = dt_arr.dtgood_receipt_spb;
+		var dtgood_receipt_detail = dt_arr.dtgood_receipt_detail;
+		for (var i = 0; i < dtgood_receipt_detail.length; i++) {
+			OPPo_detail_edit += OPPo_detail(dtgood_receipt_detail[i].ID_po_detail,[],dtgood_receipt_detail[i].QtyDiterima,'disabled');
+		}
+
+		// get Status
+		var Status = dtspb[0].Status;
+
+		var FileDocument = jQuery.parseJSON(dtgood_receipt_spb[0]['FileDocument']);
+		FileDocument = FileDocument[0];
+		var FileTandaTerima = jQuery.parseJSON(dtgood_receipt_spb[0]['FileTandaTerima']);
+		FileTandaTerima = FileTandaTerima[0];
+
+
+		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Good Receipt PO</h2></div>'+
+					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+					'<button class="btn btn-default btn-add-item" disabled><i class="fa icon-plus"></i> </button>'+
+					'<br>'+
+					'<div id = "page_po_item">'+
+						OPPo_detail_edit+
+					'</div>'+
+					'<br>'+
+					'<div class = "form-horizontal" style="margin-top:5px;">'+
+									'<div class="form-group">'+
+										'<label class = "col-sm-2">No Document</label>'+	
+											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[0]['NoDocument']+'" disabled><br>'+
+											'<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+											'</div>'+
+										'<label class = "col-sm-1">Upload Document</label>'+
+											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf" disabled>'+
+											'</div>'+
+									'</div>'+
+					'</div>'+				
+					'<div class = "form-horizontal" style="margin-top:5px;">'+
+									'<div class="form-group">'+
+										'<label class = "col-sm-2">No Tanda Terima</label>'	+
+											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...." value="'+dtgood_receipt_spb[0]['NoTandaTerima']+'" disabled>'+
+											'<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
+											'</a>'+
+											'</div>'+
+										'<label class = "col-sm-1">Upload Tanda Terima</label>'+
+											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseTTGRPO" id="BrowseTTGRPO" accept="image/*,application/pdf" disabled>'+
+											'</div>'+
+									'</div>'+
+					'</div>'+
+					'<div class = "form-horizontal" style="margin-top:5px;">'+
+									'<div class="form-group">'+
+										'<label class = "col-sm-2">Tanggal</label>'	+
+											'<div class="col-sm-4">'+'<div class="input-group input-append date datetimepicker">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control TglGRPO" type=" text" readonly="" value="'+dtgood_receipt_spb[0]['Date']+'" disabled>'+
+		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+		                		'</div></div>'+
+					'</div>'+
+					'<div id = "r_action">'+
+						'<div class="row">'+
+							'<div class="col-md-12">'+
+								'<div class="pull-right">'+
+									'<button class="btn btn-primary btnEditInputGRPO" ID_good_receipt_spb = "'+dtgood_receipt_spb[0].ID+'" Status = "'+Status+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitGRPO" Status = "'+Status+'" disabled> Submit</button>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+												
+				'</div></div>';
+
+		se_content.html(html);
+		se_content.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		se_content.find('.QtyDiterima').maskMoney('mask', '9894');
+		se_content.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});		
 	}
 
 	function makeDomGRPOAdd(action,ID_spb_created,number,se_content)
@@ -664,6 +795,23 @@
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});		
 	}
+
+	
+	$(document).off('click', '.btnEditInputGRPO').on('click', '.btnEditInputGRPO',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.pageFormInput');
+			ev2.find('input').not('.TglGRPO').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			ev2.find('select').prop('disabled',false);
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Data SPB telah approve, tidak bisa edit');
+		}
+		
+	})
 
 	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
 		var ev = $(this).closest('.FormPage');
@@ -742,10 +890,11 @@
 	$(document).off('click', '.submitGRPO').on('click', '.submitGRPO',function(e) {
 		// validation
 		var ev = $(this).closest('.FormPage');
+		var action = ev.attr('action');
 		if (confirm('Are you sure?')) {
 			var validation = validation_input_GRPO(ev);
 			if (validation) {
-				SubmitGRPO('.submitGRPO',ev);
+				SubmitGRPO('.submitGRPO',ev,action);
 			}
 		}
 	})
@@ -759,27 +908,31 @@
 			TglGRPO : ev.find('.TglGRPO').val(),
 		};
 		if (validation(data) ) {
-			// Upload Document
-			ev.find(".BrowseDocument").each(function(){
-				var IDFile = $(this).attr('id');
-				var ev2 = $(this);
-				if (!file_validation2(ev2,'Upload Document ') ) {
-				  ev.find(".submitGRPO").prop('disabled',false);
-				  find = false;
-				  return false;
-				}
-			})
+			var action = ev.attr('action');
+			if (action == 'add') {
+				// Upload Document
+				ev.find(".BrowseDocument").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Upload Document ') ) {
+					  ev.find(".submitGRPO").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
 
-			// Upload Tanda Terima GRPO
-			ev.find(".BrowseTTGRPO").each(function(){
-				var IDFile = $(this).attr('id');
-				var ev2 = $(this);
-				if (!file_validation2(ev2,'Tanda Terima ') ) {
-				  ev.find(".submitGRPO").prop('disabled',false);
-				  find = false;
-				  return false;
-				}
-			})
+				// Upload Tanda Terima GRPO
+				ev.find(".BrowseTTGRPO").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  ev.find(".submitGRPO").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+			}
+			
 		}
 		else
 		{
@@ -841,11 +994,15 @@
 		var ID_spb_created = ev.attr('id_spb_created');
 		var form_data = new FormData();
 
-		var UploadFile = ev.find('.BrowseDocument')[0].files;
-		form_data.append("FileDocument", UploadFile[0]);
-
-		var UploadFile = ev.find('.BrowseTTGRPO')[0].files;
-		form_data.append("FileTandaTerima", UploadFile[0]);
+		if ( ev.find('.BrowseDocument').length ) {
+			var UploadFile = ev.find('.BrowseDocument')[0].files;
+			form_data.append("FileDocument[]", UploadFile[0]);
+		}
+		
+		if ( ev.find('.BrowseTTGRPO').length ) {
+			var UploadFile = ev.find('.BrowseTTGRPO')[0].files;
+			form_data.append("FileTandaTerima[]", UploadFile[0]);
+		}
 
 		var NoDocument = ev.find('.NoDocument').val();
 		var NoTandaTerima = ev.find('.NoTandaTerimaGRPO').val();
