@@ -74,7 +74,7 @@
 			var arr1 = rs['dt_Year'];
 			// console.log(arr1);
 			var filee = (arr1[0].BudgetApproveUpload != '' && arr1[0].BudgetApproveUpload != null && arr1[0].BudgetApproveUpload != undefined) ? '<a href = "'+base_url_js+'fileGetAny/budgeting-'+arr1[0].BudgetApproveUpload+'" target="_blank" class = "btn btn-warning Fileexist">File '+'</a>&nbsp' : '';
-			var test = '<div class = "row" style = "margin-left : 0px;margin-right : 0px;"><div class="col-md-2 col-md-offset-10" align = "right">'+filee+'<div class ="row" ><div class = "col-xs-5"><label class="btn btn-primary" style="color: #ffff;">Upload Budget File <input id="file-upload" type="file" style="display: none;" Year = "'+data['Year']+'" accept="image/*,application/pdf"></label></div> <div class = "col-md-offset-1 col-xs-5"> <button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div></div>';
+			var test = '<div class = "row" style = "margin-left : 0px;margin-right : 0px;"><div class="col-md-2 col-md-offset-10" align = "right">'+filee+'<div class ="row" ><div class = "col-xs-5"><label class="btn btn-primary" style="color: #ffff;">Upload<input id="file-upload" type="file" style="display: none;" Year = "'+data['Year']+'" accept="image/*,application/pdf"></label></div> <div class = "col-md-offset-1 col-xs-5"> <button class = "btn btn-excel-all" Year = "'+data['Year']+'" ><i class="fa fa-download"></i> Excel</button></div></div></div></div>';
 			var TableGenerate = '<div class = "row"style = "margin-top : 10px"><div class="col-md-12" id = "pageForTable">'+
 									'<div class="table-responsive">'+
 										'<table class="table table-bordered tableData" id ="tableData3">'+

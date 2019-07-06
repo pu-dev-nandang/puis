@@ -966,6 +966,7 @@ $route['rest2/__reject_pr_from_another'] = 'api/c_rest2/reject_pr_from_another';
 $route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from_another';
 $route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1';
 $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
+$route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 
 
 
@@ -1366,6 +1367,7 @@ $route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
 $route['budgeting_menu/pembayaran/spb/create_spb'] = 'page/budgeting/c_spb/create_spb';
 $route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/configuration';
 $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
+$route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
 
 
 // cashadvance

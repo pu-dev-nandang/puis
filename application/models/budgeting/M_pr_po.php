@@ -1208,6 +1208,39 @@ class M_pr_po extends CI_Model {
 
     }
 
+    public function Get_data_po_by_ID_po_detail($ID_po_detail)
+    {
+        $sql = 'select a.ID as ID_po_detail,a.ID_pre_po_detail,a.UnitCost as UnitCost_PO,a.Discount as Discount_PO,a.PPN as PPN_PO,a.SubTotal as Subtotal,
+                b.ID_pr_detail,c.Qty as QtyPR,c.Item,c.Desc,c.DateNeeded,c.Spec_add,c.UnitCost as UnitCost_PR,c.Subtotal as Subtotal_PR,
+                c.ID_budget_left,c.ID_creator_budget,c.CodePostRealisasi,c.CodeHeadAccount,c.CodePost,c.RealisasiPostName,c.Departement as Departement_HA,c.PostName,c.NameHeadAccount,c.PPH as PPH_PR,c.PRCode,c.DetailCatalog,a.AnotherCost
+                from db_purchasing.po_detail as a 
+                join db_purchasing.pre_po_detail as b on a.ID_pre_po_detail = b.ID
+                join (
+                    select a.ID,a.PRCode,a.ID_budget_left,b.ID_creator_budget,c.CodePostRealisasi,e.CodeHeadAccount,f.CodePost,
+                                    e.RealisasiPostName,d.Departement,f.PostName,a.ID_m_catalog,g.Item,g.Desc,g.DetailCatalog,a.Spec_add,a.Need,
+                                    a.Qty,a.UnitCost,a.SubTotal,a.DateNeeded,a.UploadFile,a.PPH,g.Photo,h.NameDepartement,d.Name as NameHeadAccount,g.EstimaValue
+                                    from db_budgeting.pr_detail as a
+                                    join db_budgeting.budget_left as b on a.ID_budget_left = b.ID
+                                    join db_budgeting.creator_budget as c on b.ID_creator_budget = c.ID
+                                    join db_budgeting.cfg_postrealisasi as e on c.CodePostRealisasi = e.CodePostRealisasi
+                                    join db_budgeting.cfg_head_account as d on d.CodeHeadAccount = e.CodeHeadAccount
+                                    join db_budgeting.cfg_post as f on d.CodePost = f.CodePost
+                                    join db_purchasing.m_catalog as g on a.ID_m_catalog = g.ID
+                                    join (
+                                        select * from (
+                                                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement,`Code` as Code from db_academic.program_study where Status = 1
+                                                        UNION
+                                                        select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                        UNION
+                                                        select CONCAT("FT.",ID) as ID, NameEng as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                                        ) aa
+                                        ) as h on d.Departement = h.ID 
+                    ) c on c.ID = b.ID_pr_detail
+                    where a.ID = ?';
+            $query=$this->db->query($sql, array($ID_po_detail))->result_array();
+            return $query;        
+    }
+
     public function CheckPerubahanData_PO_Created($po_data)
     {
         $bool = true;
