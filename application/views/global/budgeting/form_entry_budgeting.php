@@ -219,7 +219,7 @@ function makeHtmlHeader()
 
 	// get Month
 	var Month = ClassDt.arr_bulan;
-	 html += '<div class = "col-md-7">'+
+	 html += '<div class = "col-md-7" style="width:64%;">'+
 	 			'<div class = "row">';	
 	for (var i = 0; i < Month.length; i++) {
 		html += '<div class = "col-md-1">'+
@@ -374,7 +374,7 @@ function makeRowAdd_del(dt)
 						'<input type = "number" class = "form-control Freq" placeholder="Input Unit Freq..." value = "0">'+
 					'</div>';
 
-			html += '<div class = "col-md-7">'+
+			html += '<div class = "col-md-7" style="width:64%;">'+
 						'<div class = "row">';
 			for (var j = 0; j < Month.length; j++) {
 				html += '<div class = "col-md-1">'+
@@ -472,7 +472,7 @@ function makeContent()
 				'</div>';
 
 		var Month = ClassDt.arr_bulan;
-		html += '<div class = "col-md-7">'+
+		html += '<div class = "col-md-7" style="width:64%;">'+
 					'<div class = "row">';
 		for (var j = 0; j < Month.length; j++) {
 			html += '<div class = "col-md-1">'+
@@ -1234,7 +1234,7 @@ function makeContent_existing()
 					'<input type = "number" class = "form-control Freq" placeholder="Input Unit Freq..." value = "'+Cmb_freq+'" style = "'+c+' color : #333">'+
 				'</div>';
 
-		html += '<div class = "col-md-7">'+
+		html += '<div class = "col-md-7" style="width:64%;">'+
 					'<div class = "row">';
 		var DetailMonth = dt[i]['DetailMonth'];
 		DetailMonth = jQuery.parseJSON(DetailMonth);		
