@@ -261,6 +261,12 @@
 		else
 		{
 			 // data existing
+			var dtspb = data.dtspb;
+			for (var i = 0; i < dtspb.length; i++) {
+				var ID_spb_created = dtspb[i]['ID'];
+				template_html += __template_html('edit',ID_spb_created,i);
+			}
+			$('.btn-tambah').removeClass('hide');
 		}
 	
 		$('#content_input').html(template_html);

@@ -247,7 +247,7 @@ class C_spb extends Budgeting_Controler {
         }
 
         $Desc = implode(',', $__arr_item);
-        // insert to pr_circulation_sheet
+        // insert to spb_circulation_sheet
             $this->m_spb->spb_grpo_circulation_sheet(null,'Good Receipt<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt<br>{'.$Desc.'}');   

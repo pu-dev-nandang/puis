@@ -75,8 +75,8 @@ class M_spb extends CI_Model {
             $ID_good_receipt_spb = $arr['dtgood_receipt_spb'][0]['ID'];
             $sql = 'select ';
             $tt=$this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);
-            for ($i=0; $i < count($t); $i++) { 
-               $ID_po_detail =$t[$i]['ID_po_detail'];
+            for ($i=0; $i < count($tt); $i++) { 
+               $ID_po_detail =$tt[$i]['ID_po_detail'];
                $G_dt = $this->m_pr_po->Get_data_po_by_ID_po_detail($ID_po_detail);
                $tt[$i]['Detail'] = $G_dt;
             }
