@@ -12,7 +12,6 @@ class C_spb extends Budgeting_Controler {
     {
         parent::__construct();
         $this->load->model('budgeting/m_spb');
-        $this->load->model('budgeting/m_pr_po');
     }
 
     public function menu_horizontal($page)

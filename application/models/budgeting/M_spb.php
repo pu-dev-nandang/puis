@@ -47,23 +47,26 @@ class M_spb extends CI_Model {
         );
 
         $sql = 'select a.*,b.Name as NameBank,c.Name as NameCreatedBy from db_purchasing.spb_created as a
-                join db_finance.bank as b on a.ID_bank = b.ID
-                join db_employees.employees as c on a.CreatedBy = c.NIP
+                left join db_finance.bank as b on a.ID_bank = b.ID
+                left join db_employees.employees as c on a.CreatedBy = c.NIP
                 where a.Code_po_create = ? limit 1
                 ';
         $query=$this->db->query($sql, array($Code_po_create))->result_array();
         if (count($query) > 0) {
             $JsonStatus = $query[0]['JsonStatus'];
-            // decode first
-            $JsonStatus = json_decode($JsonStatus,true);
-            for ($j=0; $j < count($JsonStatus); $j++) { 
-                $NIP = $JsonStatus[$j]['NIP'];
-                $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
-                $JsonStatus[$j]['Name'] = $G_emp[0]['Name'];
-            }
+            if ($JsonStatus != '' && $JsonStatus != null) {
+                // decode first
+                $JsonStatus = json_decode($JsonStatus,true);
+                for ($j=0; $j < count($JsonStatus); $j++) { 
+                    $NIP = $JsonStatus[$j]['NIP'];
+                    $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                    $JsonStatus[$j]['Name'] = $G_emp[0]['Name'];
+                }
 
-            $JsonStatus = json_encode($JsonStatus);
-            $query[0]['JsonStatus'] = $JsonStatus;
+                $JsonStatus = json_encode($JsonStatus);
+                $query[0]['JsonStatus'] = $JsonStatus;
+            }
+            
             $arr['dtspb']=$query;
 
             // Get ID untu GRPO

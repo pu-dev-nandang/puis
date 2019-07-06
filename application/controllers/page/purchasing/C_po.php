@@ -673,8 +673,16 @@ class C_po extends Transaksi_Controler {
                                 $PRCode = $query[$i]['PRCode'];
                                 $ID_pr_detail = $query[$i]['ID_pr_detail'];
                                 $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                                $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
-                                $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                                if ($query[$i]['Status'] != -1) {
+                                  $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
+                                  $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                                }
+                                else
+                                {
+                                  $Item_proc= $G_data_pr_status[0]['Item_proc'];
+                                  $Item_pending= $G_data_pr_status[0]['Item_pending'];
+                                }
+                                
                                 $Status = ($Item_proc == 0 && $G_data_pr_status[0]['Item_done'] == 0) ? 0 : 1;
                                 $dataSave = array(
                                    'Item_proc' => $Item_proc,
@@ -1338,8 +1346,15 @@ class C_po extends Transaksi_Controler {
                             $PRCode = $query[$i]['PRCode'];
                             $ID_pr_detail = $query[$i]['ID_pr_detail'];
                             $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                            $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
-                            $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            if ($query[$i]['Status'] != -1) {
+                              $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
+                              $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            }
+                            else
+                            {
+                              $Item_proc= $G_data_pr_status[0]['Item_proc'];
+                              $Item_pending= $G_data_pr_status[0]['Item_pending'];
+                            }
                             $Status = ($G_data_pr_status[0]['Item_done'] == 0 && $Item_proc == 0) ? 0 : 1;
                             $dataSave = array(
                                'Item_proc' => $Item_proc,
