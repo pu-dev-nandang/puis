@@ -1502,7 +1502,10 @@ class C_rest2 extends CI_Controller {
         }
         else if($data_arr['action']=='read2Full_PS'){
             $ID = $data_arr['ID'];
-            $data = $this->db->query('SELECT c.*, em.Name AS SalesName, s.CityID, rms.SchoolMajor, cs.Description AS StatusDesc, csl.Class AS StatusClass FROM db_admission.crm c 
+            $data = $this->db->query('SELECT c.*, em.Name AS SalesName, s.CityID, s.SchoolName, rms.SchoolMajor,  
+                                                cs.Description AS StatusDesc, csl.Class AS StatusClass, 
+                                                csl.ClassMobile AS StatusClassMobile 
+                                                FROM db_admission.crm c
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
                                                 LEFT JOIN db_admission.school s ON (s.ID = c.SchoolID)
                                                 LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
