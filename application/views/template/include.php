@@ -1782,12 +1782,12 @@
         number = ''+number;
 
         var d = number.substr(0,2);
-        var l = number.substr(2,number.length);
+        // var l = number.substr(2,number.length);
         var v = '';
         if(d=='62' || d==62){
             v = number;
         } else {
-            v = '628'+l;
+            v = '62'+parseInt(number);
         }
 
         return v;

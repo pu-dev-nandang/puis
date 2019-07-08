@@ -371,48 +371,98 @@ class C_mobile extends CI_Controller {
     public function loginCRM(){
         $data_arr = $this->getInputToken2();
 
-        // Cek setting
-        $itSetting = $this->db
-            ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password'], 'ID' => 2))
-            ->result_array();
-
         $result = array(
             'Status' => 0
         );
 
-        if(count($itSetting)>0){
-            $dIT = $itSetting[0];
+        // Login User
+        $dataLoginUser = $this->loginCRMUser($data_arr['NIP'],$data_arr['Password']);
+        if(count($dataLoginUser)>0){
+            // Get data student
+            $dataEmp = $this->getEmployees($data_arr['NIP']);
+            $dataTeam = $this->checkUserCRM($data_arr['NIP']);
+            $result = array(
+                'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+                'User' => $dataEmp[0],
+                'Team' => $dataTeam
+            );
 
-            // Mode development
-            if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
+        }
+        else {
 
-                // Get data student
-                $dataEmp = $this->getEmployees($data_arr['NIP']);
+            // Cek setting
+            $itSetting = $this->db
+                ->get_where('db_it.m_config',array('GlobalPassword' => $data_arr['Password'], 'ID' => 2))
+                ->result_array();
 
-                if(count($dataEmp)>0){
-                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
-                    $result = array(
-                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
-                        'User' => $dataEmp[0],
-                        'Team' => $dataTeam
-                    );
+            if(count($itSetting)>0){
+                $dIT = $itSetting[0];
+                if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
+                    // Get data student
+                    $dataEmp = $this->getEmployees($data_arr['NIP']);
+
+                    if(count($dataEmp)>0){
+                        $dataTeam = $this->checkUserCRM($data_arr['NIP']);
+                        $result = array(
+                            'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+                            'User' => $dataEmp[0],
+                            'Team' => $dataTeam
+                        );
+                    }
                 }
             }
-            else {
 
-                $dataEmp = $this->checkUserEmployees($data_arr['NIP'],$data_arr['Password']);
-                if(count($dataEmp)>0){
-                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
-                    $result = array(
-                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
-                        'User' => $dataEmp[0],
-                        'Team' => $dataTeam
-                    );
-                }
-            }
         }
 
+
+
+
+//        if(count($itSetting)>0){
+//            $dIT = $itSetting[0];
+//
+//            // Mode development
+//            if($dIT['DevelopMode']==1 || $dIT['DevelopMode']=='1'){
+//
+//                // Get data student
+//                $dataEmp = $this->getEmployees($data_arr['NIP']);
+//
+//                if(count($dataEmp)>0){
+//                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
+//                    $result = array(
+//                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+//                        'User' => $dataEmp[0],
+//                        'Team' => $dataTeam
+//                    );
+//                }
+//            }
+//            else {
+//
+//                $dataEmp = $this->checkUserEmployees($data_arr['NIP'],$data_arr['Password']);
+//                if(count($dataEmp)>0){
+//                    $dataTeam = $this->checkUserCRM($data_arr['NIP']);
+//                    $result = array(
+//                        'Status' => ($dataTeam['Status']==1 || $dataTeam['Status']=='1') ? 1 : 0,
+//                        'User' => $dataEmp[0],
+//                        'Team' => $dataTeam
+//                    );
+//                }
+//            }
+//        }
+
         return print_r(json_encode($result));
+    }
+
+    private function loginCRMUser($NIP,$Password){
+
+        $Pass = $this->genratePassword($NIP,$Password);
+
+        $data = $this->db->get_where('db_employees.employees',array(
+            'NIP' => $NIP,
+            'Password' => $Pass
+        ))->result_array();
+
+        return $data;
+
     }
 
     private function checkUserCRM($NIP){
