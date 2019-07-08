@@ -809,8 +809,10 @@
 				   								'<button class="btn btn-default" id="pdfprint" PRCode = "'+ClassDt.PRCodeVal+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+
 				   							'</div>'+
 				   						'</div>';
-				   	$("#Page_Button").html(html);					
+				   	$("#Page_Button").html(html);
 				}
+				// remove edit approval jika telah approve semua
+				$('#add_approver').remove();
 			}
 
 			// show button add new pr

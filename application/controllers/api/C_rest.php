@@ -2939,7 +2939,10 @@ class C_rest extends CI_Controller {
                 $Detail = $Input['Detail'];
                 $user = $Input['user'];
                 $Detail = json_encode($Detail);
-                $ID_category_catalog = $Input['ID_category_catalog'];
+                
+                if (array_key_exists('ID_category_catalog', $Input)) {
+                    $ID_category_catalog = $Input['ID_category_catalog'];
+                }
 
                 $filename = $Input['Item'].'_Uploaded';
                 $filename = str_replace(" ", '_', $filename);

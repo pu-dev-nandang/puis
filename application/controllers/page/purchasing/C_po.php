@@ -201,7 +201,7 @@ class C_po extends Transaksi_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;
@@ -250,7 +250,7 @@ class C_po extends Transaksi_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;

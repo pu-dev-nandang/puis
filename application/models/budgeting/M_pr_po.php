@@ -344,6 +344,11 @@ class M_pr_po extends CI_Model {
         // print_r($ID_m_userrole_limit.' => ID_m_userrole_limit');
         $indeksArr = 0;
         for ($i=0; $i < count($G); $i++) { 
+             // add $G[0]['NIP'] = Session NIP
+            if ($i == 0) {
+                $G[$i]['NIP'] = $this->session->userdata('NIP');
+            }
+
             $ID_m_userrole = $G[$i]['ID'];
              // print_r($ID_m_userrole.'<br>');
              $Status = ($ID_m_userrole == 1) ? 1 : 0;

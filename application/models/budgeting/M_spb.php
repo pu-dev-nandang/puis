@@ -101,4 +101,76 @@ class M_spb extends CI_Model {
         $this->db->insert('db_purchasing.spb_circulation_sheet',$dataSave);
     }
 
+    public function Get_SPBCode($Departement)
+    {
+        /* method PR
+           Code : 05/UAP-IT/SPB/IX/2018
+           05 : Increment (Max length = 2)
+           UAP- : Fix
+           IT : Division Abbreviation
+           SPB : Fix
+           IX : Bulan dalam romawi
+           2018 : Get Years Now
+        */
+        $Code = '';   
+        $Year = date('Y');
+        $Month = date('m');
+        $Month = $this->m_master->romawiNumber($Month);
+        $MaxLengthINC = 2;
+        
+        $sql = 'select * from db_purchasing.spb_created 
+                where Departement = ? and SPLIT_STR(Code, "/", 5) = ?
+                and SPLIT_STR(Code, "/", 4) = ?
+                order by SPLIT_STR(Code, "/", 1) desc
+                limit 1';
+        $query=$this->db->query($sql, array($Departement,$Year,$Month))->result_array();
+        if (count($query) == 1) {
+            // Inc last code
+            $Code = $query[0]['Code'];
+            $explode = explode('/', $Code);
+            $C = $explode[0];
+            $C = (int) $C;
+            $C = $C + 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            $explode[0] = $strINC;
+            $Code = implode('/', $explode);
+        }
+        else
+        {
+            $C = 1;
+            $B = strlen($C);
+            $strINC = $C;
+            for ($i=0; $i < $MaxLengthINC - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+
+            // get abbreviation department
+                $ExpDepart = explode('.', $Departement);
+                $abbreviation_Div = '';
+                if ($ExpDepart[0] == 'NA') {
+                    $G_Div = $this->m_master->caribasedprimary('db_employees.division','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbreviation'];
+                }
+                elseif ($ExpDepart[0] == 'AC') {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Code'];
+                }
+                else
+                {
+                    $G_Div = $this->m_master->caribasedprimary('db_academic.faculty','ID',$ExpDepart[1]);
+                    $abbreviation_Div = $G_Div[0]['Abbr'];
+                }
+
+            $Code = $strINC.'/'.'UAP-'.$abbreviation_Div.'/'.'SPB'.'/'.$Month.'/'.$Year;
+        }    
+
+        return $Code;        
+
+    }
+
 }

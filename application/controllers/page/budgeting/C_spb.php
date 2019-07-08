@@ -95,14 +95,185 @@ class C_spb extends Budgeting_Controler {
 
     public function submitspb()
     {
+        /* Tidak Boleh cancel */
         $rs = array('Status' => 0,'Change' => 0);
-        $Input = $this->getInputToken();
-        // verify data spb
-        $token2 = $this->input->post('token2');
-        $key = "UAP)(*";
-        $data_verify = (array) $this->jwt->decode($token2,$key);
-        $__checkdt = $this->m_spb->checkdt_spb_before_submit($data_verify);
+        try{
+            $Input = $this->getInputToken();
+            // verify data spb
+            $token2 = $this->input->post('token2');
+            $key = "UAP)(*";
+            $data_verify = (array) $this->jwt->decode($token2,$key);
+            $__checkdt = $this->m_spb->checkdt_spb_before_submit($data_verify);
+            if ($__checkdt) {
+                $action = $Input['action'];
+                switch ($action) {
+                    case 'add':
+                        $this->insert_spb();
+                        $rs['Status']= 1;
+                        break;
+                    case 'edit':
+                        // check status tidak sama dengan 2
+                        $ID_spb_created = $Input['ID_spb_created'];
+                        $G_spb_created = $this->m_master->caribasedprimary('db_purchasing.spb_created','ID',$ID_spb_created);
+                        if ($G_spb_created[0]['Status'] != 2) {
+                            $this->edit_spb();
+                            $rs['Status']= 1;
+                        }
+                        else
+                        {
+                            $rs['Change']= 1;
+                        }
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+            }
+            else
+            {
+                $rs['Change']= 1;
+            }
 
+            echo json_encode($rs);
+            
+        }
+        catch(Exception $e) {
+          echo json_encode($rs);
+        }
+
+    }
+
+    public function insert_spb()
+    {
+        $Input = $this->getInputToken();
+        unset($Input['action']);
+        $Code_po_create = $Input['Code_po_create'];
+        $Departement = $Input['Departement'];
+        // get Approval
+        $token3 = $this->input->post('token3');
+        $Amount = $Input['Invoice'];
+        $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token3);
+        if (count($JsonStatus) > 1) {
+            $dataSave = $Input;
+            $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
+            $UploadInvoice = json_encode($UploadInvoice); 
+
+            $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
+            $UploadTandaTerima = json_encode($UploadTandaTerima);   
+
+            $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+            $dataSave['Status'] = 1;
+            $dataSave['UploadInvoice'] = $UploadInvoice;
+            $dataSave['UploadTandaTerima'] = $UploadTandaTerima;
+            $dataSave['JsonStatus'] = json_encode($JsonStatus);
+            $dataSave['CreatedBy'] = $this->session->userdata('NIP');
+            $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
+            $this->db->insert('db_purchasing.spb_created',$dataSave);
+        }
+        else
+        {
+            // echo json_encode('Mohon Cek RAD');
+            die();
+        }
+    }
+
+    public function edit_spb()
+    {
+        $Input = $this->getInputToken();
+        $ID_spb_created = $Input['ID_spb_created'];
+        /*
+            jika approval satu telah approve maka tidak boleh melakukan edit lagi
+        */
+        $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','ID',$ID_spb_created);
+        $JsonStatus_existing = $G_data[0]['JsonStatus'];
+        $JsonStatus_existing = json_decode($JsonStatus_existing,true);
+        $bool = true;
+
+        if (count($JsonStatus_existing) > 0) {
+            for ($i=1; $i < count($JsonStatus_existing); $i++) { 
+                if ($JsonStatus_existing[$i]['Status'] == 1) {
+                    $bool = false;
+                    break;
+                }
+            }
+        }
+
+        if ($bool) {
+            unset($Input['ID_spb_created']);
+            unset($Input['action']);
+            $Code_po_create = $Input['Code_po_create'];
+            $Departement = $Input['Departement'];
+            // for approval
+            $token4 = $this->input->post('token4');
+            $key = "UAP)(*";
+            $token4 = (array) $this->jwt->decode($token4,$key);
+            // for approval
+            $Amount = $Input['Invoice'];
+            $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
+            if (count($JsonStatus) > 1) {
+                $dataSave = $Input;
+                // get code if null || empty
+                // $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+                if ($G_data[0]['Code'] =='' || $G_data[0]['Code'] == null) {
+                    $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+                    $dataSave['CreatedBy'] = $this->session->userdata('NIP');
+                    $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
+                }else
+                {
+                    $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
+                    $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
+                }
+
+                // delete old file and upload new file if user do upload
+                if (array_key_exists('UploadInvoice', $_FILES)) {
+                    // remove old file
+                    if ($G_data[0]['UploadInvoice'] != '' && $G_data[0]['UploadInvoice'] != null) {
+                        $arr_file = (array) json_decode($G_data[0]['UploadInvoice'],true);
+                        $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+                        $path = FCPATH.'uploads\\'.$filePath;
+                        unlink($path);
+                    }
+
+                    // do upload file
+                    $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
+                    $UploadInvoice = json_encode($UploadInvoice); 
+                    $dataSave['UploadInvoice'] = $UploadInvoice; 
+                }
+
+                if (array_key_exists('UploadTandaTerima', $_FILES)) {
+                    // remove old file
+                        if ($G_data[0]['UploadTandaTerima'] != '' && $G_data[0]['UploadTandaTerima'] != null) {
+                            $arr_file = (array) json_decode($G_data[0]['UploadTandaTerima'],true);
+                            $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+                            $path = FCPATH.'uploads\\'.$filePath;
+                            unlink($path);
+                        }
+
+                    // do upload file
+                    $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
+                    $UploadTandaTerima = json_encode($UploadTandaTerima); 
+                    $dataSave['UploadTandaTerima'] = $UploadTandaTerima; 
+                }
+
+                $dataSave['JsonStatus'] = json_encode($JsonStatus);
+                $dataSave['Status'] = 1;
+                $this->db->where('ID',$ID_spb_created);
+                $this->db->update('db_purchasing.spb_created',$dataSave);
+            }
+            else
+            {
+                // echo json_encode('Mohon Cek RAD');
+                die();
+            }
+
+        }
+        else
+        {
+            // $rs = array('Status' => 0,'Change' => 0);
+            // echo json_encode($rs);
+            die();
+        }
+        
     }
 
     public function submitgrpo()
