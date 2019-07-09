@@ -38,6 +38,8 @@
 <div class="row noPrint">
 	<div class="col-xs-2">
 		<div><a href="<?php echo base_url().'budgeting_menu/pembayaran/spb' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
+		<br>
+		<div id="page_status" class="noPrint"></div>
 	</div>
 	<div class="col-md-8" style="min-width: 800px;overflow: auto;">
 		<div class="well" id = "pageContent">
@@ -72,7 +74,6 @@
 			ClassDt.Dataselected = data; // all data spb by code po
 			ClassDt.Dataselected2 = dt_arr; // SPB Selected
 			Get_data_detail_po(Code_po_create).then(function(data2){
-				console.log(ClassDt);
 				// Define data
 				ClassDt.po_data = data2;
 				MakeDomHtml();
@@ -429,7 +430,7 @@
 				if (!bool) {
 					se_content.find('button').not('.print_page').remove();
 				}
-
+				makepage_status();
 				makeAction();
 				makeSignaturesSPB(se_content,JsonStatus);
 				if (JsonStatus[0].NIP != sessionNIP) {
@@ -446,20 +447,50 @@
 		
 	}
 
+	function makepage_status()
+	{
+		var Dataselected2 = ClassDt.Dataselected2;
+		var dtspb = Dataselected2.dtspb;
+		var StatusName = '';
+		switch(dtspb[0]['Status']) {
+				  case 0:
+				  case '0':
+				  	StatusName = 'Draft';
+				    break;
+				  case 1:
+				  case '1':
+				  	StatusName = 'Issued & Approval Process';
+				    break;
+				  case 2:
+				  case '2':
+				  	StatusName = 'Approval Done';
+				    break;
+				  case -1:
+				  case '-1':
+				  	StatusName = 'Reject';
+				    break;       
+				  case 4:
+				  case '4':
+				  	StatusName = 'Cancel';
+				    break;    
+		}
+
+		$('#page_status').html('<div style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+
+	}
+
 	function makeAction()
 	{
 		var Dataselected2 = ClassDt.Dataselected2;
 		var dtspb = Dataselected2.dtspb;
 
 		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
-		var po_data = ClassDt.po_data;
-		var po_create = po_data['po_create'];
-		var btn_edit = '<button class="btn btn-primary btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_edit = '<button class="btn btn-primary btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 		var btn_submit = '<button class="btn btn-success submit" disabled> Submit</button>';
 		
 		var btn_approve = '<button class="btn btn-primary" id="Approve" action="approve">Approve</button>';
 		var btn_reject = '<button class="btn btn-inverse" id="Reject" action="reject">Reject</button>';
-		var btn_print = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
+		var btn_print = '<button class="btn btn-default print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -545,7 +576,7 @@
 		  case '2':
 		  	var JsonStatus = dtspb[0]['JsonStatus'];
 		  	JsonStatus = jQuery.parseJSON(JsonStatus);
-		  	if (JsonStatus[0]['NIP'] == sessionNIP || DivisionID == '4') {
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
 		  		$('#r_action').html(html);
 		  		$('#r_action').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
 		  	}
@@ -701,4 +732,423 @@
 			
 		return def.promise();
 	}
+
+	$(document).off('click', '.btnEditInput').on('click', '.btnEditInput',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('#pageContent');
+			ev2.find('input').not('.TglSPB').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			ev2.find('select').prop('disabled',false);
+			ev2.find('.dtbank[tabindex!="-1"]').select2({
+			    //allowClear: true
+			});
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Data SPB telah approve, tidak bisa edit');
+		}	
+	})
+
+	$(document).off('click', '.submit').on('click', '.submit',function(e) {
+		// validation
+		var ev = $(this).closest('#pageContent');
+		var action = 'edit';
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_spb(ev);
+			if (validation) {
+				SubmitSPB('.submit',ev,action);
+			}
+		}
+
+	})
+
+	function validation_input_spb(ev)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			TglSPB : ev.find('.TglSPB').val(),
+			Perihal : ev.find('.Perihal').val(),
+			NoRekening : ev.find('.NoRekening').val(),
+			Pembayaran : ev.find('.Money_Pembayaran').val(),
+		};
+		if (validation(data) ) {
+
+			// check berdasarkan Code SPB
+			var dt_arr = ClassDt.Dataselected2;
+			var dtspb = dt_arr.dtspb;
+			var ID_spb_created = dtspb[0]['ID'];
+			if (dtspb[0]['Code'] == '' || dtspb[0]['Code'] == 'null' || dtspb[0]['Code'] == null) {
+				// Upload Tanda Terima 
+				ev.find(".BrowseTT").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  ev.find(".submit").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Invoice 
+				ev.find(".BrowseInvoice").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Invoice ') ) {
+					  ev.find(".submit").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+			}
+			
+		}
+		else
+		{
+			find = false;
+		}
+		
+		return find;
+	}
+
+	function validation(arr)
+	{
+	  var toatString = "";
+	  var result = "";
+	  for(var key in arr) {
+	     switch(key)
+	     {
+	      case  "Pembayaran" :
+	            if (arr[key] <= 0) {
+	            	toatString += 'Pembayaran tidak boleh kecil sama dengan nol' + "<br>";
+	            }
+	            break;
+	      default :
+	            result = Validation_required(arr[key],key);
+	            if (result['status'] == 0) {
+	              toatString += result['messages'] + "<br>";
+	            }       
+	     }
+
+	  }
+	  if (toatString != "") {
+	    toastr.error(toatString, 'Failed!!');
+	    return false;
+	  }
+
+	  return true;
+	}
+
+	function SubmitSPB(elementbtn,ev,action="add")
+	{
+		loadingStart();
+		var Code_po_create = ClassDt.Code_po_create;
+		var dt_arr = ClassDt.Dataselected2;
+		var dtspb = dt_arr.dtspb;
+		var Departement = IDDepartementPUBudget;
+		var ID_spb_created = dtspb[0]['ID'];
+		var ID_budget_left = 0;
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseInvoice').length ) {
+			var UploadFile = ev.find('.BrowseInvoice')[0].files;
+			form_data.append("UploadInvoice[]", UploadFile[0]);
+		}
+
+		if ( ev.find('.BrowseTT').length ) {
+			var UploadFile = ev.find('.BrowseTT')[0].files;
+			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		}
+
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Datee = ev.find('.TglSPB').val();
+		var Perihal = ev.find('.Perihal').val();
+		var No_Rekening = ev.find('.NoRekening').val();
+		var ID_bank = ev.find('.dtbank option:selected').val();
+		var Invoice = ev.find('.Money_Pembayaran').val();
+		Invoice = findAndReplace(Invoice, ".","");
+		var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+
+		var data = {
+			Code_po_create : Code_po_create,
+			Departement : Departement,
+			ID_budget_left : ID_budget_left,
+			NoInvoice : NoInvoice,
+			NoTandaTerima :NoTandaTerima,
+			Datee :Datee,
+			Perihal : Perihal,
+			No_Rekening : No_Rekening,
+			ID_bank : ID_bank,
+			Invoice : Invoice,
+			TypeInvoice  : TypeInvoice,
+			ID_spb_created : ID_spb_created,
+			action : action,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var data = ClassDt.Dataselected;
+		var InvoicePO = dtspb[0].InvoicePO;
+		// hitung Left PO
+		var InvoiceleftPO = parseInt(InvoicePO);
+		var Code = ClassDt.Code;
+		for (var i = 0; i < data.dtspb.length; i++) {
+			if (Code == data.dtspb[i].Code && i > 0) {
+				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				}
+				else
+				{
+					InvoiceleftPO -= parseInt(0);
+				}
+				break;
+			}
+		}
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : InvoicePO,
+			InvoiceLeftPO : InvoiceleftPO,
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
+		var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
+		form_data.append('token3',token3);
+
+		// pass po_detail agar dapat approval
+		var po_detail = ClassDt.po_data.po_detail;
+		var temp = [];
+		for (var i = 0; i < po_detail.length; i++) {
+			var arr = po_detail[i];
+			var token_ = jwt_encode(arr,"UAP)(*");
+			temp.push(token_);
+		}
+
+		var token4 = jwt_encode(temp,"UAP)(*");
+		form_data.append('token4',token4);
+
+
+		// var url = base_url_js + "budgeting/submit"
+		var url = base_url_js + "budgeting/submitspb"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_spb_grpo(Code_po_create).then(function(data){
+		  							var dt_arr = __getRsViewGRPO_SPB(Code,data);
+		  							ClassDt.Dataselected = data; // all data spb by code po
+		  							ClassDt.Dataselected2 = dt_arr; // SPB Selected
+		  							Get_data_detail_po(Code_po_create).then(function(data2){
+		  								// Define data
+		  								ClassDt.po_data = data2;
+		  								MakeDomHtml();
+		  								loadingEnd(500);
+		  							})
+
+		  						})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			Get_data_spb_grpo(Code_po_create).then(function(data){
+  						var dt_arr = __getRsViewGRPO_SPB(Code,data);
+  						ClassDt.Dataselected = data; // all data spb by code po
+  						ClassDt.Dataselected2 = dt_arr; // SPB Selected
+  						Get_data_detail_po(Code_po_create).then(function(data2){
+  							// Define data
+  							ClassDt.po_data = data2;
+  							MakeDomHtml();
+  							loadingEnd(500);
+  						})
+
+  					})
+		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    nmbtn = 'Submit';
+		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+		  }
+		})
+	}
+
+	$(document).off('click', '#Approve').on('click', '#Approve',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve');
+			var Code = ClassDt.Code;
+			var approval_number = $(this).attr('approval_number');
+			// var url = base_url_js + 'rest2/__approve_po';
+			var url = base_url_js + 'rest2/__approve_spb';
+			var data = {
+				Code : Code,
+				approval_number : approval_number,
+				NIP : sessionNIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+				po_data : ClassDt.po_data,
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				var rs = resultJson;
+				if (rs.Status == 1) {
+					Get_data_spb_grpo(Code_po_create).then(function(data){
+  						var dt_arr = __getRsViewGRPO_SPB(Code,data);
+  						ClassDt.Dataselected = data; // all data spb by code po
+  						ClassDt.Dataselected2 = dt_arr; // SPB Selected
+  						Get_data_detail_po(Code_po_create).then(function(data2){
+  							// Define data
+  							ClassDt.po_data = data2;
+  							MakeDomHtml();
+  							loadingEnd(500);
+  						})
+
+  					})
+				}
+				else
+				{
+					if (rs.Change == 1) {
+						toastr.info('The Data already have updated by another person,Please check !!!');
+						Get_data_spb_grpo(Code_po_create).then(function(data){
+  						var dt_arr = __getRsViewGRPO_SPB(Code,data);
+  						ClassDt.Dataselected = data; // all data spb by code po
+  						ClassDt.Dataselected2 = dt_arr; // SPB Selected
+  						Get_data_detail_po(Code_po_create).then(function(data2){
+  							// Define data
+  							ClassDt.po_data = data2;
+  							MakeDomHtml();
+  							loadingEnd(500);
+  						})
+
+  					})
+					}
+					else
+					{
+						toastr.error(rs.msg,'!!!Failed');
+					}
+				}
+			}).fail(function() {
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+	})
+
+	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
+		if (confirm('Are you sure ?')) {
+			var Code = ClassDt.Code;
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_spb';
+				var data = {
+					Code : Code,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					po_data : ClassDt.po_data,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						Get_data_spb_grpo(Code_po_create).then(function(data){
+	  						var dt_arr = __getRsViewGRPO_SPB(Code,data);
+	  						ClassDt.Dataselected = data; // all data spb by code po
+	  						ClassDt.Dataselected2 = dt_arr; // SPB Selected
+	  						Get_data_detail_po(Code_po_create).then(function(data2){
+	  							// Define data
+	  							ClassDt.po_data = data2;
+	  							MakeDomHtml();
+	  							loadingEnd(500);
+	  						})
+
+	  					})
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							Get_data_spb_grpo(Code_po_create).then(function(data){
+		  						var dt_arr = __getRsViewGRPO_SPB(Code,data);
+		  						ClassDt.Dataselected = data; // all data spb by code po
+		  						ClassDt.Dataselected2 = dt_arr; // SPB Selected
+		  						Get_data_detail_po(Code_po_create).then(function(data2){
+		  							// Define data
+		  							ClassDt.po_data = data2;
+		  							MakeDomHtml();
+		  							loadingEnd(500);
+		  						})
+
+		  					})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
+	})
 </script>

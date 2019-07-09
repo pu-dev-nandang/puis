@@ -1892,4 +1892,211 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function approve_spb()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $Code = $dataToken['Code'];
+                    $CodeUrl = str_replace('/', '-', $Code);
+                    $approval_number = $dataToken['approval_number'];
+                    $NIP = $dataToken['NIP'];
+                    $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                    $NameFor_NIP = $G_emp[0]['Name'];
+                    $action = $dataToken['action'];
+
+                    // get code_po
+                    $po_data = $dataToken['po_data'];
+                    $po_data = json_decode(json_encode($po_data),true);
+                    $po_create = $po_data['po_create'];
+                    $Code_po_create = '';
+                    if (count($po_create) > 0) {
+                        $Code_po_create = $po_create[0]['Code'];
+                    }
+                   
+                    // get data
+                    $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','Code',$Code);
+
+                    $keyJson = $approval_number - 1; // get array index json
+                    $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                    // get data update to approval
+                    $arr_upd = $JsonStatus[$keyJson];
+
+                    if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                        $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                        $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                        $JsonStatus[$keyJson] = $arr_upd;
+                        $datasave = array(
+                            'JsonStatus' => json_encode($JsonStatus),
+                        );
+
+                        // check all status for update data
+                        $boolApprove = true;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2 || $Status == 0) {
+                                $boolApprove = false;
+                                break;
+                            }
+                        }
+
+                        if ($boolApprove) {
+                            $datasave['Status'] = 2;
+                            $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                        }
+                        else
+                        {
+                            $boolReject = false;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2) {
+                                    $boolReject = true;
+                                    break;
+                                }
+                            }
+
+                            if ($boolReject) {
+                                $NoteDel = $dataToken['NoteDel'];
+                                $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                $datasave['Status'] = -1;
+                                // $datasave['Notes'] = $Notes;
+                            }
+                            else
+                            {
+                                // Notif to next step approval & User
+                                    $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                    // Send Notif for next approval
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code,
+                                                            'Description' => 'Please approve SPB '.$Code,
+                                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($NIPApprovalNext),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  SPB '.$Code.' has been Approved',
+                                                            'Description' => 'SPB '.$Code.' has been approved by '.$NameFor_NIP,
+                                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                            }
+                        }
+
+                        $this->db->where('Code',$Code);
+                        $this->db->update('db_purchasing.spb_created',$datasave); 
+
+                            $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                            if (array_key_exists('Status', $datasave)) {
+                                if ($datasave['Status'] == 2) {
+                                    $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+
+                                    // Notif All Approve to JsonStatus allkey
+                                        $arr_to = array();
+                                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                                            $arr_to[] = $JsonStatus[$i]['NIP'];
+                                        }
+
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> SPB '.$Code.' has been done',
+                                                            'Description' => 'SPB '.$Code.' has been done',
+                                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => $arr_to,
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                }
+                            }
+
+                            if ($arr_upd['Status'] == 2) {
+                                if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                }
+
+                                // Notif Reject to JsonStatus key 0
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> SPB '.$Code.' has been Rejected',
+                                                            'Description' => 'SPB '.$Code.' has been Rejected by '.$NameFor_NIP,
+                                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+                            }
+
+                            if (count($po_create) > 0) {
+                                 $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc.'<br><b> SPB '.$Code.'</b>',$NIP);
+                            }
+                                $this->m_spb->spb_grpo_circulation_sheet($Code,$Desc,$NIP);
+
+                    }
+                    else
+                    {
+                        $msg = 'Not Authorize';
+                    }
+
+                    echo json_encode($rs);
+
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
 }

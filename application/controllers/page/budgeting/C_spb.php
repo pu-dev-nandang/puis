@@ -148,6 +148,8 @@ class C_spb extends Budgeting_Controler {
     public function insert_spb()
     {
         $Input = $this->getInputToken();
+        $Code_SPB = '';
+        $Desc_circulationSheet = '';
         unset($Input['action']);
         $Code_po_create = $Input['Code_po_create'];
         $Departement = $Input['Departement'];
@@ -164,6 +166,8 @@ class C_spb extends Budgeting_Controler {
             $UploadTandaTerima = json_encode($UploadTandaTerima);   
 
             $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+            $Code_SPB = $dataSave['Code'];
+            $Desc_circulationSheet = 'SPB created{'.$Code_SPB.'}';
             $dataSave['Status'] = 1;
             $dataSave['UploadInvoice'] = $UploadInvoice;
             $dataSave['UploadTandaTerima'] = $UploadTandaTerima;
@@ -171,6 +175,11 @@ class C_spb extends Budgeting_Controler {
             $dataSave['CreatedBy'] = $this->session->userdata('NIP');
             $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
             $this->db->insert('db_purchasing.spb_created',$dataSave);
+
+            // insert to spb_circulation_sheet
+                $this->m_spb->spb_grpo_circulation_sheet($Code_SPB,$Desc_circulationSheet);
+            // insert to po_circulation_sheet
+                $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc_circulationSheet);  
         }
         else
         {
@@ -190,6 +199,8 @@ class C_spb extends Budgeting_Controler {
         $JsonStatus_existing = $G_data[0]['JsonStatus'];
         $JsonStatus_existing = json_decode($JsonStatus_existing,true);
         $bool = true;
+        $Code_SPB = '';
+        $Desc_circulationSheet = '';
 
         if (count($JsonStatus_existing) > 0) {
             for ($i=1; $i < count($JsonStatus_existing); $i++) { 
@@ -218,12 +229,16 @@ class C_spb extends Budgeting_Controler {
                 // $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
                 if ($G_data[0]['Code'] =='' || $G_data[0]['Code'] == null) {
                     $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+                    $Code_SPB = $dataSave['Code'];
+                    $Desc_circulationSheet = 'SPB created{'.$Code_SPB.'}';
                     $dataSave['CreatedBy'] = $this->session->userdata('NIP');
                     $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
                 }else
                 {
                     $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
                     $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
+                    $Code_SPB = $G_data[0]['Code'];
+                    $Desc_circulationSheet = 'SPB edited{'.$Code_SPB.'}';
                 }
 
                 // delete old file and upload new file if user do upload
@@ -261,6 +276,12 @@ class C_spb extends Budgeting_Controler {
                 $dataSave['Status'] = 1;
                 $this->db->where('ID',$ID_spb_created);
                 $this->db->update('db_purchasing.spb_created',$dataSave);
+
+                // insert to spb_circulation_sheet
+                    $this->m_spb->spb_grpo_circulation_sheet($Code_SPB,$Desc_circulationSheet);
+                // insert to po_circulation_sheet
+                    $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc_circulationSheet);  
+
             }
             else
             {
@@ -435,7 +456,7 @@ class C_spb extends Budgeting_Controler {
 
         $Desc = implode(',', $__arr_item);
         // insert to spb_circulation_sheet
-            $this->m_spb->spb_grpo_circulation_sheet(null,'Good Receipt<br>{'.$Desc.'}');
+            $this->m_spb->spb_grpo_circulation_sheet($Code_po_create,'Good Receipt<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt<br>{'.$Desc.'}');   
 

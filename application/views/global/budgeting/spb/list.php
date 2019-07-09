@@ -86,13 +86,18 @@ function LoadDataForTable()
           var CodeSPB = ListPR[1].CodeSPB;
           var TypeCode = ListPR[1].TypeCode;
           var code_url2 = findAndReplace(CodeSPB,'/','-');
+          var Code_po_create = '';
+          if (data[1] != null && data[1] != '') {
+          	var Code_po_create = data[1];
+          }
+
    	    	if (TypeCode == 'PO') {
    	    		$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/spb/list/'+code_url2+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+
-   	    			'<label>'+data[1]+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+   	    			'<label>'+Code_po_create+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	}
    	    	else
    	    	{
-   	    		$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/spb/list/'+code_url2+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+'<label>'+data[1]+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+   	    		$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/spb/list/'+code_url2+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+'<label>'+Code_po_create+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	}
    	    	
    	    	$( row ).find('td:eq(2)').attr('align','center');
