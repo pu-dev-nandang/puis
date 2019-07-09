@@ -7,9 +7,9 @@
             </a>
         </li>
         <?php if ($this->session->userdata('IDDepartementPUBudget') == 'NA.9'): ?>
-            <li class="<?php echo ($this->uri->segment(4) == 'configuration') ? 'active' : '' ?>">
+            <!-- <li class="<?php echo ($this->uri->segment(4) == 'configuration') ? 'active' : '' ?>">
                 <a href="<?php echo base_url().'budgeting_menu/pembayaran/spb/configuration'?>">Configuration</a>
-            </li>
+            </li> -->
         <?php endif ?>
         <li class="<?php echo ($this->uri->segment(3) == 'spb' &&  ($this->uri->segment(4) == '' || $this->uri->segment(4) == null)  ) ? 'active' : '' ?>">
             <a href="<?php echo base_url().'budgeting_menu/pembayaran/spb'?>">List</a>

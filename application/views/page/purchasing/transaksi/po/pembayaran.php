@@ -270,7 +270,6 @@
 		}
 	
 		$('#content_input').html(template_html);
-		
 	}
 
 	$(document).off('click', '.pageAnchor_pembayaran').on('click', '.pageAnchor_pembayaran',function(e) {
@@ -429,7 +428,7 @@
 		var LinkFileInvoice = '';
 		var LinkUploadTandaTerima = '';
 		var btnSPb = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-					'<button class="btn btn-primary hide btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+					'<button class="btn btn-primary hide btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
 					'<button class="btn btn-success submit"> Submit</button>';
 		// var Invoice = 0;
 		if (dtspb[0]['Code'] != '') {
@@ -447,7 +446,7 @@
 			else if(dtspb[0]['Status'] == 0 || dtspb[0]['Status'] == 1)
 			{
 				btnSPb = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-						'<button class="btn btn-primary btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+						'<button class="btn btn-primary btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
 						'<button class="btn btn-success submit" disabled> Submit</button>';
 			}
 			else
