@@ -1227,6 +1227,22 @@ $route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_f
 $route['announcement/edit-announcement/(:num)'] = 'page/announcement/c_announcement/edit_announcement/$1';
 
 
+$route['agregator/setting'] = 'page/agregator/c_agregator/setting';
+
+$route['agregator/akreditasi-eksternal'] = 'page/agregator/c_agregator/akreditasi_eksternal';
+$route['agregator/akreditasi-internasional'] = 'page/agregator/c_agregator/akreditasi_internasional';
+$route['agregator/audit-keuangan-eksternal'] = 'page/agregator/c_agregator/audit_keuangan_eksternal';
+$route['agregator/akreditasi-program-studi'] = 'page/agregator/c_agregator/akreditasi_program_studi';
+$route['agregator/kerjasama-perguruan-tinggi'] = 'page/agregator/c_agregator/kerjasama_perguruan_tinggi';
+
+$route['agregator/seleksi-mahasiswa-baru'] = 'page/agregator/c_agregator/seleksi_mahasiswa_baru';
+$route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asing';
+
+$route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
+$route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
+
+
+
 
 // budgeting & PR
 $route['budgeting'] = 'page/budgeting/c_budgeting';

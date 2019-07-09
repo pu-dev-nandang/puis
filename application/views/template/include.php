@@ -1115,6 +1115,24 @@
         })
     }
 
+    function loadSelectOptionMenuAgregator(element,selected) {
+
+        var url = base_url_js+'api3/__getListMenuAgregator';
+        $.getJSON(url,function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+
+                    $(element).append('<option value="'+v.ID+'">'+v.Name+'</option>');
+
+                });
+            }
+
+        });
+
+    }
+
     function loadSelectOptionReasonTransferStudent(element,selected) {
         var url = base_url_js+'api/__crudTransferStudent';
         var token = jwt_encode({action:'readReason'},'UAP)(*');
