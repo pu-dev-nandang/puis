@@ -21,7 +21,8 @@ class C_budgeting extends Budgeting_Controler {
         // $this->session->unset_userdata('role_user_budgeting');
 
         // --- edited -- //
-        $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
+        // $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
+        $MenuDepartement= $this->session->userdata('IDdepartementNavigation'); 
 
         if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
             $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
