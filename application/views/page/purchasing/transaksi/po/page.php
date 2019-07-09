@@ -10,7 +10,7 @@
             <a href="<?php echo base_url().'purchasing/transaction/po/list/configuration'?>">Configuration</a>
         </li>
         <li class="<?php echo ($this->uri->segment(4) == 'list' &&  ($this->uri->segment(5) == '' || $this->uri->segment(5) == null)  ) ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'purchasing/transaction/po/list'?>">List</a>
+            <a href="<?php echo base_url().'purchasing/transaction/po/list'?>">List PO / SPK</a>
         </li>
         <li class="<?php echo ($this->uri->segment(5) == 'open') ? 'active' : '' ?>">
             <a href="<?php echo base_url().'purchasing/transaction/po/list/open'?>">Open PO / SPK</a>
