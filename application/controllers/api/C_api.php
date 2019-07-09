@@ -7547,9 +7547,8 @@ class C_api extends CI_Controller {
             }
 
 
-
             $DB_ = 'ta_'.$data_arr['Year'];
-            $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, 
+            $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, s.TotalAssigment, em.Name AS CoordinatorName, 
                                      sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
                                       sp.Score, sp.Grade
                                     FROM '.$DB_.'.study_planning sp
@@ -7576,13 +7575,20 @@ class C_api extends CI_Controller {
                                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                               WHERE sdc.ScheduleID = "'.$row['ID'].'"  GROUP BY sdc.ScheduleID LIMIT 1')->result_array()[0];
 
-                $ev1 = ($row['Evaluasi1']!=null && $row['Evaluasi1']!='' && $row['Evaluasi1']!=0 && $row['Evaluasi1']!='0') ? $row['Evaluasi1'] : '-';
-                $ev2 = ($row['Evaluasi2']!=null && $row['Evaluasi2']!='' && $row['Evaluasi2']!=0 && $row['Evaluasi2']!='0') ? $row['Evaluasi2'] : '-';
-                $ev3 = ($row['Evaluasi3']!=null && $row['Evaluasi3']!='' && $row['Evaluasi3']!=0 && $row['Evaluasi3']!='0') ? $row['Evaluasi3'] : '-';
-                $ev4 = ($row['Evaluasi4']!=null && $row['Evaluasi4']!='' && $row['Evaluasi4']!=0 && $row['Evaluasi4']!='0') ? $row['Evaluasi4'] : '-';
-                $ev5 = ($row['Evaluasi5']!=null && $row['Evaluasi5']!='' && $row['Evaluasi5']!=0 && $row['Evaluasi5']!='0') ? $row['Evaluasi5'] : '-';
-                $UTS = ($row['UTS']!=null && $row['UTS']!='' && $row['UTS']!=0 && $row['UTS']!='0') ? $row['UTS'] : '-';
-                $UAS = ($row['UAS']!=null && $row['UAS']!='' && $row['UAS']!=0 && $row['UAS']!='0') ? $row['UAS'] : '-';
+                $ev1 = ($row['Evaluasi1']!=null && $row['Evaluasi1']!='') ? $row['Evaluasi1'] : '-';
+                $ev2 = ($row['Evaluasi2']!=null && $row['Evaluasi2']!='') ? $row['Evaluasi2'] : '-';
+                $ev3 = ($row['Evaluasi3']!=null && $row['Evaluasi3']!='') ? $row['Evaluasi3'] : '-';
+                $ev4 = ($row['Evaluasi4']!=null && $row['Evaluasi4']!='') ? $row['Evaluasi4'] : '-';
+                $ev5 = ($row['Evaluasi5']!=null && $row['Evaluasi5']!='') ? $row['Evaluasi5'] : '-';
+                $UTS = ($row['UTS']!=null && $row['UTS']!='') ? $row['UTS'] : '-';
+                $UAS = ($row['UAS']!=null && $row['UAS']!='') ? $row['UAS'] : '-';
+
+
+                $ev1 = (1<=$row['TotalAssigment']) ? $ev1 : 'not set';
+                $ev2 = (2<=$row['TotalAssigment']) ? $ev2 : 'not set';
+                $ev3 = (3<=$row['TotalAssigment']) ? $ev3 : 'not set';
+                $ev4 = (4<=$row['TotalAssigment']) ? $ev4 : 'not set';
+                $ev5 = (5<=$row['TotalAssigment']) ? $ev5 : 'not set';
 
 
 

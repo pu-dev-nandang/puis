@@ -28,7 +28,7 @@ class M_save_to_excel extends CI_Model {
 
 
         $DB_ = 'ta_'.$data_arr['Year'];
-        $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, em.Name AS CoordinatorName, ps.Name AS ProdiName,
+        $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, s.TotalAssigment, em.Name AS CoordinatorName, ps.Name AS ProdiName,
                                      sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS, sp.Score,sp.Grade
                                     FROM '.$DB_.'.study_planning sp
                                     LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sp.NPM)

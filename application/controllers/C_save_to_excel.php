@@ -1713,6 +1713,20 @@ class C_save_to_excel extends CI_Controller
         if(count($dataM)>0){
             for($i=0;$i<count($dataM);$i++){
                 $d = $dataM[$i];
+
+                $ev1 = ($d['Evaluasi1']!=null && $d['Evaluasi1']!='') ? $d['Evaluasi1'] : '-';
+                $ev2 = ($d['Evaluasi2']!=null && $d['Evaluasi2']!='') ? $d['Evaluasi2'] : '-';
+                $ev3 = ($d['Evaluasi3']!=null && $d['Evaluasi3']!='') ? $d['Evaluasi3'] : '-';
+                $ev4 = ($d['Evaluasi4']!=null && $d['Evaluasi4']!='') ? $d['Evaluasi4'] : '-';
+                $ev5 = ($d['Evaluasi5']!=null && $d['Evaluasi5']!='') ? $d['Evaluasi5'] : '-';
+
+
+                $ev1 = (1<=$d['TotalAssigment']) ? $ev1 : 'not set';
+                $ev2 = (2<=$d['TotalAssigment']) ? $ev2 : 'not set';
+                $ev3 = (3<=$d['TotalAssigment']) ? $ev3 : 'not set';
+                $ev4 = (4<=$d['TotalAssigment']) ? $ev4 : 'not set';
+                $ev5 = (5<=$d['TotalAssigment']) ? $ev5 : 'not set';
+
                 $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $d['NPM']);
                 $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $d['Name']);
                 $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $d['ProdiName']);
@@ -1720,15 +1734,16 @@ class C_save_to_excel extends CI_Controller
                 $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $d['MKNameEng']);
                 $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $d['ClassGroup']);
                 $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $d['CoordinatorName']);
-                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $d['Evaluasi1']);
-                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow, $d['Evaluasi2']);
-                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow, $d['Evaluasi3']);
-                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow, $d['Evaluasi4']);
-                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow, $d['Evaluasi5']);
+                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $ev1);
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow, $ev2);
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow, $ev3);
+                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow, $ev4);
+                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow, $ev5);
                 $excel->setActiveSheetIndex(0)->setCellValue('M'.$numrow, $d['UTS']);
                 $excel->setActiveSheetIndex(0)->setCellValue('N'.$numrow, $d['UAS']);
                 $excel->setActiveSheetIndex(0)->setCellValue('O'.$numrow, $d['Score']);
                 $excel->setActiveSheetIndex(0)->setCellValue('P'.$numrow, $d['Grade']);
+
 
                 // Apply style header yang telah kita buat tadi ke masing-masing kolom header
                 $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
