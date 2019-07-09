@@ -958,6 +958,7 @@ $route['rest2/__cancel_pr_item_from_another'] = 'api/c_rest2/cancel_pr_item_from
 $route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1';
 $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
+$route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
 
 
 
@@ -1453,7 +1454,9 @@ $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
 // global spb
-$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+//$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+$route['global/purchasing/transaction/spb/list/(:any)'] = 'page/C_globalpage/InfoSPB/$1';
+
 
 // template import supplier
 $route['purchasing/template_export_supplier'] = 'c_save_to_excel/template_export_supplier';

@@ -26,6 +26,8 @@ class C_spb extends Budgeting_Controler {
     	/*
 			1.filtering by pr
     	*/
+        $this->data['G_Approver'] = $this->m_pr_po->Get_m_Approver();
+        $this->data['m_type_user'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');    
 		$page = $this->load->view('global/budgeting/spb/list',$this->data,true);
 		$this->menu_horizontal($page);
     }

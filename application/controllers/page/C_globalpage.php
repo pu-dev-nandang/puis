@@ -136,45 +136,113 @@ class C_globalpage extends Budgeting_Controler {
          }
     }
 
-    public function create_spb_by_po($POCode)
+    // public function create_spb_by_po($POCode)
+    // {
+    //     /*
+    //         Syarat halaman bisa di buka
+    //         1.Code PO ada pada database
+    //         2.POCode dengan status all approve
+    //         3.Cek User memiliki hubungan dengan Code PO tersebut,kecuali Finance & Purchasing
+
+    //         Note : untuk PO yang sudah dibuat spbnya diperbolehkan untuk create spb dengan function ini dan auto TypeInvoice
+    //     */
+    //       $POCode = str_replace('-','/', $POCode);  
+    //       $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$POCode);
+    //       // status all aprove dengan value 2
+    //       $bool = true;
+    //       if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
+    //              $bool = true;
+    //       }
+    //       else{
+    //          $bool = false;
+    //       }
+
+    //       if (count($G_data) > 0  && $bool  ) {
+    //           if ($G_data[0]['Status'] == 2) {
+    //               $sql = 'select * from db_purchasing.spb_created where Code_po_create = ? order by ID desc limit 1';
+    //               $query=$this->db->query($sql, array($POCode))->result_array();
+    //               $data['DT_SPB_Exist'] = $query;
+    //               $data['POCode'] = $POCode;
+    //               $content = $this->load->view('global/budgeting/spb/create_new_spb',$data,true);
+    //               $this->temp($content);
+    //           }
+    //           else
+    //           {
+    //             show_404($log_error = TRUE); 
+    //           }
+    //       }
+    //       else
+    //       {
+    //         show_404($log_error = TRUE); 
+    //       }
+    // }
+
+    public function InfoSPB($CodeSPB)
     {
+        $Code = str_replace('-','/', $CodeSPB);
+        $ex = explode('/', $Code);
+        $rsCode = '';
+        for ($i=0; $i < count($ex); $i++) { 
+            $deli = ($i == 1) ? '-' : '/';
+            if ($i == count($ex) - 1) {
+                $rsCode .= $ex[$i];
+            }
+            else
+            {
+                $rsCode .= $ex[$i].$deli;
+            }
+             
+        }
+
         /*
-            Syarat halaman bisa di buka
-            1.Code PO ada pada database
-            2.POCode dengan status all approve
-            3.Cek User memiliki hubungan dengan Code PO tersebut,kecuali Finance & Purchasing
-
-            Note : untuk PO yang sudah dibuat spbnya diperbolehkan untuk create spb dengan function ini dan auto TypeInvoice
+            01-UAP-PURCHASING-SPB-VII-2019
+            jadikan ke 01/UAP-PURCHASING/SPB/VII/2019
+            1.Cek Code SPB exist or not
+            2.Cek User memiliki hubungan dengan Code SPB tersebut,kecuali Finance
         */
-          $POCode = str_replace('-','/', $POCode);  
-          $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$POCode);
-          // status all aprove dengan value 2
-          $bool = true;
-          if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
-                 $bool = true;
-          }
-          else{
-             $bool = false;
-          }
 
-          if (count($G_data) > 0  && $bool  ) {
-              if ($G_data[0]['Status'] == 2) {
-                  $sql = 'select * from db_purchasing.spb_created where Code_po_create = ? order by ID desc limit 1';
-                  $query=$this->db->query($sql, array($POCode))->result_array();
-                  $data['DT_SPB_Exist'] = $query;
-                  $data['POCode'] = $POCode;
-                  $content = $this->load->view('global/budgeting/spb/create_new_spb',$data,true);
-                  $this->temp($content);
-              }
-              else
-              {
-                show_404($log_error = TRUE); 
-              }
-          }
-          else
-          {
+         $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','Code',$rsCode);
+         if (count($G_data) > 0) {
+             $bool = true;
+             if ($this->session->userdata('IDdepartementNavigation') == 9) {
+                    $bool = true;
+             }
+             else{
+                $bool = false;
+             }
+
+             if (!$bool) { // for user
+                $JsonStatus = $G_data[0]['JsonStatus'];
+                $arr = (array) json_decode($JsonStatus,true);
+                $NIP = $this->session->userdata('NIP');
+                for ($i=0; $i < count($arr); $i++) { 
+                    $NIP_ = $arr[$i]['NIP'];
+                    if ($NIP == $NIP_) {
+                        $bool = true;
+                        break;
+                    }
+                }
+             }
+
+             $data = array(
+                 'auth' => 's3Cr3T-G4N', 
+             );
+             $key = "UAP)(*";
+             $token = $this->jwt->encode($data,$key);
+             $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+             $data['G_data_bank'] = $G_data_bank;
+             $data['bool'] = $bool;
+             $data['Code'] = $rsCode;
+             $data['Code_po_create'] = $G_data[0]['Code_po_create'];
+             $data['G_data'] = $G_data;
+             $content = $this->load->view('global/budgeting/spb/InfoSPB',$data,true);
+             $this->temp($content);
+             
+         }
+         else
+         {
             show_404($log_error = TRUE); 
-          }
+         }
     }
 
 }
