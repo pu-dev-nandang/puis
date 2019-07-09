@@ -201,7 +201,7 @@ class C_po extends Transaksi_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;
@@ -250,7 +250,7 @@ class C_po extends Transaksi_Controler {
                     $FormInsert = $dt[$i]['FormInsert'];
                     // check NIM already exist in employees
                     $NIP = $FormInsert['NIP'];
-                    $G = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                    $G = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
                     if (count($G) == 0) {
                         $msg['msg'] = 'NIP : '.$NIP.' is not already exist';   
                         break;
@@ -673,8 +673,16 @@ class C_po extends Transaksi_Controler {
                                 $PRCode = $query[$i]['PRCode'];
                                 $ID_pr_detail = $query[$i]['ID_pr_detail'];
                                 $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                                $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
-                                $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                                if ($query[$i]['Status'] != -1) {
+                                  $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
+                                  $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                                }
+                                else
+                                {
+                                  $Item_proc= $G_data_pr_status[0]['Item_proc'];
+                                  $Item_pending= $G_data_pr_status[0]['Item_pending'];
+                                }
+                                
                                 $Status = ($Item_proc == 0 && $G_data_pr_status[0]['Item_done'] == 0) ? 0 : 1;
                                 $dataSave = array(
                                    'Item_proc' => $Item_proc,
@@ -1338,8 +1346,15 @@ class C_po extends Transaksi_Controler {
                             $PRCode = $query[$i]['PRCode'];
                             $ID_pr_detail = $query[$i]['ID_pr_detail'];
                             $G_data_pr_status = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
-                            $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
-                            $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            if ($query[$i]['Status'] != -1) {
+                              $Item_proc= $G_data_pr_status[0]['Item_proc'] - 1;    
+                              $Item_pending= $G_data_pr_status[0]['Item_pending'] + 1;
+                            }
+                            else
+                            {
+                              $Item_proc= $G_data_pr_status[0]['Item_proc'];
+                              $Item_pending= $G_data_pr_status[0]['Item_pending'];
+                            }
                             $Status = ($G_data_pr_status[0]['Item_done'] == 0 && $Item_proc == 0) ? 0 : 1;
                             $dataSave = array(
                                'Item_proc' => $Item_proc,
@@ -1640,6 +1655,14 @@ class C_po extends Transaksi_Controler {
 
     public function pembayaran()
     {
+      // get data bank rest/__Databank
+          $data = array(
+              'auth' => 's3Cr3T-G4N', 
+          );
+          $key = "UAP)(*";
+          $token = $this->jwt->encode($data,$key);
+          $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+          $this->data['G_data_bank'] = $G_data_bank;
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/pembayaran',$this->data,true);
        $this->page_po($page); 
     }

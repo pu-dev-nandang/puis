@@ -422,7 +422,7 @@ class C_save_to_excel extends CI_Controller
                         $excel3->getStyle('K'.$aa)->applyFromArray($style_row);
                         $excel3->getStyle('K'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('L'.$aa)->applyFromArray($style_row);
-                        $excel3->getStyle('L'.$a)->applyFromArray($style_row);    
+                        $excel3->getStyle('L'.$a)->applyFromArray($style_row);
 
                         $excel3->getStyle('M'.$a)->applyFromArray($style_row);
                         $excel3->getStyle('M'.$aa)->applyFromArray($style_row);
@@ -641,15 +641,15 @@ class C_save_to_excel extends CI_Controller
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
         $aa = date('YmdHis');
         if ($PostPassing->ta == '' && $PostPassing->NIM == '') {
-            $aa = 'All_'.$aa; 
+            $aa = 'All_'.$aa;
         }
 
         if ($PostPassing->NIM != '') {
-            $aa = 'NPM_'.$PostPassing->NIM.'_'.$aa; 
+            $aa = 'NPM_'.$PostPassing->NIM.'_'.$aa;
         }
 
         if ($PostPassing->ta  != '') {
-            $aa = 'ta_'.$PostPassing->ta.'_'.$aa; 
+            $aa = 'ta_'.$PostPassing->ta.'_'.$aa;
         }
 
         $Filename = 'Report_Tagihan_Mhs_'.$aa.'.xlsx';
@@ -829,7 +829,7 @@ class C_save_to_excel extends CI_Controller
             $excel->setActiveSheetIndex(0)->setCellValue('B6', "No");
             $excel->getActiveSheet()->mergeCells('B6:C7');
             $excel->getActiveSheet()->getStyle('B6:C7')->applyFromArray($style_col);
-            
+
             $excel->setActiveSheetIndex(0)->setCellValue('D6', "POS ANGGARAN");
             $excel->getActiveSheet()->mergeCells('D6:D7');
             $excel->getActiveSheet()->getStyle('D6:D7')->applyFromArray($style_col);
@@ -900,12 +900,12 @@ class C_save_to_excel extends CI_Controller
                     $excel->setActiveSheetIndex(0)->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
                     $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                     // buat border sampai total
-                    for ($j=0; $j < 5; $j++) { 
+                    for ($j=0; $j < 5; $j++) {
                        $StH++;
                        $excel->getActiveSheet()->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                     }
 
-                    // month 
+                    // month
                     $month = $getData[$i]['DetailMonth'];
                     $month = json_decode($month);
                         // $StH = $StH + 2;
@@ -920,11 +920,11 @@ class C_save_to_excel extends CI_Controller
 
                         // Total Per Head Account
                            $arr_total_perMonth_ha = array();
-                           for ($j=0; $j < count($getData); $j++) { 
+                           for ($j=0; $j < count($getData); $j++) {
                                if ($getData[$j]['CodeHeadAccount'] == $CodeHeadAccount1) {
                                    $monthHA = $getData[$j]['DetailMonth'];
                                    $monthHA = json_decode($monthHA);
-                                   for ($z=0; $z < count($monthHA); $z++) { 
+                                   for ($z=0; $z < count($monthHA); $z++) {
                                        $a = $monthHA[$z]->value * ($getData[$j]['UnitCost'] / 1000);
                                        if (array_key_exists($z, $arr_total_perMonth_ha)) {
                                            $arr_total_perMonth_ha[$z] = $arr_total_perMonth_ha[$z] + $a;
@@ -962,7 +962,7 @@ class C_save_to_excel extends CI_Controller
                         $st_arr2 = array(
                             'borders' => array(
                                 'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
-                                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), 
+                                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
                                 'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
                                 // 'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
                             )
@@ -986,7 +986,7 @@ class C_save_to_excel extends CI_Controller
 
                        $StH++;
                        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['Freq']);
-                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+                       $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                        $StH++;
                        $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$i]['CodeDiv']);
@@ -1002,7 +1002,7 @@ class C_save_to_excel extends CI_Controller
 
                        $total = $total + ($getData[$i]['SubTotal'] / 1000);
 
-                    // month   
+                    // month
                        $StH = $StH + 2;
                        for ($z=0; $z < count($month); $z++) {
                            $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
@@ -1022,14 +1022,14 @@ class C_save_to_excel extends CI_Controller
                        $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                     // Grpuping
-                    for ($j=$i+1; $j < count($getData); $j++) { 
+                    for ($j=$i+1; $j < count($getData); $j++) {
                        $CodeHeadAccount2 = $getData[$j]['CodeHeadAccount'];
                         if ($CodeHeadAccount1 == $CodeHeadAccount2) {
                             $NoSub++;
                             $StH = 2;
                             $St++;
                             $No2 = strtolower($keyM[$NoSub]);
-                            // month 
+                            // month
                             $month = $getData[$j]['DetailMonth'];
                             $month = json_decode($month);
 
@@ -1047,7 +1047,7 @@ class C_save_to_excel extends CI_Controller
 
                                $StH++;
                                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['Freq']);
-                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+                               $excel->getActiveSheet()->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
                                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $getData[$j]['CodeDiv']);
@@ -1063,7 +1063,7 @@ class C_save_to_excel extends CI_Controller
 
                                 $total = $total + ($getData[$j]['SubTotal'] / 1000);
 
-                            // month   
+                            // month
                                $StH = $StH + 2;
                                for ($z=0; $z < count($month); $z++) {
                                    $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
@@ -1085,7 +1085,7 @@ class C_save_to_excel extends CI_Controller
                         {
                             break;
                         }
-                        $i = $j; 
+                        $i = $j;
                     }
 
                     $St++;
@@ -1097,17 +1097,17 @@ class C_save_to_excel extends CI_Controller
                 $excel->getActiveSheet()->mergeCells('B'.$St.':'.'H'.$St);
                 $excel->getActiveSheet()->getStyle('B'.$St.':'.'H'.$St)->applyFromArray($style_col);
 
-                $excel->setActiveSheetIndex(0)->setCellValue('I'.$St, $total); 
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$St, $total);
                 $excel->getActiveSheet()->getStyle('I'.$St)->applyFromArray($style_col);
 
             // make SubTotal Per Bulan
                 $StHSubTot = 10 ;
-               for ($i=0; $i < count($arr_total_perMonth); $i++) { 
-                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$i]); 
-                    $StHSubTot = $StHSubTot + 1;    
+               for ($i=0; $i < count($arr_total_perMonth); $i++) {
+                    $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$i]);
+                    $StHSubTot = $StHSubTot + 1;
                 }
-                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StHSubTot].$St, $total); 
-                
+                $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StHSubTot].$St, $total);
+
 
             // Make Footer
                 $St = $St + 2;
@@ -1135,7 +1135,7 @@ class C_save_to_excel extends CI_Controller
 
 
             // Write Rule Approval
-               $St = $StTot + 2;     
+               $St = $StTot + 2;
                $excel->setActiveSheetIndex(0)->setCellValue('D'.$St, "Jakarta,");
 
                $St = $St + 2;
@@ -1144,22 +1144,22 @@ class C_save_to_excel extends CI_Controller
                $StH2 = 3;
 
                $JsonStatus = (array) json_decode($dt[0]['JsonStatus'],true);
-               for ($i=0; $i < count($JsonStatus); $i++) { 
+               for ($i=0; $i < count($JsonStatus); $i++) {
                     if ($JsonStatus[$i]['Visible'] == 'Yes') {
                         $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
                         $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
                         $excel->setActiveSheetIndex(0)->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
                         $excel->getActiveSheet()->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
-                        $StH = $StH2 + 2; 
+                        $StH = $StH2 + 2;
                         $StH2 = $StH + 2;
                     }
                }
 
-         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(3);       
-         $excel->getActiveSheet()->getColumnDimension('C')->setWidth(3);       
-         $excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);       
-         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(25);       
-         $excel->getActiveSheet()->getColumnDimension('H')->setWidth(25);       
+         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(3);
+         $excel->getActiveSheet()->getColumnDimension('C')->setWidth(3);
+         $excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+         $excel->getActiveSheet()->getColumnDimension('E')->setWidth(25);
+         $excel->getActiveSheet()->getColumnDimension('H')->setWidth(25);
 
         // Set judul file excel nya
         $excel->getActiveSheet()->setTitle($CodeDepartement);
@@ -1225,9 +1225,9 @@ class C_save_to_excel extends CI_Controller
 
         $dt = $this->m_budgeting->get_data_ListBudgetingDepartement($Input['Year']);
         $sql = '';
-        for ($m=0; $m < count($dt); $m++) { 
+        for ($m=0; $m < count($dt); $m++) {
             $incsheet = $m;
-            $excel = $excel2->createSheet($incsheet); 
+            $excel = $excel2->createSheet($incsheet);
             // $NameDepartement = substr($dt[$m]['NameDepartement'], 0,20) ;
             $NameDepartement = $dt[$m]['NameDepartement'] ;
             $excel->setTitle($dt[$m]['Code']);
@@ -1271,7 +1271,7 @@ class C_save_to_excel extends CI_Controller
                     $excel->setCellValue('B6', "No");
                     $excel->mergeCells('B6:C7');
                     $excel->getStyle('B6:C7')->applyFromArray($style_col);
-                    
+
                     $excel->setCellValue('D6', "POS ANGGARAN");
                     $excel->mergeCells('D6:D7');
                     $excel->getStyle('D6:D7')->applyFromArray($style_col);
@@ -1342,12 +1342,12 @@ class C_save_to_excel extends CI_Controller
                             $excel->setCellValue($keyM[($StH)].$St, $NameHeadAccount );
                             $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
                             // buat border sampai total
-                            for ($j=0; $j < 5; $j++) { 
+                            for ($j=0; $j < 5; $j++) {
                                $StH++;
                                $excel->getStyle($keyM[($StH)].$St)->applyFromArray($style_col);
-                            } 
+                            }
 
-                            // month 
+                            // month
                             $month = $getData[$i]['DetailMonth'];
                             $month = json_decode($month);
                                 // $StH = $StH + 2;
@@ -1360,11 +1360,11 @@ class C_save_to_excel extends CI_Controller
 
                                 // Total Per Head Account
                                    $arr_total_perMonth_ha = array();
-                                   for ($j=0; $j < count($getData); $j++) { 
+                                   for ($j=0; $j < count($getData); $j++) {
                                        if ($getData[$j]['CodeHeadAccount'] == $CodeHeadAccount1) {
                                            $monthHA = $getData[$j]['DetailMonth'];
                                            $monthHA = json_decode($monthHA);
-                                           for ($z=0; $z < count($monthHA); $z++) { 
+                                           for ($z=0; $z < count($monthHA); $z++) {
                                                $a = $monthHA[$z]->value * ($getData[$j]['UnitCost'] / 1000);
                                                if (array_key_exists($z, $arr_total_perMonth_ha)) {
                                                    $arr_total_perMonth_ha[$z] = $arr_total_perMonth_ha[$z] + $a;
@@ -1402,7 +1402,7 @@ class C_save_to_excel extends CI_Controller
                                 $st_arr2 = array(
                                     'borders' => array(
                                         'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
-                                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), 
+                                        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),
                                         'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
                                         // 'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
                                     )
@@ -1426,7 +1426,7 @@ class C_save_to_excel extends CI_Controller
 
                                $StH++;
                                $excel->setCellValue($keyM[$StH].$St, $getData[$i]['Freq']);
-                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+                               $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                $StH++;
                                $excel->setCellValue($keyM[$StH].$St, $getData[$i]['CodeDiv']);
@@ -1442,7 +1442,7 @@ class C_save_to_excel extends CI_Controller
 
                                $total = $total + ($getData[$i]['SubTotal'] / 1000);
 
-                            // month   
+                            // month
                                $StH = $StH + 2;
                                for ($z=0; $z < count($month); $z++) {
                                    $a = $month[$z]->value * ($getData[$i]['UnitCost'] / 1000);
@@ -1462,14 +1462,14 @@ class C_save_to_excel extends CI_Controller
                                $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                             // Grpuping
-                            for ($j=$i+1; $j < count($getData); $j++) { 
+                            for ($j=$i+1; $j < count($getData); $j++) {
                                $CodeHeadAccount2 = $getData[$j]['CodeHeadAccount'];
                                 if ($CodeHeadAccount1 == $CodeHeadAccount2) {
                                     $NoSub++;
                                     $StH = 2;
                                     $St++;
                                     $No2 = strtolower($keyM[$NoSub]);
-                                    // month 
+                                    // month
                                     $month = $getData[$j]['DetailMonth'];
                                     $month = json_decode($month);
 
@@ -1487,7 +1487,7 @@ class C_save_to_excel extends CI_Controller
 
                                        $StH++;
                                        $excel->setCellValue($keyM[$StH].$St, $getData[$j]['Freq']);
-                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row); 
+                                       $excel->getStyle($keyM[$StH].$St)->applyFromArray($style_row);
 
                                        $StH++;
                                        $excel->setCellValue($keyM[$StH].$St, $getData[$j]['CodeDiv']);
@@ -1503,7 +1503,7 @@ class C_save_to_excel extends CI_Controller
 
                                         $total = $total + ($getData[$j]['SubTotal'] / 1000);
 
-                                    // month   
+                                    // month
                                        $StH = $StH + 2;
                                        for ($z=0; $z < count($month); $z++) {
                                            $a = $month[$z]->value * ($getData[$j]['UnitCost'] / 1000);
@@ -1525,7 +1525,7 @@ class C_save_to_excel extends CI_Controller
                                 {
                                     break;
                                 }
-                                $i = $j; 
+                                $i = $j;
                             }
 
                             $St++;
@@ -1537,15 +1537,15 @@ class C_save_to_excel extends CI_Controller
                         $excel->mergeCells('B'.$St.':'.'H'.$St);
                         $excel->getStyle('B'.$St.':'.'H'.$St)->applyFromArray($style_col);
 
-                        $excel->setCellValue('I'.$St, $total); 
+                        $excel->setCellValue('I'.$St, $total);
                         $excel->getStyle('I'.$St)->applyFromArray($style_col);
 
                         // make SubTotal Per Bulan
                             $StHSubTot = 10 ;
-                           for ($ii=0; $ii < count($arr_total_perMonth); $ii++) { 
-                                $excel->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$ii]); 
-                                $StHSubTot = $StHSubTot + 1;    
-                            }  
+                           for ($ii=0; $ii < count($arr_total_perMonth); $ii++) {
+                                $excel->setCellValue($keyM[$StHSubTot].$St, $arr_total_perMonth[$ii]);
+                                $StHSubTot = $StHSubTot + 1;
+                            }
                             $excel->setCellValue($keyM[$StHSubTot].$St, $total);
 
                     // Make Footer
@@ -1574,7 +1574,7 @@ class C_save_to_excel extends CI_Controller
 
 
                     // Write Rule Approval
-                       $St = $StTot + 2;     
+                       $St = $StTot + 2;
                        $excel->setCellValue('D'.$St, "Jakarta,");
 
                        $St = $St + 2;
@@ -1583,23 +1583,23 @@ class C_save_to_excel extends CI_Controller
                        $StH2 = 3;
 
                        $JsonStatus = (array) json_decode($dt[$m]['JsonStatus'],true);
-                       for ($i=0; $i < count($JsonStatus); $i++) { 
+                       for ($i=0; $i < count($JsonStatus); $i++) {
                             if ($JsonStatus[$i]['Visible'] == 'Yes') {
                                 $excel->setCellValue($keyM[$StH].$St, $JsonStatus[$i]['NameTypeDesc']);
                                 $N = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$i]['NIP']);
                                 $excel->setCellValue($keyM[$StH].$StTot, $N[0]['Name']);
                                 $excel->getStyle($keyM[$StH].$St.':'.$keyM[$StH2].$StTot)->applyFromArray($style_row);
-                                $StH = $StH2 + 2; 
+                                $StH = $StH2 + 2;
                                 $StH2 = $StH + 2;
                             }
-                            
+
                        }
 
-                 $excel->getColumnDimension('B')->setWidth(3);       
-                 $excel->getColumnDimension('C')->setWidth(3);       
-                 $excel->getColumnDimension('D')->setWidth(20);       
-                 $excel->getColumnDimension('E')->setWidth(25);       
-                 $excel->getColumnDimension('H')->setWidth(25);    
+                 $excel->getColumnDimension('B')->setWidth(3);
+                 $excel->getColumnDimension('C')->setWidth(3);
+                 $excel->getColumnDimension('D')->setWidth(20);
+                 $excel->getColumnDimension('E')->setWidth(25);
+                 $excel->getColumnDimension('H')->setWidth(25);
             }
 
         } // end loop per sheet
@@ -1610,7 +1610,7 @@ class C_save_to_excel extends CI_Controller
 
         $write = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
         $write->save('php://output');
-        
+
     }
 
     public function monitoring_score()
@@ -1681,14 +1681,14 @@ class C_save_to_excel extends CI_Controller
         $excel->setActiveSheetIndex(0)->setCellValue('F3', "Group");
         $excel->setActiveSheetIndex(0)->setCellValue('G3', "Coordinator");
         $excel->setActiveSheetIndex(0)->setCellValue('H3', "Assignment 1");
-        $excel->setActiveSheetIndex(0)->setCellValue('H3', "Assignment 2");
-        $excel->setActiveSheetIndex(0)->setCellValue('I3', "Assignment 3");
-        $excel->setActiveSheetIndex(0)->setCellValue('J3', "Assignment 4");
-        $excel->setActiveSheetIndex(0)->setCellValue('K3', "Assignment 5");
-        $excel->setActiveSheetIndex(0)->setCellValue('L3', "UTS");
-        $excel->setActiveSheetIndex(0)->setCellValue('M3', "UAS");
-        $excel->setActiveSheetIndex(0)->setCellValue('N3', "Score");
-        $excel->setActiveSheetIndex(0)->setCellValue('O3', "Grade");
+        $excel->setActiveSheetIndex(0)->setCellValue('I3', "Assignment 2");
+        $excel->setActiveSheetIndex(0)->setCellValue('J3', "Assignment 3");
+        $excel->setActiveSheetIndex(0)->setCellValue('K3', "Assignment 4");
+        $excel->setActiveSheetIndex(0)->setCellValue('L3', "Assignment 5");
+        $excel->setActiveSheetIndex(0)->setCellValue('M3', "UTS");
+        $excel->setActiveSheetIndex(0)->setCellValue('N3', "UAS");
+        $excel->setActiveSheetIndex(0)->setCellValue('O3', "Score");
+        $excel->setActiveSheetIndex(0)->setCellValue('P3', "Grade");
 
         // Apply style header yang telah kita buat tadi ke masing-masing kolom header
         $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
@@ -1706,6 +1706,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('M3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('N3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('O3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('P3')->applyFromArray($style_col);
 
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
@@ -1734,14 +1735,15 @@ class C_save_to_excel extends CI_Controller
                 $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $d['ClassGroup']);
                 $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $d['CoordinatorName']);
                 $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $ev1);
-                $excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $ev2);
-                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow, $ev3);
-                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow, $ev4);
-                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow, $ev5);
-                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow, $d['UTS']);
-                $excel->setActiveSheetIndex(0)->setCellValue('M'.$numrow, $d['UAS']);
-                $excel->setActiveSheetIndex(0)->setCellValue('N'.$numrow, $d['Score']);
-                $excel->setActiveSheetIndex(0)->setCellValue('O'.$numrow, $d['Grade']);
+                $excel->setActiveSheetIndex(0)->setCellValue('I'.$numrow, $ev2);
+                $excel->setActiveSheetIndex(0)->setCellValue('J'.$numrow, $ev3);
+                $excel->setActiveSheetIndex(0)->setCellValue('K'.$numrow, $ev4);
+                $excel->setActiveSheetIndex(0)->setCellValue('L'.$numrow, $ev5);
+                $excel->setActiveSheetIndex(0)->setCellValue('M'.$numrow, $d['UTS']);
+                $excel->setActiveSheetIndex(0)->setCellValue('N'.$numrow, $d['UAS']);
+                $excel->setActiveSheetIndex(0)->setCellValue('O'.$numrow, $d['Score']);
+                $excel->setActiveSheetIndex(0)->setCellValue('P'.$numrow, $d['Grade']);
+
 
                 // Apply style header yang telah kita buat tadi ke masing-masing kolom header
                 $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
@@ -1759,6 +1761,7 @@ class C_save_to_excel extends CI_Controller
                 $excel->getActiveSheet()->getStyle('M'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('N'.$numrow)->applyFromArray($style_col_fill);
                 $excel->getActiveSheet()->getStyle('O'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('P'.$numrow)->applyFromArray($style_col_fill);
 
                 $numrow += 1;
             }
@@ -1824,7 +1827,7 @@ class C_save_to_excel extends CI_Controller
                $SelectSortBy = $Input['SelectSortBy'];
                $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
-               $this->exCel_PenjualanFormulirData($title,$get); 
+               $this->exCel_PenjualanFormulirData($title,$get);
                 break;
             default:
                 # code...
@@ -1840,10 +1843,10 @@ class C_save_to_excel extends CI_Controller
         $sheet = $objPHPExcel->getActiveSheet();
         $count = 5;
         $phone = PHPExcel_Cell_DataType::TYPE_STRING;
-        
+
         $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
         $sheet->setCellValue('A2', $title);
-        
+
         $sheet->setCellValue('A4', 'Form');
         $sheet->setCellValue('B4', 'Tanggal');
         $sheet->setCellValue('C4', 'PIC');
@@ -1858,7 +1861,7 @@ class C_save_to_excel extends CI_Controller
         $sheet->setCellValue('L4', 'Kota Sekolah');
         $sheet->setCellValue('M4', 'Sumber Iklan');
 
-        for ($i=0; $i < count($data); $i++) { 
+        for ($i=0; $i < count($data); $i++) {
             $sheet->setCellValue('A'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref'] );
             $sheet->setCellValue('B'.$count, date('d M Y', strtotime( $data[$i]['DateSale'] ) ) );
             $sheet->setCellValue('C'.$count, $data[$i]['Sales']);
@@ -1874,7 +1877,7 @@ class C_save_to_excel extends CI_Controller
             $sheet->setCellValue('M'.$count, $data[$i]['src_name']);
             $count++;
         }
-        
+
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:M1');
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:M2');
         $sheet->getStyle('A1')->getFont()->setSize(16);
@@ -1882,13 +1885,13 @@ class C_save_to_excel extends CI_Controller
         $sheet->getStyle('A1')->getFont()->setBold(true);
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A4:M4')->getFont()->setBold(true);
-        
+
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A4:M4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A4:M'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
         $sheet->getStyle('A4:M4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
-        
+
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->getColumnDimension('B')->setAutoSize(true);
         $sheet->getColumnDimension('C')->setAutoSize(true);
@@ -1939,14 +1942,14 @@ class C_save_to_excel extends CI_Controller
                $SelectSortBy = $Input['SelectSortBy'];
                $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
-               $this->exCel_PenjualanFormulirFinance($title,$get); 
+               $this->exCel_PenjualanFormulirFinance($title,$get);
                 break;
             case 3: // dashboard / per ta
                $SelectSetTa = $Input['SelectSetTa'];
                $get = $this->m_admission->getSaleFormulirOfflinePerTA($SelectSetTa);
                $title = 'Angkatan : '.$SelectSetTa;
-               $this->exCel_PenjualanFormulirFinance($title,$get); 
-                break;    
+               $this->exCel_PenjualanFormulirFinance($title,$get);
+                break;
             default:
                 # code...
                 break;
@@ -1985,7 +1988,7 @@ class C_save_to_excel extends CI_Controller
                $SelectSortBy = $Input['SelectSortBy'];
                // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Search by : Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
-               // $this->exCel_PenjualanFormulirData($title,$get); 
+               // $this->exCel_PenjualanFormulirData($title,$get);
                $get = $this->m_finance->getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
                 break;
@@ -1994,10 +1997,10 @@ class C_save_to_excel extends CI_Controller
                $SelectSortBy = $Input['SelectSortBy'];
                // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Search by : All ';
-               // $this->exCel_PenjualanFormulirData($title,$get); 
+               // $this->exCel_PenjualanFormulirData($title,$get);
                $get = $this->m_finance->getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy);
                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
-                break;    
+                break;
             default:
                 # code...
                 break;
@@ -2057,7 +2060,7 @@ class C_save_to_excel extends CI_Controller
                 'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
               )
             );
-           $no = $i + 1;  
+           $no = $i + 1;
            $excel3->setCellValue('B'.$a, $no);
            $excel3->setCellValue('C'.$a, $data[$i]['FormulirCodeGlobal']);
            $excel3->setCellValue('D'.$a, $data[$i]['FullName']);
@@ -2080,7 +2083,7 @@ class C_save_to_excel extends CI_Controller
            $excel3->getStyle('E'.$a)->applyFromArray($style_row2);
            $excel3->getStyle('F'.$a)->applyFromArray($style_row2);
            $a = $a + 1;
-           $countFormulir++; 
+           $countFormulir++;
         }
 
         $excel3->setCellValue('H7', 'Terjual :'.$countSell);
@@ -2089,7 +2092,7 @@ class C_save_to_excel extends CI_Controller
         $filename = 'Rekap_Formulir_'.date('y-m-d').'.xlsx';
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
+        // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
         header('Content-Disposition: attachment; filename="'.$filename.'"'); // jalan ketika tidak menggunakan ajax
@@ -2104,11 +2107,11 @@ class C_save_to_excel extends CI_Controller
         $count = 5;
         $buy = $free = 0;
         $total = 0;
-        
+
         //---------------------- table data ----------------------
         $sheet->setCellValue('A1', 'Laporan Penjualan Formulir');
         $sheet->setCellValue('A2', $title);
-        
+
         $sheet->setCellValue('A4', 'No');
         $sheet->setCellValue('B4', 'Tanggal');
         $sheet->setCellValue('C4', 'Form');
@@ -2116,8 +2119,8 @@ class C_save_to_excel extends CI_Controller
         $sheet->setCellValue('E4', 'Channel');
         $sheet->setCellValue('F4', 'Keterangan');
         $sheet->setCellValue('G4', 'Jumlah');
-        
-        for ($i=0; $i < count($data); $i++) { 
+
+        for ($i=0; $i < count($data); $i++) {
             $sheet->setCellValue('A'.$count, ($i + 1));
             $sheet->setCellValue('B'.$count, date('d M Y', strtotime($data[$i]['DateSale'] )));
             $sheet->setCellValue('C'.$count, ($data[$i]['No_Ref'] == "" || $data[$i]['No_Ref'] == null ) ? $data[$i]['FormulirCode'] : $data[$i]['No_Ref']);
@@ -2138,7 +2141,7 @@ class C_save_to_excel extends CI_Controller
 
         $sheet->setCellValue('A'.$count, 'Total');
         $sheet->setCellValue('G'.$count, number_format($total));
-        
+
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A1:G1');
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A2:G2');
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('A'.$count.':F'.$count);
@@ -2148,7 +2151,7 @@ class C_save_to_excel extends CI_Controller
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A4:G4')->getFont()->setBold(true);
         $sheet->getStyle('A'.$count)->getFont()->setBold(true);
-        
+
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A4:G4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -2157,7 +2160,7 @@ class C_save_to_excel extends CI_Controller
         $sheet->getStyle('G'.$count)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT);
         $sheet->getStyle('A4:G'.$count)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
         $sheet->getStyle('A4:G4')->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('ABCAFF');
-        
+
         $sheet->getColumnDimension('A')->setAutoSize(true);
         $sheet->getColumnDimension('B')->setAutoSize(true);
         $sheet->getColumnDimension('C')->setAutoSize(true);
@@ -2165,27 +2168,27 @@ class C_save_to_excel extends CI_Controller
         $sheet->getColumnDimension('E')->setAutoSize(true);
         $sheet->getColumnDimension('F')->setAutoSize(true);
         $sheet->getColumnDimension('G')->setAutoSize(true);
-        
+
         //---------------------- summary ----------------------
         $sheet->setCellValue('I4', 'Summary');
         $sheet->setCellValue('I5', 'Bayar');
         $sheet->setCellValue('I6', 'Free');
         $sheet->setCellValue('I7', 'Total form');
-        
+
         $sheet->setCellValue('J4', ':');
         $sheet->setCellValue('J5', ':');
         $sheet->setCellValue('J6', ':');
         $sheet->setCellValue('J7', ':');
-        
+
         $sheet->setCellValue('K4', '-');
         $sheet->setCellValue('K5', $buy);
         $sheet->setCellValue('K6', $free);
         $sheet->setCellValue('K7', count($data));
-        
+
         $sheet->getColumnDimension('I')->setAutoSize(true);
         $sheet->getColumnDimension('J')->setAutoSize(true);
         $sheet->getColumnDimension('K')->setAutoSize(true);
-        
+
         $objPHPExcel->setActiveSheetIndex(0)->mergeCells('I4:L4');
 
         $sheet->setTitle('Penjualan Form');
@@ -2225,7 +2228,7 @@ class C_save_to_excel extends CI_Controller
                $SelectSortBy = $Input['SelectSortBy'];
                $get = $this->m_admission->getRegisterDataPermonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
-               $this->exCel_PengembalianFormulirData($title,$get); 
+               $this->exCel_PengembalianFormulirData($title,$get);
                 break;
             default:
                 # code...
@@ -2262,8 +2265,8 @@ class C_save_to_excel extends CI_Controller
         // start dari A7
         $a = 6;
         for ($i=0; $i < count($data); $i++) {
-           $no = $i + 1;  
-           $excel3->setCellValue('A'.$a, $data[$i]['FormulirWrite']); 
+           $no = $i + 1;
+           $excel3->setCellValue('A'.$a, $data[$i]['FormulirWrite']);
            $excel3->setCellValue('B'.$a, '');
            $excel3->setCellValue('C'.$a, date('d M Y', strtotime($data[$i]['RegisterAT'])));
            $excel3->setCellValue('D'.$a, $data[$i]['Name']);
@@ -2348,13 +2351,13 @@ class C_save_to_excel extends CI_Controller
            $excel3->getStyle('AN'.$a)->applyFromArray($style_row);
            $excel3->getStyle('AO'.$a)->applyFromArray($style_row);
 
-           $a = $a + 1; 
+           $a = $a + 1;
         }
 
         $filename = 'report_pengembalian_formulir_'.date('y-m-d').'.xlsx';
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
+        // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
         header('Content-Disposition: attachment; filename="'.$filename.'"'); // jalan ketika tidak menggunakan ajax
@@ -2838,7 +2841,7 @@ class C_save_to_excel extends CI_Controller
         $No = 1;
         $r = 8;
         $arr_total = array();
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
            $Faculty =  $getData[$i]['Faculty'];
            // merge // start di c
            $C_prodi = count($getData[$i]['Prodi']);
@@ -2875,7 +2878,7 @@ class C_save_to_excel extends CI_Controller
                 {
                     $arr_total[] = $tot;
                 }
-                
+
 
             // add tahun akademik variable
                 $G_Value = $getData[$i]['Value'][1]['Detail'];
@@ -2932,7 +2935,7 @@ class C_save_to_excel extends CI_Controller
                             )
                         );
                     }
-                    
+
                     $r1++;
                 }
                 if (array_key_exists(3, $arr_total)) {
@@ -2941,18 +2944,18 @@ class C_save_to_excel extends CI_Controller
                 else
                 {
                     $arr_total[] = $tot;
-                }                
+                }
 
-            $r = $r_merge + 1;   
+            $r = $r_merge + 1;
         }
 
         // make total
             $excel3->mergeCells('B'.$r.':'.'D'.$r);
             $excel3->setCellValue('B'.$r, 'Total')->getStyle('B'.$r.':'.'D'.$r)->applyFromArray($style_row2);
-            $st = 4; 
-            for ($i=0; $i < count($arr_total); $i++) { 
+            $st = 4;
+            for ($i=0; $i < count($arr_total); $i++) {
                 $huruf = $this->m_master->HurufColExcelNumber($st);
-                $excel3->setCellValue($huruf.$r, $arr_total[$i])->getStyle($huruf.$r)->applyFromArray($style_row2);  
+                $excel3->setCellValue($huruf.$r, $arr_total[$i])->getStyle($huruf.$r)->applyFromArray($style_row2);
                 $st++;
             }
 
@@ -2960,7 +2963,7 @@ class C_save_to_excel extends CI_Controller
             $r += 2;
                 $style = array(
                     'font' => array('bold' => true), // Set font nya jadi bold
-                );    
+                );
                 $excel3->setCellValue('E'.$r, 'Keterangan Prodi Bisnis Perhotelan:')->getStyle('E'.$r)->applyFromArray($style);
                 $r++;
                 $excel3->setCellValue('E'.$r, 'Untuk prodi Bisnis Perhotelan berikut tambahan data diluar intake:');
@@ -3042,7 +3045,7 @@ class C_save_to_excel extends CI_Controller
         $SumTotalTagihan = 0;
         $SumTotalPembayaran = 0;
         $SumTotalSisaTagihan = 0;
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $ID_register_formulir = $getData[$i]['ID_register_formulir'];
             $output = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$ID_register_formulir);
             $no = $i + 1;
@@ -3077,8 +3080,8 @@ class C_save_to_excel extends CI_Controller
                 }
                 $Discount .= $aa.'Lain-lain : '.$getData[$i]['Discount-Another'].'%';
             }
-            
-            $excel3->setCellValue('A'.$a, $no); 
+
+            $excel3->setCellValue('A'.$a, $no);
             $excel3->setCellValue('B'.$a, $FormulirCode);
             $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
             $excel3->setCellValue('D'.$a, $getData[$i]['NamePrody']);
@@ -3091,7 +3094,7 @@ class C_save_to_excel extends CI_Controller
             $keyI = 8;
             $TotalBayar = 0;
             $TotalAll = 0;
-            for ($j=0; $j < count($output); $j++) { 
+            for ($j=0; $j < count($output); $j++) {
                $tt = '';
                $byr = '';
                $as = $keyI + 1;
@@ -3109,7 +3112,7 @@ class C_save_to_excel extends CI_Controller
 
             $ss = 7 - count($output);
             for ($j=0; $j < $ss; $j++) {
-               $as = $keyI + 1; 
+               $as = $keyI + 1;
                $excel3->setCellValue($keyM[$keyI].$a, "");
                $excel3->setCellValue($keyM[$as].$a, "");
                $keyI = $keyI + 2;
@@ -3154,7 +3157,7 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('Y'.$a)->applyFromArray($style_row);
             $excel3->getStyle('Z'.$a)->applyFromArray($style_row);
             $excel3->getStyle('AA'.$a)->applyFromArray($style_row);
-            $a = $a + 1; 
+            $a = $a + 1;
         }
 
         $excel3->setCellValue('W'.$a, "Rp. ".number_format($SumTotalTagihan,2,',','.'));
@@ -3196,7 +3199,7 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
-        // write date export 
+        // write date export
         $DatePrint = date('d M Y', strtotime($GetDateNow));
         $excel3->setCellValue('A2', 'Tanggal : '.$DatePrint);
         $excel3->setCellValue('A3', 'Data Mahasiswa Angkatan '.$input['Year']);
@@ -3226,11 +3229,11 @@ class C_save_to_excel extends CI_Controller
         $Bin1 = 0;
         $Bin2 = 0;
         $arrxx = array();
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $no = $i + 1;
             // number_format($getData[$i]['SPP'],2,',','.')
-            
-            $excel3->setCellValue('A'.$a, $no); 
+
+            $excel3->setCellValue('A'.$a, $no);
             $excel3->setCellValue('B'.$a, $getData[$i]['NPM']);
             $excel3->setCellValue('C'.$a, $getData[$i]['Name']);
             $excel3->setCellValue('D'.$a, (string)$getData[$i]['VA']);
@@ -3261,7 +3264,7 @@ class C_save_to_excel extends CI_Controller
                        $arrxx[$Name] = 1;
                     }
                 }
-                
+
             }
 
             $excel3->setCellValue('J'.$a, $PriceList);
@@ -3281,16 +3284,16 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('J'.$a)->applyFromArray($style_row);
             $excel3->getStyle('K'.$a)->applyFromArray($style_row);
             $excel3->getStyle('L'.$a)->applyFromArray($style_row);
-            $a = $a + 1; 
+            $a = $a + 1;
         }
-            
-        $excel3->setCellValue('O'.'5', 'Bintang 1 : '.$Bin1);   
+
+        $excel3->setCellValue('O'.'5', 'Bintang 1 : '.$Bin1);
         $excel3->setCellValue('O'.'6', 'Bintang 2 : '.$Bin2);
         $aaaa = 7;
         foreach ($arrxx as $key => $value) {
-            $excel3->setCellValue('O'.$aaaa, $key.' : '.$value);     
+            $excel3->setCellValue('O'.$aaaa, $key.' : '.$value);
             $aaaa++;
-        }  
+        }
         // foreach(range('A','Z') as $columnID) {
         //     $excel2->getActiveSheet()->getColumnDimension($columnID)
         //         ->setAutoSize(true);
@@ -3322,7 +3325,7 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
-        // write date export 
+        // write date export
         $PerTgl = 'Per tgl '.date('d M Y', strtotime($input['DailyTgl']));
         $DatePrint = date('d M Y', strtotime($GetDateNow));
         $excel3->setCellValue('A4', $PerTgl);
@@ -3364,9 +3367,9 @@ class C_save_to_excel extends CI_Controller
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         $arrxx = array();
         $Total = 0;
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $data =$getData[$i]['data'];
-            $excel3->setCellValue('A'.$a, 'No'); 
+            $excel3->setCellValue('A'.$a, 'No');
             $excel3->setCellValue('B'.$a, 'Tgl');
             $excel3->setCellValue('C'.$a, 'Nama');
             $excel3->setCellValue('D'.$a, 'Semester');
@@ -3383,7 +3386,7 @@ class C_save_to_excel extends CI_Controller
             $a = $a + 1; // untuk isi
             for ($j=0; $j < count($data); $j++) {
                 $no = $j + 1;
-                $excel3->setCellValue('A'.$a, $no); 
+                $excel3->setCellValue('A'.$a, $no);
                 $excel3->setCellValue('B'.$a, date('d M Y', strtotime($data[$j]['DatePayment'])));
                 $excel3->setCellValue('C'.$a, $data[$j]['Name']);
                 $excel3->setCellValue('D'.$a, (string)1);
@@ -3400,11 +3403,11 @@ class C_save_to_excel extends CI_Controller
                 $excel3->getStyle('E'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('F'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('G'.$a)->applyFromArray($style_row);
-                $a = $a + 1; 
+                $a = $a + 1;
             }
 
-            $excel3->setCellValue('A'.$a, 'SUBTOTAL '.$data[0]['NamePrody']); 
-            $excel3->setCellValue('G'.$a, $getData[$i]['subtotal']); 
+            $excel3->setCellValue('A'.$a, 'SUBTOTAL '.$data[0]['NamePrody']);
+            $excel3->setCellValue('G'.$a, $getData[$i]['subtotal']);
             $excel3->mergeCells('A'.$a.':F'.$a);
             $excel3->getStyle('A'.$a)->applyFromArray($style_col);
             $excel3->getStyle('B'.$a)->applyFromArray($style_col);
@@ -3414,12 +3417,12 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('F'.$a)->applyFromArray($style_col);
             $excel3->getStyle('G'.$a)->applyFromArray($style_col);
             $Total = $Total + $getData[$i]['subtotal'];
-            $a = $a + 1; 
-            
+            $a = $a + 1;
+
         }
-        
-        $excel3->setCellValue('A'.$a, 'Total '); 
-        $excel3->setCellValue('G'.$a, $Total); 
+
+        $excel3->setCellValue('A'.$a, 'Total ');
+        $excel3->setCellValue('G'.$a, $Total);
         $excel3->mergeCells('A'.$a.':F'.$a);
         $excel3->getStyle('A'.$a)->applyFromArray($style_col);
         $excel3->getStyle('B'.$a)->applyFromArray($style_col);
@@ -3427,7 +3430,7 @@ class C_save_to_excel extends CI_Controller
         $excel3->getStyle('D'.$a)->applyFromArray($style_col);
         $excel3->getStyle('E'.$a)->applyFromArray($style_col);
         $excel3->getStyle('F'.$a)->applyFromArray($style_col);
-        $excel3->getStyle('G'.$a)->applyFromArray($style_col);       
+        $excel3->getStyle('G'.$a)->applyFromArray($style_col);
         $excel3->setCellValue('F'.($a+3), 'Print Date,'.$DatePrint);
         // foreach(range('A','Z') as $columnID) {
         //     $excel2->getActiveSheet()->getColumnDimension($columnID)
@@ -3456,7 +3459,7 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
-        // write date export 
+        // write date export
         $PerTgl = 'Per tgl '.date('d M Y', strtotime($input['DailyTgl']));
         $DatePrint = date('d M Y', strtotime($GetDateNow));
         $excel3->setCellValue('A4', $PerTgl);
@@ -3501,9 +3504,9 @@ class C_save_to_excel extends CI_Controller
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         $arrxx = array();
         $Total = 0;
-        for ($i=0; $i < count($getData); $i++) { 
+        for ($i=0; $i < count($getData); $i++) {
             $data =$getData[$i]['data'];
-            $excel3->setCellValue('A'.$a, 'No'); 
+            $excel3->setCellValue('A'.$a, 'No');
             $excel3->setCellValue('B'.$a, 'Tgl');
             $excel3->setCellValue('C'.$a, 'Nama');
             $excel3->setCellValue('D'.$a, 'Semester');
@@ -3520,7 +3523,7 @@ class C_save_to_excel extends CI_Controller
             $a = $a + 1; // untuk isi
             for ($j=0; $j < count($data); $j++) {
                 $no = $j + 1;
-                $excel3->setCellValue('A'.$a, $no); 
+                $excel3->setCellValue('A'.$a, $no);
                 $excel3->setCellValue('B'.$a, date('d M Y', strtotime($data[$j]['DatePayment'])));
                 $excel3->setCellValue('C'.$a, $data[$j]['NPM'].' | '.$data[$j]['NamaMHS']);
                 $excel3->setCellValue('D'.$a, $data[$j]['semesterCount']);
@@ -3537,11 +3540,11 @@ class C_save_to_excel extends CI_Controller
                 $excel3->getStyle('E'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('F'.$a)->applyFromArray($style_row);
                 $excel3->getStyle('G'.$a)->applyFromArray($style_row);
-                $a = $a + 1; 
+                $a = $a + 1;
             }
 
-            $excel3->setCellValue('A'.$a, 'SUBTOTAL '.$data[0]['NamePrody']); 
-            $excel3->setCellValue('G'.$a, $getData[$i]['subtotal']); 
+            $excel3->setCellValue('A'.$a, 'SUBTOTAL '.$data[0]['NamePrody']);
+            $excel3->setCellValue('G'.$a, $getData[$i]['subtotal']);
             $excel3->mergeCells('A'.$a.':F'.$a);
             $excel3->getStyle('A'.$a)->applyFromArray($style_col);
             $excel3->getStyle('B'.$a)->applyFromArray($style_col);
@@ -3551,12 +3554,12 @@ class C_save_to_excel extends CI_Controller
             $excel3->getStyle('F'.$a)->applyFromArray($style_col);
             $excel3->getStyle('G'.$a)->applyFromArray($style_col);
             $Total = $Total + $getData[$i]['subtotal'];
-            $a = $a + 1; 
-            
+            $a = $a + 1;
+
         }
-         
-        $excel3->setCellValue('A'.$a, 'Total '); 
-        $excel3->setCellValue('G'.$a, $Total); 
+
+        $excel3->setCellValue('A'.$a, 'Total ');
+        $excel3->setCellValue('G'.$a, $Total);
         $excel3->mergeCells('A'.$a.':F'.$a);
         $excel3->getStyle('A'.$a)->applyFromArray($style_col);
         $excel3->getStyle('B'.$a)->applyFromArray($style_col);
@@ -3564,7 +3567,7 @@ class C_save_to_excel extends CI_Controller
         $excel3->getStyle('D'.$a)->applyFromArray($style_col);
         $excel3->getStyle('E'.$a)->applyFromArray($style_col);
         $excel3->getStyle('F'.$a)->applyFromArray($style_col);
-        $excel3->getStyle('G'.$a)->applyFromArray($style_col);   
+        $excel3->getStyle('G'.$a)->applyFromArray($style_col);
         $excel3->setCellValue('F'.($a+3), 'Print Date,'.$DatePrint);
         // foreach(range('A','Z') as $columnID) {
         //     $excel2->getActiveSheet()->getColumnDimension($columnID)
@@ -3593,7 +3596,7 @@ class C_save_to_excel extends CI_Controller
         $excel2->setActiveSheetIndex(0);
 
         $excel3 = $excel2->getActiveSheet();
-        // write date export 
+        // write date export
         $Year = $input['Year'];
         $excel3->setCellValue('A3', 'Intake: '.$Year.'/'.($Year+1));
         $PerTgl = 'Per tgl '.date('d M Y', strtotime($GetDateNow));
@@ -3631,8 +3634,8 @@ class C_save_to_excel extends CI_Controller
         $a = 5;
         $Filaname = 'Rekap_Intake_'.$Year.'_'.$GetDateNow.'.xlsx';
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-        $rekapintake_ = $this->m_master->showData_array('db_statistik.rekapintake_'.$Year);    
-        $rekapintake_bea_ = $this->m_master->showData_array('db_statistik.rekapintake_bea_'.$Year);    
+        $rekapintake_ = $this->m_master->showData_array('db_statistik.rekapintake_'.$Year);
+        $rekapintake_bea_ = $this->m_master->showData_array('db_statistik.rekapintake_bea_'.$Year);
         $rekapintake_sch_ = $this->m_master->showData_array('db_statistik.rekapintake_sch_'.$Year);
         $arrxx = array();
 
@@ -3641,7 +3644,7 @@ class C_save_to_excel extends CI_Controller
         $rekapintake_ls = '';
         $rekapintake_bea_ls = '';
         $rekapintake_sch_ls = '';
-        for ($i=0; $i < count($lastupdate); $i++) { 
+        for ($i=0; $i < count($lastupdate); $i++) {
             if ($lastupdate[$i]['TableName'] == 'rekapintake_'.$Year) {
                 $rekapintake_ls = $lastupdate[$i]['LastUpdated'];
             }
@@ -3661,7 +3664,7 @@ class C_save_to_excel extends CI_Controller
         $a = $a + 1;
         $excel3->setCellValue('A'.$a, '');
         $excel3->getStyle('A'.$a)->applyFromArray($style_col);
-        for ($j=0; $j < count($getProdi); $j++) { 
+        for ($j=0; $j < count($getProdi); $j++) {
              $z = $j + 1;
              $excel3->setCellValue($keyM[$z].$a, $getProdi[$j]['Name']);
              $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
@@ -3669,7 +3672,7 @@ class C_save_to_excel extends CI_Controller
 
         $a = $a + 1;
         $arr_total = array();
-        for ($i=0; $i < count($field); $i++) { 
+        for ($i=0; $i < count($field); $i++) {
             if ($field[$i] != 'ID' && $field[$i] != 'ProdiID') {
                 $aa =  $field[$i];
                 $z = 0;
@@ -3699,11 +3702,11 @@ class C_save_to_excel extends CI_Controller
                          {
                             $arr_total[$rekapintake_[$j]['ProdiID']] = $value;
                          }
-                     } 
-                      
+                     }
+
                   }
-               $a = $a + 1;   
-            }   
+               $a = $a + 1;
+            }
         }
 
         $excel3->setCellValue('A'.$a, 'Total');
@@ -3718,15 +3721,15 @@ class C_save_to_excel extends CI_Controller
         $arr_total = array();
         $a = $a + 2;
         $excel3->setCellValue('A'.$a, 'Last Updated : '.$rekapintake_bea_ls);
-        $a = $a + 1;  
+        $a = $a + 1;
         $excel3->setCellValue('A'.$a, '');
         $excel3->getStyle('A'.$a)->applyFromArray($style_col);
-        for ($j=0; $j < count($getProdi); $j++) { 
+        for ($j=0; $j < count($getProdi); $j++) {
              $z = $j + 1;
              $excel3->setCellValue($keyM[$z].$a, $getProdi[$j]['Name']);
              $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_col);
         }
-        $a = $a + 1; 
+        $a = $a + 1;
         // get type beasiswa
             $dtFirst = json_decode($rekapintake_bea_[0]['Detail'],true);
             $arr_y = array();
@@ -3734,16 +3737,16 @@ class C_save_to_excel extends CI_Controller
                 $arr_y[] =  $key;
             }
 
-            for ($i=0; $i < count($arr_y); $i++) { 
+            for ($i=0; $i < count($arr_y); $i++) {
                 $typebea = $arr_y[$i];
                 $z = 0;
                 $namebea = ($typebea == 'Beasiswa_0%') ? 'Reguler' : str_replace('_', ' ', $typebea);
                 $excel3->setCellValue($keyM[$z].$a, $namebea);
                 $excel3->getStyle($keyM[$z].$a)->applyFromArray($style_row);
-                for ($j=0; $j < count($getProdi); $j++) { 
+                for ($j=0; $j < count($getProdi); $j++) {
                     $ProdiID = $getProdi[$j]['ID'];
                     for ($l=0; $l < count($rekapintake_bea_); $l++) {
-                        $f1 = true; 
+                        $f1 = true;
                         $ProdiIDBea = $rekapintake_bea_[$l]['ProdiID'];
                         $Detail = json_decode($rekapintake_bea_[$l]['Detail'],true);
                         foreach ($Detail as $key => $value) {
@@ -3763,15 +3766,15 @@ class C_save_to_excel extends CI_Controller
                                break;
                             }
                         }
-                        
+
                         if  (!$f1) {
                             break;
-                        }    
+                        }
 
                     }
                 }
 
-                $a = $a + 1; 
+                $a = $a + 1;
             }
 
             $excel3->setCellValue('A'.$a, 'Total');
@@ -3787,11 +3790,11 @@ class C_save_to_excel extends CI_Controller
 
         //rekapintake_sch_
         $excel3->setCellValue('A'.$a, 'Last Updated : '.$rekapintake_sch_ls);
-        $a = $a + 1;  
+        $a = $a + 1;
         for ($i=0; $i < count($rekapintake_sch_); $i++) {
-            $Qty = $rekapintake_sch_[$i]['Qty']; 
+            $Qty = $rekapintake_sch_[$i]['Qty'];
             if ($Qty > 0) {
-                $ProvinceID = $rekapintake_sch_[$i]['ProvinceID']; 
+                $ProvinceID = $rekapintake_sch_[$i]['ProvinceID'];
                 $Detail = json_decode($rekapintake_sch_[$i]['Detail']);
                 $g = $this->m_master->caribasedprimary('db_admission.province','ProvinceID',$ProvinceID);
                 $ProvinceName = $g[0]['ProvinceName'];
@@ -3817,7 +3820,7 @@ class C_save_to_excel extends CI_Controller
                         $excel3->getStyle('C'.$a)->applyFromArray($style_row);
                         $a = $a + 1;
                     }
-                    
+
                 }
                 $a = $a + 1;
             }
@@ -3908,13 +3911,13 @@ class C_save_to_excel extends CI_Controller
                 $st = 3;
                 $strow = 4;
                 $arr_wr = array();
-                for ($j=0; $j < count($data); $j++) { 
+                for ($j=0; $j < count($data); $j++) {
                     $CodePost1 = $data[$j]['CodePost'];
                     $temp = array();
                     $temp['Post'] = $data[$j]['PostName'];
                     $temp2 = array();
                     $temp2[] = array('NameHeadAccount' => $data[$j]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$j]['Budget'],2,',','.'),'j' => $j,'k' => 0);
-                    for ($k=$j+1; $k < count($data); $k++) { 
+                    for ($k=$j+1; $k < count($data); $k++) {
                        $CodePost2 = $data[$k]['CodePost'];
                        if ($CodePost1 == $CodePost2  ) {
                            $temp2[] = array('NameHeadAccount' => $data[$k]['NameHeadAccount'],'Cost' => 'Rp. '.number_format($data[$k]['Budget'],2,',','.'),'j' => $j,'k' => $k);
@@ -3932,26 +3935,26 @@ class C_save_to_excel extends CI_Controller
                 }
 
                 // print_r($arr_wr);
-                for ($k=0; $k < count($arr_wr); $k++) { 
+                for ($k=0; $k < count($arr_wr); $k++) {
                   $Post = $arr_wr[$k]['Post'];
                   $exc->setCellValue('A'.$st, $Post);
                   $dt = $arr_wr[$k]['data'];
                   $no = 1;
-                  for ($l=0; $l < count($dt); $l++) { 
+                  for ($l=0; $l < count($dt); $l++) {
                       // add isi data
                       if ($l == 0) {
-                          $exc->setCellValue('A'.$strow, 'No'); 
-                          $exc->setCellValue('B'.$strow, 'Head Account'); 
-                          $exc->setCellValue('C'.$strow, 'Cost'); 
+                          $exc->setCellValue('A'.$strow, 'No');
+                          $exc->setCellValue('B'.$strow, 'Head Account');
+                          $exc->setCellValue('C'.$strow, 'Cost');
 
                           $exc->getStyle('A'.$strow)->applyFromArray($style_col);
                           $exc->getStyle('B'.$strow)->applyFromArray($style_col);
                           $exc->getStyle('C'.$strow)->applyFromArray($style_col);
                           $strow++;
                       }
-                      $exc->setCellValue('A'.$strow, $no); 
-                      $exc->setCellValue('B'.$strow, $dt[$l]['NameHeadAccount'] ); 
-                      $exc->setCellValue('C'.$strow, $dt[$l]['Cost']); 
+                      $exc->setCellValue('A'.$strow, $no);
+                      $exc->setCellValue('B'.$strow, $dt[$l]['NameHeadAccount'] );
+                      $exc->setCellValue('C'.$strow, $dt[$l]['Cost']);
 
                       $exc->getStyle('A'.$strow)->applyFromArray($style_row);
                       $exc->getStyle('B'.$strow)->applyFromArray($style_row);
@@ -3959,7 +3962,7 @@ class C_save_to_excel extends CI_Controller
                       $strow++;
                       $no++;
                   }
-                  
+
                   $st= $strow + 1;
                   $strow = $st +1;
                 }
@@ -4034,7 +4037,7 @@ class C_save_to_excel extends CI_Controller
             $excel->setActiveSheetIndex(0)->setCellValue('A1', "(,000)");
             $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE);
             $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(12);
-            
+
             $excel->setActiveSheetIndex(0)->setCellValue('A2', "No");
             $excel->getActiveSheet()->mergeCells('A2:A3');
             $excel->getActiveSheet()->getStyle('A2:A3')->applyFromArray($style_col);
@@ -4045,7 +4048,7 @@ class C_save_to_excel extends CI_Controller
 
             //loop month
                 $st = 2;
-                for ($i=0; $i < count($arr_bulan); $i++) { 
+                for ($i=0; $i < count($arr_bulan); $i++) {
                     $MonthName = $arr_bulan[$i]['MonthName'];
                     $keyValueFirst = $arr_bulan[$i]['keyValueFirst'];
                     $Y = explode('-', $keyValueFirst);
@@ -4075,14 +4078,14 @@ class C_save_to_excel extends CI_Controller
                 }
 
             // Col Total Realisasi
-                  $huruf = $this->m_master->HurufColExcelNumber($st);  
+                  $huruf = $this->m_master->HurufColExcelNumber($st);
                   $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','TOTAL REALISASI TA '.$wrYear);
                   $excel->getActiveSheet()->mergeCells($huruf.'2:'.$huruf.'3');
                   $excel->getActiveSheet()->getStyle($huruf.'2')->applyFromArray($style_col)->getAlignment()->setWrapText(true);
                   $excel->getActiveSheet()->getStyle($huruf.'2:'.$huruf.'3')->applyFromArray($style_col);
                   $excel->getActiveSheet()->getColumnDimension($huruf)->setWidth(20);
 
-            // Unit      
+            // Unit
                   $SortDeparByProdiFirst = function($arr)
                   {
                     $rs = [];
@@ -4091,7 +4094,7 @@ class C_save_to_excel extends CI_Controller
                     $Code2 = 'FT';
                     $Code3 = 'NA';
                     $temp = array();
-                    for ($i=0; $i < count($arr); $i++) { 
+                    for ($i=0; $i < count($arr); $i++) {
                         if (substr($arr[$i]['Code'], 0,2) == $Code1 || substr($arr[$i]['Code'], 0,2) == $Code2) {
                            $sortbyAc[] = $arr[$i];
                            $temp[] = $arr[$i];
@@ -4099,7 +4102,7 @@ class C_save_to_excel extends CI_Controller
                     }
                     $rs['Academic'] = $temp;
                     $temp = array();
-                    for ($i=0; $i < count($arr); $i++) { 
+                    for ($i=0; $i < count($arr); $i++) {
                         if (substr($arr[$i]['Code'], 0,2) == $Code3) {
                            $sortbyAc[] = $arr[$i];
                            $temp[] = $arr[$i];
@@ -4119,7 +4122,7 @@ class C_save_to_excel extends CI_Controller
                   $huruf = $this->m_master->HurufColExcelNumber($st);
                     // Sub Header Department
                         $sb = $st;
-                        for ($i=0; $i < count($arr_Department_ac); $i++) { 
+                        for ($i=0; $i < count($arr_Department_ac); $i++) {
                             $huruf_ = $this->m_master->HurufColExcelNumber($sb);
                             $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', $arr_Department_ac[$i]['Abbr']);
                             $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
@@ -4132,12 +4135,12 @@ class C_save_to_excel extends CI_Controller
                             $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
                             $sb++;
 
-                        for ($i=0; $i < count($arr_Department_nac); $i++) { 
+                        for ($i=0; $i < count($arr_Department_nac); $i++) {
                             $huruf_ = $this->m_master->HurufColExcelNumber($sb);
                             $excel->setActiveSheetIndex(0)->setCellValue($huruf_.'3', $arr_Department_nac[$i]['Abbr']);
                             $excel->getActiveSheet()->getStyle($huruf_.'3')->applyFromArray($style_col);
                             $sb++;
-                        }    
+                        }
 
 
                   $st = $st + count($arr_Department);
@@ -4148,7 +4151,7 @@ class C_save_to_excel extends CI_Controller
 
             // Col Total Anggaran
                       $st++;
-                      $huruf = $this->m_master->HurufColExcelNumber($st);  
+                      $huruf = $this->m_master->HurufColExcelNumber($st);
                       $excel->setActiveSheetIndex(0)->setCellValue($huruf.'2','TOTAL Anggaran TA '.$wrYear);
                       $excel->getActiveSheet()->mergeCells($huruf.'2:'.$huruf.'3');
                       $excel->getActiveSheet()->getStyle($huruf.'2')->applyFromArray($style_col)->getAlignment()->setWrapText(true);
@@ -4191,7 +4194,7 @@ class C_save_to_excel extends CI_Controller
                     $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, $arr_isian[$i]['PosAnggaran']);
                     $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style);
                     // loop isian, isi dengan value = ''
-                    for ($j=2; $j <= $st ; $j++) { 
+                    for ($j=2; $j <= $st ; $j++) {
                         $huruf_ = $this->m_master->HurufColExcelNumber($j);
                         $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
                         $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
@@ -4203,19 +4206,19 @@ class C_save_to_excel extends CI_Controller
                     $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'TOTAL PENERIMAAN');
                     $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
                     $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
-                    for ($j=2; $j <= $st ; $j++) { 
+                    for ($j=2; $j <= $st ; $j++) {
                         $huruf_ = $this->m_master->HurufColExcelNumber($j);
                         $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
                         $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
                     }
 
-        // Make isian         
+        // Make isian
                 $n++;
             $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, 'B');
             $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_col);
             $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, 'PENGELUARAN');
             $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_col);
-                for ($j=2; $j <= $st ; $j++) { 
+                for ($j=2; $j <= $st ; $j++) {
                     $huruf_ = $this->m_master->HurufColExcelNumber($j);
                     $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
                     $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
@@ -4229,13 +4232,13 @@ class C_save_to_excel extends CI_Controller
                 $ALL_TotBudget_vertical_ac_tot= 0;
                 $ALL_TotBudget_vertical_anggaran= 0;
                 $ALL_PostName = [];
-                for ($i=0; $i < count($dt); $i++) { 
+                for ($i=0; $i < count($dt); $i++) {
                     $PostName = $dt[$i]['PostName'];
                     $ALL_PostName[] = $PostName;
                     $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, $PostName);
                     $excel->getActiveSheet()->mergeCells('A'.$n.':'.'B'.$n);
                     $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
-                    for ($j=2; $j <= $st ; $j++) { 
+                    for ($j=2; $j <= $st ; $j++) {
                         $huruf_ = $this->m_master->HurufColExcelNumber($j);
                         $excel->setActiveSheetIndex(0)->setCellValue($huruf_.$n, '');
                         $excel->getActiveSheet()->getStyle($huruf_.$n)->applyFromArray($style_row);
@@ -4249,7 +4252,7 @@ class C_save_to_excel extends CI_Controller
                         $TotBudget_vertical_ac = array();
                         $TotBudget_vertical_ac_tot= 0;
                         $TotBudget_vertical_anggaran= 0;
-                        for ($j=0; $j <count($arr_head_account) ; $j++) { 
+                        for ($j=0; $j <count($arr_head_account) ; $j++) {
                             $excel->setActiveSheetIndex(0)->setCellValue('A'.$n, ($j+1));
                             $excel->getActiveSheet()->getStyle('A'.$n)->applyFromArray($style_row);
                             $excel->setActiveSheetIndex(0)->setCellValue('B'.$n, $arr_head_account[$j]['NameHeadAccount']);
@@ -4262,7 +4265,7 @@ class C_save_to_excel extends CI_Controller
                             }
                             else
                             {
-                                $arr_code_ha[] = $arr_head_account[$j]['CodeHeadAccount']; 
+                                $arr_code_ha[] = $arr_head_account[$j]['CodeHeadAccount'];
                             }
 
                             // if (count($Merger) == 0) {
@@ -4270,11 +4273,11 @@ class C_save_to_excel extends CI_Controller
                             // }
                             $G_dt = $this->m_budgeting->SearchDt_perHeadAccount($arr_code_ha,$arr_bulan,$arr_Department_split,$Year);
                             // die();
-                            
+
                             // Loop Month
                              $arr_month_val = $G_dt['arr_month_val'];
                              $col_ = 2;
-                             for ($k=0; $k < count($arr_month_val); $k++) { 
+                             for ($k=0; $k < count($arr_month_val); $k++) {
                                  // Budget
                                      $huruf = $this->m_master->HurufColExcelNumber($col_);
                                      $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_month_val[$k]['value']);
@@ -4288,20 +4291,20 @@ class C_save_to_excel extends CI_Controller
                                      {
                                         $TotBudget_vertical_month[] = $arr_month_val[$k]['value'];
                                      }
-                                 // Realisasi 
+                                 // Realisasi
                                      $huruf = $this->m_master->HurufColExcelNumber($col_);
                                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                      $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                     $col_++; 
+                                     $col_++;
 
-                                // Variance 
+                                // Variance
                                     $huruf = $this->m_master->HurufColExcelNumber($col_);
                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                    $col_++;        
+                                    $col_++;
                              }
 
-                             // Total Realisasi 
+                             // Total Realisasi
                                  $huruf = $this->m_master->HurufColExcelNumber($col_);
                                  $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                  $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4310,7 +4313,7 @@ class C_save_to_excel extends CI_Controller
                              // Unit Prodi
                                 $arr_unit_ac_val = $G_dt['arr_unit_ac_val'];
                                 $TotalProdi = 0;
-                                for ($k=0; $k < count($arr_unit_ac_val); $k++) { 
+                                for ($k=0; $k < count($arr_unit_ac_val); $k++) {
                                    $huruf = $this->m_master->HurufColExcelNumber($col_);
                                    $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_unit_ac_val[$k]['SubTotal']);
                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4335,7 +4338,7 @@ class C_save_to_excel extends CI_Controller
                                     $TotBudget_vertical_ac_tot = $TotBudget_vertical_ac_tot + $TotalProdi;
 
                                 $arr_unit_nac_val = $G_dt['arr_unit_nac_val'];
-                                for ($k=0; $k < count($arr_unit_nac_val); $k++) { 
+                                for ($k=0; $k < count($arr_unit_nac_val); $k++) {
                                       $huruf = $this->m_master->HurufColExcelNumber($col_);
                                       $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $arr_unit_nac_val[$k]['SubTotal']);
                                       $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4356,7 +4359,7 @@ class C_save_to_excel extends CI_Controller
                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                     $TotBudget_vertical_anggaran = $TotBudget_vertical_anggaran + ($arr_head_account[$j]['total'] / 1000);
 
-                            $n++;          
+                            $n++;
 
                         }
 
@@ -4367,7 +4370,7 @@ class C_save_to_excel extends CI_Controller
                            $excel->getActiveSheet()->getStyle('B'.$n)->applyFromArray($style_row);
                            $col__ = 2;
                            for ($k=0; $k < count($TotBudget_vertical_month); $k++) {
-                              // Budget 
+                              // Budget
                                 $huruf = $this->m_master->HurufColExcelNumber($col__);
                                 $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_month[$k]);
                                 $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4381,26 +4384,26 @@ class C_save_to_excel extends CI_Controller
                                    $ALL_TotBudget_vertical_month[] = $TotBudget_vertical_month[$k];
                                 }
 
-                                 // Realisasi 
+                                 // Realisasi
                                      $huruf = $this->m_master->HurufColExcelNumber($col__);
                                      $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                      $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                     $col__++; 
+                                     $col__++;
 
-                                // Variance 
+                                // Variance
                                     $huruf = $this->m_master->HurufColExcelNumber($col__);
                                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                     $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
-                                    $col__++; 
+                                    $col__++;
                            }
 
-                           // Total Realisasi 
+                           // Total Realisasi
                                $huruf = $this->m_master->HurufColExcelNumber($col__);
                                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                $col__++;
 
-                               for ($k=0; $k < count($TotBudget_vertical_ac); $k++) { 
+                               for ($k=0; $k < count($TotBudget_vertical_ac); $k++) {
                                   $huruf = $this->m_master->HurufColExcelNumber($col__);
                                   $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_ac[$k]);
                                   $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4421,7 +4424,7 @@ class C_save_to_excel extends CI_Controller
                                $col__++;
                                $ALL_TotBudget_vertical_ac_tot = $ALL_TotBudget_vertical_ac_tot + $TotBudget_vertical_ac_tot;
 
-                               for ($k=0; $k < count($TotBudget_vertical_unit); $k++) { 
+                               for ($k=0; $k < count($TotBudget_vertical_unit); $k++) {
                                   $huruf = $this->m_master->HurufColExcelNumber($col__);
                                   $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $TotBudget_vertical_unit[$k]);
                                   $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
@@ -4442,7 +4445,7 @@ class C_save_to_excel extends CI_Controller
                                    $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
 
                                    $ALL_TotBudget_vertical_anggaran = $ALL_TotBudget_vertical_anggaran + $TotBudget_vertical_anggaran;
-                        $n++;            
+                        $n++;
                         // Total Budget Category
                             $col__ = 0;
                             $huruf = $this->m_master->HurufColExcelNumber($col__);
@@ -4451,28 +4454,28 @@ class C_save_to_excel extends CI_Controller
                             }
                             $col__++;
                             $hurufMerge = $this->m_master->HurufColExcelNumber($col__);
-                            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, 'Total '.$PostName);           
+                            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, 'Total '.$PostName);
                             $excel->getActiveSheet()->mergeCells($huruf.$n.':'.$hurufMerge.$n);
                             $excel->getActiveSheet()->getStyle($huruf.$n.':'.$hurufMerge.$n)->applyFromArray($style_col);
 
                             // Total Realisasi
-                                $col__++; 
+                                $col__++;
                                 $huruf = $this->m_master->HurufColExcelNumber($col__);
                                 $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                                 $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_row);
                                 $col__++;
 
-                                $huruf = $this->m_master->HurufColExcelNumber($col__); 
+                                $huruf = $this->m_master->HurufColExcelNumber($col__);
                                 for ($k=0; $k < count($arr_unit_ac_val); $k++) {
                                     $col__++;
                                 }
                                 $col__++;
 
-                                for ($k=0; $k < count($arr_unit_nac_val) - 1; $k++) { 
+                                for ($k=0; $k < count($arr_unit_nac_val) - 1; $k++) {
                                     $col__++;
                                 }
                                 $hurufMerge = $this->m_master->HurufColExcelNumber($col__);
-                                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n,'');           
+                                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n,'');
                                 $excel->getActiveSheet()->mergeCells($huruf.$n.':'.$hurufMerge.$n);
                                 $excel->getActiveSheet()->getStyle($huruf.$n.':'.$hurufMerge.$n)->applyFromArray($style_col);
 
@@ -4482,7 +4485,7 @@ class C_save_to_excel extends CI_Controller
                                 $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
 
                     $n++;
-                                
+
                 }
 
                 // ALL TOTAL
@@ -4492,32 +4495,32 @@ class C_save_to_excel extends CI_Controller
                     $excel->getActiveSheet()->getStyle('A'.$n.':'.'B'.$n)->applyFromArray($style_col);
                     $col__ = 2;
                     for ($k=0; $k < count($ALL_TotBudget_vertical_month); $k++) {
-                       // Budget 
+                       // Budget
                          $huruf = $this->m_master->HurufColExcelNumber($col__);
                          $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_month[$k]);
                          $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
                          $col__++;
 
-                          // Realisasi 
+                          // Realisasi
                               $huruf = $this->m_master->HurufColExcelNumber($col__);
                               $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                               $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
-                              $col__++; 
+                              $col__++;
 
-                         // Variance 
+                         // Variance
                              $huruf = $this->m_master->HurufColExcelNumber($col__);
                              $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                              $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
-                             $col__++; 
+                             $col__++;
                     }
 
-                    // Total Realisasi 
+                    // Total Realisasi
                         $huruf = $this->m_master->HurufColExcelNumber($col__);
                         $excel->setActiveSheetIndex(0)->setCellValue($huruf.$n, '-');
                         $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
                         $col__++;
 
-                        for ($k=0; $k < count($ALL_TotBudget_vertical_ac); $k++) { 
+                        for ($k=0; $k < count($ALL_TotBudget_vertical_ac); $k++) {
                            $huruf = $this->m_master->HurufColExcelNumber($col__);
                            $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_ac[$k]);
                            $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
@@ -4530,7 +4533,7 @@ class C_save_to_excel extends CI_Controller
                         $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
                         $col__++;
 
-                        for ($k=0; $k < count($ALL_TotBudget_vertical_unit); $k++) { 
+                        for ($k=0; $k < count($ALL_TotBudget_vertical_unit); $k++) {
                            $huruf = $this->m_master->HurufColExcelNumber($col__);
                            $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_unit[$k]);
                            $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
@@ -4543,16 +4546,16 @@ class C_save_to_excel extends CI_Controller
                             $excel->setActiveSheetIndex(0)->setCellValueExplicit($huruf.$n, $ALL_TotBudget_vertical_anggaran);
                             $excel->getActiveSheet()->getStyle($huruf.$n)->applyFromArray($style_col);
 
-        
+
         // footer signatures
             $St_line_end= $col__;
             $arr_col = array();
                 $__function_col= function($St_line_end){
-                    $arr = array(); 
+                    $arr = array();
                     $splitBagi =3;
                     $split = $St_line_end / $splitBagi;
                     $split = (int) $split;
-                    for ($i=1; $i <= $splitBagi; $i++) { 
+                    for ($i=1; $i <= $splitBagi; $i++) {
                         $s = $i * $split;
                         if ($s > $St_line_end) {
                            $rs = $split - ($s - $St_line_end);
@@ -4564,7 +4567,7 @@ class C_save_to_excel extends CI_Controller
 
                         $arr[] = $rs;
                     }
-                    
+
                     // join array
                         $arr[0] = $arr[0]+$arr[1];
                         $arr[1] = $arr[2] / 2;
@@ -4706,7 +4709,7 @@ class C_save_to_excel extends CI_Controller
             $huruf_ = $this->m_master->HurufColExcelNumber($col__);
             $excel->getActiveSheet()->getStyle($huruf.$n.':'.$huruf_.$n)->applyFromArray($thick);
 
-        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);             
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
         // die();
         // Set judul file excel nya
         $excel->getActiveSheet()->setTitle('Report-Anggaran '.$wrYear);
@@ -4728,7 +4731,7 @@ class C_save_to_excel extends CI_Controller
         $sheet = $objPHPExcel->getActiveSheet();
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load('./uploads/budgeting/supplier/m_supplier.xlsx'); // Empty Sheet
-        $excel = $excel2->createSheet(1); 
+        $excel = $excel2->createSheet(1);
         $excel->setTitle('CategorySupplier');
         $excel2->setActiveSheetIndex(1);
 
@@ -4751,20 +4754,20 @@ class C_save_to_excel extends CI_Controller
         $G_header = $this->m_master->getColumnTable('db_purchasing.m_categorysupplier');
         $col = 0;
         for ($i=0; $i < count($G_header['field']); $i++) {
-           $huruf = $this->m_master->HurufColExcelNumber($col); 
+           $huruf = $this->m_master->HurufColExcelNumber($col);
            $excel3->setCellValue($huruf.'1', $G_header['field'][$i]);
            $col++;
         }
 
         $G_data = $this->m_master->showData_array('db_purchasing.m_categorysupplier');
         $row = 2;
-        for ($i=0; $i < count($G_data); $i++) { 
+        for ($i=0; $i < count($G_data); $i++) {
             $dt = $G_data[$i];
             $col = 0;
             foreach ($dt as $key => $value) {
                 $huruf = $this->m_master->HurufColExcelNumber($col);
                 $excel3->setCellValue($huruf.$row, $value);
-                $col++; 
+                $col++;
             }
             $row++;
         }
@@ -4778,7 +4781,7 @@ class C_save_to_excel extends CI_Controller
         $excel3 = $excel2->getActiveSheet();
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
+        // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
         header('Content-Disposition: attachment; filename=supplier.xlsx'); // jalan ketika tidak menggunakan ajax
@@ -4793,7 +4796,7 @@ class C_save_to_excel extends CI_Controller
         $sheet = $objPHPExcel->getActiveSheet();
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load('./uploads/budgeting/catalog/m_catalog.xlsx'); // Empty Sheet
-        $excel = $excel2->createSheet(1); 
+        $excel = $excel2->createSheet(1);
         // $excel->setTitle('CategorySupplier');
         $excel2->setActiveSheetIndex(1);
         $excel3 = $excel2->getActiveSheet();
@@ -4813,16 +4816,16 @@ class C_save_to_excel extends CI_Controller
 
         // get All Department
          $r = 2;
-        $excel3->setCellValue('B'.$r, 'ID');    
-        $excel3->setCellValue('C'.$r, 'Name');    
-        $excel3->setCellValue('D'.$r, 'Code');  
+        $excel3->setCellValue('B'.$r, 'ID');
+        $excel3->setCellValue('C'.$r, 'Name');
+        $excel3->setCellValue('D'.$r, 'Code');
 
         $arr_Department = $this->m_master->apiservertoserver(base_url().'api/__getAllDepartementPU');
         $r = 3;
-        for ($i=0; $i < count($arr_Department); $i++) { 
-            $excel3->setCellValue('B'.$r, $arr_Department[$i]['Code']);    
-            $excel3->setCellValue('C'.$r, $arr_Department[$i]['Name2']);    
-            $excel3->setCellValue('D'.$r, $arr_Department[$i]['Abbr']);    
+        for ($i=0; $i < count($arr_Department); $i++) {
+            $excel3->setCellValue('B'.$r, $arr_Department[$i]['Code']);
+            $excel3->setCellValue('C'.$r, $arr_Department[$i]['Name2']);
+            $excel3->setCellValue('D'.$r, $arr_Department[$i]['Abbr']);
             $r++;
         }
 
@@ -4830,20 +4833,20 @@ class C_save_to_excel extends CI_Controller
         $r+= 3;
         $col = 1;
         for ($i=0; $i < count($G_header['field']); $i++) {
-           $huruf = $this->m_master->HurufColExcelNumber($col); 
+           $huruf = $this->m_master->HurufColExcelNumber($col);
            $excel3->setCellValue($huruf.$r, $G_header['field'][$i]);
            $col++;
         }
 
         $G_data = $this->m_master->showData_array('db_purchasing.m_category_catalog');
         $row = $r+1;
-        for ($i=0; $i < count($G_data); $i++) { 
+        for ($i=0; $i < count($G_data); $i++) {
             $dt = $G_data[$i];
             $col = 1;
             foreach ($dt as $key => $value) {
                 $huruf = $this->m_master->HurufColExcelNumber($col);
                 $excel3->setCellValue($huruf.$row, $value);
-                $col++; 
+                $col++;
             }
             $row++;
         }
@@ -4857,7 +4860,7 @@ class C_save_to_excel extends CI_Controller
         $excel3 = $excel2->getActiveSheet();
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
-        // We'll be outputting an excel file  
+        // We'll be outputting an excel file
         header('Content-type: application/vnd.ms-excel'); // jalan ketika tidak menggunakan ajax
         // It will be called file.xlss
         header('Content-Disposition: attachment; filename=catalog.xlsx'); // jalan ketika tidak menggunakan ajax

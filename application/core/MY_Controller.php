@@ -549,6 +549,15 @@ abstract class Purchasing_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('master/m_master');
+
+        // add session department budgeting
+        $PositionMain = $this->session->userdata('PositionMain');
+        $this->session->set_userdata('IDDepartement',$PositionMain['IDDivision']);
+        $this->data['IDdepartment'] = $PositionMain['IDDivision'];
+        // adding menu department
+        $IDDepartementPUBudget= ($PositionMain['IDDivision']== 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$PositionMain['IDDivision']; 
+        $this->session->set_userdata('IDDepartementPUBudget',$IDDepartementPUBudget);
+
         // $this->load->model('budgeting/m_budgeting');
         // check user auth
         if (!$this->session->userdata('purchasing_sess')) {

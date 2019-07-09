@@ -5,15 +5,18 @@
     }
 
     .Custom-PostBudget{
-        width: 9.333% !important;
-    }
-
-    .Custom-Freq{
+         /*width: 9.333% !important;*/
         width: 10.333% !important;
     }
 
+    .Custom-Freq{
+        /*width: 10.333% !important;*/
+        width: 7.333% !important;
+    }
+
     .Custom-Total{
-        width: 13.666666666666664% !important;
+        /*width: 13.666666666666664% !important;*/
+        width: 8.666666666666664% !important;
     }
 
     .Custom-select2 {
@@ -21,7 +24,10 @@
     }
 
     .CustomSubtotalFooter {
-        margin-left: 28%; !important;
+        /*margin-left: 28%; !important;*/
+        margin-left: 26%; !important;
+        /* adding */
+        width: 64%;
     }
 
     /* Custom for Report Anggaran*/
@@ -53,6 +59,10 @@
     /*#TblBudgetAllocation table {
         width:400px;
     }*/
+
+    /*
+        note col-md-7 64% di form_entry_budgeting adalah custom
+    */
 </style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menuEBudget">
@@ -85,6 +95,7 @@
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
             <div class="panel panel-primary">
+            <!-- <div class="panel panel-primary" style="min-width: 1600px;overflow: auto;"> -->
                 <div class="panel-heading clearfix">
                     <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Budget</h4>
                 </div>
@@ -131,6 +142,13 @@
             var response = jQuery.parseJSON(resultJson);
             var html = response.html;
             var jsonPass = response.jsonPass;
+            if (page=='EntryBudget') {
+                $('.panel-primary').attr('style','min-width: 1600px;overflow: auto;');
+            }
+            else
+            {
+                $('.panel-primary').attr('style','');
+            }
             setTimeout(function () {
                 $("#pageContent").empty();
                 $("#pageContent").html(html);
