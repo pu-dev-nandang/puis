@@ -44,8 +44,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Gender (Required)</label>
+                    <select class="form-control" id="formGender">
+                        <option value="L">Male</option>
+                        <option value="P">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label>Phone (Required)</label>
                     <input class="form-control" id="formPhone">
+                </div>
+
+                <div class="form-group">
+                    <label>Position</label>
+                    <input class="form-control" id="formPosition">
                 </div>
 
                 <div class="form-group">
@@ -149,10 +162,13 @@
 
         var filterSchool = $('#filterSchool').val();
         var formName = $('#formName').val();
+        var formGender = $('#formGender').val();
         var formPhone = $('#formPhone').val();
         var formEmail = $('#formEmail').val();
+        var formPosition = $('#formPosition').val();
 
         if(filterDistrict!='' && filterDistrict!=null &&
+            formGender!='' && formGender!=null &&
             filterSchool!='' && filterSchool!=null &&
             formName!='' && formName!=null &&
         formPhone!='' && formPhone!=null){
@@ -168,6 +184,8 @@
                     Name : formName,
                     Phone : formPhone,
                     Email : formEmail,
+                    Gender : formGender,
+                    Position : formPosition,
                     CreatedBy : sessionNIP
                 }
             };
@@ -317,7 +335,7 @@
                     var email = (v.Email!='' && v.Email!=null)
                         ? '<li><i class="fa fa-envelope"></i> '+v.Email+'</li>' : '';
                     $('#listContactView').append('<tr><td>' +
-                        '                            <h4>'+v.Name+'</h4>' +
+                        '                            <h4>'+v.Name+' | '+v.Position+'</h4>' +
                         '                            <div class="detailContact">' +
                         '                                <ul>' +
                         '                                    <li><i class="fa fa-building"></i> '+v.SchoolName+'</li>' +
@@ -386,6 +404,9 @@
         $('#formName').val(d.Name);
         $('#formPhone').val(d.Phone);
         $('#formEmail').val(d.Email);
+
+        $('#formGender').val(d.Gender);
+        $('#formPosition').val(d.Position);
 
     });
 

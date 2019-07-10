@@ -352,7 +352,7 @@
                 '       <div class="row">' +
                 '           <div class="col-xs-5">' +
                 '               <div class="form-group">' +
-                '                   <label>Gender <span class="required">*</span></label>' +
+                '                   <label>Gender</label>' +
                 '                   <select class="form-control" id="formGender">' +
                 '                       <option value="Male">Male</option>' +
                 '                       <option value="Female">Female</option>' +
@@ -361,14 +361,14 @@
                 '           </div>' +
                 '           <div class="col-xs-7">' +
                 '               <div class="form-group">' +
-                '                   <label>Phone <span class="required">*</span></label>' +
+                '                   <label>Phone</label>' +
                 '                   <input type="number" data-form="phone" value="'+ifNullChecking(d_v.Phone)+'" id="formPhone" class="form-control"/>' +
                 '               </div>' +
                 '           </div>' +
                 '       </div>' +
 
                 '        <div class="form-group">' +
-                '            <label>Email <span class="required">*</span></label>' +
+                '            <label>Email</label>' +
                 '            <input type="email" value="'+ifNullChecking(d_v.Email)+'" id="formEmail" class="form-control"/>' +
                 '        </div>' +
                 '       <div class="row">' +
@@ -408,15 +408,15 @@
                 '       </div>' +
                 '' +
                 '        <div class="form-group">' +
-                '            <label>Place Of Birth <span class="required">*</span></label>' +
+                '            <label>Place Of Birth</label>' +
                 '            <input type="text" value="'+ifNullChecking(d_v.PlaceOfBirth)+'" id="formPlaceOfBirth" class="form-control"/>' +
                 '        </div>' +
                 '        <div class="form-group">' +
-                '            <label>Date Of Birth <span class="required">*</span></label>' +
+                '            <label>Date Of Birth</label>' +
                 '            <input type="text" value="" id="formDateOfBirth" readonly class="form-control"/>' +
                 '        </div>' +
                 '        <div class="form-group">' +
-                '            <label>Address <span class="required">*</span></label>' +
+                '            <label>Address</label>' +
                     '            <textarea class="form-control" id="formAddress" rows="3">'+ifNullChecking(d_v.Address)+'</textarea>' +
                 '        </div>' +
                 '        <div class="form-group" id="divFormUpload">' +
@@ -607,11 +607,8 @@
         var formName = $('#formName').val();
         checkFormRequired('#formName',formName);
         var formGender = $('#formGender').val();
-        checkFormRequired('#formGender',formGender);
         var formPhone = $('#formPhone').val();
-        checkFormRequired('#formPhone',formPhone);
         var formEmail = $('#formEmail').val();
-        checkFormRequired('#formEmail',formEmail);
         var formLineID = $('#formLineID').val();
         var formInstagram = $('#formInstagram').val();
         var formClass = $('#formClass').val();
@@ -619,11 +616,8 @@
         var formPathwayID = $('#formPathwayID').val();
         checkFormRequired('#formPathwayID',formPathwayID);
         var formPlaceOfBirth = $('#formPlaceOfBirth').val();
-        checkFormRequired('#formPlaceOfBirth',formPlaceOfBirth);
         var formDateOfBirth = $('#formDateOfBirth').datepicker("getDate");
-        checkFormRequired('#formDateOfBirth',formDateOfBirth);
         var formAddress = $('#formAddress').val();
-        checkFormRequired('#formAddress',formAddress);
         var formFatherName = $('#formFatherName').val();
         var formFatherEduLevel = $('#formFatherEduLevel').val();
         var formFatherJob = $('#formFatherJob').val();
@@ -645,14 +639,8 @@
 
 
         if(formName!='' && formName!=null &&
-            formGender!='' && formGender!=null &&
-            formPhone!='' && formPhone!=null &&
-            formEmail!='' && formEmail!=null &&
             formClass!='' && formClass!=null &&
-            formPathwayID!='' && formPathwayID!=null &&
-            formPlaceOfBirth!='' && formPlaceOfBirth!=null &&
-            formDateOfBirth!='' && formDateOfBirth!=null &&
-            formAddress!='' && formAddress!=null){
+            formPathwayID!='' && formPathwayID!=null){
 
             loading_button('#btnSaveFullPS');
             var data = {
