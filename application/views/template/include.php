@@ -988,8 +988,9 @@
                         ? 'selected' : '';
 
                     var dsc = (v.Status=='1') ? 'disabled' : '';
+                    var clsHide = (v.Status=='1') ? 'hide' : '';
 
-                    $(element).append('<option value="'+v.ID+'" '+sc+' '+dsc+'>'+v.Description+'</option>');
+                    $(element).append('<option class="'+clsHide+'" value="'+v.ID+'" '+sc+' '+dsc+'>'+v.Description+'</option>');
 
                 });
             }

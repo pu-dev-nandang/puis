@@ -497,7 +497,7 @@
             $('#GlobalModalLarge .modal-body').html(body);
 
             var StatusMart = (d_v.Status!='' && d_v.Status!=null) ? d_v.Status : '';
-            if(parseInt(StatusMart)!=7 && parseInt(StatusMart)!=8){
+            if(parseInt(StatusMart)!=7 && parseInt(StatusMart)!=8 && parseInt(StatusMart)!=9){
                 loadSelectOptionStatusMarketing('#formStatusPS',StatusMart);
             } else {
                 $('#viewStatus').html('<label class="'+d_v.StatusClass+'">'+d_v.StatusDesc+'</label>');
@@ -537,7 +537,6 @@
             $('#formGender').val(ifNullChecking(d_v.Gender));
 
             if(d_v.CityID!=null && d_v.CityID!=''){
-                console.log('masuk pak');
                 $('#filterDistrict').select2('val',d_v.CityID);
                 getSchoolList(d_v.SchoolID);
             }
