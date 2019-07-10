@@ -22,12 +22,13 @@ class M_budgeting extends CI_Model {
                 on d.G_user = x.cfg_group_user
                 join db_budgeting.cfg_sub_menu as c
                 on x.ID_cfg_sub_menu = c.ID
-                join (select * from db_budgeting.cfg_menu where IDDepartement = ?
+                join (select * from db_budgeting.cfg_menu where IDDepartement = "'.$MenuDepartement.'"
                 UNION
                 select * from db_budgeting.cfg_menu where IDDepartement = "0"
-                ) as b
-                where a.NIP = ? GROUP by b.id order by b.Sort asc';
-        $query=$this->db->query($sql, array($MenuDepartement,$NIP))->result_array();
+                ) as b on c.ID_menu = b.ID
+                where a.NIP = "'.$NIP.'" GROUP by b.id order by b.Sort asc';
+                // print_r($sql);die();
+        $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
 

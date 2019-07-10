@@ -420,6 +420,11 @@ abstract class Budgeting_Controler extends Globalclass{
         $this->load->model('budgeting/m_budgeting');
         $this->load->model('budgeting/m_pr_po');
         $this->load->model('master/m_master');
+
+        $this->session->unset_userdata('auth_budgeting_sess');
+        $this->session->unset_userdata('menu_budgeting_sess');
+        $this->session->unset_userdata('menu_budgeting_grouping');
+        
         $PositionMain = $this->session->userdata('PositionMain');
         $DivisionPage = $PositionMain['Division'];
         $IDPosition = $PositionMain['IDPosition'];
