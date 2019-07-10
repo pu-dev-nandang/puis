@@ -1671,6 +1671,35 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function show_info_spb()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $rs = array();
+                $Code = $dataToken['Code'];
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.spb_circulation_sheet as a 
+                        join db_employees.employees as b on a.By = b.NIP
+                        where a.Code = ?
+                        ';
+                $query=$this->db->query($sql, array($Code))->result_array();
+                $rs['spb_circulation_sheet'] = $query;
+                echo json_encode($rs);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
     public function reject_pr_from_another()
     {
         $msg = '';

@@ -475,7 +475,7 @@
 				    break;    
 		}
 
-		$('#page_status').html('<div style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet">Info</a></div></div>');
+		$('#page_status').html('<div style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+dtspb[0]['Code']+'">Info</a></div></div>');
 
 	}
 
@@ -1002,6 +1002,7 @@
 		if (confirm('Are you sure ?')) {
 			loading_button('#Approve');
 			var Code = ClassDt.Code;
+			var Code_po_create = ClassDt.Code_po_create;
 			var approval_number = $(this).attr('approval_number');
 			// var url = base_url_js + 'rest2/__approve_po';
 			var url = base_url_js + 'rest2/__approve_spb';
@@ -1065,6 +1066,7 @@
 	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
 		if (confirm('Are you sure ?')) {
 			var Code = ClassDt.Code;
+			var Code_po_create = ClassDt.Code_po_create;
 			var approval_number = $(this).attr('approval_number');
 			// show modal insert reason
 			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
@@ -1150,5 +1152,106 @@
 			})	
 		}
 
+	})
+
+	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
+	    var url = base_url_js+'rest2/__show_info_spb';
+	    var Code = $(this).attr('code');
+   		var data = {
+   		    Code : Code,
+   		    auth : 's3Cr3T-G4N',
+   		};
+   		var token = jwt_encode(data,"UAP)(*");
+   		$.post(url,{ token:token },function (data_json) {
+   			var html = '<div class = "row"><div class="col-md-12"><div class="well">';
+   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<caption><h4>Circulation Sheet</h4></caption>'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">Date</th>'+
+                              '<th style="width: 55px;">By</th>';
+		        html += '</tr>' ;
+		        html += '</thead>' ;
+		        html += '<tbody>' ;
+		        html += '</tbody>' ;
+		        html += '</table></div></div></div>' ;
+
+   			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+   			    '';
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info SPB Code : '+Code+'</h4>');
+   			$('#GlobalModalLarge .modal-body').html(html);
+   			$('#GlobalModalLarge .modal-footer').html(footer);
+   			$('#GlobalModalLarge').modal({
+   			    'show' : true,
+   			    'backdrop' : 'static'
+   			});
+
+   			// make datatable
+   				var table = $('#TblModal').DataTable({
+   				      "data" : data_json['spb_circulation_sheet'],
+   				      'columnDefs': [
+   					      {
+   					         'targets': 0,
+   					         'searchable': false,
+   					         'orderable': false,
+   					         'className': 'dt-body-center',
+   					         'render': function (data, type, full, meta){
+   					             return '';
+   					         }
+   					      },
+   					      {
+   					         'targets': 1,
+   					         'render': function (data, type, full, meta){
+   					             return full.Desc;
+   					         }
+   					      },
+   					      {
+   					         'targets': 2,
+   					         'render': function (data, type, full, meta){
+   					             return full.Date;
+   					         }
+   					      },
+   					      {
+   					         'targets': 3,
+   					         'render': function (data, type, full, meta){
+   					             return full.Name;
+   					         }
+   					      },
+   				      ],
+   				      'createdRow': function( row, data, dataIndex ) {
+   				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   				      	
+   				      },
+   				});
+
+   				table.on( 'order.dt search.dt', function () {
+   				        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   				            cell.innerHTML = i+1;
+   				        } );
+   				} ).draw();
+
+   		});
+	})
+
+	$(document).off('click', '.print_page').on('click', '.print_page',function(e) {
+		var dt_arr = ClassDt.Dataselected2;
+		var dtspb = dt_arr.dtspb;
+		var ID_spb_created = dtspb[0]['ID'];
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+
+		var url = base_url_js+'save2pdf/print/pre_pembayaran';
+		var data = {
+		  ID_spb_created : ID_spb_created,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
 	})
 </script>

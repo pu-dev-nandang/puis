@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_spb extends Budgeting_Controler {
+class C_spb extends Budgeting_Controler { // SPB / Bank Advance 
     public $Msg = array(
             'Duplicate' => 'The data duplicate, Please check',
             'NotAction' => 'The data has been used for transaction, Cannot be action',
@@ -174,6 +174,7 @@ class C_spb extends Budgeting_Controler {
             $dataSave['JsonStatus'] = json_encode($JsonStatus);
             $dataSave['CreatedBy'] = $this->session->userdata('NIP');
             $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
+            $dataSave['Type'] = 'Spb';
             $this->db->insert('db_purchasing.spb_created',$dataSave);
 
             // insert to spb_circulation_sheet
@@ -274,6 +275,7 @@ class C_spb extends Budgeting_Controler {
 
                 $dataSave['JsonStatus'] = json_encode($JsonStatus);
                 $dataSave['Status'] = 1;
+                $dataSave['Type'] = 'Spb';
                 $this->db->where('ID',$ID_spb_created);
                 $this->db->update('db_purchasing.spb_created',$dataSave);
 
