@@ -392,16 +392,17 @@
 		var ev = se_content.closest('.FormPage');
 		var ID_spb_created = ev.attr('id_spb_created');
 		var dt_arr = __getRsViewGRPO_SPB(ID_spb_created);
-		console.log(dt_arr);
 		var dtspb = dt_arr.dtspb;
 		var data = ClassDt.Dataselected;
 		
 		// hitung Left PO
 		var InvoiceleftPO = parseInt(InvoicePO);
+		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_spb_created == data.dtspb[i].ID && i > 0) {
 				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+					c++;
 				}
 				else
 				{
@@ -411,7 +412,7 @@
 			}
 		}
 		// Fill Type Pembayaran
-		var TypeInvoice = 'Pembayaran ' + (parseInt(i)+1);
+		var TypeInvoice = 'Pembayaran ' + (parseInt(c)+1);
 		// update all null to be ''
 		for (var i = 0; i < dtspb.length; i++) {
 			var arr = dtspb[i];
@@ -443,7 +444,7 @@
 			if (dtspb[0]['Status'] == 2) {
 				btnSPb = '<button class="btn btn-default print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 			}
-			else if(dtspb[0]['Status'] == 0 || dtspb[0]['Status'] == 1)
+			else if(dtspb[0]['Status'] == 0 || dtspb[0]['Status'] == 1 || dtspb[0]['Status'] == -1)
 			{
 				btnSPb = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
 						'<button class="btn btn-primary btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
@@ -459,11 +460,11 @@
 			// Invoice = Invoice.substring(0, n);
 
 			// Fill Type Pembayaran
-			var TypeInvoice = 'Pembayaran ' + (parseInt(i));
+			var TypeInvoice = dtspb[0]['TypeInvoice'];
 		}
 		
 		var html = '';
-		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
+		html += '<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 					'<table class="table borderless" style="font-weight: bold;">'+
 					'<thead></thead>'+
@@ -673,6 +674,7 @@
 					se_content.find('button').not('.print_page').remove();
 				}
 				makeSignaturesSPB(se_content,JsonStatus);
+				makepage_status(dt_arr,se_content);
 			}
 			else
 			{
@@ -681,6 +683,37 @@
 				});
 			}
 		// end action
+
+	}
+
+	function makepage_status(Dataselected2,se_content)
+	{
+		var dtspb = Dataselected2.dtspb;
+		var StatusName = '';
+		switch(dtspb[0]['Status']) {
+				  case 0:
+				  case '0':
+				  	StatusName = 'Draft';
+				    break;
+				  case 1:
+				  case '1':
+				  	StatusName = 'Issued & Approval Process';
+				    break;
+				  case 2:
+				  case '2':
+				  	StatusName = 'Approval Done';
+				    break;
+				  case -1:
+				  case '-1':
+				  	StatusName = 'Reject';
+				    break;       
+				  case 4:
+				  case '4':
+				  	StatusName = 'Cancel';
+				    break;    
+		}
+
+		se_content.find('.page_status').html('<div style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+dtspb[0]['Code']+'">Info</a></div></div>');
 
 	}
 
@@ -776,11 +809,14 @@
 
 		var data = ClassDt.Dataselected;
 		var dtspb = data.dtspb;
+		var TypeInvoice = 'Pembayaran 1';
 		if (dtspb.length > 0) {
 			var InvoiceleftPO = parseInt(InvoicePO);
+			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
 				if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+					c++;
 				}
 				else
 				{
@@ -789,6 +825,7 @@
 			}
 
 			InvoiceleftPO = (parseFloat(InvoiceleftPO)).toFixed(2);
+			var TypeInvoice = 'Pembayaran ' + (parseInt(c)+1);
 		}
 
 		var html = '';
@@ -929,7 +966,7 @@
 							'</tr>'+
 							'<tr>'+
 								'<td class="TD1">'+
-									'<label class="TypePembayaran" type = "Pembayaran '+( parseInt(data.dtspb.length)+1 )+'"><b>Pembayaran '+( parseInt(data.dtspb.length)+1 )+'</b></label>'+
+									'<label class="TypePembayaran" type = "'+TypeInvoice+'"><b>'+TypeInvoice+'</b></label>'+
 								'</td>'+
 								'<td class="TD2">'+
 									'='+
@@ -1901,6 +1938,106 @@
 			}
 			// console.log(data);
 		})
+	})
+
+	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
+	    var url = base_url_js+'rest2/__show_info_spb';
+	    var Code = $(this).attr('code');
+   		var data = {
+   		    Code : Code,
+   		    auth : 's3Cr3T-G4N',
+   		};
+   		var token = jwt_encode(data,"UAP)(*");
+   		$.post(url,{ token:token },function (data_json) {
+   			var html = '<div class = "row"><div class="col-md-12"><div class="well">';
+   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<caption><h4>Circulation Sheet</h4></caption>'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">Date</th>'+
+                              '<th style="width: 55px;">By</th>';
+		        html += '</tr>' ;
+		        html += '</thead>' ;
+		        html += '<tbody>' ;
+		        html += '</tbody>' ;
+		        html += '</table></div></div></div>' ;
+
+   			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+   			    '';
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info SPB Code : '+Code+'</h4>');
+   			$('#GlobalModalLarge .modal-body').html(html);
+   			$('#GlobalModalLarge .modal-footer').html(footer);
+   			$('#GlobalModalLarge').modal({
+   			    'show' : true,
+   			    'backdrop' : 'static'
+   			});
+
+   			// make datatable
+   				var table = $('#TblModal').DataTable({
+   				      "data" : data_json['spb_circulation_sheet'],
+   				      'columnDefs': [
+   					      {
+   					         'targets': 0,
+   					         'searchable': false,
+   					         'orderable': false,
+   					         'className': 'dt-body-center',
+   					         'render': function (data, type, full, meta){
+   					             return '';
+   					         }
+   					      },
+   					      {
+   					         'targets': 1,
+   					         'render': function (data, type, full, meta){
+   					             return full.Desc;
+   					         }
+   					      },
+   					      {
+   					         'targets': 2,
+   					         'render': function (data, type, full, meta){
+   					             return full.Date;
+   					         }
+   					      },
+   					      {
+   					         'targets': 3,
+   					         'render': function (data, type, full, meta){
+   					             return full.Name;
+   					         }
+   					      },
+   				      ],
+   				      'createdRow': function( row, data, dataIndex ) {
+   				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   				      	
+   				      },
+   				});
+
+   				table.on( 'order.dt search.dt', function () {
+   				        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   				            cell.innerHTML = i+1;
+   				        } );
+   				} ).draw();
+
+   		});
+	})
+	
+	$(document).off('click', '.print_page').on('click', '.print_page',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var ID_spb_created = ev.attr('id_spb_created');
+		var dt_arr = __getRsViewGRPO_SPB(ID_spb_created);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+		var url = base_url_js+'save2pdf/print/pre_pembayaran';
+		var data = {
+		  ID_spb_created : ID_spb_created,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
 	})
 	
 </script>
