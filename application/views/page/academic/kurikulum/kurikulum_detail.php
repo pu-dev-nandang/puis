@@ -46,8 +46,11 @@
                     LoadDetailMK(data_json.MataKuliah);
                 } else {
                     $('#DataMataKuliah').html('--- Mata Kuliah Belum Ditambahkan ---');
+                    loading_modal_hide();
                 }
                 loadSemesterAdd();
+            } else {
+                loading_modal_hide();
             }
 
 
