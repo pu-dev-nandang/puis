@@ -4332,8 +4332,6 @@ class C_api2 extends CI_Controller {
 
         $btnedit = $this->input->get('btnedit');
 
-        $whereP = '' ;
-
         $orderBy = '';
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
@@ -4344,9 +4342,9 @@ class C_api2 extends CI_Controller {
 
         if($btnedit=='0'){
             // Get ID team
-            $dataIDteam = $this->db->select('CRMTeamID')->get_where('db_admission.crm_team_member',array(
-                'NIP' => $this->session->userdata('NIP')
-            ))->result_array();
+            $dataIDteam = $this->db->query('SELECT ctm.* FROM db_admission.crm_team_member ctm 
+                                                              LEFT JOIN db_admission.crm_team ct WHERE ct.PeriodeID = "'.$PeriodID.'" 
+                                                              AND ctm.NIP = "'.$this->session->userdata('NIP').'" ')->result_array();
 
             $CRMTeamID = $dataIDteam[0]['CRMTeamID'];
         }
@@ -4359,8 +4357,9 @@ class C_api2 extends CI_Controller {
                                                 LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
                                                 WHERE c.PeriodID = "'.$PeriodID.'" '.$btnNIP.'  '.$dataSearch.' '.$orderBy;
 
-        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
 
         $dataTable = $this->db->query($sql)->result_array();

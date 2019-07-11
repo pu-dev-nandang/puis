@@ -1,3 +1,14 @@
+<style>
+    ul > li {
+        display: inline-block;
+        /* You can also add some margins here to make it look prettier */
+        zoom:1;
+        *display:inline;
+        /* this fix is needed for IE7- */
+    }
+</style>
+
+
 <div class="well">
 
 
@@ -31,6 +42,7 @@
                     <th>Menu</th>
                 </tr>
                 </thead>
+                <tbody id="listTeamSetting"></tbody>
             </table>
         </div>
     </div>
@@ -44,6 +56,8 @@
         loadSelectOptionMenuAgregator('#formMenu','');
 
         $('#formMember,#formMenu').select2({allowClear: true});
+
+        loadSetting();
 
     });
 
@@ -63,8 +77,8 @@
                 ID : formID,
                 dataForm : {
                     Name : formName,
-                    Menu : formMenu
-                }
+                    Menu : JSON.stringify(formMenu)
+                },
                 Member : formMember
             };
 
@@ -78,9 +92,46 @@
 
         }
 
-
-
-
     });
+
+    function loadSetting() {
+
+        var data = {
+            action : 'readTeamAggr'
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api3/__crudTeamAgregagor';
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#listTeamSetting').empty();
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var Member = '';
+                    if(v.Member.length>0){
+                        $.each(v.Member,function (i2,v2) {
+                            Member = Member +', '+v2.Name;
+                        });
+                    }
+
+                    var Menu = '';
+                    if(v.DetailMenu.length>0){
+                        $.each(v.DetailMenu,function (i2,v2) {
+                            Menu = Menu+'<li>'+v2.Name+'</li>'
+                        });
+                    }
+
+                    $('#listTeamSetting').append('<tr>' +
+                        '<td>'+(i+1)+'</td>' +
+                        '<td><b>'+v.Name+'</b><div>'+Member+'</div></td>' +
+                        '<td><ul>'+Menu+'</ul></td>' +
+                        '</tr>')
+                });
+            }
+
+        });
+
+    }
 
 </script>
