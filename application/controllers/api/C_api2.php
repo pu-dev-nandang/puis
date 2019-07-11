@@ -4343,7 +4343,8 @@ class C_api2 extends CI_Controller {
         if($btnedit=='0'){
             // Get ID team
             $dataIDteam = $this->db->query('SELECT ctm.* FROM db_admission.crm_team_member ctm 
-                                                              LEFT JOIN db_admission.crm_team ct WHERE ct.PeriodeID = "'.$PeriodID.'" 
+                                                              LEFT JOIN db_admission.crm_team ct ON (ct.ID = ctm.CRMTeamID) 
+                                                              WHERE ct.PeriodID = "'.$PeriodID.'" 
                                                               AND ctm.NIP = "'.$this->session->userdata('NIP').'" ')->result_array();
 
             $CRMTeamID = $dataIDteam[0]['CRMTeamID'];
