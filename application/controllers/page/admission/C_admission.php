@@ -2179,7 +2179,8 @@ class C_admission extends Admission_Controler {
           # code...
           break;
       }
-      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadInputPenjualanoffline',$this->data,true);
+//      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadInputPenjualanoffline',$this->data,true);
+      $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/LoadInputPenjualanoffline2',$this->data,true);
       echo json_encode($arr_result);
     }
 
