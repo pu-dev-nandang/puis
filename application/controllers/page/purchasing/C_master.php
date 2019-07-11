@@ -694,6 +694,9 @@ class C_master extends Purchasing_Controler {
             $nestedData[] = $st;
             $nestedData[] = $btn;
             $nestedData[] = $row['Reason'];
+            // arr assign division
+            $G_arr_div = $this->m_master->caribasedprimary('db_purchasing.m_catalog_division','ID_m_catalog',$row['ID']);
+            $nestedData[] = $G_arr_div;
             $data[] = $nestedData;
 
             $No++;

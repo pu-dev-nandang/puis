@@ -48,8 +48,9 @@ class M_spb extends CI_Model {
 
         $sql = 'select a.*,b.Name as NameBank,c.Name as NameCreatedBy,
                 poi.InvoicePO,poi.InvoicePayPO,InvoiceLeftPO,poi.Status as StatusPOI,poi.ID as ID_poi
-                from db_purchasing.spb_created as a
-                left join db_finance.bank as b on a.ID_bank = b.ID
+                from db_payment.payment as a
+                left join db_payment.spb as spb on a.ID = spb.ID_payment
+                left join db_finance.bank as b on spb.ID_bank = b.ID
                 left join db_employees.employees as c on a.CreatedBy = c.NIP
                 left join db_purchasing.po_invoice_status as poi on a.Code_po_create = poi.Code_po_create
                 where a.Code_po_create = ? limit 1
@@ -74,7 +75,7 @@ class M_spb extends CI_Model {
 
             // Get ID untu GRPO
             $ID = $query[0]['ID'];
-            $arr['dtgood_receipt_spb']=$this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_spb_created',$ID);
+            $arr['dtgood_receipt_spb']=$this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID);
             $ID_good_receipt_spb = $arr['dtgood_receipt_spb'][0]['ID'];
             $sql = 'select ';
             $tt=$this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);

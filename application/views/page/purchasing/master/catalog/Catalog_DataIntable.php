@@ -17,6 +17,13 @@
 	</div>
 	
 </div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="thumbnail" style="padding: 10px;">
+	        <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Multiple Department
+	    </div>
+	</div>
+</div>
 <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 10px">
 	<div class="col-xs-12">
 		<div class="table-responsive">
@@ -77,6 +84,12 @@
 		        },
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
+		    	var st_de = data[11];
+		    	console.log(st_de);
+		    	if (st_de.length > 0) {
+		    		$(row).attr('style','background-color: #8ED6EA;')
+		    	}
+
 		        /*var no = 'row'+(dataIndex + 1);
 		          $(row).attr('id', no);*/
 		    },
