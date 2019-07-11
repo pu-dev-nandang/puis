@@ -43,7 +43,6 @@ class M_spb extends CI_Model {
         $arr = array(
             'dtspb'=> array(),
             'dtgood_receipt_spb'=>array(),
-            'dtgood_receipt_detail'=> array(),
         );
 
         $sql = 'select a.*,b.Name as NameBank,c.Name as NameCreatedBy,
@@ -76,15 +75,17 @@ class M_spb extends CI_Model {
             // Get ID untu GRPO
             $ID = $query[0]['ID'];
             $arr['dtgood_receipt_spb']=$this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID);
-            $ID_good_receipt_spb = $arr['dtgood_receipt_spb'][0]['ID'];
-            $sql = 'select ';
-            $tt=$this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);
-            for ($i=0; $i < count($tt); $i++) { 
-               $ID_po_detail =$tt[$i]['ID_po_detail'];
-               $G_dt = $this->m_pr_po->Get_data_po_by_ID_po_detail($ID_po_detail);
-               $tt[$i]['Detail'] = $G_dt;
+            for ($i=0; $i < count($arr['dtgood_receipt_spb']); $i++) { 
+                $ID_good_receipt_spb = $arr['dtgood_receipt_spb'][$i]['ID'];
+                $tt=$this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);
+                for ($j=0; $j < count($tt); $j++) { 
+                    $ID_po_detail =$tt[$j]['ID_po_detail'];
+                    $G_dt = $this->m_pr_po->Get_data_po_by_ID_po_detail($ID_po_detail);
+                    $tt[$j]['Detail'] = $G_dt;
+                }
+               
+                $arr['dtgood_receipt_spb'][$i]['dtgood_receipt_detail'] = $tt;
             }
-            $arr['dtgood_receipt_detail'] = $tt;
         }
         
         return $arr;
