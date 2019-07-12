@@ -1671,20 +1671,21 @@ class C_rest2 extends CI_Controller {
         }
     }
 
-    public function show_info_spb()
+    public function show_info_payment()
     {
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $rs = array();
-                $Code = $dataToken['Code'];
-                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.spb_circulation_sheet as a 
+                $ID_payment = $dataToken['ID_payment'];
+                $whereField = 'where a.ID_payment = ?';
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_payment.payment_circulation_sheet as a 
                         join db_employees.employees as b on a.By = b.NIP
-                        where a.Code = ?
+                       '.$whereField.' 
                         ';
-                $query=$this->db->query($sql, array($Code))->result_array();
-                $rs['spb_circulation_sheet'] = $query;
+                $query=$this->db->query($sql, array($ID_payment))->result_array();
+                $rs['payment_circulation_sheet'] = $query;
                 echo json_encode($rs);
             }
             else

@@ -315,6 +315,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 $dataSave2['ID_bank'] = $Input['ID_bank'];
                 $dataSave2['Invoice'] = $Input['Invoice'];
                 $dataSave2['TypeInvoice'] = $Input['TypeInvoice'];
+                $this->db->where('ID_payment',$ID_payment);
+                $this->db->update('db_payment.spb',$dataSave2);
 
                 // insert to spb_circulation_sheet
                     $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);

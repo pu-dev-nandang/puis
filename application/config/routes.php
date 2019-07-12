@@ -970,7 +970,7 @@ $route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1
 $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 $route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
-$route['rest2/__show_info_spb'] = 'api/c_rest2/show_info_spb';
+$route['rest2/__show_info_payment'] = 'api/c_rest2/show_info_payment';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
