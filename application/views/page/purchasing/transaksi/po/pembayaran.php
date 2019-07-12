@@ -1062,5 +1062,371 @@
 		var r = $(this).closest('.row');
 		r.after(html);
 	})
+
+	$(document).off('keyup keydown', '.Money_Pembayaran').on('keyup keydown', '.Money_Pembayaran',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var v = $(this).val();
+		v = findAndReplace(v, ".","");
+		var InvoiceleftPO = $(this).attr('invoiceleftpo');
+		// console.log(InvoiceleftPO);
+		var n = InvoiceleftPO.indexOf(".");
+		InvoiceleftPO = InvoiceleftPO.substring(0, n);
+		// console.log(InvoiceleftPO);
+		var sisa = parseInt(InvoiceleftPO) - parseInt(v);
+		if (sisa < 0) {
+			ev.find('.submit').prop('disabled',true);
+			toastr.info('Pembayaran melebihi harga');
+			v = InvoiceleftPO;
+			$(this).val(v);
+			$(this).maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$(this).maskMoney('mask', '9894');
+			sisa = 0;
+			ev.find('.submit').prop('disabled',false);
+		}
+		ev.find('.Sisa_Pembayaran').html(formatRupiah(sisa));
+		// ajax terbilang
+		setTimeout(function () {
+		    _ajax_terbilang(v).then(function(data){
+		    	ev.find('.terbilang').html('Terbilang (Rupiah) : '+data+' Rupiah');
+		    })
+		},500);
+
+	})
+
+	function _ajax_terbilang(bilangan)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__ajax_terbilang";
+		var data = {
+		    bilangan : bilangan,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
+
+
+	$(document).off('click', '.submit').on('click', '.submit',function(e) {
+		// validation
+		var ev = $(this).closest('.FormPage');
+		var action = ev.attr('action');
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_spb(ev);
+			if (validation) {
+				SubmitSPB('.submit',ev,action);
+			}
+		}
+
+	})
+
+	function validation_input_spb(ev)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			TglSPB : ev.find('.TglSPB').val(),
+			Perihal : ev.find('.Perihal').val(),
+			NoRekening : ev.find('.NoRekening').val(),
+			Pembayaran : ev.find('.Money_Pembayaran').val(),
+		};
+		if (validation(data) ) {
+			// check berdasarkan ID_payment
+			var ID_payment = ev.attr('id_payment');
+			if (ID_payment != '' && ID_payment != null && ID_payment != undefined) {
+				var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+				var dtspb = dt_arr.dtspb;
+				if (dtspb[0]['Code'] == '' || dtspb[0]['Code'] == 'null' || dtspb[0]['Code'] == null) {
+					// Upload Tanda Terima 
+					ev.find(".BrowseTT").each(function(){
+						var IDFile = $(this).attr('id');
+						var ev2 = $(this);
+						if (!file_validation2(ev2,'Tanda Terima ') ) {
+						  ev.find(".submit").prop('disabled',false);
+						  find = false;
+						  return false;
+						}
+					})
+
+					// Upload Invoice 
+					ev.find(".BrowseInvoice").each(function(){
+						var IDFile = $(this).attr('id');
+						var ev2 = $(this);
+						if (!file_validation2(ev2,'Invoice ') ) {
+						  ev.find(".submit").prop('disabled',false);
+						  find = false;
+						  return false;
+						}
+					})
+				}
+			}
+			else
+			{
+				// Upload Tanda Terima 
+				ev.find(".BrowseTT").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  ev.find(".submit").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Invoice 
+				ev.find(".BrowseInvoice").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Invoice ') ) {
+					  ev.find(".submit").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+			}
+		}
+		else
+		{
+			find = false;
+		}
+		
+		return find;
+	}
+
+	function SubmitSPB(elementbtn,ev,action="add")
+	{
+		// loadingStart();
+		var Code_po_create = $('.C_radio_pr:checked').attr('code');
+		var Departement = IDDepartementPUBudget;
+		var ID_payment = ev.attr('id_payment');
+		var ID_budget_left = 0;
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseInvoice').length ) {
+			var UploadFile = ev.find('.BrowseInvoice')[0].files;
+			form_data.append("UploadInvoice[]", UploadFile[0]);
+		}
+
+		if ( ev.find('.BrowseTT').length ) {
+			var UploadFile = ev.find('.BrowseTT')[0].files;
+			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		}
+
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Datee = ev.find('.TglSPB').val();
+		var Perihal = ev.find('.Perihal').val();
+		var No_Rekening = ev.find('.NoRekening').val();
+		var ID_bank = ev.find('.dtbank option:selected').val();
+		var Invoice = ev.find('.Money_Pembayaran').val();
+		Invoice = findAndReplace(Invoice, ".","");
+		var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+
+		var data = {
+			Code_po_create : Code_po_create,
+			Departement : Departement,
+			ID_budget_left : ID_budget_left,
+			NoInvoice : NoInvoice,
+			NoTandaTerima :NoTandaTerima,
+			Datee :Datee,
+			Perihal : Perihal,
+			No_Rekening : No_Rekening,
+			ID_bank : ID_bank,
+			Invoice : Invoice,
+			TypeInvoice  : TypeInvoice,
+			ID_payment : ID_payment,
+			action : action,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
+		var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
+		form_data.append('token3',token3);
+
+		// pass po_detail agar dapat approval
+		var po_detail = ClassDt.po_data.po_detail;
+		var temp = [];
+		for (var i = 0; i < po_detail.length; i++) {
+			var arr = po_detail[i];
+			var token_ = jwt_encode(arr,"UAP)(*");
+			temp.push(token_);
+		}
+
+		var token4 = jwt_encode(temp,"UAP)(*");
+		form_data.append('token4',token4);
+
+		var url = base_url_js + "budgeting/submitspb"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_po().then(function(data){
+		  					$('.C_radio_pr:first').prop('checked',true);
+		  					$('.C_radio_pr:first').trigger('change');
+		  					loadingEnd(500);
+		  				})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			loadingEnd(500);
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			Get_data_po().then(function(data){
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+		  				loadingEnd(500);
+		  			})
+		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    nmbtn = 'Submit';
+		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+		  }
+		})
+	}
+
+	function validation(arr)
+	{
+	  var toatString = "";
+	  var result = "";
+	  for(var key in arr) {
+	     switch(key)
+	     {
+	      case  "Pembayaran" :
+	            if (arr[key] <= 0) {
+	            	toatString += 'Pembayaran tidak boleh kecil sama dengan nol' + "<br>";
+	            }
+	            break;
+	      default :
+	            result = Validation_required(arr[key],key);
+	            if (result['status'] == 0) {
+	              toatString += result['messages'] + "<br>";
+	            }       
+	     }
+
+	  }
+	  if (toatString != "") {
+	    toastr.error(toatString, 'Failed!!');
+	    return false;
+	  }
+
+	  return true;
+	}
+
+	function __getRsViewGRPO_SPB(ID_payment)
+	{
+		var arr=[];
+		var Dataselected = ClassDt.Dataselected;
+		var dtspb = Dataselected.dtspb;
+		var dtspb_rs = [];
+		// get indeks array
+		for (var i = 0; i < dtspb.length; i++) {
+			if (ID_payment == dtspb[i].ID) {
+				break;
+			}
+		}
+
+		dtspb_rs[0] = dtspb[i];
+		arr = {
+			dtspb : dtspb_rs,
+		};
+
+		return arr;
+	}
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
 	
 </script>

@@ -115,8 +115,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         break;
                     case 'edit':
                         // check status tidak sama dengan 2
-                        $ID_spb_created = $Input['ID_spb_created'];
-                        $G_spb_created = $this->m_master->caribasedprimary('db_purchasing.spb_created','ID',$ID_spb_created);
+                        $ID_payment = $Input['ID_payment'];
+                        $G_spb_created = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
                         if ($G_spb_created[0]['Status'] != 2) {
                             $this->edit_spb();
                             $rs['Status']= 1;
@@ -156,7 +156,12 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         // get Approval
         $token3 = $this->input->post('token3');
         $Amount = $Input['Invoice'];
-        $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token3);
+
+        // for approval
+        $token4 = $this->input->post('token4');
+        $key = "UAP)(*";
+        $token4 = (array) $this->jwt->decode($token4,$key);
+        $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
         if (count($JsonStatus) > 1) {
             $dataSave = $Input;
             $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
@@ -165,20 +170,40 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
             $UploadTandaTerima = json_encode($UploadTandaTerima);   
 
-            $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
-            $Code_SPB = $dataSave['Code'];
-            $Desc_circulationSheet = 'SPB created{'.$Code_SPB.'}';
-            $dataSave['Status'] = 1;
-            $dataSave['UploadInvoice'] = $UploadInvoice;
-            $dataSave['UploadTandaTerima'] = $UploadTandaTerima;
-            $dataSave['JsonStatus'] = json_encode($JsonStatus);
-            $dataSave['CreatedBy'] = $this->session->userdata('NIP');
-            $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
-            $dataSave['Type'] = 'Spb';
-            $this->db->insert('db_purchasing.spb_created',$dataSave);
+            $Code = $this->m_spb->Get_SPBCode($Departement);
+            $Desc_circulationSheet = 'SPB created{'.$Code.'}';
+            $dataSave1 = array(
+                'Type' => 'Spb',
+                'Code' => $Code,
+                'Code_po_create' => $Input['Code_po_create'],
+                'Departement' => $Input['Departement'],
+                'CreatedBy' => $this->session->userdata('NIP'),
+                'CreatedAt' => date('Y-m-d H:i:s'),
+                'JsonStatus' => json_encode($JsonStatus),
+                'Status' => 1,
+            );
+            $this->db->insert('db_payment.payment',$dataSave1);
+            $ID_payment = $this->db->insert_id();
+
+            $dataSave2 = array(
+                'ID_budget_left' => $Input['ID_budget_left'],
+                'ID_payment' => $ID_payment,
+                'UploadInvoice' => $UploadInvoice,
+                'NoInvoice' => $Input['NoInvoice'],
+                'UploadTandaTerima' => $UploadTandaTerima,
+                'NoTandaTerima' => $Input['NoTandaTerima'],
+                'Datee' => $Input['Datee'],
+                'Perihal' => $Input['Perihal'],
+                'No_Rekening' => $Input['No_Rekening'],
+                'ID_bank' => $Input['ID_bank'],
+                'Invoice' => $Input['Invoice'],
+                'TypeInvoice' => $Input['TypeInvoice'],
+            );
+
+            $this->db->insert('db_payment.spb',$dataSave2);
 
             // insert to spb_circulation_sheet
-                $this->m_spb->spb_grpo_circulation_sheet($Code_SPB,$Desc_circulationSheet);
+                $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
             // insert to po_circulation_sheet
                 $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc_circulationSheet);  
         }
@@ -192,11 +217,11 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
     public function edit_spb()
     {
         $Input = $this->getInputToken();
-        $ID_spb_created = $Input['ID_spb_created'];
+        $ID_payment = $Input['ID_payment'];
         /*
             jika approval satu telah approve maka tidak boleh melakukan edit lagi
         */
-        $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','ID',$ID_spb_created);
+        $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
         $JsonStatus_existing = $G_data[0]['JsonStatus'];
         $JsonStatus_existing = json_decode($JsonStatus_existing,true);
         $bool = true;
@@ -213,7 +238,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         }
 
         if ($bool) {
-            unset($Input['ID_spb_created']);
+            unset($Input['ID_payment']);
             unset($Input['action']);
             $Code_po_create = $Input['Code_po_create'];
             $Departement = $Input['Departement'];
@@ -225,16 +250,19 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             $Amount = $Input['Invoice'];
             $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
             if (count($JsonStatus) > 1) {
-                $dataSave = $Input;
-                // get code if null || empty
-                // $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
+                $dataSave = array(
+                    'Departement' => $Input['Departement'],
+                    'Code_po_create' => $Code_po_create,
+                );
+                $dataSave2 = array();
                 if ($G_data[0]['Code'] =='' || $G_data[0]['Code'] == null) {
                     $dataSave['Code'] = $this->m_spb->Get_SPBCode($Departement);
                     $Code_SPB = $dataSave['Code'];
                     $Desc_circulationSheet = 'SPB created{'.$Code_SPB.'}';
                     $dataSave['CreatedBy'] = $this->session->userdata('NIP');
                     $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
-                }else
+                }
+                else
                 {
                     $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
                     $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
@@ -255,7 +283,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     // do upload file
                     $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
                     $UploadInvoice = json_encode($UploadInvoice); 
-                    $dataSave['UploadInvoice'] = $UploadInvoice; 
+                    $dataSave2['UploadInvoice'] = $UploadInvoice; 
                 }
 
                 if (array_key_exists('UploadTandaTerima', $_FILES)) {
@@ -270,20 +298,28 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     // do upload file
                     $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
                     $UploadTandaTerima = json_encode($UploadTandaTerima); 
-                    $dataSave['UploadTandaTerima'] = $UploadTandaTerima; 
+                    $dataSave2['UploadTandaTerima'] = $UploadTandaTerima; 
                 }
 
                 $dataSave['JsonStatus'] = json_encode($JsonStatus);
                 $dataSave['Status'] = 1;
                 $dataSave['Type'] = 'Spb';
-                $this->db->where('ID',$ID_spb_created);
-                $this->db->update('db_purchasing.spb_created',$dataSave);
+                $this->db->where('ID',$ID_payment);
+                $this->db->update('db_payment.payment',$dataSave);
+
+                $dataSave2['NoInvoice'] = $Input['NoInvoice'];
+                $dataSave2['NoTandaTerima'] = $Input['NoTandaTerima'];
+                $dataSave2['Datee'] = $Input['Datee'];
+                $dataSave2['Perihal'] = $Input['Perihal'];
+                $dataSave2['No_Rekening'] = $Input['No_Rekening'];
+                $dataSave2['ID_bank'] = $Input['ID_bank'];
+                $dataSave2['Invoice'] = $Input['Invoice'];
+                $dataSave2['TypeInvoice'] = $Input['TypeInvoice'];
 
                 // insert to spb_circulation_sheet
-                    $this->m_spb->spb_grpo_circulation_sheet($Code_SPB,$Desc_circulationSheet);
+                    $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
                 // insert to po_circulation_sheet
                     $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc_circulationSheet);  
-
             }
             else
             {
