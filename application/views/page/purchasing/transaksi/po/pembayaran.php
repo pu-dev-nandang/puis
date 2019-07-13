@@ -351,7 +351,7 @@
 		/* Choose Payment */
 			var html = '';
 			var htmlChoosePayment = __OPPayment(Type);
-			var PageContentPayment = __HtmlPageContentPayment(number,'');
+			var PageContentPayment = __HtmlPageContentPayment(number,Type);
 			html = '<div class ="row FormPage" action = "'+action+'" ID_payment = "'+ID_payment+'" number="'+number+'">'+
 						'<div class="col-xs-12" >'+
 							'<div class="panel panel-primary">'+
@@ -741,6 +741,8 @@
 		var Perihal = 'Pembayaran '+Code;
 		var Dis = '';
 		var btn_hide = 'hide';
+		var btn_hide_print = 'hide';
+		var Status = 0;
 		
 		if (typeof dtspb[0] !== "undefined") {
 			if (dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length == 0 && action == 'edit') {
@@ -750,7 +752,7 @@
 			else
 			{
 				if (action == 'edit' && dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length > 0) {
-					Invoice = dtspb[0].Detail[0].Biaya;
+					Invoice = parseInt(dtspb[0].Detail[0].Biaya);
 					TypePay = dtspb[0].Detail[0].TypePay;
 					ID_bank = dtspb[0].Detail[0].ID_bank;
 					NoRekening = dtspb[0].Detail[0].No_Rekening;
@@ -759,6 +761,10 @@
 					Perihal = dtspb[0].Detail[0].Perihal;
 					Dis = 'disabled';
 					btn_hide = '';
+					Status = dtspb[0]['Status'];
+					if (Status == 2) {
+						btn_hide_print = '';
+					}
 
 					// hitung Left PO
 					var InvoiceleftPO = parseInt(InvoicePO);
@@ -793,7 +799,7 @@
 			}
 		}
 
-		html += htmlAdd+'<div class = "row"><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
+		html += htmlAdd+'<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 					'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
 					'<table class="table borderless" style="font-weight: bold;">'+
@@ -818,7 +824,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+InvoiceleftPO+'" value = "'+Invoice+'">'+ 
+								'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+InvoiceleftPO+'" value = "'+Invoice+'" '+Dis+'>'+ 
 							'</td>'+		
 						'</tr>'+
 						'<tr>'+
@@ -886,8 +892,8 @@
 						'<div class="row">'+
 							'<div class="col-md-12">'+
 								'<div class="pull-right">'+
-									'<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-									'<button class="btn btn-primary '+btn_hide+' btnEditInputBA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
+									'<button class="btn btn-primary '+btn_hide+' btnEditInputBA" status="'+Status+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
 									'<button class="btn btn-success submitBA" '+Dis+'> Submit</button>'+
 								'</div>'+
 							'</div>'+
@@ -905,7 +911,15 @@
 		se_content.find('.dtbank[tabindex!="-1"]').select2({
 		    //allowClear: true
 		});
+		if (typeof dtspb[0] !== "undefined") {
+			if (action == 'edit' && dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length > 0) {
+				var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
+				makeSignaturesSPB(se_content,JsonStatus);
+				makepage_status(dt_arr,se_content);
+			}
+		}	
 		
+
 	}
 
 	function makeDomCash_AdvanceAdd(action,ID_payment,number,se_content,button = 0)
@@ -1555,7 +1569,7 @@
 					'<button class="btn btn-primary hide btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
 					'<button class="btn btn-success submit"> Submit</button>';
 
-		if (dtspb[0]['Code'] != '') {
+		if (dtspb[0]['Code'] != '' && dtspb[0]['Code'] != null) {
 			var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
 			UploadInvoice = UploadInvoice[0];
 			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
@@ -1580,6 +1594,11 @@
 
 			// Fill Type Pembayaran
 			var TypeInvoice = dtspb[0].Detail[0]['TypeInvoice'];
+		}
+		else
+		{
+			makeDomSPBAdd('add',ID_payment,number,se_content);
+			return;
 		}
 
 		var html = '';
@@ -2528,12 +2547,15 @@
 		var ID_budget_left = 0;
 		var form_data = new FormData();
 
-		var Biaya = ev.find('.Biaya').val();
+		var Biaya = ev.find('.Money_Pembayaran').val();
 		Biaya = findAndReplace(Biaya, ".","");
 		var TypePay = ev.find('.TypePay').val();
 		var Perihal = ev.find('.Perihal').val();
 		var No_Rekening = ev.find('.NoRekening').val();
 		var ID_bank = ev.find('.dtbank option:selected').val();
+		if (TypePay == 'Cash') {
+			ID_bank = 0;
+		}
 		var Nama_Penerima = ev.find('.Nama_Penerima').val();
 		var Date_Needed = ev.find('.TglBA').val();
 
@@ -2629,5 +2651,41 @@
 		  }
 		})
 	}
+
+
+	$(document).off('change', '.TypePay').on('change', '.TypePay',function(e) {
+		console.log('asd');
+		var ev = $(this).closest('.FormPage');
+		if ($(this).val() == 'Cash') {
+			ev.find('.NoRekening').prop('disabled',true);
+			// ev.find('.Nama_Penerima').prop('disabled',true);
+			ev.find('.dtbank').prop('disabled',true);
+		}
+		else
+		{
+			ev.find('.NoRekening').prop('disabled',false);
+			// ev.find('.Nama_Penerima').prop('disabled',false);
+			ev.find('.dtbank').prop('disabled',false);
+		}
+	})
+
+	$(document).off('click', '.btnEditInputBA').on('click', '.btnEditInputBA',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.pageFormInput');
+			ev2.find('input').not('.TglBA').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
+			$(this).remove();
+			ev2.find('.TypePay').trigger('change');
+		}
+		else
+		{
+			toastr.info('Data Bank Advance telah approve, tidak bisa edit');
+		}	
+	})
 		
 </script>

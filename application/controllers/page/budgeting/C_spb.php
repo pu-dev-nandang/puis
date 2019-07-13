@@ -552,7 +552,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             $this->db->insert('db_purchasing.good_receipt_spb',$dts);
             $ID_good_receipt_spb = $this->db->insert_id();
         }
-        
+        $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID_payment);
 
         $dataSave = array(
             'ID_payment' => $ID_payment,
