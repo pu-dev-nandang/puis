@@ -55,6 +55,8 @@ class M_spb extends CI_Model {
         if (count($query) > 0) {
             for ($i=0; $i < count($query); $i++) { 
                 $JsonStatus = $query[$i]['JsonStatus'];
+                // Get ID
+                $ID = $query[$i]['ID'];
                 if ($JsonStatus != '' && $JsonStatus != null) {
                     // decode first
                     $JsonStatus = json_decode($JsonStatus,true);
@@ -67,8 +69,6 @@ class M_spb extends CI_Model {
                     $JsonStatus = json_encode($JsonStatus);
                     // update JsonStatus for show
                     $query[$i]['JsonStatus'] = $JsonStatus;
-                    // Get ID
-                    $ID = $query[$i]['ID'];
                     $Type = $query[$i]['Type'];
                     $Detail = array();
                     switch ($Type) {
@@ -116,19 +116,19 @@ class M_spb extends CI_Model {
                     }
 
                     $query[$i]['Detail'] = $Detail;
-
-                    // add good_receipt_spb & good_receipt_detail
-                    $Good_Receipt = array();
-                    $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID); // spb , cash advance, bank advance
-                    for ($j=0; $j < count($G_good_receipt_spb); $j++) { 
-                        $ID_good_receipt_spb = $G_good_receipt_spb[$j]['ID'];
-                        $G_good_receipt_detail = $this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);
-                        $G_good_receipt_spb[$j]['Detail'] = $G_good_receipt_detail;
-                    }
-
-                    $Good_Receipt = $G_good_receipt_spb;
-                    $query[$i]['Good_Receipt'] = $Good_Receipt;
                 }
+
+                // add good_receipt_spb & good_receipt_detail
+                $Good_Receipt = array();
+                $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID); // spb , cash advance, bank advance
+                for ($j=0; $j < count($G_good_receipt_spb); $j++) { 
+                    $ID_good_receipt_spb = $G_good_receipt_spb[$j]['ID'];
+                    $G_good_receipt_detail = $this->m_master->caribasedprimary('db_purchasing.good_receipt_detail','ID_good_receipt_spb',$ID_good_receipt_spb);
+                    $G_good_receipt_spb[$j]['Detail'] = $G_good_receipt_detail;
+                }
+
+                $Good_Receipt = $G_good_receipt_spb;
+                $query[$i]['Good_Receipt'] = $Good_Receipt;
             }
             $arr['dtspb']=$query;
         }

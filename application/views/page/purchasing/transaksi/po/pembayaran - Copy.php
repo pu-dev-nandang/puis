@@ -1305,7 +1305,7 @@
 		})
 	})
 
-	$(document).off('click', '.btn-delete-item	').on('click', '.btn-delete-item	',function(e) {
+	$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
 		var ev = $(this).closest('.GroupingItem');
 		if (ev.find('.Item').length > 1) {
 			$(this).closest('.GroupingItem').remove();

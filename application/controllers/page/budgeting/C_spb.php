@@ -422,6 +422,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $dataSave = array(
             'Code_po_create' => $Code_po_create,
             'Departement'=> $Departement,
+            'Type'=> 'Spb',
         ); 
 
         $this->db->insert('db_payment.payment',$dataSave);
@@ -536,11 +537,21 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             6.insert payment_circulation_sheet dengan tambahan kata edited  
             7.insert po_circulation_sheet dengan tambahan kata edited  
         */
+        // check action2 untuk add or edit    
+        if ($Input['action2'] == 'add') {
+          $this->addGRPO();
+          $rs = array('Status' => 0,'Change' => 0);
+          $rs['Status']= 1;
+          echo json_encode($rs);
+          die();  
+        }    
+
         $Code_po_create = $Input['Code_po_create'];    
         $ID_payment = $Input['ID_payment'];
         $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID_payment);
         if (count($G_good_receipt_spb) > 0) {
-           $ID_good_receipt_spb = $G_good_receipt_spb[0]['ID'];
+           // $ID_good_receipt_spb = $G_good_receipt_spb[0]['ID'];
+           $ID_good_receipt_spb = $Input['ID_good_receipt_spb'];
         }
         else
         {
@@ -561,7 +572,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             'NoTandaTerima'=> $Input['NoTandaTerima'],
             'LastUpdatedBy'=> $this->session->userdata('NIP'),
             'LastUpdatedAt'=> date('Y-m-d H:i:s'),
-        ); 
+        );
+
         if (array_key_exists('FileDocument', $_FILES)) {
             // remove old file
                 if ($G_good_receipt_spb[0]['FileDocument'] != '' && $G_good_receipt_spb[0]['FileDocument'] != null && empty($G_good_receipt_spb[0]['FileDocument'])) {
@@ -716,6 +728,101 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             $this->m_spb->payment_circulation_sheet($ID_payment,'Good Receipt Edited<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt Edited<br>{'.$Desc.'}');
+    }
+
+    public function addGRPO()
+    {
+        $Input = $this->getInputToken();
+        $Code_po_create = $Input['Code_po_create'];    
+        $ID_payment = $Input['ID_payment'];
+
+        $FileDocument = $this->m_master->uploadDokumenMultiple(uniqid(),'FileDocument',$path = './uploads/budgeting/grpo');
+        $FileDocument = json_encode($FileDocument); 
+
+        $FileTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'FileTandaTerima',$path = './uploads/budgeting/grpo');
+        $FileTandaTerima = json_encode($FileTandaTerima); 
+
+        $dataSave = array(
+            'ID_payment' => $ID_payment,
+            'Date'=> $Input['TglGRPO'],
+            'NoDocument'=> $Input['NoDocument'],
+            'FileDocument'=> $FileDocument,
+            'NoTandaTerima'=> $Input['NoTandaTerima'],
+            'FileTandaTerima'=> $FileTandaTerima,
+            'CreatedBy'=> $this->session->userdata('NIP'),
+            'CreatedAt'=> date('Y-m-d H:i:s'),
+        ); 
+
+        $this->db->insert('db_purchasing.good_receipt_spb',$dataSave);
+        $ID_good_receipt_spb = $this->db->insert_id();
+
+        $arr_item = $Input['arr_item'];
+        $arr_item = json_decode(json_encode($arr_item),true);
+        $po_data = $Input['po_data'];
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_detail = $po_data['po_detail'];
+
+        $PRCode =$po_detail[0]['PRCode'];
+        // find ID_pr_status
+        $G_data = $this->m_master->caribasedprimary('db_purchasing.pr_status','PRCode',$PRCode);
+        $ID_pr_status = $G_data[0]['ID'];
+
+
+        // Desc Item for circulation sheet
+        $__arr_item = array();
+        for ($i=0; $i < count($arr_item); $i++) { 
+            $arr_item[$i]['ID_good_receipt_spb'] = $ID_good_receipt_spb;
+            $dataSave = $arr_item[$i];
+            $this->db->insert('db_purchasing.good_receipt_detail',$dataSave);
+            // update pr_status_detail
+            $QtyDiterima = $arr_item[$i]['QtyDiterima'];
+            $ID_po_detail = $arr_item[$i]['ID_po_detail'];
+
+            
+            // find ID_po_detail untuk QtyPR
+            for ($j=0; $j < count($po_detail); $j++) { 
+                if ($ID_po_detail == $po_detail[$j]['ID_po_detail']) {
+                    $QtyPR = $po_detail[$j]['QtyPR'];
+                    $__arr_item[] = $po_detail[$j]['Item'].'('.$QtyDiterima.')';
+                    $ID_pr_detail = $po_detail[$j]['ID_pr_detail'];
+                    if ($QtyPR == $QtyDiterima) {
+                        // check pr_status untuk update
+                        $Item_proc = $G_data[0]['Item_proc'];
+                        $Item_done = $G_data[0]['Item_done'];
+                        $Item_proc = $Item_proc - 1;
+                        $Item_done = $Item_done + 1;
+                        $Item_pending = $G_data[0]['Item_pending'];
+                        $dataSave = array(
+                            'Item_proc' => $Item_proc,
+                            'Item_done' => $Item_done,
+                        );
+                        if ($Item_pending == 0 && $Item_proc == 0) {
+                            $Status = 2;
+                            $dataSave['Status'] = $Status;
+                        }
+
+                        $this->db->where('ID',$ID_pr_status);
+                        $this->db->update('db_purchasing.pr_status',$dataSave);
+
+                        // update pr_status_detail
+                        $dataSave = array(
+                            'Status' => 2,
+                        );
+                        $this->db->where('ID_pr_status',$ID_pr_status);
+                        $this->db->where('ID_pr_detail',$ID_pr_detail);
+                        $this->db->update('db_purchasing.pr_status_detail',$dataSave);
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        $Desc = implode(',', $__arr_item);
+        // insert to spb_circulation_sheet
+            $this->m_spb->payment_circulation_sheet($ID_payment,'Good Receipt added<br>{'.$Desc.'}');
+        // insert to po_circulation_sheet
+            $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt added<br>{'.$Desc.'}');
     }
 
 }

@@ -406,28 +406,19 @@
 			}
 			else if(type == 'Bank Advance')
 			{
-				// if (action=='add') {
-				// 	makeDomBank_AdvanceAdd(action,ID_payment,number,se_content);
-				// }
-				// else
-				// {
-				// 	makeDomBank_AdvanceView(action,ID_payment,number,se_content);
-				// }
 				makeDomBank_Advance(action,ID_payment,number,se_content);
 			}
 			else if(type == 'Cash Advance')
 			{
-				// if (action=='add') {
-				// 	makeDomCash_AdvanceAdd(action,ID_payment,number,se_content);
-				// }
-				// else
-				// {
-				// 	makeDomCash_AdvanceView(action,ID_payment,number,se_content);
-				// }
 				makeDomCash_Advance(action,ID_payment,number,se_content);
 			}
 			else if(type == 'gr')
 			{
+				// var number = $(this).attr('data-target');
+				// number = findAndReplace(number,'.FormInputGR','');
+				// number = parseInt(number);
+				// var se_ = $('.'+page+number);
+				// var se_content = se_.find('.pageFormInput');
 				if (action=='add') {
 					makeDomGRPOAdd(action,ID_payment,number,se_content);
 				}
@@ -1158,11 +1149,9 @@
 	{
 		var html = '';
 		var po_data = ClassDt.po_data;
-		var htmlAdd = (button == 0) ? '<div class = "GRPOAdd">' : '';
-		var EndhtmlAdd = (button == 0) ? '</div>' : '';
-		html += htmlAdd+'<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Good Receipt PO</h2></div>'+
+		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Good Receipt PO <button class="btn btn-warning btn-delete-grpo" ID_good_receipt_spb = ""><i class="fa fa-trash"></i> </button></h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-					'<button class="btn btn-default btn-add-item"><i class="fa icon-plus"></i> </button>'+
+					'<button class="btn btn-default btn-add-item"><i class="fa icon-plus"></i>  </button>'+
 					'<br>'+
 					'<div id = "page_po_item">'+
 						OPPo_detail()+
@@ -1202,10 +1191,11 @@
 							'</div>'+
 						'</div>'+
 					'</div>'+												
-				'</div></div>'+EndhtmlAdd;
+				'</div></div>';
 
 
-		se_content.html(html);
+		se_content.append(html);
+		// se_content.append(html);
 		se_content.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
 		se_content.find('.QtyDiterima').maskMoney('mask', '9894');
 		se_content.find('.datetimepicker').datetimepicker({
@@ -2124,12 +2114,14 @@
 		var ev = se_content.closest('.FormPage');
 		var ID_payment = ev.attr('ID_payment');
 		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
-		var html = '<div class = "GRPOAdd">';
 		var po_data = ClassDt.po_data;
 		var dtspb = dt_arr.dtspb;
+		console.log(dtspb);
 		// get Status
 		var Status = dtspb[0].Status;
 		var dtgood_receipt_spb = dtspb[0].Good_Receipt;
+		var html = '';
+		// if (dtgood_receipt_spb.length > 0 && (number + 1) == dtgood_receipt_spb.length) {
 		if (dtgood_receipt_spb.length > 0) {
 			for (var i = 0; i < dtgood_receipt_spb.length; i++) {
 				var FileDocument = jQuery.parseJSON(dtgood_receipt_spb[i]['FileDocument']);
@@ -2191,10 +2183,9 @@
 								'</div>'+
 							'</div>'+
 						'</div>'+												
-					'</div></div>';
+					'</div></div></div>';
 			}
 
-			html += '</div>';
 			se_content.html(html);
 			se_content.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
 			se_content.find('.QtyDiterima').maskMoney('mask', '9894');
@@ -2208,7 +2199,7 @@
 	}
 
 	$(document).off('change', '.Item').on('change', '.Item',function(e) {
-		var ev = $(this).closest('.FormPage');
+		var ev = $(this).closest('.row');
 		var vv = $(this).find('option:selected').val();
 		ev.find('.Item').not(this).each(function(){
 			$(this).find('option[value="'+vv+'"]').remove();
@@ -2221,7 +2212,8 @@
 	})
 
 	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
-		var ev = $(this).closest('.FormPage');
+		console.log('asdsad');
+		var ev = $(this).closest('.row');
 		var arr_selected = [];
 		var po_data = ClassDt.po_data;
 		var po_detail= po_data.po_detail;
@@ -2229,25 +2221,39 @@
 			var v = $(this).find('option:selected').val();
 			arr_selected.push(v);
 		})
-		if (arr_selected.length != po_detail.length	) {
-			var html = OPPo_detail(null,arr_selected);
-			$('#page_po_item').append(html);
-			ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
-			ev.find('.QtyDiterima').maskMoney('mask', '9894');
-		}	
+		console.log(arr_selected);
+		// if (arr_selected.length != po_detail.length	) {
+		// 	var html = OPPo_detail(null,arr_selected);
+		// 	$('#page_po_item').append(html);
+		// 	ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		// 	ev.find('.QtyDiterima').maskMoney('mask', '9894');
+		// }
+		var html = OPPo_detail(null,arr_selected);
+		ev.find('div[ID="page_po_item"]').append(html);
+		// $('#page_po_item').append(html);
+		ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+		ev.find('.QtyDiterima').maskMoney('mask', '9894');
+
 		// console.log(arr_selected);
 	})
 
 	$(document).off('keyup keydown', '.QtyDiterima').on('keyup keydown', '.QtyDiterima',function(e) {
 		var ev = $(this).closest('.GroupingItem');
 		var QtyPR = ev.find('.Item').find('option:selected').attr('qtypr');
-		var ID_po_detail = $(this).find('option:selected').val();
-		var qtyExisting = __GetQtyDiterima(ID_po_detail);
+		// var ID_po_detail = $(this).find('option:selected').val();
+		var ID_po_detail = ev.find('.Item').find('option:selected').val();
+		var r = $(this).closest('.row');
+		var btn = r.find('.submitGRPO');
+		btn.prop('disabled',false);
+		var index__ = btn.index();
+		var qtyExisting = __GetQtyDiterima(ID_po_detail,index__);
 		var v = $(this).val();
 		v = findAndReplace(v, ".","");
+		// console.log(qtyExisting);
 		var sisa = parseInt(QtyPR)-parseInt(qtyExisting);
 		if (sisa==0) {
 			toastr.info('Qty telah mencukupi, silahkan hapus Item ini');
+			btn.prop('disabled',true);
 		}
 		else
 		{
@@ -2261,7 +2267,7 @@
 		
 	})
 
-	function __GetQtyDiterima(ID_po_detail)
+	function __GetQtyDiterima(ID_po_detail,index__)
 	{
 		var rs = 0;
 		var tt = ClassDt.Dataselected;
@@ -2272,41 +2278,45 @@
 				var dtgood_receipt_detail = Good_Receipt[j].Detail;
 				for (var k = 0; k < dtgood_receipt_detail.length; k++) {
 					if (ID_po_detail== dtgood_receipt_detail[k].ID_po_detail) {
-						rs += dtgood_receipt_detail[k].QtyDiterima;
+						if (k != index__) {
+							rs += parseInt(dtgood_receipt_detail[k].QtyDiterima);
+						}
+						
 					}
 				}
 			}
 		}
-		
+		// console.log(rs);
 		return rs;
 	}
 
-	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
-		var ev = $(this).closest('.FormPage');
-		var arr_selected = [];
-		var po_data = ClassDt.po_data;
-		var po_detail= po_data.po_detail;
-		ev.find('.Item').each(function(){
-			var v = $(this).find('option:selected').val();
-			arr_selected.push(v);
-		})
-		if (arr_selected.length != po_detail.length	) {
-			var html = OPPo_detail(null,arr_selected);
-			$('#page_po_item').append(html);
-			ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
-			ev.find('.QtyDiterima').maskMoney('mask', '9894');
-		}	
-		// console.log(arr_selected);
-	})
+	// $(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
+	// 	var ev = $(this).closest('.FormPage');
+	// 	var arr_selected = [];
+	// 	var po_data = ClassDt.po_data;
+	// 	var po_detail= po_data.po_detail;
+	// 	ev.find('.Item').each(function(){
+	// 		var v = $(this).find('option:selected').val();
+	// 		arr_selected.push(v);
+	// 	})
+	// 	if (arr_selected.length != po_detail.length	) {
+	// 		var html = OPPo_detail(null,arr_selected);
+	// 		$('#page_po_item').append(html);
+	// 		ev.find('.QtyDiterima').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+	// 		ev.find('.QtyDiterima').maskMoney('mask', '9894');
+	// 	}	
+	// 	// console.log(arr_selected);
+	// })
 
 	$(document).off('click', '.submitGRPO').on('click', '.submitGRPO',function(e) {
 		// validation
 		var ev = $(this).closest('.FormPage');
+		var ev2 = $(this).closest('.col-xs-12');
 		var action = ev.attr('action');
 		if (confirm('Are you sure?')) {
-			var validation = validation_input_GRPO(ev);
+			var validation = validation_input_GRPO(ev2);
 			if (validation) {
-				SubmitGRPO('.submitGRPO',ev,action);
+				SubmitGRPO('.submitGRPO',ev,action,ev2);
 			}
 		}
 	})
@@ -2320,7 +2330,18 @@
 			TglGRPO : ev.find('.TglGRPO').val(),
 		};
 		if (validation(data) ) {
-			var action = ev.attr('action');
+			// var action = ev.attr('action');
+			var ID_good_receipt_spb = ev.find('.btn-delete-grpo').attr('id_good_receipt_spb');
+			if (ID_good_receipt_spb == '' || ID_good_receipt_spb == undefined || ID_good_receipt_spb == null ) {
+				var action = 'add';
+				ID_good_receipt_spb = '';
+			}
+			else
+			{
+				var action = 'edit';
+			}
+			// console.log(action)
+
 			if (action == 'add') {
 				// Upload Document
 				ev.find(".BrowseDocument").each(function(){
@@ -2398,7 +2419,7 @@
 		return find;
 	}
 
-	function SubmitGRPO(elementbtn,ev,action="add")
+	function SubmitGRPO(elementbtn,ev,action="add",ev2)
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
@@ -2406,22 +2427,22 @@
 		var ID_payment = ev.attr('ID_payment');
 		var form_data = new FormData();
 
-		if ( ev.find('.BrowseDocument').length ) {
-			var UploadFile = ev.find('.BrowseDocument')[0].files;
+		if ( ev2.find('.BrowseDocument').length ) {
+			var UploadFile = ev2.find('.BrowseDocument')[0].files;
 			form_data.append("FileDocument[]", UploadFile[0]);
 		}
 		
-		if ( ev.find('.BrowseTTGRPO').length ) {
-			var UploadFile = ev.find('.BrowseTTGRPO')[0].files;
+		if ( ev2.find('.BrowseTTGRPO').length ) {
+			var UploadFile = ev2.find('.BrowseTTGRPO')[0].files;
 			form_data.append("FileTandaTerima[]", UploadFile[0]);
 		}
 
-		var NoDocument = ev.find('.NoDocument').val();
-		var NoTandaTerima = ev.find('.NoTandaTerimaGRPO').val();
+		var NoDocument = ev2.find('.NoDocument').val();
+		var NoTandaTerima = ev2.find('.NoTandaTerimaGRPO').val();
 		var ID_budget_left = 0;
 
 		var arr_item = [];
-		ev.find('.Item').each(function(){
+		ev2.find('.Item').each(function(){
 			var ID_po_detail = $(this).find('option:selected').val();
 			var ev2 = $(this).closest('.GroupingItem');
 			var QtyDiterima = ev2.find('.QtyDiterima').val();
@@ -2432,6 +2453,16 @@
 			arr_item.push(temp);
 		})
 
+		var ID_good_receipt_spb = ev2.find('.btn-delete-grpo').attr('id_good_receipt_spb');
+		if (ID_good_receipt_spb == '' || ID_good_receipt_spb == undefined || ID_good_receipt_spb == null ) {
+			var action2 = 'add';
+			ID_good_receipt_spb = '';
+		}
+		else
+		{
+			var action2 = 'edit';
+		}
+
 		var data = {
 			Code_po_create : Code_po_create,
 			Departement : Departement,
@@ -2440,11 +2471,14 @@
 			NoTandaTerima :NoTandaTerima,
 			ID_payment : ID_payment,
 			action : action,
+			action2 : action2,
 			arr_item : arr_item,
-			TglGRPO : ev.find('.TglGRPO').val(),
+			TglGRPO : ev2.find('.TglGRPO').val(),
 			po_data : ClassDt.po_data,
+			ID_good_receipt_spb : ID_good_receipt_spb,
 		};
-
+		// console.log(data);
+		// return false;
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
 
@@ -2513,7 +2547,11 @@
 	$(document).off('click', '.btnEditInputGRPO').on('click', '.btnEditInputGRPO',function(e) {
 		var Status = $(this).attr('status');
 		if (Status != 2) {
-			var ev2 = $(this).closest('.pageFormInput');
+			var ev = $(this).closest('.FormPage');
+			ev.find('.btn-add-grpo').prop('disabled',true);
+
+			// var ev2 = $(this).closest('.pageFormInput');
+			var ev2 = $(this).closest('.col-xs-12');
 			ev2.find('input').not('.TglGRPO').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
 			ev2.find('select').prop('disabled',false);
@@ -2960,5 +2998,57 @@
 		{
 			toastr.info('Data Bank Advance telah approve, tidak bisa edit');
 		}	
-	})	
+	})
+
+	$(document).off('click', '.btn-add-grpo').on('click', '.btn-add-grpo',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var GRPORow = ev.find('.GRPORow');
+		var se_content = GRPORow.find('.pageFormInput');
+		var ID_payment = ev.attr('ID_payment');
+		var number = ev.attr('number');
+		// check data existing telah submit atau belum
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var dtspb = dt_arr.dtspb;
+		if (typeof dtspb[0] !== "undefined") {
+			var dtgood_receipt_spb = dtspb[0].Good_Receipt;
+			if (dtgood_receipt_spb.length == $('.btn-delete-grpo').length ) {
+				$(".btnEditInputGRPO").addClass('hide');
+				$(".submitGRPO").addClass('hide');
+				makeDomGRPOAdd('add',ID_payment,number,se_content);
+			}
+			else
+			{
+				toastr.info('Mohon untuk submit GRPO sebelumnya dahulu');
+			}
+		}
+		else
+		{
+			toastr.info('Mohon untuk submit GRPO ini dahulu');
+		}
+		
+	})
+
+	$(document).off('click', '.btn-delete-grpo').on('click', '.btn-delete-grpo',function(e) {
+		var index__ = $(this).index();
+		var r = $(this).closest('.row');
+		if ($('.btn-delete-grpo').length > 1  ) {
+			r.remove();
+			$('.btnEditInputGRPO:eq('+(parseInt(index__) - 1)+')').removeClass('hide');
+			$('.submitGRPO:eq('+(parseInt(index__) - 1)+')').removeClass('hide');
+		}
+		else
+		{
+			toastr.info('Page GRPO memiliki sisa 1, aksi dibatalkan')
+		}
+		
+	})
+
+	$(document).off('click', '.btn-delete-item').on('click', '.btn-delete-item',function(e) {
+		// console.log('asdsad');
+		var ev = $(this).closest('div[id="page_po_item"]');
+		// console.log(ev.find('.Item').length);
+		if (ev.find('.Item').length > 1) {
+			$(this).closest('.form-horizontal').remove();
+		}
+	})
 </script>
