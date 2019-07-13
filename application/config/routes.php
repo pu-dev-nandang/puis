@@ -1393,6 +1393,7 @@ $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 // cashadvance
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
 $route['budgeting_menu/pembayaran/cashadvance/configuration'] = 'page/budgeting/c_cashadvance/configuration';
+$route['budgeting/submitca'] = 'page/budgeting/c_cashadvance/submitca';
 
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';

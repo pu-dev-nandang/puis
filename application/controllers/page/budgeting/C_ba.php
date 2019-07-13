@@ -277,9 +277,21 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                 else
                 {
                     $dataSave['Code'] = null;
-                    $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
-                    $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
-                    $Desc_circulationSheet = 'Bank Advance Edited';
+                    
+                    if ($G_data_[0]['Perihal'] != ''&& $G_data_[0]['Perihal'] != null) {
+                        $Desc_circulationSheet = 'Bank Advance Edited';
+                        $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
+                        $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
+                    }
+                    else
+                    {
+                        $Desc_circulationSheet = 'Bank Advance Created';
+                        $dataSave['CreatedBy'] = $this->session->userdata('NIP');
+                        $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
+                        $dataSave['LastUpdatedBy'] = null;
+                        $dataSave['LastUpdatedAt'] = null;
+                    }
+                    
                 }
 
                 $dataSave['JsonStatus'] = json_encode($JsonStatus);
