@@ -11,7 +11,6 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('budgeting/m_spb');
     }
 
     public function menu_horizontal($page)
@@ -128,7 +127,12 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                             {
                                 // remove another payment
                                 $this->m_global->__change_payment_type($ID_payment);
-                                $this->insert_spb();
+                                // insert db spb
+                                $dts = array(
+                                        'ID_payment' => $ID_payment
+                                    );
+                                $this->db->insert('db_payment.spb',$dts);
+                                $this->edit_spb();
                                 $rs['Status']= 1;
                             }
                         }
