@@ -117,9 +117,20 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         // check status tidak sama dengan 2
                         $ID_payment = $Input['ID_payment'];
                         $G_spb_created = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                        // find data spb
+                        $G_data = $this->m_master->caribasedprimary('db_payment.spb','ID_payment',$ID_payment);
                         if ($G_spb_created[0]['Status'] != 2) {
-                            $this->edit_spb();
-                            $rs['Status']= 1;
+                            if (count($G_data) > 0) { // spb exist
+                               $this->edit_spb();
+                               $rs['Status']= 1;
+                            }
+                            else
+                            {
+                                // remove another payment
+                                $this->m_global->__change_payment_type($ID_payment);
+                                $this->insert_spb();
+                                $rs['Status']= 1;
+                            }
                         }
                         else
                         {
@@ -164,10 +175,10 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $JsonStatus =  $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
         if (count($JsonStatus) > 1) {
             $dataSave = $Input;
-            $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
+            $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/spb');
             $UploadInvoice = json_encode($UploadInvoice); 
 
-            $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
+            $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/spb');
             $UploadTandaTerima = json_encode($UploadTandaTerima);   
 
             $Code = $this->m_spb->Get_SPBCode($Departement);
@@ -227,7 +238,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $bool = true;
         $Code_SPB = '';
         $Desc_circulationSheet = '';
-
+        // get data spb
+            $G_data_ = $this->m_master->caribasedprimary('db_payment.spb','ID_payment',$ID_payment);
         if (count($JsonStatus_existing) > 0) {
             for ($i=1; $i < count($JsonStatus_existing); $i++) { 
                 if ($JsonStatus_existing[$i]['Status'] == 1) {
@@ -273,30 +285,30 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 // delete old file and upload new file if user do upload
                 if (array_key_exists('UploadInvoice', $_FILES)) {
                     // remove old file
-                    if ($G_data[0]['UploadInvoice'] != '' && $G_data[0]['UploadInvoice'] != null) {
-                        $arr_file = (array) json_decode($G_data[0]['UploadInvoice'],true);
-                        $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+                    if ($G_data_[0]['UploadInvoice'] != '' && $G_data_[0]['UploadInvoice'] != null) {
+                        $arr_file = (array) json_decode($G_data_[0]['UploadInvoice'],true);
+                        $filePath = 'budgeting\\spb\\'.$arr_file[0]; // pasti ada file karena required
                         $path = FCPATH.'uploads\\'.$filePath;
                         unlink($path);
                     }
 
                     // do upload file
-                    $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/po');
+                    $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/spb');
                     $UploadInvoice = json_encode($UploadInvoice); 
                     $dataSave2['UploadInvoice'] = $UploadInvoice; 
                 }
 
                 if (array_key_exists('UploadTandaTerima', $_FILES)) {
                     // remove old file
-                        if ($G_data[0]['UploadTandaTerima'] != '' && $G_data[0]['UploadTandaTerima'] != null) {
-                            $arr_file = (array) json_decode($G_data[0]['UploadTandaTerima'],true);
-                            $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+                        if ($G_data_[0]['UploadTandaTerima'] != '' && $G_data_[0]['UploadTandaTerima'] != null) {
+                            $arr_file = (array) json_decode($G_data_[0]['UploadTandaTerima'],true);
+                            $filePath = 'budgeting\\spb\\'.$arr_file[0]; // pasti ada file karena required
                             $path = FCPATH.'uploads\\'.$filePath;
                             unlink($path);
                         }
 
                     // do upload file
-                    $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/po');
+                    $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/spb');
                     $UploadTandaTerima = json_encode($UploadTandaTerima); 
                     $dataSave2['UploadTandaTerima'] = $UploadTandaTerima; 
                 }
@@ -359,9 +371,9 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         break;
                     case 'edit':
                         // check status tidak sama dengan 2
-                        $ID_spb_created = $Input['ID_spb_created'];
-                        $G_spb_created = $this->m_master->caribasedprimary('db_purchasing.spb_created','ID',$ID_spb_created);
-                        if ($G_spb_created[0]['Status'] != 2) {
+                        $ID_payment = $Input['ID_payment'];
+                        $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                        if ($G_data[0]['Status'] != 2) {
                             $this->edit_gr_po();
                             $rs['Status']= 1;
                         }
@@ -392,12 +404,12 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
     {
         $Input = $this->getInputToken();
         /*
-            1.Insert spb_created dengan field Code_po_create,Departement
+            1.Insert payment dengan field Code_po_create,Departement
             2.get  $insert_id = $this->db->insert_id();
             3.Insert good_receipt_spb 
             4.get  $insert_id = $this->db->insert_id();
             5.Insert good_receipt_detail 
-            6.Insert spb_circulation_sheet dengan keteranga terima barang 
+            6.Insert payment_circulation_sheet dengan keteranga terima barang 
             7.Update PR Status & PR Status Detail
         */
 
@@ -408,18 +420,18 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             'Departement'=> $Departement,
         ); 
 
-        $this->db->insert('db_purchasing.spb_created',$dataSave);
-        $ID_spb_created = $this->db->insert_id();
+        $this->db->insert('db_payment.payment',$dataSave);
+        $ID_payment = $this->db->insert_id();
 
-        $FileDocument = $this->m_master->uploadDokumenMultiple(uniqid(),'FileDocument',$path = './uploads/budgeting/po');
+        $FileDocument = $this->m_master->uploadDokumenMultiple(uniqid(),'FileDocument',$path = './uploads/budgeting/grpo');
         $FileDocument = json_encode($FileDocument); 
 
-        $FileTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'FileTandaTerima',$path = './uploads/budgeting/po');
+        $FileTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'FileTandaTerima',$path = './uploads/budgeting/grpo');
         $FileTandaTerima = json_encode($FileTandaTerima); 
 
 
         $dataSave = array(
-            'ID_spb_created' => $ID_spb_created,
+            'ID_payment' => $ID_payment,
             'Date'=> $Input['TglGRPO'],
             'NoDocument'=> $Input['NoDocument'],
             'FileDocument'=> $FileDocument,
@@ -496,17 +508,16 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
 
         $Desc = implode(',', $__arr_item);
         // insert to spb_circulation_sheet
-            $this->m_spb->spb_grpo_circulation_sheet($Code_po_create,'Good Receipt<br>{'.$Desc.'}');
+            $this->m_spb->payment_circulation_sheet($ID_payment,'Good Receipt<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt<br>{'.$Desc.'}');   
-
     }
 
     public function edit_gr_po()
     {
         $Input = $this->getInputToken();
         /*
-            1.Dapatkan ID_spb_created dan ID_good_receipt_spb
+            1.Dapatkan ID_payment dan ID_good_receipt_spb
             2.Check file upload FileDocument & FileTandaTerima
                 jika ada maka hapus file lama
             3.Get data good_receipt_detail berdasarkan ID_good_receipt_spb
@@ -518,16 +529,29 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 diluar jika QtyPR pada po_detail == QtyDiterima pada good_receipt_detail
                 jadikan Status = 1 untuk  pr_status_detail berdasarkan ID_pr_detail dan ID_pr_status 
             5.hapus data good_receipt_detail  berdasarkan ID_good_receipt_spb   
-            6.insert spb_grpo_circulation_sheet dengan tambahan kata edited  
+            6.insert payment_circulation_sheet dengan tambahan kata edited  
             7.insert po_circulation_sheet dengan tambahan kata edited  
         */
         $Code_po_create = $Input['Code_po_create'];    
-        $ID_spb_created = $Input['ID_spb_created'];
-        $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_spb_created',$ID_spb_created);
-        $ID_good_receipt_spb = $G_good_receipt_spb[0]['ID'];
+        $ID_payment = $Input['ID_payment'];
+        $G_good_receipt_spb = $this->m_master->caribasedprimary('db_purchasing.good_receipt_spb','ID_payment',$ID_payment);
+        if (count($G_good_receipt_spb) > 0) {
+           $ID_good_receipt_spb = $G_good_receipt_spb[0]['ID'];
+        }
+        else
+        {
+            $dts = array(
+                'ID_payment' => $ID_payment,
+                'CreatedBy'=> $this->session->userdata('NIP'),
+                'CreatedAt'=> date('Y-m-d H:i:s'),
+                );
+            $this->db->insert('db_purchasing.good_receipt_spb',$dts);
+            $ID_good_receipt_spb = $this->db->insert_id();
+        }
+        
 
         $dataSave = array(
-            'ID_spb_created' => $ID_spb_created,
+            'ID_payment' => $ID_payment,
             'Date'=> $Input['TglGRPO'],
             'NoDocument'=> $Input['NoDocument'],
             'NoTandaTerima'=> $Input['NoTandaTerima'],
@@ -536,25 +560,31 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         ); 
         if (array_key_exists('FileDocument', $_FILES)) {
             // remove old file
-                $arr_file = (array) json_decode($G_good_receipt_spb[0]['FileDocument'],true);
-                $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
-                $path = FCPATH.'uploads\\'.$filePath;
-                unlink($path);
+                if ($G_good_receipt_spb[0]['FileDocument'] != '' && $G_good_receipt_spb[0]['FileDocument'] != null && empty($G_good_receipt_spb[0]['FileDocument'])) {
+                    $arr_file = (array) json_decode($G_good_receipt_spb[0]['FileDocument'],true);
+                    $filePath = 'budgeting\\grpo\\'.$arr_file[0]; // pasti ada file karena required
+                    $path = FCPATH.'uploads\\'.$filePath;
+                    unlink($path);
+                }
+                
 
             // do upload file
-            $FileDocument = $this->m_master->uploadDokumenMultiple(uniqid(),'FileDocument',$path = './uploads/budgeting/po');
+            $FileDocument = $this->m_master->uploadDokumenMultiple(uniqid(),'FileDocument',$path = './uploads/budgeting/grpo');
             $dataSave['FileDocument'] = json_encode($FileDocument); 
         }
 
         if (array_key_exists('FileTandaTerima', $_FILES)) {
             // remove old file
-                $arr_file = (array) json_decode($G_good_receipt_spb[0]['FileTandaTerima'],true);
-                $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
-                $path = FCPATH.'uploads\\'.$filePath;
-                unlink($path);
-
+                if ($G_good_receipt_spb[0]['FileTandaTerima'] != '' && $G_good_receipt_spb[0]['FileTandaTerima'] != null && empty($G_good_receipt_spb[0]['FileTandaTerima'])) 
+                {
+                    $arr_file = (array) json_decode($G_good_receipt_spb[0]['FileTandaTerima'],true);
+                    $filePath = 'budgeting\\grpo\\'.$arr_file[0]; // pasti ada file karena required
+                    $path = FCPATH.'uploads\\'.$filePath;
+                    unlink($path);
+                }
+                
             // do upload file
-            $FileTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'FileTandaTerima',$path = './uploads/budgeting/po');
+            $FileTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'FileTandaTerima',$path = './uploads/budgeting/grpo');
             $dataSave['FileTandaTerima'] = json_encode($FileTandaTerima); 
         }
 
@@ -679,7 +709,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $Desc = implode(',', $__arr_item);
 
         // insert to spb_circulation_sheet
-            $this->m_spb->spb_grpo_circulation_sheet(null,'Good Receipt Edited<br>{'.$Desc.'}');
+            $this->m_spb->payment_circulation_sheet($ID_payment,'Good Receipt Edited<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt Edited<br>{'.$Desc.'}');
     }

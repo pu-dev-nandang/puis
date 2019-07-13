@@ -406,13 +406,14 @@
 			}
 			else if(type == 'Bank Advance')
 			{
-				if (action=='add') {
-					makeDomBank_AdvanceAdd(action,ID_payment,number,se_content);
-				}
-				else
-				{
-					makeDomBank_AdvanceView(action,ID_payment,number,se_content);
-				}
+				// if (action=='add') {
+				// 	makeDomBank_AdvanceAdd(action,ID_payment,number,se_content);
+				// }
+				// else
+				// {
+				// 	makeDomBank_AdvanceView(action,ID_payment,number,se_content);
+				// }
+				makeDomBank_AdvanceAdd(action,ID_payment,number,se_content);
 			}
 			else if(type == 'Cash Advance')
 			{
@@ -690,7 +691,7 @@
 
 	}
 
-	function makeDomBank_AdvanceAdd(action,ID_spb_created,number,se_content)
+	function makeDomBank_AdvanceAdd(action,ID_payment,number,se_content,button = 0)
 	{
 		var Code = $('.C_radio_pr:checked').attr('code');
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
@@ -721,124 +722,137 @@
 		var html = '';
 		Supplier = Supplier.split('||');
 		Supplier = Supplier[1].trim();
-		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
-					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-					'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
-					'<table class="table borderless" style="font-weight: bold;">'+
-					'<thead></thead>'+
-					'<tbody>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Kegiatan'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<span color = "red">Pembayaran '+Code+'</span>'+
-							'</td>'+
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Biaya'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+InvoiceleftPO+'">'+ 
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Uang diberikan melalui: (pilih salah satu)'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<select class = "form-control TypePay">'+
-									'<option value = "Transfer" selected>Transfer</option>'+ 
-									'<option value = "Cash" selected>Cash</option>'+ 
-								'</select>'+	
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Bank'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								OPBank()+
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'No Rekening'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening">'+
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Nama Penerima'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control Nama_Penerima" placeholder="Nama Penerima">'+
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Dibutuhkan pada tanggal:'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglBA" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
-		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
-		                		'</div>'+
-							'</td>	'+			
-						'</tr>'+
-					'</tbody>'+
-					'</table>'+
-					'<div id="r_signatures"></div>'+
-					'<div id = "r_action">'+
-						'<div class="row">'+
-							'<div class="col-md-12">'+
-								'<div class="pull-right">'+
-									'<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-									'<button class="btn btn-primary hide btnEditInputBA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-									'<button class="btn btn-success submitBA"> Submit</button>'+
+		var htmlAdd = (button == 0) ? '<div class = "BAAdd">' : '';
+		var EndhtmlAdd = (button == 0) ? '</div>' : '';
+		// check exist or not for edit
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var dtspb = dt_arr.dtspb;
+		
+		if (dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length == 0) {
+			makeDomBank_AdvanceAdd('add',ID_payment,number,se_content);
+		}
+		else
+		{
+			html += htmlAdd+'<div class = "row"><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
+						'<table class="table borderless" style="font-weight: bold;">'+
+						'<thead></thead>'+
+						'<tbody>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Kegiatan'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<span color = "red">Pembayaran '+Code+'</span>'+
+								'</td>'+
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Biaya'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+InvoiceleftPO+'">'+ 
+								'</td>'+		
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Uang diberikan melalui: (pilih salah satu)'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<select class = "form-control TypePay">'+
+										'<option value = "Transfer" selected>Transfer</option>'+ 
+										'<option value = "Cash" selected>Cash</option>'+ 
+									'</select>'+	
+								'</td>'+		
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Bank'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									OPBank()+
+								'</td>'+		
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'No Rekening'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening">'+
+								'</td>'+		
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Nama Penerima'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<input type = "text" class = "form-control Nama_Penerima" placeholder="Nama Penerima">'+
+								'</td>'+		
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Dibutuhkan pada tanggal:'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+			                            '<input data-format="yyyy-MM-dd" class="form-control TglBA" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
+			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+			                		'</div>'+
+								'</td>	'+			
+							'</tr>'+
+						'</tbody>'+
+						'</table>'+
+						'<div id="r_signatures"></div>'+
+						'<div id = "r_action">'+
+							'<div class="row">'+
+								'<div class="col-md-12">'+
+									'<div class="pull-right">'+
+										'<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
+										'<button class="btn btn-primary hide btnEditInputBA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+										'<button class="btn btn-success submitBA"> Submit</button>'+
+									'</div>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
-					'</div>'+
-				'</div></div></div>';
-		se_content.html(html);			
-		se_content.find('.Money_Pembayaran').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-		se_content.find('.Money_Pembayaran').maskMoney('mask', '9894');
+					'</div></div></div>'+EndhtmlAdd;
+			se_content.html(html);			
+			se_content.find('.Money_Pembayaran').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			se_content.find('.Money_Pembayaran').maskMoney('mask', '9894');
 
-		se_content.find('.datetimepicker').datetimepicker({
-			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-		});
+			se_content.find('.datetimepicker').datetimepicker({
+				format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+			});
 
-		se_content.find('.dtbank[tabindex!="-1"]').select2({
-		    //allowClear: true
-		});
+			se_content.find('.dtbank[tabindex!="-1"]').select2({
+			    //allowClear: true
+			});
+		}
+		
 	}
 
-	function makeDomCash_AdvanceAdd(action,ID_spb_created,number,se_content)
+	function makeDomCash_AdvanceAdd(action,ID_payment,number,se_content,button = 0)
 	{
 		var Code = $('.C_radio_pr:checked').attr('code');
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
@@ -869,7 +883,9 @@
 		var html = '';
 		Supplier = Supplier.split('||');
 		Supplier = Supplier[1].trim();
-		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>CASH ADVANCE FORM</h2></div>'+
+		var htmlAdd = (button == 0) ? '<div class = "CAAdd">' : '';
+		var EndhtmlAdd = (button == 0) ? '</div>' : '';
+		html += htmlAdd+'<div class = "row"><div class = "col-xs-12"><div align="center"><h2>CASH ADVANCE FORM</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 					'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
 					'<table class="table borderless" style="font-weight: bold;">'+
@@ -938,7 +954,7 @@
 							'</div>'+
 						'</div>'+
 					'</div>'+
-				'</div></div></div>';
+				'</div></div></div>'+EndhtmlAdd;
 		se_content.html(html);			
 		se_content.find('.Money_Pembayaran').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		se_content.find('.Money_Pembayaran').maskMoney('mask', '9894');
@@ -1051,13 +1067,14 @@
 		var ev = $(this).closest('.FormPage');
 		var action = ev.attr('action');
 		var number = ev.attr('number');
-		if (action == 'add') {
-			var html = __HtmlPageContentPayment(number,v);
-		}
-		else
-		{
-			var html = '';
-		}
+		// if (action == 'add') {
+		// 	var html = __HtmlPageContentPayment(number,v);
+		// }
+		// else
+		// {
+		// 	var html = '';
+		// }
+		var html = __HtmlPageContentPayment(number,v);
 		ev.find('.PageContentPayment').remove();
 		var r = $(this).closest('.row');
 		r.after(html);
@@ -1429,7 +1446,7 @@
 	    }
 	}
 
-	function makeDomSPBView(action,ID_spb_created,number,se_content)
+	function makeDomSPBView(action,ID_payment,number,se_content)
 	{
 		var Code = $('.C_radio_pr:checked').attr('code');
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
@@ -1439,8 +1456,8 @@
 		Supplier = Supplier.split('||');
 		Supplier = Supplier[1].trim();
 		var ev = se_content.closest('.FormPage');
-		var ID_payment = ev.attr('ID_payment');
-		var dt_arr = __getRsViewGRPO_SPB(ID_spb_created);
+		// var ID_payment = ev.attr('ID_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
 		var dtspb = dt_arr.dtspb;
 		console.log(dtspb);
 		var data = ClassDt.Dataselected;
@@ -1448,7 +1465,7 @@
 		var InvoiceleftPO = parseInt(InvoicePO);
 		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
-			if (ID_spb_created == data.dtspb[i].ID && i > 0) {
+			if (ID_payment == data.dtspb[i].ID && i > 0) {
 				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
 					c++;
@@ -1485,11 +1502,11 @@
 		if (dtspb[0]['Code'] != '') {
 			var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
 			UploadInvoice = UploadInvoice[0];
-			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
 
 			var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
 			UploadTandaTerima = UploadTandaTerima[0];
-			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
 
 			if (dtspb[0]['Status'] == 2) {
 				btnSPb = '<button class="btn btn-default print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
@@ -1981,7 +1998,7 @@
 										'<div class="form-group">'+
 											'<label class = "col-sm-2">No Document</label>'+	
 												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
-												'<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
 												'</div>'+
 											'<label class = "col-sm-1">Upload Document</label>'+
 												'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf" disabled>'+
@@ -1992,7 +2009,7 @@
 										'<div class="form-group">'+
 											'<label class = "col-sm-2">No Tanda Terima</label>'	+
 												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...." value="'+dtgood_receipt_spb[i]['NoTandaTerima']+'" disabled>'+
-												'<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
 												'</a>'+
 												'</div>'+
 											'<label class = "col-sm-1">Upload Tanda Terima</label>'+
@@ -2124,6 +2141,233 @@
 			ev.find('.QtyDiterima').maskMoney('mask', '9894');
 		}	
 		// console.log(arr_selected);
+	})
+
+	$(document).off('click', '.submitGRPO').on('click', '.submitGRPO',function(e) {
+		// validation
+		var ev = $(this).closest('.FormPage');
+		var action = ev.attr('action');
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_GRPO(ev);
+			if (validation) {
+				SubmitGRPO('.submitGRPO',ev,action);
+			}
+		}
+	})
+
+	function validation_input_GRPO(ev)
+	{
+		var find = true;
+		var data = {
+			NoDocument : ev.find('.NoDocument').val(),
+			NoTandaTerimaGRPO : ev.find('.NoTandaTerimaGRPO').val(),
+			TglGRPO : ev.find('.TglGRPO').val(),
+		};
+		if (validation(data) ) {
+			var action = ev.attr('action');
+			if (action == 'add') {
+				// Upload Document
+				ev.find(".BrowseDocument").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Upload Document ') ) {
+					  ev.find(".submitGRPO").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Tanda Terima GRPO
+				ev.find(".BrowseTTGRPO").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  ev.find(".submitGRPO").prop('disabled',false);
+					  find = false;
+					  return false;
+					}
+				})
+			}
+			
+		}
+		else
+		{
+			find = false;
+		}
+
+		// check item
+		var arr = [];
+		ev.find('.Item').each(function(){
+			var v = $(this).val();
+			arr.push(v);
+		})
+
+		var arr_qty_diterima = [];
+		ev.find('.QtyDiterima').each(function(){
+			var v = $(this).val();
+			arr_qty_diterima.push(v);
+		})
+
+		for (var i = 0; i < arr_qty_diterima.length; i++) {
+			if (arr_qty_diterima[i] == 0) {
+				toastr.error('Qty tidak boleh 0','!!!Error');
+				find=false;
+				break;
+			}
+		}
+
+		for (var i = 0; i < arr.length; i++) {
+			if (arr[i]=='' || arr[i]==null || arr[i]==undefined) {
+				toastr.error('Item belum dipilih','!!!Error');
+				find=false;
+				break;
+
+			}
+			else
+			{
+				for (var k = i+1; k < arr.length; k++) {
+					if (arr[i]==arr[k]) {
+						toastr.error('Item yang dipilih tidak boleh sama','!!!Error');
+						find=false;
+						break;
+					}
+				}
+
+				if (!find) {
+					break;
+				}
+			}
+		}
+		
+		return find;
+	}
+
+	function SubmitGRPO(elementbtn,ev,action="add")
+	{
+		loadingStart();
+		var Code_po_create = $('.C_radio_pr:checked').attr('code');
+		var Departement = IDDepartementPUBudget;
+		var ID_payment = ev.attr('ID_payment');
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseDocument').length ) {
+			var UploadFile = ev.find('.BrowseDocument')[0].files;
+			form_data.append("FileDocument[]", UploadFile[0]);
+		}
+		
+		if ( ev.find('.BrowseTTGRPO').length ) {
+			var UploadFile = ev.find('.BrowseTTGRPO')[0].files;
+			form_data.append("FileTandaTerima[]", UploadFile[0]);
+		}
+
+		var NoDocument = ev.find('.NoDocument').val();
+		var NoTandaTerima = ev.find('.NoTandaTerimaGRPO').val();
+		var ID_budget_left = 0;
+
+		var arr_item = [];
+		ev.find('.Item').each(function(){
+			var ID_po_detail = $(this).find('option:selected').val();
+			var ev2 = $(this).closest('.GroupingItem');
+			var QtyDiterima = ev2.find('.QtyDiterima').val();
+			var temp = {
+				ID_po_detail : ID_po_detail,
+				QtyDiterima : QtyDiterima,
+			}
+			arr_item.push(temp);
+		})
+
+		var data = {
+			Code_po_create : Code_po_create,
+			Departement : Departement,
+			ID_budget_left : ID_budget_left,
+			NoDocument : NoDocument,
+			NoTandaTerima :NoTandaTerima,
+			ID_payment : ID_payment,
+			action : action,
+			arr_item : arr_item,
+			TglGRPO : ev.find('.TglGRPO').val(),
+			po_data : ClassDt.po_data,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var data_verify = {
+			Code_po_create : Code_po_create,
+			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+		};
+
+		var token2 = jwt_encode(data_verify,"UAP)(*");
+		form_data.append('token2',token2);
+
+		// var url = base_url_js + "budgeting/submit"
+		var url = base_url_js + "budgeting/submitgrpo"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		if (data.Change == 1) {
+		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+		  			setTimeout(function () {
+		  				Get_data_po().then(function(data){
+		  					$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+		  					$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+		  					loadingEnd(500);
+		  				})
+		  			},1000);
+		  			// load first load data
+		  			
+		  		}
+		  		else
+		  		{
+		  			toastr.error("Connection Error, Please try again", 'Error!!');
+		  			loadingEnd(500);
+		  		}
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			Get_data_po().then(function(data){
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+		  				loadingEnd(500);
+		  			})
+		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+		  		},1500);
+		  	}
+		    
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    nmbtn = 'Submit';
+		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+		  }
+		})
+	}
+
+	$(document).off('click', '.btnEditInputGRPO').on('click', '.btnEditInputGRPO',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.pageFormInput');
+			ev2.find('input').not('.TglGRPO').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			ev2.find('select').prop('disabled',false);
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Data SPB telah approve, tidak bisa edit');
+		}
+		
 	})	
 	
 </script>
