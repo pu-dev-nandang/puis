@@ -110,7 +110,7 @@
 			         'orderable': false,
 			         'className': 'dt-body-center',
 			         'render': function (data, type, full, meta){
-			             return OPMenu(full.ID_Menu)+
+			             return '<div class = "hide">'+full.Menu+'</div>'+OPMenu(full.ID_Menu)+
 							'<div class = "hide">'+full.Menu+'</div>';
 			         }
 			      },
@@ -118,7 +118,8 @@
 			         'targets': 1,
 			         'render': function (data, type, full, meta){
 			             return '<input type="text" class="form-control SubMenu1" value="'+full.SubMenu1+'">'+
-							'<div class = "hide">'+full.SubMenu1+'</div>';
+							'<div class = "hide">'+full.SubMenu1+'</div>'+
+							'<div class = "hide">'+full.Menu+'</div>';
 			         }
 			      },
 			      {

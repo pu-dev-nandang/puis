@@ -199,9 +199,12 @@ class C_globalpage extends Budgeting_Controler {
             jadikan ke 01/UAP-PURCHASING/SPB/VII/2019
             1.Cek Code SPB exist or not
             2.Cek User memiliki hubungan dengan Code SPB tersebut,kecuali Finance
+            3.Cek Code SPB dari PO/SPK atau tidak
+                jika dari PO maka SPB PO dan jika tidak maka dari user
         */
-
-         $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','Code',$rsCode);
+         $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb" and a.Code = ?';
+         $query=$this->db->query($sql, array($rsCode))->result_array();
+         $G_data = $query;
          if (count($G_data) > 0) {
              $bool = true;
              if ($this->session->userdata('IDdepartementNavigation') == 9) {
@@ -235,8 +238,16 @@ class C_globalpage extends Budgeting_Controler {
              $data['Code'] = $rsCode;
              $data['Code_po_create'] = $G_data[0]['Code_po_create'];
              $data['G_data'] = $G_data;
-             $content = $this->load->view('global/budgeting/spb/InfoSPB',$data,true);
-             $this->temp($content);
+             if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                 $content = $this->load->view('global/budgeting/spb/InfoSPB_PO',$data,true);
+                 $this->temp($content);
+             }
+             else
+             {
+                $content = $this->load->view('global/budgeting/spb/InfoSPB_User',$data,true);
+                $this->temp($content);
+             }
+             
              
          }
          else

@@ -586,7 +586,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $this->load->model('master/m_master');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
-        $ID_spb_created = $input['ID_spb_created'];
+        $ID_payment = $input['ID_payment'];
         $dt_arr = $input['dt_arr'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
         $dtspb = $dt_arr['dtspb'];
@@ -612,7 +612,7 @@ class C_save_to_pdf3 extends CI_Controller {
     {
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
-        $ID_spb_created = $input['ID_spb_created'];
+        $ID_payment = $input['ID_payment'];
         $dt_arr = $input['dt_arr'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
         $dtspb = $dt_arr['dtspb'];
@@ -624,7 +624,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $po_data = json_decode(json_encode($po_data),true);
         $po_create = $po_data['po_create'];
 
-        $filename = '__'.$ID_spb_created.'.pdf'; 
+        $filename = '__'.$ID_payment.'.pdf'; 
 
         $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
         // $fpdf->AliasNbPages();
@@ -657,15 +657,15 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $fpdf->Cell(50, $h, 'NO KWT/INV', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$dtspb[0]['NoInvoice'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$dtspb[0]['Detail'][0]['NoInvoice'] , 0, 1, 'L', 0);
 
         $fpdf->Cell(50, $h, 'TANGGAL', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$this->getDateIndonesian($dtspb[0]['Datee']) , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$this->getDateIndonesian($dtspb[0]['Detail'][0]['Datee']) , 0, 1, 'L', 0);
 
         $fpdf->Cell(50, $h, 'PERIHAL', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$dtspb[0]['Perihal'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$dtspb[0]['Detail'][0]['Perihal'] , 0, 1, 'L', 0);
 
         $y = $fpdf->GetY()+2;
         $fpdf->Line(10,$y,200,$y);
@@ -678,22 +678,22 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(80, $h,$po_create[0]['NamaSupplier'] , 0, 1, 'L', 0);
         $fpdf->SetFont('Arial','',$FontIsian);
         $fpdf->Cell(75, $h, 'No Rekening', 0, 0, 'L', 0);
-        $ID_bank = $dtspb[0]['ID_bank'];
+        $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
         $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
-        $fpdf->Cell(80, $h,$G_bank[0]['Name'].' No : '.$dtspb[0]['No_Rekening'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$G_bank[0]['Name'].' No : '.$dtspb[0]['Detail'][0]['No_Rekening'] , 0, 1, 'L', 0);
 
         $y = $fpdf->GetY()+10;
         $fpdf->SetY($y);
         $fpdf->SetFont('Arial','B',$FontIsian);
         $fpdf->Cell(50, $h, 'PEMBAYARAN', 0, 1, 'L', 0);
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
-        $fpdf->Cell(45, $h, 'HARGA', 0, 0, 'L', 0);
+        $fpdf->Cell(45, $h, 'Harga', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
         // count left po
         $InvoiceleftPO = $dtspb[0]['InvoicePO'];
         $datadtsb = $Dataselected['dtspb'];
         for ($i=0; $i < count($datadtsb); $i++) { 
-            if ($ID_spb_created == $datadtsb[$i]['ID'] && $i > 0) {
+            if ($ID_payment == $datadtsb[$i]['ID'] && $i > 0) {
                 if ($datadtsb[$i]['Invoice']!= null && $datadtsb[$i]['Invoice'] != 'null') {
                     $InvoiceleftPO -= $datadtsb[$i - 1]['Invoice'];
                 }
@@ -707,9 +707,9 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(50, $h, 'Rp '.number_format($InvoiceleftPO,2,',','.'), 0, 0, 'L', 0);
         $fpdf->Cell(30, $h, '(include PPN)', 0, 1, 'L', 0);
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
-        $fpdf->Cell(45, $h, $dtspb[0]['TypeInvoice'], 0, 0, 'L', 0);
+        $fpdf->Cell(45, $h, $dtspb[0]['Detail'][0]['TypeInvoice'], 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
-        $fpdf->Cell(50, $h, 'Rp '.number_format($dtspb[0]['Invoice'],2,',','.'), 0, 0, 'L', 0);
+        $fpdf->Cell(50, $h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 0, 0, 'L', 0);
         $fpdf->Cell(30, $h, '(include PPN)', 0, 1, 'L', 0);
 
         $xcustom = 50;
@@ -718,13 +718,13 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
         $fpdf->Cell(45, $h,'Sisa Pembayaran', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
-        $Sisa = $InvoiceleftPO - $dtspb[0]['Invoice'];
+        $Sisa = $InvoiceleftPO - $dtspb[0]['Detail'][0]['Invoice'];
         $fpdf->Cell(50, $h, 'Rp '.number_format($Sisa,2,',','.'), 0, 1, 'L', 0);
 
         $y = $fpdf->GetY();
         $y += 5;
         $data = array(
-            'bilangan' => (int)$dtspb[0]['Invoice'],
+            'bilangan' => (int)$dtspb[0]['Detail'][0]['Invoice'],
             'auth' => 's3Cr3T-G4N', 
         );
         $key = "UAP)(*";

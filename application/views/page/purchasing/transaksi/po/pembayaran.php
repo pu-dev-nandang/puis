@@ -3051,4 +3051,96 @@
 			$(this).closest('.form-horizontal').remove();
 		}
 	})
+
+	$(document).off('click', '.btn-tambah').on('click', '.btn-tambah',function(e) {
+		//loadingStart();
+		// check data via ajax 
+		var Code = $('.C_radio_pr:checked').attr('code');
+		// console.log(Code)
+		Get_data_spb_grpo(Code).then(function(data){
+			var dtspb = data.dtspb;
+			var bool = true;
+			for (var i = 0; i < dtspb.length; i++) {
+				if (dtspb[i].Status != 2) {
+					bool = false;
+					break;
+				}
+				else
+				{
+					if (dtspb[i].FinanceAP.length == 0) {
+						bool = false;
+						break;
+					}
+					else
+					{
+						var FinanceAP = dtspb[i].FinanceAP;
+						if (FinanceAP[0]['Status'] != 2) {
+							bool = false;
+							break;
+						}
+					}
+				}
+			}
+
+			// check sisa 
+			var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
+			if (dtspb.length > 0) {
+				var InvoiceleftPO = parseInt(InvoicePO);
+				for (var i = 0; i < dtspb.length; i++) {
+					if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
+						InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+					}
+					else
+					{
+						InvoiceleftPO -= parseInt(0);
+					}
+				}
+
+				if (InvoiceleftPO <= 0) {
+					bool = false;
+				}
+			}
+
+			if (bool) {
+				if ($('.FormPage[action="add"').length ) {
+					toastr.info('SPB hanya boleh ditambah satu');
+				}
+				else
+				{
+
+					// get number last
+					var number = $('.FormPage:last').attr('number');
+					number = parseInt(number) + 1;
+					template_html = __template_html('add','',number);
+					$('#content_input').append(template_html);
+				}
+				
+			}
+			else
+			{
+				toastr.info('Tidak bisa tambah SPB, Karena SPB sebelumnya belum selesai');
+			}
+			// console.log(data);
+		})
+	})
+
+	$(document).off('click', '.print_page').on('click', '.print_page',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var ID_payment = ev.attr('id_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+
+		var url = base_url_js+'save2pdf/print/pre_pembayaran';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 </script>

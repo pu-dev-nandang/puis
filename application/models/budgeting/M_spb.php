@@ -129,6 +129,12 @@ class M_spb extends CI_Model {
 
                 $Good_Receipt = $G_good_receipt_spb;
                 $query[$i]['Good_Receipt'] = $Good_Receipt;
+
+                // check ap udah bayar atau belum
+                $FinanceAP = array();
+                $FinanceAP = $this->m_master->caribasedprimary('db_budgeting.ap','ID_payment',$ID);
+
+                $query[$i]['FinanceAP'] = $FinanceAP;
             }
             $arr['dtspb']=$query;
         }

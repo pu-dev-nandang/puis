@@ -971,6 +971,8 @@ $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 $route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
 $route['rest2/__show_info_payment'] = 'api/c_rest2/show_info_payment';
+$route['rest2/__get_data_payment'] = 'api/c_rest2/get_data_payment';
+	
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1398,6 +1400,9 @@ $route['budgeting/submitca'] = 'page/budgeting/c_cashadvance/submitca';
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
+
+// financeAP
+$route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
