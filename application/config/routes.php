@@ -1241,6 +1241,12 @@ $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asin
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
 
+$route['api3/__crudLembagaSurview'] = 'api/c_api3/crudLembagaSurview';
+$route['api3/__crudExternalAccreditation'] = 'api/c_api3/crudExternalAccreditation';
+$route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalAccreditation';
+
+$route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
+
 
 
 
