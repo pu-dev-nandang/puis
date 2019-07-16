@@ -972,7 +972,8 @@ $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 $route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
 $route['rest2/__show_info_payment'] = 'api/c_rest2/show_info_payment';
 $route['rest2/__get_data_payment'] = 'api/c_rest2/get_data_payment';
-	
+$route['rest2/__reject_payment_from_fin'] = 'api/c_rest2/reject_payment_from_fin';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

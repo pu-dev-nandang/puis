@@ -2437,7 +2437,7 @@ class C_rest2 extends CI_Controller {
                $whereaction = ' and StatusPay = 2';
 
                 // get Department
-                $WhereFiltering = '';
+                $WhereFiltering = ' and ID_payment not in (select ID_payment from db_budgeting.ap where Status != 2)';
                  
                 $requestData = $_REQUEST;
                 $StatusQuery = ' and Status = 2';
@@ -2569,6 +2569,41 @@ class C_rest2 extends CI_Controller {
              // handling orang iseng
              echo '{"status":"999","message":"Not Authorize"}';
         }
+    }
+
+    public function reject_payment_from_fin()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $NIP = $dataToken['NIP'];
+                    $NoteDel = $dataToken['NoteDel'];
+                    $Desc_circulationSheet = 'Reject{'.$NoteDel.'}';
+                    $arr = array(
+                        'Status' => -1,
+                    );
+                    $this->db->where('ID',$ID_payment);
+                    $this->db->update('db_payment.payment',$arr);
+                    $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                    // insert to spb_circulation_sheet
+                        $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
+                        if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                            // insert to po_circulation_sheet
+                                $this->m_pr_po->po_circulation_sheet($G_data[0]['Code_po_create'],$Desc_circulationSheet);  
+                        }
+
+                    echo json_encode($rs);    
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
     }
 
 }

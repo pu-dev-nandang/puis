@@ -1,11 +1,32 @@
+<style type="text/css">
+	.borderless thead>tr>th {
+	    vertical-align: bottom;
+	    border-bottom: none !important;
+	}
+
+	.borderless thead>tr>th, .borderless tbody>tr>th, .borderless tfoot>tr>th, .borderless thead>tr>td, .borderless tbody>tr>td, .borderless tfoot>tr>td {
+		    padding: 4px;
+		    line-height: 1.428571429;
+		    vertical-align: top;
+		    border-top: none !important;
+		}
+
+	.TD1 {
+		width: 35%;
+	}
+
+	.TD2 {
+		width: 5%;
+	}	
+</style>
 <div class="row">
-	<div class="col-xs-6 col-md-offset-3" style="min-width: 600px;overflow: auto;">
+	<div class="col-xs-8 col-md-offset-2" style="min-width: 600px;overflow: auto;">
 		<div class="thumbnail">
 			<div id = "page_payment_list"></div>
 		</div>	
 	</div>
 </div>
-<div id="page_content">
+<div id="page_content" style="min-width: 800px;overflow: auto;">
 
 </div>
 <script type="text/javascript">
@@ -36,6 +57,9 @@
 
 		    return html;    	 				
 		},
+		po_data : [],
+		po_payment_data : [],
+		all_po_payment : [],
 	};
 
 	$(document).ready(function() {
@@ -46,7 +70,6 @@
 			loadingEnd(500);
 		})
 	});
-
 
 	function Get_data_payment(){
        var def = jQuery.Deferred();
@@ -202,44 +225,331 @@
 		var CodeSPB = $(this).attr('CodeSPB');
 		var Code_po_create = $(this).attr('Code_po_create');
 		var PR = $(this).attr('prcode');
-		MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+
+		if (Code_po_create != '' && Code_po_create != null) {
+			Get_data_spb_grpo(Code_po_create).then(function(data){
+				ClassDt.all_po_payment = data;
+				var dt_arr = __getRsViewGRPO_SPB(ID_payment,data);
+				ClassDt.po_payment_data = dt_arr;
+				Get_data_detail_po(Code_po_create).then(function(data){
+					ClassDt.po_data = data;
+					MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+				})
+			})
+			
+		}
+		else
+		{
+			MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+		}
+		
 	})
+
+	function Get_data_spb_grpo(Code)
+	{
+       var def = jQuery.Deferred();
+       var url = base_url_js + 'rest2/__Get_data_spb_grpo';
+       var data = {
+           auth : 's3Cr3T-G4N',
+           Code : Code,
+       };
+       var token = jwt_encode(data,"UAP)(*");
+       $.post(url,{ token:token },function (resultJson) {
+       		def.resolve(resultJson);
+       }).fail(function() {
+       	  def.reject();
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
+       return def.promise();
+	}
+
+	function __getRsViewGRPO_SPB(ID_payment,Dataselected)
+	{
+		var arr=[];
+		var dtspb = Dataselected.dtspb;
+		var dtspb_rs = [];
+		// get indeks array
+		for (var i = 0; i < dtspb.length; i++) {
+			if (ID_payment == dtspb[i].ID) {
+				break;
+			}
+		}
+
+		dtspb_rs[0] = dtspb[i];
+		arr = {
+			dtspb : dtspb_rs,
+		};
+
+		return arr;
+	}
+
+	function Get_data_detail_po(Code)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__Get_data_po_by_Code";
+		var data = {
+		    Code : Code,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
 
 	function MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR)
 	{
-		var html = '<div class ="row FormPage" style ="margin-top:10px;">';
-						'<div class = "col-xs-12">'+
-							'<div class = "form-horizontal">';
+		var html = '<div class ="row FormPage" style ="margin-top:30px;">'+
+						'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
+							'<div class="well">'+
+							'<div align="center"><h2>Payment</h2></div>'+
+							'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+							'<table class="table borderless" style="font-weight: bold;">'+
+							'<thead></thead>'+
+							'<tbody>';
 
 		var se_content = $('#page_content');
 		if (PR != '' && PR != null) {
-			html += '<div class="form-group">'+
-						'<label class = "col-sm-2">PR Code</label>'+
-						'<div class = "col-xs-3">'+
-							'<button class="btn btn-default" id="pdfprintPR" prcode="'+PR+'"> <i class="fa fa-file-pdf-o"></i> '+PR+'</button>'+
-						'</div>'+
-					'</div>';	
+			html += '<tr>'+
+						'<td class = "TD1"><label>PR Code</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "javascript:void(0)" prcode = "'+PR+'" class = "printpr">'+PR+'</a></td>'+
+					'</tr>';	
 		}
 
 		if (Code_po_create != '' && Code_po_create != null) {
-			html += '<div class="form-group">'+
-						'<label class = "col-sm-2">PO/SPK Code</label>'+
-						'<div class = "col-xs-3">'+
-							'<button class="btn btn-default" id="pdfprintPO" Code_po_create="'+Code_po_create+'"> <i class="fa fa-file-pdf-o"></i> '+Code_po_create+'</button>'+
-						'</div>'+
-					'</div>';	
+			var po_data = ClassDt.po_data;
+			var po_create = po_data.po_create;
+			var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
+			html += '<tr>'+
+						'<td class = "TD1"><label>PO / SPK Code</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a></td>'+
+					'</tr>';
+
+			var pre_po_supplier = po_data.pre_po_supplier;
+			var t = '';									
+			for (var i = 0; i < pre_po_supplier.length; i++) {
+				var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
+				var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
+				var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
+				// t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+				t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
+					Reason+
+					'</li>';
+			}		
+
+
+			html += '<tr>'+
+						'<td class = "TD1"><label>Perbandingan Vendor</label></td>'+
+						'<td>:</td>'+
+						'<td>'+t+'</td>'+
+					'</tr>';			
 		}
 
-		html += '<div class="form-group">'+
-						'<label class = "col-sm-2">Payment</label>'+
-						'<div class = "col-xs-3">'+
-							'<button class="btn btn-default" id="pdfprintPO" ID_payment="'+ID_payment+'"> <i class="fa fa-file-pdf-o"></i> '+'View Pay'+'</button>'+
-						'</div>'+
-					'</div>';
+		var lblAdd = '';
+		if (TypePay == 'Spb') {
+			lblAdd = "<br> Code : "+CodeSPB;
+		}
 
-		html += '</div>';		
+		html += '<tr>'+
+					'<td class = "TD1"><label>Payment Type : '+TypePay+' '+lblAdd+'</label></td>'+
+					'<td>:</td>'+
+					'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
+				'</tr>';
+
+		var FolderPayment = '';
+		switch(TypePay) {
+		  case "Spb":
+		    FolderPayment = "spb";
+		    break;
+		  case "Bank Advance":
+		    FolderPayment = "bankadvance";
+		    break;
+		  case "Cash Advance":
+		    FolderPayment = "cashadvance";
+		    break;
+		  case "Petty Cash":
+		    FolderPayment = "pettycash";  
+		  default:
+		    FolderPayment = '';
+		}		
+		var po_payment_data = ClassDt.po_payment_data;
+		// check for document invoice
+		var dtspb = po_payment_data.dtspb;
+		var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+		if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
+			UploadInvoice = UploadInvoice[0];
+			html += '<tr>'+
+						'<td class = "TD1"><label>Invoice</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
+					'</tr>';
+		}
+		
+		var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+		if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
+			UploadTandaTerima = UploadTandaTerima[0];
+			html += '<tr>'+
+						'<td class = "TD1"><label>Tanda Terima</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
+					'</tr>';
+		}
+
+		html += '<tr>'+
+					'<td class = "TD1"><label>No Voucher</label></td>'+
+					'<td>:</td>'+
+					'<td><input type ="text" class = "form-control NoVoucher" style = "width : 350px;"></td>'+
+				'</tr>'+
+				'<tr>'+
+					'<td><label>Upload Voucher</label></td>'+
+					'<td>:</td>'+
+					'<td><input type="file" data-style="fileinput" class="BrowseVoucher" id="BrowseVoucher" accept="image/*,application/pdf"></td>'+
+				'</tr>';
+
+		html += '</tbody></table>';
+		html += '<div id = "r_action">'+
+						'<div class="row">'+
+							'<div class="col-md-12">'+
+								'<div class="pull-right">'+
+									'<button class="btn btn-inverse" id="Reject" action="reject" ID_payment = "'+ID_payment+'">Reject</button>'+
+									'&nbsp'+
+									'<button class="btn btn-success" id = "Paid" ID_payment = "'+ID_payment+'"> Paid</button>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>';		
+		html += '</div></div></div>';		
 
 		se_content.html(html);		
 
 	}
+
+	$(document).off('click', '.printpr').on('click', '.printpr',function(e) {
+		var url = base_url_js+'save2pdf/print/prdeparment';
+		var PRCode = $(this).attr('prcode');
+		data = {
+		  PRCode : PRCode,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+	$(document).off('click', '.printpo').on('click', '.printpo',function(e) {
+		// print pdf
+		var url = base_url_js+'save2pdf/print/spk_or_po';
+		data = {
+		  Code : $(this).attr('code_po_create') ,
+		  type : $(this).attr('TypeCode'),
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+	$(document).off('click', '.printpay').on('click', '.printpay',function(e) {
+		var dt_arr = ClassDt.po_payment_data;
+		var dtspb = dt_arr.dtspb;
+		var ID_payment = dtspb[0]['ID'];
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.all_po_payment;
+
+		var url = base_url_js+'save2pdf/print/pre_pembayaran';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+
+	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
+		var ID_payment = $(this).attr('ID_payment');
+		if (confirm('Are you sure ?')) {
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__reject_payment_from_fin';
+				var data = {
+					ID_payment : ID_payment,
+					NIP : sessionNIP,
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					$('#page_content').empty();
+					if (rs.Status == 1) {
+						$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+						Get_data_payment().then(function(data){
+							$('.C_radio:first').prop('checked',true);
+							$('.C_radio:first').trigger('change');
+							loadingEnd(500);
+						})
+						toastr.success('Payment telah berhasil di reject');
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+							Get_data_payment().then(function(data){
+								$('.C_radio:first').prop('checked',true);
+								$('.C_radio:first').trigger('change');
+								loadingEnd(500);
+							})
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+
+				});
+			})	
+		}
+
+	})
 </script>

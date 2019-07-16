@@ -471,8 +471,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
 					c++;
 				}
 				else
@@ -701,8 +701,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
 					c++;
 				}
 				else
@@ -763,8 +763,8 @@
 					var c = 0;
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
-							if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+							if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
 								c++;
 							}
 							else
@@ -928,8 +928,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
 					c++;
 				}
 				else
@@ -990,8 +990,8 @@
 					var c = 0;
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
-							if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+							if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
 								c++;
 							}
 							else
@@ -1607,8 +1607,8 @@
 		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_payment == data.dtspb[i].ID && i > 0) {
-				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
 					c++;
 				}
 				else
@@ -3087,8 +3087,8 @@
 			if (dtspb.length > 0) {
 				var InvoiceleftPO = parseInt(InvoicePO);
 				for (var i = 0; i < dtspb.length; i++) {
-					if (dtspb[i].Invoice != null && dtspb[i].Invoice != 'null') {
-						InvoiceleftPO -= parseInt(dtspb[i].Invoice);
+					if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
+						InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
 					}
 					else
 					{
@@ -3100,7 +3100,7 @@
 					bool = false;
 				}
 			}
-
+			
 			if (bool) {
 				if ($('.FormPage[action="add"').length ) {
 					toastr.info('SPB hanya boleh ditambah satu');
