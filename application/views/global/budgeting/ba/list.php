@@ -54,6 +54,7 @@ function LoadDataForTable()
     	sessionNIP : sessionNIP,
 	    auth : 's3Cr3T-G4N',
 	    length : G_ApproverLength,
+      Type : 'Bank Advance',
 	};
 	var token = jwt_encode(data,"UAP)(*");
 
@@ -67,7 +68,7 @@ function LoadDataForTable()
 	    "iDisplayLength" : 5,
 	    "ordering" : false,
 	    "ajax":{
-	        url : base_url_js+"rest2/__get_data_spb", // json datasource
+	        url : base_url_js+"rest2/__get_data_payment_type", // json datasource
 	        ordering : false,
 	        type: "post",  // method  , by default get
 	        data : {token : token},
@@ -84,15 +85,15 @@ function LoadDataForTable()
           var PRHTML = '';
           PRHTML += '<li>'+ListPR[0]+'</li>';
           var ID_payment = ListPR[1].ID_payment;
-          var CodeSPB = ListPR[1].CodeSPB;
+          var Perihal = ListPR[1].Perihal;
           var TypeCode = ListPR[1].TypeCode;
-          var code_url2 = findAndReplace(CodeSPB,'/','-');
+          var code_url2 = jwt_encode(ID_payment,"UAP)(*");;
           var Code_po_create = '';
           if (data[1] != null && data[1] != '') {
           	var Code_po_create = data[1];
           }
 
-   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/spb/list/'+code_url2+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+'<label>'+Code_po_create+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/ba/list/'+code_url2+'" ID_payment="'+ID_payment+'">'+Perihal+'</a>'+'<br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	
    	    	$( row ).find('td:eq(2)').attr('align','center');
    	    	$( row ).find('td:eq(4)').attr('align','center');

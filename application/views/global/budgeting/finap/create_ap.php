@@ -405,12 +405,12 @@
 		}
 
 		html += '<tr>'+
-					'<td class = "TD1"><label>No Voucher</label></td>'+
+					'<td class = "TD1"><label>No Dokumen</label></td>'+
 					'<td>:</td>'+
 					'<td><input type ="text" class = "form-control NoVoucher" style = "width : 350px;"></td>'+
 				'</tr>'+
 				'<tr>'+
-					'<td><label>Upload Voucher</label></td>'+
+					'<td><label>Upload Dokumen</label></td>'+
 					'<td>:</td>'+
 					'<td><input type="file" data-style="fileinput" class="BrowseVoucher" id="BrowseVoucher" accept="image/*,application/pdf"></td>'+
 				'</tr>';
@@ -552,4 +552,164 @@
 		}
 
 	})
+
+
+	$(document).off('click', '#Paid').on('click', '#Paid',function(e) {
+		var ID_payment = $(this).attr('ID_payment');
+		if (confirm('Are you sure ?')) {
+			var validation = __validation();
+			if (validation) {
+				loadingStart();
+				var form_data = new FormData();
+				var UploadFile = $('.BrowseVoucher')[0].files;
+				form_data.append("UploadVoucher[]", UploadFile[0]);
+
+				var url = base_url_js + 'rest2/__paid_payment_from_fin';
+				var data = {
+					ID_payment : ID_payment,
+					NoVoucher : $('.NoVoucher').val(),
+					NIP : sessionNIP,
+					auth : 's3Cr3T-G4N',
+					po_data : ClassDt.po_data,
+					po_payment_data : ClassDt.po_payment_data,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				form_data.append('token',token);
+				$.ajax({
+				  type:"POST",
+				  url:url,
+				  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+				  contentType: false,       // The content type used when sending data to the server.
+				  cache: false,             // To unable request pages to be cached
+				  processData:false,
+				  dataType: "json",
+				  success:function(data)
+				  {
+				  	$('#page_content').empty();
+				  	var rs = data;
+				  	if (rs.Status == 1) {
+				  		$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+				  		Get_data_payment().then(function(data){
+				  			$('.C_radio:first').prop('checked',true);
+				  			$('.C_radio:first').trigger('change');
+				  			loadingEnd(500);
+				  		})
+				  		toastr.success('Payment telah berhasil dibayarkan');
+				  	}
+				  	else
+				  	{
+				  		if (rs.Change == 1) {
+				  			toastr.info('The Data already have updated by another person,Please check !!!');
+				  			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+				  			Get_data_payment().then(function(data){
+				  				$('.C_radio:first').prop('checked',true);
+				  				$('.C_radio:first').trigger('change');
+				  				loadingEnd(500);
+				  			})
+				  		}
+				  		else
+				  		{
+				  			toastr.error(rs.msg,'!!!Failed');
+				  		}
+				  	}
+				  	$('#NotificationModal').modal('hide');
+				  },
+				  error: function (data) {
+				    toastr.error("Connection Error, Please try again", 'Error!!');
+				  }
+				})
+			}
+			
+		}
+
+	})
+
+	function __validation()
+	{
+		var find = true;
+		var NoVoucher = $('.NoVoucher').val();
+		var toatString = "";
+		var result = "";
+		result = Validation_required(NoVoucher,'No Voucher');
+		if (result['status'] == 0) {
+		  toatString += result['messages'] + "<br>";
+		}
+
+		// check file
+		$(".BrowseVoucher").each(function(){
+			var IDFile = $(this).attr('id');
+			var ev2 = $(this);
+			if (!file_validation2(ev2,'Upload Voucher ') ) {
+			  find = false;
+			  return false;
+			}
+		})
+
+		if (toatString != "" || (!find) ) {
+		  toastr.error(toatString, 'Failed!!');
+		  return false;
+		}
+
+		return true;
+	}
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
+
+	
 </script>

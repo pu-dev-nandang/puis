@@ -244,14 +244,17 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $Desc_circulationSheet = '';
         // get data spb
             $G_data_ = $this->m_master->caribasedprimary('db_payment.spb','ID_payment',$ID_payment);
-        if (count($JsonStatus_existing) > 0) {
-            for ($i=1; $i < count($JsonStatus_existing); $i++) { 
-                if ($JsonStatus_existing[$i]['Status'] == 1) {
-                    $bool = false;
-                    break;
-                }
-            }
-        }
+        if ($G_data[0]['Status'] != -1) {
+             if (count($JsonStatus_existing) > 0) {
+                 for ($i=1; $i < count($JsonStatus_existing); $i++) { 
+                     if ($JsonStatus_existing[$i]['Status'] == 1) {
+                         $bool = false;
+                         break;
+                     }
+                 }
+             }
+        }    
+        
 
         if ($bool) {
             unset($Input['ID_payment']);

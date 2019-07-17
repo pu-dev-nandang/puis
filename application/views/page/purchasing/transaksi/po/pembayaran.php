@@ -263,6 +263,7 @@
 		{
 			 // data existing
 			var dtspb = data.dtspb;
+			// console.log(dtspb);
 			for (var i = 0; i < dtspb.length; i++) {
 				var ID_payment = dtspb[i]['ID'];
 				var Type = dtspb[i]['Type'];
@@ -354,7 +355,7 @@
 			var PageContentPayment = __HtmlPageContentPayment(number,Type);
 			html = '<div class ="row FormPage" action = "'+action+'" ID_payment = "'+ID_payment+'" number="'+number+'">'+
 						'<div class="col-xs-12" >'+
-							'<div class="panel panel-primary">'+
+							'<div class="panel panel-primary" style = "border-color: #437d73;">'+
 								'<div class="panel-heading clearfix" style = "background-color: #437d73;">'+
 									'<h4 class="panel-title pull-left" style="padding-top: 7.5px;">Payment & GRPO</h4>'+
 								'</div>'+
@@ -471,8 +472,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
+				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;
 				}
 				else
@@ -701,8 +702,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
+				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;
 				}
 				else
@@ -744,7 +745,7 @@
 			else
 			{
 				if (action == 'edit' && dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length > 0) {
-					Invoice = parseInt(dtspb[0].Detail[0].Biaya);
+					Invoice = parseInt(dtspb[0].Detail[0].Invoice);
 					TypePay = dtspb[0].Detail[0].TypePay;
 					ID_bank = dtspb[0].Detail[0].ID_bank;
 					NoRekening = dtspb[0].Detail[0].No_Rekening;
@@ -763,8 +764,8 @@
 					var c = 0;
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
-							if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
+							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
 								c++;
 							}
 							else
@@ -774,7 +775,7 @@
 							break;
 						}
 					}
-
+					InvoiceleftPO = (parseFloat(InvoiceleftPO)).toFixed(2);
 					// Fill Type Pembayaran
 					var TypeInvoice = 'Pembayaran ' + (parseInt(c)+1);
 					// update all null to be ''
@@ -900,9 +901,9 @@
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
 
-		se_content.find('.dtbank[tabindex!="-1"]').select2({
-		    //allowClear: true
-		});
+		// se_content.find('.dtbank[tabindex!="-1"]').select2({
+		//     //allowClear: true
+		// });
 		if (typeof dtspb[0] !== "undefined") {
 			if (action == 'edit' && dtspb[0].Type == 'Bank Advance' && dtspb[0].Detail.length > 0) {
 				var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
@@ -928,8 +929,8 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
-				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
+				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;
 				}
 				else
@@ -971,7 +972,7 @@
 			else
 			{
 				if (action == 'edit' && dtspb[0].Type == 'Cash Advance' && dtspb[0].Detail.length > 0) {
-					Invoice = parseInt(dtspb[0].Detail[0].Biaya);
+					Invoice = parseInt(dtspb[0].Detail[0].Invoice);
 					TypePay = dtspb[0].Detail[0].TypePay;
 					ID_bank = dtspb[0].Detail[0].ID_bank;
 					NoRekening = dtspb[0].Detail[0].No_Rekening;
@@ -990,8 +991,8 @@
 					var c = 0;
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
-							if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
+							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
 								c++;
 							}
 							else
@@ -1001,7 +1002,7 @@
 							break;
 						}
 					}
-
+					InvoiceleftPO = (parseFloat(InvoiceleftPO)).toFixed(2);
 					// Fill Type Pembayaran
 					var TypeInvoice = 'Pembayaran ' + (parseInt(c)+1);
 					// update all null to be ''
@@ -1097,9 +1098,9 @@
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
 
-		se_content.find('.dtbank[tabindex!="-1"]').select2({
-		    //allowClear: true
-		});
+		// se_content.find('.dtbank[tabindex!="-1"]').select2({
+		//     //allowClear: true
+		// });
 
 		if (typeof dtspb[0] !== "undefined") {
 			if (action == 'edit' && dtspb[0].Type == 'Cash Advance' && dtspb[0].Detail.length > 0) {
@@ -1607,8 +1608,8 @@
 		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_payment == data.dtspb[i].ID && i > 0) {
-				if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][parseInt(i) - 1].Invoice);
+				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
 					c++;
 				}
 				else
@@ -1881,7 +1882,10 @@
 				}
 
 				if (!bool) {
-					se_content.find('button').not('.print_page').remove();
+					if (dtspb[0]['Status'] == 2) {
+						se_content.find('button').not('.print_page').remove();
+					}
+					
 				}
 				makeSignaturesSPB(se_content,JsonStatus);
 				makepage_status(dt_arr,se_content);
@@ -2795,9 +2799,9 @@
 			ev2.find('input').not('.TglBA').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
 			ev2.find('select').prop('disabled',false);
-			// ev2.find('.dtbank[tabindex!="-1"]').select2({
-			//     //allowClear: true
-			// });
+			ev2.find('.dtbank[tabindex!="-1"]').select2({
+			    //allowClear: true
+			});
 			$(this).remove();
 			ev2.find('.TypePay').trigger('change');
 		}
@@ -3087,8 +3091,8 @@
 			if (dtspb.length > 0) {
 				var InvoiceleftPO = parseInt(InvoicePO);
 				for (var i = 0; i < dtspb.length; i++) {
-					if (dtspb[i]['Detail'][i].Invoice != null && dtspb[i]['Detail'][i].Invoice != 'null') {
-						InvoiceleftPO -= parseInt(dtspb[i]['Detail'][i].Invoice);
+					if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
+						InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					}
 					else
 					{
@@ -3118,7 +3122,7 @@
 			}
 			else
 			{
-				toastr.info('Tidak bisa tambah SPB, Karena SPB sebelumnya belum selesai');
+				toastr.info('Tidak bisa tambah payment, Karena payment sebelumnya belum selesai');
 			}
 			// console.log(data);
 		})

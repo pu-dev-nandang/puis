@@ -147,7 +147,7 @@ class C_cashadvance extends Budgeting_Controler {
 
             $dataSave2 = array(
                 'ID_payment' => $ID_payment,
-                'Biaya' =>  $Input['Biaya'],
+                'Invoice' =>  $Input['Biaya'],
                 'TypePay' =>  $Input['TypePay'],
                 'Perihal' =>  $Input['Perihal'],
                 'No_Rekening' =>  $Input['No_Rekening'],
@@ -256,7 +256,7 @@ class C_cashadvance extends Budgeting_Controler {
                 $this->db->update('db_payment.payment',$dataSave);
 
                $dataSave2 = array(
-                   'Biaya' =>  $Input['Biaya'],
+                   'Invoice' =>  $Input['Biaya'],
                    'TypePay' =>  $Input['TypePay'],
                    'Perihal' =>  $Input['Perihal'],
                    'No_Rekening' =>  $Input['No_Rekening'],

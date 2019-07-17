@@ -662,7 +662,7 @@ class C_master extends Purchasing_Controler {
             }
 
             if ($action == 'All_approval') {
-                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i></button>';
             }
             elseif ($action == 'non_approval')
             {
@@ -995,7 +995,7 @@ class C_master extends Purchasing_Controler {
             $nestedData[] = $temp;
 
             if ($action == 'All_approval') {
-                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-supplier" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-supplier" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-supplier" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-supplier" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> </button>';
             }
             elseif ($action == 'non_approval')
             {

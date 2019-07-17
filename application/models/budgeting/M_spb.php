@@ -49,7 +49,7 @@ class M_spb extends CI_Model {
                 from db_payment.payment as a
                 left join db_employees.employees as c on a.CreatedBy = c.NIP
                 left join db_purchasing.po_invoice_status as poi on a.Code_po_create = poi.Code_po_create
-                where a.Code_po_create = ? limit 1
+                where a.Code_po_create = ?
                 ';
         $query=$this->db->query($sql, array($Code_po_create))->result_array();
         if (count($query) > 0) {
@@ -78,7 +78,8 @@ class M_spb extends CI_Model {
                             break;
                         case 'Bank Advance':
                             $G_dt = $this->m_master->caribasedprimary('db_payment.bank_advance','ID_payment',$ID);
-                            for ($j=0; $j < count($G_dt); $j++) { 
+                            $tot = count($G_dt);
+                            for ($j=0; $j < $tot; $j++) { 
                                 // get bank_advance_detail
                                 $ID_bank_advance = $G_dt[$j]['ID'];
                                 $__Detail = $this->m_master->caribasedprimary('db_payment.bank_advance_detail','ID_bank_advance',$ID_bank_advance);
@@ -88,14 +89,15 @@ class M_spb extends CI_Model {
                                 }
                                 $__Realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi','ID_bank_advance',$ID_bank_advance);
 
-                                $G_dt[$i]['Detail'] = $__Detail;
-                                $G_dt[$i]['Realisasi'] = $__Realisasi;
+                                $G_dt[$j]['Detail'] = $__Detail;
+                                $G_dt[$j]['Realisasi'] = $__Realisasi;
                             }
                             $Detail = $G_dt;
                             break;
                         case 'Cash Advance':
                             $G_dt = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID);
-                            for ($j=0; $j < count($G_dt); $j++) { 
+                            $tot2 = count($G_dt);
+                            for ($j=0; $j < $tot2; $j++) { 
                                 // get bank_advance_detail
                                 $ID_cash_advance = $G_dt[$j]['ID'];
                                 $__Detail = $this->m_master->caribasedprimary('db_payment.cash_advance_detail','ID_cash_advance',$ID_cash_advance);
