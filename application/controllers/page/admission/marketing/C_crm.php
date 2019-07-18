@@ -310,10 +310,11 @@ class C_crm extends Admission_Controler {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = ' AND ( sc.ClassGroup LIKE "%'.$search.'%" 
-            OR mk.Name LIKE "%'.$search.'%"
-             OR mk.NameEng LIKE "%'.$search.'%"
-              OR em.Name LIKE "%'.$search.'%" ) ';
+            $dataSearch = ' AND ( c.Name LIKE "%'.$search.'%" 
+            OR c.NIP LIKE "%'.$search.'%"
+             OR s.SchoolName LIKE "%'.$search.'%"
+             OR em.Name LIKE "%'.$search.'%"
+              OR rms.SchoolMajor LIKE "%'.$search.'%" ) ';
         }
 
         $queryDefault = 'SELECT c.*, s.SchoolName, r.RegionName, rms.SchoolMajor, cp.Year AS PeriodYear, em.Name AS PICName FROM db_admission.crm c 
