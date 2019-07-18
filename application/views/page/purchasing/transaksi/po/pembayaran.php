@@ -757,6 +757,7 @@
 					Status = dtspb[0]['Status'];
 					if (Status == 2) {
 						btn_hide_print = '';
+						btn_hide = 'hide';
 					}
 
 					// hitung Left PO
@@ -887,7 +888,7 @@
 								'<div class="pull-right">'+
 									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
 									'<button class="btn btn-primary '+btn_hide+' btnEditInputBA" status="'+Status+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-									'<button class="btn btn-success submitBA" '+Dis+'> Submit</button>'+
+									'<button class="btn btn-success submitBA '+btn_hide+'" '+Dis+'> Submit</button>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+

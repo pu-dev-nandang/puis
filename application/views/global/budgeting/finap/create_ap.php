@@ -304,12 +304,164 @@
 		return def.promise();
 	}
 
+	function __showHistory(ID_payment_ori,Code_po_create,PR)
+	{
+		var html = '';
+		var all_po_payment = ClassDt.all_po_payment;
+		var index__ = 0;
+		var dtspb_all = all_po_payment.dtspb;
+		for (var i = 0; i < dtspb_all.length; i++) {
+			if (dtspb_all[i].ID == ID_payment_ori) {
+				index__ = i - 1;
+				break;
+			}
+		}
+		
+		if (index__ >= 0) {
+			for (var i = 0; i < dtspb_all.length; i++) {
+				var ID_payment = dtspb_all[i].ID;
+				if (ID_payment == ID_payment_ori) {
+					break;
+				}
+				var dt_arr = __getRsViewGRPO_SPB(ID_payment,all_po_payment);
+				var po_payment_data = dt_arr;
+				var dtspb = po_payment_data.dtspb;
+				html += '<div class ="row" style ="margin-top:30px;">'+
+								'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
+									'<div class="well" style = "background-color:#f5f0f0;">'+
+									'<div align="center"><h2 class="payment_number">Payment</h2></div>'+
+									'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+									'<table class="table borderless" style="font-weight: bold;">'+
+									'<thead></thead>'+
+									'<tbody>';
+
+				var se_content = $('#page_content');
+				if (PR != '' && PR != null) {
+					html += '<tr>'+
+								'<td class = "TD1"><label>PR Code</label></td>'+
+								'<td>:</td>'+
+								'<td>'+'<a href = "javascript:void(0)" prcode = "'+PR+'" class = "printpr">'+PR+'</a></td>'+
+							'</tr>';	
+				}
+
+				if (Code_po_create != '' && Code_po_create != null) {
+					var po_data = ClassDt.po_data;
+					var po_create = po_data.po_create;
+					var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
+					html += '<tr>'+
+								'<td class = "TD1"><label>PO / SPK Code</label></td>'+
+								'<td>:</td>'+
+								'<td>'+'<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a></td>'+
+							'</tr>';
+
+					var pre_po_supplier = po_data.pre_po_supplier;
+					var t = '';									
+					for (var i = 0; i < pre_po_supplier.length; i++) {
+						var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
+						var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
+						var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
+						// t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+						t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
+							Reason+
+							'</li>';
+					}		
+
+
+					html += '<tr>'+
+								'<td class = "TD1"><label>Perbandingan Vendor</label></td>'+
+								'<td>:</td>'+
+								'<td>'+t+'</td>'+
+							'</tr>';			
+				}
+
+				var lblAdd = '';
+				var TypePay = dtspb[0].Type;
+				if (TypePay == 'Spb') {
+					lblAdd = "<br> Code : "+dtspb[0].Code;
+				}
+
+				html += '<tr>'+
+							'<td class = "TD1"><label>Payment Type : '+TypePay+' '+lblAdd+'</label></td>'+
+							'<td>:</td>'+
+							'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
+						'</tr>';
+
+				var FolderPayment = '';
+				switch(TypePay) {
+				  case "Spb":
+				    FolderPayment = "spb";
+				    break;
+				  case "Bank Advance":
+				    FolderPayment = "bankadvance";
+				    break;
+				  case "Cash Advance":
+				    FolderPayment = "cashadvance";
+				    break;
+				  case "Petty Cash":
+				    FolderPayment = "pettycash";  
+				  default:
+				    FolderPayment = '';
+				}		
+				
+				// check for document invoice
+				if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
+					var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+					if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
+						UploadInvoice = UploadInvoice[0];
+						html += '<tr>'+
+									'<td class = "TD1"><label>Invoice</label></td>'+
+									'<td>:</td>'+
+									'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
+								'</tr>';
+					}
+					
+					var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+					if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
+						UploadTandaTerima = UploadTandaTerima[0];
+						html += '<tr>'+
+									'<td class = "TD1"><label>Tanda Terima</label></td>'+
+									'<td>:</td>'+
+									'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
+								'</tr>';
+					}
+
+				}
+
+				var UploadVoucher = jQuery.parseJSON(dtspb[0].FinanceAP[0].UploadVoucher);
+				var htmlUploadVoucher = '';
+				if (UploadVoucher != '' && UploadVoucher != null && UploadVoucher != undefined) {
+					UploadVoucher = UploadVoucher[0];
+					htmlUploadVoucher = '<a href = "'+base_url_js+'fileGetAny/finance-'+UploadVoucher+'" target="_blank" class = "Fileexist">'+'File '+dtspb[0].FinanceAP[0].NoVoucher+'</a>';
+				}
+
+				html += '<tr>'+
+							'<td class = "TD1"><label>No Dokumen</label></td>'+
+							'<td>:</td>'+
+							'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
+						'</tr>'+
+						'<tr>'+
+							'<td><label>Upload Dokumen</label></td>'+
+							'<td>:</td>'+
+							'<td>'+htmlUploadVoucher+'</td>'+
+						'</tr>';
+
+				html += '</tbody></table>';
+				html += '</div></div></div>';	
+			}
+			
+		}
+
+		return html;
+	}
+
 	function MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR)
 	{
-		var html = '<div class ="row FormPage" style ="margin-top:30px;">'+
+		var html = '';
+		html += __showHistory(ID_payment,Code_po_create,PR);
+		html += '<div class ="row FormPage" style ="margin-top:30px;">'+
 						'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
 							'<div class="well">'+
-							'<div align="center"><h2>Payment</h2></div>'+
+							'<div align="center"><h2 class="payment_number">Payment</h2></div>'+
 							'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 							'<table class="table borderless" style="font-weight: bold;">'+
 							'<thead></thead>'+
@@ -406,7 +558,6 @@
 			}
 
 		}
-		
 
 		html += '<tr>'+
 					'<td class = "TD1"><label>No Dokumen</label></td>'+
@@ -433,7 +584,14 @@
 					'</div>';		
 		html += '</div></div></div>';		
 
-		se_content.html(html);		
+		se_content.html(html);
+
+		// berikan auto number
+		var s = 1; 
+		$('.payment_number').each(function(){
+			$(this).html('Payment ('+s+')');
+			s++;
+		})		
 
 	}
 

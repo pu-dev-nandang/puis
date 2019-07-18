@@ -2656,6 +2656,7 @@ class C_rest2 extends CI_Controller {
                                 'PostingDate' => $dtime,
                                 'Code' => '',
                                 'NoVoucher' => $dataToken['NoVoucher'],
+                                'UploadVoucher' => $UploadVoucher,
                               );
                               $this->db->insert('db_budgeting.ap',$arr);
                               $ID_ap = $this->db->insert_id();
