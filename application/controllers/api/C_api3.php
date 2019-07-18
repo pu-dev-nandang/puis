@@ -482,6 +482,92 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']=='crudKPT'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $FileName ='';
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.university_collaboration',$dataForm);
+
+                $dataFileName = $this->db->select('File')->get_where('db_agregator.university_collaboration',
+                    array(
+                       'ID' => $ID
+                    ))->result_array();
+
+                $FileName = (count($dataFileName)>0) ? $dataFileName[0]['File'] : '';
+            } else {
+                // Insert
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.university_collaboration',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(json_encode(array(
+                'ID' => $ID,
+                'FileName' => $FileName
+            )));
+
+        }
+        else if($data_arr['action']=='viewListKPT'){
+
+            $requestData= $_REQUEST;
+
+            $Previlege = $data_arr['Previlege'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%" 
+            OR uc.Tingkat LIKE "%'.$search.'%"
+             OR uc.Benefit LIKE "%'.$search.'%"';
+            }
+
+            $queryDefault = 'SELECT uc.*, lmk.Lembaga FROM db_agregator.university_collaboration uc 
+                                        LEFT JOIN db_agregator.lembaga_mitra_kerjasama lmk ON (lmk.ID = uc.LembagaMitraID) '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+            for($i=0;$i<count($query);$i++){
+
+                $nestedData=array();
+                $row = $query[$i];
+
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['Tingkat'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Benefit'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
+                $nestedData[] = '<div style="text-align:left;"><a target="_blank" href="'.base_url('uploads/agregator/'.$row['File']).'">Download Bukti</a></div>';
+                $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
 
     }
 

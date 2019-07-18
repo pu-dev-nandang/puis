@@ -38,7 +38,9 @@
             </div>
             <div class="form-group">
                 <label>Bukti Kerjasama (.pdf | Maks 8 Mb)</label>
-                <input type="file">
+                <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                    <input type="file" name="userfile" id="upload_files" accept="application/pdf">
+                </form>
             </div>
 
             <div style="text-align: right;">
@@ -48,21 +50,7 @@
         </div>
         <div class="col-md-9">
 
-            <div>
-                <table class="table table-striped table-bordered" id="tableData">
-                    <thead>
-                    <tr>
-                        <th style="width: 1%">No</th>
-                        <th style="width: 25%">Lembaga Mitra Kerjasama</th>
-                        <th style="width: 7%;">Tingkat</th>
-                        <th>Bentuk Kegiatan / Manfaat</th>
-                        <th style="width: 15%">Bukti Kerjasama</th>
-                        <th style="width: 15%">Masa Berlaku</th>
-                        <th style="width: 5%"><i class="fa fa-cog"></i></th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
+            <div id="viewData"></div>
 
         </div>
 
@@ -91,6 +79,8 @@
                     }
                 });
         }
+
+        loadDataTable();
 
     });
 
@@ -230,4 +220,134 @@
         $('#formDescription').val(dataForm.Description);
 
     });
+
+    function UploadFile(ID,FileNameOld) {
+
+        var input = $('#upload_files');
+        var files = input[0].files[0];
+
+        console.log(input);
+
+        var sz = parseFloat(files.size) / 1000000; // ukuran MB
+        var ext = files.type.split('/')[1];
+
+        if(Math.floor(sz)<=8){
+
+            var fileName = moment().unix()+'_'+sessionNIP+'.'+ext;
+            var formData = new FormData( $("#formupload_files")[0]);
+            var url = base_url_js+'agregator/uploadFile?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
+
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+                    toastr.success('Upload Success','Saved');
+                    // loadDataEmployees();
+
+                }
+            });
+
+        }
+
+    }
+
+    $('#btnSave').click(function () {
+
+        var file = $('#upload_files').val();
+
+        var formID = $('#formID').val();
+        var formLembagaMitraID = $('#formLembagaMitraID').val();
+        var formTingkat = $('#formTingkat').val();
+        var formBenefit = $('#formBenefit').val();
+        var formDueDate = $('#formDueDate').val();
+
+        if(formLembagaMitraID!='' && formLembagaMitraID!=null &&
+            formTingkat!='' && formTingkat!=null &&
+            formBenefit!='' && formBenefit!=null &&
+            formDueDate!='' && formDueDate!=null &&
+            file!='' && file!=null){
+
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+            var data = {
+              action : 'crudKPT',
+                ID : (formID!='' && formID!=null) ? formID : '',
+                dataForm : {
+                    LembagaMitraID : formLembagaMitraID,
+                    Tingkat : formTingkat,
+                    Benefit : formBenefit,
+                    DueDate : formDueDate
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (jsonResult) {
+
+                var ID = jsonResult.ID;
+                var FileName = jsonResult.FileName;
+
+                UploadFile(ID,FileName);
+
+            });
+
+
+
+        } else {
+            toastr.warning('All form required','Warning');
+        }
+
+
+
+    });
+
+
+    function loadDataTable() {
+
+        $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
+            '                    <thead>' +
+            '                    <tr>' +
+            '                        <th style="width: 1%">No</th>' +
+            '                        <th style="width: 25%">Lembaga Mitra Kerjasama</th>' +
+            '                        <th style="width: 7%;">Tingkat</th>' +
+            '                        <th>Bentuk Kegiatan / Manfaat</th>' +
+            '                        <th style="width: 15%">Bukti Kerjasama</th>' +
+            '                        <th style="width: 15%">Masa Berlaku</th>' +
+            '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
+            '                    </tr>' +
+            '                    </thead>' +
+            '                </table>');
+
+
+        var token = jwt_encode({action:'viewListKPT',Previlege:act},'UAP)(*');
+        var url = base_url_js+'api3/__crudAgregatorTB1';
+
+        var dataTable = $('#tableData').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "Lembaga, Sertifikat, Lingkup, Tingkat"
+            },
+            "ajax":{
+                url : url, // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        });
+
+    }
+
+
+
 </script>
