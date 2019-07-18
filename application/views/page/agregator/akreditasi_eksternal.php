@@ -19,7 +19,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-default" id="btnLembagaSurview">Lembaga Surview</button>
+                <button class="btn btn-default" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Surview</button>
             </div>
 
             <div>

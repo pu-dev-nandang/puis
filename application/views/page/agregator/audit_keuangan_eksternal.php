@@ -6,7 +6,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-default" id="btnLembagaAudit">Lembaga Audit</button>
+                <button class="btn btn-default" id="btnLembagaAudit"><i class="fa fa-cog margin-right"></i> Lembaga Audit</button>
             </div>
 
             <div>
@@ -301,7 +301,7 @@
         $('#form_Year').val(dataDetail.Year);
         $('#form_Opinion').val(dataDetail.Opinion);
         $('#form_Description').val(dataDetail.Description);
-        
+
 
     });
 

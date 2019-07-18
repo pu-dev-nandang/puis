@@ -404,7 +404,8 @@ class C_api3 extends CI_Controller {
 
             return print_r(1);
 
-        } else if($data_arr['action']=='viewListAKE'){
+        }
+        else if($data_arr['action']=='viewListAKE'){
 
             $requestData= $_REQUEST;
 
@@ -457,9 +458,31 @@ class C_api3 extends CI_Controller {
             echo json_encode($json_data);
 
         }
+        else if($data_arr['action']=='updateLembagaMitraKerjasama'){
+
+            $dataForm = array(
+                'Lembaga' => $data_arr['Lembaga'],
+                'Description' => $data_arr['Description']
+            );
+
+            if($data_arr['ID']!=''){
+                // Update
+                $this->db->where('ID',$data_arr['ID']);
+                $this->db->update('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+            } else {
+                // Insert
+                $this->db->insert('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='readLembagaMitraKerjasama'){
+            $data = $this->db->get('db_agregator.lembaga_mitra_kerjasama')->result_array();
+
+            return print_r(json_encode($data));
+        }
 
     }
-
-
 
 }

@@ -493,7 +493,7 @@ $route['admission/intake_Excel'] = 'c_save_to_excel/intake_Excel';
 
 $route['admisssion/crm/(:any)'] = 'page/admission/marketing/c_crm/crmpage/$1';
 $route['admission/crm/import'] = 'page/admission/marketing/c_crm/import_data_crm';
-$route['admission/crm/showdata'] = 'page/admission/marketing/c_crm/showdata_crm';
+$route['admission/crm/showdata/(:num)'] = 'page/admission/marketing/c_crm/showdata_crm/$1';
 $route['admission/crm/delete/byid'] = 'page/admission/marketing/c_crm/deletecrm_by_id';
 
 
