@@ -186,9 +186,7 @@
 		var CodeWr = (dtspb[0]['Code'] == '' || dtspb[0]['Code'] == null ) ? 'auto by system' : dtspb[0]['Code'];
 		var LinkFileInvoice = '';
 		var LinkUploadTandaTerima = '';
-		var btnSPb = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-					'<button class="btn btn-primary hide btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-					'<button class="btn btn-success submit"> Submit</button>';
+		var btnSPb = '';
 
 		var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
 		UploadInvoice = UploadInvoice[0];
@@ -197,20 +195,6 @@
 		var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
 		UploadTandaTerima = UploadTandaTerima[0];
 		LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
-
-		if (dtspb[0]['Status'] == 2) {
-			btnSPb = '<button class="btn btn-default print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
-		}
-		else if(dtspb[0]['Status'] == 0 || dtspb[0]['Status'] == 1 || dtspb[0]['Status'] == -1)
-		{
-			btnSPb = '<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-					'<button class="btn btn-primary btnEditInput" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-					'<button class="btn btn-success submit" disabled> Submit</button>';
-		}
-		else
-		{
-			btnSPbs = '';
-		}
 
 		// Fill Type Pembayaran
 		var TypeInvoice = dtspb[0].Detail[0]['TypeInvoice'];
@@ -531,11 +515,6 @@
 		    				if (JsonStatus[ii]['Status'] == 1) {
 		    					HierarkiApproval++;
 		    				}
-
-		    				// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
-		    				// 	HierarkiApproval++;
-		    				// }
-		    				// HierarkiApproval++;
 		    			}
 		    			else
 		    			{
@@ -889,8 +868,8 @@
 		var Code = ClassDt.Code;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
 				}
 				else
 				{

@@ -2777,7 +2777,6 @@
 
 
 	$(document).off('change', '.TypePay').on('change', '.TypePay',function(e) {
-		console.log('asd');
 		var ev = $(this).closest('.FormPage');
 		if ($(this).val() == 'Cash') {
 			ev.find('.NoRekening').prop('disabled',true);

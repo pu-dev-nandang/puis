@@ -949,6 +949,7 @@ $route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
 $route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
 $route['rest2/__approve_spb'] = 'api/c_rest2/approve_spb';
+$route['rest2/__approve_payment'] = 'api/c_rest2/approve_payment';
 
 
 $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
@@ -1491,9 +1492,9 @@ $route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/Inf
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
-// global spb
-//$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+// global
 $route['global/purchasing/transaction/spb/list/(:any)'] = 'page/C_globalpage/InfoSPB/$1';
+$route['global/purchasing/transaction/ba/list/(:any)'] = 'page/C_globalpage/InfoBA/$1';
 
 
 // template import supplier

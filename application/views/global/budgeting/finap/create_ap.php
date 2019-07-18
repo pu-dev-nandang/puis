@@ -384,25 +384,29 @@
 		var po_payment_data = ClassDt.po_payment_data;
 		// check for document invoice
 		var dtspb = po_payment_data.dtspb;
-		var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
-		if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
-			UploadInvoice = UploadInvoice[0];
-			html += '<tr>'+
-						'<td class = "TD1"><label>Invoice</label></td>'+
-						'<td>:</td>'+
-						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
-					'</tr>';
+		if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
+			var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+			if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
+				UploadInvoice = UploadInvoice[0];
+				html += '<tr>'+
+							'<td class = "TD1"><label>Invoice</label></td>'+
+							'<td>:</td>'+
+							'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
+						'</tr>';
+			}
+			
+			var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+			if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
+				UploadTandaTerima = UploadTandaTerima[0];
+				html += '<tr>'+
+							'<td class = "TD1"><label>Tanda Terima</label></td>'+
+							'<td>:</td>'+
+							'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
+						'</tr>';
+			}
+
 		}
 		
-		var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
-		if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
-			UploadTandaTerima = UploadTandaTerima[0];
-			html += '<tr>'+
-						'<td class = "TD1"><label>Tanda Terima</label></td>'+
-						'<td>:</td>'+
-						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
-					'</tr>';
-		}
 
 		html += '<tr>'+
 					'<td class = "TD1"><label>No Dokumen</label></td>'+
@@ -640,7 +644,7 @@
 		$(".BrowseVoucher").each(function(){
 			var IDFile = $(this).attr('id');
 			var ev2 = $(this);
-			if (!file_validation2(ev2,'Upload Voucher ') ) {
+			if (!file_validation2(ev2,'Upload Dokumen') ) {
 			  find = false;
 			  return false;
 			}
