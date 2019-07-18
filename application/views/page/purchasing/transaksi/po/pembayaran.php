@@ -132,6 +132,9 @@
 	$(document).ready(function() {
 		$('#page_po_list').html(ClassDt.htmlPage_po_list);
 		Get_data_po().then(function(data){
+			if (data.length == 0) {
+				loadingEnd(500);
+			}
 			$('.C_radio_pr:first').prop('checked',true);
 			$('.C_radio_pr:first').trigger('change');
 		})
