@@ -1461,6 +1461,8 @@ class C_admission extends Admission_Controler {
             $EmailMother = '';
             $StatusStudentID = 3;
 
+             $KTPNumber = $data[0]['IdentityCard'];
+
             // copy document
             $Photo = ''; // id foto 5
             if (!file_exists('./uploads/document/'.$NPM)) {
@@ -1598,6 +1600,7 @@ class C_admission extends Admission_Controler {
                 'Name' => $Name,
                 'ProdiID' => $ProdiID,
                 'ProgramID' => 1,
+                'KTPNumber' => $KTPNumber,
             );
 
             $arr_insert_auth[] = $temp2;
