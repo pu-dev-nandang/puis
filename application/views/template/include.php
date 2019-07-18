@@ -1712,6 +1712,24 @@
         });
     }
 
+    function loadSelectOptionLembaga(element,selected) {
+
+        var url = base_url_js+'api3/__crudLembagaSurview';
+        var token = jwt_encode({action : 'readLembagaSurview'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && selected==v.ID) ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Lembaga+'</option>');
+
+            });
+
+        });
+
+    }
+
     function getCustomtoFixed(dataValue,digit) {
         var exTitik = dataValue.toFixed(4).toString().split('.');
         var exKoma = dataValue.toFixed(4).toString().split(',');
@@ -1811,4 +1829,19 @@
 
         return v;
     }
+
+    window.getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
 </script>

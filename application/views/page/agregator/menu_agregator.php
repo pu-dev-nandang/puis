@@ -20,7 +20,6 @@
     }
 </style>
 
-<?php //print_r($listMenu); ?>
 
 <div class="row">
     <div class="col-md-2" id="menuLeft">
@@ -53,7 +52,6 @@
 
             <?php } ?>
 
-
         </div>
     </div>
     <div class="col-md-10">
@@ -67,7 +65,6 @@
 
 
 <script>
-
     $(document).ready(function () {
 
         $('.fixed-header').addClass('sidebar-closed');
@@ -78,6 +75,28 @@
         var elm = $('a[href="'+base_url_js+'agregator/<?= $this->uri->segment(2); ?>"]');
         elm.addClass('active-left-menu');
         elm.parent().parent().addClass('in');
+
+
+
+
+        //var elm2 = $('#"'+base_url_js+'agregator/<?//= $this->uri->segment(2); ?>//"]');
+
+
+        //console.log(elm.attr('id'));
+        //
+        //var IDMenu =  $('#data_');
+        //
+        //
+        //var MyMenu = JSON.parse('<?//= $MyMenu; ?>//');
+        //
+        //console.log(IDMenu);
+        //console.log(MyMenu);
+        //
+        //var v = ($.inArray(IDMenu,MyMenu)!=-1) ? '1' : '0';
+        //$('#dataView').val(v);
+
+        //         elm.attr('id', 'classAct');
+
 
     });
 

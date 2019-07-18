@@ -8,8 +8,6 @@
                 <div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px">
                     <div class="col-md-12">
 
-
-
                         <div class="panel panel-primary">
                             <div class="panel-heading clearfix">
                                 <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Data Formulir</h4>
@@ -700,31 +698,16 @@
 
 
         $("#BtnSelectCRM").click(function(){
-            var html = '<div class="row">'+
-                '<div class="col-md-12">'+
-                '<div class="table-responsive">'+
-                '<table class="table table-bordered tableData" id ="tableData3">'+
-                '<thead>'+
-                '<tr>'+
-                '<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Candidate Name</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">School</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Pathway</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Gender</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF; width: 5%;">Prospect Year</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Parent Name</th>'+
-                '<th style = "text-align: center;background: #20485A;color: #FFFFFF; width: 5%;">Action</th>'+
-                '</tr>'
-            '</thead>'
-            '<tbody>'
-            '</tbody>'
-            '</table>'
-            '</div>'
-            '</div>'
-            '</div>';
+            var html = '<div class="row"><div class="col-md-4 col-md-offset-4">' +
+                '<div class="well"><select class="form-control" id="filterPeriod"></select>' +
+                '</div></div></div>' +
+                '<div id="viewTableCRM"></div>';
 
             $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Data CRM'+'</h4>');
             $('#GlobalModalLarge .modal-body').html(html);
+
+            loadActivePeriod();
+
             $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>');
             $('#GlobalModalLarge').modal({
                 'show' : true,
@@ -734,77 +717,99 @@
             $("#GlobalModalLarge").find(".modal-dialog").attr('style','width: 1200px');
             $("#tableData3 tbody").empty();
 
-            $.fn.dataTable.ext.errMode = 'throw';
-            $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
-            {
-                return {
-                    "iStart": oSettings._iDisplayStart,
-                    "iEnd": oSettings.fnDisplayEnd(),
-                    "iLength": oSettings._iDisplayLength,
-                    "iTotal": oSettings.fnRecordsTotal(),
-                    "iFilteredTotal": oSettings.fnRecordsDisplay(),
-                    "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-                    "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
-                };
-            };
-
-            var table = $('#tableData3').DataTable( {
-                "fixedHeader": true,
-                "processing": true,
-                "destroy": true,
-                "serverSide": true,
-                "iDisplayLength" : 10,
-                "ordering" : false,
-                "ajax":{
-                    url : base_url_js+"admission/crm/showdata", // json datasource
-                    ordering : false,
-                    type: "post",  // method  , by default get
-                    // data : {length : $("select[name='tableData4_length']").val()},
-                    error: function(){  // error handling
-                        $(".employee-grid-error").html("");
-                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                        $("#employee-grid_processing").css("display","none");
-                    }
-                },
-                'createdRow': function( row, data, dataIndex ) {
-                    var btndel = '';
-                    $(row).attr('idtable',data[13]);
-                    //$( row ).find('td:eq(12)').remove();
-                },
-            } );
-
-            // table.on( 'click', 'tr', function (e) {
-            //     var row = $(this);
-            //     var idtable = row.attr('idtable');
-            //     var Candidate_Name = row.find('td:eq(2)').html();
-            //     var hp = row.find('td:eq(9)').html();
-            //     var email = row.find('td:eq(10)').html();
-            //     var autoCompleteSchool = row.find('td:eq(4)').html();
-            //     var gender = row.find('td:eq(6)').html();
-            //     var telp_rmh = row.find('td:eq(8)').html();
-            //
-            //     $("#ID_Crm").attr('idtable',idtable);
-            //     $("#ID_Crm").val(Candidate_Name);
-            //     $("#Name").val(Candidate_Name);
-            //     $("#hp").val(hp);
-            //     $("#email").val(email);
-            //     $("#autoCompleteSchool").val(autoCompleteSchool);
-            //     $('#autoCompleteSchool').autocomplete("search");
-            //     $("#selectGender option").filter(function() {
-            //         //may want to use $.trim in here
-            //         return $(this).val() == gender;
-            //     }).prop("selected", true);
-            //     $("#telp_rmh").val(telp_rmh);
-            //     $('#GlobalModalLarge').modal('hide');
-            //
-            // } );
 
 
+            $('#filterPeriod').change(function () {
+                var filterPeriod = $('#filterPeriod').val();
+                loadDataCRM(filterPeriod);
+            });
 
         });
 
 
 
+    }
+
+    function loadActivePeriod() {
+        var data = {
+            action : 'activeCRMPeriode'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'rest2/__crudCRMPeriode';
+
+        $.post(url,{token:token},function (jsonResult) {
+            var y = jsonResult[0].Year;
+            var i = jsonResult[0].ID;
+
+            loadSelectOptionCRMPeriod('#filterPeriod',i);
+
+            loadDataCRM(i);
+
+
+        });
+
+    }
+
+    function loadDataCRM(PeriodID) {
+
+        $('#viewTableCRM').html('<div class="row">' +
+            '                         <div class="col-md-12">' +
+            '                             <table class="table table-bordered tableData" id ="tableData3">' +
+            '                                 <thead>' +
+            '                                 <tr>' +
+            '                                     <th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Candidate Name</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF;">School</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Pathway</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Gender</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF; width: 5%;">Prospect Year</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Parent Name</th>' +
+            '                                     <th style = "text-align: center;background: #20485A;color: #FFFFFF; width: 5%;">Action</th>' +
+            '                                 </tr>' +
+            '                                 </thead>' +
+            '                                 <tbody></tbody>' +
+            '                             </table>' +
+            '                         </div>' +
+            '                     </div>');
+
+        $.fn.dataTable.ext.errMode = 'throw';
+        $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+        {
+            return {
+                "iStart": oSettings._iDisplayStart,
+                "iEnd": oSettings.fnDisplayEnd(),
+                "iLength": oSettings._iDisplayLength,
+                "iTotal": oSettings.fnRecordsTotal(),
+                "iFilteredTotal": oSettings.fnRecordsDisplay(),
+                "iPage": Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+                "iTotalPages": Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+            };
+        };
+
+        var table = $('#tableData3').DataTable( {
+            "fixedHeader": true,
+            "processing": true,
+            "destroy": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"admission/crm/showdata/"+PeriodID, // json datasource
+                ordering : false,
+                type: "post",  // method  , by default get
+                // data : {length : $("select[name='tableData4_length']").val()},
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            },
+            'createdRow': function( row, data, dataIndex ) {
+                var btndel = '';
+                $(row).attr('idtable',data[13]);
+                //$( row ).find('td:eq(12)').remove();
+            },
+        } );
     }
 
     $(document).on('click','.btnShowDet',function () {

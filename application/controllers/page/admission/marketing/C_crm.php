@@ -303,7 +303,7 @@ class C_crm extends Admission_Controler {
         echo json_encode($json_data);
     }
 
-    public function showdata_crm(){
+    public function showdata_crm($PeriodID){
         $requestData= $_REQUEST;
 
         $orderBy = ' GROUP BY c.Name ASC ';
@@ -322,7 +322,7 @@ class C_crm extends Admission_Controler {
                                   LEFT JOIN db_admission.register_major_school rms ON (rms.ID = c.PathwayID)
                                   LEFT JOIN db_admission.crm_period cp ON (cp.ID = c.PeriodID)
                                   LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
-                                  WHERE c.Status = 6 '.$dataSearch.' '.$orderBy.' ';
+                                  WHERE c.Status = 6 AND c.PeriodID = "'.$PeriodID.'" '.$dataSearch.' '.$orderBy.' ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
