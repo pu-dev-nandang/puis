@@ -35,9 +35,11 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy ';
         $joinaction = ' right join (
-                                 select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
+                                 select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
+                                 ,c.CreatedBy as CreateBYPayFin
+                                 from db_payment.payment as a join
                                  ( select ID_payment,Perihal  from db_payment.spb
                                    UNION 
                                    select ID_payment,Perihal  from db_payment.bank_advance
@@ -46,10 +48,11 @@ class C_finap extends Budgeting_Controler {
                                    UNION 
                                    select ID_payment,Perihal  from db_payment.petty_cash 
                                  )
-                                 join db_budgeting.ap as c on a.ID = c.ID_payment
                  as b on a.ID = b.ID_payment
+                 join db_budgeting.ap as c on a.ID = c.ID_payment
                   )
                          as pay on pay.Code_po_create = a.Code
+                        left join db_employees.employees as e_PayFin on e_PayFin.NIP = pay.CreateBYPayFin
                         left join db_employees.employees as e_spb on e_spb.NIP = pay.CreatedBy
                         join (
                         select * from (
@@ -64,7 +67,7 @@ class C_finap extends Budgeting_Controler {
         $whereaction = ' and StatusPay = 2';
 
          // get Department
-         $WhereFiltering = ' and ID_payment not in (select ID_payment from db_budgeting.ap where Status = 2)';
+         $WhereFiltering = '';
           
          $requestData = $_REQUEST;
          $StatusQuery = ' and Status = 2';
@@ -131,7 +134,7 @@ class C_finap extends Budgeting_Controler {
              // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
              $nestedData[] = $row['StatusNamepay'];
              $nestedData[] = '';
-             $nestedData[] = $row['PayNameCreatedBy'];
+             $nestedData[] = $row['PayFinNameCreatedBy'];
              // find PR in po_detail
                  $arr_temp = array();
                  $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -169,6 +172,7 @@ class C_finap extends Budgeting_Controler {
                      'TypePay' => $row['TypePay'],
                      'ID_payment' => $row['ID_payment'],
                      'Perihal' => $row['Perihal'],
+                     'StatusPayFin' => $row['StatusPayFin'],
                  );
 
              $nestedData[] = $arr_temp;
