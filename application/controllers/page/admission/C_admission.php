@@ -1320,15 +1320,17 @@ class C_admission extends Admission_Controler {
 
             // Update Intake CRM
              if (count($data2) > 0) {
-               $ID_Crm = $data2[0]['ID_Crm'];
-               if($ID_Crm!=null && $ID_Crm!=0 && $ID_Crm!='' && $ID_Crm!='0'){
-                   $this->db->set('Status', 8);
-                   $this->db->where('ID', $ID_Crm);
-                   $this->db->update('db_admission.crm');
-                   $this->db->reset_query();
-               }
+              $t_r = $data2[0];
+              if (array_key_exists('ID_Crm', $t_r)) {
+                $ID_Crm = $data2[0]['ID_Crm'];
+                if($ID_Crm!=null && $ID_Crm!=0 && $ID_Crm!='' && $ID_Crm!='0') {
+                    $this->db->set('Status', 8);
+                    $this->db->where('ID', $ID_Crm);
+                    $this->db->update('db_admission.crm');
+                    $this->db->reset_query();
+                }
+              }
              }
-              
 
             $ProdiID = $data[0]['ID_program_study'];
             $aa = 1;
