@@ -154,6 +154,36 @@ class C_agregator extends Globalclass {
     }
 
 
+    public function uploadFile(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $id = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/agregator/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!='' && is_file('./uploads/agregator/'.$old)){
+            unlink('./uploads/agregator/'.$old);
+        }
+
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+            $this->db->where('ID', $id);
+            $this->db->update('db_agregator.university_collaboration',array(
+                'File' => $fileName
+            ));
+        }
+    }
+
+
 
 
 }

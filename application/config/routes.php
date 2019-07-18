@@ -1241,6 +1241,8 @@ $route['agregator/kerjasama-perguruan-tinggi'] = 'page/agregator/c_agregator/ker
 $route['agregator/seleksi-mahasiswa-baru'] = 'page/agregator/c_agregator/seleksi_mahasiswa_baru';
 $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asing';
 
+$route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
+
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
 
