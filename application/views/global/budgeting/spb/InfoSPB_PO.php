@@ -135,27 +135,9 @@
 		}
 
 		dtspb_rs[0] = dtspb[i];
-
-		var dtgood_receipt_spb = Dataselected.dtgood_receipt_spb;
-		var dtgood_receipt_spb_rs = [];
-		// get dtgood_receipt_spb from ID_spb_created
-		dtgood_receipt_spb_rs[0] = dtgood_receipt_spb[i];
-		var ID_good_receipt_spb = dtgood_receipt_spb_rs[0].ID;
-		// get dtgood_receipt_detail from ID_good_receipt_spb
-		var dtgood_receipt_detail_rs = [];
-		var dtgood_receipt_detail = Dataselected.dtgood_receipt_detail;
-		for (var i = 0; i < dtgood_receipt_detail.length; i++) {
-			if (dtgood_receipt_detail[i].ID_good_receipt_spb == ID_good_receipt_spb) {
-				dtgood_receipt_detail_rs.push(dtgood_receipt_detail[i]);
-			}
-		}
-
 		arr = {
 			dtspb : dtspb_rs,
-			dtgood_receipt_spb : dtgood_receipt_spb_rs,
-			dtgood_receipt_detail : dtgood_receipt_detail_rs,
 		};
-
 		return arr;
 	}
 
@@ -172,10 +154,12 @@
 		var Supplier = po_create[0].NamaSupplier;
 		// hitung Left PO
 		var InvoiceleftPO = parseInt(InvoicePO);
+		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (Code == data.dtspb[i].Code && i > 0) {
 				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+					c++;
 				}
 				else
 				{
@@ -186,7 +170,7 @@
 		}
 
 		// Fill Type Pembayaran
-		var TypeInvoice = 'Pembayaran ' + (parseInt(i)+1);
+		var TypeInvoice = 'Pembayaran ' + (parseInt(c)+1);
 		// update all null to be ''
 		for (var i = 0; i < dtspb.length; i++) {
 			var arr = dtspb[i];
@@ -202,26 +186,21 @@
 		var CodeWr = (dtspb[0]['Code'] == '' || dtspb[0]['Code'] == null ) ? 'auto by system' : dtspb[0]['Code'];
 		var LinkFileInvoice = '';
 		var LinkUploadTandaTerima = '';
-		// var Invoice = 0;
-		if (dtspb[0]['Code'] != '') {
-			var UploadInvoice = jQuery.parseJSON(dtspb[0]['UploadInvoice']);
-			UploadInvoice = UploadInvoice[0];
-			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+		var btnSPb = '';
 
-			var UploadTandaTerima = jQuery.parseJSON(dtspb[0]['UploadTandaTerima']);
-			UploadTandaTerima = UploadTandaTerima[0];
-			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+		var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+		UploadInvoice = UploadInvoice[0];
+		LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
 
-			// Invoice = dtspb[0]['Invoice'];
-			// var n = Invoice.indexOf(".");
-			// Invoice = Invoice.substring(0, n);
+		var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+		UploadTandaTerima = UploadTandaTerima[0];
+		LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
 
-			// Fill Type Pembayaran
-			var TypeInvoice = 'Pembayaran ' + (parseInt(i));
-		}
+		// Fill Type Pembayaran
+		var TypeInvoice = dtspb[0].Detail[0]['TypeInvoice'];
 		
 		var html = '';
-		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
+		html += '<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 					'<table class="table borderless" style="font-weight: bold;">'+
 					'<thead></thead>'+
@@ -257,7 +236,7 @@
 							'</td>'+
 							'<td>'+
 								'<label>No Invoice</label>'+
-								'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value="'+dtspb[0]['NoInvoice']+'" '+Dis+'>'+
+								'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value="'+dtspb[0].Detail[0]['NoInvoice']+'" '+Dis+'>'+
 								'<br>'+
 								'<label style="color: red">Upload Invoice</label>'+
 								'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+'><br>'+
@@ -266,7 +245,7 @@
 								'</div>'+
 								'<br>'+
 								'<label>No Tanda Terima</label>'+
-								'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+dtspb[0]['NoTandaTerima']+'" '+Dis+'>'+
+								'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+dtspb[0].Detail[0]['NoTandaTerima']+'" '+Dis+'>'+
 								'<br>'+
 								'<label style="color: red">Upload Tanda Terima</label>'+
 								'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
@@ -284,7 +263,7 @@
 							'</td>'+
 							'<td>'+
 								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+dtspb[0]['Datee']+'">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+dtspb[0].Detail[0]['Datee']+'">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+
 							'</td>	'+			
@@ -297,7 +276,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<input type = "text" class = "form-control Perihal" placeholder ="Input Perihal..." value="'+dtspb[0]['Perihal']+'" '+Dis+'>'+
+								'<input type = "text" class = "form-control Perihal" placeholder ="Input Perihal..." value="'+dtspb[0].Detail[0]['Perihal']+'" '+Dis+'>'+
 							'</td>	'+			
 						'</tr>'+
 					'</tbody>'+
@@ -320,13 +299,13 @@
 								'<td>'+
 									'<div class= "row">'+
 										'<div class="col-xs-5">'+
-											OPBank(dtspb[0]['ID_bank'],Dis)+
+											OPBank(dtspb[0].Detail[0]['ID_bank'],Dis)+
 										'</div>'+
 										'<div class="col-xs-1">'+
 											'<b>&</b>'+
 										'</div>'+
 										'<div class="col-xs-5">'+
-											'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening"  value="'+dtspb[0]['No_Rekening']+'" '+Dis+'>'+
+											'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening"  value="'+dtspb[0].Detail[0]['No_Rekening']+'" '+Dis+'>'+
 										'</div>'+
 									'</div>'+		
 								'</td>'+
@@ -362,7 +341,7 @@
 									'='+
 								'</td>'+
 								'<td>'+
-									'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+(parseFloat(InvoiceleftPO)).toFixed(2)+'" value="'+parseInt(dtspb[0]['Invoice'])+'" '+Dis+'>'+ 
+									'<input type = "text" class = "form-control Money_Pembayaran" invoiceleftpo="'+(parseFloat(InvoiceleftPO)).toFixed(2)+'" value="'+parseInt(dtspb[0].Detail[0]['Invoice'])+'" '+Dis+'>'+ 
 									'<br>'+
 									'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: 5px;">'+
 								'</td>'+
@@ -398,12 +377,13 @@
 						'<div class="row">'+
 							'<div class="col-md-12">'+
 								'<div class="pull-right">'+
-									''+
+									btnSPb+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 					'</div>'+
 				'</div></div></div>';
+
 		se_content.html(html);			
 		se_content.find('.Money_Pembayaran').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		se_content.find('.Money_Pembayaran').maskMoney('mask', '9894');
@@ -417,32 +397,27 @@
 			/*
 				jika approval satu telah approve maka tidak boleh melakukan edit lagi
 			*/
-			if (dtspb[0]['Code'] != '') {
-				var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
-				var bool = true;
-				for (var i = 1; i < JsonStatus.length; i++) {
-					if (JsonStatus[i].Status == 1) {
-						bool = false;
-						break;
-					}
+			var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
+			var bool = true;
+			for (var i = 1; i < JsonStatus.length; i++) {
+				if (JsonStatus[i].Status == 1) {
+					bool = false;
+					break;
 				}
+			}
 
-				if (!bool) {
+			if (!bool) {
+				if (dtspb[0]['Status'] == 2) {
 					se_content.find('button').not('.print_page').remove();
 				}
-				makepage_status();
-				makeAction();
-				makeSignaturesSPB(se_content,JsonStatus);
-				if (JsonStatus[0].NIP != sessionNIP) {
-					$('#add_approver').remove();
-				}
+				
 			}
-			else
-			{
-				se_content.find('.dtbank[tabindex!="-1"]').select2({
-				    //allowClear: true
-				});
-			}
+			makepage_status();
+			makeAction();
+			makeSignaturesSPB(se_content,JsonStatus);
+			if (JsonStatus[0].NIP != sessionNIP) {
+				$('#add_approver').remove();
+			}	
 		// end action
 		
 	}
@@ -540,11 +515,6 @@
 		    				if (JsonStatus[ii]['Status'] == 1) {
 		    					HierarkiApproval++;
 		    				}
-
-		    				// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
-		    				// 	HierarkiApproval++;
-		    				// }
-		    				// HierarkiApproval++;
 		    			}
 		    			else
 		    			{
@@ -780,7 +750,6 @@
 			// check berdasarkan Code SPB
 			var dt_arr = ClassDt.Dataselected2;
 			var dtspb = dt_arr.dtspb;
-			var ID_spb_created = dtspb[0]['ID'];
 			if (dtspb[0]['Code'] == '' || dtspb[0]['Code'] == 'null' || dtspb[0]['Code'] == null) {
 				// Upload Tanda Terima 
 				ev.find(".BrowseTT").each(function(){
@@ -849,7 +818,7 @@
 		var dt_arr = ClassDt.Dataselected2;
 		var dtspb = dt_arr.dtspb;
 		var Departement = IDDepartementPUBudget;
-		var ID_spb_created = dtspb[0]['ID'];
+		var ID_payment = dtspb[0]['ID'];
 		var ID_budget_left = 0;
 		var form_data = new FormData();
 
@@ -885,7 +854,7 @@
 			ID_bank : ID_bank,
 			Invoice : Invoice,
 			TypeInvoice  : TypeInvoice,
-			ID_spb_created : ID_spb_created,
+			ID_payment : ID_payment,
 			action : action,
 		};
 
@@ -899,8 +868,8 @@
 		var Code = ClassDt.Code;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
 				}
 				else
 				{
@@ -1155,10 +1124,13 @@
 	})
 
 	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
-	    var url = base_url_js+'rest2/__show_info_spb';
+	    var url = base_url_js+'rest2/__show_info_payment';
+	    var Dataselected2 = ClassDt.Dataselected2;
+	    var dtspb = Dataselected2.dtspb;
+	    var ID_payment = dtspb[0]['ID'];
 	    var Code = $(this).attr('code');
    		var data = {
-   		    Code : Code,
+   		    ID_payment : ID_payment,
    		    auth : 's3Cr3T-G4N',
    		};
    		var token = jwt_encode(data,"UAP)(*");
@@ -1190,7 +1162,7 @@
 
    			// make datatable
    				var table = $('#TblModal').DataTable({
-   				      "data" : data_json['spb_circulation_sheet'],
+   				      "data" : data_json['payment_circulation_sheet'],
    				      'columnDefs': [
    					      {
    					         'targets': 0,
@@ -1238,13 +1210,13 @@
 	$(document).off('click', '.print_page').on('click', '.print_page',function(e) {
 		var dt_arr = ClassDt.Dataselected2;
 		var dtspb = dt_arr.dtspb;
-		var ID_spb_created = dtspb[0]['ID'];
+		var ID_payment = dtspb[0]['ID'];
 		var po_data = ClassDt.po_data;
 		var Dataselected = ClassDt.Dataselected;
 
 		var url = base_url_js+'save2pdf/print/pre_pembayaran';
 		var data = {
-		  ID_spb_created : ID_spb_created,
+		  ID_payment : ID_payment,
 		  dt_arr : dt_arr,
 		  po_data : po_data,
 		  Dataselected : Dataselected,

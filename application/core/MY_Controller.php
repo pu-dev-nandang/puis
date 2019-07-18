@@ -418,8 +418,10 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         parent::__construct();
         $this->load->model('budgeting/m_budgeting');
+        $this->load->model('budgeting/m_global');
         $this->load->model('budgeting/m_pr_po');
         $this->load->model('master/m_master');
+        $this->load->model('budgeting/m_spb');
 
         $this->session->unset_userdata('auth_budgeting_sess');
         $this->session->unset_userdata('menu_budgeting_sess');

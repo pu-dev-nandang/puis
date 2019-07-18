@@ -949,6 +949,7 @@ $route['rest2/__ajax_dayOfDate'] = 'api/c_rest2/ajax_dayOfDate';
 $route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
 $route['rest2/__approve_spb'] = 'api/c_rest2/approve_spb';
+$route['rest2/__approve_payment'] = 'api/c_rest2/approve_payment';
 
 
 $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
@@ -970,7 +971,13 @@ $route['rest2/__getCategoryCatalog/(:any)'] = 'api/c_rest2/getCategoryCatalog/$1
 $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 $route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
-$route['rest2/__show_info_spb'] = 'api/c_rest2/show_info_spb';
+$route['rest2/__get_data_payment_type'] = 'api/c_rest2/get_data_payment_type';
+
+$route['rest2/__show_info_payment'] = 'api/c_rest2/show_info_payment';
+$route['rest2/__get_data_payment'] = 'api/c_rest2/get_data_payment';
+$route['rest2/__reject_payment_from_fin'] = 'api/c_rest2/reject_payment_from_fin';
+$route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1395,14 +1402,21 @@ $route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/co
 $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
 
+// bankadvance
+$route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 
 // cashadvance
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
 $route['budgeting_menu/pembayaran/cashadvance/configuration'] = 'page/budgeting/c_cashadvance/configuration';
+$route['budgeting/submitca'] = 'page/budgeting/c_cashadvance/submitca';
 
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
+
+// financeAP
+$route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
+$route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
@@ -1487,9 +1501,9 @@ $route['global/purchasing/transaction/spk/list/(:any)'] = 'page/C_globalpage/Inf
 $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 
 
-// global spb
-//$route['global/purchasing/transaction/create_spb_by_po/(:any)'] = 'page/C_globalpage/create_spb_by_po/$1';
+// global
 $route['global/purchasing/transaction/spb/list/(:any)'] = 'page/C_globalpage/InfoSPB/$1';
+$route['global/purchasing/transaction/ba/list/(:any)'] = 'page/C_globalpage/InfoBA/$1';
 
 
 // template import supplier

@@ -75,7 +75,7 @@
 		          	      	'className': 'dt-body-center',
 		          	      	'render': function (data, type, full, meta){
 		          	      		 // console.log(meta);
-		          	      	    return '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'+full[6]+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'+full[6]+'"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+		          	      	    return '<button type="button" class="btn btn-warning btn-edit btn-edit-catalog" code="'+full[6]+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button> &nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-catalog" code="'+full[6]+'"> <i class="fa fa-trash" aria-hidden="true"></i> </button>';
 		          	      	    // return no;
 		          	      	}
 		          	      },

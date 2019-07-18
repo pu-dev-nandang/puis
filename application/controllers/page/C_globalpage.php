@@ -5,7 +5,6 @@ include_once APPPATH.'vendor/autoload.php';
 use ElephantIO\Client;
 use ElephantIO\Engine\SocketIO\Version1X;
 
-// class C_globalpage extends Globalclass {
 class C_globalpage extends Budgeting_Controler {
 
     public function temp($content)
@@ -136,47 +135,6 @@ class C_globalpage extends Budgeting_Controler {
          }
     }
 
-    // public function create_spb_by_po($POCode)
-    // {
-    //     /*
-    //         Syarat halaman bisa di buka
-    //         1.Code PO ada pada database
-    //         2.POCode dengan status all approve
-    //         3.Cek User memiliki hubungan dengan Code PO tersebut,kecuali Finance & Purchasing
-
-    //         Note : untuk PO yang sudah dibuat spbnya diperbolehkan untuk create spb dengan function ini dan auto TypeInvoice
-    //     */
-    //       $POCode = str_replace('-','/', $POCode);  
-    //       $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$POCode);
-    //       // status all aprove dengan value 2
-    //       $bool = true;
-    //       if ($this->session->userdata('IDdepartementNavigation') == 4 || $this->session->userdata('IDdepartementNavigation') == 9) {
-    //              $bool = true;
-    //       }
-    //       else{
-    //          $bool = false;
-    //       }
-
-    //       if (count($G_data) > 0  && $bool  ) {
-    //           if ($G_data[0]['Status'] == 2) {
-    //               $sql = 'select * from db_purchasing.spb_created where Code_po_create = ? order by ID desc limit 1';
-    //               $query=$this->db->query($sql, array($POCode))->result_array();
-    //               $data['DT_SPB_Exist'] = $query;
-    //               $data['POCode'] = $POCode;
-    //               $content = $this->load->view('global/budgeting/spb/create_new_spb',$data,true);
-    //               $this->temp($content);
-    //           }
-    //           else
-    //           {
-    //             show_404($log_error = TRUE); 
-    //           }
-    //       }
-    //       else
-    //       {
-    //         show_404($log_error = TRUE); 
-    //       }
-    // }
-
     public function InfoSPB($CodeSPB)
     {
         $Code = str_replace('-','/', $CodeSPB);
@@ -199,9 +157,12 @@ class C_globalpage extends Budgeting_Controler {
             jadikan ke 01/UAP-PURCHASING/SPB/VII/2019
             1.Cek Code SPB exist or not
             2.Cek User memiliki hubungan dengan Code SPB tersebut,kecuali Finance
+            3.Cek Code SPB dari PO/SPK atau tidak
+                jika dari PO maka SPB PO dan jika tidak maka dari user
         */
-
-         $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','Code',$rsCode);
+         $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb" and a.Code = ?';
+         $query=$this->db->query($sql, array($rsCode))->result_array();
+         $G_data = $query;
          if (count($G_data) > 0) {
              $bool = true;
              if ($this->session->userdata('IDdepartementNavigation') == 9) {
@@ -235,14 +196,87 @@ class C_globalpage extends Budgeting_Controler {
              $data['Code'] = $rsCode;
              $data['Code_po_create'] = $G_data[0]['Code_po_create'];
              $data['G_data'] = $G_data;
-             $content = $this->load->view('global/budgeting/spb/InfoSPB',$data,true);
-             $this->temp($content);
+             if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                 $content = $this->load->view('global/budgeting/spb/InfoSPB_PO',$data,true);
+                 $this->temp($content);
+             }
+             else
+             {
+                $content = $this->load->view('global/budgeting/spb/InfoSPB_User',$data,true);
+                $this->temp($content);
+             }
+             
              
          }
          else
          {
             show_404($log_error = TRUE); 
          }
+    }
+
+    public function InfoBA($TokenPayment)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($TokenPayment,$key);
+            $ID_payment = $token;
+            $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.bank_advance as b on a.ID = b.ID_payment where a.Type = "Bank Advance" and a.ID = ?';
+            $query=$this->db->query($sql, array($ID_payment))->result_array();
+            $G_data = $query;
+            if (count($G_data) > 0) {
+                $bool = true;
+                if ($this->session->userdata('IDdepartementNavigation') == 9) {
+                       $bool = true;
+                }
+                else{
+                   $bool = false;
+                }
+
+                if (!$bool) { // for user
+                   $JsonStatus = $G_data[0]['JsonStatus'];
+                   $arr = (array) json_decode($JsonStatus,true);
+                   $NIP = $this->session->userdata('NIP');
+                   for ($i=0; $i < count($arr); $i++) { 
+                       $NIP_ = $arr[$i]['NIP'];
+                       if ($NIP == $NIP_) {
+                           $bool = true;
+                           break;
+                       }
+                   }
+                }
+
+                $data = array(
+                    'auth' => 's3Cr3T-G4N', 
+                );
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($data,$key);
+                $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+                $data['G_data_bank'] = $G_data_bank;
+                $data['bool'] = $bool;
+                $data['ID_payment'] = $ID_payment;
+                $data['Code_po_create'] = $G_data[0]['Code_po_create'];
+                $data['G_data'] = $G_data;
+                if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                    $content = $this->load->view('global/budgeting/ba/Infoba_PO',$data,true);
+                    $this->temp($content);
+                }
+                else
+                {
+                   $content = $this->load->view('global/budgeting/ba/Infoba_User',$data,true);
+                   $this->temp($content);
+                }
+                
+                
+            }
+            else
+            {
+               show_404($log_error = TRUE); 
+            }
+
+        } catch (Exception $e) {
+            show_404($log_error = TRUE); 
+        }
+
     }
 
 }

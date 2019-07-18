@@ -1671,20 +1671,21 @@ class C_rest2 extends CI_Controller {
         }
     }
 
-    public function show_info_spb()
+    public function show_info_payment()
     {
         try {
             $dataToken = $this->getInputToken2();
             $auth = $this->m_master->AuthAPI($dataToken);
             if ($auth) {
                 $rs = array();
-                $Code = $dataToken['Code'];
-                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_purchasing.spb_circulation_sheet as a 
+                $ID_payment = $dataToken['ID_payment'];
+                $whereField = 'where a.ID_payment = ?';
+                $sql = 'select a.Desc,a.Date,b.NIP,b.Name from db_payment.payment_circulation_sheet as a 
                         join db_employees.employees as b on a.By = b.NIP
-                        where a.Code = ?
+                       '.$whereField.' 
                         ';
-                $query=$this->db->query($sql, array($Code))->result_array();
-                $rs['spb_circulation_sheet'] = $query;
+                $query=$this->db->query($sql, array($ID_payment))->result_array();
+                $rs['payment_circulation_sheet'] = $query;
                 echo json_encode($rs);
             }
             else
@@ -2002,8 +2003,10 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB ';
-               $joinaction = ' right join db_purchasing.spb_created as spb on spb.Code_po_create = a.Code
+               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB ';
+               // $joinaction = ' right join db_purchasing.spb_created as spb on spb.Code_po_create = a.Code
+               $joinaction = ' right join (select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb")
+                                as spb on spb.Code_po_create = a.Code
                                left join db_employees.employees as e_spb on e_spb.NIP = spb.CreatedBy
                                join (
                                select * from (
@@ -2020,7 +2023,7 @@ class C_rest2 extends CI_Controller {
                 // get Department
                 $IDDepartementPUBudget = $dataToken['IDDepartementPUBudget'];
                 $WhereFiltering = '';
-                if ($IDDepartementPUBudget != 'NA.4') {
+                if ($IDDepartementPUBudget != 'NA.9') {
                     $NIP = $dataToken['sessionNIP'];
                     $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementSPB = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                 }
@@ -2125,7 +2128,7 @@ class C_rest2 extends CI_Controller {
                     }
 
                     $nestedData = array_merge($nestedData,$arr);
-                    $nestedData[] = $row['NameCreateBy'];
+                    $nestedData[] = $row['SPBNameCreatedBy'];
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2161,6 +2164,7 @@ class C_rest2 extends CI_Controller {
                             'CodeSPB' => $row['CodeSPB'],
                             'StatusSPB' => $row['StatusSPB'],
                             'TypeCode' => $row['TypeCode'],
+                            'ID_payment' => $row['ID_payment'],
                         );
 
                     $nestedData[] = $arr_temp;
@@ -2215,7 +2219,9 @@ class C_rest2 extends CI_Controller {
                     }
                    
                     // get data
-                    $G_data = $this->m_master->caribasedprimary('db_purchasing.spb_created','Code',$Code);
+                    $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb" and a.Code = ?';
+                    $query=$this->db->query($sql, array($Code))->result_array();
+                    $G_data = $query;
 
                     $keyJson = $approval_number - 1; // get array index json
                     $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
@@ -2309,12 +2315,12 @@ class C_rest2 extends CI_Controller {
                         }
 
                         $this->db->where('Code',$Code);
-                        $this->db->update('db_purchasing.spb_created',$datasave); 
+                        $this->db->update('db_payment.payment',$datasave); 
 
-                            $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                            $Desc = ($arr_upd['Status'] == 1) ? 'SPB{'.$Code.'} Approve' : 'SPB Code : '.$Code.' Reject';
                             if (array_key_exists('Status', $datasave)) {
                                 if ($datasave['Status'] == 2) {
-                                    $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+                                    $Desc = 'SPB{'.$Code."} All Approve and posting date at : ".$datasave['PostingDate'];
 
                                     // Notif All Approve to JsonStatus allkey
                                         $arr_to = array();
@@ -2372,7 +2378,778 @@ class C_rest2 extends CI_Controller {
                             if (count($po_create) > 0) {
                                  $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc.'<br><b> SPB '.$Code.'</b>',$NIP);
                             }
-                                $this->m_spb->spb_grpo_circulation_sheet($Code,$Desc,$NIP);
+                                $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
+
+                    }
+                    else
+                    {
+                        $msg = 'Not Authorize';
+                    }
+
+                    echo json_encode($rs);
+
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function get_data_payment()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_pr_po');
+                //check action
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+               $joinaction = ' right join (
+                                        select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
+                                        ( select ID_payment,Perihal  from db_payment.spb
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.bank_advance
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.cash_advance  
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.petty_cash 
+                                        )
+                        as b on a.ID = b.ID_payment
+                         )
+                                as pay on pay.Code_po_create = a.Code
+                               left join db_employees.employees as e_spb on e_spb.NIP = pay.CreatedBy
+                               join (
+                               select * from (
+                               select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                               UNION
+                               select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                               UNION
+                               select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                               ) aa
+                               ) as t_spb_de on pay.Departement = t_spb_de.ID
+                            ';
+               $whereaction = ' and StatusPay = 2';
+
+                // get Department
+                $WhereFiltering = ' and ID_payment not in (select ID_payment from db_budgeting.ap where Status = 2)';
+                 
+                $requestData = $_REQUEST;
+                $StatusQuery = ' and Status = 2';
+                $sqltotalData = 'select count(*) as total  from (
+                            select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                a.JsonStatus,
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                            from db_purchasing.po_create as a
+                            left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                            left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                            left join db_employees.employees as d on a.CreatedBy = d.NIP
+                            left join db_purchasing.po_detail as e on a.Code = e.Code
+                            left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                            left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                            left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                            '.$joinaction.'
+                        )aa
+                       ';
+
+                $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                      or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
+                      or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                    ) '.$StatusQuery.$WhereFiltering.$whereaction ;
+  
+                $querytotalData = $this->db->query($sqltotalData)->result_array();
+                $totalData = $querytotalData[0]['total'];
+
+                $sql = 'select * from (
+                            select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                a.JsonStatus,
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                            from db_purchasing.po_create as a
+                            left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                            left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                            left join db_employees.employees as d on a.CreatedBy = d.NIP
+                            left join db_purchasing.po_detail as e on a.Code = e.Code
+                            left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                            left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                            left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                            '.$joinaction.'
+                        )aa
+                       ';
+
+                $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                      or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
+                      or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                    ) '.$StatusQuery.$WhereFiltering.$whereaction ;
+                $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $query = $this->db->query($sql)->result_array();
+
+                $No = $requestData['start'] + 1;
+                
+                $data = array();
+                for($i=0;$i<count($query);$i++){
+                    $nestedData=array();
+                    $row = $query[$i];
+                    $nestedData[] = $No;
+                    $nestedData[] = $row['Code'];
+                    $nestedData[] = $row['NameDepartementPay'];
+                    // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
+                    $nestedData[] = $row['StatusNamepay'];
+                    $nestedData[] = '';
+                    $nestedData[] = $row['PayNameCreatedBy'];
+                    // find PR in po_detail
+                        $arr_temp = array();
+                        $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
+                        from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                        left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                        left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                        where d.Code = ?
+                        ';
+                        $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
+                        for ($j=0; $j < count($query_get_pr); $j++) { 
+                            if (count($arr_temp) == 0) {
+                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                            }
+                            else
+                            {
+                                // check exist
+                                $bool = true;
+                                for ($k=0; $k < count($arr_temp); $k++) { 
+                                    if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                        $bool = false;    
+                                        break;
+                                    }
+                                }
+
+                                if ($bool) {
+                                    $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                }
+
+                            }
+                        }
+                        // pass data spb
+                        $arr_temp[] = array(
+                            'CodeSPB' => $row['CodeSPB'],
+                            'StatusPay' => $row['StatusPay'],
+                            'TypePay' => $row['TypePay'],
+                            'ID_payment' => $row['ID_payment'],
+                            'Perihal' => $row['Perihal'],
+                        );
+
+                    $nestedData[] = $arr_temp;
+                    $data[] = $nestedData;
+                    $No++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval($totalData),
+                    "recordsFiltered" => intval($totalData ),
+                    "data"            => $data,
+                );
+                echo json_encode($json_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        catch(Exception $e) {
+             // handling orang iseng
+             echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function reject_payment_from_fin()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $NIP = $dataToken['NIP'];
+                    $NoteDel = $dataToken['NoteDel'];
+                    $Desc_circulationSheet = 'Reject{'.$NoteDel.'}';
+                    $arr = array(
+                        'Status' => -1,
+                    );
+                    $this->db->where('ID',$ID_payment);
+                    $this->db->update('db_payment.payment',$arr);
+                    $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                    // insert to spb_circulation_sheet
+                        $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
+                        if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                            // insert to po_circulation_sheet
+                                $this->m_pr_po->po_circulation_sheet($G_data[0]['Code_po_create'],$Desc_circulationSheet);  
+                        }
+
+                    echo json_encode($rs);    
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function paid_payment_from_fin()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    /*
+                        1. Check by po atau tidak
+                        2. jika by po maka dapatkan data budget_left dari pr
+                        a. check budget left yang tersedia masih cukup atau tidak pada database untuk verifikasi beserta dengan po_invoice_status
+                        b. check type payment, untuk link data invoice dari table type payment
+                        c. kurangi budget budget left pada using dan kurangi juga pada value
+                        d.kurangi juga pada InvoiceLeftPO di po_invoice status
+                        3.kurangi budget budget left pada using dan kurangi juga pada value
+                    */
+                    $ID_payment = $dataToken['ID_payment'];
+                    $po_payment_data = $dataToken['po_payment_data'];
+                    $po_payment_data = json_decode(json_encode($po_payment_data),true);
+                    $dt = $po_payment_data['dtspb'];
+                    $Invoice = $dt[0]['Detail'][0]['Invoice'];
+                    $Code_po_create =  $dt[0]['Code_po_create'];
+                    if ($Code_po_create != '' && $Code_po_create != null) {
+                        $po_data = $dataToken['po_data'];
+                        $po_data = json_decode(json_encode($po_data),true);
+                        $po_create = $po_data['po_create'];
+                        $PRCode = $po_create[0]['Code'];
+                        $po_detail = $po_data['po_detail'];
+                        $bool = true;
+                        $Total = 0;
+                        for ($i=0; $i < count($po_detail); $i++) { 
+                            $ID_budget_left = $po_detail[$i]['ID_budget_left'];
+                            $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                            $ValueInvoice = $G[0]['Value'];
+                            $Total += $ValueInvoice;
+                        }
+
+                        $InvoiceLeft = $Invoice;
+                        if ($Total >= $Invoice) {
+                             // insert ke table ap dulu
+                              $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                              $UploadVoucher = json_encode($UploadVoucher);
+                              $dtime =  date('Y-m-d H:i:s');
+                              $arr = array(
+                                'ID_payment' => $ID_payment,
+                                'Status' => 2,
+                                'JsonStatus' => json_encode(array()),
+                                'CreatedBy' => $dataToken['NIP'],
+                                'CreatedAt' => $dtime,
+                                'PostingDate' => $dtime,
+                                'Code' => '',
+                                'NoVoucher' => $dataToken['NoVoucher'],
+                                'UploadVoucher' => $UploadVoucher,
+                              );
+                              $this->db->insert('db_budgeting.ap',$arr);
+                              $ID_ap = $this->db->insert_id();
+
+                              for ($i=0; $i < count($po_detail); $i++) {
+                                  if ($InvoiceLeft <= 0) {
+                                      break;
+                                  } 
+                                  $ID_budget_left = $po_detail[$i]['ID_budget_left'];
+                                  $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                  $ValueUsing= $G[0]['Using'];
+                                  $ValueInvoice= $G[0]['Value'];
+                                  $InvoiceAP = 0;   
+                                  // $bool2 = true;
+                                  if ($ValueUsing >= $InvoiceLeft) {
+                                      $ValueInvoice = $ValueInvoice - $InvoiceLeft;
+                                      $ValueUsing = $ValueUsing - $InvoiceLeft;
+                                      $InvoiceAP = $InvoiceLeft;  
+                                      $InvoiceLeft = $InvoiceLeft - $InvoiceLeft;
+                                      // $bool2 = false;
+                                  }
+                                  else
+                                  {
+                                    $ValueInvoice = $ValueInvoice - $ValueUsing;
+                                    $InvoiceAP = $ValueUsing;
+                                    $ValueUsing = $ValueUsing - $ValueUsing;
+                                    $InvoiceLeft = $InvoiceLeft - $ValueUsing;
+                                  }
+
+                                  // insert ke budget_payment
+                                  $arr_ap = array(
+                                    'ID_ap' => $ID_ap,
+                                    'ID_budget_left' => $ID_budget_left,
+                                    'Invoice' => $InvoiceAP,
+                                  );
+                                  $this->db->insert('db_budgeting.budget_payment',$arr_ap);
+
+                                  // update budget_left
+                                  $arr_budget_left = array(
+                                    'Value' =>  $ValueInvoice,
+                                    'Using' => $ValueUsing,                                   
+                                  );
+
+                                  $this->db->where('ID',$ID_budget_left);
+                                  $this->db->update('db_budgeting.budget_left',$arr_budget_left);
+                              }
+
+                              // update po_invoice_status
+                              $G_po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
+                              $InvoiceLeftPO = $G_po_invoice_status[0]['InvoiceLeftPO'];
+                              $InvoiceLeftPO = $InvoiceLeftPO - $Invoice;
+                              $arr_po_invoice_status = array();
+                              if ($InvoiceLeftPO <= 0) {
+                                  $arr_po_invoice_status['Status'] = 1;
+                              }
+                             $arr_po_invoice_status['InvoiceLeftPO'] = $InvoiceLeftPO;
+                             $arr_po_invoice_status['InvoicePayPO'] = $Invoice;
+                             $this->db->where('Code_po_create',$Code_po_create);
+                             $this->db->update('db_purchasing.po_invoice_status',$arr_po_invoice_status);
+                        }
+                        else
+                        {
+                            $rs['Status'] = 0;
+                            $rs['msg'] = 'Post Budget pada PR Code : '.$PRCode.' tidak mencukupi untuk melakukan pembayaran';
+                        }
+
+                    }
+                    else
+                    {
+                        // NON PO
+                    }
+
+                    echo json_encode($rs);
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function get_data_payment_type()
+    {
+        try {
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $this->load->model('budgeting/m_pr_po');
+                //check action
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+               $joinaction = ' right join (
+                                        select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
+                                        ( select ID_payment,Perihal  from db_payment.spb
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.bank_advance
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.cash_advance  
+                                          UNION 
+                                          select ID_payment,Perihal  from db_payment.petty_cash 
+                                        )
+                        as b on a.ID = b.ID_payment
+                        where a.Type = "'.$dataToken['Type'].'"
+                         )
+                                as pay on pay.Code_po_create = a.Code
+                               left join db_employees.employees as e_spb on e_spb.NIP = pay.CreatedBy
+                               join (
+                               select * from (
+                               select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                               UNION
+                               select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                               UNION
+                               select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                               ) aa
+                               ) as t_spb_de on pay.Departement = t_spb_de.ID
+                            ';
+               $whereaction = ' and StatusPay != 0';
+
+                // get Department
+                $WhereFiltering = '';
+                 
+                $requestData = $_REQUEST;
+                $StatusQuery = ' and Status = 2';
+                $sqltotalData = 'select count(*) as total  from (
+                            select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                a.JsonStatus,
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                            from db_purchasing.po_create as a
+                            left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                            left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                            left join db_employees.employees as d on a.CreatedBy = d.NIP
+                            left join db_purchasing.po_detail as e on a.Code = e.Code
+                            left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                            left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                            left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                            '.$joinaction.'
+                            group by a.Code     
+                        )aa
+                       ';
+
+                $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                      or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
+                      or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                    ) '.$StatusQuery.$WhereFiltering.$whereaction ;
+                // print_r($sqltotalData);die();    
+                $querytotalData = $this->db->query($sqltotalData)->result_array();
+                $totalData = $querytotalData[0]['total'];
+
+                $sql = 'select * from (
+                            select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                                c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                                a.JsonStatus,
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                            from db_purchasing.po_create as a
+                            left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                            left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                            left join db_employees.employees as d on a.CreatedBy = d.NIP
+                            left join db_purchasing.po_detail as e on a.Code = e.Code
+                            left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                            left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                            left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                            '.$joinaction.'
+                            group by a.Code      
+                        )aa
+                       ';
+
+                $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                      or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
+                      or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                    ) '.$StatusQuery.$WhereFiltering.$whereaction ;
+                $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $query = $this->db->query($sql)->result_array();
+
+                $No = $requestData['start'] + 1;
+                $G_Approver = $this->m_pr_po->Get_m_Approver();
+                if (array_key_exists('length', $dataToken)) {
+                    $Count_G_Approver = $dataToken['length'];
+                }
+                else
+                {
+                    $Count_G_Approver = count($G_Approver);
+                }
+                $data = array();
+                for($i=0;$i<count($query);$i++){
+                    $nestedData=array();
+                    $row = $query[$i];
+                    $nestedData[] = $No;
+                    $nestedData[] = $row['Code'];
+                    $nestedData[] = $row['NameDepartementPay'];
+                    // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
+                    $nestedData[] = $row['StatusNamepay'];
+                    $nestedData[] = '';
+                    $JsonStatus = (array)json_decode($row['JsonStatus3'],true);
+                    $arr = array();
+                    if (count($JsonStatus) > 0) {
+                        for ($j=1; $j < count($JsonStatus); $j++) {
+                            $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                            $Name = $getName[0]['Name'];
+                            $StatusInJson = $JsonStatus[$j]['Status'];
+                            switch ($StatusInJson) {
+                                case '1':
+                                    $stjson = '<i class="fa fa-check" style="color: green;"></i>';
+                                    break;
+                                case '2':
+                                    $stjson = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+                                    break;
+                                default:
+                                    $stjson = "-";
+                                    break;
+                            }
+                            $arr[] = $stjson.'<br>'.'Approver : '.$Name.'<br>'.'Approve At : '.$JsonStatus[$j]['ApproveAt'];
+                        }
+                    }
+
+                    $c = $Count_G_Approver - count($arr);
+                    for ($l=0; $l < $c; $l++) { 
+                         $arr[] = '-';
+                    }
+
+                    $nestedData = array_merge($nestedData,$arr);
+                    $nestedData[] = $row['PayNameCreatedBy'];
+                    // find PR in po_detail
+                        $arr_temp = array();
+                        $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
+                        from db_budgeting.pr_detail as a join db_purchasing.m_catalog as b on a.ID_m_catalog = b.ID
+                        left join db_purchasing.pre_po_detail as c on a.ID = c.ID_pr_detail
+                        left join db_purchasing.po_detail as d on c.ID = d.ID_pre_po_detail
+                        where d.Code = ?
+                        ';
+                        $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
+                        for ($j=0; $j < count($query_get_pr); $j++) { 
+                            if (count($arr_temp) == 0) {
+                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                            }
+                            else
+                            {
+                                // check exist
+                                $bool = true;
+                                for ($k=0; $k < count($arr_temp); $k++) { 
+                                    if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                        $bool = false;    
+                                        break;
+                                    }
+                                }
+
+                                if ($bool) {
+                                    $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                }
+
+                            }
+                        }
+                        // pass data spb
+                        $arr_temp[] = array(
+                            'CodeSPB' => $row['CodeSPB'],
+                            'StatusPay' => $row['StatusPay'],
+                            'TypePay' => $row['TypePay'],
+                            'ID_payment' => $row['ID_payment'],
+                            'Perihal' => $row['Perihal'],
+                        );
+
+                    $nestedData[] = $arr_temp;
+                    $data[] = $nestedData;
+                    $No++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval($totalData),
+                    "recordsFiltered" => intval($totalData ),
+                    "data"            => $data,
+                );
+                echo json_encode($json_data);
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        catch(Exception $e) {
+             // handling orang iseng
+             echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
+    public function approve_payment()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $key = "UAP)(*";
+                    $token = $this->jwt->encode($ID_payment,$key);
+
+                    $CodeUrl = $token;
+                    $approval_number = $dataToken['approval_number'];
+                    $NIP = $dataToken['NIP'];
+                    $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                    $NameFor_NIP = $G_emp[0]['Name'];
+                    $action = $dataToken['action'];
+
+                    // get code_po
+                    $po_data = $dataToken['po_data'];
+                    $po_data = json_decode(json_encode($po_data),true);
+                    $po_create = $po_data['po_create'];
+                    $Code_po_create = '';
+                    if (count($po_create) > 0) {
+                        $Code_po_create = $po_create[0]['Code'];
+                    }
+                   
+                    // get data
+                    $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt from db_payment.payment as a where a.ID = ?';
+                    $query=$this->db->query($sql, array($ID_payment))->result_array();
+                    $G_data = $query;
+
+                    $urlType = '';
+                    switch ($G_data[0]['Type']) {
+                        case 'Bank Advance':
+                            $urlType = 'ba';
+                            break;
+                        case 'Cash Advance':
+                            $urlType = 'ca';
+                            break;
+                        case 'Petty Cash':
+                             $urlType = 'pc';
+                            break;    
+                        default:
+                            # code...
+                            break;
+                    }
+
+                    $keyJson = $approval_number - 1; // get array index json
+                    $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                    // get data update to approval
+                    $arr_upd = $JsonStatus[$keyJson];
+
+                    if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                        $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                        $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                        $JsonStatus[$keyJson] = $arr_upd;
+                        $datasave = array(
+                            'JsonStatus' => json_encode($JsonStatus),
+                        );
+
+                        // check all status for update data
+                        $boolApprove = true;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2 || $Status == 0) {
+                                $boolApprove = false;
+                                break;
+                            }
+                        }
+
+                        if ($boolApprove) {
+                            $datasave['Status'] = 2;
+                            $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                        }
+                        else
+                        {
+                            $boolReject = false;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2) {
+                                    $boolReject = true;
+                                    break;
+                                }
+                            }
+
+                            if ($boolReject) {
+                                $NoteDel = $dataToken['NoteDel'];
+                                $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                $datasave['Status'] = -1;
+                                // $datasave['Notes'] = $Notes;
+                            }
+                            else
+                            {
+                                // Notif to next step approval & User
+                                    $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                    // Send Notif for next approval
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($NIPApprovalNext),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$G_data[0]['Type'].' has been Approved',
+                                                            'Description' => $G_data[0]['Type'].' has been approved by '.$NameFor_NIP,
+                                                            'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                            }
+                        }
+
+                        $this->db->where('ID',$ID_payment);
+                        $this->db->update('db_payment.payment',$datasave); 
+
+                            $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                            if (array_key_exists('Status', $datasave)) {
+                                if ($datasave['Status'] == 2) {
+                                    $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+
+                                    // Notif All Approve to JsonStatus allkey
+                                        $arr_to = array();
+                                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                                            $arr_to[] = $JsonStatus[$i]['NIP'];
+                                        }
+
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' has been done',
+                                                            'Description' => $G_data[0]['Type'].' has been done',
+                                                            'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => $arr_to,
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                }
+                            }
+
+                            if ($arr_upd['Status'] == 2) {
+                                if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                }
+
+                                // Notif Reject to JsonStatus key 0
+                                    // Send Notif for user 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' has been Rejected',
+                                                            'Description' => $G_data[0]['Type'].' has been Rejected by '.$NameFor_NIP,
+                                                            'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+                            }
+
+                            if (count($po_create) > 0) {
+                                 $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc.'<br><b>'.$G_data[0]['Type'].'</b>',$NIP);
+                            }
+                                $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
 
                     }
                     else

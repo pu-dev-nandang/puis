@@ -586,7 +586,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $this->load->model('master/m_master');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
-        $ID_spb_created = $input['ID_spb_created'];
+        $ID_payment = $input['ID_payment'];
         $dt_arr = $input['dt_arr'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
         $dtspb = $dt_arr['dtspb'];
@@ -612,7 +612,7 @@ class C_save_to_pdf3 extends CI_Controller {
     {
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
-        $ID_spb_created = $input['ID_spb_created'];
+        $ID_payment = $input['ID_payment'];
         $dt_arr = $input['dt_arr'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
         $dtspb = $dt_arr['dtspb'];
@@ -624,7 +624,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $po_data = json_decode(json_encode($po_data),true);
         $po_create = $po_data['po_create'];
 
-        $filename = '__'.$ID_spb_created.'.pdf'; 
+        $filename = '__'.$ID_payment.'.pdf'; 
 
         $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
         // $fpdf->AliasNbPages();
@@ -657,15 +657,15 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $fpdf->Cell(50, $h, 'NO KWT/INV', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$dtspb[0]['NoInvoice'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$dtspb[0]['Detail'][0]['NoInvoice'] , 0, 1, 'L', 0);
 
         $fpdf->Cell(50, $h, 'TANGGAL', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$this->getDateIndonesian($dtspb[0]['Datee']) , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$this->getDateIndonesian($dtspb[0]['Detail'][0]['Datee']) , 0, 1, 'L', 0);
 
         $fpdf->Cell(50, $h, 'PERIHAL', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, ':', 0, 0, 'L', 0);
-        $fpdf->Cell(80, $h,$dtspb[0]['Perihal'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$dtspb[0]['Detail'][0]['Perihal'] , 0, 1, 'L', 0);
 
         $y = $fpdf->GetY()+2;
         $fpdf->Line(10,$y,200,$y);
@@ -678,22 +678,22 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(80, $h,$po_create[0]['NamaSupplier'] , 0, 1, 'L', 0);
         $fpdf->SetFont('Arial','',$FontIsian);
         $fpdf->Cell(75, $h, 'No Rekening', 0, 0, 'L', 0);
-        $ID_bank = $dtspb[0]['ID_bank'];
+        $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
         $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
-        $fpdf->Cell(80, $h,$G_bank[0]['Name'].' No : '.$dtspb[0]['No_Rekening'] , 0, 1, 'L', 0);
+        $fpdf->Cell(80, $h,$G_bank[0]['Name'].' No : '.$dtspb[0]['Detail'][0]['No_Rekening'] , 0, 1, 'L', 0);
 
         $y = $fpdf->GetY()+10;
         $fpdf->SetY($y);
         $fpdf->SetFont('Arial','B',$FontIsian);
         $fpdf->Cell(50, $h, 'PEMBAYARAN', 0, 1, 'L', 0);
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
-        $fpdf->Cell(45, $h, 'HARGA', 0, 0, 'L', 0);
+        $fpdf->Cell(45, $h, 'Harga', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
         // count left po
         $InvoiceleftPO = $dtspb[0]['InvoicePO'];
         $datadtsb = $Dataselected['dtspb'];
         for ($i=0; $i < count($datadtsb); $i++) { 
-            if ($ID_spb_created == $datadtsb[$i]['ID'] && $i > 0) {
+            if ($ID_payment == $datadtsb[$i]['ID'] && $i > 0) {
                 if ($datadtsb[$i]['Invoice']!= null && $datadtsb[$i]['Invoice'] != 'null') {
                     $InvoiceleftPO -= $datadtsb[$i - 1]['Invoice'];
                 }
@@ -707,9 +707,9 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(50, $h, 'Rp '.number_format($InvoiceleftPO,2,',','.'), 0, 0, 'L', 0);
         $fpdf->Cell(30, $h, '(include PPN)', 0, 1, 'L', 0);
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
-        $fpdf->Cell(45, $h, $dtspb[0]['TypeInvoice'], 0, 0, 'L', 0);
+        $fpdf->Cell(45, $h, $dtspb[0]['Detail'][0]['TypeInvoice'], 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
-        $fpdf->Cell(50, $h, 'Rp '.number_format($dtspb[0]['Invoice'],2,',','.'), 0, 0, 'L', 0);
+        $fpdf->Cell(50, $h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 0, 0, 'L', 0);
         $fpdf->Cell(30, $h, '(include PPN)', 0, 1, 'L', 0);
 
         $xcustom = 50;
@@ -718,13 +718,13 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(5, $h, '-', 0, 0, 'L', 0);
         $fpdf->Cell(45, $h,'Sisa Pembayaran', 0, 0, 'L', 0);
         $fpdf->Cell(5, $h, '=', 0, 0, 'L', 0);
-        $Sisa = $InvoiceleftPO - $dtspb[0]['Invoice'];
+        $Sisa = $InvoiceleftPO - $dtspb[0]['Detail'][0]['Invoice'];
         $fpdf->Cell(50, $h, 'Rp '.number_format($Sisa,2,',','.'), 0, 1, 'L', 0);
 
         $y = $fpdf->GetY();
         $y += 5;
         $data = array(
-            'bilangan' => (int)$dtspb[0]['Invoice'],
+            'bilangan' => (int)$dtspb[0]['Detail'][0]['Invoice'],
             'auth' => 's3Cr3T-G4N', 
         );
         $key = "UAP)(*";
@@ -734,6 +734,191 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(50,5, 'Terbilang (Rupiah) : '.$_ajax_terbilang[0].' Rupiah', 0, 1, 'L', 0);
 
         
+        $JsonStatus = $dtspb[0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
+        $y = $fpdf->GetY()+20;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function GeneratePDFBankAdvance()
+    {
+        $token = $this->input->post('token');
+        $input = $this->getInputToken($token);
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['dt_arr'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['dtspb'];
+
+        $Dataselected = $input['Dataselected'];
+        $Dataselected = json_decode(json_encode($Dataselected),true);
+        
+        $po_data = $input['po_data']; 
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+
+        $filename = '__'.$ID_payment.'.pdf'; 
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'YAYASAN PENDIDIKAN AGUNG PODOMORO / YPAP', 0, 1, 'L', 0);
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'BANK ADVANCE FORM', 0, 1, 'C', 0);
+        $y += 5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Mohon dapat diberikan bank advance dengan perincian sebagai berikut:', 0, 1, 'L', 0);
+        $fpdf->Cell(0,$h, '1.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 0, 1, 'L', 0);
+        $fpdf->SetX($x);
+        $fpdf->Cell(0,$h, '2.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Perincian biaya : ', 0, 0, 'L', 0);
+        $fpdf->SetX(60);
+        $fpdf->Cell(0,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 0, 1, 'L', 0);
+        $y += 35;
+        $fpdf->SetXY(15,$y);
+        $fpdf->Cell(0,$h, 'Jumlah', 0, 0, 'L', 0);
+         $fpdf->SetX(60);
+         $fpdf->Cell(50,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 'TB', 1, 'L', 0);
+         $y += 15;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : (pilih salah satu)', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Cash') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Tunai', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Transfer') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Transfer', 0, 1, 'L', 0);
+         $No_Rekening = '...............................................................................';
+         $Name_Penerima = '...............................................................................';
+         $Nama_Bank = '...............................................................................';
+         if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
+             $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
+             $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
+             $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
+             $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
+             $Nama_Bank = $G_bank[0]['Name'];
+         }
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Ke rekening : ', 0, 1, 'L', 0);
+         $h = 5;
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Nama penerima : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Name_Penerima, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Bank : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Nama_Bank, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'No rekening: : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$No_Rekening, 0, 1, 'L', 0);
+         $h = 10;
+         $y = $fpdf->GetY()+ 5;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(50,$h,'4.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(60,$h, 'Dibutuhkan pada tanggal:', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h, $this->getDateIndonesian($dtspb[0]['Detail'][0]['Date_Needed']), 0, 0, 'L', 0);
+        
+
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
         $y = $fpdf->GetY()+20;

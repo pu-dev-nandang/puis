@@ -907,8 +907,8 @@ class C_po extends Transaksi_Controler {
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
-            // check apakah data telah dibuat spb atau belum
-                $G= $this->m_master->caribasedprimary('db_purchasing.spb_created','Code_po_create',$Code);
+            // check apakah data telah dibuat payment atau belum
+                $G= $this->m_master->caribasedprimary('db_payment.payment','Code_po_create',$Code);
                 if (count($G) == 0) {
                     // do change status pr item & kembalikan
                         $arr_post_data_ID_po_detail = json_decode(json_encode($arr_post_data_ID_po_detail),true);
@@ -971,7 +971,7 @@ class C_po extends Transaksi_Controler {
                 else
                 {
                     $rs['Status'] = 0;
-                    $rs['msg'] = 'SPB for The PO : '.$Code.' has created, cant action!!!';
+                    $rs['msg'] = 'Payment for The PO : '.$Code.' has created, cant action!!!';
                 }
         }
         else
@@ -1579,8 +1579,8 @@ class C_po extends Transaksi_Controler {
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
-            // check apakah data telah dibuat spb atau belum
-                $G= $this->m_master->caribasedprimary('db_purchasing.spb_created','Code_po_create',$Code);
+            // check apakah data telah dibuat payment atau belum
+                $G= $this->m_master->caribasedprimary('db_payment.payment','Code_po_create',$Code);
                 if (count($G) == 0) {
                     // do change status pr item & kembalikan
                         $arr_post_data_ID_po_detail = json_decode(json_encode($arr_post_data_ID_po_detail),true);
@@ -1642,7 +1642,7 @@ class C_po extends Transaksi_Controler {
                 else
                 {
                     $rs['Status'] = 0;
-                    $rs['msg'] = 'SPB for The SPK : '.$Code.' has created, cant action!!!';
+                    $rs['msg'] = 'Payment for The SPK : '.$Code.' has created, cant action!!!';
                 }
         }
         else
