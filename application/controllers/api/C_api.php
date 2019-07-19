@@ -8331,6 +8331,7 @@ class C_api extends CI_Controller {
                         // Data Student
                         $dataStd = $this->m_api->getStudentByScheduleID($dataCourse[$c]['SemesterID'],$dataCourse[$c]['ID'],'');
                         $dataCourse[$c]['TotalStudent'] = count($dataStd);
+                        $dataCourse[$c]['DetailsStudent'] = $dataStd;
 
                         // Data Edom Answer
                         $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 

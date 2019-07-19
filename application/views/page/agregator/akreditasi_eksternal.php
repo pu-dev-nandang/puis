@@ -7,6 +7,7 @@
     #tableData tr th, #tableData tr td {
         text-align: center;
     }
+
 </style>
 
 
@@ -260,7 +261,7 @@
                     Type : formAE_Type,
                     Scope : formAE_Scope,
                     Level : formAE_Level,
-                    DueDate : formAE_DueDate,
+                    DueDate :  moment(formAE_DueDate).format('YYYY-MM-DD'),
                     Description : formAE_Description,
                     EntredBy : sessionNIP
                 }
@@ -308,8 +309,8 @@
             '                        <th style="width: 10%">Lingkup</th>' +
             '                        <th style="width: 15%">Tingkat</th>' +
             '                        <th style="width: 15%">Masa Berlaku</th>' +
-            '                        <th>Keterangan</th>' +
             '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
+            '                        <th>Keterangan</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                   <tbody id="listData"></tbody>' +
@@ -360,4 +361,37 @@
             : '';
 
     });
+
+    // $(document).on('click','.btnRemove',function () {
+    //
+    //    if(confirm('Hapus data?')){
+    //
+    //        $('.btnAction').prop('disabled',true);
+    //
+    //        var ID = $(this).attr('data-id');
+    //        var table = $(this).attr('data-tb');
+    //
+    //        var url = base_url_js+'api3/__crudAgregatorTB1';
+    //
+    //        var data = {
+    //            action: 'rmeoveDataAgg',
+    //            ID : ID,
+    //            table : table
+    //        };
+    //
+    //        var token = jwt_encode(data,'UAP)(*');
+    //
+    //        $.post(url,{token:token},function (result) {
+    //
+    //            toastr.success('Data removed','Success');
+    //            setTimeout(function () {
+    //                loadDataTable();
+    //            },500);
+    //
+    //        });
+    //    }
+    //
+    //
+    // });
+
 </script>

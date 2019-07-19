@@ -276,7 +276,18 @@ class C_api3 extends CI_Controller {
                 $nestedData=array();
                 $row = $query[$i];
 
-                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '
+                                                                       <div class="btn-group btnAction">
+                                                                      <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                                                      </button>
+                                                                      <ul class="dropdown-menu">
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li role="separator" class="divider"></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.external_accreditation">Remove</a></li>
+                                                                      </ul>
+                                                                    </div>
+                                                                        <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
@@ -284,8 +295,8 @@ class C_api3 extends CI_Controller {
                 $nestedData[] = '<div style="text-align:left;">'.$row['Scope'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Level'].'</div>';
                 $nestedData[] = '<div style="text-align:right;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
 
                 $data[] = $nestedData;
                 $no++;
@@ -353,15 +364,28 @@ class C_api3 extends CI_Controller {
                 $nestedData=array();
                 $row = $query[$i];
 
-                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEdit" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+//                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEdit" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '
+                                                                       <div class="btn-group btnAction">
+                                                                      <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                                                      </button>
+                                                                      <ul class="dropdown-menu">
+                                                                        <li><a href="javascript:void(0);" class="btnEdit" data-no="'.$no.'">Edit</a></li>
+                                                                        <li role="separator" class="divider"></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.international_accreditation_prodi">Remove</a></li>
+                                                                      </ul>
+                                                                    </div>
+                                                                        <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['ProdiName'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Status'].'</div>';
                 $nestedData[] = '<div style="text-align:right;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
 
                 $data[] = $nestedData;
                 $no++;
@@ -405,6 +429,21 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='removeDataAgg'){
+
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete($data_arr['Table']);
+
+            // Remove File
+            if(isset($data_arr['File']) && $data_arr['File']!=''
+                && is_file('./uploads/agregator/'.$data_arr['File'])){
+                unlink('./uploads/agregator/'.$data_arr['File']);
+            }
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='viewListAKE'){
 
             $requestData= $_REQUEST;
@@ -435,14 +474,27 @@ class C_api3 extends CI_Controller {
                 $nestedData=array();
                 $row = $query[$i];
 
-                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+//                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '
+                                                                       <div class="btn-group btnAction">
+                                                                      <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                                                      </button>
+                                                                      <ul class="dropdown-menu">
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li role="separator" class="divider"></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.financial_external_audit">Remove</a></li>
+                                                                      </ul>
+                                                                    </div>
+                                                                        <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$row['Year'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Opinion'].'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
 
                 $data[] = $nestedData;
                 $no++;
@@ -544,7 +596,20 @@ class C_api3 extends CI_Controller {
                 $nestedData=array();
                 $row = $query[$i];
 
-                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+//                $btnAction = ($Previlege=='1' || $Previlege==1) ? '<button class="btn btn-default btn-sm btnEditAE" data-no="'.$no.'"><i class="fa fa-edit"></i></button><textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '
+                                                                       <div class="btn-group btnAction">
+                                                                      <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                                                      </button>
+                                                                      <ul class="dropdown-menu">
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li role="separator" class="divider"></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-file="'.$row['File'].'" data-tb="db_agregator.university_collaboration">Remove</a></li>
+                                                                      </ul>
+                                                                    </div>
+                                                                        <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';

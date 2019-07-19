@@ -1,4 +1,12 @@
 
+<style>
+
+    #tableData tr th, #tableData tr td {
+        text-align: center;
+    }
+
+</style>
+
 <div class="well">
 
     <div class="row">
@@ -254,9 +262,9 @@
             '                        <th style="width: 1%">No</th>' +
             '                        <th style="width: 15%">Lembaga</th>' +
             '                        <th style="width: 5%">Year</th>' +
-            '                        <th style="width: 10%">Opini</th>' +
-            '                        <th>Keterangan</th>' +
+            '                        <th style="width: 20%">Opini</th>' +
             '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
+            '                        <th>Keterangan</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                   <tbody id="listData"></tbody>' +

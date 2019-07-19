@@ -81,9 +81,9 @@
                     '                    <th rowspan="2" style="width: 1%;">No</th>' +
                     '                    <th rowspan="2" style="width: 15%;">Lecturer</th>' +
                     '                    <th colspan="2" style="width: 20%;">Course</th>' +
-                    '                    <th style="width: 10%;">Total<br/>Student</th>' +
-                    '                    <th style="width: 10%;">Filled<br/>Edom</th>' +
-                    '                    <th style="width: 5%;">Rate</th>' +
+                    '                    <th rowspan="2" style="width: 10%;">Total<br/>Student</th>' +
+                    '                    <th rowspan="2" style="width: 10%;">Filled<br/>Edom</th>' +
+                    '                    <th rowspan="2" style="width: 5%;">Rate</th>' +
                     '                </tr>' +
                     '               <tr>' +
                     '                   <th style="width: 3%;">Group</th>' +
@@ -113,6 +113,9 @@
                                 '<td style="text-align: left;">' +
                                 '   <b>'+dc.CourseEng+'</b><br/><i>'+dc.Course+'</i>' +
                                 '</td>' +
+                                '<td>'+dc.TotalStudent+'</td>' +
+                                '<td>'+dc.TotalAnswer+'</td>' +
+                                '<td></td>' +
                                 '</tr>');
                         }
 

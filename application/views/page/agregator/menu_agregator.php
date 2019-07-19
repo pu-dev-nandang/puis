@@ -100,4 +100,40 @@
 
     });
 
+    $(document).on('click','.btnRemove',function () {
+
+        if(confirm('Hapus data?')){
+
+            var ID = $(this).attr('data-id');
+            var table = $(this).attr('data-tb');
+            var file = $(this).attr('data-file');
+
+            $('.btnAction').prop('disabled',true);
+
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+
+            var data = {
+                action: 'removeDataAgg',
+                ID : ID,
+                Table : table,
+                File : file
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (result) {
+
+                toastr.success('Data removed','Success');
+                setTimeout(function () {
+                    loadDataTable();
+                },500);
+
+            });
+
+
+        }
+
+
+    });
+
 </script>

@@ -153,6 +153,15 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function kecukupan_dosen(){
+
+        $viewPage = 'kecukupan_dosen';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
 
     public function uploadFile(){
 
