@@ -43,9 +43,16 @@
                 </form>
             </div>
 
-            <div style="text-align: right;">
-                <button class="btn btn-primary" id="btnSave">Save</button>
+            <div class="row">
+                <div class="col-xs-8" id="viewFile"></div>
+                <div class="col-xs-4">
+                    <div style="text-align: right;">
+                        <button class="btn btn-primary" id="btnSave">Save</button>
+                    </div>
+                </div>
             </div>
+
+
 
         </div>
         <div class="col-md-9">
@@ -226,8 +233,6 @@
         var input = $('#upload_files');
         var files = input[0].files[0];
 
-        console.log(input);
-
         var sz = parseFloat(files.size) / 1000000; // ukuran MB
         var ext = files.type.split('/')[1];
 
@@ -247,6 +252,9 @@
                 processData : false,
                 success : function(data) {
                     toastr.success('Upload Success','Saved');
+                    setTimeout(function () {
+                        window.location.href = '';
+                    },500);
                     // loadDataEmployees();
 
                 }
@@ -256,6 +264,7 @@
 
     }
 
+
     $('#btnSave').click(function () {
 
         var file = $('#upload_files').val();
@@ -264,13 +273,12 @@
         var formLembagaMitraID = $('#formLembagaMitraID').val();
         var formTingkat = $('#formTingkat').val();
         var formBenefit = $('#formBenefit').val();
-        var formDueDate = $('#formDueDate').val();
+        var formDueDate = $('#formDueDate').datepicker("getDate");
 
         if(formLembagaMitraID!='' && formLembagaMitraID!=null &&
             formTingkat!='' && formTingkat!=null &&
             formBenefit!='' && formBenefit!=null &&
-            formDueDate!='' && formDueDate!=null &&
-            file!='' && file!=null){
+            formDueDate!='' && formDueDate!=null){
 
             var url = base_url_js+'api3/__crudAgregatorTB1';
             var data = {
@@ -280,7 +288,7 @@
                     LembagaMitraID : formLembagaMitraID,
                     Tingkat : formTingkat,
                     Benefit : formBenefit,
-                    DueDate : formDueDate
+                    DueDate : moment(formDueDate).format('YYYY-MM-DD')
                 }
             };
 
@@ -290,7 +298,15 @@
                 var ID = jsonResult.ID;
                 var FileName = jsonResult.FileName;
 
-                UploadFile(ID,FileName);
+                if(file!='' && file!=null){
+                    UploadFile(ID,FileName);
+                } else {
+                    toastr.success('Data Saved','Success');
+                    setTimeout(function () {
+                        window.location.href = '';
+                    },500);
+                }
+
 
             });
 
@@ -307,7 +323,7 @@
 
     function loadDataTable() {
 
-        $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
+        $('#viewData').html('<table class="table table-striped" id="tableData">' +
             '                    <thead>' +
             '                    <tr>' +
             '                        <th style="width: 1%">No</th>' +
@@ -315,8 +331,8 @@
             '                        <th style="width: 7%;">Tingkat</th>' +
             '                        <th>Bentuk Kegiatan / Manfaat</th>' +
             '                        <th style="width: 15%">Bukti Kerjasama</th>' +
-            '                        <th style="width: 15%">Masa Berlaku</th>' +
             '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
+            '                        <th style="width: 15%">Masa Berlaku</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                </table>');
@@ -347,6 +363,33 @@
         });
 
     }
+
+    $(document).on('click','.btnEditAE',function () {
+
+        var no = $(this).attr('data-no');
+        var dataDetail = $('#viewDetail_'+no).val();
+        dataDetail = JSON.parse(dataDetail);
+
+        console.log(dataDetail);
+
+
+        $('#formID').val(dataDetail.ID);
+
+        $('#formLembagaMitraID').val(dataDetail.LembagaMitraID);
+        $('#formTingkat').val(dataDetail.Tingkat);
+        $('#formBenefit').val(dataDetail.Benefit);
+
+        (dataDetail.DueDate!=='0000-00-00' && dataDetail.DueDate!==null)
+            ? $('#formDueDate').datepicker('setDate',new Date(dataDetail.DueDate))
+            : '';
+
+        (dataDetail.File!=null && dataDetail.File!='')
+        ?
+        $('#viewFile').html('<iframe src="'+base_url_js+'uploads/agregator/'+dataDetail.File+'" width="100%;" height="200"></iframe>')
+            : '';
+
+
+    });
 
 
 

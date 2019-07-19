@@ -1,7 +1,7 @@
 
 
 <style>
-    #dataTable tr th, #dataTable tr td {
+    #tableData tr th, #tableData tr td {
         text-align: center;
     }
 </style>
@@ -93,7 +93,7 @@
                     LembagaID : formLembagaID,
                     ProdiID : formProdiID,
                     Status : formStatus,
-                    DueDate : formDueDate,
+                    DueDate : moment(formDueDate).format('YYYY-MM-DD'),
                     Description : formDescription,
                     EntredBy : sessionNIP
                 }
@@ -134,8 +134,8 @@
             '                        <th style="width: 15%;">Program Studi</th>' +
             '                        <th style="width: 10%;">Status</th>' +
             '                        <th style="width: 15%;">Masa Berlaku</th>' +
-            '                        <th>Keterangan</th>' +
             '                        <th style="width: 1%;"><i class="fa fa-cog"></i></th>' +
+            '                        <th>Keterangan</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                </table>');
@@ -184,5 +184,7 @@
             : '';
 
     });
+
+
 
 </script>
