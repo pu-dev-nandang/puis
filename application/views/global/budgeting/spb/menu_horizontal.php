@@ -34,6 +34,6 @@
 <script type="text/javascript">
     $(document).ready(function() {
         loadingStart();
-        $("#container").attr('class','fixed-header sidebar-closed');
+        // $("#container").attr('class','fixed-header sidebar-closed');
     }); // exit document Function
 </script>

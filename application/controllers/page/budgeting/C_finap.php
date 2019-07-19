@@ -35,10 +35,10 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin ';
         $joinaction = ' right join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
-                                 ,c.CreatedBy as CreateBYPayFin
+                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin
                                  from db_payment.payment as a join
                                  ( select ID_payment,Perihal  from db_payment.spb
                                    UNION 
@@ -119,7 +119,7 @@ class C_finap extends Budgeting_Controler {
                or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
              ) '.$StatusQuery.$WhereFiltering.$whereaction ;
-         $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+         $sql.= ' ORDER BY ID_payment_fin Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
          $query = $this->db->query($sql)->result_array();
 
          $No = $requestData['start'] + 1;
@@ -173,6 +173,7 @@ class C_finap extends Budgeting_Controler {
                      'ID_payment' => $row['ID_payment'],
                      'Perihal' => $row['Perihal'],
                      'StatusPayFin' => $row['StatusPayFin'],
+                     'ID_payment_fin' => $row['ID_payment_fin'],
                  );
 
              $nestedData[] = $arr_temp;
@@ -187,6 +188,43 @@ class C_finap extends Budgeting_Controler {
              "data"            => $data,
          );
          echo json_encode($json_data);
+    }
+
+    public function global_view_finap($token)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($token,$key);
+            $ID_payment_fin = $token;
+            $G_payment_ap = $this->m_master->caribasedprimary('db_budgeting.ap','ID',$ID_payment_fin);
+            if (count($G_payment_ap) > 0) {
+                $ID_payment = $G_payment_ap[0]['ID_payment'];
+                // check by po atau tidak
+                $G_payment = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                $Code_po_create = $G_payment[0]['Code_po_create'];
+                $TypePay = $G_payment[0]['Type'];
+                $CodeSPB =  $G_payment[0]['Code'];
+                $G_po = $this->m_pr_po->Get_data_po_by_Code($Code_po_create);
+                $PRCode = $G_po['po_detail'][0]['PRCode'];
+                $data = array(
+                    'ID_payment_fin' => $ID_payment_fin,
+                    'ID_payment' => $ID_payment,
+                    'Code_po_create' => $Code_po_create,
+                    'TypePay' => $TypePay,
+                    'CodeSPB' => $CodeSPB,
+                    'PRCode' => $PRCode,
+                    'po_data' => $G_po,
+                );
+
+                $content = $this->load->view('global/budgeting/finap/InfoFinap',$data,true);
+                $this->temp($content);
+            }
+            
+
+        } 
+        catch (Exception $e) {
+            show_404($log_error = TRUE); 
+        }
     }
 
 }

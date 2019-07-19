@@ -202,7 +202,8 @@
        	    "processing": true,
        	    "destroy": true,
        	    "serverSide": true,
-       	    "iDisplayLength" : 10,
+       	    "lengthMenu": [[5], [5]],
+       	    "iDisplayLength" : 5,
        	    "ordering" : false,
        	    "ajax":{
        	        url : base_url_js+"rest/__get_data_pr/2", // json datasource

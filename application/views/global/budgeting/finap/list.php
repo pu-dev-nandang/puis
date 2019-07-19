@@ -46,6 +46,7 @@ function Get_data_payment(){
    	    "processing": true,
    	    "destroy": true,
    	    "serverSide": true,
+   	    "lengthMenu": [[5], [5]],
    	    "iDisplayLength" : 5,
    	    "ordering" : false,
    	    "ajax":{
@@ -65,6 +66,8 @@ function Get_data_payment(){
 	    	       var PRHTML = '';
 	    	       PRHTML += ListPR[0];
 	    	       var ID_payment = ListPR[1].ID_payment;
+	    	       var ID_payment_fin = ListPR[1].ID_payment_fin;
+	    	       var StatusPayFin = ListPR[1].StatusPayFin;
 	    	       var CodeSPB = ListPR[1].CodeSPB;
 	    	       var TypePay = ListPR[1].TypePay;
 	    	       var Perihal = ListPR[1].Perihal;
@@ -73,24 +76,25 @@ function Get_data_payment(){
 	    	       	var Code_po_create = data[1];
 	    	       }
 
-	    	       var input_radio = '';
-	    	       var Payment = input_radio + ' Type : '+TypePay;
+	    	       var token = jwt_encode(ID_payment_fin,"UAP)(*");
+	    	       var Payment = '<a href="'+base_url_js+'finance_ap/global/'+token+'">Perihal : '+Perihal+'</a>';
+  	    	        Payment += '<p> Type : '+TypePay+'</p>';
 	    	       if (TypePay == 'Spb') {
-	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+	    	       	Payment += '<p>Code : '+CodeSPB+'</p>';
 	    	       }
 	    	      if (Code_po_create != '') {
-	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+	    	      	 Payment += '<label> PO/SPK Code : '+Code_po_create+'</label>';
 	    	      }
 	    	      if (Code_po_create != '') {
 	    	      	 Payment += '<br>PR Code : '+PRHTML;
 	    	      }
-
-	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
-	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+	    	      Payment += '<br>Created : '+data[parseInt(data.length) - 2];
 	    	       
 	    	       $( row ).find('td:eq(1)').html(Payment);
     		    	
     		    	$( row ).find('td:eq(2)').attr('align','center');
+    		    	var st = (StatusPayFin == 2) ? '<i class="fa fa-check-circle" style="color: green;"></i>' : '';
+    		    	$( row ).find('td:eq(3)').html(st);
     		    	$( row ).find('td:eq(3)').attr('align','center');
 	    },
    	    "initComplete": function(settings, json) {

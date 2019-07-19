@@ -735,6 +735,7 @@
 		var Perihal = 'Pembayaran '+Code;
 		var Dis = '';
 		var btn_hide = 'hide';
+		var btn_hide_submit = '';
 		var btn_hide_print = 'hide';
 		var Status = 0;
 		
@@ -759,6 +760,7 @@
 					if (Status == 2) {
 						btn_hide_print = '';
 						btn_hide = 'hide';
+						btn_hide_submit = 'hide';
 					}
 
 					// hitung Left PO
@@ -767,7 +769,10 @@
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
 							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								// InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								for (var j = 0; j < i; j++) {
+									InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+								}
 								c++;
 							}
 							else
@@ -963,6 +968,7 @@
 		var Perihal = 'Pembayaran '+Code;
 		var Dis = '';
 		var btn_hide = 'hide';
+		var btn_hide_submit = '';
 		var btn_hide_print = 'hide';
 		var Status = 0;
 
@@ -986,6 +992,8 @@
 					Status = dtspb[0]['Status'];
 					if (Status == 2) {
 						btn_hide_print = '';
+						btn_hide = 'hide';
+						btn_hide_submit = 'hide';
 					}
 
 					// hitung Left PO
@@ -994,7 +1002,10 @@
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
 							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								// InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								for (var j = 0; j < i; j++) {
+									InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+								}
 								c++;
 							}
 							else
@@ -1086,7 +1097,7 @@
 								'<div class="pull-right">'+
 									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
 									'<button class="btn btn-primary '+btn_hide+'  btnEditInputCA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-									'<button class="btn btn-success submitCA" '+Dis+'> Submit</button>'+
+									'<button class="btn btn-success submitCA '+btn_hide_submit+'" '+Dis+'> Submit</button>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
@@ -1474,7 +1485,8 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		  	
+		  	$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');
@@ -1611,7 +1623,9 @@
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_payment == data.dtspb[i].ID && i > 0) {
 				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+					for (var j = 0; j < i; j++) {
+						InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+					}
 					c++;
 				}
 				else
@@ -2539,7 +2553,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		    
 		  },
 		  error: function (data) {
@@ -2767,7 +2781,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');
@@ -2976,7 +2990,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');

@@ -42,7 +42,7 @@
 		<div id="page_status" class="noPrint"></div>
 	</div>
 	<div class="col-md-8" style="min-width: 800px;overflow: auto;">
-		<div class="well" id = "pageContent">
+		<div class="well" id = "pageContent" style="margin-top: 10px;">
 
 		</div>
 	</div>
@@ -59,7 +59,13 @@
 		G_data_bank : <?php echo json_encode($G_data_bank) ?>,
 	};
 	$(document).ready(function() {
-		$("#container").attr('class','fixed-header sidebar-closed');
+		// buat navigasi menu active
+		var Menu_ = $('#nav').find('li[segment2="pembayaran"]:first');
+		Menu_.addClass('current open');
+		var SubMenu = Menu_.find('.sub-menu');
+		SubMenu.find('li[segment3="spb"]').addClass('current');
+
+		// $("#container").attr('class','fixed-header sidebar-closed');
 		loadingStart();
 	    // loadFirst
 	    loadFirst();
@@ -157,8 +163,10 @@
 		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+					for (var j = 0; j < i; j++) {
+						InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+					}
 					c++;
 				}
 				else
@@ -864,26 +872,27 @@
 		var data = ClassDt.Dataselected;
 		var InvoicePO = dtspb[0].InvoicePO;
 		// hitung Left PO
-		var InvoiceleftPO = parseInt(InvoicePO);
+		
+		var InvoiceleftPO = parseInt(dtspb[0].InvoiceLeftPO);
 		var Code = ClassDt.Code;
-		for (var i = 0; i < data.dtspb.length; i++) {
-			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
-				}
-				else
-				{
-					InvoiceleftPO -= parseInt(0);
-				}
-				break;
-			}
-		}
+		// for (var i = 0; i < data.dtspb.length; i++) {
+		// 	if (Code == data.dtspb[i].Code && i > 0) {
+		// 		if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+		// 			InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+		// 		}
+		// 		else
+		// 		{
+		// 			InvoiceleftPO -= parseInt(0);
+		// 		}
+		// 		break;
+		// 	}
+		// }
 		var data_verify = {
 			Code_po_create : Code_po_create,
 			InvoicePO : InvoicePO,
 			InvoiceLeftPO : InvoiceleftPO,
 		};
-
+		console.log(data_verify);
 		var token2 = jwt_encode(data_verify,"UAP)(*");
 		form_data.append('token2',token2);
 

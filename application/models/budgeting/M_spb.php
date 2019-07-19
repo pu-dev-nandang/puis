@@ -107,8 +107,8 @@ class M_spb extends CI_Model {
                                 }
                                 $__Realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID_cash_advance',$ID_cash_advance);
 
-                                $G_dt[$i]['Detail'] = $__Detail;
-                                $G_dt[$i]['Realisasi'] = $__Realisasi;
+                                $G_dt[$j]['Detail'] = $__Detail;
+                                $G_dt[$j]['Realisasi'] = $__Realisasi;
                             }
                             $Detail = $G_dt;
                             break;    

@@ -37,7 +37,7 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="row noPrint">
 	<div class="col-xs-2">
-		<div><a href="<?php echo base_url().'budgeting_menu/pembayaran/bank_advance' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
+		<div><a href="<?php echo base_url().'budgeting_menu/pembayaran/cashadvance' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
 		<br>
 		<div id="page_status" class="noPrint"></div>
 	</div>
@@ -63,7 +63,7 @@
 		var Menu_ = $('#nav').find('li[segment2="pembayaran"]:first');
 		Menu_.addClass('current open');
 		var SubMenu = Menu_.find('.sub-menu');
-		SubMenu.find('li[segment3="bank_advance"]').addClass('current');
+		SubMenu.find('li[segment3="cashadvance"]').addClass('current');
 		
 	    // $("#container").attr('class','fixed-header sidebar-closed');
 	    loadingStart();
@@ -84,7 +84,7 @@
 				// Define data
 				ClassDt.po_data = data2;
 				var se_content = $('#pageContent');
-				makeDomBank_Advance(ID_payment,se_content)
+				makeDomCash_Advance(ID_payment,se_content)
 				loadingEnd(500);
 			})
 
@@ -184,7 +184,7 @@
 		return h;
 	}
 
-	function makeDomBank_Advance(ID_payment,se_content)
+	function makeDomCash_Advance(ID_payment,se_content)
 	{
 		var DataPaymentSelected = ClassDt.DataPaymentSelected;
 		var data = ClassDt.DataPaymentPO;
@@ -197,7 +197,7 @@
 		var Supplier = po_create[0].NamaSupplier;
 
 		var html = '';
-		var htmlAdd ='<div class = "BAAdd">'
+		var htmlAdd ='<div class = "CAAdd">'
 		var EndhtmlAdd = '</div>';
 		Invoice = parseInt(dtspb[0].Detail[0].Invoice);
 		TypePay = dtspb[0].Detail[0].TypePay;
@@ -207,11 +207,14 @@
 		Date_Needed = dtspb[0].Detail[0].Date_Needed;
 		Perihal = dtspb[0].Detail[0].Perihal;
 		Dis = 'disabled';
-		btn_hide = '';
+		var btn_hide = '';
 		var btn_hide_print = 'hide';
+		var btn_hide_submit = '';
 		Status = dtspb[0]['Status'];
 		if (Status == 2) {
 			btn_hide_print = '';
+			btn_hide = 'hide';
+			btn_hide_submit = 'hide';
 		}
 
 		// hitung Left PO
@@ -246,9 +249,9 @@
 			}
 		}
 
-		html += htmlAdd+'<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
+		html += htmlAdd+'<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>CASH ADVANCE FORM</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-					'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
+					'<label>Mohon dapat diberikan Cash Advance dengan perincian sebagai berikut:</label>'+
 					'<table class="table borderless" style="font-weight: bold;">'+
 					'<thead></thead>'+
 					'<tbody>'+
@@ -282,40 +285,9 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								OPTypePay(TypePay,Dis)+	
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Bank'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								OPBank(ID_bank,Dis)+
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'No Rekening'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening" value = "'+NoRekening+'" '+Dis+'>'+
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'Nama Penerima'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control Nama_Penerima" placeholder="Nama Penerima" value = "'+Nama_Penerima+'" '+Dis+'>'+
+								'<select class = "form-control TypePay" disabled>'+
+									'<option value = "Cash" selected>Cash</option>'+ 
+								'</select>'+	
 							'</td>'+		
 						'</tr>'+
 						'<tr>'+
@@ -327,7 +299,7 @@
 							'</td>'+
 							'<td>'+
 								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglBA" type=" text" readonly="" value = "'+Date_Needed+'">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control TglCA" type=" text" readonly="" value = "'+Date_Needed+'">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+
 							'</td>	'+			
@@ -339,12 +311,15 @@
 						'<div class="row">'+
 							'<div class="col-md-12">'+
 								'<div class="pull-right">'+
-									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>'+
+									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
+									'<button class="btn btn-primary '+btn_hide+'  btnEditInputCA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitCA '+btn_hide_submit+'" '+Dis+'> Submit</button>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+
 					'</div>'+
 				'</div></div></div>'+EndhtmlAdd;
+		
 		se_content.html(html);			
 		se_content.find('.Money_Pembayaran').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		se_content.find('.Money_Pembayaran').maskMoney('mask', '9894');
@@ -360,7 +335,6 @@
 		if (JsonStatus[0].NIP != sessionNIP) {
 			$('#add_approver').remove();
 		}		
-
 	}
 
 	function makeAction()
@@ -369,8 +343,8 @@
 		var dtspb = Dataselected2.dtspb;
 
 		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
-		var btn_edit = '<button class="btn btn-primary btnEditInputBA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-		var btn_submit = '<button class="btn btn-success submitBA" disabled> Submit</button>';
+		var btn_edit = '<button class="btn btn-primary btnEditInputCA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_submit = '<button class="btn btn-success submitCA" disabled> Submit</button>';
 		
 		var btn_approve = '<button class="btn btn-primary" id="Approve" action="approve">Approve</button>';
 		var btn_reject = '<button class="btn btn-inverse" id="Reject" action="reject">Reject</button>';
@@ -659,16 +633,16 @@
    		});
 	})
 
-	$(document).off('click', '.btnEditInputBA').on('click', '.btnEditInputBA',function(e) {
+	$(document).off('click', '.btnEditInputCA').on('click', '.btnEditInputCA',function(e) {
 		var Status = $(this).attr('status');
 		if (Status != 2) {
 			var ev2 = $(this).closest('#pageContent');
-			ev2.find('input').not('.TglBA').prop('disabled',false);
+			ev2.find('input').not('.TglCA').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
-			ev2.find('select').prop('disabled',false);
-			ev2.find('.dtbank[tabindex!="-1"]').select2({
-			    //allowClear: true
-			});
+			//ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
 			$(this).remove();
 			ev2.find('.TypePay').trigger('change');
 		}
@@ -678,30 +652,27 @@
 		}	
 	})
 
-	$(document).off('click', '.submitBA').on('click', '.submitBA',function(e) {
+	$(document).off('click', '.submitCA').on('click', '.submitCA',function(e) {
 		// validation
 		var ev = $(this).closest('#pageContent');
 		var action = 'edit';
 		if (confirm('Are you sure?')) {
-			var validation = validation_input_ba(ev);
+			var validation = validation_input_ca(ev);
 			if (validation) {
-				SubmitBA('.submitBA',ev,action);
+				submitCA('.submitCA',ev,action);
 			}
 		}	
 	})
 
-	function validation_input_ba(ev)
+	function validation_input_ca(ev)
 	{
 		var find = true;
 		var data = {
 			Biaya : ev.find('.Money_Pembayaran').val(),
 			TypePay : ev.find('.TypePay').val(),
-			ID_bank : ev.find('.dtbank').val(),
-			NoRekening : ev.find('.NoRekening').val(),
-			Nama_Penerima : ev.find('.Nama_Penerima').val(),
-			Date_Needed : ev.find('.TglBA').val(),
+			Date_Needed : ev.find('.TglCA').val(),
 		};
-		if (validationBA(data) ) {
+		if (validationCA(data) ) {
 			
 		}
 		else
@@ -712,7 +683,7 @@
 		return find;
 	}
 
-	function validationBA(arr)
+	function validationCA(arr)
 	{
 	  var toatString = "";
 	  var result = "";
@@ -724,23 +695,7 @@
 	            	toatString += 'Pembayaran tidak boleh kecil sama dengan nol' + "<br>";
 	            }
 	            break;
-	      case  "TypePay" :
-	            if (arr[key] == 'Transfer') {
-	            	var tt = arr['ID_bank'];
-	            	result = Validation_required(tt,'Bank');
-	            	if (result['status'] == 0) {
-	            	  toatString += result['messages'] + "<br>";
-	            	}
-
-	            	var tt = arr['NoRekening'];
-	            	result = Validation_required(tt,'No Rekening');
-	            	if (result['status'] == 0) {
-	            	  toatString += result['messages'] + "<br>";
-	            	}  
-	            }
-	            break;      
 	      case  "Date_Needed" :
-	      case  "Nama_Penerima" :
 	            result = Validation_required(arr[key],key);
 	            if (result['status'] == 0) {
 	              toatString += result['messages'] + "<br>";
@@ -757,7 +712,7 @@
 	  return true;
 	}
 
-	function SubmitBA(elementbtn,ev,action)
+	function submitCA(elementbtn,ev,action)
 	{
 		loadingStart();
 		var Code_po_create = ClassDt.Code_po_create;
@@ -770,13 +725,14 @@
 		Biaya = findAndReplace(Biaya, ".","");
 		var TypePay = ev.find('.TypePay').val();
 		var Perihal = ev.find('.Perihal').text();
-		var No_Rekening = ev.find('.NoRekening').val();
+		var No_Rekening = '';
 		var ID_bank = ev.find('.dtbank option:selected').val();
 		if (TypePay == 'Cash') {
 			ID_bank = 0;
 		}
-		var Nama_Penerima = ev.find('.Nama_Penerima').val();
-		var Date_Needed = ev.find('.TglBA').val();
+		
+		var Nama_Penerima = sessionName;
+		var Date_Needed = ev.find('.TglCA').val();
 
 		var data = {
 			Code_po_create : Code_po_create,
@@ -823,7 +779,7 @@
 		var token4 = jwt_encode(temp,"UAP)(*");
 		form_data.append('token4',token4);
 
-		var url = base_url_js + "budgeting/submitba"
+		var url = base_url_js + "budgeting/submitca"
 		$.ajax({
 		  type:"POST",
 		  url:url,

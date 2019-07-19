@@ -1419,6 +1419,7 @@ $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_
 // financeAP
 $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
+$route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
@@ -1506,6 +1507,7 @@ $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 // global
 $route['global/purchasing/transaction/spb/list/(:any)'] = 'page/C_globalpage/InfoSPB/$1';
 $route['global/purchasing/transaction/ba/list/(:any)'] = 'page/C_globalpage/InfoBA/$1';
+$route['global/purchasing/transaction/ca/list/(:any)'] = 'page/C_globalpage/InfoCA/$1';
 
 
 // template import supplier
