@@ -59,7 +59,13 @@
 		G_data_bank : <?php echo json_encode($G_data_bank) ?>,
 	};
 	$(document).ready(function() {
-	    $("#container").attr('class','fixed-header sidebar-closed');
+		// buat navigasi menu active
+		var Menu_ = $('#nav').find('li[segment2="pembayaran"]:first');
+		Menu_.addClass('current open');
+		var SubMenu = Menu_.find('.sub-menu');
+		SubMenu.find('li[segment3="bank_advance"]').addClass('current');
+		
+	    // $("#container").attr('class','fixed-header sidebar-closed');
 	    loadingStart();
 	    // loadFirst
 	    loadFirst();

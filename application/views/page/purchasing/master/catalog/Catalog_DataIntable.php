@@ -70,6 +70,7 @@
 		    "processing": true,
 		    "destroy": true,
 		    "serverSide": true,
+		    "lengthMenu": [[10], [10]],
 		    "iDisplayLength" : 10,
 		    "ordering" : false,
 		    "ajax":{

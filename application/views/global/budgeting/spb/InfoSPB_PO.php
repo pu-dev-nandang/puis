@@ -42,7 +42,7 @@
 		<div id="page_status" class="noPrint"></div>
 	</div>
 	<div class="col-md-8" style="min-width: 800px;overflow: auto;">
-		<div class="well" id = "pageContent">
+		<div class="well" id = "pageContent" style="margin-top: 10px;">
 
 		</div>
 	</div>
@@ -59,7 +59,13 @@
 		G_data_bank : <?php echo json_encode($G_data_bank) ?>,
 	};
 	$(document).ready(function() {
-		$("#container").attr('class','fixed-header sidebar-closed');
+		// buat navigasi menu active
+		var Menu_ = $('#nav').find('li[segment2="pembayaran"]:first');
+		Menu_.addClass('current open');
+		var SubMenu = Menu_.find('.sub-menu');
+		SubMenu.find('li[segment3="spb"]').addClass('current');
+
+		// $("#container").attr('class','fixed-header sidebar-closed');
 		loadingStart();
 	    // loadFirst
 	    loadFirst();
