@@ -37,7 +37,7 @@ document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
 **/uploads/files/
-
+**/uploads/finance/
 
 /uploads/budgeting/catalog/*.jpeg
 /uploads/budgeting/catalog/*.jpg
