@@ -42,3 +42,5 @@ document/*
 /uploads/budgeting/catalog/*.jpeg
 /uploads/budgeting/catalog/*.jpg
 /uploads/budgeting/catalog/*.png
+
+**/uploads/students/
