@@ -21,7 +21,12 @@ class C_cashadvance extends Budgeting_Controler {
     }
 
     public function index()
-    {       
+    {
+        /*
+            1.filtering by pr
+        */
+        $this->data['G_Approver'] = $this->m_pr_po->Get_m_Approver();
+        $this->data['m_type_user'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');          
 		$page = $this->load->view('global/budgeting/cashadvance/list',$this->data,true);
 		$this->menu_horizontal($page);
     }

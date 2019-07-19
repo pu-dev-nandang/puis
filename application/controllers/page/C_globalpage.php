@@ -279,4 +279,69 @@ class C_globalpage extends Budgeting_Controler {
 
     }
 
+    public function InfoCA($TokenPayment)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($TokenPayment,$key);
+            $ID_payment = $token;
+            $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.cash_advance as b on a.ID = b.ID_payment where a.Type = "Cash Advance" and a.ID = ?';
+            $query=$this->db->query($sql, array($ID_payment))->result_array();
+            $G_data = $query;
+            if (count($G_data) > 0) {
+                $bool = true;
+                if ($this->session->userdata('IDdepartementNavigation') == 9) {
+                       $bool = true;
+                }
+                else{
+                   $bool = false;
+                }
+
+                if (!$bool) { // for user
+                   $JsonStatus = $G_data[0]['JsonStatus'];
+                   $arr = (array) json_decode($JsonStatus,true);
+                   $NIP = $this->session->userdata('NIP');
+                   for ($i=0; $i < count($arr); $i++) { 
+                       $NIP_ = $arr[$i]['NIP'];
+                       if ($NIP == $NIP_) {
+                           $bool = true;
+                           break;
+                       }
+                   }
+                }
+
+                $data = array(
+                    'auth' => 's3Cr3T-G4N', 
+                );
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($data,$key);
+                $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+                $data['G_data_bank'] = $G_data_bank;
+                $data['bool'] = $bool;
+                $data['ID_payment'] = $ID_payment;
+                $data['Code_po_create'] = $G_data[0]['Code_po_create'];
+                $data['G_data'] = $G_data;
+                if ($G_data[0]['Code_po_create'] != '' && $G_data[0]['Code_po_create'] != null) {
+                    $content = $this->load->view('global/budgeting/cashadvance/Infoca_PO',$data,true);
+                    $this->temp($content);
+                }
+                else
+                {
+                   $content = $this->load->view('global/budgeting/cashadvance/Infoca_User',$data,true);
+                   $this->temp($content);
+                }
+                
+                
+            }
+            else
+            {
+               show_404($log_error = TRUE); 
+            }
+
+        } catch (Exception $e) {
+            show_404($log_error = TRUE); 
+        }
+
+    }
+
 }

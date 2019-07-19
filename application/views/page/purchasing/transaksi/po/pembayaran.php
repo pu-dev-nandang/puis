@@ -735,6 +735,7 @@
 		var Perihal = 'Pembayaran '+Code;
 		var Dis = '';
 		var btn_hide = 'hide';
+		var btn_hide_submit = '';
 		var btn_hide_print = 'hide';
 		var Status = 0;
 		
@@ -759,6 +760,7 @@
 					if (Status == 2) {
 						btn_hide_print = '';
 						btn_hide = 'hide';
+						btn_hide_submit = 'hide';
 					}
 
 					// hitung Left PO
@@ -963,6 +965,7 @@
 		var Perihal = 'Pembayaran '+Code;
 		var Dis = '';
 		var btn_hide = 'hide';
+		var btn_hide_submit = '';
 		var btn_hide_print = 'hide';
 		var Status = 0;
 
@@ -986,6 +989,8 @@
 					Status = dtspb[0]['Status'];
 					if (Status == 2) {
 						btn_hide_print = '';
+						btn_hide = 'hide';
+						btn_hide_submit = 'hide';
 					}
 
 					// hitung Left PO
@@ -1086,7 +1091,7 @@
 								'<div class="pull-right">'+
 									'<button class="btn btn-default '+btn_hide_print+' print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
 									'<button class="btn btn-primary '+btn_hide+'  btnEditInputCA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-									'<button class="btn btn-success submitCA" '+Dis+'> Submit</button>'+
+									'<button class="btn btn-success submitCA '+btn_hide_submit+'" '+Dis+'> Submit</button>'+
 								'</div>'+
 							'</div>'+
 						'</div>'+

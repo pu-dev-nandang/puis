@@ -1497,6 +1497,7 @@ $route['purchasing/transaction/po_submit'] = 'page/purchasing/c_po/po_submit';
 // global
 $route['global/purchasing/transaction/spb/list/(:any)'] = 'page/C_globalpage/InfoSPB/$1';
 $route['global/purchasing/transaction/ba/list/(:any)'] = 'page/C_globalpage/InfoBA/$1';
+$route['global/purchasing/transaction/ca/list/(:any)'] = 'page/C_globalpage/InfoCA/$1';
 
 
 // template import supplier
