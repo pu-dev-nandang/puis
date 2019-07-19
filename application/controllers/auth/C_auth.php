@@ -112,13 +112,13 @@ class C_auth extends Globalclass {
 
     }
 
-    public function getReportEdom($ClassOf){
+    public function getReportEdom($SemesterID,$ClassOf,$ProdiID){
 
         $max_execution_time = 3600;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
 
-        $SemesterID = 13;
+//        $SemesterID = 14;
 //        $ClassOf = 2014;
 
         // AS COORDINATOR
@@ -130,26 +130,40 @@ class C_auth extends Globalclass {
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                             LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                             LEFT JOIN db_employees.employees em ON (s.Coordinator = em.NIP)
-                                            WHERE s.SemesterID = "'.$SemesterID.'"
-                                            GROUP BY s.ID ORDER BY s.ID ASC
+                                            WHERE s.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$ProdiID.'"
+                                            GROUP BY s.ID 
+                                            UNION
+                                            SELECT s1.ID, s1.ClassGroup, em1.NIP, em1.Name AS Lecturer, mk1.Name AS Course, mk1.NameEng AS CourseEng,
+                                            ps1.Name AS ProdiName, mk1.MKCode
+                                            FROM db_academic.schedule_team_teaching stt1
+                                            LEFT JOIN db_academic.schedule s1 ON (s1.ID = stt1.ScheduleID)
+                                            LEFT JOIN db_academic.schedule_details_course sdc1 ON (sdc1.ScheduleID = s1.ID)
+                                            LEFT JOIN db_academic.mata_kuliah mk1 ON (mk1.ID = sdc1.MKID)
+                                            LEFT JOIN db_academic.program_study ps1 ON (ps1.ID = sdc1.ProdiID)
+                                            LEFT JOIN db_employees.employees em1 ON (stt1.NIP = em1.NIP)
+                                            WHERE s1.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$ProdiID.'"
+                                            GROUP BY s1.ID
                                             ')->result_array();
 
 //         AS TEAMTEACHING
 
-        $dataTeam = $this->db->query('SELECT s.ID, s.ClassGroup, s.SemesterID, em.NIP, em.Name AS Lecturer, mk.Name AS Course, mk.NameEng AS CourseEng,
-                                            ps.Name AS ProdiName, mk.MKCode
-                                            FROM db_academic.schedule_team_teaching stt
-                                            LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
-                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
-                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
-                                            LEFT JOIN db_employees.employees em ON (stt.NIP = em.NIP)
-                                            WHERE s.SemesterID = "'.$SemesterID.'"
-                                            GROUP BY s.ID ORDER BY s.ID ASC')->result_array();
+//        $dataTeam = $this->db->query('SELECT s.ID, s.ClassGroup, s.SemesterID, em.NIP, em.Name AS Lecturer, mk.Name AS Course, mk.NameEng AS CourseEng,
+//                                            ps.Name AS ProdiName, mk.MKCode
+//                                            FROM db_academic.schedule_team_teaching stt
+//                                            LEFT JOIN db_academic.schedule s ON (s.ID = stt.ScheduleID)
+//                                            LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+//                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+//                                            LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
+//                                            LEFT JOIN db_employees.employees em ON (stt.NIP = em.NIP)
+//                                            WHERE s.SemesterID = "'.$SemesterID.'"
+//                                            GROUP BY s.ID ORDER BY s.ID ASC')->result_array();
+//
+//        for($i=0;$i<count($dataTeam);$i++){
+//            array_push($data,$dataTeam[$i]);
+//        }
 
-        for($i=0;$i<count($dataTeam);$i++){
-            array_push($data,$dataTeam[$i]);
-        }
+//        print_r($data);
+//        exit;
 
 
 

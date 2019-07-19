@@ -26,7 +26,7 @@ $route['callback'] = 'c_login/callback';
 
 $route['db/(:any)'] = 'auth/c_auth/db/$1';
 $route['parent/(:num)'] = 'auth/c_auth/parent/$1';
-$route['getReportEdom/(:num)'] = 'auth/c_auth/getReportEdom/$1';
+$route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/$3';
 
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
