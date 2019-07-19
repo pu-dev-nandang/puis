@@ -163,8 +163,10 @@
 		var c = 0;
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i].Invoice != null && data.dtspb[i].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1].Invoice);
+				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+					for (var j = 0; j < i; j++) {
+						InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+					}
 					c++;
 				}
 				else
@@ -870,26 +872,27 @@
 		var data = ClassDt.Dataselected;
 		var InvoicePO = dtspb[0].InvoicePO;
 		// hitung Left PO
-		var InvoiceleftPO = parseInt(InvoicePO);
+		
+		var InvoiceleftPO = parseInt(dtspb[0].InvoiceLeftPO);
 		var Code = ClassDt.Code;
-		for (var i = 0; i < data.dtspb.length; i++) {
-			if (Code == data.dtspb[i].Code && i > 0) {
-				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
-				}
-				else
-				{
-					InvoiceleftPO -= parseInt(0);
-				}
-				break;
-			}
-		}
+		// for (var i = 0; i < data.dtspb.length; i++) {
+		// 	if (Code == data.dtspb[i].Code && i > 0) {
+		// 		if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
+		// 			InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+		// 		}
+		// 		else
+		// 		{
+		// 			InvoiceleftPO -= parseInt(0);
+		// 		}
+		// 		break;
+		// 	}
+		// }
 		var data_verify = {
 			Code_po_create : Code_po_create,
 			InvoicePO : InvoicePO,
 			InvoiceLeftPO : InvoiceleftPO,
 		};
-
+		console.log(data_verify);
 		var token2 = jwt_encode(data_verify,"UAP)(*");
 		form_data.append('token2',token2);
 

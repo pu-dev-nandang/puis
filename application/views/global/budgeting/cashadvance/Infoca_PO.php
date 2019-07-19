@@ -223,7 +223,10 @@
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_payment == data.dtspb[i].ID && i > 0) {
 				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+					// InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+					for (var j = 0; j < i; j++) {
+						InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+					}
 					c++;
 				}
 				else
@@ -995,11 +998,11 @@
 	})
 
 	$(document).off('click', '.print_page').on('click', '.print_page',function(e) {
-		var dt_arr = ClassDt.po_payment_data;
+		var dt_arr = ClassDt.DataPaymentSelected;
 		var dtspb = dt_arr.dtspb;
 		var ID_payment = dtspb[0]['ID'];
 		var po_data = ClassDt.po_data;
-		var Dataselected = ClassDt.all_po_payment;
+		var Dataselected = ClassDt.DataPaymentPO;
 
 		var url = base_url_js+'save2pdf/print/pre_pembayaran';
 		var data = {

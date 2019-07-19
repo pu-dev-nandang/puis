@@ -317,10 +317,10 @@
 				break;
 			}
 		}
-		
+		console.log(dtspb_all);
 		if (index__ >= 0) {
-			for (var i = 0; i < dtspb_all.length; i++) {
-				var ID_payment = dtspb_all[i].ID;
+			for (var z = 0; z < dtspb_all.length; z++) {
+				var ID_payment = dtspb_all[z].ID;
 				if (ID_payment == ID_payment_ori) {
 					break;
 				}
@@ -622,11 +622,10 @@
 	})
 
 	$(document).off('click', '.printpay').on('click', '.printpay',function(e) {
-		var dt_arr = ClassDt.po_payment_data;
-		var dtspb = dt_arr.dtspb;
-		var ID_payment = dtspb[0]['ID'];
+		var ID_payment = $(this).attr('id_payment');
 		var po_data = ClassDt.po_data;
 		var Dataselected = ClassDt.all_po_payment;
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
 
 		var url = base_url_js+'save2pdf/print/pre_pembayaran';
 		var data = {
@@ -705,6 +704,7 @@
 						}
 					}
 					$('#NotificationModal').modal('hide');
+					$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 				}).fail(function() {
 				  toastr.error('The Database connection error, please try again', 'Failed!!');
 				  $('#NotificationModal').modal('hide');
@@ -777,6 +777,7 @@
 				  		}
 				  	}
 				  	$('#NotificationModal').modal('hide');
+				  	$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 				  },
 				  error: function (data) {
 				    toastr.error("Connection Error, Please try again", 'Error!!');

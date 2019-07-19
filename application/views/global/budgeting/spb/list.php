@@ -64,6 +64,7 @@ function LoadDataForTable()
 	    "processing": true,
 	    "destroy": true,
 	    "serverSide": true,
+      "lengthMenu": [[5], [5]],
 	    "iDisplayLength" : 5,
 	    "ordering" : false,
 	    "ajax":{

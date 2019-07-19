@@ -769,7 +769,10 @@
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
 							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								// InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								for (var j = 0; j < i; j++) {
+									InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+								}
 								c++;
 							}
 							else
@@ -999,7 +1002,10 @@
 					for (var i = 0; i < data.dtspb.length; i++) {
 						if (ID_payment == data.dtspb[i].ID && i > 0) {
 							if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-								InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								// InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+								for (var j = 0; j < i; j++) {
+									InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+								}
 								c++;
 							}
 							else
@@ -1479,7 +1485,8 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		  	
+		  	$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');
@@ -1616,7 +1623,9 @@
 		for (var i = 0; i < data.dtspb.length; i++) {
 			if (ID_payment == data.dtspb[i].ID && i > 0) {
 				if (data.dtspb[i]['Detail'][0].Invoice != null && data.dtspb[i]['Detail'][0].Invoice != 'null') {
-					InvoiceleftPO -= parseInt(data.dtspb[parseInt(i) - 1]['Detail'][0].Invoice);
+					for (var j = 0; j < i; j++) {
+						InvoiceleftPO -= parseInt(data.dtspb[j]['Detail'][0].Invoice);
+					}
 					c++;
 				}
 				else
@@ -2544,7 +2553,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		    
 		  },
 		  error: function (data) {
@@ -2772,7 +2781,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');
@@ -2981,7 +2990,7 @@
 		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
 		  		},1500);
 		  	}
-		    
+		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
 		  },
 		  error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');

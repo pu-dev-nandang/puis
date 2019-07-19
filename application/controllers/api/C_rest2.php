@@ -2044,7 +2044,7 @@ class C_rest2 extends CI_Controller {
                             left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                             left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                             '.$joinaction.'
-                            group by a.Code     
+
                         )aa
                        ';
 
@@ -2052,7 +2052,7 @@ class C_rest2 extends CI_Controller {
                       or SPBNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or SPBCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
-
+                // print_r($sqltotalData);die();    
                 $querytotalData = $this->db->query($sqltotalData)->result_array();
                 $totalData = $querytotalData[0]['total'];
 
@@ -2070,7 +2070,6 @@ class C_rest2 extends CI_Controller {
                             left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                             left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                             '.$joinaction.'
-                            group by a.Code      
                         )aa
                        ';
 
@@ -2775,7 +2774,12 @@ class C_rest2 extends CI_Controller {
                $whereaction = ' and StatusPay != 0';
 
                 // get Department
+                $IDDepartementPUBudget = $dataToken['IDDepartementPUBudget'];
                 $WhereFiltering = '';
+                if ($IDDepartementPUBudget != 'NA.9') {
+                    $NIP = $dataToken['sessionNIP'];
+                    $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                }
                  
                 $requestData = $_REQUEST;
                 $StatusQuery = ' and Status = 2';
@@ -2793,7 +2797,6 @@ class C_rest2 extends CI_Controller {
                             left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                             left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                             '.$joinaction.'
-                            group by a.Code     
                         )aa
                        ';
 
@@ -2820,7 +2823,6 @@ class C_rest2 extends CI_Controller {
                             left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
                             left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
                             '.$joinaction.'
-                            group by a.Code      
                         )aa
                        ';
 
