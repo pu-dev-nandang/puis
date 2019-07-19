@@ -1069,12 +1069,13 @@ class C_rest2 extends CI_Controller {
             // Get data Team
             $dataTeam = $this->db->query('SELECT ct.* FROM db_admission.crm_team ct 
                                             LEFT JOIN db_admission.crm_team_member ctm ON (ct.ID = ctm.CRMTeamID) 
-                                            WHERE ctm.NIP = "'.$NIP.'" LIMIT 1')->result_array();
+                                            WHERE ct.PeriodID = "'.$PeriodID.'" AND  ctm.NIP = "'.$NIP.'" LIMIT 1')->result_array();
 
             $result = [];
             if(count($dataTeam)>0){
                 $d = $dataTeam[0];
-                $data = $this->db->query('SELECT c.*, em.Name AS SalesName, cs.Description AS StatusDesc, csl.ClassMobile AS StatusCalss FROM db_admission.crm c 
+                $data = $this->db->query('SELECT c.*, IF(LENGTH(em.Name)>16, SUBSTRING(em.Name, 1, 15), em.Name) AS SalesName,  
+                                                cs.Description AS StatusDesc, csl.ClassMobile AS StatusCalss FROM db_admission.crm c
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = c.NIP)
                                                 LEFT JOIN db_admission.crm_status cs ON (cs.ID = c.Status)
                                                 LEFT JOIN db_admission.crm_status_label csl ON (csl.ID = cs.LabelID)
