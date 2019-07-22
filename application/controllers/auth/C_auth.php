@@ -141,7 +141,7 @@ class C_auth extends Globalclass {
                                             LEFT JOIN db_academic.mata_kuliah mk1 ON (mk1.ID = sdc1.MKID)
                                             LEFT JOIN db_academic.program_study ps1 ON (ps1.ID = sdc1.ProdiID)
                                             LEFT JOIN db_employees.employees em1 ON (stt1.NIP = em1.NIP)
-                                            WHERE s1.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$ProdiID.'"
+                                            WHERE s1.SemesterID = "'.$SemesterID.'" AND sdc1.ProdiID = "'.$ProdiID.'"
                                             GROUP BY s1.ID
                                             ')->result_array();
 
@@ -172,22 +172,24 @@ class C_auth extends Globalclass {
             $d = $data[$e];
 
             // Multiple
-            $dataQuestion = $this->db->query('SELECT * FROM db_academic.edom_question WHERE ID != 12 ')->result_array();
+            $dataQuestion = $this->db->query('SELECT * FROM db_academic.edom_question WHERE ID < 12 ')->result_array();
+
+//            print_r($dataQuestion);
 
             for($q=0;$q<count($dataQuestion);$q++){
-                $dataEdom = $this->db->query('SELECT ea.NPM, ead.Rate, ead.Essay FROM db_academic.edom_answer ea 
+                $dataEdom = $this->db->query('SELECT ea.NPM, ead.Rate, ead.Essay FROM db_academic.edom_answer ea
                                                     LEFT JOIN db_academic.edom_answer_details ead ON (ead.EAID = ea.ID)
-                                                    LEFT JOIN db_academic.auth_students auts ON (auts.NPM = ea.NPM) 
+                                                    LEFT JOIN db_academic.auth_students auts ON (auts.NPM = ea.NPM)
                                                     WHERE ea.SemesterID = "'.$SemesterID.'"
-                                                    AND ea.ScheduleID = "'.$d['ID'].'" 
-                                                    AND ea.NIP = "'.$d['NIP'].'" 
+                                                    AND ea.ScheduleID = "'.$d['ID'].'"
+                                                    AND ea.NIP = "'.$d['NIP'].'"
+                                                    AND ea.Type = "1"
                                                     AND ead.QuestionID = "'.$dataQuestion[$q]['ID'].'"
                                                     AND auts.Year = "'.$ClassOf.'"
                                                     ORDER BY ea.NPM')->result_array();
 
 
                 if(count($dataEdom)>0){
-                    $Rate = 0;
                     $totalRate = 0;
                     foreach ($dataEdom as $itemEd){
                         $totalRate = $totalRate + $itemEd['Rate'];
@@ -207,6 +209,7 @@ class C_auth extends Globalclass {
 
 
         }
+
 
         $no = 1;
         echo "<table border='0.5'><thead>
