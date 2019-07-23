@@ -268,6 +268,23 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label>Level of Education</label>
+                            <select class="form-control" id="formLevelEducationID"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label>Lecturer Academic Position</label>
+                            <select class="form-control" id="formLecturerAcademicPositionID">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-xs-12">
                         <label>Ijazah</label>
 
@@ -360,11 +377,11 @@
           split++;
     }
     $(document).ready(function () {
-        loadSelectOptionReligi('#formReligion',<?php echo $arrEmp['ReligionID']; ?>);
-        $('#formGender').val("<?php echo $arrEmp['Gender']; ?>");
+        loadSelectOptionReligi('#formReligion',<?= $arrEmp['ReligionID']; ?>);
+        $('#formGender').val("<?= $arrEmp['Gender']; ?>");
 
         // Load Year
-        var DateOfBirth = "<?php echo $arrEmp['DateOfBirth']; ?>";
+        var DateOfBirth = "<?= $arrEmp['DateOfBirth']; ?>";
         var exDOB = DateOfBirth.split('-');
         loadYearOfBirth('#formYearBirth',exDOB[0].trim());
         loadMonthBirth('#formMontBirth',exDOB[1].trim());
@@ -372,7 +389,7 @@
         loadCountDays(exDOB[0],exDOB[1],'#formDateBirth',exDOB[2]);
 
         // Division Main
-        var MainPosition = "<?php echo $arrEmp['PositionMain']; ?>";
+        var MainPosition = "<?= $arrEmp['PositionMain']; ?>";
         var MainDivision_ID = '';
         var MainPosition_ID = '';
         if(MainPosition!='' && MainPosition!=null){
@@ -438,6 +455,9 @@
         $('#formProgrammeStudy').append('<option disabled>-------------------</option>');
         loadSelectOptionBaseProdi('#formProgrammeStudy',ProdiID);
         FuncEvform_MainDivision();
+
+        loadSelectOptionLevelEducation('#formLevelEducationID',<?= $arrEmp['LevelEducationID']; ?>);
+        loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID',<?= $arrEmp['LecturerAcademicPositionID']; ?>);
 
     });
 
@@ -731,6 +751,10 @@
             var formIjazahExt = $('#formIjazahExt').val();
             var fileNameIjazah = (formIjazahExt!='') ? 'IJAZAH_'+formNIP+'.'+formIjazahExt : '';
 
+
+            var formLevelEducationID = $('#formLevelEducationID').val();
+            var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'UpdateEmployees',
@@ -741,6 +765,9 @@
                     ReligionID: formReligion,
                     PositionMain: PositionMain,
                     ProdiID: formProgrammeStudy,
+
+                    LevelEducationID: formLevelEducationID,
+                    LecturerAcademicPositionID: formLecturerAcademicPositionID,
 
                     // CityID : formProgrammeStudy,
                     // ProvinceID : formProgrammeStudy,
@@ -763,7 +790,7 @@
                     PositionOther1: PositionOther1,
                     PositionOther2: PositionOther2,
                     PositionOther3: PositionOther3,
-                    StatusEmployeeID: formStatusEmployee,
+                    StatusEmployeeID: formStatusEmployee
                 }
             };
 

@@ -588,6 +588,34 @@
         });
     }
 
+    function loadSelectOptionLevelEducation(element,selected) {
+        var url = base_url_js+"api/__getLevelEducation";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Level+' - '+v.Description+'</option>');
+            });
+
+        });
+    }
+
+    function loadSelectOptionLecturerAcademicPosition(element,selected) {
+        var url = base_url_js+"api/__getLecturerAcademicPosition";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Position+'</option>');
+            });
+
+        });
+    }
+
     function loadSelectOptionCurriculum(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {
@@ -1830,6 +1858,10 @@
         return v;
     }
 
+    function checkValue(v) {
+        return (v!='' && v!=null) ? v : '';
+    }
+
     window.getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = decodeURIComponent(window.location.search.substring(1)),
             sURLVariables = sPageURL.split('&'),
@@ -1843,5 +1875,7 @@
             }
         }
     };
+
+
 
 </script>
