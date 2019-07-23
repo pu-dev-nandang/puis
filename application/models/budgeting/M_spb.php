@@ -87,7 +87,20 @@ class M_spb extends CI_Model {
                                     $__Detail_Realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi_detail','ID_bank_advance_detail',$__Detail[$k]['ID']);
                                    $__Detail[$k]['Realisasi'] =  $__Detail_Realisasi;
                                 }
+
                                 $__Realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi','ID_bank_advance',$ID_bank_advance);
+                                for ($l=0; $l < count($__Realisasi); $l++) { 
+                                   $__JsonStatus = $__Realisasi[$l]['JsonStatus'];
+                                   $__JsonStatus_de = json_decode($__JsonStatus,true);
+                                   for ($m=0; $m < count($__JsonStatus_de); $m++) { 
+                                       $NIP_Re = $__JsonStatus_de[$j]['NIP'];
+                                       $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP_Re);
+                                       $__JsonStatus_de[$j]['Name'] = $G_emp[0]['Name'];
+                                   }
+
+                                    $__JsonStatus = json_encode($__JsonStatus_de);
+                                    $__Realisasi[$l]['JsonStatus'] = $__JsonStatus;
+                                }
 
                                 $G_dt[$j]['Detail'] = $__Detail;
                                 $G_dt[$j]['Realisasi'] = $__Realisasi;
@@ -107,6 +120,19 @@ class M_spb extends CI_Model {
                                 }
                                 $__Realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID_cash_advance',$ID_cash_advance);
 
+                                for ($l=0; $l < count($__Realisasi); $l++) { 
+                                   $__JsonStatus = $__Realisasi[$l]['JsonStatus'];
+                                   $__JsonStatus_de = json_decode($__JsonStatus,true);
+                                   for ($m=0; $m < count($__JsonStatus_de); $m++) { 
+                                       $NIP_Re = $__JsonStatus_de[$j]['NIP'];
+                                       $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP_Re);
+                                       $__JsonStatus_de[$j]['Name'] = $G_emp[0]['Name'];
+                                   }
+
+                                    $__JsonStatus = json_encode($__JsonStatus_de);
+                                    $__Realisasi[$l]['JsonStatus'] = $__JsonStatus;
+                                }
+                                
                                 $G_dt[$j]['Detail'] = $__Detail;
                                 $G_dt[$j]['Realisasi'] = $__Realisasi;
                             }

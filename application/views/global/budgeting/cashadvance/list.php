@@ -37,7 +37,8 @@ function LoadDataForTable()
 	                '<th rowspan = "2" width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 	                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Code</th>'+
 	                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
-	                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+                  '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+	                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
 	                '<th rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 	                '<th colspan = "'+G_ApproverLength+'" style = "text-align: center;background: #20485A;color: #FFFFFF;" id = "parent_th_approver">Approver</th>'+
 	            '</tr>'+
@@ -96,9 +97,29 @@ function LoadDataForTable()
 
    	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/ca/list/'+code_url2+'" ID_payment="'+ID_payment+'">'+Perihal+'</a>'+'<br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	
-   	    	$( row ).find('td:eq(2)').attr('align','center');
+          $( row ).find('td:eq(2)').attr('align','center');
+          $( row ).find('td:eq(3)').attr('align','center');
+          // show off realisasi
+          var arr_realisasi = data[4];
+          if (arr_realisasi.StatusRealisasi == null || arr_realisasi.StatusRealisasi == '' || arr_realisasi.StatusRealisasi == undefined) {
+            $( row ).find('td:eq(4)').html('<i class="fa fa-minus-circle" style="color: red;"></i>');
+          }
+          else
+          {
+            var h = '<i class="fa fa-check" style="color: green;"></i>';
+            if (arr_realisasi.StatusRealisasi == 2) {
+              h += '<br>Done'; 
+            }
+            else
+            {
+               h += '<br>Realiasi Approval not yet'; 
+            }
+            $( row ).find('td:eq(4)').html(h);
+          }
+
    	    	$( row ).find('td:eq(4)').attr('align','center');
-   	    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+   	    	$( row ).find('td:eq(5)').attr('align','center');
+   	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
    	    },
         dom: 'l<"toolbar">frtip',
    	    "initComplete": function(settings, json) {

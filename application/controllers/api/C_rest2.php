@@ -2708,12 +2708,13 @@ class C_rest2 extends CI_Controller {
                               $G_po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
                               $InvoiceLeftPO = $G_po_invoice_status[0]['InvoiceLeftPO'];
                               $InvoiceLeftPO = $InvoiceLeftPO - $Invoice;
+                              $InvoicePayPO = $G_po_invoice_status[0]['InvoicePayPO'];
                               $arr_po_invoice_status = array();
                               if ($InvoiceLeftPO <= 0) {
                                   $arr_po_invoice_status['Status'] = 1;
                               }
                              $arr_po_invoice_status['InvoiceLeftPO'] = $InvoiceLeftPO;
-                             $arr_po_invoice_status['InvoicePayPO'] = $Invoice;
+                             $arr_po_invoice_status['InvoicePayPO'] = $InvoicePayPO + $Invoice;
                              $this->db->where('Code_po_create',$Code_po_create);
                              $this->db->update('db_purchasing.po_invoice_status',$arr_po_invoice_status);
                         }
@@ -2746,16 +2747,17 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt, 
+                    t_realisasi.ID_payment_type,t_realisasi.JsonStatus as JsonStatusRealisasi,t_realisasi.Status as StatusRealisasi';
                $joinaction = ' right join (
                                         select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
-                                        ( select ID_payment,Perihal  from db_payment.spb
+                                        ( select ID_payment,Perihal,ID as ID_payment_type  from db_payment.spb
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.bank_advance
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.bank_advance
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.cash_advance  
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.cash_advance  
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.petty_cash 
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.petty_cash 
                                         )
                         as b on a.ID = b.ID_payment
                         where a.Type = "'.$dataToken['Type'].'"
@@ -2771,6 +2773,13 @@ class C_rest2 extends CI_Controller {
                                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                                ) aa
                                ) as t_spb_de on pay.Departement = t_spb_de.ID
+                               left join (
+                                  select ID_bank_advance as ID_payment_type,JsonStatus,Status  from db_payment.bank_advance_realisasi
+                                  UNION 
+                                  select ID_cash_advance as ID_payment_type,JsonStatus,Status  from db_payment.cash_advance_realisasi
+                                  UNION 
+                                  select ID_petty_cash as ID_payment_type,JsonStatus,Status  from db_payment.petty_cash_realisasi  
+                               ) as t_realisasi on t_realisasi.ID_payment_type = pay.ID_payment_type
                             ';
                $whereaction = ' and StatusPay != 0';
 
@@ -2853,6 +2862,13 @@ class C_rest2 extends CI_Controller {
                     $nestedData[] = $row['NameDepartementPay'];
                     // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
                     $nestedData[] = $row['StatusNamepay'];
+                    $arr_realisasi = array(
+                        'ID_payment_type' => $row['ID_payment_type'],
+                        'JsonStatusRealisasi' => $row['JsonStatusRealisasi'],
+                        'StatusRealisasi' => $row['StatusRealisasi'],
+                    );
+
+                    $nestedData[] = $arr_realisasi;
                     $nestedData[] = '';
                     $JsonStatus = (array)json_decode($row['JsonStatus3'],true);
                     $arr = array();

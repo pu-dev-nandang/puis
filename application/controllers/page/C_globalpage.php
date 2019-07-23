@@ -331,7 +331,6 @@ class C_globalpage extends Budgeting_Controler {
                    $this->temp($content);
                 }
                 
-                
             }
             else
             {

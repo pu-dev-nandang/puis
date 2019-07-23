@@ -334,6 +334,12 @@
 		makeAction();
 		if (JsonStatus[0].NIP != sessionNIP) {
 			$('#add_approver').remove();
+		}
+
+		// show page realisasi
+		if (DataPaymentSelected.dtspb[0].Status == 2) {
+			var DivPageRealisasi = se_content.find('.CAAdd');
+			makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 		}		
 	}
 
@@ -1016,5 +1022,305 @@
 		    { name: 'token', value: token },
 		]);
 	})
+
+	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
+	{
+		var html = '';
+		var dtspb = DataPaymentSelected.dtspb;
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var Dis = '';
+		var ID_Realisasi = '';
+		var ID_payment_type = Detail[0].ID;
+		var UploadInvoice = '';
+		var LinkFileInvoice = '';
+		var NoInvoice = '';
+		var UploadTandaTerima = '';
+		var LinkUploadTandaTerima = '';
+		var NoTandaTerima = '';
+		var Date_Realisasi = '';
+		var JsonStatus = '';
+		var StatusRealiasi = '';
+		var btn_hide_submit = '';
+		var btnRealisasi = '<button class="btn btn-success submitRealisasi '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		if (Realisasi.length > 0) { // exist
+			StatusRealiasi = Realisasi[0].Status;
+			btn_hide_submit = 'hide';
+			btnRealisasi = '<button class="btn btn-primary hide btnEditInputRealisasi"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitRealisasi '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+			if (StatusRealiasi == 2) {
+				Dis = 'disabled';
+				btnRealisasi = '';
+			}
+
+			ID_Realisasi = Realisasi[0].ID;
+			UploadInvoice = jQuery.parseJSON(Realisasi[0]['UploadInvoice']);
+			UploadInvoice = UploadInvoice[0];
+			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoInvoice = Realisasi[0].NoInvoice;
+			UploadTandaTerima = jQuery.parseJSON(Realisasi[0]['UploadTandaTerima']);
+			UploadTandaTerima = UploadTandaTerima[0];
+			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoTandaTerima = Realisasi[0].NoTandaTerima;
+			Date_Realisasi = Realisasi[0].Date_Realisasi;
+			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+		}
+
+		html += '<div class = "row">'+
+					'<div class = "col-xs-12">'+
+						'<div align="center"><h2>CASH ADVANCE REALISASI</h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<table class="table borderless" style="font-weight: bold;">'+
+							'<thead></thead>'+
+							'<tbody>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'NO KWT/INV'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<label>No Invoice</label>'+
+										'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value="'+NoInvoice+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Invoice</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+'><br>'+
+										'<div id = "FileInvoice">'+
+										LinkFileInvoice+
+										'</div>'+
+										'<br>'+
+										'<label>No Tanda Terima</label>'+
+										'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+NoTandaTerima+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Tanda Terima</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+										'<div id = "FileTT" '+Dis+'>'+
+										LinkUploadTandaTerima+
+										'</div>'+
+									'</td>'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'TANGGAL REALISASI'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasi" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
+				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+				                		'</div>'+
+									'</td>	'+			
+								'</tr>'+
+							'</tbody>'+
+						'</table>'+
+						'<div id="r_signatures_realisasi"></div>'+
+						'<div id = "r_action_realisasi">'+
+							'<div class="row">'+
+								'<div class="col-md-12">'+
+									'<div class="pull-right">'+
+										btnRealisasi+
+									'</div>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+	
+				'</div>';		
+		DivPageRealisasi.append(html);
+		DivPageRealisasi.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});		
+		if (Realisasi.length > 0) {
+			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
+			makeActionRealisasi(DivPageRealisasi,Realisasi);
+		}
+		
+	}
+
+	function makeSignaturesRealiasi (DivPageRealisasi,JsonStatus)
+	{
+		if (JsonStatus != '') {
+			var html = '<div class= "row" style = "margin-top : 20px;">'+
+							'<div class = "col-xs-12">'+
+								'<a href="javascript:void(0)" class="btn btn-default btn-default-success" type="button" id="add_approver"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>'+
+								'<table class = "table borderless">'+
+									'<thead>'+
+										'<tr>'
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<th '+style+'>'+
+							JsonStatus[i].NameTypeDesc+
+						'</th>';	
+			}
+
+			html += '</tr>';
+
+			html += '</thead>'+
+						'<tbody>'+
+							'<tr style = "height : 20px">';
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var v = '-';
+				if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+					v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+				}
+				else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+				{
+					v = '<i class="fa fa-check" style="color: green;"></i>';
+				}
+				else
+				{
+					v = '-';
+				}
+
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'>'+
+							v+
+						'</td>';	
+			}
+
+			html += '</tr></tbody>';				
+			html += '<tfoot>'+
+						'<tr>';
+
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+			}
+
+			html += '</tr></tfoot></table></div></div>';
+			DivPageRealisasi.find('#r_signatures_realisasi').html(html);
+		}
+	}
+
+	function makeActionRealisasi(DivPageRealisasi,Realisasi)
+	{
+		var dtspb = Realisasi;
+		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
+		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasi" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_submit = '<button class="btn btn-success submitRealisasi" disabled> Submit</button>';
+		
+		var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		var btn_print = '';
+		var Status = dtspb[0]['Status'];
+		switch(Status) {
+		  case 0:
+		  case '0':
+		  case -1:
+		  case '-1':
+		  case 4:
+		  case '4':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		  	}
+		    break;
+		  case 1:
+		  case '1':
+		    var JsonStatus = dtspb[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+
+		    if (JsonStatus[0]['NIP'] == sessionNIP) {
+		    	var booledit2 = true;
+		    	for (var i = 1; i < JsonStatus.length; i++) {
+		    		if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+		    			booledit2 = false;
+		    			break;
+		    		}
+		    	}
+
+		    	if (booledit2) {
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		    	}
+		    }
+
+		    // for approval
+		    	var bool = false;
+		    	var HierarkiApproval = 0; // for check hierarki approval;
+		    	var NumberOfApproval = 0; // for check hierarki approval;
+		    	var NIP = sessionNIP;
+		    	for (var i = 0; i < JsonStatus.length; i++) {
+		    		NumberOfApproval++;
+		    		if (JsonStatus[i]['Status'] == 0) {
+		    			// check status before
+		    			if (i > 0) {
+		    				var ii = i - 1;
+		    				if (JsonStatus[ii]['Status'] == 1) {
+		    					HierarkiApproval++;
+		    				}
+		    			}
+		    			else
+		    			{
+		    				HierarkiApproval++;
+		    			}
+
+		    			if (NIP == JsonStatus[i]['NIP']) {
+		    				bool = true;
+		    				break;
+		    			}
+		    		}
+		    		else
+		    		{
+		    			HierarkiApproval++;
+		    		}
+		    	}
+
+
+		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
+		    		$('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		$('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    	}
+
+		    break;
+		  case 2:
+		  case '2':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
+		  	}
+		    break;
+		  default:
+		    // code block
+		}
+	}
 
 </script>
