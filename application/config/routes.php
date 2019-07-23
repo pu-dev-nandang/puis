@@ -710,6 +710,8 @@ $route['save2excel/student-recap'] =  'c_save_to_excel/student_recap';
 $route['api/__getKurikulumByYear'] = 'api/c_api/getKurikulumByYear';
 $route['api/__getBaseProdi'] = 'api/c_api/getProdi';
 $route['api/__getBaseProdiSelectOption'] = 'api/c_api/getProdiSelectOption';
+$route['api/__getLevelEducation'] = 'api/c_api/getLevelEducation';
+$route['api/__getLecturerAcademicPosition'] = 'api/c_api/getLecturerAcademicPosition';
 $route['api/__getBaseProdiSelectOptionAll'] = 'api/c_api/getProdiSelectOptionAll';
 $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 
@@ -1260,6 +1262,7 @@ $route['api3/__crudExternalAccreditation'] = 'api/c_api3/crudExternalAccreditati
 $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalAccreditation';
 
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
+$route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
 
 
 

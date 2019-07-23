@@ -267,6 +267,23 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label>Level of Education</label>
+                            <select class="form-control" id="formLevelEducationID"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label>Lecturer Academic Position</label>
+                            <select class="form-control" id="formLecturerAcademicPositionID">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-xs-3" style="text-align: center;border-right: 1px solid #CCCCCC;">
                         <hr/>
                         <img id="imgThumbnail" src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="max-width: 100px;width: 100%;">
@@ -350,6 +367,9 @@
             }
         },1000);
         FuncEvform_MainDivision();
+
+        loadSelectOptionLevelEducation('#formLevelEducationID','');
+        loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID','');
     });
 
     function FuncEvform_MainDivision()
@@ -521,6 +541,12 @@
             var emailPU = (formEmailPU!='')
                 ? formEmailPU+'@podomorouniversity.ac.id'
                 : '';
+
+
+            var formLevelEducationID = $('#formLevelEducationID').val();
+            var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
+
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'addEmployees',
@@ -529,6 +555,8 @@
                     PositionMain : PositionMain,
                     ProdiID : formProgrammeStudy,
 
+                    LevelEducationID: formLevelEducationID,
+                    LecturerAcademicPositionID: formLecturerAcademicPositionID,
                     // CityID : formProgrammeStudy,
                     // ProvinceID : formProgrammeStudy,
 

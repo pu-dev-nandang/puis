@@ -636,4 +636,45 @@ class C_api3 extends CI_Controller {
 
     }
 
+    public function crudAgregatorTB2(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='crudMHSBaru'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            // Update
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.student_selection',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.student_selection',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='filterYear'){
+            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection GROUP BY Year ORDER BY Year ASC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readDataMHSBaru'){
+
+            $Year = $data_arr['Year'];
+            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss 
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                    WHERE ss.Year = "'.$Year.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
 }

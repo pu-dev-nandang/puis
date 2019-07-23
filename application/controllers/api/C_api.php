@@ -8295,6 +8295,10 @@ class C_api extends CI_Controller {
 
     public function getLecturerEvaluation(){
 
+        $max_execution_time = 3600;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
         $SemesterID = $this->input->get('SemesterID');
         $ProdiID = $this->input->get('ProdiID');
 
@@ -8337,9 +8341,23 @@ class C_api extends CI_Controller {
                         $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
                                                                       WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
                                                                       AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
-                                                                      AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
+                                                                      AND ea.NIP = "'.$d['NIP'].'"
+                                                                       AND ea.Type = "1" ')->result_array();
+
+                        // Read Details
+                        if(count($dataEd)>0){
+                            for($e=0;$e<count($dataEd);$e++){
+                                $dataDetails = $this->db->get_where('db_academic.edom_answer_details',array(
+                                    'EAID' => $dataEd[$e]['ID'],
+                                    'QuestionID !=' => '12'
+                                ))->result_array();
+
+                                $dataEd[$e]['Details'] = $dataDetails;
+                            }
+                        }
 
                         $dataCourse[$c]['TotalAnswer'] = count($dataEd);
+                        $dataCourse[$c]['DataAnswer'] = $dataEd;
                     }
 
                     $queryDefaultRow[$i]['Course'] = $dataCourse;
@@ -9931,6 +9949,16 @@ class C_api extends CI_Controller {
         }
 
         echo json_encode($arr);
+    }
+
+    public function getLevelEducation(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.level_education')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLecturerAcademicPosition(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.lecturer_academic_position')->result_array();
+        return print_r(json_encode($data));
     }
 
 }
