@@ -162,6 +162,24 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function jabatan_dosen_tetap(){
+
+        $viewPage = 'jabatan_dosen_tetap';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+
+    }
+
+    public function sertifikasi_dosen(){
+        $viewPage = 'sertifikasi_dosen';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
 
     public function uploadFile(){
 

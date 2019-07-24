@@ -93,7 +93,17 @@
 <script>
 
     $(document).ready(function () {
-        loadSelectOptionBaseProdi('#formProdiID','');
+
+
+        window.act = "<?= $accessUser; ?>";
+        if(parseInt(act)<=0){
+            $('.form-data-edit').remove();
+        } else {
+            loadSelectOptionBaseProdi('#formProdiID','');
+        }
+
+
+
         filteryear();
 
         var firstLoad = setInterval(function () {
@@ -122,10 +132,9 @@
         var url = base_url_js+'api3/__crudAgregatorTB2';
 
         $.post(url,{token:token},function (jsonResult) {
-
+            $('#filterYear').empty();
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
-                    console.log(v.Year);
 
                     $('#filterYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
                 })
@@ -184,7 +193,13 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 toastr.success('Data saved','Success');
-                loadDataTable();
+
+                filteryear();
+                setTimeout(function () {
+                    loadDataTable();
+                },2000);
+
+
 
                 setTimeout(function () {
                     $('#formID').val('');

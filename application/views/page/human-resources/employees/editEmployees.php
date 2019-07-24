@@ -1,4 +1,10 @@
 
+<style>
+    #dataTableCerti tr th, #dataTableCerti tr td {
+        text-align: center;
+    }
+</style>
+
 <div class="panel panel-primary">
     <div class="panel-heading" style="border-radius: 0px;">
         <h4 class="header">Edit Employees</h4>
@@ -253,13 +259,19 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-xs-4">
                         <div class="form-group">
                             <label>Status Employees</label>
                             <select class="form-control" id="formStatusEmployee"></select>
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Status Lecturer</label>
+                            <select class="form-control" id="formStatusLecturer"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
                         <div class="form-group">
                             <label>Programme Study</label>
                             <select class="form-control" id="formProgrammeStudy"></select>
@@ -273,6 +285,14 @@
                             <label>Level of Education</label>
                             <select class="form-control" id="formLevelEducationID"></select>
                         </div>
+
+                        <div class="form-group">
+                            <label>Status Forlap</label>
+                            <select class="form-control" id="formStatusForlap">
+                                <option value="0">Contract</option>
+                                <option value="1">Permanent</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-xs-6">
                         <div class="form-group">
@@ -280,6 +300,15 @@
                             <select class="form-control" id="formLecturerAcademicPositionID">
                                 <option></option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified']=='1') ? 'checked' : ''; ?> value="1">
+                                    Bersertifikat
+                                </label>
+                            </div>
+                            <button class="btn btn-sm btn-default" id="btnCertificate"><i class="fa fa-folder margin-right"></i> Certificate</button>
                         </div>
                     </div>
                 </div>
@@ -368,6 +397,9 @@
 </div>
 
 
+
+
+
 <script>
     var Prodi = <?php echo json_encode($ProdiArr) ?>;
     var splitBagi = 5;
@@ -447,7 +479,7 @@
         loadSelectOptionDivision('#form_Other3Division',Other3Division_ID);
         loadSelectOptionPosition('#form_Other3Position',Other3Position_ID);
 
-        loadSelectOptionEmployeesStatus('#formStatusEmployee',"<?php echo $arrEmp['StatusEmployeeID']; ?>");
+        loadSelectOptionEmployeesStatus2('#formStatusEmployee',"<?php echo $arrEmp['StatusEmployeeID']; ?>");
 
         var ProdiID = "<?php echo $arrEmp['ProdiID']; ?>";
         // if(ProdiID=='' )
@@ -458,6 +490,11 @@
 
         loadSelectOptionLevelEducation('#formLevelEducationID',<?= $arrEmp['LevelEducationID']; ?>);
         loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID',<?= $arrEmp['LecturerAcademicPositionID']; ?>);
+
+        <?php if($arrEmp['StatusForlap']!='' && $arrEmp['StatusForlap']!=null){ ?>
+            $('#formStatusForlap').val(<?= $arrEmp['StatusForlap']; ?>);
+        <?php } ?>
+
 
     });
 
@@ -755,6 +792,10 @@
             var formLevelEducationID = $('#formLevelEducationID').val();
             var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
 
+            var formCertified = ($('#formCertified').is(':checked')) ? '1' : '0';
+
+            var formStatusForlap = $('#formStatusForlap').val();
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'UpdateEmployees',
@@ -777,20 +818,22 @@
                     Name: formName,
                     TitleAhead: formTitleAhead,
                     TitleBehind: formTitleBehind,
+                    Certified: formCertified,
                     Gender: formGender,
-                    PlaceOfBirth: formPlaceOfBirht,
+                    PlaceOfBirth: formPlaceOfBirht.trim(),
                     DateOfBirth: DateOfBirht,
                     Phone: formPhone,
                     HP: formMobile,
                     Email: formEmail,
                     EmailPU: emailPU,
                     Password_Old: Password_Old,
-                    Address: formAddress,
+                    Address: formAddress.trim(),
                     Photo: fileName,
                     PositionOther1: PositionOther1,
                     PositionOther2: PositionOther2,
                     PositionOther3: PositionOther3,
-                    StatusEmployeeID: formStatusEmployee
+                    StatusEmployeeID: formStatusEmployee,
+                    StatusForlap : formStatusForlap
                 }
             };
 
@@ -905,10 +948,328 @@
             });
 
         } else {
-            toastr.error('NIK / NIK is empty','Error');
+            toastr.error('NIP / NIP is empty','Error');
         }
 
     }
     // ===================================
+
+
+    $(document).on('click','#btnCertificate',function () {
+
+        var formNIP = $('#formNIP').val();
+        var formName = $('#formName').val();
+
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">'+formNIP+' - '+formName+'</h4>');
+
+        window.bodyModal = '<div class="row">' +
+            '' +
+            '    <div class="col-md-4">' +
+            '        <div class="well">' +
+            '<input id="formID" class="hide">' +
+            '            <div class="form-group">' +
+            '                <label>Certificate</label>' +
+            '                <select class="form-control" id="formCertificate">' +
+            '                    <option value="Profesional">Profesional</option>' +
+            '                    <option value="Profesi">Profesi</option>' +
+            '                    <option value="Industri">Industri</option>' +
+            '                    <option value="Kompetensi">Kompetensi</option>' +
+            '                </select>' +
+            '            </div>' +
+            '            <div class="form-group">' +
+            '                <label>Publish Yaer</label>' +
+            '                <input class="form-control" id="formPublicationYear" style="color: #333;" readonly>' +
+            '            </div>' +
+            '            <div class="form-group">' +
+            '                <label>Due Date</label>' +
+            '                <input class="form-control" id="formDueDate" style="color: #333;" readonly>' +
+            '                <div class="checkbox">' +
+            '                    <label>' +
+            '                        <input type="checkbox" id="formLifetime" value="1">' +
+            '                        Lifetime' +
+            '                    </label>' +
+            '                </div>' +
+            '            </div>' +
+            '' +
+            '            <div class="form-group">' +
+            '                <label>Scale</label>' +
+            '                <select class="form-control" id="formScale">' +
+            '                    <option value="Nasional">Nasional</option>' +
+            '                    <option value="Internasional">Internasional</option>' +
+            '                </select>' +
+            '            </div>' +
+            '' +
+            '            <div class="form-group">' +
+            '                <label>Files</label>' +
+            '                <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
+            '                    <input type="file" name="userfile" id="upload_files" accept="application/pdf">' +
+            '                </form>' +
+            '            </div>' +
+            '            <div class="form-group" style="text-align: right;">' +
+            '                <button class="btn btn-success" id="btnSaveCerti">Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    ' +
+            '    <div class="col-md-8">' +
+            '        <table class="table table-bordered table-striped" id="dataTableCerti">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>Certificate</th>' +
+            '                <th style="width: 20%;">Scale</th>' +
+            '                <th style="width: 17%;">File</th>' +
+            '                <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '            <tbody id="dataList"></tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '' +
+            '</div>';
+
+        $('#GlobalModalLarge .modal-body').html('<div id="loadUlang">'+bodyModal+'</div>');
+
+        loadCertificate();
+
+        $( "#formPublicationYear,#formDueDate" )
+            .datepicker({
+                showOtherMonths:true,
+                autoSize: true,
+                dateFormat: 'dd MM yy',
+                // minDate: new Date(moment().year(),moment().month(),moment().date()),
+                onSelect : function () {
+                    // var data_date = $(this).val().split(' ');
+                    // var nextelement = $(this).attr('nextelement');
+                    // nextDatePick(data_date,nextelement);
+                }
+            });
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
+
+
+    });
+
+    $(document).on('click','#btnSaveCerti',function () {
+
+        var formID = $('#formID').val();
+        var formNIP = $('#formNIP').val();
+        var formCertificate = $('#formCertificate').val();
+        var formPublicationYear = $('#formPublicationYear').datepicker("getDate");
+        var formDueDate = $('#formDueDate').datepicker("getDate");
+        var formLifetime = ($('#formLifetime').is(':checked')) ? '1' : '0';
+        var formScale = $('#formScale').val();
+
+        if(formPublicationYear!=null && formPublicationYear!=''){
+
+            loading_buttonSm('#btnSaveCerti');
+
+            var data = {
+                action : 'UpdateCertificateLec',
+                ID : (formID!='' && formID!=null) ? formID : '',
+                dataForm : {
+                    NIP : formNIP,
+                    Certificate : formCertificate,
+                    PublicationYear : (formPublicationYear!=null) ? moment(formPublicationYear).format('YYYY-MM-DD') : '',
+                    DueDate : (formDueDate!=null) ? moment(formDueDate).format('YYYY-MM-DD') : '',
+                    Lifetime : formLifetime,
+                    Scale : formScale
+                }
+            };
+
+            var file = $('#upload_files').val();
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js + 'api/__crudEmployees';
+            $.post(url,{token:token},function (jsonResult) {
+
+                var ID = jsonResult.ID;
+                var FileName = jsonResult.FileName;
+
+                if(file!='' && file!=null){
+                    uploadCertificate(ID,FileName);
+                } else {
+                    toastr.success('Data Saved','Success');
+                }
+
+                setTimeout(function () {
+
+                    $('#loadUlang').html(bodyModal);
+
+                    $( "#formPublicationYear,#formDueDate" )
+                        .datepicker({
+                            showOtherMonths:true,
+                            autoSize: true,
+                            dateFormat: 'dd MM yy',
+                            // minDate: new Date(moment().year(),moment().month(),moment().date()),
+                            onSelect : function () {
+                                // var data_date = $(this).val().split(' ');
+                                // var nextelement = $(this).attr('nextelement');
+                                // nextDatePick(data_date,nextelement);
+                            }
+                        });
+
+                    loadCertificate();
+                },500);
+
+            });
+
+        }
+
+    });
+
+    function loadCertificate() {
+
+        var formNIP = $('#formNIP').val();
+        var data = {
+            action : 'readCertificateLec',
+            NIP : formNIP
+        };
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js + 'api/__crudEmployees';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#dataList').empty();
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var btnAct = '<div class="btn-group">' +
+                        '  <button type="button" class="btn btn-default dropdown-toggle btnAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                        '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
+                        '  </button>' +
+                        '  <ul class="dropdown-menu">' +
+                        '    <li><a href="javascript:void(0);" class="btnEditCerti" data-id="'+v.ID+'">Edit</a></li>' +
+                        '    <li role="separator" class="divider"></li>' +
+                        '    <li><a href="javascript:void(0);" class="btnDelCerti" data-id="'+v.ID+'">Remove</a></li>' +
+                        '  </ul>' +
+                        '</div>' +
+                        '<textarea class="hide" id="dataEditCerti_'+v.ID+'">'+JSON.stringify(v)+'</textarea>';
+
+                    var p = (v.PublicationYear!='' && v.PublicationYear!=null)
+                        ? moment(v.PublicationYear).format('DD MMM YYYY') : '';
+
+                    var d = (v.Duedate!='' && v.Duedate!=null)
+                        ? moment(v.Duedate).format('DD MMM YYYY') : '';
+
+                    d = (v.Lifetime!='1') ? d : 'Lifetime';
+
+                    var file = (v.File!='' && v.File!=null) ? '<a class="btn btn-sm btn-default" target="_blank" href="'+base_url_js+'uploads/certificate/'+v.File+'">Download</a>' : '';
+
+                    $('#dataList').append('<tr>' +
+                        '<td>'+(i+1)+'</td>' +
+                        '<td style="text-align: left;"><b>'+v.Certificate+'</b><br/> '+p+' - '+d+'</td>' +
+                        '<td>'+v.Scale+'</td>' +
+                        '<td>'+file+'</td>' +
+                        '<td>'+btnAct+'</td>' +
+                        '</tr>');
+                });
+            } else {
+                $('#dataList').append('<tr><td colspan="5">Sertificate not yet</td></tr>');
+            }
+
+        });
+
+    }
+
+    $(document).on('click','.btnEditCerti',function () {
+
+        var ID = $(this).attr('data-id');
+        var dataEditCerti = $('#dataEditCerti_'+ID).val();
+        var d = JSON.parse(dataEditCerti);
+
+        $('#formID').val(d.ID);
+        $('#formCertificate').val(d.Certificate);
+        $('#formScale').val(d.Scale);
+
+
+        (d.DueDate!=='0000-00-00' && d.DueDate!==null)
+            ? $('#formDueDate').datepicker('setDate',new Date(d.DueDate))
+            : '';
+        (d.PublicationYear!=='0000-00-00' && d.PublicationYear!==null)
+            ? $('#formPublicationYear').datepicker('setDate',new Date(d.PublicationYear))
+            : '';
+
+        var lf = (d.Lifetime=='1') ? true : false ;
+        $('#formLifetime').prop('checked',lf);
+
+    });
+
+    function uploadCertificate(ID,FileNameOld) {
+
+        var input = $('#upload_files');
+        var files = input[0].files[0];
+
+        var sz = parseFloat(files.size) / 1000000; // ukuran MB
+        var ext = files.type.split('/')[1];
+
+        if(Math.floor(sz)<=8){
+
+            var fileName = moment().unix()+'_'+sessionNIP+'.'+ext;
+            var formData = new FormData( $("#formupload_files")[0]);
+
+            var url = base_url_js+'human-resources/upload_certificate?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
+
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+                    toastr.success('Upload Success','Saved');
+                    setTimeout(function () {
+                        // window.location.href = '';
+                    },500);
+                    // loadDataEmployees();
+
+                }
+            });
+
+        }
+
+
+
+    }
+
+    $(document).on('click','.btnDelCerti',function () {
+
+        if(confirm('Are you sure to permanent remove?')){
+
+            $('.btnAct').prop('disabled',true);
+
+            var ID = $(this).attr('data-id');
+            var dataEditCerti = $('#dataEditCerti_'+ID).val();
+            var d = JSON.parse(dataEditCerti);
+
+            var data = {
+                action : 'removeCertificateLec',
+                ID : ID,
+                File : (d.File!='' && d.File!=null) ? d.File : ''
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js + 'api/__crudEmployees';
+
+            $.post(url,{token:token},function (result) {
+
+                toastr.success('Date removed','Success');
+                setTimeout(function () {
+                    loadCertificate();
+                },500);
+            });
+        }
+
+    })
 
 </script>

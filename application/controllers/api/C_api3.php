@@ -660,6 +660,27 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='crudMHSBaruAsing'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            // Update
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.student_selection_foreign',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.student_selection_foreign',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='filterYear'){
             $data = $this->db->query('SELECT Year FROM db_agregator.student_selection GROUP BY Year ORDER BY Year ASC')->result_array();
 
@@ -675,6 +696,87 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='readDataMHSBaruAsing'){
+
+            $Year = $data_arr['Year'];
+            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf 
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
+                                                    WHERE ssf.Year = "'.$Year.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='filterYearMhsAsing'){
+            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+    }
+
+    public function getKecukupanDosen(){
+
+        // Get Program Studi
+        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study',array('Status' => 1))->result_array();
+
+        if(count($data)>0){
+            $dataLAP = $this->db->get_where('db_employees.level_education',array(
+                'ID >' => 7
+            ))->result_array();
+            for($i=0;$i<count($data);$i++){
+
+                for($j=0;$j<count($dataLAP);$j++){
+
+                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                    AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" ')->result_array();
+
+                    $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
+                    $data[$i]['dataLecturers'][$j] = $r;
+
+                }
+
+
+            }
+
+        }
+
+
+        return print_r(json_encode($data));
+
+    }
+
+    public function getJabatanAkademikDosenTetap(){
+
+        $data = $this->db->get_where('db_employees.level_education',array(
+            'ID >' => 7
+        ))->result_array();
+
+        $dataPosition = $this->db->get('db_employees.lecturer_academic_position')->result_array();
+
+        if(count($data)>0){
+
+            for($i=0;$i<count($data);$i++){
+
+                for($p=0;$p<count($dataPosition);$p++){
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                                                                    AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'" ')->result_array();
+
+                    $r = array(
+                        'Position' => $dataPosition[$p]['Position'],
+                        'dataEmployees' => $dataEmp
+                    );
+
+                    $data[$i]['details'][$p] = $r;
+                }
+
+
+            }
+
+        }
+
+        return print_r(json_encode($data));
+
     }
 
 }

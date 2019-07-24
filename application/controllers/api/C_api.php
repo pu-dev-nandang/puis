@@ -5416,6 +5416,52 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']=='UpdateCertificateLec'){
+
+                $ID = $data_arr['ID'];
+                $dataForm = (array) $data_arr['dataForm'];
+                $FileName = '';
+
+                if($ID!=''){
+                    // Update
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_employees.employees_certificate',$dataForm);
+                    $FileName = $this->db->select('File')
+                        ->get_where('db_employees.employees_certificate',array('ID' => $ID))->result_array()[0]['File'];
+
+                } else {
+                    // Insert
+                    $this->db->insert('db_employees.employees_certificate',$dataForm);
+                    $ID = $this->db->insert_id();
+                }
+
+                return print_r(json_encode(array(
+                    'ID' => $ID,
+                    'FileName' => $FileName
+                )));
+
+            }
+            else if($data_arr['action']=='removeCertificateLec'){
+
+                // Remove File
+                if($data_arr['File']!=''){
+                    unlink('./uploads/certificate/'.$data_arr['File']);
+                }
+
+                // Remove DB
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_employees.employees_certificate');
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readCertificateLec'){
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+
+                return print_r(json_encode($data));
+            }
+
             else if($data_arr['action']=='addEmployees'){
                 $formInsert = (array) $data_arr['formInsert'];
 
@@ -6865,6 +6911,14 @@ class C_api extends CI_Controller {
 //        $generate = $this->m_master->showData_array('db_employees.employees_status');
         $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
               WHERE IDStatus != -2 ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getStatusEmployee2()
+    {
+//        $generate = $this->m_master->showData_array('db_employees.employees_status');
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+              WHERE IDStatus != -2 AND (Type = "lec" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
         echo json_encode($generate);
     }
 
