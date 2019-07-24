@@ -93,9 +93,9 @@ class M_spb extends CI_Model {
                                    $__JsonStatus = $__Realisasi[$l]['JsonStatus'];
                                    $__JsonStatus_de = json_decode($__JsonStatus,true);
                                    for ($m=0; $m < count($__JsonStatus_de); $m++) { 
-                                       $NIP_Re = $__JsonStatus_de[$j]['NIP'];
+                                       $NIP_Re = $__JsonStatus_de[$m]['NIP'];
                                        $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP_Re);
-                                       $__JsonStatus_de[$j]['Name'] = $G_emp[0]['Name'];
+                                       $__JsonStatus_de[$m]['Name'] = $G_emp[0]['Name'];
                                    }
 
                                     $__JsonStatus = json_encode($__JsonStatus_de);
@@ -124,9 +124,9 @@ class M_spb extends CI_Model {
                                    $__JsonStatus = $__Realisasi[$l]['JsonStatus'];
                                    $__JsonStatus_de = json_decode($__JsonStatus,true);
                                    for ($m=0; $m < count($__JsonStatus_de); $m++) { 
-                                       $NIP_Re = $__JsonStatus_de[$j]['NIP'];
+                                       $NIP_Re = $__JsonStatus_de[$m]['NIP'];
                                        $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP_Re);
-                                       $__JsonStatus_de[$j]['Name'] = $G_emp[0]['Name'];
+                                       $__JsonStatus_de[$m]['Name'] = $G_emp[0]['Name'];
                                    }
 
                                     $__JsonStatus = json_encode($__JsonStatus_de);

@@ -35,18 +35,22 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus ';
         $joinaction = ' right join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
                                  ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin
                                  from db_payment.payment as a join
-                                 ( select ID_payment,Perihal  from db_payment.spb
+                                 ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
                                    UNION 
-                                   select ID_payment,Perihal  from db_payment.bank_advance
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.bank_advance_realisasi where ID_bank_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.bank_advance as a
+                                   left join db_payment.bank_advance_realisasi as b on a.ID = b.ID_bank_advance
                                    UNION 
-                                   select ID_payment,Perihal  from db_payment.cash_advance  
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
+                                   left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
                                    UNION 
-                                   select ID_payment,Perihal  from db_payment.petty_cash 
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
+                                   as a
+                                   left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
                                  )
                  as b on a.ID = b.ID_payment
                  join db_budgeting.ap as c on a.ID = c.ID_payment
@@ -174,6 +178,8 @@ class C_finap extends Budgeting_Controler {
                      'Perihal' => $row['Perihal'],
                      'StatusPayFin' => $row['StatusPayFin'],
                      'ID_payment_fin' => $row['ID_payment_fin'],
+                     'RealisasiTotal' => $row['RealisasiTotal'],
+                     'RealisasiStatus' => $row['RealisasiStatus'],
                  );
 
              $nestedData[] = $arr_temp;

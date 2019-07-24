@@ -107,11 +107,11 @@ function LoadDataForTable()
          {
            var h = '<i class="fa fa-check" style="color: green;"></i>';
            if (arr_realisasi.StatusRealisasi == 2) {
-             h += '<br>Done'; 
+             h += '<br><div style = "color:green;">Done</div>'; 
            }
            else
            {
-              h += '<br>Realiasi Approval not yet'; 
+              h += '<br><div style = "color:red;">Realiasi Approval not yet</div>'; 
            }
            $( row ).find('td:eq(4)').html(h);
          }

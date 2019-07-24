@@ -98,6 +98,9 @@
 		html += __showHistory(ID_payment,Code_po_create,PR);
 		var se_content = $('#pageContent');
 		se_content.html(html);
+		var DataPaymentSelected = ClassDt.po_payment_data;
+		var DivPageRealisasi = se_content;
+		// var htmlrelisasi = makePagerealisasi(DataPaymentSelected,DivPageRealisasi);
 
 	}
 

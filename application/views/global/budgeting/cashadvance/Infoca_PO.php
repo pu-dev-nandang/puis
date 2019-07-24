@@ -1042,12 +1042,13 @@
 		var JsonStatus = '';
 		var StatusRealiasi = '';
 		var btn_hide_submit = '';
-		var btnRealisasi = '<button class="btn btn-success submitRealisasi '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		var btnRealisasi = '<button class="btn btn-success submitRealisasiCA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
 		if (Realisasi.length > 0) { // exist
+			Dis = 'disabled';
 			StatusRealiasi = Realisasi[0].Status;
 			btn_hide_submit = 'hide';
-			btnRealisasi = '<button class="btn btn-primary hide btnEditInputRealisasi"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-									'<button class="btn btn-success submitRealisasi '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+			btnRealisasi = '<button class="btn btn-primary hide btnEditInputRealisasiCA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitRealisasiCA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
 			if (StatusRealiasi == 2) {
 				Dis = 'disabled';
 				btnRealisasi = '';
@@ -1066,7 +1067,7 @@
 			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
 		}
 
-		html += '<div class = "row">'+
+		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
 					'<div class = "col-xs-12">'+
 						'<div align="center"><h2>CASH ADVANCE REALISASI</h2></div>'+
 						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
@@ -1109,7 +1110,7 @@
 									'</td>'+
 									'<td>'+
 										'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasi" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
+				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasiCA" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
 				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 				                		'</div>'+
 									'</td>	'+			
@@ -1228,8 +1229,8 @@
 	{
 		var dtspb = Realisasi;
 		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
-		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasi" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
-		var btn_submit = '<button class="btn btn-success submitRealisasi" disabled> Submit</button>';
+		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiCA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_submit = '<button class="btn btn-success submitRealisasiCA" disabled> Submit</button>';
 		
 		var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
 		var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
@@ -1253,7 +1254,6 @@
 		  case '1':
 		    var JsonStatus = dtspb[0]['JsonStatus'];
 		    JsonStatus = jQuery.parseJSON(JsonStatus);
-
 		    if (JsonStatus[0]['NIP'] == sessionNIP) {
 		    	var booledit2 = true;
 		    	for (var i = 1; i < JsonStatus.length; i++) {
@@ -1322,5 +1322,234 @@
 		    // code block
 		}
 	}
+
+	$(document).off('click', '.submitRealisasiCA').on('click', '.submitRealisasiCA',function(e) {
+		// validation
+		var ev = $(this).closest('.realisasi_page');
+		var DataPaymentSelected = ClassDt.DataPaymentSelected;
+		var dtspb = DataPaymentSelected.dtspb;
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var action = 'add';
+		if (Realisasi.length > 0) {
+			var action = 'edit';
+		}
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_ca_realisasi(ev,action);
+			if (validation) {
+				submitCA_realisasi('.submitRealisasiCA',ev,action);
+			}
+		}
+
+	})
+
+	function validation_input_ca_realisasi(ev,action)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			Date_Realisasi : ev.find('.TglRealisasiCA').val(),
+		};
+
+		if (validation__(data) ) {
+			if (action == 'add') {
+				// Upload Tanda Terima 
+				ev.find(".BrowseTT").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Invoice 
+				ev.find(".BrowseInvoice").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Invoice ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+			}
+
+		}
+		else
+		{
+			find = false;
+		}
+
+		return find;
+	}
+
+
+	function validation__(arr)
+	{
+		var toatString = "";
+		var result = "";
+		for(var key in arr) {
+		   switch(key)
+		   {
+		    default :
+		          result = Validation_required(arr[key],key);
+		          if (result['status'] == 0) {
+		            toatString += result['messages'] + "<br>";
+		          }       
+		   }
+
+		}
+		if (toatString != "") {
+		  toastr.error(toatString, 'Failed!!');
+		  return false;
+		}
+
+		return true;
+	}
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
+
+	function submitCA_realisasi(elementbtn,ev,action)
+	{
+		loadingStart();
+		var ID_Realisasi = ev.attr('ID_Realisasi');
+		var ID_payment = ClassDt.ID_payment;
+		var DataPaymentSelected = ClassDt.DataPaymentSelected;
+		var dtspb = DataPaymentSelected.dtspb;
+		var Detail = dtspb[0].Detail;
+		var ID_payment_type = Detail[0].ID; // ID Cash Advance
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseInvoice').length ) {
+			var UploadFile = ev.find('.BrowseInvoice')[0].files;
+			form_data.append("UploadInvoice[]", UploadFile[0]);
+		}
+
+		if ( ev.find('.BrowseTT').length ) {
+			var UploadFile = ev.find('.BrowseTT')[0].files;
+			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		}
+
+		
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Date_Realisasi = ev.find('.TglRealisasiCA').val();
+
+		var data = {
+			ID_Realisasi : ID_Realisasi,
+			NoInvoice : NoInvoice,
+			NoTandaTerima : NoTandaTerima,
+			Date_Realisasi : Date_Realisasi,
+			ID_payment_type : ID_payment_type,
+			ID_payment : ID_payment,
+			action : action,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+		var url = base_url_js + "budgeting/submitca_realisasi_by_po"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		loadingEnd(500);
+		  		toastr.error("Connection Error, Please try again", 'Error!!');
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			loadFirst();
+		  			loadingEnd(500);
+		  		},1500);
+		  	}
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    loadingEnd(500);
+		  }
+		})
+	}
+
+	$(document).off('click', '.btnEditInputRealisasiCA').on('click', '.btnEditInputRealisasiCA',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.realisasi_page');
+			ev2.find('input').not('.TglRealisasiCA').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			//ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Realisasi telah approve tidak bisa edit');
+		}	
+	})
 
 </script>
