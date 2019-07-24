@@ -953,6 +953,7 @@ $route['rest2/__Get_spk_pembukaan'] = 'api/c_rest2/Get_spk_pembukaan';
 $route['rest2/__approve_po'] = 'api/c_rest2/approve_po';
 $route['rest2/__approve_spb'] = 'api/c_rest2/approve_spb';
 $route['rest2/__approve_payment'] = 'api/c_rest2/approve_payment';
+$route['rest2/__approve_payment_realisasi'] = 'api/c_rest2/approve_payment_realisasi';
 
 
 $route['rest2/__crudFormCRM'] = 'api/c_rest2/crudFormCRM';
@@ -1420,6 +1421,7 @@ $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
 $route['budgeting_menu/pembayaran/cashadvance/configuration'] = 'page/budgeting/c_cashadvance/configuration';
 $route['budgeting/submitca'] = 'page/budgeting/c_cashadvance/submitca';
+$route['budgeting/submitca_realisasi_by_po'] = 'page/budgeting/c_cashadvance/submitca_realisasi_by_po';
 
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';

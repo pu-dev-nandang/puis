@@ -2708,12 +2708,13 @@ class C_rest2 extends CI_Controller {
                               $G_po_invoice_status = $this->m_master->caribasedprimary('db_purchasing.po_invoice_status','Code_po_create',$Code_po_create);
                               $InvoiceLeftPO = $G_po_invoice_status[0]['InvoiceLeftPO'];
                               $InvoiceLeftPO = $InvoiceLeftPO - $Invoice;
+                              $InvoicePayPO = $G_po_invoice_status[0]['InvoicePayPO'];
                               $arr_po_invoice_status = array();
                               if ($InvoiceLeftPO <= 0) {
                                   $arr_po_invoice_status['Status'] = 1;
                               }
                              $arr_po_invoice_status['InvoiceLeftPO'] = $InvoiceLeftPO;
-                             $arr_po_invoice_status['InvoicePayPO'] = $Invoice;
+                             $arr_po_invoice_status['InvoicePayPO'] = $InvoicePayPO + $Invoice;
                              $this->db->where('Code_po_create',$Code_po_create);
                              $this->db->update('db_purchasing.po_invoice_status',$arr_po_invoice_status);
                         }
@@ -2746,16 +2747,29 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+
+                $JoinRealisasi = '';
+                if ($dataToken['Type'] == 'Bank Advance') {
+                   $JoinRealisasi = 'select ID_bank_advance as ID_payment_type,JsonStatus,Status  from db_payment.bank_advance_realisasi';
+                }
+                elseif ($dataToken['Type'] == 'Cash Advance') {
+                    $JoinRealisasi = 'select ID_cash_advance as ID_payment_type,JsonStatus,Status  from db_payment.cash_advance_realisasi';
+                }
+                elseif ($dataToken['Type'] == 'Petty Cash') {
+                    $JoinRealisasi = 'select ID_petty_cash as ID_payment_type,JsonStatus,Status  from db_payment.petty_cash_realisasi';
+                }
+
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt, 
+                    t_realisasi.ID_payment_type,t_realisasi.JsonStatus as JsonStatusRealisasi,t_realisasi.Status as StatusRealisasi';
                $joinaction = ' right join (
                                         select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
-                                        ( select ID_payment,Perihal  from db_payment.spb
+                                        ( select ID_payment,Perihal,ID as ID_payment_type  from db_payment.spb
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.bank_advance
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.bank_advance
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.cash_advance  
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.cash_advance  
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.petty_cash 
+                                          select ID_payment,Perihal,ID as ID_payment_type  from db_payment.petty_cash 
                                         )
                         as b on a.ID = b.ID_payment
                         where a.Type = "'.$dataToken['Type'].'"
@@ -2771,6 +2785,9 @@ class C_rest2 extends CI_Controller {
                                select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                                ) aa
                                ) as t_spb_de on pay.Departement = t_spb_de.ID
+                               left join (
+                                  '.$JoinRealisasi.'
+                               ) as t_realisasi on t_realisasi.ID_payment_type = pay.ID_payment_type
                             ';
                $whereaction = ' and StatusPay != 0';
 
@@ -2853,6 +2870,13 @@ class C_rest2 extends CI_Controller {
                     $nestedData[] = $row['NameDepartementPay'];
                     // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
                     $nestedData[] = $row['StatusNamepay'];
+                    $arr_realisasi = array(
+                        'ID_payment_type' => $row['ID_payment_type'],
+                        'JsonStatusRealisasi' => $row['JsonStatusRealisasi'],
+                        'StatusRealisasi' => $row['StatusRealisasi'],
+                    );
+
+                    $nestedData[] = $arr_realisasi;
                     $nestedData[] = '';
                     $JsonStatus = (array)json_decode($row['JsonStatus3'],true);
                     $arr = array();
@@ -3153,6 +3177,252 @@ class C_rest2 extends CI_Controller {
                                  $this->m_pr_po->po_circulation_sheet($Code_po_create,$Desc.'<br><b>'.$G_data[0]['Type'].'</b>',$NIP);
                             }
                                 $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
+
+                    }
+                    else
+                    {
+                        $msg = 'Not Authorize';
+                    }
+
+                    echo json_encode($rs);
+
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+
+
+    public function approve_payment_realisasi()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $ID_Realisasi = $dataToken['ID_Realisasi'];
+                    $key = "UAP)(*";
+                    $token = $this->jwt->encode($ID_payment,$key);
+
+                    $CodeUrl = $token;
+                    $approval_number = $dataToken['approval_number'];
+                    $NIP = $dataToken['NIP'];
+                    $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                    $NameFor_NIP = $G_emp[0]['Name'];
+                    $action = $dataToken['action'];
+                   
+                    // get data
+                    $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt from db_payment.payment as a where a.ID = ?';
+                    $query=$this->db->query($sql, array($ID_payment))->result_array();
+                    $G_data = $query;
+
+                    $urlType = '';
+                    switch ($G_data[0]['Type']) {
+                        case 'Bank Advance':
+                            $urlType = 'ba';
+                            break;
+                        case 'Cash Advance':
+                            $urlType = 'ca';
+                            break;
+                        case 'Petty Cash':
+                             $urlType = 'pc';
+                            break;    
+                        default:
+                            # code...
+                            break;
+                    }
+
+                    $keyJson = $approval_number - 1; // get array index json
+
+                    // get data realisasi
+                    $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
+                    $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+
+                    // get data update to approval
+                    $arr_upd = $JsonStatus[$keyJson];
+
+                    if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                        $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                        $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                        $JsonStatus[$keyJson] = $arr_upd;
+                        $datasave = array(
+                            'JsonStatus' => json_encode($JsonStatus),
+                        );
+
+                        // check all status for update data
+                        $boolApprove = true;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2 || $Status == 0) {
+                                $boolApprove = false;
+                                break;
+                            }
+                        }
+
+                        if ($boolApprove) {
+                            $datasave['Status'] = 2;
+                        }
+                        else
+                        {
+                            $boolReject = false;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2) {
+                                    $boolReject = true;
+                                    break;
+                                }
+                            }
+
+                            if ($boolReject) {
+                                $NoteDel = $dataToken['NoteDel'];
+                                $Notes = $NoteDel;
+                                $datasave['Status'] = -1;
+                                // $datasave['Notes'] = $Notes;
+                            }
+                            else
+                            {
+                                // Notif to next step approval & User
+                                    $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                    $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                    $b_check = $this->m_master->NonDiv(9,$NIPApprovalNext);
+                                    if ($b_check) {
+                                        $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                    }
+
+                                    // Send Notif for next approval
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Realisasi Approval '.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($NIPApprovalNext),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Send Notif for user
+                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
+                                        if ($b_check) {
+                                            $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                        } 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Realisasi '.$G_data[0]['Type'].' has been Approved',
+                                                            'Description' => $G_data[0]['Type'].' has been approved by '.$NameFor_NIP,
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                            }
+                        }
+
+                        $this->db->where('ID',$ID_Realisasi);
+                        $this->db->update('db_payment.cash_advance_realisasi',$datasave); 
+
+                            $Desc = ($arr_upd['Status'] == 1) ? 'Realisasi Approve' : 'Realisasi Reject';
+                            if (array_key_exists('Status', $datasave)) {
+                                if ($datasave['Status'] == 2) {
+                                    $Desc = "Realisasi Approve and finished at : ".date('Y-m-d H:i:s');
+
+                                    // Notif All Approve to JsonStatus allkey
+                                        // $arr_to = array();
+                                        // for ($i=0; $i < count($JsonStatus); $i++) { 
+                                        //     $arr_to[] = $JsonStatus[$i]['NIP'];
+                                        // }
+
+                                        for ($i=0; $i < count($JsonStatus); $i++) {
+                                            $NIPJson =  $JsonStatus[$i]['NIP'];
+                                            $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                            $b_check = $this->m_master->NonDiv(9,$NIPJson);
+                                            if ($b_check) {
+                                                $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                            }
+
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>Realisasi '.$G_data[0]['Type'].' has been done',
+                                                                'Description' => $G_data[0]['Type'].' has been done',
+                                                                'URLDirect' => $UrlDirect,
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($JsonStatus[$i]['NIP']),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token); 
+                                        }
+
+                                }
+                            }
+
+                            if ($arr_upd['Status'] == 2) {
+                                if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                }
+
+                                // Notif Reject to JsonStatus key 0
+                                    // Send Notif for user
+                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
+                                        if ($b_check) {
+                                            $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                        }  
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>Realisasi '.$G_data[0]['Type'].' has been Rejected',
+                                                            'Description' => $G_data[0]['Type'].' has been Rejected by '.$NameFor_NIP,
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+                            }
+    
+                            $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
 
                     }
                     else

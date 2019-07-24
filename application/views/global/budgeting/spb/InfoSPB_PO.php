@@ -1235,4 +1235,61 @@
 		    { name: 'token', value: token },
 		]);
 	})
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
 </script>

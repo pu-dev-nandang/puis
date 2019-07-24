@@ -303,4 +303,103 @@ class C_cashadvance extends Budgeting_Controler {
         }
     }
 
+    public function submitca_realisasi_by_po()
+    {
+        $rs = array('Status' => 0,'Change' => 0);
+        $Input = $this->getInputToken();
+        $action = $Input['action'];
+        $ID_payment = $Input['ID_payment'];
+        switch ($action) {
+            case 'add':
+                $ID_cash_advance = $Input['ID_payment_type'];
+                $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/cashadvance');
+                $UploadInvoice = json_encode($UploadInvoice); 
+
+                $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
+                $UploadTandaTerima = json_encode($UploadTandaTerima);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $Status = 1;
+                $dataSave = array(
+                    'ID_cash_advance' => $ID_cash_advance,
+                    'UploadInvoice' => $UploadInvoice,
+                    'NoInvoice' => $Input['NoInvoice'],
+                    'UploadTandaTerima' => $UploadTandaTerima,
+                    'NoTandaTerima' => $Input['NoTandaTerima'],
+                    'Date_Realisasi' =>  $Input['Date_Realisasi'],
+                    'Status' => $Status,
+                    'JsonStatus' => $JsonStatus,
+                );
+
+                $this->db->insert('db_payment.cash_advance_realisasi',$dataSave);
+                
+                $G = $this->m_master->caribasedprimary('db_payment.cash_advance_detail','ID_cash_advance',$ID_cash_advance);
+                for ($i=0; $i < count($G); $i++) { 
+                    $dataSave = array(
+                        'ID_cash_advance_detail' => $G[$i]['ID'],
+                        'InvoiceRealisasi' => $G[$i]['Invoice'],
+                        'Status' => 1,
+                    );
+                    $this->db->insert('db_payment.cash_advance_realisasi_detail',$dataSave);
+                }
+
+                 $this->m_spb->payment_circulation_sheet($ID_payment,'Input Realisasi');
+                $rs['Status']= 1;
+                break;
+            case 'edit':
+                $ID_Realisasi = $Input['ID_Realisasi'];
+                $ID_cash_advance = $Input['ID_payment_type'];
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $Status = 1;
+                $dataSave = array(
+                    'ID_cash_advance' => $ID_cash_advance,
+                    'NoInvoice' => $Input['NoInvoice'],
+                    'NoTandaTerima' => $Input['NoTandaTerima'],
+                    'Date_Realisasi' =>  $Input['Date_Realisasi'],
+                    'Status' => $Status,
+                    'JsonStatus' => $JsonStatus,
+                );
+                $G_data_ = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
+                // delete old file and upload new file if user do upload
+                if (array_key_exists('UploadInvoice', $_FILES)) {
+                    // remove old file
+                    if ($G_data_[0]['UploadInvoice'] != '' && $G_data_[0]['UploadInvoice'] != null) {
+                        $arr_file = (array) json_decode($G_data_[0]['UploadInvoice'],true);
+                        $filePath = 'budgeting\\cashadvance\\'.$arr_file[0]; // pasti ada file karena required
+                        $path = FCPATH.'uploads\\'.$filePath;
+                        unlink($path);
+                    }
+
+                    // do upload file
+                    $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/cashadvance');
+                    $UploadInvoice = json_encode($UploadInvoice); 
+                    $dataSave['UploadInvoice'] = $UploadInvoice; 
+                }
+
+                if (array_key_exists('UploadTandaTerima', $_FILES)) {
+                    // remove old file
+                        if ($G_data_[0]['UploadTandaTerima'] != '' && $G_data_[0]['UploadTandaTerima'] != null) {
+                            $arr_file = (array) json_decode($G_data_[0]['UploadTandaTerima'],true);
+                            $filePath = 'budgeting\\cashadvance\\'.$arr_file[0]; // pasti ada file karena required
+                            $path = FCPATH.'uploads\\'.$filePath;
+                            unlink($path);
+                        }
+
+                    // do upload file
+                    $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
+                    $UploadTandaTerima = json_encode($UploadTandaTerima); 
+                    $dataSave['UploadTandaTerima'] = $UploadTandaTerima; 
+                }
+
+                $this->db->where('ID',$ID_Realisasi);
+                $this->db->update('db_payment.cash_advance_realisasi',$dataSave);
+                $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
+                $rs['Status']= 1;
+                break;
+            default:
+                # code...
+                break;
+        }
+        echo json_encode($rs);
+    }
+
 }

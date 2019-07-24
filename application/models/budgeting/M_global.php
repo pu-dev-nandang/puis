@@ -123,4 +123,43 @@ class M_global extends CI_Model {
         }
     }
 
+    public function JsonStatusRealisasi()
+    {
+        // approval oleh kasubag finance
+        $arr = array();
+        // insert created by
+        $arr[] = array(
+          'NIP' => $this->session->userdata('NIP'),
+          'Status' => 1,
+          'ApproveAt' => date('Y-m-d H:i:s'),
+          'Representedby' => '',
+          'Visible' => 'Yes',
+          'NameTypeDesc' => 'Requested by',
+        );
+
+        $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
+                       SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
+                             a.StatusEmployeeID
+                FROM   db_employees.employees as a
+                where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
+                                                        // Finance                                  // kasubag
+        $query=$this->db->query($sql, array())->result_array();        
+
+        if (count($query) > 0) {
+            $arr[] = array(
+              'NIP' => $query[0]['NIP'] ,
+              'Status' => 0,
+              'ApproveAt' => '',
+              'Representedby' => '',
+              'Visible' => 'Yes',
+              'NameTypeDesc' => 'Approval by',
+            );
+        }
+        else
+        {
+            die();
+        }
+        return $arr;
+    }
+
 }
