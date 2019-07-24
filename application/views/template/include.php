@@ -1591,6 +1591,30 @@
             }
         });
     }
+
+    function loadSelectOptionEmployeesStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionLecturerStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
     
     function loadSelectOptionPathway(element,selected) {
         

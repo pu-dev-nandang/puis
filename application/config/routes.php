@@ -146,6 +146,7 @@ $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
+$route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certificate';
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
 
 // --- Modal Academic ---- ADD Bismar
@@ -999,6 +1000,7 @@ $route['api/__getAgama'] = 'api/c_api/getAgama';
 $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
+$route['api/__getStatusEmployee2'] = 'api/c_api/getStatusEmployee2';
 $route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
 $route['api/__getStatusVersion2'] = 'api/c_api/getstatusversion2';
 $route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
@@ -1251,6 +1253,8 @@ $route['agregator/seleksi-mahasiswa-baru'] = 'page/agregator/c_agregator/seleksi
 $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asing';
 
 $route['agregator/kecukupan-dosen'] = 'page/agregator/c_agregator/kecukupan_dosen';
+$route['agregator/jabatan-dosen-tetap'] = 'page/agregator/c_agregator/jabatan_dosen_tetap';
+$route['agregator/sertifikasi-dosen'] = 'page/agregator/c_agregator/sertifikasi_dosen';
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 
@@ -1263,6 +1267,8 @@ $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalA
 
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
 $route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
+$route['api3/__getKecukupanDosen'] = 'api/c_api3/getKecukupanDosen';
+$route['api3/__getJabatanAkademikDosenTetap'] = 'api/c_api3/getJabatanAkademikDosenTetap';
 
 
 
