@@ -392,6 +392,7 @@ class C_cashadvance extends Budgeting_Controler {
 
                 $this->db->where('ID',$ID_Realisasi);
                 $this->db->update('db_payment.cash_advance_realisasi',$dataSave);
+                $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
                 $rs['Status']= 1;
                 break;
             default:

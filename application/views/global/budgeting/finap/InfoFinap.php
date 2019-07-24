@@ -1,4 +1,9 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
+<style type="text/css">
+	.TD1 {
+		width: 40%;
+	}
+</style>
 <div class="row noPrint">
 	<div class="col-xs-2">
 		<div><a href="<?php echo base_url().'finance_ap' ?>" class = "btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>
@@ -100,7 +105,7 @@
 		se_content.html(html);
 		var DataPaymentSelected = ClassDt.po_payment_data;
 		var DivPageRealisasi = se_content;
-		// var htmlrelisasi = makePagerealisasi(DataPaymentSelected,DivPageRealisasi);
+		var htmlrelisasi = makePagerealisasi(DataPaymentSelected,DivPageRealisasi);
 
 	}
 
@@ -169,7 +174,7 @@
 					}
 
 					html += '<tr>'+
-								'<td class = "TD1"><label>Payment Type : '+TypePay+' '+lblAdd+'</label></td>'+
+								'<td class = "TD1"><label>Payment Type'+' '+lblAdd+'</label></td>'+
 								'<td>:</td>'+
 								'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
 							'</tr>';
@@ -285,5 +290,467 @@
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
+	})
+
+
+	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
+	{
+		var html = '';
+		var dtspb = DataPaymentSelected.dtspb;
+		// selain spb
+		var Type = dtspb[0].Type;
+		if (Type != 'Spb') {
+			var Detail = dtspb[0].Detail;
+			var Realisasi = Detail[0].Realisasi;
+			var Dis = '';
+			var ID_Realisasi = '';
+			var ID_payment_type = Detail[0].ID;
+			var UploadInvoice = '';
+			var LinkFileInvoice = '';
+			var NoInvoice = '';
+			var UploadTandaTerima = '';
+			var LinkUploadTandaTerima = '';
+			var NoTandaTerima = '';
+			var Date_Realisasi = '';
+			var JsonStatus = '';
+			var StatusRealiasi = '';
+			var btn_hide_submit = '';
+			var htmldetail = '';
+			if (Realisasi.length > 0) { // exist
+				Dis = 'disabled';
+				StatusRealiasi = Realisasi[0].Status;
+				btn_hide_submit = 'hide';
+			
+				if (StatusRealiasi == 2) {
+					Dis = 'disabled';
+				}
+
+				ID_Realisasi = Realisasi[0].ID;
+				UploadInvoice = jQuery.parseJSON(Realisasi[0]['UploadInvoice']);
+				UploadInvoice = UploadInvoice[0];
+				NoInvoice = Realisasi[0].NoInvoice;
+				LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+NoInvoice+'</a>';
+				UploadTandaTerima = jQuery.parseJSON(Realisasi[0]['UploadTandaTerima']);
+				UploadTandaTerima = UploadTandaTerima[0];
+				NoTandaTerima = Realisasi[0].NoTandaTerima;
+				LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+NoTandaTerima+'</a>';
+				
+				Date_Realisasi = Realisasi[0].Date_Realisasi;
+				JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+
+				// show detail realisasi
+				// console.log(dtspb);
+				var Detail_detail = Detail[0].Detail;
+				var loopDetail = '';
+				for (var i = 0; i < Detail_detail.length; i++) {
+					var NamaBiaya = Detail_detail[i].NamaBiaya;
+					var Invoice_detail = formatRupiah(Detail_detail[i].Invoice);
+					var InvoiceRealisasi = formatRupiah(0);
+					var ID_cash_advance_detail = Detail_detail[i].ID;
+					var Realisasi_detail = Detail_detail[i].Realisasi;
+					for (var k = 0; k < Realisasi_detail.length; k++) {
+						if (ID_cash_advance_detail == Realisasi_detail[k].ID_cash_advance_detail) {
+							InvoiceRealisasi = formatRupiah(Realisasi_detail[k].InvoiceRealisasi);
+							break;
+						}
+					}
+
+					loopDetail += '<tr>'+
+										'<td>'+NamaBiaya+'</td>'+
+										'<td>'+Invoice_detail+'</td>'+
+										'<td>'+InvoiceRealisasi+'</td>'+
+									'</tr>';	
+				}
+				htmldetail = '<tr>'+
+								'<td class="TD1">'+
+									'Detail'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<table class = "table">'+
+										'<thead>'+
+											'<tr>'+
+												'<th>'+
+													'Nama Biaya'+
+												'</th>'+
+												'<th>'+
+													'Invoice'+
+												'</th>'+
+												'<th>'+
+													'Invoice Realisasi'+
+												'</th>'+
+											'</th>'+
+										'</thead>'+
+										'<tbody>'+
+											loopDetail+
+										'</tbody>'+
+									'</table>'+
+								'</td>'+
+							'</tr>';
+
+				html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
+							'<div class = "col-xs-12">'+
+								'<div align="center"><h2>REALISASI</h2></div>'+
+								'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+								'<table class="table borderless" style="font-weight: bold;">'+
+									'<thead></thead>'+
+									'<tbody>'+
+										'<tr>'+
+											'<td class="TD1">'+
+												'NO KWT/INV'+
+											'</td>'+
+											'<td class="TD2">'+
+												':'+
+											'</td>'+
+											'<td>'+
+												'<label>No Invoice</label>'+
+												'<div id = "FileInvoice">'+
+												LinkFileInvoice+
+												'</div>'+
+												'<br>'+
+												'<label>No Tanda Terima</label>'+
+												'<div id = "FileTT" '+Dis+'>'+
+												LinkUploadTandaTerima+
+												'</div>'+
+											'</td>'+			
+										'</tr>'+
+										'<tr>'+
+											'<td class="TD1">'+
+												'TANGGAL REALISASI'+
+											'</td>'+
+											'<td class="TD2">'+
+												':'+
+											'</td>'+
+											'<td>'+
+												Date_Realisasi+
+											'</td>	'+			
+										'</tr>'+
+										htmldetail+
+									'</tbody>'+
+								'</table>'+
+								'<div id="r_signatures_realisasi"></div>'+
+								'<div id = "r_action_realisasi">'+
+									'<div class="row">'+
+										'<div class="col-md-12">'+
+											'<div class="pull-right">'+
+												''+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+								'</div>'+
+							'</div>'+	
+						'</div>';		
+				DivPageRealisasi.append(html);
+				DivPageRealisasi.find('.datetimepicker').datetimepicker({
+					format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+				});
+				
+				if (Realisasi.length > 0) {
+					makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
+					makeActionRealisasi(DivPageRealisasi,Realisasi);
+				}												
+
+			}
+			
+		}
+
+		function makeSignaturesRealiasi (DivPageRealisasi,JsonStatus)
+		{
+			if (JsonStatus != '') {
+				var html = '<div class= "row" style = "margin-top : 20px;">'+
+								'<div class = "col-xs-12">'+
+									''+
+									'<table class = "table borderless">'+
+										'<thead>'+
+											'<tr>'
+				for (var i = 0; i < JsonStatus.length; i++) {
+					var style = '';
+					if (i == 0) {
+						style = 'style = "text-align :left"';
+					}
+					else if(parseInt(JsonStatus.length)-1 == i){
+						style = 'style = "text-align :right"';
+					}
+					else
+					{
+						style = 'style = "text-align :center"';
+					}
+					html += '<th '+style+'>'+
+								JsonStatus[i].NameTypeDesc+
+							'</th>';	
+				}
+
+				html += '</tr>';
+
+				html += '</thead>'+
+							'<tbody>'+
+								'<tr style = "height : 20px">';
+				for (var i = 0; i < JsonStatus.length; i++) {
+					var v = '-';
+					if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+						v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+					}
+					else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+					{
+						v = '<i class="fa fa-check" style="color: green;"></i>';
+					}
+					else
+					{
+						v = '-';
+					}
+
+					var style = '';
+					if (i == 0) {
+						style = 'style = "text-align :left"';
+					}
+					else if(parseInt(JsonStatus.length)-1 == i){
+						style = 'style = "text-align :right"';
+					}
+					else
+					{
+						style = 'style = "text-align :center"';
+					}
+					html += '<td '+style+'>'+
+								v+
+							'</td>';	
+				}
+
+				html += '</tr></tbody>';				
+				html += '<tfoot>'+
+							'<tr>';
+
+				for (var i = 0; i < JsonStatus.length; i++) {
+					var style = '';
+					if (i == 0) {
+						style = 'style = "text-align :left"';
+					}
+					else if(parseInt(JsonStatus.length)-1 == i){
+						style = 'style = "text-align :right"';
+					}
+					else
+					{
+						style = 'style = "text-align :center"';
+					}
+					html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+				}
+
+				html += '</tr></tfoot></table></div></div>';
+				DivPageRealisasi.find('#r_signatures_realisasi').html(html);
+			}
+		}
+
+		function makeActionRealisasi(DivPageRealisasi,Realisasi)
+		{
+			var dtspb = Realisasi;
+			var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
+			var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiCA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+			var btn_submit = '<button class="btn btn-success submitRealisasiCA" disabled> Submit</button>';
+			
+			var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+			var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+			var btn_print = '';
+			var Status = dtspb[0]['Status'];
+			switch(Status) {
+			  case 0:
+			  case '0':
+			  case -1:
+			  case '-1':
+			  case 4:
+			  case '4':
+			  	var JsonStatus = dtspb[0]['JsonStatus'];
+			  	JsonStatus = jQuery.parseJSON(JsonStatus);
+			  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+			  	}
+			    break;
+			  case 1:
+			  case '1':
+			    var JsonStatus = dtspb[0]['JsonStatus'];
+			    JsonStatus = jQuery.parseJSON(JsonStatus);
+			    if (JsonStatus[0]['NIP'] == sessionNIP) {
+			    	var booledit2 = true;
+			    	for (var i = 1; i < JsonStatus.length; i++) {
+			    		if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+			    			booledit2 = false;
+			    			break;
+			    		}
+			    	}
+
+			    	if (booledit2) {
+			    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+			    	}
+			    }
+
+			    // for approval
+			    	var bool = false;
+			    	var HierarkiApproval = 0; // for check hierarki approval;
+			    	var NumberOfApproval = 0; // for check hierarki approval;
+			    	var NIP = sessionNIP;
+			    	for (var i = 0; i < JsonStatus.length; i++) {
+			    		NumberOfApproval++;
+			    		if (JsonStatus[i]['Status'] == 0) {
+			    			// check status before
+			    			if (i > 0) {
+			    				var ii = i - 1;
+			    				if (JsonStatus[ii]['Status'] == 1) {
+			    					HierarkiApproval++;
+			    				}
+			    			}
+			    			else
+			    			{
+			    				HierarkiApproval++;
+			    			}
+
+			    			if (NIP == JsonStatus[i]['NIP']) {
+			    				bool = true;
+			    				break;
+			    			}
+			    		}
+			    		else
+			    		{
+			    			HierarkiApproval++;
+			    		}
+			    	}
+
+
+			    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+			    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
+			    		$('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+			    		$('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+			    	}
+
+			    break;
+			  case 2:
+			  case '2':
+			  	var JsonStatus = dtspb[0]['JsonStatus'];
+			  	JsonStatus = jQuery.parseJSON(JsonStatus);
+			  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
+			  	}
+			    break;
+			  default:
+			    // code block
+			}
+		}
+		
+	}
+
+	$(document).off('click', '#Approve_realisasi').on('click', '#Approve_realisasi',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve_realisasi');
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// var url = base_url_js + 'rest2/__approve_po';
+			var url = base_url_js + 'rest2/__approve_payment_realisasi';
+			var data = {
+				ID_payment : ID_payment,
+				ID_Realisasi : ID_Realisasi,
+				approval_number : approval_number,
+				NIP : sessionNIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				var rs = resultJson;
+				if (rs.Status == 1) {
+					loadFirst();
+				}
+				else
+				{
+					if (rs.Change == 1) {
+						toastr.info('The Data already have updated by another person,Please check !!!');
+						loadFirst();
+					}
+					else
+					{
+						toastr.error(rs.msg,'!!!Failed');
+					}
+				}
+			}).fail(function() {
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+	})
+
+
+	$(document).off('click', '#Reject_realisasi').on('click', '#Reject_realisasi',function(e) {
+		if (confirm('Are you sure ?')) {
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_payment_realisasi';
+				var data = {
+					ID_payment : ID_payment,
+					ID_Realisasi : ID_Realisasi,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						loadFirst();
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							loadFirst();
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
 	})
 </script>

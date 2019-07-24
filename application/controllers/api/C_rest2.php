@@ -3199,4 +3199,250 @@ class C_rest2 extends CI_Controller {
             }
     }
 
+
+
+    public function approve_payment_realisasi()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $rs = array('Status' => 1,'Change' => 0,'msg' => '');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $ID_Realisasi = $dataToken['ID_Realisasi'];
+                    $key = "UAP)(*";
+                    $token = $this->jwt->encode($ID_payment,$key);
+
+                    $CodeUrl = $token;
+                    $approval_number = $dataToken['approval_number'];
+                    $NIP = $dataToken['NIP'];
+                    $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                    $NameFor_NIP = $G_emp[0]['Name'];
+                    $action = $dataToken['action'];
+                   
+                    // get data
+                    $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt from db_payment.payment as a where a.ID = ?';
+                    $query=$this->db->query($sql, array($ID_payment))->result_array();
+                    $G_data = $query;
+
+                    $urlType = '';
+                    switch ($G_data[0]['Type']) {
+                        case 'Bank Advance':
+                            $urlType = 'ba';
+                            break;
+                        case 'Cash Advance':
+                            $urlType = 'ca';
+                            break;
+                        case 'Petty Cash':
+                             $urlType = 'pc';
+                            break;    
+                        default:
+                            # code...
+                            break;
+                    }
+
+                    $keyJson = $approval_number - 1; // get array index json
+
+                    // get data realisasi
+                    $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
+                    $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+
+                    // get data update to approval
+                    $arr_upd = $JsonStatus[$keyJson];
+
+                    if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                        $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                        $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                        $JsonStatus[$keyJson] = $arr_upd;
+                        $datasave = array(
+                            'JsonStatus' => json_encode($JsonStatus),
+                        );
+
+                        // check all status for update data
+                        $boolApprove = true;
+                        for ($i=0; $i < count($JsonStatus); $i++) { 
+                            $arr = $JsonStatus[$i];
+                            $Status = $arr['Status'];
+                            if ($Status == 2 || $Status == 0) {
+                                $boolApprove = false;
+                                break;
+                            }
+                        }
+
+                        if ($boolApprove) {
+                            $datasave['Status'] = 2;
+                        }
+                        else
+                        {
+                            $boolReject = false;
+                            for ($i=0; $i < count($JsonStatus); $i++) { 
+                                $arr = $JsonStatus[$i];
+                                $Status = $arr['Status'];
+                                if ($Status == 2) {
+                                    $boolReject = true;
+                                    break;
+                                }
+                            }
+
+                            if ($boolReject) {
+                                $NoteDel = $dataToken['NoteDel'];
+                                $Notes = $NoteDel;
+                                $datasave['Status'] = -1;
+                                // $datasave['Notes'] = $Notes;
+                            }
+                            else
+                            {
+                                // Notif to next step approval & User
+                                    $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                    $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                    $b_check = $this->m_master->NonDiv(9,$NIPApprovalNext);
+                                    if ($b_check) {
+                                        $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                    }
+
+                                    // Send Notif for next approval
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Realisasi Approval '.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($NIPApprovalNext),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+
+                                    // Send Notif for user
+                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
+                                        if ($b_check) {
+                                            $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                        } 
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Realisasi '.$G_data[0]['Type'].' has been Approved',
+                                                            'Description' => $G_data[0]['Type'].' has been approved by '.$NameFor_NIP,
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token); 
+                            }
+                        }
+
+                        $this->db->where('ID',$ID_Realisasi);
+                        $this->db->update('db_payment.cash_advance_realisasi',$datasave); 
+
+                            $Desc = ($arr_upd['Status'] == 1) ? 'Realisasi Approve' : 'Realisasi Reject';
+                            if (array_key_exists('Status', $datasave)) {
+                                if ($datasave['Status'] == 2) {
+                                    $Desc = "Realisasi Approve and finished at : ".date('Y-m-d H:i:s');
+
+                                    // Notif All Approve to JsonStatus allkey
+                                        // $arr_to = array();
+                                        // for ($i=0; $i < count($JsonStatus); $i++) { 
+                                        //     $arr_to[] = $JsonStatus[$i]['NIP'];
+                                        // }
+
+                                        for ($i=0; $i < count($JsonStatus); $i++) {
+                                            $NIPJson =  $JsonStatus[$i]['NIP'];
+                                            $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                            $b_check = $this->m_master->NonDiv(9,$NIPJson);
+                                            if ($b_check) {
+                                                $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                            }
+
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>Realisasi '.$G_data[0]['Type'].' has been done',
+                                                                'Description' => $G_data[0]['Type'].' has been done',
+                                                                'URLDirect' => $UrlDirect,
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($JsonStatus[$i]['NIP']),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token); 
+                                        }
+
+                                }
+                            }
+
+                            if ($arr_upd['Status'] == 2) {
+                                if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                    $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                }
+
+                                // Notif Reject to JsonStatus key 0
+                                    // Send Notif for user
+                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
+                                        if ($b_check) {
+                                            $UrlDirect = 'finance_ap/global/'.$CodeUrl;
+                                        }  
+                                        $data = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Logging' => array(
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>Realisasi '.$G_data[0]['Type'].' has been Rejected',
+                                                            'Description' => $G_data[0]['Type'].' has been Rejected by '.$NameFor_NIP,
+                                                            'URLDirect' => $UrlDirect,
+                                                            'CreatedBy' => $NIP,
+                                                          ),
+                                            'To' => array(
+                                                      'NIP' => array($JsonStatus[0]['NIP']),
+                                                    ),
+                                            'Email' => 'No', 
+                                        );
+
+                                        $url = url_pas.'rest2/__send_notif_browser';
+                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                        $this->m_master->apiservertoserver($url,$token);
+                            }
+    
+                            $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
+
+                    }
+                    else
+                    {
+                        $msg = 'Not Authorize';
+                    }
+
+                    echo json_encode($rs);
+
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
 }

@@ -1069,7 +1069,7 @@
 
 		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
 					'<div class = "col-xs-12">'+
-						'<div align="center"><h2>CASH ADVANCE REALISASI</h2></div>'+
+						'<div align="center"><h2>REALISASI</h2></div>'+
 						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 						'<table class="table borderless" style="font-weight: bold;">'+
 							'<thead></thead>'+
@@ -1232,8 +1232,10 @@
 		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiCA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 		var btn_submit = '<button class="btn btn-success submitRealisasiCA" disabled> Submit</button>';
 		
-		var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
-		var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		// var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		var btn_approve = '';
+		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		var btn_reject = '';
 		var btn_print = '';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
@@ -1304,8 +1306,8 @@
 		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
-		    		$('#Approve_realisasi').attr('approval_number',NumberOfApproval);
-		    		$('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    		// $('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		// $('#Reject_realisasi').attr('approval_number',NumberOfApproval);
 		    	}
 
 		    break;

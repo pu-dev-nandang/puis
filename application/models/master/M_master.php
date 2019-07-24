@@ -3097,4 +3097,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
        return $rs;
     }
+
+    public function NonDiv($IDDivSelected,$NIP)
+    {
+        $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as Division,
+                   SPLIT_STR(a.PositionMain, '.', 2) as Position,
+                         a.StatusEmployeeID
+            FROM   db_employees.employees as a
+            where SPLIT_STR(a.PositionMain, '.', 1) = ? and a.StatusEmployeeID != -1 and a.NIP = ? ";
+         $query=$this->db->query($sql, array($IDDivSelected,$NIP))->result_array();
+         if (count($query) > 0  ) {
+             return true;
+         }
+         else
+         {
+            return false;
+         }
+    }
 }
