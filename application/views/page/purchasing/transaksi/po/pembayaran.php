@@ -303,11 +303,11 @@
 		}
 	}
 
-	function __OPPayment(NameSelected = '')
+	function __OPPayment(NameSelected = '',Dis = '')
 	{
 		var html = '';
 		NameSelected = (NameSelected == '') ? 'Spb' : NameSelected;
-		html += '<select class = "form-control ChoosePayment" style = "width:350px;">';
+		html += '<select class = "form-control ChoosePayment" style = "width:350px;" '+Dis+' >';
 		for (var i = 0; i < PaymentType.length; i++) {
 			var selected = (PaymentType[i] == NameSelected) ? 'selected' : '';
 			html += '<option value = "'+PaymentType[i]+'" '+selected+'>'+PaymentType[i]+'</option>';
@@ -377,9 +377,18 @@
 
 	function __template_html(action='add',ID_payment='',number=0,Type='')
 	{
+		var Dis = '';
+		if (action != 'add') {
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+			var DataPaymentSelected = dt_arr;
+			var dtspb = DataPaymentSelected.dtspb;
+			if (dtspb[0].Status == 2) {
+				Dis = 'disabled';
+			}
+		}
 		/* Choose Payment */
 			var html = '';
-			var htmlChoosePayment = __OPPayment(Type);
+			var htmlChoosePayment = __OPPayment(Type,Dis);
 			var PageContentPayment = __HtmlPageContentPayment(number,Type);
 			html = '<div class ="row FormPage" action = "'+action+'" ID_payment = "'+ID_payment+'" number="'+number+'">'+
 						'<div class="col-xs-12" >'+
@@ -3934,7 +3943,7 @@
 			NoTandaTerima : ev.find('.NoTT').val(),
 			Date_Realisasi : ev.find('.TglRealisasiCA').val(),
 		};
-	
+
 		if (validation__(data) ) {
 			if (action == 'add') {
 				// Upload Tanda Terima 
