@@ -46,7 +46,7 @@
 						<th>DetailInfo</th>
 						<th>DetailItem</th>
 						<th>CreatedBy</th>
-						<th width="15%">Action</th>
+						<th style="min-width: 120px !important;">Action</th>
 					</tr>
 				</thead>
 				<tbody>

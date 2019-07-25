@@ -39,7 +39,7 @@
 						<th>DetailCatalog</th>
 						<th>CreatedBy</th>
 						<th>Status</th>
-						<th>Action</th>
+						<th style="min-width: 120px !important;">Action</th>
 					</tr>
 				</thead>
 				<tbody>
