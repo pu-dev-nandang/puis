@@ -447,7 +447,7 @@ function loadTable1()
 							'<th width = "3%">No</th>'+
                             '<th>Budget Category Code</th>'+
 							'<th>Budget Category Name</th>'+
-							'<th>Action</th>'+
+							'<th style = "min-width:120px !important;">Action</th>'+
 						'</tr></thead>'	
 						;
 	TableGenerate += '<tbody>';
@@ -544,7 +544,7 @@ function loadTable2()
                             '<th>Department</th>'+
                             '<th>User</th>'+
                             '<th>Desc</th>'+
-                            '<th>Action</th>'+
+                            '<th style = "min-width:120px !important;">Action</th>'+
                         '</tr></thead>' 
                         ;
     TableGenerate += '<tbody>';
@@ -640,7 +640,7 @@ function loadTable3()
                             '<th>HeadAccount</th>'+
                             '<th>Budget Category</th>'+
                             '<th>Department</th>'+
-                            '<th>Action</th>'+
+                            '<th style = "min-width:120px !important;">Action</th>'+
                         '</tr></thead>' 
                         ;
     TableGenerate += '<tbody>';
