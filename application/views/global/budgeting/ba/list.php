@@ -69,6 +69,9 @@ function LoadDataForTable()
       "lengthMenu": [[5], [5]],
 	    "iDisplayLength" : 5,
 	    "ordering" : false,
+      "language": {
+          "searchPlaceholder": "PRCode, PO Code & Perihal",
+      },
 	    "ajax":{
 	        url : base_url_js+"rest2/__get_data_payment_type", // json datasource
 	        ordering : false,

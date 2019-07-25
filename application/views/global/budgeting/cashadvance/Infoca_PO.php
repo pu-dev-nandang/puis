@@ -1027,9 +1027,14 @@
 	{
 		var html = '';
 		var dtspb = DataPaymentSelected.dtspb;
+		var JsonStatusdtspb = dtspb[0].JsonStatus;
+		JsonStatusdtspb = jQuery.parseJSON(JsonStatusdtspb);
 		var Detail = dtspb[0].Detail;
 		var Realisasi = Detail[0].Realisasi;
-		var Dis = '';
+		var Dis = 'disabled';
+		if (JsonStatusdtspb[0]['NIP'] == sessionNIP) {
+			Dis = '';
+		}
 		var ID_Realisasi = '';
 		var ID_payment_type = Detail[0].ID;
 		var UploadInvoice = '';

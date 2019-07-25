@@ -49,6 +49,9 @@ function Get_data_payment(){
    	    "serverSide": true,
    	    "lengthMenu": [[5], [5]],
    	    "iDisplayLength" : 5,
+   	    "language": {
+   	        "searchPlaceholder": "PRCode, PO Code & SPB Code",
+   	    },
    	    "ordering" : false,
    	    "ajax":{
    	        url : base_url_js+"finance_ap/list_server_side", // json datasource

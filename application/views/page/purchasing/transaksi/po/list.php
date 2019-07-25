@@ -1,4 +1,11 @@
 <div class="row btn-read">
+  <div class="col-md-12">
+    <div class="thumbnail" style="padding: 10px;">
+            <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve
+        </div>
+  </div>
+</div>
+<div class="row btn-read" style="margin-top: 10px;">
 	<div class="col-md-12">
 		<div class="table-responsive" id = "DivTable">
 			
@@ -68,6 +75,9 @@ $(document).ready(function() {
 		    "serverSide": true,
         "lengthMenu": [[5], [5]],
 		    "iDisplayLength" : 5,
+        "language": {
+            "searchPlaceholder": "PRCode, PO Code & SPK Code",
+        },
 		    "ordering" : false,
 		    "ajax":{
 		        url : base_url_js+"rest2/__get_data_po/All", // json datasource
@@ -104,7 +114,10 @@ $(document).ready(function() {
        	    	$( row ).find('td:eq(4)').attr('align','left');
        	    	$( row ).find('td:eq(5)').attr('align','center');
        	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Info</a>');
-       	    		
+              if (data[4] == 'Approval Done') {
+                $( row ).attr('style','background-color:#8ED6EA;')
+              }
+              // console.log(data);
        	    },
             dom: 'l<"toolbar">frtip',
        	    "initComplete": function(settings, json) {

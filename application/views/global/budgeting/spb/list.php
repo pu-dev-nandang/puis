@@ -67,6 +67,9 @@ function LoadDataForTable()
       "lengthMenu": [[5], [5]],
 	    "iDisplayLength" : 5,
 	    "ordering" : false,
+      "language": {
+          "searchPlaceholder": "PRCode, PO Code & SPB Code",
+      },
 	    "ajax":{
 	        url : base_url_js+"rest2/__get_data_spb", // json datasource
 	        ordering : false,

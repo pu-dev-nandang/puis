@@ -96,6 +96,7 @@ class C_finap extends Budgeting_Controler {
                or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
                or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+               or Perihal LIKE "'.$requestData['search']['value'].'%"
              ) '.$StatusQuery.$WhereFiltering.$whereaction ;
         
          $querytotalData = $this->db->query($sqltotalData)->result_array();
@@ -122,8 +123,10 @@ class C_finap extends Budgeting_Controler {
                or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+               or Perihal LIKE "'.$requestData['search']['value'].'%"
              ) '.$StatusQuery.$WhereFiltering.$whereaction ;
          $sql.= ' ORDER BY ID_payment_fin Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+         // print_r($sql);die();
          $query = $this->db->query($sql)->result_array();
 
          $No = $requestData['start'] + 1;

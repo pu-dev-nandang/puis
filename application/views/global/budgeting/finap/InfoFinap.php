@@ -300,6 +300,17 @@
 		// selain spb
 		var Type = dtspb[0].Type;
 		if (Type != 'Spb') {
+			var FolderName = '';
+			if (Type == 'Bank Advance') {
+				FolderName = 'bankadvance';
+			}
+			else if (Type == 'Cash Advance') {
+				FolderName = 'cashadvance';
+			}
+			else if (Type == 'Petty Cash') {
+				FolderName = 'pettycash';
+			}
+
 			var Detail = dtspb[0].Detail;
 			var Realisasi = Detail[0].Realisasi;
 			var Dis = '';
@@ -329,11 +340,11 @@
 				UploadInvoice = jQuery.parseJSON(Realisasi[0]['UploadInvoice']);
 				UploadInvoice = UploadInvoice[0];
 				NoInvoice = Realisasi[0].NoInvoice;
-				LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+NoInvoice+'</a>';
+				LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderName+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+NoInvoice+'</a>';
 				UploadTandaTerima = jQuery.parseJSON(Realisasi[0]['UploadTandaTerima']);
 				UploadTandaTerima = UploadTandaTerima[0];
 				NoTandaTerima = Realisasi[0].NoTandaTerima;
-				LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-cashadvance-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+NoTandaTerima+'</a>';
+				LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderName+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+NoTandaTerima+'</a>';
 				
 				Date_Realisasi = Realisasi[0].Date_Realisasi;
 				JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
@@ -349,7 +360,18 @@
 					var ID_cash_advance_detail = Detail_detail[i].ID;
 					var Realisasi_detail = Detail_detail[i].Realisasi;
 					for (var k = 0; k < Realisasi_detail.length; k++) {
-						if (ID_cash_advance_detail == Realisasi_detail[k].ID_cash_advance_detail) {
+						if (Type == 'Cash Advance') {
+							var ID_compare = Realisasi_detail[k].ID_cash_advance_detail;
+						}
+						else if(Type == 'Bank Advance')
+						{
+							var ID_compare = Realisasi_detail[k].ID_bank_advance_detail;
+						}
+						else if (Type == 'Petty Cash') {
+							var ID_compare = Realisasi_detail[k].ID_petty_cash_detail;
+						}
+						
+						if (ID_cash_advance_detail == ID_compare) {
 							InvoiceRealisasi = formatRupiah(Realisasi_detail[k].InvoiceRealisasi);
 							break;
 						}
