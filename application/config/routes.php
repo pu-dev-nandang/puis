@@ -1002,6 +1002,7 @@ $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
 $route['api/__getStatusEmployee2'] = 'api/c_api/getStatusEmployee2';
+$route['api/__getStatusLecturer2'] = 'api/c_api/getStatusLecturer2';
 $route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
 $route['api/__getStatusVersion2'] = 'api/c_api/getstatusversion2';
 $route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
