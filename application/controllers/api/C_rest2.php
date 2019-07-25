@@ -349,11 +349,14 @@ class C_rest2 extends CI_Controller {
                     $whereaction = '';
                     $joinaction = '';
                     $fieldaction = '';
+                    $OrderBY = '';
                     if (array_key_exists('action', $dataToken)) {
                         if ($dataToken['action'] == 'forspb') {
                            $fieldaction = ', poi.InvoicePO,poi.InvoicePayPO,InvoiceLeftPO,poi.Status as StatusPOI,poi.ID as ID_poi ';
                            $joinaction = ' join db_purchasing.po_invoice_status as poi on a.Code = poi.Code_po_create ';
-                           $whereaction = ' and StatusPOI = 0';
+                           // $whereaction = ' and StatusPOI = 0';
+                           $whereaction = '';
+                           $OrderBY = 'StatusPOI asc,';
                         }
                         
                     }
@@ -419,7 +422,7 @@ class C_rest2 extends CI_Controller {
                           or NameCreateBy LIKE "'.$requestData['search']['value'].'%" or CreatedBy LIKE "'.$requestData['search']['value'].'%" 
                           or PRCode LIKE "'.$requestData['search']['value'].'%"  
                         ) '.$StatusQuery.$WhereFiltering.$whereaction ;
-                    $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $sql.= ' ORDER BY '.$OrderBY.' ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
 
                     $No = $requestData['start'] + 1;
@@ -2822,6 +2825,7 @@ class C_rest2 extends CI_Controller {
                       or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
                       or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                      or Perihal LIKE "'.$requestData['search']['value'].'%"
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
                 // print_r($sqltotalData);die();    
                 $querytotalData = $this->db->query($sqltotalData)->result_array();
@@ -2848,6 +2852,7 @@ class C_rest2 extends CI_Controller {
                       or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                       or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
+                      or Perihal LIKE "'.$requestData['search']['value'].'%"
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
                 $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $query = $this->db->query($sql)->result_array();
@@ -3228,26 +3233,35 @@ class C_rest2 extends CI_Controller {
                     $G_data = $query;
 
                     $urlType = '';
+                    $tblupdate = '';
                     switch ($G_data[0]['Type']) {
                         case 'Bank Advance':
                             $urlType = 'ba';
+                            // get data realisasi
+                            $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi','ID',$ID_Realisasi);
+                            $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+                            $tblupdate = 'db_payment.bank_advance_realisasi';
                             break;
                         case 'Cash Advance':
                             $urlType = 'ca';
+                            // get data realisasi
+                            $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
+                            $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+                            $tblupdate = 'db_payment.cash_advance_realisasi';
                             break;
                         case 'Petty Cash':
                              $urlType = 'pc';
+                             // get data realisasi
+                             $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.petty_cash_realisasi','ID',$ID_Realisasi);
+                             $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+                             $tblupdate = 'db_payment.petty_cash_realisasi';
                             break;    
                         default:
-                            # code...
+                            die();
                             break;
                     }
 
                     $keyJson = $approval_number - 1; // get array index json
-
-                    // get data realisasi
-                    $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
-                    $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
 
                     // get data update to approval
                     $arr_upd = $JsonStatus[$keyJson];
@@ -3348,7 +3362,7 @@ class C_rest2 extends CI_Controller {
                         }
 
                         $this->db->where('ID',$ID_Realisasi);
-                        $this->db->update('db_payment.cash_advance_realisasi',$datasave); 
+                        $this->db->update($tblupdate,$datasave); 
 
                             $Desc = ($arr_upd['Status'] == 1) ? 'Realisasi Approve' : 'Realisasi Reject';
                             if (array_key_exists('Status', $datasave)) {

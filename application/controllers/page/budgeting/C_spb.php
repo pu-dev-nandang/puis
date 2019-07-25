@@ -380,14 +380,16 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         // check status tidak sama dengan 2
                         $ID_payment = $Input['ID_payment'];
                         $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
-                        if ($G_data[0]['Status'] != 2) {
-                            $this->edit_gr_po();
-                            $rs['Status']= 1;
-                        }
-                        else
-                        {
-                            $rs['Change']= 1;
-                        }
+                        // if ($G_data[0]['Status'] != 2) {
+                        //     $this->edit_gr_po();
+                        //     $rs['Status']= 1;
+                        // }
+                        // else
+                        // {
+                        //     $rs['Change']= 1;
+                        // }
+                         $this->edit_gr_po();
+                         $rs['Status']= 1;
                         break;
                     default:
                         # code...

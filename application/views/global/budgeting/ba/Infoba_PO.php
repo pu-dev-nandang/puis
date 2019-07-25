@@ -197,7 +197,7 @@
 		var Supplier = po_create[0].NamaSupplier;
 
 		var html = '';
-		var htmlAdd ='<div class = "BAAdd">'
+		var htmlAdd ='<div class = "BAAdd">';
 		var EndhtmlAdd = '</div>';
 		Invoice = parseInt(dtspb[0].Detail[0].Invoice);
 		TypePay = dtspb[0].Detail[0].TypePay;
@@ -359,9 +359,324 @@
 		makeAction();
 		if (JsonStatus[0].NIP != sessionNIP) {
 			$('#add_approver').remove();
-		}		
+		}
+
+		// show page realisasi
+		if (DataPaymentSelected.dtspb[0].Status == 2) {
+			var DivPageRealisasi = se_content.find('.BAAdd');
+			makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
+		}			
 
 	}
+
+	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
+	{
+		var html = '';
+		var dtspb = DataPaymentSelected.dtspb;
+		var JsonStatusdtspb = dtspb[0].JsonStatus;
+		JsonStatusdtspb = jQuery.parseJSON(JsonStatusdtspb);
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var Dis = 'disabled';
+		if (JsonStatusdtspb[0]['NIP'] == sessionNIP) {
+			Dis = '';
+		}
+		var ID_Realisasi = '';
+		var ID_payment_type = Detail[0].ID;
+		var UploadInvoice = '';
+		var LinkFileInvoice = '';
+		var NoInvoice = '';
+		var UploadTandaTerima = '';
+		var LinkUploadTandaTerima = '';
+		var NoTandaTerima = '';
+		var Date_Realisasi = '';
+		var JsonStatus = '';
+		var StatusRealiasi = '';
+		var btn_hide_submit = '';
+		var btnRealisasi = '<button class="btn btn-success submitRealisasiBA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		if (Realisasi.length > 0) { // exist
+			Dis = 'disabled';
+			StatusRealiasi = Realisasi[0].Status;
+			btn_hide_submit = 'hide';
+			btnRealisasi = '<button class="btn btn-primary hide btnEditInputRealisasiBA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitRealisasiBA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+			if (StatusRealiasi == 2) {
+				Dis = 'disabled';
+				btnRealisasi = '';
+			}
+
+			ID_Realisasi = Realisasi[0].ID;
+			UploadInvoice = jQuery.parseJSON(Realisasi[0]['UploadInvoice']);
+			UploadInvoice = UploadInvoice[0];
+			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-bankadvance-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoInvoice = Realisasi[0].NoInvoice;
+			UploadTandaTerima = jQuery.parseJSON(Realisasi[0]['UploadTandaTerima']);
+			UploadTandaTerima = UploadTandaTerima[0];
+			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-bankadvance-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoTandaTerima = Realisasi[0].NoTandaTerima;
+			Date_Realisasi = Realisasi[0].Date_Realisasi;
+			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+		}
+
+		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
+					'<div class = "col-xs-12">'+
+						'<div align="center"><h2>REALISASI</h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<table class="table borderless" style="font-weight: bold;">'+
+							'<thead></thead>'+
+							'<tbody>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'NO KWT/INV'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<label>No Invoice</label>'+
+										'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value="'+NoInvoice+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Invoice</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+'><br>'+
+										'<div id = "FileInvoice">'+
+										LinkFileInvoice+
+										'</div>'+
+										'<br>'+
+										'<label>No Tanda Terima</label>'+
+										'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+NoTandaTerima+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Tanda Terima</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+										'<div id = "FileTT" '+Dis+'>'+
+										LinkUploadTandaTerima+
+										'</div>'+
+									'</td>'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'TANGGAL REALISASI'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasiBA" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
+				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+				                		'</div>'+
+									'</td>	'+			
+								'</tr>'+
+							'</tbody>'+
+						'</table>'+
+						'<div id="r_signatures_realisasi"></div>'+
+						'<div id = "r_action_realisasi">'+
+							'<div class="row">'+
+								'<div class="col-md-12">'+
+									'<div class="pull-right">'+
+										btnRealisasi+
+									'</div>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+	
+				'</div>';		
+		DivPageRealisasi.append(html);
+		DivPageRealisasi.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
+
+		if (Realisasi.length > 0) {
+			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
+			makeActionRealisasi(DivPageRealisasi,Realisasi);
+		}
+		
+	}
+
+	function makeActionRealisasi(DivPageRealisasi,Realisasi)
+	{
+		var dtspb = Realisasi;
+		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
+		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiBA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_submit = '<button class="btn btn-success submitRealisasiBA" disabled> Submit</button>';
+		
+		// var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		var btn_approve = '';
+		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		var btn_reject = '';
+		var btn_print = '';
+		var Status = dtspb[0]['Status'];
+		switch(Status) {
+		  case 0:
+		  case '0':
+		  case -1:
+		  case '-1':
+		  case 4:
+		  case '4':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		  	}
+		    break;
+		  case 1:
+		  case '1':
+		    var JsonStatus = dtspb[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP) {
+		    	var booledit2 = true;
+		    	for (var i = 1; i < JsonStatus.length; i++) {
+		    		if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+		    			booledit2 = false;
+		    			break;
+		    		}
+		    	}
+
+		    	if (booledit2) {
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		    	}
+		    }
+
+		    // for approval
+		    	var bool = false;
+		    	var HierarkiApproval = 0; // for check hierarki approval;
+		    	var NumberOfApproval = 0; // for check hierarki approval;
+		    	var NIP = sessionNIP;
+		    	for (var i = 0; i < JsonStatus.length; i++) {
+		    		NumberOfApproval++;
+		    		if (JsonStatus[i]['Status'] == 0) {
+		    			// check status before
+		    			if (i > 0) {
+		    				var ii = i - 1;
+		    				if (JsonStatus[ii]['Status'] == 1) {
+		    					HierarkiApproval++;
+		    				}
+		    			}
+		    			else
+		    			{
+		    				HierarkiApproval++;
+		    			}
+
+		    			if (NIP == JsonStatus[i]['NIP']) {
+		    				bool = true;
+		    				break;
+		    			}
+		    		}
+		    		else
+		    		{
+		    			HierarkiApproval++;
+		    		}
+		    	}
+
+
+		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
+		    		// $('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		// $('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    	}
+
+		    break;
+		  case 2:
+		  case '2':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
+		  	}
+		    break;
+		  default:
+		    // code block
+		}
+	}
+
+	function makeSignaturesRealiasi (DivPageRealisasi,JsonStatus)
+	{
+		if (JsonStatus != '') {
+			var html = '<div class= "row" style = "margin-top : 20px;">'+
+							'<div class = "col-xs-12">'+
+								'<a href="javascript:void(0)" class="btn btn-default btn-default-success" type="button" id="add_approver"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>'+
+								'<table class = "table borderless">'+
+									'<thead>'+
+										'<tr>'
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<th '+style+'>'+
+							JsonStatus[i].NameTypeDesc+
+						'</th>';	
+			}
+
+			html += '</tr>';
+
+			html += '</thead>'+
+						'<tbody>'+
+							'<tr style = "height : 20px">';
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var v = '-';
+				if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+					v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+				}
+				else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+				{
+					v = '<i class="fa fa-check" style="color: green;"></i>';
+				}
+				else
+				{
+					v = '-';
+				}
+
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'>'+
+							v+
+						'</td>';	
+			}
+
+			html += '</tr></tbody>';				
+			html += '<tfoot>'+
+						'<tr>';
+
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+			}
+
+			html += '</tr></tfoot></table></div></div>';
+			DivPageRealisasi.find('#r_signatures_realisasi').html(html);
+		}
+	}
+
 
 	function makeAction()
 	{
@@ -1061,4 +1376,231 @@
 		]);
 	})
 
+	$(document).off('click', '.submitRealisasiBA').on('click', '.submitRealisasiBA',function(e) {
+		// validation
+		var ev = $(this).closest('.realisasi_page');
+		var DataPaymentSelected = ClassDt.DataPaymentSelected;
+		var dtspb = DataPaymentSelected.dtspb;
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var action = 'add';
+		if (Realisasi.length > 0) {
+			var action = 'edit';
+		}
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_ba_realisasi(ev,action);
+			if (validation) {
+				submitBA_realisasi('.submitRealisasiBA',ev,action);
+			}
+		}
+
+	})
+
+	function validation_input_ba_realisasi(ev,action)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			Date_Realisasi : ev.find('.TglRealisasiBA').val(),
+		};
+
+		if (validation__(data) ) {
+			if (action == 'add') {
+				// Upload Tanda Terima 
+				ev.find(".BrowseTT").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Invoice 
+				ev.find(".BrowseInvoice").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Invoice ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+			}
+
+		}
+		else
+		{
+			find = false;
+		}
+
+		return find;
+	}
+
+	function validation__(arr)
+	{
+		var toatString = "";
+		var result = "";
+		for(var key in arr) {
+		   switch(key)
+		   {
+		    default :
+		          result = Validation_required(arr[key],key);
+		          if (result['status'] == 0) {
+		            toatString += result['messages'] + "<br>";
+		          }       
+		   }
+
+		}
+		if (toatString != "") {
+		  toastr.error(toatString, 'Failed!!');
+		  return false;
+		}
+
+		return true;
+	}
+
+	function file_validation2(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	}
+
+	function submitBA_realisasi(elementbtn,ev,action)
+	{
+		loadingStart();
+		var ID_Realisasi = ev.attr('ID_Realisasi');
+		var ID_payment = ClassDt.ID_payment;
+		var DataPaymentSelected = ClassDt.DataPaymentSelected;
+		var dtspb = DataPaymentSelected.dtspb;
+		var Detail = dtspb[0].Detail;
+		var ID_payment_type = Detail[0].ID; // ID Cash Advance
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseInvoice').length ) {
+			var UploadFile = ev.find('.BrowseInvoice')[0].files;
+			form_data.append("UploadInvoice[]", UploadFile[0]);
+		}
+
+		if ( ev.find('.BrowseTT').length ) {
+			var UploadFile = ev.find('.BrowseTT')[0].files;
+			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		}
+
+		
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Date_Realisasi = ev.find('.TglRealisasiBA').val();
+
+		var data = {
+			ID_Realisasi : ID_Realisasi,
+			NoInvoice : NoInvoice,
+			NoTandaTerima : NoTandaTerima,
+			Date_Realisasi : Date_Realisasi,
+			ID_payment_type : ID_payment_type,
+			ID_payment : ID_payment,
+			action : action,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+		var url = base_url_js + "budgeting/submitba_realisasi_by_po"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		loadingEnd(500);
+		  		toastr.error("Connection Error, Please try again", 'Error!!');
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			loadFirst();
+		  			loadingEnd(500);
+		  		},1500);
+		  	}
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    loadingEnd(500);
+		  }
+		})
+	}
+
+	$(document).off('click', '.btnEditInputRealisasiBA').on('click', '.btnEditInputRealisasiBA',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.realisasi_page');
+			ev2.find('input').not('.TglRealisasiBA').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			//ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Realisasi telah approve tidak bisa edit');
+		}	
+	})
 </script>

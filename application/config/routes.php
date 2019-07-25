@@ -1407,6 +1407,7 @@ $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
 
 // bankadvance
 $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
+$route['budgeting/submitba_realisasi_by_po'] = 'page/budgeting/c_ba/submitba_realisasi_by_po';
 
 // cashadvance
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
