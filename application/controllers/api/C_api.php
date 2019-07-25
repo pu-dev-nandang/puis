@@ -6916,7 +6916,13 @@ class C_api extends CI_Controller {
 
     public function getStatusEmployee2()
     {
-//        $generate = $this->m_master->showData_array('db_employees.employees_status');
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+              WHERE IDStatus != -2 AND (Type = "emp" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getStatusLecturer2()
+    {
         $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
               WHERE IDStatus != -2 AND (Type = "lec" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
         echo json_encode($generate);

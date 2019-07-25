@@ -1605,7 +1605,7 @@
     }
 
     function loadSelectOptionLecturerStatus2(element,selected) {
-        var url = base_url_js+'api/__getStatusEmployee2';
+        var url = base_url_js+'api/__getStatusLecturer2';
         $.getJSON(url,function (jsonResult) {
             for(var i=0;i<jsonResult.length;i++){
                 var d = jsonResult[i];
