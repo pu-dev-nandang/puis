@@ -28,6 +28,14 @@ class C_pettycash extends Budgeting_Controler {
 
     public function create_pettycash()
     {
+        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+        $Year = $get[0]['Year'];
+        $this->data['Year'] = $Year;
+        $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        // get budgeting/detail_budgeting_remaining
+            $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
+            $arr_result = array('data' =>$getData);
+        $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);          
 		$page = $this->load->view('global/budgeting/pettycash/create_pettycash',$this->data,true);
 		$this->menu_horizontal($page);
     }

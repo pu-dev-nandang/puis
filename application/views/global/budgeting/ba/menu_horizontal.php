@@ -15,7 +15,7 @@
             <a href="<?php echo base_url().'budgeting_menu/pembayaran/bank_advance'?>">List</a>
         </li>
         <li class="<?php echo ($this->uri->segment(4) == 'create_ba') ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'budgeting_menu/pembayaran/spb/create_ba'?>">Create Bank Advance</a>
+            <a href="<?php echo base_url().'budgeting_menu/pembayaran/spb/create_ba'?>">Entry</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">

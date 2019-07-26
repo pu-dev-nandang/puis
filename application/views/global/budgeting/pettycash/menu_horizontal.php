@@ -1,3 +1,9 @@
+<style type="text/css">
+    #example_budget.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+</style>
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menu">
     <ul class="nav nav-tabs">
@@ -15,7 +21,7 @@
             <a href="<?php echo base_url().'budgeting_menu/pembayaran/pettycash'?>">List</a>
         </li>
         <li class="<?php echo ($this->uri->segment(4) == 'create_pettycash') ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'budgeting_menu/pembayaran/pettycash/create_pettycash'?>">Create Petty Cash</a>
+            <a href="<?php echo base_url().'budgeting_menu/pembayaran/pettycash/create_pettycash'?>">Entry</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
