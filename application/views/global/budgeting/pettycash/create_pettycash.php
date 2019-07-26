@@ -39,16 +39,55 @@
 		LoadFirstLoad();
 	})
 
+	function __loadRuleInput()
+	{
+		var def = jQuery.Deferred();
+		var ID_payment = ClassDt.ID_payment;
+		// check Rule for Input
+		var url = base_url_js+"budgeting/checkruleinput";
+		var data = {
+			NIP : NIP,
+		};
+		if (ID_payment != '') {
+			data = {
+				NIP : NIP,
+				Departement : ClassDt.Departement,
+			};
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+		  var response = jQuery.parseJSON(resultJson);
+		  def.resolve(response);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		});
+		return def.promise();
+	}
+
 	function LoadFirstLoad()
 	{
 		var ID_payment = ClassDt.ID_payment;
-		var se_content = $('#Content_entry');
-		makeDomHTML(se_content);
-		if (ID_payment == '') {
+		__loadRuleInput().then(function(data){
+			var access = data['access'];
+			if (access.length > 0) {
+				ClassDt.RuleAccess = data;
+				var se_content = $('#Content_entry');
+				makeDomHTML(se_content);
+				if (ID_payment == '') {
 
-		}
+				}
+			}
+			else
+			{
+				$("#Content_entry").empty();
+				$("#Content_entry").html('<h2 align = "center">Your not authorize these modul</h2>');
+			}
 
-		loadingEnd(500);
+			loadingEnd(500);
+		})
 
 	}
 
@@ -104,7 +143,16 @@
 							  '</div>';						  
 						  
 		var htmlTerbilang = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Terbilang">'+
-						  '</div>';					  
+						  '</div>';
+
+		var Supporting_documents = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+							'<div class = "col-md-6">'+
+								'<div class = "form-group">'+
+									'<label>Supporting documents</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
+								'</div>'+
+							'</div>'+
+						'</div>';				  					  
 
 		var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
 						  '</div>';	
@@ -112,7 +160,12 @@
 		var htmlButton = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Button">'+
 						  '</div>';					
 			
-		se_content.html(html+htmlBtnAdd+htmlInput+htmlgrandtotal+htmlTerbilang+htmlApproval+htmlButton);	
+		se_content.html(html+htmlBtnAdd+htmlInput+htmlgrandtotal+htmlTerbilang+Supporting_documents+htmlApproval+htmlButton);
+
+		if (ClassDt.ID_payment != '') {
+			makeApproval();
+		}
+		MakeButton();	
 	}
 
 	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
@@ -145,11 +198,11 @@
 						'<input type="text" class="form-control NomorAcc">'+
 						'<label class = "lblNomorAcc"></label>'+
 					'</td>'+
-					'<td><input type="text" class="form-control SubTotal" value = "0"></td>'+
+					'<td><input type="text" class="form-control SubTotal" value = "0" disabled></td>'+
                 	action
                 '</tr>';
         $('#table_input tbody').append(html);
-        MakeAutoNumbering(); 
+        MakeAutoNumbering();
 	}
 
 	function MakeAutoNumbering()
@@ -159,6 +212,8 @@
 			var a = $(this);
 			a.find('td:eq(0)').html(no);
 			no++;
+			$(this).find('.SubTotal').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			$(this).find('.SubTotal').maskMoney('mask', '9894');  
 		})
 	}
 
@@ -247,6 +302,7 @@
 			fillItem.find('td:eq(1)').find('.lblBudget').html(RealisasiPostName);
 			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('id_budget_left',id_budget_left);
 			fillItem.find('td:eq(1)').find('.PostBudgetItem').attr('remaining',money);
+			fillItem.find('.SubTotal').prop('disabled',false);
 			fillItem.find('.SubTotal').trigger('keyup');
 			$('#GlobalModalLarge').modal('hide');
 		} );
@@ -329,6 +385,10 @@
 
 		// write Grand total
 		$('#phtmltotal').html('Total : '+formatRupiah(GrandTotal));
+		// make terbilang
+		_ajax_terbilang(GrandTotal).then(function(data){
+			$('#Page_Terbilang').html('<div class = "col-xs-12"><label>Terbilang (Rupiah) : '+data+' Rupiah</label></div>');
+		})
 	}
 
 	function MakeTableRemaining()
@@ -373,4 +433,260 @@
 		row.find('td:eq(5)').find('button').prop('disabled',false);
 		__BudgetRemaining(); 
 	})
+
+	function _ajax_terbilang(bilangan)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+"rest2/__ajax_terbilang";
+		var data = {
+		    bilangan : bilangan,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{token:token},function (resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		})
+			
+		return def.promise();
+	}
+
+	function makeApproval()
+	{
+		var DtExisting = ClassDt.DtExisting;
+		var data = DtExisting;
+		var JsonStatus = jQuery.parseJSON(data[0].JsonStatus);
+
+		/* Page_Approval */
+		// only admin & Finance to custom approval
+			// console.log(JsonStatus);
+			var html_add_approver = '';
+			var bool = false;
+			if (data[0].CreatedBy == NIP) {
+				bool = true;
+			}
+
+			if (bool || DivSession == 'NA.9') { // NA.9 Finance
+				html_add_approver = '<a href = "javascript:void(0)"  class="btn btn-default btn-default-success" type="button" id = "add_approver" ID_payment = "'+ClassDt.ID_payment+'">'+
+                        			'<i class="fa fa-plus-circle" aria-hidden="true"></i>'+
+                    		'</a>';
+			}
+
+			var html = '<div class = "col-md-6 col-md-offset-6"><div class = "table-responsive">'+
+		    				html_add_approver+
+							'<table class = "table table-striped table-bordered table-hover table-checkable tableApproval" style = "margin-top : 5px">'+
+								'<thead><tr>';
+
+				// html += '<th>'+'Created by'+'</th>';
+				for (var i = 0; i < JsonStatus.length; i++) {
+					html += '<th>'+JsonStatus[i].NameTypeDesc+'</th>';
+				}
+				html +=	'</th></thead>'+'<tbody><tr style = "height : 51px">';
+
+				// html += '<td>'+'<i class="fa fa-check" style="color: green;"></i>'+'</td>'
+				for (var i = 0; i < JsonStatus.length; i++) {
+					var v = '-';
+					if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+						v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+					}
+					else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+					{
+						v = '<i class="fa fa-check" style="color: green;"></i>';
+					}
+					else
+					{
+						v = '-';
+					}
+					html += '<td>'+v+'</td>';		
+				}
+				html += '</tr><tr>';
+				// html += '<td>'+data[0].NameCreatedBy+'</td>';
+				for (var i = 0; i < JsonStatus.length; i++) {
+					html += '<td>'+JsonStatus[i].NameAprrovedBy+'</td>';		
+				}
+				html +=	'</tr></tbody>'+'</table></div></div>';
+				$('#Page_Approval').html(html);
+	}
+
+	function MakeButton()
+	{
+		var dt = ClassDt.RuleAccess;
+		if (ClassDt.ID_payment != '') { 
+			var DtExisting = ClassDt.DtExisting;
+			var dataa = DtExisting;
+			if (dataa[0].Status == 3) {
+				var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+							'<button class = "btn btn-success" id = "SaveSubmit" ID_payment = "'+ClassDt.ID_payment+'" action = "1">Submit</button>'+
+						   '</div>';
+				var r_access = dt['access'];
+				var rule = dt['rule'];
+				// allow access dengan ID_m_userrole: "1"
+				var bool = false;
+				for (var i = 0; i < r_access.length; i++) {
+					var ID_m_userrole = r_access[i].ID_m_userrole;
+					// search rule Entry = 1
+					for (var j = 0; j < rule.length; j++) {
+						var ID_m_userrole_ = rule[j].ID_m_userrole;
+						if (ID_m_userrole == ID_m_userrole_) {
+							var Entry = rule[j].Entry
+							if (Entry == 1) {
+								bool = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (bool) {
+					$('#Page_Button').html(html);
+				}
+				else
+				{
+					// check rule entry
+					$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',true);
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea').prop('disabled',true);
+				}
+			}
+			else if(dataa[0].Status == 1)
+			{
+				var btn_edit = '';
+				var html = '';
+				// after submit dan sebelum approval bisa melakukan edit
+					var booledit = false;
+					var r_access = dt['access'];
+					var rule = dt['rule'];
+					for (var i = 0; i < r_access.length; i++) {
+						var ID_m_userrole = r_access[i].ID_m_userrole;
+						// search rule Entry = 1
+						for (var j = 0; j < rule.length; j++) {
+							var ID_m_userrole_ = rule[j].ID_m_userrole;
+							if (ID_m_userrole == ID_m_userrole_) {
+								var Entry = rule[j].Entry
+								if (Entry == 1) {
+									booledit = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (booledit) {
+						var JsonStatus = jQuery.parseJSON(dataa[0].JsonStatus);
+						var booledit2 = false;
+						for (var i = 1; i < JsonStatus.length; i++) {
+							if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+								booledit2 = true;
+								break;
+							}
+						}
+
+						if (!booledit2) {
+							btn_edit = '<button class = "btn btn-primary" id = "btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp<button class = "btn btn-success" id = "SaveSubmit" ID_payment = "'+ClassDt.ID_payment+'" action = "1" disabled>Submit</button>&nbsp';
+						}
+					}
+
+				var JsonStatus = jQuery.parseJSON(dataa[0].JsonStatus);
+				var bool = false;
+				var HierarkiApproval = 0; // for check hierarki approval;
+				var NumberOfApproval = 0; // for check hierarki approval;
+				for (var i = 0; i < JsonStatus.length; i++) {
+					NumberOfApproval++;
+					if (JsonStatus[i]['Status'] == 0) {
+						// check status before
+						if (i > 0) {
+							var ii = i - 1;
+							if (JsonStatus[ii]['Status'] == 1) {
+								HierarkiApproval++;
+							}
+
+							// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
+							// 	HierarkiApproval++;
+							// }
+							// HierarkiApproval++;
+						}
+						else
+						{
+							HierarkiApproval++;
+						}
+						
+						// if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+						if (NIP == JsonStatus[i]['NIP']) {
+							bool = true;
+							break;
+						}
+					}
+					else
+					{
+						HierarkiApproval++;
+					}
+				}
+
+				html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+btn_edit;
+
+				if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+					html += '<button class = "btn btn-primary" id = "Approve" action = "approve" ID_payment = "'+ClassDt.ID_payment+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
+									'&nbsp'+
+									'<button class = "btn btn-inverse" id = "Reject" action = "reject" ID_payment = "'+ClassDt.ID_payment+'" approval_number = "'+NumberOfApproval+'">Reject</button>'+
+							'</div>';
+					
+				}
+
+				$("#Page_Button").html(html);
+			}
+			else
+			{
+				if (dataa[0].Status == 2) {
+					var html = '<div class = "col-md-12">'+
+				   							'<div class = "pull-right">'+
+				   								'<button class="btn btn-default" id="pdfprint" ID_payment = "'+ClassDt.ID_payment+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+
+				   							'</div>'+
+				   						'</div>';
+				   	$("#Page_Button").html(html);
+				}
+				// remove edit approval jika telah approve semua
+				$('#add_approver').remove();
+			}
+
+			// show button add new pr
+			$('.btn-add-new-pr').removeClass('hide');
+
+		}
+		else
+		{
+			var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+						'<button class = "btn btn-success" id = "SaveSubmit" id_dataa = "" ID_payment = "" action = "1">Submit</button>'+
+					   '</div>';
+			var r_access = dt['access'];
+			var rule = dt['rule'];
+			// allow access dengan ID_m_userrole: "1"
+			var bool = false;
+			for (var i = 0; i < r_access.length; i++) {
+				var ID_m_userrole = r_access[i].ID_m_userrole;
+				// search rule Entry = 1
+				for (var j = 0; j < rule.length; j++) {
+					var ID_m_userrole_ = rule[j].ID_m_userrole;
+					if (ID_m_userrole == ID_m_userrole_) {
+						var Entry = rule[j].Entry
+						if (Entry == 1) {
+							bool = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if (bool) {
+				$('#Page_Button').html(html);
+			}
+			else
+			{
+				// check rule entry
+				$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',true);
+			}		   
+		}
+		
+	}
 </script>
