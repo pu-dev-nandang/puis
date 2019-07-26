@@ -15,7 +15,7 @@
             <a href="<?php echo base_url().'finance_ap'?>">List</a>
         </li>
         <li class="<?php echo ($this->uri->segment(1) == 'finance_ap' &&  ($this->uri->segment(2) == 'create_ap')  ) ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'finance_ap/create_ap'?>">Create AP</a>
+            <a href="<?php echo base_url().'finance_ap/create_ap'?>">Entry</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">

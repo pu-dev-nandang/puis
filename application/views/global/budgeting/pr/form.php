@@ -559,7 +559,7 @@
 		var htmlInputPR = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_PR">'+
 							'<div class = "col-md-12">'+
 								'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input_pr">'+
+									'<table class="table table-bordered tableData" id ="table_input_pr" style = "min-width: 1200px;">'+
 									'<thead>'+
 									'<tr>'+
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
