@@ -23,9 +23,9 @@
                     <th rowspan="2" style="width: 10%;">Jumlah</th>
                 </tr>
                 <tr>
-                    <th style="width: 10%;">Profesi</th>
-                    <th style="width: 10%;">Magister</th>
                     <th style="width: 10%;">Doktor</th>
+                    <th style="width: 10%;">Magister</th>
+                    <th style="width: 10%;">Profesi</th>
                 </tr>
                 </thead>
                 <tbody id="listTable"></tbody>
@@ -58,7 +58,7 @@
                         totalLec = totalLec + det;
                         edu = edu+'<td>'+det+'</td>';
 
-                        if(i==0){
+                        if(i==2){
                             p = p+det
                         }
 
@@ -66,7 +66,7 @@
                             m = m+det
                         }
 
-                        if(i==2){
+                        if(i==0){
                             d = d+det
                         }
 
@@ -83,9 +83,9 @@
 
                 $('#listTable').append('<tr>' +
                     '<th colspan="2" class="tdJml">Jumlah</th>' +
-                    '<th class="tdJml">'+p+'</th>' +
                     '<th class="tdJml">'+m+'</th>' +
                     '<th class="tdJml">'+d+'</th>' +
+                    '<th class="tdJml">'+p+'</th>' +
                     '<th class="tdJml">'+j+'</th>' +
                     '</tr>');
             }

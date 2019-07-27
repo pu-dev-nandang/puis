@@ -40,7 +40,7 @@
     });
 
     function loadData() {
-        var url = base_url_js+'api3/__getJabatanAkademikDosenTetap';
+        var url = base_url_js+'api3/__getJabatanAkademikDosenTidakTetap';
         $.getJSON(url,function (jsonResult) {
 
             $('#listData').empty();
@@ -51,14 +51,13 @@
                     var td = '';
                     var total = 0;
                     $.each(v.details,function (i2, v2) {
-                       td = td+'<td>'+v2.dataEmployees.length+'</td>';
+                        td = td+'<td>'+v2.dataEmployees.length+'</td>';
                         total = total + parseInt(v2.dataEmployees.length);
                     });
 
                     $('#listData').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+v.Level+' - '+v.Description+'</td> '+td+
-
                         '<td style="text-align: center;background: lightyellow;border-left: 1px solid #ccc;">'+total+'</td>' +
                         '</tr>');
 

@@ -1257,6 +1257,9 @@ $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asin
 $route['agregator/kecukupan-dosen'] = 'page/agregator/c_agregator/kecukupan_dosen';
 $route['agregator/jabatan-dosen-tetap'] = 'page/agregator/c_agregator/jabatan_dosen_tetap';
 $route['agregator/sertifikasi-dosen'] = 'page/agregator/c_agregator/sertifikasi_dosen';
+$route['agregator/dosen-tidak-tetap'] = 'page/agregator/c_agregator/dosen_tidak_tetap';
+$route['agregator/perolehan-dana'] = 'page/agregator/c_agregator/perolehan_dana';
+$route['agregator/penggunaan-dana'] = 'page/agregator/c_agregator/penggunaan_dana';
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 
@@ -1269,8 +1272,12 @@ $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalA
 
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
 $route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
+$route['api3/__crudAgregatorTB4'] = 'api/c_api3/crudAgregatorTB4';
 $route['api3/__getKecukupanDosen'] = 'api/c_api3/getKecukupanDosen';
 $route['api3/__getJabatanAkademikDosenTetap'] = 'api/c_api3/getJabatanAkademikDosenTetap';
+$route['api3/__getJabatanAkademikDosenTidakTetap'] = 'api/c_api3/getJabatanAkademikDosenTidakTetap';
+$route['api3/__getLecturerCertificate'] = 'api/c_api3/getLecturerCertificate';
+$route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
 
 
 
