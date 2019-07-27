@@ -85,10 +85,11 @@ function LoadDataForTable()
 	    },
    	    'createdRow': function( row, data, dataIndex ) {
    	    	$( row ).find('td:eq(0)').attr('align','center');
-   	    	var code_url = findAndReplace(data[1],'/','-');
           var ListPR = data[parseInt(data.length) - 1];
           var PRHTML = '';
-          PRHTML += '<li>'+ListPR[0]+'</li>';
+          if (ListPR[0].length > 0) {
+            PRHTML += '<li>'+ListPR[0]+'</li>';
+          }
           var ID_payment = ListPR[1].ID_payment;
           var Perihal = ListPR[1].Perihal;
           var TypeCode = ListPR[1].TypeCode;
@@ -98,7 +99,15 @@ function LoadDataForTable()
           	var Code_po_create = data[1];
           }
 
-   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/ca/list/'+code_url2+'" ID_payment="'+ID_payment+'">'+Perihal+'</a>'+'<br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+          if (ListPR[0].length > 0) {
+            var URLRedirect = 'global/purchasing/transaction/ca/list/'+code_url2;
+          }
+          else
+          {
+            var URLRedirect = 'budgeting_menu/pembayaran/cashadvance/'+code_url2;
+          }
+
+   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+URLRedirect+'" ID_payment="'+ID_payment+'">'+Perihal+'</a>'+'<br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	
           $( row ).find('td:eq(2)').attr('align','center');
           $( row ).find('td:eq(3)').attr('align','center');

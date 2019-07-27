@@ -973,11 +973,14 @@ $route['rest2/__spb_for_po'] = 'api/c_rest2/spb_for_po';
 $route['rest2/__Get_data_spb_grpo'] = 'api/c_rest2/Get_data_spb_grpo';
 $route['rest2/__get_data_spb'] = 'api/c_rest2/get_data_spb';
 $route['rest2/__get_data_payment_type'] = 'api/c_rest2/get_data_payment_type';
+$route['rest2/__Get_data_payment_user'] = 'api/c_rest2/Get_data_payment_user';
 
 $route['rest2/__show_info_payment'] = 'api/c_rest2/show_info_payment';
 $route['rest2/__get_data_payment'] = 'api/c_rest2/get_data_payment';
 $route['rest2/__reject_payment_from_fin'] = 'api/c_rest2/reject_payment_from_fin';
 $route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
+$route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
+
 
 
 
@@ -1418,6 +1421,9 @@ $route['budgeting/submitca_realisasi_by_po'] = 'page/budgeting/c_cashadvance/sub
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
+$route['budgeting/submit_pettycash_user'] = 'page/budgeting/c_pettycash/submit_pettycash_user';
+$route['budgeting_menu/pembayaran/pettycash/(:any)'] = 'page/budgeting/c_pettycash/view_petty_cash_user/$1';
+
 
 // financeAP
 $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
