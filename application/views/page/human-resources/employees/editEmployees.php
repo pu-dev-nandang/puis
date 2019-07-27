@@ -300,6 +300,10 @@
                             <label>Level of Education</label>
                             <select class="form-control" id="formLevelEducationID"></select>
                         </div>
+                        <div class="form-group">
+                            <label>Profesi</label>
+                            <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
+                        </div>
                     </div>
                     <div class="col-xs-4">
                         <div class="form-group">
@@ -324,7 +328,6 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <label>Ijazah</label>
-
                     </div>
                 </div>
 
@@ -806,6 +809,7 @@
             var formStatusForlap = $('#formStatusForlap').val();
 
             var formStatusLecturer = $('#formStatusLecturer').val();
+            var formProfession = $('#formProfession').val();
 
             var data = {
                 arr_Prodi : arr_Prodi,
@@ -845,6 +849,7 @@
                     PositionOther3: PositionOther3,
                     StatusEmployeeID: formStatusEmployee,
                     StatusLecturerID: formStatusLecturer,
+                    Profession: formProfession,
                     StatusForlap : formStatusForlap
                 }
             };
