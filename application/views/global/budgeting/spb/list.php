@@ -83,10 +83,11 @@ function LoadDataForTable()
 	    },
    	    'createdRow': function( row, data, dataIndex ) {
    	    	$( row ).find('td:eq(0)').attr('align','center');
-   	    	var code_url = findAndReplace(data[1],'/','-');
           var ListPR = data[parseInt(data.length) - 1];
           var PRHTML = '';
-          PRHTML += '<li>'+ListPR[0]+'</li>';
+          if (ListPR[0].length > 0) {
+            PRHTML += '<li>'+ListPR[0]+'</li>';
+          }
           var ID_payment = ListPR[1].ID_payment;
           var CodeSPB = ListPR[1].CodeSPB;
           var TypeCode = ListPR[1].TypeCode;
@@ -96,7 +97,15 @@ function LoadDataForTable()
           	var Code_po_create = data[1];
           }
 
-   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+'global/purchasing/transaction/spb/list/'+code_url2+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+'<label>'+Code_po_create+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
+          if (ListPR[0].length > 0) {
+            var URLRedirect = 'global/purchasing/transaction/spb/list/'+code_url2;
+          }
+          else
+          {
+            var URLRedirect = 'budgeting_menu/pembayaran/spb/'+code_url2;
+          }
+
+   	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+URLRedirect+'" code="'+CodeSPB+'">'+CodeSPB+'</a><br>'+'<label>'+Code_po_create+'</label><br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');
    	    	
    	    	$( row ).find('td:eq(2)').attr('align','center');
    	    	$( row ).find('td:eq(4)').attr('align','center');

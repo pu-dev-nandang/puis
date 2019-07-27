@@ -2478,7 +2478,7 @@ class C_rest extends CI_Controller {
                 }
                 else{
                     $Reload = 1;
-                    $msg = 'The data has been approve and will do to reload and resubmit';
+                    $msg = 'The data was not approve and will do to reload and resubmit';
                 }          
 
                 // echo json_encode($msg);

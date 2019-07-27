@@ -1999,6 +1999,32 @@ class C_rest2 extends CI_Controller {
         }
     }
 
+    public function Get_data_payment_user()
+    {
+        $rs = array ('msg' => '','dt' => array(),'change'=>0);
+        try {
+            $this->load->model('budgeting/m_global');
+            $dataToken = $this->getInputToken2();
+            $auth = $this->m_master->AuthAPI($dataToken);
+            if ($auth) {
+                $ID_payment = $dataToken['ID_payment'];
+                $dt = $this->m_global->Get_data_payment_user($ID_payment);
+                echo json_encode($dt);
+
+            }
+            else
+            {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
+        }
+        //catch exception
+        catch(Exception $e) {
+          // handling orang iseng
+          echo '{"status":"999","message":"Not Authorize"}';
+        }
+    }
+
     public function get_data_spb()
     {
         try {
@@ -2799,11 +2825,11 @@ class C_rest2 extends CI_Controller {
                 $WhereFiltering = '';
                 if ($IDDepartementPUBudget != 'NA.9') {
                     $NIP = $dataToken['sessionNIP'];
-                    $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                    $WhereFiltering = ' or (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                 }
                  
                 $requestData = $_REQUEST;
-                $StatusQuery = ' and Status = 2';
+                $StatusQuery = ' or Status = 2';
                 $sqltotalData = 'select count(*) as total  from (
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
@@ -2921,27 +2947,34 @@ class C_rest2 extends CI_Controller {
                         where d.Code = ?
                         ';
                         $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
-                        for ($j=0; $j < count($query_get_pr); $j++) { 
-                            if (count($arr_temp) == 0) {
-                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                            }
-                            else
-                            {
-                                // check exist
-                                $bool = true;
-                                for ($k=0; $k < count($arr_temp); $k++) { 
-                                    if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
-                                        $bool = false;    
-                                        break;
-                                    }
-                                }
-
-                                if ($bool) {
+                        if (count($query_get_pr)  == 0) {
+                            $arr_temp[] = array();
+                        }
+                        else
+                        {
+                            for ($j=0; $j < count($query_get_pr); $j++) { 
+                                if (count($arr_temp) == 0) {
                                     $arr_temp[] = $query_get_pr[$j]['PRCode'];
                                 }
+                                else
+                                {
+                                    // check exist
+                                    $bool = true;
+                                    for ($k=0; $k < count($arr_temp); $k++) { 
+                                        if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                            $bool = false;    
+                                            break;
+                                        }
+                                    }
 
+                                    if ($bool) {
+                                        $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    }
+
+                                }
                             }
                         }
+
                         // pass data spb
                         $arr_temp[] = array(
                             'CodeSPB' => $row['CodeSPB'],
@@ -3446,6 +3479,247 @@ class C_rest2 extends CI_Controller {
 
                     echo json_encode($rs);
 
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function approve_payment_user()
+    {
+        $msg = '';
+        $Reload = 0;
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $this->load->model('budgeting/m_spb');
+                    $ID_payment = $dataToken['ID_payment'];
+                    $approval_number = $dataToken['approval_number'];
+                    // check data telah berubah atau tidak
+                       $DtExisting = json_decode(json_encode($dataToken['DtExisting']),true);
+                       $DtExisting_encode = json_encode($DtExisting);
+                       // print_r($DtExisting);
+                       // load data payment
+                       $data = array(
+                           'auth' => 's3Cr3T-G4N',
+                           'ID_payment' => $ID_payment,
+                       );
+                       // print_r($data);
+                       $url = url_pas.'rest2/__Get_data_payment_user';
+                       $token = $this->jwt->encode($data,"UAP)(*");
+                       $DtExisting_Load = $this->m_master->apiservertoserver($url,$token);
+                       $DtExisting_Load = json_encode($DtExisting_Load);
+                       if ($DtExisting_Load == $DtExisting_encode) {
+                            $key = "UAP)(*";
+                            $token = $this->jwt->encode($ID_payment,$key);
+                            $CodeUrl = $token;
+                            $approval_number = $dataToken['approval_number'];
+                            $NIP = $dataToken['NIP'];
+                            $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
+                            $NameFor_NIP = $G_emp[0]['Name'];
+                            $action = $dataToken['action'];
+
+                            // get data
+                            $sql = 'select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt from db_payment.payment as a where a.ID = ?';
+                            $query=$this->db->query($sql, array($ID_payment))->result_array();
+                            $G_data = $query;
+                            $urlType = '';
+                            switch ($G_data[0]['Type']) {
+                                case 'Bank Advance':
+                                    $urlType = 'bank_advance';
+                                    break;
+                                case 'Cash Advance':
+                                    $urlType = 'cashadvance';
+                                    break;
+                                case 'Petty Cash':
+                                     $urlType = 'pettycash';
+                                    break;
+                                case 'Spb':
+                                     $urlType = 'spb';
+                                    break;         
+                                default:
+                                    # code...
+                                    break;
+                            }
+
+                            $keyJson = $approval_number - 1; // get array index json
+                            $JsonStatus = (array)json_decode($G_data[0]['JsonStatus'],true);
+
+                            // get data update to approval
+                            $arr_upd = $JsonStatus[$keyJson];
+
+                            if ($arr_upd['NIP'] == $NIP || $arr_upd['Representedby'] == $NIP) {
+                                $arr_upd['Status'] = ($action == 'approve') ? 1 : 2;
+                                $arr_upd['ApproveAt'] = ($action == 'approve') ? date('Y-m-d H:i:s') : '-';
+                                $JsonStatus[$keyJson] = $arr_upd;
+                                $datasave = array(
+                                    'JsonStatus' => json_encode($JsonStatus),
+                                );
+
+                                // check all status for update data
+                                $boolApprove = true;
+                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                    $arr = $JsonStatus[$i];
+                                    $Status = $arr['Status'];
+                                    if ($Status == 2 || $Status == 0) {
+                                        $boolApprove = false;
+                                        break;
+                                    }
+                                }
+
+                                if ($boolApprove) {
+                                    $datasave['Status'] = 2;
+                                    $datasave['PostingDate'] = date('Y-m-d H:i:s');
+                                }
+                                else
+                                {
+                                    $boolReject = false;
+                                    for ($i=0; $i < count($JsonStatus); $i++) { 
+                                        $arr = $JsonStatus[$i];
+                                        $Status = $arr['Status'];
+                                        if ($Status == 2) {
+                                            $boolReject = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ($boolReject) {
+                                        $NoteDel = $dataToken['NoteDel'];
+                                        $Notes = $G_data[0]['Notes']."\n".$NoteDel;
+                                        $datasave['Status'] = -1;
+                                        // $datasave['Notes'] = $Notes;
+                                    }
+                                    else
+                                    {
+                                        // Notif to next step approval & User
+                                            $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                            // Send Notif for next approval
+                                                $data = array(
+                                                    'auth' => 's3Cr3T-G4N',
+                                                    'Logging' => array(
+                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
+                                                                    'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                                                    'CreatedBy' => $NIP,
+                                                                  ),
+                                                    'To' => array(
+                                                              'NIP' => array($NIPApprovalNext),
+                                                            ),
+                                                    'Email' => 'No', 
+                                                );
+
+                                                $url = url_pas.'rest2/__send_notif_browser';
+                                                $token = $this->jwt->encode($data,"UAP)(*");
+                                                $this->m_master->apiservertoserver($url,$token);
+
+                                            // Send Notif for user 
+                                                $data = array(
+                                                    'auth' => 's3Cr3T-G4N',
+                                                    'Logging' => array(
+                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>'.$G_data[0]['Type'].' has been Approved',
+                                                                    'Description' => $G_data[0]['Type'].' has been approved by '.$NameFor_NIP,
+                                                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                                                    'CreatedBy' => $NIP,
+                                                                  ),
+                                                    'To' => array(
+                                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                                            ),
+                                                    'Email' => 'No', 
+                                                );
+
+                                                $url = url_pas.'rest2/__send_notif_browser';
+                                                $token = $this->jwt->encode($data,"UAP)(*");
+                                                $this->m_master->apiservertoserver($url,$token); 
+                                    }
+                                }
+
+                                $this->db->where('ID',$ID_payment);
+                                $this->db->update('db_payment.payment',$datasave); 
+
+                                    $Desc = ($arr_upd['Status'] == 1) ? 'Approve' : 'Reject';
+                                    if (array_key_exists('Status', $datasave)) {
+                                        if ($datasave['Status'] == 2) {
+                                            $Desc = "All Approve and posting date at : ".$datasave['PostingDate'];
+
+                                            // Notif All Approve to JsonStatus allkey
+                                                $arr_to = array();
+                                                for ($i=0; $i < count($JsonStatus); $i++) { 
+                                                    $arr_to[] = $JsonStatus[$i]['NIP'];
+                                                }
+
+                                                $data = array(
+                                                    'auth' => 's3Cr3T-G4N',
+                                                    'Logging' => array(
+                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' has been done',
+                                                                    'Description' => $G_data[0]['Type'].' has been done',
+                                                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                                                    'CreatedBy' => $NIP,
+                                                                  ),
+                                                    'To' => array(
+                                                              'NIP' => $arr_to,
+                                                            ),
+                                                    'Email' => 'No', 
+                                                );
+
+                                                $url = url_pas.'rest2/__send_notif_browser';
+                                                $token = $this->jwt->encode($data,"UAP)(*");
+                                                $this->m_master->apiservertoserver($url,$token);
+
+                                        }
+                                    }
+
+                                    if ($arr_upd['Status'] == 2) {
+                                        if ($dataToken['NoteDel'] != '' || $dataToken['NoteDel'] != null) {
+                                            $Desc .= '<br>{'.$dataToken['NoteDel'].'}';
+                                        }
+
+                                        // Notif Reject to JsonStatus key 0
+                                            // Send Notif for user 
+                                                $data = array(
+                                                    'auth' => 's3Cr3T-G4N',
+                                                    'Logging' => array(
+                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' has been Rejected',
+                                                                    'Description' => $G_data[0]['Type'].' has been Rejected by '.$NameFor_NIP,
+                                                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                                                    'CreatedBy' => $NIP,
+                                                                  ),
+                                                    'To' => array(
+                                                              'NIP' => array($JsonStatus[0]['NIP']),
+                                                            ),
+                                                    'Email' => 'No', 
+                                                );
+
+                                                $url = url_pas.'rest2/__send_notif_browser';
+                                                $token = $this->jwt->encode($data,"UAP)(*");
+                                                $this->m_master->apiservertoserver($url,$token);
+                                    }
+
+                                    $this->m_spb->payment_circulation_sheet($G_data[0]['ID_payment_'],$Desc,$NIP);
+
+                            }
+                            else
+                            {
+                                $Reload = 1;
+                                $msg = 'Not Authorize';
+                            }
+                       }
+                       else
+                       {
+                        $Reload = 1;
+                        $msg = 'The data was not approve and will do to reload and resubmit';
+                       }
+                       
+                       echo json_encode(array('Reload' => $Reload,'msg' => $msg));  
                 }
                 else
                 {
