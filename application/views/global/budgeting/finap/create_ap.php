@@ -241,7 +241,12 @@
 		}
 		else
 		{
-			MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			
+			__load_data_payment(ID_payment).then(function(data){
+				ClassDt.po_payment_data = data;
+				MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			})
+			
 		}
 		
 	})
@@ -269,19 +274,22 @@
 	function __getRsViewGRPO_SPB(ID_payment,Dataselected)
 	{
 		var arr=[];
-		var dtspb = Dataselected.dtspb;
-		var dtspb_rs = [];
-		// get indeks array
-		for (var i = 0; i < dtspb.length; i++) {
-			if (ID_payment == dtspb[i].ID) {
-				break;
+		if (typeof Dataselected.dtspb !== "undefined") {
+			var dtspb = Dataselected.dtspb;
+			var dtspb_rs = [];
+			// get indeks array
+			for (var i = 0; i < dtspb.length; i++) {
+				if (ID_payment == dtspb[i].ID) {
+					break;
+				}
 			}
-		}
 
-		dtspb_rs[0] = dtspb[i];
-		arr = {
-			dtspb : dtspb_rs,
-		};
+			dtspb_rs[0] = dtspb[i];
+			arr = {
+				dtspb : dtspb_rs,
+			};
+		}
+		
 
 		return arr;
 	}
@@ -317,7 +325,7 @@
 				break;
 			}
 		}
-		console.log(dtspb_all);
+		
 		if (index__ >= 0) {
 			for (var z = 0; z < dtspb_all.length; z++) {
 				var ID_payment = dtspb_all[z].ID;
@@ -455,10 +463,35 @@
 		return html;
 	}
 
+	function __load_data_payment(ID_payment)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__Get_data_payment_user';
+		var data = {
+		    ID_payment : ID_payment,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
 	function MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR)
 	{
 		var html = '';
-		html += __showHistory(ID_payment,Code_po_create,PR);
+		if (PR != '' && PR != null) {
+			html += __showHistory(ID_payment,Code_po_create,PR);
+		}
+		
 		html += '<div class ="row FormPage" style ="margin-top:30px;">'+
 						'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
 							'<div class="well">'+
@@ -536,7 +569,14 @@
 		}		
 		var po_payment_data = ClassDt.po_payment_data;
 		// check for document invoice
-		var dtspb = po_payment_data.dtspb;
+		if (typeof po_payment_data.dtspb !== "undefined") {
+			var dtspb = po_payment_data.dtspb;
+		}
+		else
+		{
+			var dtspb = po_payment_data.payment;
+		}
+		
 		if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
 			var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
 			if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {

@@ -1430,6 +1430,10 @@ $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
 
+
+// pr adding
+$route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
+
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
 $result = $query->result();

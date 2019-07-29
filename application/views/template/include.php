@@ -1844,4 +1844,43 @@
         }
     };
 
+    function SelectOptionloadBulan(Element,choice='')
+    {
+        var month = {
+            01 : 'Jan',
+            02 : 'Feb',
+            03 : 'Mar',
+            04 : 'April',
+            05 : 'Mei',
+            06 : 'Jun',
+            07 : 'Jul',
+            08 : 'Aug',
+            09 : 'Sep',
+            10 : 'Okt',
+            11 : 'Nov',
+            12 : 'Des'
+        }
+
+        if (choice != '') {
+            Element.append('<option value="'+'all'+'" '+'selected'+'>'+'--No Filtering Month--'+'</option>');
+        }
+
+        for(var key in month) {
+            // var selected = (key==1) ? 'selected' : '';
+            var getKey = key.toString();
+            if (getKey.length == 1) {
+                var value = '0' + getKey;
+            }
+            else
+            {
+                var value = key;
+            }
+            Element.append('<option value="'+ value +'" '+''+'>'+month[key]+'</option>');
+        }
+
+        Element.select2({
+          // allowClear: true
+        });
+    }
+
 </script>
