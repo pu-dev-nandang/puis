@@ -162,6 +162,48 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function jabatan_dosen_tetap(){
+
+        $viewPage = 'jabatan_dosen_tetap';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+
+    }
+
+    public function sertifikasi_dosen(){
+        $viewPage = 'sertifikasi_dosen';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function dosen_tidak_tetap(){
+
+        $viewPage = 'dosen_tidak_tetap';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function perolehan_dana(){
+            $viewPage = 'perolehan_dana';
+            $accessUser = $this->agregatorPrevilege($viewPage);
+            $data['accessUser'] = $accessUser;
+            $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+            $this->menu_agregator($page);
+    }
+
+    public function penggunaan_dana(){
+            $viewPage = 'penggunaan_dana';
+            $accessUser = $this->agregatorPrevilege($viewPage);
+            $data['accessUser'] = $accessUser;
+            $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+            $this->menu_agregator($page);
+    }
 
     public function uploadFile(){
 

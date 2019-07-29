@@ -405,8 +405,11 @@
                    // show to fixed
                    var IPS = 0;
                    var IPK = 0;
+                   // console.log(Data_mhs[i]['IPS']);
                    try {
+                       // IPS = parseFloat(Data_mhs[i]['IPS']).toFixed(2);
                        IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
+                       // IPK = parseFloat(Data_mhs[i]['IPK']).toFixed(2);
                        IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
                    }
                    catch(err) {

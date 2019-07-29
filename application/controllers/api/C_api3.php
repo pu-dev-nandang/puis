@@ -636,4 +636,375 @@ class C_api3 extends CI_Controller {
 
     }
 
+    public function crudAgregatorTB2(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='crudMHSBaru'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            // Update
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.student_selection',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.student_selection',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='crudMHSBaruAsing'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            // Update
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.student_selection_foreign',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.student_selection_foreign',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='filterYear'){
+            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection GROUP BY Year ORDER BY Year ASC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readDataMHSBaru'){
+
+            $Year = $data_arr['Year'];
+            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss 
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                    WHERE ss.Year = "'.$Year.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='readDataMHSBaruAsing'){
+
+            $Year = $data_arr['Year'];
+            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf 
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
+                                                    WHERE ssf.Year = "'.$Year.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='filterYearMhsAsing'){
+            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+    }
+
+    public function crudAgregatorTB4(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='readSumberDana'){
+
+            $data = $this->db->get('db_agregator.sumber_dana')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='readSumberDanaType'){
+
+            $data = $this->db->get_where('db_agregator.sumber_dana_type',array(
+                'SumberDanaID' => $data_arr['SumberDanaID']
+            ))->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readSumberDanaType_All'){
+            $data = $this->db->query('SELECT sdt.*, sd.SumberDana FROM db_agregator.sumber_dana_type sdt 
+                                          LEFT JOIN db_agregator.sumber_dana sd ON (sdt.SumberDanaID = sd.ID) ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readSumberDana_SumberDanaID'){
+            $D = $data_arr['SumberDanaID'];
+        }
+        else if($data_arr['action']=='updateSumberDana'){
+
+            $ID = $data_arr['ID'];
+
+            if($ID!=''){
+                // Update
+                $this->db->set('SumberDana', $data_arr['SumberDana']);
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.sumber_dana');
+
+            } else {
+                $this->db->insert('db_agregator.sumber_dana', array(
+                    'SumberDana' => $data_arr['SumberDana']
+                ));
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(json_encode(array('ID' => $ID)));
+
+        }
+        else if($data_arr['action']=='UpdateSumberDataType'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.sumber_dana_type',$dataForm);
+            } else {
+                // Insert
+                $this->db->insert('db_agregator.sumber_dana_type', $dataForm);
+                $ID = $this->db->insert_id();
+            }
+            return print_r(json_encode(array('ID'=>$ID)));
+        }
+        else if($data_arr['action']=='updatePerolehanDana'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.perolehan_dana',$dataForm);
+            } else {
+                // Insert
+                $this->db->insert('db_agregator.perolehan_dana',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+            return print_r(json_encode(array('ID'=>$ID)));
+
+        } else if($data_arr['action']=='readPerolehanDana'){
+
+            $data = $this->db->query('SELECT pd.*, sd.SumberDana, sdt.Label AS SumberDanaType FROM db_agregator.perolehan_dana pd 
+                                              LEFT JOIN db_agregator.sumber_dana sd ON (sd.ID = pd.SumberDanaID)
+                                              LEFT JOIN db_agregator.sumber_dana_type sdt ON (sdt.ID = pd.SumberDanaTypeID) ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removePerolehanDana'){
+
+            $ID = $data_arr['ID'];
+
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.perolehan_dana');
+
+            return print_r(1);
+
+        }
+
+    }
+
+    public function getKecukupanDosen(){
+
+        // Get Program Studi
+        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study',array('Status' => 1))->result_array();
+
+        if(count($data)>0){
+            $dataLAP = $this->db->order_by('ID','DESC')->get_where('db_employees.level_education',array(
+                'ID >' => 8
+            ))->result_array();
+            for($i=0;$i<count($data);$i++){
+
+                for($j=0;$j<count($dataLAP);$j++){
+
+                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                    AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" ')->result_array();
+
+                    $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
+                    $data[$i]['dataLecturers'][$j] = $r;
+                }
+
+
+                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                    AND em.Profession <> "" ')->result_array();
+                $r = array('Level' => '', 'Details' => $dataL);
+                $data[$i]['dataLecturers'][2] = $r;
+
+            }
+
+        }
+
+
+        return print_r(json_encode($data));
+
+    }
+
+    public function getJabatanAkademikDosenTetap(){
+
+        $data = $this->db->get_where('db_employees.level_education',array(
+            'ID >' => 7
+        ))->result_array();
+
+        $dataPosition = $this->db->get('db_employees.lecturer_academic_position')->result_array();
+
+        if(count($data)>0){
+
+            for($i=0;$i<count($data);$i++){
+
+                for($p=0;$p<count($dataPosition);$p++){
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                                                                    AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
+                                                                     AND em.StatusForlap = "1" ')->result_array();
+
+                    $r = array(
+                        'Position' => $dataPosition[$p]['Position'],
+                        'dataEmployees' => $dataEmp
+                    );
+
+                    $data[$i]['details'][$p] = $r;
+                }
+
+
+                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position) 
+                                                                     AND em.StatusForlap = "1" ')->result_array();
+
+                $r = array(
+                    'Position' => 'Tenaga Pengajar',
+                    'dataEmployees' => $dataEmp
+                );
+
+                $data[$i]['details'][4] = $r;
+
+
+            }
+
+        }
+
+        return print_r(json_encode($data));
+
+    }
+
+    public function getJabatanAkademikDosenTidakTetap(){
+
+        $data = $this->db->get_where('db_employees.level_education',array(
+            'ID >' => 7
+        ))->result_array();
+
+        $dataPosition = $this->db->get('db_employees.lecturer_academic_position')->result_array();
+
+        if(count($data)>0){
+
+            for($i=0;$i<count($data);$i++){
+
+                for($p=0;$p<count($dataPosition);$p++){
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                                                                    AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
+                                                                     AND em.StatusForlap = "0" ')->result_array();
+
+                    $r = array(
+                        'Position' => $dataPosition[$p]['Position'],
+                        'dataEmployees' => $dataEmp
+                    );
+
+                    $data[$i]['details'][$p] = $r;
+                }
+
+                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position) 
+                                                                     AND em.StatusForlap = "0" ')->result_array();
+
+                $r = array(
+                    'Position' => 'Tenaga Pengajar',
+                    'dataEmployees' => $dataEmp
+                );
+
+                $data[$i]['details'][4] = $r;
+
+            }
+
+        }
+
+        return print_r(json_encode($data));
+
+    }
+
+    public function getLecturerCertificate(){
+
+        $Status = $this->input->get('s');
+
+        $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
+            'Status' => 1
+        ))->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+
+                // Total Employees
+                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees 
+                                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+
+                $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+                $dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees 
+                                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
+                $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
+
+            }
+        }
+
+
+
+        return print_r(json_encode($data));
+
+    }
+
+    public function getAkreditasiProdi(){
+        $data = $this->db->get('db_academic.accreditation')->result_array();
+
+        if(count($data)>0){
+
+            // Data Education level
+            $edl = $this->db->get('db_academic.education_level')->result_array();
+            for($i=0;$i<count($data);$i++){
+
+                for($a=0;$a<count($edl);$a++){
+
+                    $dataP = $this->db->get_where('db_academic.program_study',array(
+                        'EducationLevelID' => $edl[$a]['ID'],
+                        'AccreditationID' => $data[$i]['ID']
+                    ))->result_array();
+
+                    $r = array(
+                        'Level' => $edl[$a]['Name'],
+                        'Prodi' => count($dataP)
+                    );
+
+                    $data[$i]['Details'][$a] = $r;
+
+                }
+
+            }
+
+        }
+
+        return print_r(json_encode($data));
+
+    }
+
 }

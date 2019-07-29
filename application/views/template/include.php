@@ -588,6 +588,34 @@
         });
     }
 
+    function loadSelectOptionLevelEducation(element,selected) {
+        var url = base_url_js+"api/__getLevelEducation";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Level+' - '+v.Description+'</option>');
+            });
+
+        });
+    }
+
+    function loadSelectOptionLecturerAcademicPosition(element,selected) {
+        var url = base_url_js+"api/__getLecturerAcademicPosition";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Position+'</option>');
+            });
+
+        });
+    }
+
     function loadSelectOptionCurriculum(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {
@@ -1563,6 +1591,30 @@
             }
         });
     }
+
+    function loadSelectOptionEmployeesStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionLecturerStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusLecturer2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
     
     function loadSelectOptionPathway(element,selected) {
         
@@ -1731,30 +1783,30 @@
     }
 
     function getCustomtoFixed(dataValue,digit) {
-        var exTitik = dataValue.toFixed(4).toString().split('.');
-        var exKoma = dataValue.toFixed(4).toString().split(',');
+        // var exTitik = dataValue.toFixed(4).toString().split('.');
+        // var exKoma = dataValue.toFixed(4).toString().split(',');
 
-        var s = 0;
-        var s2 = 0;
-        var after = 0;
+        // var s = 0;
+        // var s2 = 0;
+        // var after = 0;
 
-        var result = dataValue;
-        if(exTitik.length>1){
-            s = exTitik[1].substr(digit,1);
-            s2 = exTitik[1].substr(0,digit);
-            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
-            result = exTitik[0]+'.'+after;
-
-
-        } else if(exKoma.length>1){
-            s = exKoma[1].substr(digit,1);
-            s2 = exKoma[1].substr(0,digit);
-            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
-            result = exKoma[0]+'.'+after;
-        }
+        // var result = dataValue;
+        // if(exTitik.length>1){
+        //     s = exTitik[1].substr(digit,1);
+        //     s2 = exTitik[1].substr(0,digit);
+        //     after = (parseFloat(s)<5) ? parseFloat(s2) : parseFloat(s2) + 1;
+        //     result = exTitik[0]+'.'+after;
 
 
-        return parseFloat(result);
+        // } else if(exKoma.length>1){
+        //     s = exKoma[1].substr(digit,1);
+        //     s2 = exKoma[1].substr(0,digit);
+        //     after = (parseFloat(s)<5) ? parseFloat(s2) : parseFloat(s2) + 1;
+        //     result = exKoma[0]+'.'+after;
+        // }
+
+        var result = parseFloat(dataValue).toFixed(digit);
+        return result;
     }
 
     function checkFormRequired(elm,value) {
@@ -1828,6 +1880,10 @@
         }
 
         return v;
+    }
+
+    function checkValue(v) {
+        return (v!='' && v!=null) ? v : '';
     }
 
     window.getUrlParameter = function getUrlParameter(sParam) {

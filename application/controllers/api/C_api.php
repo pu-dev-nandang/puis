@@ -5416,6 +5416,52 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']=='UpdateCertificateLec'){
+
+                $ID = $data_arr['ID'];
+                $dataForm = (array) $data_arr['dataForm'];
+                $FileName = '';
+
+                if($ID!=''){
+                    // Update
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_employees.employees_certificate',$dataForm);
+                    $FileName = $this->db->select('File')
+                        ->get_where('db_employees.employees_certificate',array('ID' => $ID))->result_array()[0]['File'];
+
+                } else {
+                    // Insert
+                    $this->db->insert('db_employees.employees_certificate',$dataForm);
+                    $ID = $this->db->insert_id();
+                }
+
+                return print_r(json_encode(array(
+                    'ID' => $ID,
+                    'FileName' => $FileName
+                )));
+
+            }
+            else if($data_arr['action']=='removeCertificateLec'){
+
+                // Remove File
+                if($data_arr['File']!=''){
+                    unlink('./uploads/certificate/'.$data_arr['File']);
+                }
+
+                // Remove DB
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_employees.employees_certificate');
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readCertificateLec'){
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+
+                return print_r(json_encode($data));
+            }
+
             else if($data_arr['action']=='addEmployees'){
                 $formInsert = (array) $data_arr['formInsert'];
 
@@ -6868,6 +6914,20 @@ class C_api extends CI_Controller {
         echo json_encode($generate);
     }
 
+    public function getStatusEmployee2()
+    {
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+              WHERE IDStatus != -2 AND (Type = "emp" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getStatusLecturer2()
+    {
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+              WHERE IDStatus != -2 AND (Type = "lec" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
     public function searchnip_employees($NIP)
     {
         $generate = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
@@ -8295,6 +8355,10 @@ class C_api extends CI_Controller {
 
     public function getLecturerEvaluation(){
 
+        $max_execution_time = 3600;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
         $SemesterID = $this->input->get('SemesterID');
         $ProdiID = $this->input->get('ProdiID');
 
@@ -8337,9 +8401,23 @@ class C_api extends CI_Controller {
                         $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
                                                                       WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
                                                                       AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
-                                                                      AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
+                                                                      AND ea.NIP = "'.$d['NIP'].'"
+                                                                       AND ea.Type = "1" ')->result_array();
+
+                        // Read Details
+                        if(count($dataEd)>0){
+                            for($e=0;$e<count($dataEd);$e++){
+                                $dataDetails = $this->db->get_where('db_academic.edom_answer_details',array(
+                                    'EAID' => $dataEd[$e]['ID'],
+                                    'QuestionID !=' => '12'
+                                ))->result_array();
+
+                                $dataEd[$e]['Details'] = $dataDetails;
+                            }
+                        }
 
                         $dataCourse[$c]['TotalAnswer'] = count($dataEd);
+                        $dataCourse[$c]['DataAnswer'] = $dataEd;
                     }
 
                     $queryDefaultRow[$i]['Course'] = $dataCourse;
@@ -9931,6 +10009,16 @@ class C_api extends CI_Controller {
         }
 
         echo json_encode($arr);
+    }
+
+    public function getLevelEducation(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.level_education')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLecturerAcademicPosition(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.lecturer_academic_position')->result_array();
+        return print_r(json_encode($data));
     }
 
 }
