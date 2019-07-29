@@ -355,7 +355,7 @@ class C_rest2 extends CI_Controller {
                            $fieldaction = ', poi.InvoicePO,poi.InvoicePayPO,InvoiceLeftPO,poi.Status as StatusPOI,poi.ID as ID_poi ';
                            $joinaction = ' join db_purchasing.po_invoice_status as poi on a.Code = poi.Code_po_create ';
                            // $whereaction = ' and StatusPOI = 0';
-                           $whereaction = '';
+                           $whereaction = ' and POPrint_Approve IS NOT NULL and POPrint_Approve != "" ';
                            $OrderBY = 'StatusPOI asc,';
                         }
                         
@@ -370,6 +370,17 @@ class C_rest2 extends CI_Controller {
                         $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                         // $WhereFiltering2 .= ' or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
                     }
+
+                    if (array_key_exists('Years', $dataToken)) {
+                        $WhereFiltering .= ' and Year = "'.$dataToken['Years'].'" ';
+                    }
+
+                    if (array_key_exists('Month', $dataToken)) {
+                        if ($dataToken['Month'] != 'all') {
+                            $WhereFiltering .= ' and MONTH(CreatedAt) = '.(int)$dataToken['Month'];
+                        }
+                    }
+
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
                     $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
@@ -377,7 +388,7 @@ class C_rest2 extends CI_Controller {
                                 select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status,a.POPrint_Approve '.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -404,7 +415,7 @@ class C_rest2 extends CI_Controller {
                                 select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status,a.POPrint_Approve '.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -472,7 +483,7 @@ class C_rest2 extends CI_Controller {
                         }
 
                         $nestedData = array_merge($nestedData,$arr);
-                        $nestedData[] = $row['NameCreateBy'];
+                        $nestedData[] = $row['NameCreateBy'].'<br>'.'At : '.$row['CreatedAt'];
                         // find PR in po_detail
                             $arr_temp = array();
                             $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2033,7 +2044,7 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB ';
+               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB,spb.CreatedAt as CreatedAtSPB ';
                // $joinaction = ' right join db_purchasing.spb_created as spb on spb.Code_po_create = a.Code
                $joinaction = ' right join (select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb")
                                 as spb on spb.Code_po_create = a.Code
@@ -2057,6 +2068,16 @@ class C_rest2 extends CI_Controller {
                     $NIP = $dataToken['sessionNIP'];
                     $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementSPB = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                 }
+
+                if (array_key_exists('Years', $dataToken)) {
+                    $WhereFiltering .= ' and (Year = "'.$dataToken['Years'].'" or YEAR(CreatedAtSPB) = "'.$dataToken['Years'].'" ) ';
+                }
+
+                if (array_key_exists('Month', $dataToken)) {
+                    if ($dataToken['Month'] != 'all') {
+                        $WhereFiltering .= ' and MONTH(CreatedAtSPB) = '.(int)$dataToken['Month'];
+                    }
+                }
                  
                 $requestData = $_REQUEST;
                 $StatusQuery = ' and Status = 2';
@@ -2064,7 +2085,7 @@ class C_rest2 extends CI_Controller {
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2090,7 +2111,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2157,7 +2178,7 @@ class C_rest2 extends CI_Controller {
                     }
 
                     $nestedData = array_merge($nestedData,$arr);
-                    $nestedData[] = $row['SPBNameCreatedBy'];
+                    $nestedData[] = $row['SPBNameCreatedBy'].'<br>'.'At : '.$row['CreatedAtSPB'];
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2832,16 +2853,27 @@ class C_rest2 extends CI_Controller {
                 $WhereFiltering = '';
                 if ($IDDepartementPUBudget != 'NA.9') {
                     $NIP = $dataToken['sessionNIP'];
-                    $WhereFiltering = ' or (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                    $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                }
+
+                if (array_key_exists('Years', $dataToken)) {
+                    $WhereFiltering .= ' and (Year = "'.$dataToken['Years'].'" or YEAR(PayCreateAt) = "'.$dataToken['Years'].'" ) ';
+                }
+
+                if (array_key_exists('Month', $dataToken)) {
+                    if ($dataToken['Month'] != 'all') {
+                        $WhereFiltering .= ' and MONTH(PayCreateAt) = '.(int)$dataToken['Month'];
+                    }
                 }
                  
                 $requestData = $_REQUEST;
-                $StatusQuery = ' or Status = 2';
+                // $StatusQuery = ' or Status = 2';
+                $StatusQuery = '';
                 $sqltotalData = 'select count(*) as total  from (
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2868,7 +2900,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2944,7 +2976,7 @@ class C_rest2 extends CI_Controller {
                     }
 
                     $nestedData = array_merge($nestedData,$arr);
-                    $nestedData[] = $row['PayNameCreatedBy'];
+                    $nestedData[] = $row['PayNameCreatedBy'].'<br>'.'At : '.$row['PayCreateAt'];
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode

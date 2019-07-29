@@ -1498,6 +1498,8 @@ $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/ta
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
 $route['purchasing/transaction/po/list/open'] = 'page/purchasing/c_po/open';
 $route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
+$route['po_spk/upload_file_Approve'] = 'page/purchasing/c_po/upload_file_Approve';
+
 $route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
 $route['purchasing/transaction/po/list/pembayaran'] = 'page/purchasing/c_po/pembayaran';
 $route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';
