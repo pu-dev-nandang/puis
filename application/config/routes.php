@@ -1447,6 +1447,10 @@ $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
 
+
+// pr adding
+$route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
+
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
 $result = $query->result();
@@ -1511,6 +1515,8 @@ $route['purchasing/page/catalog/table_allow_div'] = 'page/purchasing/c_master/ta
 $route['purchasing/page/catalog/submit-permission-division'] = 'page/purchasing/c_master/submit_permission_division';
 $route['purchasing/transaction/po/list/open'] = 'page/purchasing/c_po/open';
 $route['po_spk/submit_create'] = 'page/purchasing/c_po/submit_create_po_spk';
+$route['po_spk/upload_file_Approve'] = 'page/purchasing/c_po/upload_file_Approve';
+
 $route['purchasing/transaction/po/list/configuration'] = 'page/purchasing/c_po/configuration';
 $route['purchasing/transaction/po/list/pembayaran'] = 'page/purchasing/c_po/pembayaran';
 $route['purchasing/transaction/po/Set_Rad']= 'page/purchasing/c_po/set_rad';

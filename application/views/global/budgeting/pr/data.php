@@ -1,9 +1,38 @@
-<div class="row" style="margin-left: 0px;margin-right: 0px">
+<!-- <div class="row" style="margin-left: 0px;margin-right: 0px">
 	<div class="col-md-12">
 		<div class="thumbnail" style="padding: 10px;">
             <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve
         </div>
 	</div>
+</div> -->
+<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<div class="thumbnail">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label>Period</label>
+							<select class="select2-select-00 full-width-fix" id="Years">
+							     <!-- <option></option> -->
+							 </select>
+						</div>	
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label>Month</label>
+							<select class="select2-select-00 full-width-fix" id="Month">
+							     <!-- <option></option> -->
+							 </select>
+						</div>	
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12" align="center">
+						<b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Approve
+					</div>
+				</div>
+			</div>
+		</div>
 </div>
 <div class="row" style="margin-left: 0px;margin-right: 0px;margin-top: 10px;">
 	<div class="col-md-12">
@@ -24,8 +53,42 @@ $(document).ready(function() {
 
 	function LoadFirstLoad()
 	{
-		LoadDataForTable();
+		// get data tahun period
+		load_table_activated_period_years();
 	}
+
+	function load_table_activated_period_years()
+	{
+	   // load Year
+	   $("#Years").empty();
+	   var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
+	   var thisYear = (new Date()).getFullYear();
+	   $.post(url,function (resultJson) {
+	   	var response = jQuery.parseJSON(resultJson);
+	   	for(var i=0;i<response.length;i++){
+	   	    //var selected = (i==0) ? 'selected' : '';
+	   	    var selected = (response[i].Activated==1) ? 'selected' : '';
+	   	    $('#Years').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+' - '+(parseInt(response[i].Year) + 1)+'</option>');
+	   	}
+	   	$('#Years').select2({
+	   	   //allowClear: true
+	   	});
+
+	   	// load bulan
+	   	var S_bulan = $('#Month');
+	   	SelectOptionloadBulan(S_bulan,'choice');
+
+	   	LoadDataForTable();
+	   }); 
+	}
+
+	$(document).off('click', '#Years').on('click', '#Years',function(e) {
+		LoadDataForTable();
+	})
+
+	$(document).off('click', '#Month').on('click', '#Month',function(e) {
+		LoadDataForTable();
+	})
 
 	function LoadDataForTable()
 	{
@@ -68,106 +131,342 @@ $(document).ready(function() {
 		    };
 		};
 
-		var table = $('#tableData4').DataTable( {
-			"fixedHeader": true,
-		    "processing": true,
-		    "destroy": true,
-		    "serverSide": true,
-		    "lengthMenu": [[5], [5]],
-		    "iDisplayLength" : 5,
-		    "ordering" : false,
-		    "ajax":{
-		        url : base_url_js+"budgeting/DataPR", // json datasource
-		        ordering : false,
-		        type: "post",  // method  , by default get
-		        data : {ApproverLength : G_ApproverLength},
-		        error: function(){  // error handling
-		            $(".employee-grid-error").html("");
-		            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-		            $("#employee-grid_processing").css("display","none");
-		        }
-		    },
-		    'createdRow': function( row, data, dataIndex ) {
-		    		// console.log(data);
-		    		 var endkey = (data.length) - 1;
-		    		 var keydepartment = (data.length) - 3;
-		    		 $( row ).find('td:eq(1)').html(
-		    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'" style = "color : #d41c1c">'+data[1]+'</a><br>By : '+ data[endkey]
-		    		 	)
-		    		 $( row ).find('td:eq(4)').attr('align','center');
+		var Years = $('#Years option:selected').val();
+		var Month = $('#Month option:selected').val();
 
-		    		 /* 
-		    		 	Warna Status oleh admin setelah approve semua menjadi color:#8ED6EA; selainnya default
-						Warna Status oleh approval ketika akan di approval default jika telah approval color:#8ED6EA;
-						Warna Status oleh user selain dua diatas adalah default
-		    		 */
+		
 
-		    		 var keyJsonStatus = (data.length) - 2;
-		    		 var JsonStatus = data[keyJsonStatus];
-		    		 // find NIP
-		    		 	var st = {
-		    		 		Find : 0,
-		    		 		Approval : 0,
-		    		 		Approved : 0,
-		    		 		AllApprove : 0,
-		    		 	};
+		// go to redirect in url  
+		if (SegmentURL != '' && SegmentURL != null) {
+			if (Onetime == 0) {
+				var token = jwt_decode(SegmentURL,"UAP)(*");
+				var table = $('#tableData4').DataTable( {
+					"fixedHeader": true,
+				    "processing": true,
+				    "destroy": true,
+				    "serverSide": true,
+				    "lengthMenu": [[5], [5]],
+				    "oSearch": {"sSearch": token},
+				    "iDisplayLength" : 5,
+				    "ordering" : false,
+				    "ajax":{
+				        url : base_url_js+"budgeting/DataPR", // json datasource
+				        ordering : false,
+				        type: "post",  // method  , by default get
+				        data : {
+				        	ApproverLength : G_ApproverLength,
+				        	Years : Years,
+				        	Month : Month,
+				        	},
+				        error: function(){  // error handling
+				            $(".employee-grid-error").html("");
+				            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+				            $("#employee-grid_processing").css("display","none");
+				        }
+				    },
+				    'createdRow': function( row, data, dataIndex ) {
+				    		// console.log(data);
+				    		 var endkey_by = (data.length) - 2;
+				    		 var endkey_at = (data.length) - 1;
+				    		 var keydepartment = (data.length) - 4;
+				    		 $( row ).find('td:eq(1)').html(
+				    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'" style = "color : #d41c1c">'+data[1]+'</a><br>By : '+ data[endkey_by]+'<br>'+'At : '+ data[endkey_at]
+				    		 	)
+				    		 $( row ).find('td:eq(4)').attr('align','center');
 
-		    		 	var j_AllApprove = 0;
-		    		 	for (var i = 0; i < JsonStatus.length; i++) {
-		    		 		if (i > 0) {
-		    		 			if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 1 ) {
-		    		 				st.Find = 1;
-		    		 				st.Approval = 1;
-		    		 				st.Approved = 1;
+				    		 /* 
+				    		 	Warna Status oleh admin setelah approve semua menjadi color:#8ED6EA; selainnya default
+								Warna Status oleh approval ketika akan di approval default jika telah approval color:#8ED6EA;
+								Warna Status oleh user selain dua diatas adalah default
+				    		 */
 
-		    		 			}
-		    		 			else if(NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 0 ) {
-		    		 				st.Find = 1;
-		    		 				st.Approval = 1;
-		    		 				st.Approved = 0;
-		    		 			}
-		    		 			else
-		    		 			{
-		    		 				st.Find = 1;
-		    		 			}
-		    		 		}
+				    		 var keyJsonStatus = (data.length) - 3;
+				    		 var JsonStatus = data[keyJsonStatus];
+ 				    		 // find NIP
+				    		 	var st = {
+				    		 		Find : 0,
+				    		 		Approval : 0,
+				    		 		Approved : 0,
+				    		 		AllApprove : 0,
+				    		 	};
 
-		    		 		// check all approve or not
-		    		 		if (JsonStatus[i]['Status'] == 0) {
-		    		 			j_AllApprove++;
-		    		 		}
-		    		 	}
+				    		 	var j_AllApprove = 0;
+				    		 	for (var i = 0; i < JsonStatus.length; i++) {
+				    		 		if (i > 0) {
+				    		 			if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 1 ) {
+				    		 				st.Find = 1;
+				    		 				st.Approval = 1;
+				    		 				st.Approved = 1;
 
-		    		 	// check all approve or not
-		    		 		if (j_AllApprove > 0) {
-		    		 			st.AllApprove = 0;
-		    		 		}
-		    		 		else
-		    		 		{
-		    		 			st.AllApprove = 1;
-		    		 		}
+				    		 			}
+				    		 			else if(NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 0 ) {
+				    		 				st.Find = 1;
+				    		 				st.Approval = 1;
+				    		 				st.Approved = 0;
+				    		 			}
+				    		 			else
+				    		 			{
+				    		 				st.Find = 1;
+				    		 			}
+				    		 		}
 
-		    		 	// html warna
-		    		 		if (st.AllApprove == 1) {
-		    		 			$( row ).attr('style','background-color: #8ED6EA;');
-		    		 		}
-		    		 		else
-		    		 		{
-		    		 			if (st.Find == 1 && st.Approval == 1 && st.Approved == 1) {
-		    		 				$( row ).attr('style','background-color: #8ED6EA;');
-		    		 			}
-		    		 		}	
-		    },
-		    dom: 'l<"toolbar">frtip',
-	        initComplete: function(){
-	          $("div.toolbar")
-	             .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
-				    '<span data-smt="" class="btn btn-add-new-pr" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
-				        '<i class="icon-plus"></i> Create New PR'+
-				   '</span>'+
-				'</div>');           
-	       }  
-		} );
+				    		 		// check all approve or not
+				    		 		if (JsonStatus[i]['Status'] == 0) {
+				    		 			j_AllApprove++;
+				    		 		}
+				    		 	}
+
+				    		 	// check all approve or not
+				    		 		if (j_AllApprove > 0) {
+				    		 			st.AllApprove = 0;
+				    		 		}
+				    		 		else
+				    		 		{
+				    		 			st.AllApprove = 1;
+				    		 		}
+
+				    		 	// html warna
+				    		 		if (st.AllApprove == 1) {
+				    		 			$( row ).attr('style','background-color: #8ED6EA;');
+				    		 		}
+				    		 		else
+				    		 		{
+				    		 			if (st.Find == 1 && st.Approval == 1 && st.Approved == 1) {
+				    		 				$( row ).attr('style','background-color: #8ED6EA;');
+				    		 			}
+				    		 		}	
+				    },
+				    dom: 'l<"toolbar">frtip',
+			        initComplete: function(){
+			          $("div.toolbar")
+			             .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+						    '<span data-smt="" class="btn btn-add-new-pr" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+						        '<i class="icon-plus"></i> Create New PR'+
+						   '</span>'+
+						'</div>');
+			             $('.PRCode:first').trigger('click');
+			       }  
+				} );
+				
+			}
+			else
+			{
+					var table = $('#tableData4').DataTable( {
+						"fixedHeader": true,
+					    "processing": true,
+					    "destroy": true,
+					    "serverSide": true,
+					    "lengthMenu": [[5], [5]],
+					    "iDisplayLength" : 5,
+					    "ordering" : false,
+					    "ajax":{
+					        url : base_url_js+"budgeting/DataPR", // json datasource
+					        ordering : false,
+					        type: "post",  // method  , by default get
+					        data : {
+					        	ApproverLength : G_ApproverLength,
+					        	Years : Years,
+					        	Month : Month,
+					        	},
+					        error: function(){  // error handling
+					            $(".employee-grid-error").html("");
+					            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+					            $("#employee-grid_processing").css("display","none");
+					        }
+					    },
+					    'createdRow': function( row, data, dataIndex ) {
+					    		// console.log(data);
+					    		 var endkey_by = (data.length) - 2;
+					    		 var endkey_at = (data.length) - 1;
+					    		 var keydepartment = (data.length) - 4;
+					    		 $( row ).find('td:eq(1)').html(
+					    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'" style = "color : #d41c1c">'+data[1]+'</a><br>By : '+ data[endkey_by]+'<br>'+'At : '+ data[endkey_at]
+					    		 	)
+					    		 $( row ).find('td:eq(4)').attr('align','center');
+
+					    		 /* 
+					    		 	Warna Status oleh admin setelah approve semua menjadi color:#8ED6EA; selainnya default
+									Warna Status oleh approval ketika akan di approval default jika telah approval color:#8ED6EA;
+									Warna Status oleh user selain dua diatas adalah default
+					    		 */
+
+					    		 var keyJsonStatus = (data.length) - 3;
+					    		 var JsonStatus = data[keyJsonStatus];
+					    		 // find NIP
+					    		 	var st = {
+					    		 		Find : 0,
+					    		 		Approval : 0,
+					    		 		Approved : 0,
+					    		 		AllApprove : 0,
+					    		 	};
+
+					    		 	var j_AllApprove = 0;
+					    		 	for (var i = 0; i < JsonStatus.length; i++) {
+					    		 		if (i > 0) {
+					    		 			if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 1 ) {
+					    		 				st.Find = 1;
+					    		 				st.Approval = 1;
+					    		 				st.Approved = 1;
+
+					    		 			}
+					    		 			else if(NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 0 ) {
+					    		 				st.Find = 1;
+					    		 				st.Approval = 1;
+					    		 				st.Approved = 0;
+					    		 			}
+					    		 			else
+					    		 			{
+					    		 				st.Find = 1;
+					    		 			}
+					    		 		}
+
+					    		 		// check all approve or not
+					    		 		if (JsonStatus[i]['Status'] == 0) {
+					    		 			j_AllApprove++;
+					    		 		}
+					    		 	}
+
+					    		 	// check all approve or not
+					    		 		if (j_AllApprove > 0) {
+					    		 			st.AllApprove = 0;
+					    		 		}
+					    		 		else
+					    		 		{
+					    		 			st.AllApprove = 1;
+					    		 		}
+
+					    		 	// html warna
+					    		 		if (st.AllApprove == 1) {
+					    		 			$( row ).attr('style','background-color: #8ED6EA;');
+					    		 		}
+					    		 		else
+					    		 		{
+					    		 			if (st.Find == 1 && st.Approval == 1 && st.Approved == 1) {
+					    		 				$( row ).attr('style','background-color: #8ED6EA;');
+					    		 			}
+					    		 		}	
+					    },
+					    dom: 'l<"toolbar">frtip',
+				        initComplete: function(){
+				          $("div.toolbar")
+				             .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+							    '<span data-smt="" class="btn btn-add-new-pr" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+							        '<i class="icon-plus"></i> Create New PR'+
+							   '</span>'+
+							'</div>');
+				       }  
+					} );
+			}
+			Onetime++;
+		}
+		else
+		{
+			var table = $('#tableData4').DataTable( {
+				"fixedHeader": true,
+			    "processing": true,
+			    "destroy": true,
+			    "serverSide": true,
+			    "lengthMenu": [[5], [5]],
+			    "iDisplayLength" : 5,
+			    "ordering" : false,
+			    "ajax":{
+			        url : base_url_js+"budgeting/DataPR", // json datasource
+			        ordering : false,
+			        type: "post",  // method  , by default get
+			        data : {
+			        	ApproverLength : G_ApproverLength,
+			        	Years : Years,
+			        	Month : Month,
+			        	},
+			        error: function(){  // error handling
+			            $(".employee-grid-error").html("");
+			            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+			            $("#employee-grid_processing").css("display","none");
+			        }
+			    },
+			    'createdRow': function( row, data, dataIndex ) {
+			    		// console.log(data);
+			    		 var endkey_by = (data.length) - 2;
+			    		 var endkey_at = (data.length) - 1;
+			    		 var keydepartment = (data.length) - 4;
+			    		 $( row ).find('td:eq(1)').html(
+			    		 		'<a href = "javascript:void(0)" class = "PRCode" fill = "'+data[1]+'" department = "'+data[keydepartment]+'" style = "color : #d41c1c">'+data[1]+'</a><br>By : '+ data[endkey_by]+'<br>'+'At : '+ data[endkey_at]
+			    		 	)
+			    		 $( row ).find('td:eq(4)').attr('align','center');
+
+			    		 /* 
+			    		 	Warna Status oleh admin setelah approve semua menjadi color:#8ED6EA; selainnya default
+							Warna Status oleh approval ketika akan di approval default jika telah approval color:#8ED6EA;
+							Warna Status oleh user selain dua diatas adalah default
+			    		 */
+
+			    		 var keyJsonStatus = (data.length) - 3;
+			    		 var JsonStatus = data[keyJsonStatus];
+			    		 // find NIP
+			    		 	var st = {
+			    		 		Find : 0,
+			    		 		Approval : 0,
+			    		 		Approved : 0,
+			    		 		AllApprove : 0,
+			    		 	};
+
+			    		 	var j_AllApprove = 0;
+			    		 	for (var i = 0; i < JsonStatus.length; i++) {
+			    		 		if (i > 0) {
+			    		 			if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 1 ) {
+			    		 				st.Find = 1;
+			    		 				st.Approval = 1;
+			    		 				st.Approved = 1;
+
+			    		 			}
+			    		 			else if(NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['Status'] == 0 ) {
+			    		 				st.Find = 1;
+			    		 				st.Approval = 1;
+			    		 				st.Approved = 0;
+			    		 			}
+			    		 			else
+			    		 			{
+			    		 				st.Find = 1;
+			    		 			}
+			    		 		}
+
+			    		 		// check all approve or not
+			    		 		if (JsonStatus[i]['Status'] == 0) {
+			    		 			j_AllApprove++;
+			    		 		}
+			    		 	}
+
+			    		 	// check all approve or not
+			    		 		if (j_AllApprove > 0) {
+			    		 			st.AllApprove = 0;
+			    		 		}
+			    		 		else
+			    		 		{
+			    		 			st.AllApprove = 1;
+			    		 		}
+
+			    		 	// html warna
+			    		 		if (st.AllApprove == 1) {
+			    		 			$( row ).attr('style','background-color: #8ED6EA;');
+			    		 		}
+			    		 		else
+			    		 		{
+			    		 			if (st.Find == 1 && st.Approval == 1 && st.Approved == 1) {
+			    		 				$( row ).attr('style','background-color: #8ED6EA;');
+			    		 			}
+			    		 		}	
+			    },
+			    dom: 'l<"toolbar">frtip',
+		        initComplete: function(){
+		          $("div.toolbar")
+		             .html('<div class="toolbar no-padding pull-right" style = "margin-left : 10px;">'+
+					    '<span data-smt="" class="btn btn-add-new-pr" page = "form" style = "background-color : #0a885f;color:whitesmoke">'+
+					        '<i class="icon-plus"></i> Create New PR'+
+					   '</span>'+
+					'</div>');
+		       }  
+			} );
+		}
 	}
 
 	$(document).off('click', '.PRCode').on('click', '.PRCode',function(e) {

@@ -154,6 +154,14 @@ class C_pr_po extends Budgeting_Controler {
 
     public function pr()
     {
+        $this->data['token'] = '';
+        $content = $this->load->view('global/budgeting/pr/page',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function budgeting_pr_view($token)
+    {
+        $this->data['token'] = $token;
         $content = $this->load->view('global/budgeting/pr/page',$this->data,true);
         $this->temp($content);
     }
@@ -246,12 +254,18 @@ class C_pr_po extends Budgeting_Controler {
         $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
         $NIP = $this->session->userdata('NIP');
         if ($IDDepartementPUBudget != 'NA.9') {
-            $WhereFiltering .= ' where a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
+            $WhereFiltering .= ' where (a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\')';
         }
 
-        // $sqltotalData = 'select count(*) as total from db_budgeting.pr_create as a';
-        // $querytotalData = $this->db->query($sqltotalData)->result_array();
-        // $totalData = $querytotalData[0]['total'];
+        if (array_key_exists('Years', $_POST)) {
+            $WhereFiltering .= ' and a.Year = "'.$_POST['Years'].'" ';
+        }
+
+        if (array_key_exists('Month', $_POST)) {
+            if ($_POST['Month'] != 'all') {
+                $WhereFiltering .= ' and MONTH(a.CreatedAt) = '.(int)$_POST['Month'];
+            }
+        }
 
         $sqltotalData = 'select count(*) as total from 
                 (
@@ -356,6 +370,7 @@ class C_pr_po extends Budgeting_Controler {
             // get name created by
                 $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($row['CreatedBy']);
                 $nestedData[] = $getName[0]['Name'];
+                $nestedData[] = $row['CreatedAt'];
 
             $data[] = $nestedData;
             $No++;
@@ -534,9 +549,9 @@ class C_pr_po extends Budgeting_Controler {
         $key = "UAP)(*";
         $Departement = $this->jwt->decode($Departement,$key);
 
-        $PRCode = $this->input->post('PRCode');
+        $PRCodeURL = $this->input->post('PRCode');
         $key = "UAP)(*";
-        $PRCode = $this->jwt->decode($PRCode,$key);
+        $PRCode = $this->jwt->decode($PRCodeURL,$key);
 
         $Notes = $this->input->post('Notes');
         $key = "UAP)(*";
@@ -653,6 +668,9 @@ class C_pr_po extends Budgeting_Controler {
                             $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued');
 
                         // send notifikasi
+                            $key = "UAP)(*";
+                            $PRCodeURL = $this->jwt->encode($PRCode,$key);
+                            $URLDirect = 'budgeting_pr/'.$PRCodeURL;
                             $IDdiv = $Departement;
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                             // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -662,7 +680,7 @@ class C_pr_po extends Budgeting_Controler {
                                 'Logging' => array(
                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Created by '.$Code,
                                                 'Description' => 'PR '.$PRCode.' has been Created by '.$Code.'('.$this->session->userdata('Name').')',
-                                                'URLDirect' => 'budgeting_pr',
+                                                'URLDirect' => $URLDirect,
                                                 'CreatedBy' => $this->session->userdata('NIP'),
                                               ),
                                 'To' => array(
@@ -711,9 +729,9 @@ class C_pr_po extends Budgeting_Controler {
         $key = "UAP)(*";
         $Departement = $this->jwt->decode($Departement,$key);
 
-        $PRCode = $this->input->post('PRCode');
+        $PRCodeURL = $this->input->post('PRCode');
         $key = "UAP)(*";
-        $PRCode = $this->jwt->decode($PRCode,$key);
+        $PRCode = $this->jwt->decode($PRCodeURL,$key);
 
         $Notes = $this->input->post('Notes');
         $key = "UAP)(*";
@@ -878,6 +896,7 @@ class C_pr_po extends Budgeting_Controler {
                                 $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued & Edited');
 
                                 // send notifikasi
+                                    $URLDirect = 'budgeting_pr/'.$PRCodeURL;
                                     $IDdiv = $Departement;
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                                     // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -887,7 +906,7 @@ class C_pr_po extends Budgeting_Controler {
                                         'Logging' => array(
                                                         'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Revised by '.$Code,
                                                         'Description' => 'PR '.$PRCode.' has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
-                                                        'URLDirect' => 'budgeting_pr',
+                                                        'URLDirect' => $URLDirect,
                                                         'CreatedBy' => $this->session->userdata('NIP'),
                                                       ),
                                         'To' => array(

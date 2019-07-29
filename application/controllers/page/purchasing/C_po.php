@@ -1667,4 +1667,29 @@ class C_po extends Transaksi_Controler {
        $this->page_po($page); 
     }
 
+    public function upload_file_Approve()
+    {
+       $rs = array('status' => 0,'msg' => '');
+       $Input = $this->getInputToken();
+       $Code = $Input['Code'];
+       // check file sebelumnya, jika ada maka hapus
+       $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+       $F_POPrint_Approve = $G_data[0]['POPrint_Approve'];
+       if ($F_POPrint_Approve != '' && $F_POPrint_Approve != null) {
+           $arr_file = (array) json_decode($F_POPrint_Approve,true);
+           $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+           $path = FCPATH.'uploads\\'.$filePath;
+           unlink($path);
+       }
+
+
+       $POPrint_Approve = $this->m_master->uploadDokumenMultiple(uniqid(),'fileData',$path = './uploads/budgeting/po');
+       $POPrint_Approve = json_encode($POPrint_Approve);
+       $dataSave['POPrint_Approve']  = $POPrint_Approve;
+       $this->db->where('Code',$Code);
+       $this->db->update('db_purchasing.po_create',$dataSave);
+       $rs['status'] = 1;
+       echo json_encode($rs);
+    }
+
 }

@@ -66,6 +66,8 @@
          DivSessionName = '<?php echo $P ?>'; 
     <?php endif ?> 
     var NIP = sessionNIP;
+    window.SegmentURL = '<?php echo $this->uri->segment(2) ?>';
+    window.Onetime = 0;
     $(document).ready(function() {
         $("#container").attr('class','fixed-header sidebar-closed');
         // $("#sidebar").remove();
@@ -84,7 +86,6 @@
     function LoadPage(page)
     {
         // change page & 
-
         loading_page("#pageContent");
         var url = base_url_js+'budgeting/page_pr/'+page;
         $.post(url,function (resultJson) {
