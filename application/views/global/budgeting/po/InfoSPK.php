@@ -419,7 +419,13 @@
 							'</div>'+
 						'</div>';
 
-			$('#r_upload_file').html(html);			
+			$('#r_upload_file').html(html);
+			// just admin to do upload the file
+			var JsonStatus = po_create[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] != sessionNIP && DivisionID != '4') {
+		  		$('#BrowseFileSD').closest('.col-md-6').find('.form-group').remove();
+		  	}			
 			var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
 			if (POPrint_Approve != null && POPrint_Approve != '') {
 				var htUpload = '';
