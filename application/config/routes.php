@@ -985,8 +985,6 @@ $route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
 $route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
 
 
-
-
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
 $route['api/__test_data2'] = 'api/c_api/test_data2';

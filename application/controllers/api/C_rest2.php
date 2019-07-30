@@ -2723,6 +2723,26 @@ class C_rest2 extends CI_Controller {
                                       break;
                                   } 
                                   $ID_budget_left = $po_detail[$i]['ID_budget_left'];
+                                  /*
+                                    Note : jika terjadi perubahan harga pada po maka update data using dulu dengan keterangan dibawah
+                                  */
+
+                                  $SubTotal_PO = $po_detail[$i]['Subtotal'];
+                                  $Subtotal_PR =  $po_detail[$i]['Subtotal_PR'];
+                                  if ($SubTotal_PO != $Subtotal_PR) {
+                                     /*
+                                           using kurangi dengan Subtotal_PR terlebih dahulu, lalu baru ditambahkan dengan  SubTotal_PO
+                                     */
+
+                                     $_G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                      $_ValueUsing= $_G[0]['Using'];
+                                      $_ValueUsing = $_ValueUsing - $Subtotal_PR;
+                                      $_ValueUsing = $_ValueUsing + $SubTotal_PO;
+                                      $arr_save['Using'] = $_ValueUsing;
+                                      $this->db->where('ID',$ID_budget_left);
+                                      $this->db->update('db_budgeting.budget_left',$arr_save);
+                                  }   
+
                                   $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
                                   $ValueUsing= $G[0]['Using'];
                                   $ValueInvoice= $G[0]['Value'];

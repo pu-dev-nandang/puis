@@ -217,6 +217,29 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
 
             $this->db->insert('db_payment.spb',$dataSave2);
 
+            // send to notifikasi ke approval 1
+            // Notif to next step approval & User
+                $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                $CodeUrl = str_replace('/', '-', $Code);
+                // Send Notif for next approval
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code,
+                                        'Description' => 'Please approve SPB '.$Code,
+                                        'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($NIPApprovalNext),
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+
             // insert to spb_circulation_sheet
                 $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
             // insert to po_circulation_sheet
@@ -336,6 +359,30 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 $dataSave2['TypeInvoice'] = $Input['TypeInvoice'];
                 $this->db->where('ID_payment',$ID_payment);
                 $this->db->update('db_payment.spb',$dataSave2);
+
+                // send to notifikasi ke approval 1
+                // Notif to next step approval & User
+                    $Code = $G_data[0]['Code'];
+                    $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                    $CodeUrl = str_replace('/', '-', $Code);
+                    // Send Notif for next approval
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code.' after edited',
+                                            'Description' => 'Please approve SPB '.$Code.' after edited',
+                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => array(
+                                      'NIP' => array($NIPApprovalNext),
+                                    ),
+                            'Email' => 'No', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
 
                 // insert to spb_circulation_sheet
                     $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
