@@ -1250,6 +1250,14 @@ $route['agregator/dosen-tidak-tetap'] = 'page/agregator/c_agregator/dosen_tidak_
 $route['agregator/perolehan-dana'] = 'page/agregator/c_agregator/perolehan_dana';
 $route['agregator/penggunaan-dana'] = 'page/agregator/c_agregator/penggunaan_dana';
 
+$route['agregator/ipk'] = 'page/agregator/c_agregator/ipk';
+$route['agregator/prestasi-akademik-mahasiswa'] = 'page/agregator/c_agregator/prestasi_akademik_mahasiswa';
+$route['agregator/prestasi-non-akademik-mahasiswa'] = 'page/agregator/c_agregator/prestasi_non_akademik_mahasiswa';
+$route['agregator/lama-studi-mahasiswa'] = 'page/agregator/c_agregator/lama_studi_mahasiswa';
+$route['agregator/rasio-kelulusan'] = 'page/agregator/c_agregator/rasio_kelulusan';
+$route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
+$route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
+
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
@@ -1262,11 +1270,14 @@ $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalA
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
 $route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
 $route['api3/__crudAgregatorTB4'] = 'api/c_api3/crudAgregatorTB4';
+$route['api3/__crudAgregatorTB5'] = 'api/c_api3/crudAgregatorTB5';
 $route['api3/__getKecukupanDosen'] = 'api/c_api3/getKecukupanDosen';
 $route['api3/__getJabatanAkademikDosenTetap'] = 'api/c_api3/getJabatanAkademikDosenTetap';
 $route['api3/__getJabatanAkademikDosenTidakTetap'] = 'api/c_api3/getJabatanAkademikDosenTidakTetap';
 $route['api3/__getLecturerCertificate'] = 'api/c_api3/getLecturerCertificate';
 $route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
+
+$route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 
 
 
