@@ -226,7 +226,9 @@
 		var CodeSPB = $(this).attr('CodeSPB');
 		var Code_po_create = $(this).attr('Code_po_create');
 		var PR = $(this).attr('prcode');
-
+		ClassDt.all_po_payment = [];
+		ClassDt.po_payment_data = [];
+		ClassDt.po_data = [];
 		if (Code_po_create != '' && Code_po_create != null) {
 			Get_data_spb_grpo(Code_po_create).then(function(data){
 				ClassDt.all_po_payment = data;
@@ -712,16 +714,31 @@
 		var ID_payment = $(this).attr('id_payment');
 		var po_data = ClassDt.po_data;
 		var Dataselected = ClassDt.all_po_payment;
-		var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
 
-		var url = base_url_js+'save2pdf/print/pre_pembayaran';
-		var data = {
-		  ID_payment : ID_payment,
-		  dt_arr : dt_arr,
-		  po_data : po_data,
-		  Dataselected : Dataselected,
+			var url = base_url_js+'save2pdf/print/pre_pembayaran';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			}
+			var token = jwt_encode(data,"UAP)(*");
 		}
-		var token = jwt_encode(data,"UAP)(*");
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user';
+		}
+		
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
