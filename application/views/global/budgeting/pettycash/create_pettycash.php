@@ -1573,4 +1573,18 @@
 	    }
 	})
 
+	$(document).off('click', '#pdfprint').on('click', '#pdfprint',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var url = base_url_js+'save2pdf/print/payment_user';
+		var data = {
+		  ID_payment : ID_payment,
+		  TypePay : 'Petty Cash',
+		  DataPayment : ClassDt.DtExisting,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
 </script>

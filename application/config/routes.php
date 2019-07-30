@@ -700,6 +700,7 @@ $route['save2pdf/PrintIDCard'] =  'c_save_to_pdf/PrintIDCard';
 $route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
 $route['save2pdf/print/spk_or_po'] =  'C_save_to_pdf3/spk_or_po';
 $route['save2pdf/print/pre_pembayaran'] =  'C_save_to_pdf3/pre_pembayaran';
+$route['save2pdf/print/payment_user'] =  'C_save_to_pdf3/payment_user';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
