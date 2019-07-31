@@ -2680,7 +2680,14 @@ class C_rest2 extends CI_Controller {
                     $ID_payment = $dataToken['ID_payment'];
                     $po_payment_data = $dataToken['po_payment_data'];
                     $po_payment_data = json_decode(json_encode($po_payment_data),true);
-                    $dt = $po_payment_data['dtspb'];
+                    if (array_key_exists('dtspb', $po_payment_data)) {
+                        $dt = $po_payment_data['dtspb'];
+                    }
+                    else
+                    {
+                        $dt = $po_payment_data['payment'];
+                    }
+                    
                     $Invoice = $dt[0]['Detail'][0]['Invoice'];
                     $Code_po_create =  $dt[0]['Code_po_create'];
                     if ($Code_po_create != '' && $Code_po_create != null) {
@@ -2749,11 +2756,20 @@ class C_rest2 extends CI_Controller {
                                   $InvoiceAP = 0;   
                                   // $bool2 = true;
                                   if ($ValueUsing >= $InvoiceLeft) {
-                                      $ValueInvoice = $ValueInvoice - $InvoiceLeft;
-                                      $ValueUsing = $ValueUsing - $InvoiceLeft;
-                                      $InvoiceAP = $InvoiceLeft;  
-                                      $InvoiceLeft = $InvoiceLeft - $InvoiceLeft;
-                                      // $bool2 = false;
+                                      if ($InvoiceLeft <= $SubTotal_PO) {
+                                        $ValueInvoice = $ValueInvoice - $InvoiceLeft;
+                                        $ValueUsing = $ValueUsing - $InvoiceLeft;
+                                        $InvoiceAP = $InvoiceLeft; 
+                                        $InvoiceLeft = $InvoiceLeft - $InvoiceLeft;
+                                      }
+                                      else
+                                      {
+                                        $ValueInvoice = $ValueInvoice - $SubTotal_PO;
+                                        $ValueUsing = $ValueUsing - $SubTotal_PO;
+                                        $InvoiceAP = $SubTotal_PO; 
+                                        $InvoiceLeft = $InvoiceLeft - $SubTotal_PO;
+                                      }
+                                      
                                   }
                                   else
                                   {
@@ -2805,6 +2821,93 @@ class C_rest2 extends CI_Controller {
                     else
                     {
                         // NON PO
+                        $DetailPayment = $dt[0]['Detail'];
+                        $DetailPaymentType = $DetailPayment[0]['Detail'];
+                        $Invoice = $DetailPayment[0]['Invoice'];
+                        $Total = 0;
+                        // get total budget left
+                        for ($i=0; $i < count($DetailPaymentType); $i++) { 
+                            $ID_budget_left = $DetailPaymentType[$i]['ID_budget_left'];
+                            $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                            $ValueInvoice = $G[0]['Value'];
+                            $Total += $ValueInvoice;
+                        }
+
+                        $InvoiceLeft = $Invoice;
+                        if ($Total >= $Invoice) {
+                            // insert ke table ap dulu
+                            $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                            $UploadVoucher = json_encode($UploadVoucher);
+                            $dtime =  date('Y-m-d H:i:s');
+
+                            $arr = array(
+                              'ID_payment' => $ID_payment,
+                              'Status' => 2,
+                              'JsonStatus' => json_encode(array()),
+                              'CreatedBy' => $dataToken['NIP'],
+                              'CreatedAt' => $dtime,
+                              'PostingDate' => $dtime,
+                              'Code' => '',
+                              'NoVoucher' => $dataToken['NoVoucher'],
+                              'UploadVoucher' => $UploadVoucher,
+                            );
+                            $this->db->insert('db_budgeting.ap',$arr);
+                            $ID_ap = $this->db->insert_id();
+
+                            for ($i=0; $i < count($DetailPaymentType); $i++) { 
+                                if ($InvoiceLeft <= 0) {
+                                    break;
+                                }
+
+                                $ID_budget_left = $DetailPaymentType[$i]['ID_budget_left'];
+                                $InvoiceByr =  $DetailPaymentType[$i]['Invoice'];
+
+                                $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                $ValueUsing= $G[0]['Using'];
+                                $ValueInvoice= $G[0]['Value'];
+                                $InvoiceAP = 0;   
+
+                                if ($ValueUsing >= $InvoiceByr) {
+                                    $ValueInvoice = $ValueInvoice - $InvoiceByr;
+                                    $ValueUsing = $ValueUsing - $InvoiceByr;
+                                    $InvoiceAP = $InvoiceByr;  
+                                    $InvoiceLeft = $InvoiceLeft - $InvoiceByr;
+                                    // $bool2 = false;
+                                }
+                                else
+                                {
+                                  $ValueInvoice = $ValueInvoice - $ValueUsing;
+                                  $InvoiceAP = $ValueUsing;
+                                  $ValueUsing = $ValueUsing - $ValueUsing;
+                                  $InvoiceLeft = $InvoiceLeft - $ValueUsing;
+                                }
+
+                                // insert ke budget_payment
+                                $arr_ap = array(
+                                  'ID_ap' => $ID_ap,
+                                  'ID_budget_left' => $ID_budget_left,
+                                  'Invoice' => $InvoiceAP,
+                                );
+                                $this->db->insert('db_budgeting.budget_payment',$arr_ap);
+
+                                // update budget_left
+                                $arr_budget_left = array(
+                                  'Value' =>  $ValueInvoice,
+                                  'Using' => $ValueUsing,                                   
+                                );
+
+                                $this->db->where('ID',$ID_budget_left);
+                                $this->db->update('db_budgeting.budget_left',$arr_budget_left);
+                            }
+
+                        }
+                        else
+                        {
+                            $rs['Status'] = 0;
+                            $rs['msg'] = 'Post Budget mencukupi untuk melakukan pembayaran';
+                        }
+
+                        // print_r($dt);die();
                     }
 
                     echo json_encode($rs);

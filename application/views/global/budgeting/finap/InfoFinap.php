@@ -52,8 +52,34 @@
 		}
 		else
 		{
-			MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			__load_data_payment(ID_payment).then(function(data){
+				ClassDt.po_payment_data = data;
+				MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			})
+			// MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
 		}
+	}
+
+	function __load_data_payment(ID_payment)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__Get_data_payment_user';
+		var data = {
+		    ID_payment : ID_payment,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
 	}
 
 	function Get_data_spb_grpo(Code)
@@ -79,19 +105,21 @@
 	function __getRsViewGRPO_SPB(ID_payment,Dataselected)
 	{
 		var arr=[];
-		var dtspb = Dataselected.dtspb;
-		var dtspb_rs = [];
-		// get indeks array
-		for (var i = 0; i < dtspb.length; i++) {
-			if (ID_payment == dtspb[i].ID) {
-				break;
+		if (typeof Dataselected.dtspb !== "undefined") {
+			var dtspb = Dataselected.dtspb;
+			var dtspb_rs = [];
+			// get indeks array
+			for (var i = 0; i < dtspb.length; i++) {
+				if (ID_payment == dtspb[i].ID) {
+					break;
+				}
 			}
-		}
 
-		dtspb_rs[0] = dtspb[i];
-		arr = {
-			dtspb : dtspb_rs,
-		};
+			dtspb_rs[0] = dtspb[i];
+			arr = {
+				dtspb : dtspb_rs,
+			};
+		}
 
 		return arr;
 	}
@@ -112,159 +140,285 @@
 	function __showHistory(ID_payment_ori,Code_po_create,PR)
 	{
 		var html = '';
-		var all_po_payment = ClassDt.all_po_payment;
-		var dtspb_all = all_po_payment.dtspb;
-			for (var i = 0; i < dtspb_all.length; i++) {
-				var ID_payment = dtspb_all[i].ID;
-				if (ID_payment == ID_payment_ori) {
-					var dt_arr = __getRsViewGRPO_SPB(ID_payment,all_po_payment);
-					var po_payment_data = dt_arr;
-					var dtspb = po_payment_data.dtspb;
-					html += '<div class ="row" style ="margin-top:30px;">'+
-									'<div class = "col-xs-12">'+
-										'<div align="center"><h2 class="payment_number">Payment</h2></div>'+
-										'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-										'<table class="table borderless" style="font-weight: bold;">'+
-										'<thead></thead>'+
-										'<tbody>';
+		if (Code_po_create != '' && Code_po_create != null) {
+			var all_po_payment = ClassDt.all_po_payment;
+			var dtspb_all = all_po_payment.dtspb;
+				for (var i = 0; i < dtspb_all.length; i++) {
+					var ID_payment = dtspb_all[i].ID;
+					if (ID_payment == ID_payment_ori) {
+						var dt_arr = __getRsViewGRPO_SPB(ID_payment,all_po_payment);
+						var po_payment_data = dt_arr;
+						var dtspb = po_payment_data.dtspb;
+						html += '<div class ="row" style ="margin-top:30px;">'+
+										'<div class = "col-xs-12">'+
+											'<div align="center"><h2 class="payment_number">Payment</h2></div>'+
+											'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+											'<table class="table borderless" style="font-weight: bold;">'+
+											'<thead></thead>'+
+											'<tbody>';
 
-					var se_content = $('#page_content');
-					if (PR != '' && PR != null) {
-						html += '<tr>'+
-									'<td class = "TD1"><label>PR Code</label></td>'+
-									'<td>:</td>'+
-									'<td>'+'<a href = "javascript:void(0)" prcode = "'+PR+'" class = "printpr">'+PR+'</a></td>'+
-								'</tr>';	
-					}
+						var se_content = $('#page_content');
+						if (PR != '' && PR != null) {
+							html += '<tr>'+
+										'<td class = "TD1"><label>PR Code</label></td>'+
+										'<td>:</td>'+
+										'<td>'+'<a href = "javascript:void(0)" prcode = "'+PR+'" class = "printpr">'+PR+'</a></td>'+
+									'</tr>';	
+						}
 
-					if (Code_po_create != '' && Code_po_create != null) {
-						var po_data = ClassDt.po_data;
-						var po_create = po_data.po_create;
-						var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
-						var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
-						var ahrefPO_SPK = '<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a>';
-						if (POPrint_Approve != null && POPrint_Approve != '') {
-							ahrefPO_SPK = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+POPrint_Approve[0]+'" target="_blank" class = "Fileexist">'+Code_po_create+'</a>'
+						if (Code_po_create != '' && Code_po_create != null) {
+							var po_data = ClassDt.po_data;
+							var po_create = po_data.po_create;
+							var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
+							var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
+							var ahrefPO_SPK = '<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a>';
+							if (POPrint_Approve != null && POPrint_Approve != '') {
+								ahrefPO_SPK = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+POPrint_Approve[0]+'" target="_blank" class = "Fileexist">'+Code_po_create+'</a>'
+							}
+
+							html += '<tr>'+
+										'<td class = "TD1"><label>PO / SPK Code</label></td>'+
+										'<td>:</td>'+
+										'<td>'+ahrefPO_SPK+'</td>'+
+									'</tr>';
+
+							var pre_po_supplier = po_data.pre_po_supplier;
+							var t = '';									
+							for (var i = 0; i < pre_po_supplier.length; i++) {
+								var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
+								var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
+								var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
+								// t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
+								t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
+									Reason+
+									'</li>';
+							}		
+
+
+							html += '<tr>'+
+										'<td class = "TD1"><label>Perbandingan Vendor</label></td>'+
+										'<td>:</td>'+
+										'<td>'+t+'</td>'+
+									'</tr>';			
+						}
+
+						var lblAdd = '';
+						var TypePay = dtspb[0].Type;
+						if (TypePay == 'Spb') {
+							lblAdd = "<br> Code : "+dtspb[0].Code;
 						}
 
 						html += '<tr>'+
-									'<td class = "TD1"><label>PO / SPK Code</label></td>'+
+									'<td class = "TD1"><label>Payment Type'+' '+lblAdd+'</label></td>'+
 									'<td>:</td>'+
-									'<td>'+ahrefPO_SPK+'</td>'+
+									'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
 								'</tr>';
 
-						var pre_po_supplier = po_data.pre_po_supplier;
-						var t = '';									
-						for (var i = 0; i < pre_po_supplier.length; i++) {
-							var File = jQuery.parseJSON(pre_po_supplier[i].FileOffer);
-							var Reason = (pre_po_supplier[i].ApproveSupplier == 1) ? '<label style="margin-left:19px;">Reason : <br>'+ nl2br(pre_po_supplier[i].Desc)+'</label>' : '';
-							var Approve = (pre_po_supplier[i].ApproveSupplier == 1) ? ' (Approve) ' : '';
-							// t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+'</a>'+'</li>';
-							t += '<li><a href="'+base_url_js+'fileGetAny/budgeting-po-'+File[0]+'" target="_blank">'+pre_po_supplier[i].NamaSupplier+Approve+'</a>'+'<br>'+
-								Reason+
-								'</li>';
+						var FolderPayment = '';
+						switch(TypePay) {
+						  case "Spb":
+						    FolderPayment = "spb";
+						    break;
+						  case "Bank Advance":
+						    FolderPayment = "bankadvance";
+						    break;
+						  case "Cash Advance":
+						    FolderPayment = "cashadvance";
+						    break;
+						  case "Petty Cash":
+						    FolderPayment = "pettycash";
+						    break;   
+						  default:
+						    FolderPayment = '';
+						}
+
+						// check IOM exist or not
+						var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+						if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+							UploadIOM = UploadIOM[0];
+							html += '<tr>'+
+										'<td class = "TD1"><label>IOM</label></td>'+
+										'<td>:</td>'+
+										'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+									'</tr>';
+						}					
+
+
+						if (Code_po_create != '' && Code_po_create != null) {
+							// make GRPO
+							var TDGRPO = '-';
+							var Good_Receipt = dtspb[0].Good_Receipt;
+							if (Good_Receipt.length > 0) {
+								TDGRPO = '<button class = "btn btn-primary ShowGRPOMODAL" id_payment = "'+ID_payment+'">Show GRPO</button>';
+							}	
+							html += '<tr>'+
+										'<td class = "TD1"><label>GRPO</label></td>'+
+										'<td>:</td>'+
+										'<td>'+TDGRPO+'</td>'+
+									'</tr>';	
+
 						}		
-
-
-						html += '<tr>'+
-									'<td class = "TD1"><label>Perbandingan Vendor</label></td>'+
-									'<td>:</td>'+
-									'<td>'+t+'</td>'+
-								'</tr>';			
-					}
-
-					var lblAdd = '';
-					var TypePay = dtspb[0].Type;
-					if (TypePay == 'Spb') {
-						lblAdd = "<br> Code : "+dtspb[0].Code;
-					}
-
-					html += '<tr>'+
-								'<td class = "TD1"><label>Payment Type'+' '+lblAdd+'</label></td>'+
-								'<td>:</td>'+
-								'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
-							'</tr>';
-
-					var FolderPayment = '';
-					switch(TypePay) {
-					  case "Spb":
-					    FolderPayment = "spb";
-					    break;
-					  case "Bank Advance":
-					    FolderPayment = "bankadvance";
-					    break;
-					  case "Cash Advance":
-					    FolderPayment = "cashadvance";
-					    break;
-					  case "Petty Cash":
-					    FolderPayment = "pettycash";  
-					  default:
-					    FolderPayment = '';
-					}
-
-					if (Code_po_create != '' && Code_po_create != null) {
-						// make GRPO
-						var TDGRPO = '-';
-						var Good_Receipt = dtspb[0].Good_Receipt;
-						if (Good_Receipt.length > 0) {
-							TDGRPO = '<button class = "btn btn-primary ShowGRPOMODAL" id_payment = "'+ID_payment+'">Show GRPO</button>';
-						}	
-						html += '<tr>'+
-									'<td class = "TD1"><label>GRPO</label></td>'+
-									'<td>:</td>'+
-									'<td>'+TDGRPO+'</td>'+
-								'</tr>';	
-
-					}		
-					
-					// check for document invoice
-					if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
-						var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
-						if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
-							UploadInvoice = UploadInvoice[0];
-							html += '<tr>'+
-										'<td class = "TD1"><label>Invoice</label></td>'+
-										'<td>:</td>'+
-										'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
-									'</tr>';
-						}
 						
-						var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
-						if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
-							UploadTandaTerima = UploadTandaTerima[0];
-							html += '<tr>'+
-										'<td class = "TD1"><label>Tanda Terima</label></td>'+
-										'<td>:</td>'+
-										'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
-									'</tr>';
+						// check for document invoice
+						if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
+							var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+							if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
+								UploadInvoice = UploadInvoice[0];
+								html += '<tr>'+
+											'<td class = "TD1"><label>Invoice</label></td>'+
+											'<td>:</td>'+
+											'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
+										'</tr>';
+							}
+							
+							var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+							if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
+								UploadTandaTerima = UploadTandaTerima[0];
+								html += '<tr>'+
+											'<td class = "TD1"><label>Tanda Terima</label></td>'+
+											'<td>:</td>'+
+											'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
+										'</tr>';
+							}
+
 						}
 
-					}
+						var UploadVoucher = jQuery.parseJSON(dtspb[0].FinanceAP[0].UploadVoucher);
+						var htmlUploadVoucher = '';
+						if (UploadVoucher != '' && UploadVoucher != null && UploadVoucher != undefined) {
+							UploadVoucher = UploadVoucher[0];
+							htmlUploadVoucher = '<a href = "'+base_url_js+'fileGetAny/finance-'+UploadVoucher+'" target="_blank" class = "Fileexist">'+'File '+dtspb[0].FinanceAP[0].NoVoucher+'</a>';
+						}
 
-					var UploadVoucher = jQuery.parseJSON(dtspb[0].FinanceAP[0].UploadVoucher);
-					var htmlUploadVoucher = '';
-					if (UploadVoucher != '' && UploadVoucher != null && UploadVoucher != undefined) {
-						UploadVoucher = UploadVoucher[0];
-						htmlUploadVoucher = '<a href = "'+base_url_js+'fileGetAny/finance-'+UploadVoucher+'" target="_blank" class = "Fileexist">'+'File '+dtspb[0].FinanceAP[0].NoVoucher+'</a>';
-					}
+						html += '<tr>'+
+									'<td class = "TD1"><label>No Dokumen</label></td>'+
+									'<td>:</td>'+
+									'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
+								'</tr>'+
+								'<tr>'+
+									'<td><label>Upload Dokumen</label></td>'+
+									'<td>:</td>'+
+									'<td>'+htmlUploadVoucher+'</td>'+
+								'</tr>';
 
+						html += '</tbody></table>';
+						html += '</div></div>';	
+						break;
+					}
+					
+				}
+		}
+		else
+		{
+			var po_payment_data = ClassDt.po_payment_data;
+			// check for document invoice
+			if (typeof po_payment_data.dtspb !== "undefined") {
+				var dtspb = po_payment_data.dtspb;
+			}
+			else
+			{
+				var dtspb = po_payment_data.payment;
+			}
+
+			var CodeSPB = dtspb[0].Code;
+			var TypePay = dtspb[0].Type;
+			var ID_payment = dtspb[0].ID;
+
+			html += '<div class ="row FormPage" style ="margin-top:30px;">'+
+							'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
+								'<div class="well">'+
+								'<div align="center"><h2 class="payment_number">Payment</h2></div>'+
+								'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+								'<table class="table borderless" style="font-weight: bold;">'+
+								'<thead></thead>'+
+								'<tbody>';
+			var lblAdd = '';
+			if (TypePay == 'Spb') {
+				lblAdd = "<br> Code : "+CodeSPB;
+			}
+
+			html += '<tr>'+
+						'<td class = "TD1"><label>Payment Type : '+TypePay+' '+lblAdd+'</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "javascript:void(0)" ID_payment = "'+ID_payment+'" class = "printpay">'+TypePay+'</a></td>'+
+					'</tr>';
+
+			var FolderPayment = '';
+			switch(TypePay) {
+			  case "Spb":
+			    FolderPayment = "spb";
+			    break;
+			  case "Bank Advance":
+			    FolderPayment = "bankadvance";
+			    break;
+			  case "Cash Advance":
+			    FolderPayment = "cashadvance";
+			    break;
+			  case "Petty Cash":
+			    FolderPayment = "pettycash";
+			     break;  
+			  default:
+			    FolderPayment = '';
+			}
+
+
+			// check IOM exist or not
+			var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+			if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+				UploadIOM = UploadIOM[0];
+				html += '<tr>'+
+							'<td class = "TD1"><label>IOM</label></td>'+
+							'<td>:</td>'+
+							'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+						'</tr>';
+			}
+
+
+			if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
+				var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+				if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
+					UploadInvoice = UploadInvoice[0];
 					html += '<tr>'+
-								'<td class = "TD1"><label>No Dokumen</label></td>'+
+								'<td class = "TD1"><label>Invoice</label></td>'+
 								'<td>:</td>'+
-								'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
-							'</tr>'+
-							'<tr>'+
-								'<td><label>Upload Dokumen</label></td>'+
-								'<td>:</td>'+
-								'<td>'+htmlUploadVoucher+'</td>'+
+								'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadInvoice+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoInvoice']+'</a>'+'</td>'+
 							'</tr>';
-
-					html += '</tbody></table>';
-					html += '</div></div>';	
-					break;
 				}
 				
+				var UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+				if (UploadTandaTerima.length > 0 && UploadTandaTerima != '' && UploadTandaTerima != null && UploadTandaTerima != undefined) {
+					UploadTandaTerima = UploadTandaTerima[0];
+					html += '<tr>'+
+								'<td class = "TD1"><label>Tanda Terima</label></td>'+
+								'<td>:</td>'+
+								'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">'+dtspb[0].Detail[0]['NoTandaTerima']+'</a>'+'</td>'+
+							'</tr>';
+				}
+
 			}
+
+			var UploadVoucher = jQuery.parseJSON(dtspb[0].FinanceAP[0].UploadVoucher);
+			var htmlUploadVoucher = '';
+			if (UploadVoucher != '' && UploadVoucher != null && UploadVoucher != undefined) {
+				UploadVoucher = UploadVoucher[0];
+				htmlUploadVoucher = '<a href = "'+base_url_js+'fileGetAny/finance-'+UploadVoucher+'" target="_blank" class = "Fileexist">'+'File '+dtspb[0].FinanceAP[0].NoVoucher+'</a>';
+			}
+
+			html += '<tr>'+
+						'<td class = "TD1"><label>No Dokumen</label></td>'+
+						'<td>:</td>'+
+						'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
+					'</tr>'+
+					'<tr>'+
+						'<td><label>Upload Dokumen</label></td>'+
+						'<td>:</td>'+
+						'<td>'+htmlUploadVoucher+'</td>'+
+					'</tr>';
+
+			html += '</tbody></table>';
+
+		}
+		
 		return html;
 	}
 
@@ -302,20 +456,34 @@
 	})
 
 	$(document).off('click', '.printpay').on('click', '.printpay',function(e) {
-		var dt_arr = ClassDt.po_payment_data;
-		var dtspb = dt_arr.dtspb;
-		var ID_payment = dtspb[0]['ID'];
+		var ID_payment = $(this).attr('id_payment');
 		var po_data = ClassDt.po_data;
 		var Dataselected = ClassDt.all_po_payment;
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
 
-		var url = base_url_js+'save2pdf/print/pre_pembayaran';
-		var data = {
-		  ID_payment : ID_payment,
-		  dt_arr : dt_arr,
-		  po_data : po_data,
-		  Dataselected : Dataselected,
+			var url = base_url_js+'save2pdf/print/pre_pembayaran';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			}
+			var token = jwt_encode(data,"UAP)(*");
 		}
-		var token = jwt_encode(data,"UAP)(*");
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user';
+		}
+		
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
@@ -325,7 +493,14 @@
 	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
 	{
 		var html = '';
-		var dtspb = DataPaymentSelected.dtspb;
+		if (typeof DataPaymentSelected.dtspb !== "undefined") {
+			var dtspb = DataPaymentSelected.dtspb;
+		}
+		else
+		{
+			var dtspb = DataPaymentSelected.payment;
+		}
+		// var dtspb = DataPaymentSelected.dtspb;
 		// selain spb
 		var Type = dtspb[0].Type;
 		if (Type != 'Spb') {
