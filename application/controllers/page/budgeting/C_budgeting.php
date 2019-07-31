@@ -1893,28 +1893,19 @@ class C_budgeting extends Budgeting_Controler {
     public function BudgetLeft()
     {
         $this->auth_ajax();
-        $Departement = $this->session->userdata('IDDepartementPUBudget');
-        switch ($Departement) {
-            case 'NA.9':
-                $this->BudgetRemainingFinance();
-                break;
+        // $Departement = $this->session->userdata('IDDepartementPUBudget');
+        // switch ($Departement) {
+        //     case 'NA.9':
+        //         $this->BudgetRemainingFinance();
+        //         break;
             
-            default:
-                $this->BudgetRemainingPerDiv();
-                break;
-        }
-    }
-
-    public function BudgetRemainingFinance()
-    {
+        //     default:
+        //         $this->BudgetRemainingPerDiv();
+        //         break;
+        // }
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/BudgetRemaining',$this->data,true);
+        $arr_result['html'] = $this->load->view('global/budgeting/BudgetRemaining',$this->data,true);
         echo json_encode($arr_result);
-    }
-
-    public function BudgetRemainingPerDiv()
-    {
-
     }
 
     public function getListBudgetingRemaining()

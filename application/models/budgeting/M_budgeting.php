@@ -568,7 +568,7 @@ class M_budgeting extends CI_Model {
     public function get_budget_remaining($Year,$Departement)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.SubTotal as PriceBudgetAwal
          from
             (
                    select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,

@@ -88,9 +88,9 @@
             <a href="javascript:void(0)" class="pageAnchor" page = "report_anggaran_per_years">Report Anggaran</a>
         </li>
         <?php endif ?>
-        <!-- <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
+        <li class="<?php if($request=='BudgetLeft'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "BudgetLeft">Budget Remaining</a>
-        </li> -->
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
