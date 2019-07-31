@@ -414,9 +414,21 @@
 				    FolderPayment = "cashadvance";
 				    break;
 				  case "Petty Cash":
-				    FolderPayment = "pettycash";  
+				    FolderPayment = "pettycash";
+				    break;   
 				  default:
 				    FolderPayment = '';
+				}
+
+				// check IOM exist or not
+				var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+				if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+					UploadIOM = UploadIOM[0];
+					html += '<tr>'+
+								'<td class = "TD1"><label>IOM</label></td>'+
+								'<td>:</td>'+
+								'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+							'</tr>';
 				}
 
 				if (Code_po_create != '' && Code_po_create != null) {
@@ -590,10 +602,13 @@
 		    FolderPayment = "cashadvance";
 		    break;
 		  case "Petty Cash":
-		    FolderPayment = "pettycash";  
+		    FolderPayment = "pettycash";
+		     break;  
 		  default:
 		    FolderPayment = '';
-		}		
+		}
+		// console.log('*'+TypePay+'*');		
+		// console.log('*'+FolderPayment+'*');		
 		var po_payment_data = ClassDt.po_payment_data;
 		// check for document invoice
 		if (typeof po_payment_data.dtspb !== "undefined") {
@@ -604,6 +619,16 @@
 			var dtspb = po_payment_data.payment;
 		}
 		
+		// check IOM exist or not
+		var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+		if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+			UploadIOM = UploadIOM[0];
+			html += '<tr>'+
+						'<td class = "TD1"><label>IOM</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+					'</tr>';
+		}
 
 		if (Code_po_create != '' && Code_po_create != null) {
 			// make GRPO
@@ -885,6 +910,7 @@
 				  },
 				  error: function (data) {
 				    toastr.error("Connection Error, Please try again", 'Error!!');
+				    loadingEnd(500);
 				  }
 				})
 			}

@@ -86,7 +86,7 @@ class C_finap extends Budgeting_Controler {
          }
           
          $requestData = $_REQUEST;
-         $StatusQuery = ' and Status = 2';
+         $StatusQuery = '';
          $sqltotalData = 'select count(*) as total  from (
                      select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                          c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
@@ -163,27 +163,34 @@ class C_finap extends Budgeting_Controler {
                  where d.Code = ?
                  ';
                  $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
-                 for ($j=0; $j < count($query_get_pr); $j++) { 
-                     if (count($arr_temp) == 0) {
-                         $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                     }
-                     else
-                     {
-                         // check exist
-                         $bool = true;
-                         for ($k=0; $k < count($arr_temp); $k++) { 
-                             if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
-                                 $bool = false;    
-                                 break;
-                             }
-                         }
-
-                         if ($bool) {
-                             $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                         }
-
-                     }
+                 if (count($query_get_pr)  == 0) {
+                     $arr_temp[] = array();
                  }
+                 else
+                 {
+                    for ($j=0; $j < count($query_get_pr); $j++) { 
+                        if (count($arr_temp) == 0) {
+                            $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                        }
+                        else
+                        {
+                            // check exist
+                            $bool = true;
+                            for ($k=0; $k < count($arr_temp); $k++) { 
+                                if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                    $bool = false;    
+                                    break;
+                                }
+                            }
+
+                            if ($bool) {
+                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                            }
+
+                        }
+                    }
+                 }
+                 
                  // pass data spb
                  $arr_temp[] = array(
                      'CodeSPB' => $row['CodeSPB'],
@@ -226,7 +233,14 @@ class C_finap extends Budgeting_Controler {
                 $TypePay = $G_payment[0]['Type'];
                 $CodeSPB =  $G_payment[0]['Code'];
                 $G_po = $this->m_pr_po->Get_data_po_by_Code($Code_po_create);
-                $PRCode = $G_po['po_detail'][0]['PRCode'];
+                if ($Code_po_create == '' || $Code_po_create == null) {
+                    $PRCode = ''; 
+                }
+                else
+                {
+                   $PRCode = $G_po['po_detail'][0]['PRCode']; 
+                }
+                
                 $data = array(
                     'ID_payment_fin' => $ID_payment_fin,
                     'ID_payment' => $ID_payment,
