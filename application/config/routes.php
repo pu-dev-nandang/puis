@@ -11,7 +11,6 @@ $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
-
 // FROM PORTAL
 $route['uath/__portal4SignIn'] = 'c_login/portal4SignIn';
 
