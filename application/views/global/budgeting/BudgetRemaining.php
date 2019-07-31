@@ -6,7 +6,7 @@
 					<div class="col-md-6">
 						<div class="form-group">
 							<label>Period</label>
-							<select class="select2-select-00 full-width-fix" id="Years">
+							<select class="select2-select-00 full-width-fix" id="YearsBudgetRemaining">
 							     <!-- <option></option> -->
 							 </select>
 						</div>	
@@ -14,7 +14,7 @@
 					<div class="col-md-6">
 						<div class="form-group">
 							<label>Departement</label>
-							<select class="select2-select-00 full-width-fix" id="Departement">
+							<select class="select2-select-00 full-width-fix" id="DepartementBudgetRemaining">
 								
 							</select>	
 						</div>	
@@ -49,7 +49,7 @@
 	function load_table_activated_period_years()
 	{
 	   // load Year
-	   $("#Years").empty();
+	   $("#YearsBudgetRemaining").empty();
 	   var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
 	   var thisYear = (new Date()).getFullYear();
 	   $.post(url,function (resultJson) {
@@ -57,9 +57,9 @@
 	    for(var i=0;i<response.length;i++){
 	        //var selected = (i==0) ? 'selected' : '';
 	        var selected = (response[i].Activated==1) ? 'selected' : '';
-	        $('#Years').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+' - '+(parseInt(response[i].Year) + 1)+'</option>');
+	        $('#YearsBudgetRemaining').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+' - '+(parseInt(response[i].Year) + 1)+'</option>');
 	    }
-	    $('#Years').select2({
+	    $('#YearsBudgetRemaining').select2({
 	       //allowClear: true
 	    });
 	    getAllDepartementPU__();
@@ -69,33 +69,37 @@
 	function getAllDepartementPU__()
 	{
 	  var url = base_url_js+"api/__getAllDepartementPU";
-	  $('#Departement').empty();
+	  $('#DepartementBudgetRemaining').empty();
 	  $.post(url,function (data_json) {
 	    for (var i = 0; i < data_json.length; i++) {
 	    	if (IDDepartementPUBudget== 'NA.9') {
-	    		$('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
+	    		$('#DepartementBudgetRemaining').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
 	    	}
 	    	else
 	    	{
 	    		if (data_json[i]['Code']==IDDepartementPUBudget) {
 	    			var selected = (data_json[i]['Code']==IDDepartementPUBudget) ? 'selected' : '';
-	    			$('#Departement').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
+	    			$('#DepartementBudgetRemaining').append('<option value="'+ data_json[i]['Code']  +'" '+selected+'>'+data_json[i]['Name2']+'</option>');
 	    			break;
 	    		}
 	    	}
 	    }
 	   
-	    $('#Departement').select2({
+	    $('#DepartementBudgetRemaining').select2({
 	       //allowClear: true
 	    });
 	    makeDomBudgetRemaining();
 	  })
 	}
 
+	$(document).off('click', '#DepartementBudgetRemaining,#YearsBudgetRemaining').on('click', '#DepartementBudgetRemaining,#YearsBudgetRemaining',function(e) {
+		makeDomBudgetRemaining();
+	})
+
 	function makeDomBudgetRemaining()
 	{
-		var Departement = $('#Departement option:selected').val();
-		var Year = $('#Years option:selected').val();
+		var Departement = $('#DepartementBudgetRemaining option:selected').val();
+		var Year = $('#YearsBudgetRemaining option:selected').val();
 		var se_content = $('#BudgetRemainingContent');
 		load_budget_remaining__(Year,Departement).then(function(response){
 			var dt = response.data;
