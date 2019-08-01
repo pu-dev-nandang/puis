@@ -3895,4 +3895,106 @@ class C_rest2 extends CI_Controller {
             }
     }
 
+    public function load_budget_real_detail_byMonthYear()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $ID_budget_left = $dataToken['ID_budget_left'];
+                    $Year = $dataToken['Year'];
+                    $Month = $dataToken['Month'];
+                    $rs = array();
+                    $sql = '
+                            select aa.*,bb.Name as  NameCreatedPayment from (
+                                select a.ID as ID_ap,a.Code as CodeAP,a.ID_payment,a.PostingDate,a.CreatedBy as CreatedPayment,
+                                c.Type as TypePayment,c.Code as CodeSPB,c.Code_po_create
+                                from db_budgeting.ap as a join (select * from db_budgeting.budget_payment group by ID_ap) as b on a.ID = b.ID_ap
+                                join db_payment.payment as c on a.ID_payment = c.ID
+                                where YEAR(a.PostingDate) = '.$Year.' and MONTH(a.PostingDate) = '.$Month.' and b.ID_budget_left = '.$ID_budget_left.'
+                                UNION
+                                select a.ID,"","",a.CreateAt,a.CreateBy,"Revisi","",""
+                                from db_budgeting.budget_adjustment as a
+                                where YEAR(a.CreateAt) = '.$Year.' and MONTH(a.CreateAt) = '.$Month.' and a.ID_budget_left = '.$ID_budget_left.'
+                            ) aa
+                            join db_employees.employees as bb on bb.NIP = aa.CreatedPayment
+                            order by aa.PostingDate asc
+                           ';
+                     $query=$this->db->query($sql, array())->result_array();
+                     $rs = $query;
+                     for ($i=0; $i < count($rs); $i++) { 
+                         $TypePayment = $rs[$i]['TypePayment'];
+                         $ID_ap = $rs[$i]['ID_ap'];
+                         if ($TypePayment != 'Revisi') {
+                             $__bp = $this->m_master->caribasedprimary('db_budgeting.budget_payment','ID_ap',$ID_ap);
+                             $Tot = 0;
+                             for ($j=0; $j < count($__bp); $j++) { 
+                                $Type = $__bp[$j]['Type'];
+                                if ($Type == 'Less') {
+                                    $Tot = $Tot - $__bp[$j]['Invoice'];
+                                }
+                                else
+                                {
+                                    $Tot = $Tot + $__bp[$j]['Invoice'];
+                                }
+                             }
+
+                              $rs[$i]['bpd'] = $__bp;
+                              $rs[$i]['Invoice'] = $Tot;
+                         }
+                         else
+                         {
+                            $__bp = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_ap);
+                            for ($j=0; $j < count($__bp); $j++) { 
+                                $Typebpd = $__bp[$j]['Type'];
+                                if ($Typebpd == 'Mutasi') {
+                                    $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_a',$__bp[$j]['ID']);
+                                    if (count($d) > 0 ) {
+                                       $stMutasi = 'Mutasi ke '; 
+                                       $ID_budget_adjustment_b = $d[0]['ID_budget_adjustment_b'];
+                                       $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_b);
+                                       $ID_budget_left_b = $dd[0]['ID_budget_left'];
+                                       $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_b);
+                                       $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
+                                    }
+                                    else
+                                    {
+                                        $stMutasi = 'DiMutasi dari';
+                                        $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_b',$__bp[$j]['ID']);
+                                        $ID_budget_adjustment_a = $d[0]['ID_budget_adjustment_a'];
+                                        $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_a);
+                                        $ID_budget_left_a = $dd[0]['ID_budget_left'];
+                                        $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_a);
+                                        $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
+                                    }
+                                     $__bp[$j]['detail'] = $stMutasi;
+
+                                }   
+                                else
+                                {
+                                    $__bp[$j]['detail'] = '';
+                                }
+                            }
+                            $rs[$i]['bpd'] = $__bp;
+                            $rs[$i]['Invoice'] = $__bp[0]['Invoice'];
+
+                         }
+                     }
+                    
+                    echo json_encode($rs);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
 }

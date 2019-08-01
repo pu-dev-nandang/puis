@@ -882,6 +882,30 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+
+            // notification
+              $CodeUrl = str_replace('/', '-', $Code);
+              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              $NIPApprovalNext = $JsonStatus[1]['NIP'];
+              $NIP = $this->session->userdata('NIP');
+              // Send Notif for next approval
+                  $data = array(
+                      'auth' => 's3Cr3T-G4N',
+                      'Logging' => array(
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                      'CreatedBy' => $NIP,
+                                    ),
+                      'To' => array(
+                                'NIP' => array($NIPApprovalNext),
+                              ),
+                      'Email' => 'No', 
+                  );
+
+                  $url = url_pas.'rest2/__send_notif_browser';
+                  $token = $this->jwt->encode($data,"UAP)(*");
+                  $this->m_master->apiservertoserver($url,$token);
         }
         else
         {
@@ -1555,6 +1579,30 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+
+            // notification
+              $CodeUrl = str_replace('/', '-', $Code);
+              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              $NIPApprovalNext = $JsonStatus[1]['NIP'];
+              $NIP = $this->session->userdata('NIP');
+              // Send Notif for next approval
+                  $data = array(
+                      'auth' => 's3Cr3T-G4N',
+                      'Logging' => array(
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'URLDirect' => 'global/purchasing/transaction/spk/list/'.$CodeUrl,
+                                      'CreatedBy' => $NIP,
+                                    ),
+                      'To' => array(
+                                'NIP' => array($NIPApprovalNext),
+                              ),
+                      'Email' => 'No', 
+                  );
+
+                  $url = url_pas.'rest2/__send_notif_browser';
+                  $token = $this->jwt->encode($data,"UAP)(*");
+                  $this->m_master->apiservertoserver($url,$token);
         }
         else
         {

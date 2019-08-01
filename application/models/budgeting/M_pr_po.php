@@ -278,7 +278,7 @@ class M_pr_po extends CI_Model {
     public function Get_DataBudgeting_by_ID_budget_left($ID_budget_left)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.CodeDiv as CodeDepartment
          from
             (
                    select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,

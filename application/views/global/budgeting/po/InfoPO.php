@@ -1041,6 +1041,7 @@
 			    Notes : Notes,
 			    ID_pay_type : ID_pay_type,
 			};
+
 			var token = jwt_encode(data,"UAP)(*");
 			var action_mode = 'modifycreated';
 				action_mode = jwt_encode(action_mode,"UAP)(*");
