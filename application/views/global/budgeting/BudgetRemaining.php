@@ -1,29 +1,27 @@
 <div class="row">
-	<div class="col-md-12">
-		<div class="col-md-6 col-md-offset-3">
-			<div class="thumbnail" style="height: 100px">
-				<div class="row">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label>Period</label>
-							<select class="select2-select-00 full-width-fix" id="YearsBudgetRemaining">
-							     <!-- <option></option> -->
-							 </select>
-						</div>	
-					</div>
-					<div class="col-md-6">
-						<div class="form-group">
-							<label>Departement</label>
-							<select class="select2-select-00 full-width-fix" id="DepartementBudgetRemaining">
-								
-							</select>	
-						</div>	
-					</div>
+	<div class="col-md-6 col-md-offset-3">
+		<div class="thumbnail">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="form-group">
+						<label>Period</label>
+						<select class="select2-select-00 full-width-fix" id="YearsBudgetRemaining">
+						     <!-- <option></option> -->
+						 </select>
+					</div>	
 				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<p style="color: red;font-size: 20px">(.000)</p>	
-					</div>
+				<div class="col-md-6">
+					<div class="form-group">
+						<label>Departement</label>
+						<select class="select2-select-00 full-width-fix" id="DepartementBudgetRemaining">
+							
+						</select>	
+					</div>	
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<p style="color: red;font-size: 20px">(.000)</p>	
 				</div>
 			</div>
 		</div>
@@ -106,7 +104,8 @@
 			var html = '';
 			html = '<div class = "row">'+
 						'<div class = "col-xs-12">'+
-							'<table id="tblBudgetRemaining" class="table table-bordered display select" cellspacing="0" width="100%">'+
+							'<div class = "table-responsive">'+
+							'<table id="tblBudgetRemaining" class="table table-bordered" cellspacing="0" width="100%">'+
 						           '<thead>'+
 						              '<tr>'+
 						                 '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 3%;">No</th>'+
@@ -119,6 +118,7 @@
 						           '</thead>'+
 						           '<tbody></tbody>'+
 		      				'</table>'+
+		      				'</div>'+
 		      			'</div>'+
 		      		'</div>';
 
@@ -151,7 +151,7 @@
 		    	      {
 		    	         'targets': 3,
 		    	         'render': function (data, type, full, meta){
-		    	             return formatRupiah(full.Value);
+		    	             return '<a href = "javascript:void(0)" class = "ShowReal" IDData = "'+full.ID+'">'+formatRupiah(full.Value)+'</a>';
 		    	         }
 		    	      },
 		    	      {
@@ -163,7 +163,7 @@
 		    	      {
 		    	         'targets': 5,
 		    	         'render': function (data, type, full, meta){
-		    	             return formatRupiah(full.Using);
+		    	             return '<a href = "javascript:void(0)" class = "ShowProcess" IDData = "'+full.ID+'">'+formatRupiah(full.Using)+'</a>';
 		    	         }
 		    	      },
 		          ],
@@ -207,4 +207,14 @@
 		});
 		return def.promise();
 	}
+
+
+	$(document).off('click', '.ShowReal').on('click', '.ShowReal',function(e) {
+		var ID_budget_left = $(this).attr('IDData');
+		var CodeURL = jwt_encode(ID_budget_left,"UAP)(*");
+		var url = base_url_js+'budgeting_real_detail/'+CodeURL;
+		FormSubmitAuto(url, 'POST', [
+		    {},
+		]);
+	})
 </script>

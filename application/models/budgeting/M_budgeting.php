@@ -1033,5 +1033,49 @@ class M_budgeting extends CI_Model {
                 ';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
+    }
+
+    public function FindBudgetLeft_Department($ID_budget_left,$Departement)
+    {
+        $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
+        $AddSql ='where cba.Departement = "'.$Departement.'"';
+        if ($DepartementSess == 'NA.9') {
+            $AddSql = '';
+        }
+        $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.SubTotal as PriceBudgetAwal
+         from
+            (
+                   select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                     b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv,
+                             cba.Departement,cba.`Year`
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               LEFT JOIN (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+               ) as dp on b.UnitDiv = dp.ID
+                             left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+                             '.$AddSql.' 
+            ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget where dd.ID = ?
+            ';
+        $query=$this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;
+    }
+
+    public function get_budget_left_group_by_month($ID_budget_left)
+    {
+        $sql = 'SELECT DISTINCT YEAR(a.PostingDate) AS "Year", MONTH(a.PostingDate) AS "Month" FROM db_budgeting.ap as a
+                join db_budgeting.budget_payment as b on a.ID = b.ID_ap                
+                where b.ID_budget_left = ?
+                ';
+        $query=$this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;
+        
     }  
 }

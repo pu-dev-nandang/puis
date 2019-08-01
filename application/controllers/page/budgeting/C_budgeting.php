@@ -2135,4 +2135,29 @@ class C_budgeting extends Budgeting_Controler {
         echo json_encode($arr_result);
     }
 
+    public function budgeting_real_detail($token)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($token,$key);
+            $ID_budget_left = $token;
+            $Departement = $this->session->userdata('IDDepartementPUBudget');
+            $G_data = $this->m_budgeting->FindBudgetLeft_Department($ID_budget_left,$Departement);
+            if (count($G_data) > 0) {
+                $G_budget_left_payment = $this->m_budgeting->get_budget_left_group_by_month($ID_budget_left);
+                $this->data['ID_budget_left'] = $ID_budget_left;
+                $this->data['G_budget_left_payment'] = $G_budget_left_payment;
+                $this->data['G_data'] = $G_data;
+                $content = $this->load->view('global/budgeting/detail_budget_left_real',$this->data,true);
+                $this->temp($content);   
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
+        } catch (Exception $e) {
+            show_404($log_error = TRUE);
+        }
+    }
+
 }

@@ -987,6 +987,7 @@ $route['rest2/__get_data_payment'] = 'api/c_rest2/get_data_payment';
 $route['rest2/__reject_payment_from_fin'] = 'api/c_rest2/reject_payment_from_fin';
 $route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
 $route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
+$route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget_real_detail_byMonthYear';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1465,6 +1466,11 @@ $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$
 
 // pr adding
 $route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
+
+
+// budget remaining
+$route['budgeting_real_detail/(:any)'] = 'page/budgeting/c_budgeting/budgeting_real_detail/$1';
+
 
 // Purchasing
 $query = $db->get('db_purchasing.cfg_sub_menu');
