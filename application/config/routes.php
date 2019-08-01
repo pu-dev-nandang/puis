@@ -30,6 +30,8 @@ $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/
 
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
+$route['cekKRS/(:any)'] = 'auth/c_auth/checkRedudantKRS/$1';
+
 $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 
 
@@ -175,6 +177,8 @@ $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailRes
 
 $route['database/students'] = 'page/database/c_database/students';
 $route['database/students/(:num)'] = 'page/database/c_database/students/$1';
+$route['database/students-group'] = 'page/database/c_database/students_group';
+
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
 $route['database/employees'] = 'page/database/c_database/employees';
@@ -1278,6 +1282,8 @@ $route['api3/__getLecturerCertificate'] = 'api/c_api3/getLecturerCertificate';
 $route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
 
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
+
+$route['api3/__crudGroupStd'] = 'api/c_api3/crudGroupStd';
 
 
 

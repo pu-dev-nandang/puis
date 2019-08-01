@@ -919,6 +919,17 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='viewIPK'){
+
+            $Year = $data_arr['Year'];
+
+            $data = $this->db->query('SELECT * FROM db_academic.auth_students ast 
+                                                          WHERE ast.StatusStudentID = "1" 
+                                                          AND ast.Year = "'.$Year.'" ')->result_array();
+
+
+
+        }
 
     }
 
@@ -1147,6 +1158,110 @@ class C_api3 extends CI_Controller {
                 'ID' => $ID,
                 'File' => $OldFile
             )));
+
+        }
+
+    }
+
+    public function crudGroupStd(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='view_GS'){
+
+            $ProdiID = $data_arr['ProdiID'];
+
+            $data = $this->db->order_by('ID','ASC')->get_where('db_academic.prodi_group',array(
+                'ProdiID' => $ProdiID
+            ))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='update_GS'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID',$ID);
+                $this->db->update('db_academic.prodi_group',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_academic.prodi_group',$dataForm);
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='viewStudent_GS'){
+            $data = $this->db->select('ID,NPM, Name, ProdiGroupID')->get_where('db_academic.auth_students',array(
+                'ProdiGroupID' => $data_arr['ProdiGroupID']
+            ))->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='viewStudentNew_GS'){
+
+            $data = $this->db->query('SELECT ID, NPM, Name, ProdiGroupID FROM db_academic.auth_students 
+                                          WHERE Year = "'.$data_arr['Year'].'"
+                                           AND ProdiID = "'.$data_arr['ProdiID'].'"
+                                            AND (ProdiGroupID IS NULL OR ProdiGroupID ="")')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateStudent_GS'){
+
+            $arrID = (array) $data_arr['arrID'];
+
+            for ($i=0;$i<count($arrID);$i++){
+
+                // Update
+                $this->db->where('ID',$arrID[$i]);
+                $this->db->update('db_academic.auth_students',array(
+                    'ProdiGroupID' => $data_arr['ProdiGroupID']
+                ));
+                $this->db->reset_query();
+
+                // get nip
+                $dataN = $this->db->select('NPM')->get_where('db_academic.auth_students',array(
+                    'ID' => $arrID[$i]
+                ))->result_array();
+
+                $this->db->insert('db_academic.prodi_group_log',array(
+                    'NPM' => $dataN[0]['NPM'],
+                    'ProdiGroupID' => $data_arr['ProdiGroupID'],
+                    'Status' => 'in',
+                    'UpdatedBy' => $this->session->userdata('NIP')
+                ));
+
+
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='removeFMGrStudent_GS'){
+
+            $this->db->where('ID',$data_arr['ID']);
+            $this->db->update('db_academic.auth_students',array(
+                'ProdiGroupID' => ''
+            ));
+
+            $this->db->reset_query();
+
+            $this->db->insert('db_academic.prodi_group_log',array(
+                'NPM' => $data_arr['NPM'],
+                'ProdiGroupID' => $data_arr['ProdiGroupID'],
+                'Status' => 'out',
+                'UpdatedBy' => $this->session->userdata('NIP')
+            ));
+
+
+            return print_r(1);
+
+
 
         }
 
