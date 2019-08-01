@@ -205,6 +205,62 @@ class C_agregator extends Globalclass {
             $this->menu_agregator($page);
     }
 
+    public function ipk(){
+        $viewPage = 'ipk';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function prestasi_akademik_mahasiswa(){
+        $viewPage = 'prestasi_akademik_mahasiswa';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function prestasi_non_akademik_mahasiswa(){
+        $viewPage = 'prestasi_non_akademik_mahasiswa';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function lama_studi_mahasiswa(){
+        $viewPage = 'lama_studi_mahasiswa';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function rasio_kelulusan(){
+        $viewPage = 'rasio_kelulusan';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function waktu_tunggu_lulusan(){
+        $viewPage = 'waktu_tunggu_lulusan';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function kesesuaian_bidang_kerja_lulusan(){
+        $viewPage = 'kesesuaian_bidang_kerja_lulusan';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
     public function uploadFile(){
 
         $fileName = $this->input->get('fileName');

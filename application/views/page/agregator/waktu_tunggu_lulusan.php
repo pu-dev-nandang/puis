@@ -1,0 +1,1 @@
+<h1>waktu_tunggu_lulusan</h1>
