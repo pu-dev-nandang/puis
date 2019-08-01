@@ -147,7 +147,7 @@ class C_api3 extends CI_Controller {
                     }
                 }
 
-                $data[$i]['Member'] = $this->db->query('SELECT aum.*, em.Name FROM db_agregator.agregator_user_member aum 
+                $data[$i]['Member'] = $this->db->query('SELECT aum.*, em.Name FROM db_agregator.agregator_user_member aum
                                                             LEFT JOIN db_employees.employees em ON (em.NIP = aum.NIP)
                                                             WHERE aum.AUPID = "'.$data[$i]['ID'].'" ')->result_array();
 
@@ -254,13 +254,13 @@ class C_api3 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE  ls.Lembaga LIKE "%'.$search.'%" 
+                $dataSearch = ' WHERE  ls.Lembaga LIKE "%'.$search.'%"
             OR ea.Type LIKE "%'.$search.'%"
              OR ea.Scope LIKE "%'.$search.'%"
               OR ea.Description LIKE "%'.$search.'%"  ';
             }
 
-            $queryDefault = 'SELECT ea.*, ls.Lembaga FROM db_agregator.external_accreditation ea 
+            $queryDefault = 'SELECT ea.*, ls.Lembaga FROM db_agregator.external_accreditation ea
                                         LEFT JOIN db_agregator.lembaga_surview ls ON (ls.ID = ea.LembagaID) '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -340,13 +340,13 @@ class C_api3 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE  ls.Lembaga LIKE "%'.$search.'%" 
+                $dataSearch = ' WHERE  ls.Lembaga LIKE "%'.$search.'%"
             OR ea.Type LIKE "%'.$search.'%"
              OR ea.Scope LIKE "%'.$search.'%"
               OR ea.Description LIKE "%'.$search.'%"  ';
             }
 
-            $queryDefault = 'SELECT iap.*, ls.Lembaga, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.international_accreditation_prodi iap 
+            $queryDefault = 'SELECT iap.*, ls.Lembaga, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.international_accreditation_prodi iap
                                         LEFT JOIN db_agregator.lembaga_surview ls ON (ls.ID = iap.LembagaID)
                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = iap.ProdiID)
                                          '.$dataSearch;
@@ -453,13 +453,13 @@ class C_api3 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE  fae.Lembaga LIKE "%'.$search.'%" 
+                $dataSearch = ' WHERE  fae.Lembaga LIKE "%'.$search.'%"
             OR fae.Year LIKE "%'.$search.'%"
              OR fae.Opinion LIKE "%'.$search.'%"
               OR fae.Description LIKE "%'.$search.'%"  ';
             }
 
-            $queryDefault = 'SELECT fae.*, lu.Lembaga FROM db_agregator.financial_external_audit fae 
+            $queryDefault = 'SELECT fae.*, lu.Lembaga FROM db_agregator.financial_external_audit fae
                                         LEFT JOIN db_agregator.lembaga_audit lu ON (lu.ID = fae.LembagaAuditID) '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -576,12 +576,12 @@ class C_api3 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%" 
+                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%"
             OR uc.Tingkat LIKE "%'.$search.'%"
              OR uc.Benefit LIKE "%'.$search.'%"';
             }
 
-            $queryDefault = 'SELECT uc.*, lmk.Lembaga FROM db_agregator.university_collaboration uc 
+            $queryDefault = 'SELECT uc.*, lmk.Lembaga FROM db_agregator.university_collaboration uc
                                         LEFT JOIN db_agregator.lembaga_mitra_kerjasama lmk ON (lmk.ID = uc.LembagaMitraID) '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -689,7 +689,7 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readDataMHSBaru'){
 
             $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss 
+            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
                                                     WHERE ss.Year = "'.$Year.'" ')->result_array();
 
@@ -699,7 +699,7 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readDataMHSBaruAsing'){
 
             $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf 
+            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
                                                     WHERE ssf.Year = "'.$Year.'" ')->result_array();
 
@@ -734,7 +734,7 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
         }
         else if($data_arr['action']=='readSumberDanaType_All'){
-            $data = $this->db->query('SELECT sdt.*, sd.SumberDana FROM db_agregator.sumber_dana_type sdt 
+            $data = $this->db->query('SELECT sdt.*, sd.SumberDana FROM db_agregator.sumber_dana_type sdt
                                           LEFT JOIN db_agregator.sumber_dana sd ON (sdt.SumberDanaID = sd.ID) ')->result_array();
 
             return print_r(json_encode($data));
@@ -794,7 +794,7 @@ class C_api3 extends CI_Controller {
 
         } else if($data_arr['action']=='readPerolehanDana'){
 
-            $data = $this->db->query('SELECT pd.*, sd.SumberDana, sdt.Label AS SumberDanaType FROM db_agregator.perolehan_dana pd 
+            $data = $this->db->query('SELECT pd.*, sd.SumberDana, sdt.Label AS SumberDanaType FROM db_agregator.perolehan_dana pd
                                               LEFT JOIN db_agregator.sumber_dana sd ON (sd.ID = pd.SumberDanaID)
                                               LEFT JOIN db_agregator.sumber_dana_type sdt ON (sdt.ID = pd.SumberDanaTypeID) ')->result_array();
 
@@ -826,7 +826,7 @@ class C_api3 extends CI_Controller {
 
                 for($j=0;$j<count($dataLAP);$j++){
 
-                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
                     AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" ')->result_array();
 
                     $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
@@ -834,7 +834,7 @@ class C_api3 extends CI_Controller {
                 }
 
 
-                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
                     AND em.Profession <> "" ')->result_array();
                 $r = array('Level' => '', 'Details' => $dataL);
                 $data[$i]['dataLecturers'][2] = $r;
@@ -861,8 +861,8 @@ class C_api3 extends CI_Controller {
             for($i=0;$i<count($data);$i++){
 
                 for($p=0;$p<count($dataPosition);$p++){
-                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
-                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
                                                                      AND em.StatusForlap = "1" ')->result_array();
 
@@ -875,9 +875,9 @@ class C_api3 extends CI_Controller {
                 }
 
 
-                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
-                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
-                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position) 
+                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
+                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position)
                                                                      AND em.StatusForlap = "1" ')->result_array();
 
                 $r = array(
@@ -909,8 +909,8 @@ class C_api3 extends CI_Controller {
             for($i=0;$i<count($data);$i++){
 
                 for($p=0;$p<count($dataPosition);$p++){
-                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
-                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
                                                                      AND em.StatusForlap = "0" ')->result_array();
 
@@ -922,9 +922,9 @@ class C_api3 extends CI_Controller {
                     $data[$i]['details'][$p] = $r;
                 }
 
-                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
-                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'" 
-                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position) 
+                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                                                                    WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
+                                                                    AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position)
                                                                      AND em.StatusForlap = "0" ')->result_array();
 
                 $r = array(
@@ -956,12 +956,12 @@ class C_api3 extends CI_Controller {
                 $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
 
                 // Total Employees
-                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees 
+                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
                                           WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
 
                 $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
 
-                $dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees 
+                $dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
                                           WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
                 $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
 
@@ -1006,5 +1006,96 @@ class C_api3 extends CI_Controller {
         return print_r(json_encode($data));
 
     }
+
+    public function crudqna(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='updateNewQNA'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $ID = $data_arr['ID'];
+
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID',$ID);
+                $this->db->update('db_employees.user_qna',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_employees.user_qna',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(json_encode(array('ID' => $ID )));
+        }
+        else if($data_arr['action']=='viewListQNA'){
+
+            $requestData= $_REQUEST;
+
+            $Previlege = $data_arr['Previlege'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' WHERE  ls.Questions LIKE "%'.$search.'%"
+            OR qna.Answers "%'.$search.'%" ';
+            }
+
+            $queryDefault = 'SELECT qna.*, ls.Questions FROM db_employees.qna qna '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++){
+
+                $nestedData=array();
+                $row = $query[$i];
+
+                $btnAction = ($Previlege=='1' || $Previlege==1) ? '
+                                                                       <div class="btn-group btnAction">
+                                                                      <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                                                      </button>
+                                                                      <ul class="dropdown-menu">
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li role="separator" class="divider"></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.external_accreditation">Remove</a></li>
+                                                                      </ul>
+                                                                    </div>
+                                                                        <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Type'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Scope'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Level'].'</div>';
+                $nestedData[] = '<div style="text-align:right;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+
+    }
+
 
 }

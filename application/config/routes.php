@@ -199,7 +199,7 @@ $route['academic/attendance/monitoring-all-student'] = 'page/academic/c_presensi
 $route['academic/attendance/monitoring-schedule-exchange'] = 'page/academic/c_presensi/monitoring_exchange';
 
 
-// -- master student -- 
+// -- master student --
 $route['academic/master/student'] = 'page/academic/c_m_student';
 $route['academic/master/showStudent'] = 'page/academic/c_m_student/showStudent';
 $route['academic/master/loadPageStudents'] = 'page/academic/c_m_student/loadPageStudents';
@@ -222,7 +222,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -230,7 +230,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -378,7 +378,7 @@ $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
 $route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
 $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
-//Surat Tugas Keluar 
+//Surat Tugas Keluar
 // $route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
 $route['requestsurat'] = 'api/c_global/getlistrequestdoc';
 $route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
@@ -739,8 +739,8 @@ $route['api/__getEmployees'] = 'api/c_api/getEmployees';
 $route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
 $route['api/__getEmployeesHR'] = 'api/c_api/getEmployeesHR';
-$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar 
-$route['api/__delistacaemploy'] = 'api/c_api/delelelistacaemployee'; //add bismar 
+$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar
+$route['api/__delistacaemploy'] = 'api/c_api/delelelistacaemployee'; //add bismar
 
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
@@ -1083,6 +1083,8 @@ $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';
 
 $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
+$route['api3/__crudqna'] = 'api/c_api3/crudqna';
+$route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 
 // Penutup API 2 ===
@@ -1091,7 +1093,7 @@ $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
 
-//Venue Reservation // 
+//Venue Reservation //
 $route['loginToVenue'] = 'c_login/loginToVenue';
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $query = $db->get('db_reservation.cfg_sub_menu');
@@ -1103,7 +1105,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1111,7 +1113,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1217,7 +1219,7 @@ $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
 $route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
-$route['api/__confirmrequest'] = 'api/c_api/confirm_requestdocument'; 
+$route['api/__confirmrequest'] = 'api/c_api/confirm_requestdocument';
 
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
@@ -1297,7 +1299,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1305,7 +1307,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1458,7 +1460,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1466,7 +1468,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1552,7 +1554,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1560,7 +1562,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1604,4 +1606,3 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
 
 $route['portal'] = 'c_login/portal';
-
