@@ -26,7 +26,7 @@
 </div>
 
 
-<input id="viewRed" value="0" class="">
+<input id="viewRed" value="0" class="hide">
 <div id="viewData"></div>
 
 
