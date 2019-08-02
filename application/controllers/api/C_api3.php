@@ -1267,4 +1267,109 @@ class C_api3 extends CI_Controller {
 
     }
 
+
+    public function crudCheckDataKRS(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='checkDataKRS'){
+
+            $Year = $data_arr['Year'];
+            $SemesterID = $data_arr['SemesterID'];
+
+            $db = 'ta_'.$Year;
+
+            $dataStd = $this->db->query('SELECT s.NPM, s.Name FROM  '.$db.'.students s 
+                                                ORDER BY s.NPM ASC ')->result_array();
+
+            $result = [];
+            if(count($dataStd)>0){
+
+                for($i=0;$i<count($dataStd);$i++){
+
+                    // KRS Approve
+                    $dataSP = $this->db->query('SELECT sp.ID, sp.ScheduleID, sch.ClassGroup FROM '.$db.'.study_planning sp
+                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sp.ScheduleID)
+                                                WHERE sp.SemesterID = '.$SemesterID.' 
+                                                AND sp.NPM = "'.$dataStd[$i]['NPM'].'"
+                                                ORDER BY sp.ScheduleID ASC ')->result_array();
+
+                    // KRS Online
+                    $dataKO = $this->db->query('SELECT sk.ID, sk.ScheduleID, sch.ClassGroup FROM db_academic.std_krs sk 
+                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sk.ScheduleID)
+                                                WHERE sk.SemesterID = '.$SemesterID.' 
+                                                AND sk.NPM = "'.$dataStd[$i]['NPM'].'"
+                                                AND sk.Status = "3" 
+                                                ORDER BY sk.ScheduleID ASC ')->result_array();
+
+
+
+                    if(count($dataSP)!= count($dataKO)){
+
+                        $dataStd[$i]['A'] = $dataSP;
+                        $dataStd[$i]['B'] = $dataKO;
+                        array_push($result,$dataStd[$i]);
+                    }
+
+                }
+
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='removeRedundancy'){
+
+            $Year = $data_arr['Year'];
+            $NPM = $data_arr['NPM'];
+            $SemesterID = $data_arr['SemesterID'];
+            $ScheduleID = $data_arr['ScheduleID'];
+
+            $db = 'ta_'.$Year.'.study_planning';
+
+            // Cek apakah double
+            $data = $this->db->query('SELECT sp.ID FROM '.$db.' sp WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                AND sp.NPM = "'.$NPM.'"
+                                                 AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+            $result = array(
+                'Status' => '0'
+            );
+
+            if(count($data)>1){
+
+
+                // Get ID Attendance
+                $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                    'SemesterID' => $SemesterID,
+                    'ScheduleID' => $ScheduleID
+                ))->result_array();
+
+                if(count($dataAttd)>0){
+                    for ($i=0;$i<count($dataAttd);$i++){
+                        $this->db->where(array(
+                            'ID_Attd' => $dataAttd[$i]['ID'],
+                            'NPM' => $NPM
+                        ));
+                        $this->db->delete('db_academic.attendance_students');
+                    }
+                }
+
+                // Remove di SP
+                $this->db->where('ID', $data_arr['SPID']);
+                $this->db->delete($db);
+
+                $result = array(
+                    'Status' => '1'
+                );
+
+
+            }
+
+            return print_r(json_encode($result));
+
+        }
+
+    }
+
 }
