@@ -26,6 +26,7 @@
 </div>
 
 
+<input id="viewRed" value="0" class="">
 <div id="viewData"></div>
 
 
@@ -83,6 +84,8 @@
 
             var url = base_url_js+'api3/__crudCheckDataKRS';
 
+            $('#viewRed').val(0);
+
             $.post(url,{token:token},function (jsonResult) {
 
                 if(jsonResult.length>0){
@@ -92,73 +95,95 @@
                         var krs_A = v.A;
                         var krs_B = v.B;
 
-                        var a = '';
-                        $.each(krs_A,function (i2,v2) {
+                        // cek array
 
-                            a = a+'<tr>'+
-                                '      <td style="border-right: 1px solid #CCCCCC;">'+(i2+1)+'</td>'+
-                                '      <td>'+v2.ScheduleID+'</td>'+
-                                '      <td>'+v2.ClassGroup+'</td>'+
-                                '      <td><button class="btn btn-sm btn-danger btnRemove" data-id="'+v2.ID+'" data-view="'+i+'" data-scd="'+v2.ScheduleID+'">Remove</button>' +
-                                '</td>'+
-                                '  </tr>';
-
+                        var valueArr = krs_A.map(function(item){ return item.ScheduleID });
+                        var isDuplicate = valueArr.some(function(item, idx){
+                            return valueArr.indexOf(item) != idx
                         });
+                        console.log(isDuplicate);
+                        if(isDuplicate){
 
-                        a = a+'<textarea class="hide" id="viewData_'+i+'">'+JSON.stringify(v)+'</textarea>';
+                            $('#viewRed').val(1);
 
-                        var b = '';
-                        $.each(krs_B,function (i2,v2) {
+                            var a = '';
+                            $.each(krs_A,function (i2,v2) {
 
-                            b = b+'<tr>'+
-                                '      <td style="border-right: 1px solid #CCCCCC;">'+(i2+1)+'</td>'+
-                                '      <td>'+v2.ScheduleID+'</td>'+
-                                '      <td>'+v2.ClassGroup+'</td>'+
-                                '  </tr>';
+                                a = a+'<tr>'+
+                                    '      <td style="border-right: 1px solid #CCCCCC;">'+(i2+1)+'</td>'+
+                                    '      <td>'+v2.ScheduleID+'</td>'+
+                                    '      <td>'+v2.ClassGroup+'</td>'+
+                                    '      <td><button class="btn btn-sm btn-danger btnRemove" data-id="'+v2.ID+'" data-view="'+i+'" data-scd="'+v2.ScheduleID+'">Remove</button>' +
+                                    '</td>'+
+                                    '  </tr>';
 
-                        });
+                            });
+
+                            a = a+'<textarea class="hide" id="viewData_'+i+'">'+JSON.stringify(v)+'</textarea>';
+
+                            var b = '';
+                            $.each(krs_B,function (i2,v2) {
+
+                                b = b+'<tr>'+
+                                    '      <td style="border-right: 1px solid #CCCCCC;">'+(i2+1)+'</td>'+
+                                    '      <td>'+v2.ScheduleID+'</td>'+
+                                    '      <td>'+v2.ClassGroup+'</td>'+
+                                    '  </tr>';
+
+                            });
 
 
 
-                        $('#viewData').append('<div class="row">' +
-                            '    <div class="col-xs-6">' +
-                            '        <div class="thumbnail"><div style="text-align: center;"><h3 style="margin-top: 0px;">Jadwal di Timetable<br/><small>Setelah approve by Kaprodi</small></h3></div>' +
-                            '           <b>'+v.Name+'</b> <br/> '+v.NPM+' ' +
-                            '           <table class="table table-striped">' +
-                            '                <thead>' +
-                            '                <tr>' +
-                            '                    <th style="width: 1%;">No</th>' +
-                            '                    <th>ScheduleID</th>' +
-                            '                    <th>Group</th>' +
-                            '                    <th style="width: 5%;">Aksi</th>' +
-                            '                </tr>' +
-                            '                </thead>' +
-                            '                <tbody>'+a+'</tbody>' +
-                            '            </table>' +
-                            '        </div>' +
-                            '    </div>' +
-                            '    <div class="col-xs-6">' +
-                            '        <div class="thumbnail"><div style="text-align: center;"><h3 style="margin-top: 0px;">Data KRS Online</h3></div>' +
-                            '           <b>'+v.Name+'</b> <br/> '+v.NPM+' ' +
-                            '           <table class="table table-striped">' +
-                            '                <thead>' +
-                            '                <tr>' +
-                            '                    <th style="width: 1%;">No</th>' +
-                            '                    <th>ScheduleID</th>' +
-                            '                    <th>Group</th>' +
-                            '                </tr>' +
-                            '                </thead>' +
-                            '                <tbody>'+b+'</tbody>' +
-                            '            </table>' +
-                            '        </div>' +
-                            '    </div>' +
-                            ' ' +
-                            '</div><div class="row col-md-12"><hr/></div>');
+                            $('#viewData').append('<div class="row">' +
+                                '    <div class="col-xs-6">' +
+                                '        <div class="thumbnail"><div style="text-align: center;"><h3 style="margin-top: 0px;">Jadwal di Timetable<br/><small>Setelah approve by Kaprodi</small></h3></div>' +
+                                '           <b>'+v.Name+'</b> <br/> '+v.NPM+' ' +
+                                '           <table class="table table-striped">' +
+                                '                <thead>' +
+                                '                <tr>' +
+                                '                    <th style="width: 1%;">No</th>' +
+                                '                    <th>ScheduleID</th>' +
+                                '                    <th>Group</th>' +
+                                '                    <th style="width: 5%;">Aksi</th>' +
+                                '                </tr>' +
+                                '                </thead>' +
+                                '                <tbody>'+a+'</tbody>' +
+                                '            </table>' +
+                                '        </div>' +
+                                '    </div>' +
+                                '    <div class="col-xs-6">' +
+                                '        <div class="thumbnail"><div style="text-align: center;"><h3 style="margin-top: 0px;">Data KRS Online</h3></div>' +
+                                '           <b>'+v.Name+'</b> <br/> '+v.NPM+' ' +
+                                '           <table class="table table-striped">' +
+                                '                <thead>' +
+                                '                <tr>' +
+                                '                    <th style="width: 1%;">No</th>' +
+                                '                    <th>ScheduleID</th>' +
+                                '                    <th>Group</th>' +
+                                '                </tr>' +
+                                '                </thead>' +
+                                '                <tbody>'+b+'</tbody>' +
+                                '            </table>' +
+                                '        </div>' +
+                                '    </div>' +
+                                ' ' +
+                                '</div><div class="row col-md-12"><hr/></div>');
+                        }
+
+
                     });
+
+
+                    var viewRed = $('#viewRed').val();
+                    if(viewRed==0 || viewRed=='0'){
+                        $('#viewData').html('<div style="text-align: center;"><h3>There is no redundant data</h3></div>');
+                    }
 
                 } else {
                     $('#viewData').html('<div style="text-align: center;"><h3>There is no redundant data</h3></div>');
                 }
+
+
 
 
                 setTimeout(function () {
