@@ -1077,5 +1077,62 @@ class M_budgeting extends CI_Model {
         $query=$this->db->query($sql, array($ID_budget_left))->result_array();
         return $query;
         
+    }
+
+    public function get_budget_left_onprocess_group_by_month($ID_budget_left)
+    {
+        // print_r($ID_budget_left);die();
+        $sql = 'SELECT DISTINCT YEAR(CreatedAt) AS "Year", MONTH(CreatedAt) AS "Month" FROM 
+                (
+                    select * from (
+                        select a.CreatedAt,b.ID_payment from db_payment.payment as a
+                        join 
+                            (
+                                select ID_payment,Perihal  from db_payment.spb
+                                where ID_budget_left = '.$ID_budget_left.'
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.bank_advance as a
+                               join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_bank_advance
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.cash_advance  as a
+                               join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_cash_advance
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.petty_cash 
+                               as a
+                               join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_petty_cash
+                            ) as b
+                            on a.ID = b.ID_payment
+                    ) as py
+                    where py.ID_payment not in (
+                            select ap.ID_payment from db_budgeting.ap as ap
+                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                        )
+                    UNION
+                    select a.CreatedAt,b.ID_payment from db_budgeting.pr_create as a
+                    join (
+                        select d.ID as ID_payment,a.PRCode from db_budgeting.pr_detail as a
+                        left join db_purchasing.pre_po_detail as b on a.ID = b.ID_pr_detail
+                        left join db_purchasing.po_detail as c on b.ID = c.ID_pre_po_detail
+                        left join db_payment.payment as d on d.Code_po_create = c.Code
+                        where a.ID_budget_left = '.$ID_budget_left.'
+                        group by d.ID 
+
+                    ) as b
+                    on a.PRCode = b.PRCode
+                    left join (
+                                select ap.ID_payment from db_budgeting.ap as ap
+                                join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                            )   as ap on ap.ID_payment = b.ID_payment
+                    
+                ) aa
+                ';
+             
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
     }  
 }

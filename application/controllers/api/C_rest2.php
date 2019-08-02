@@ -3911,9 +3911,10 @@ class C_rest2 extends CI_Controller {
                             select aa.*,bb.Name as  NameCreatedPayment from (
                                 select a.ID as ID_ap,a.Code as CodeAP,a.ID_payment,a.PostingDate,a.CreatedBy as CreatedPayment,
                                 c.Type as TypePayment,c.Code as CodeSPB,c.Code_po_create
-                                from db_budgeting.ap as a join (select * from db_budgeting.budget_payment group by ID_ap) as b on a.ID = b.ID_ap
+                                from db_budgeting.ap as a join (select * from db_budgeting.budget_payment) as b on a.ID = b.ID_ap
                                 join db_payment.payment as c on a.ID_payment = c.ID
                                 where YEAR(a.PostingDate) = '.$Year.' and MONTH(a.PostingDate) = '.$Month.' and b.ID_budget_left = '.$ID_budget_left.'
+                                group by b.ID_ap
                                 UNION
                                 select a.ID,"","",a.CreateAt,a.CreateBy,"Revisi","",""
                                 from db_budgeting.budget_adjustment as a
@@ -3932,13 +3933,16 @@ class C_rest2 extends CI_Controller {
                              $Tot = 0;
                              for ($j=0; $j < count($__bp); $j++) { 
                                 $Type = $__bp[$j]['Type'];
-                                if ($Type == 'Less') {
-                                    $Tot = $Tot - $__bp[$j]['Invoice'];
+                                if ($ID_budget_left == $__bp[$j]['ID_budget_left']) {
+                                    if ($Type == 'Less') {
+                                        $Tot = $Tot - $__bp[$j]['Invoice'];
+                                    }
+                                    else
+                                    {
+                                        $Tot = $Tot + $__bp[$j]['Invoice'];
+                                    }
                                 }
-                                else
-                                {
-                                    $Tot = $Tot + $__bp[$j]['Invoice'];
-                                }
+                                
                              }
 
                               $rs[$i]['bpd'] = $__bp;
