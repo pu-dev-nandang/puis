@@ -655,6 +655,20 @@
         });
     }
 
+    function loadSelectOptionStudentYear(element,selected) {
+        var url = base_url_js+"api/__getStudentYear";
+        $.get(url,function (jsonResult) {
+            // console.log(data_json);
+
+            $.each(jsonResult,function (i, v) {
+                var selected = (v.Year==selected && selected!='' && selected!=null &&
+                typeof selected !== 'undefined') ? 'selected' : '';
+                $(element).append('<option value="'+v.Year+'" '+selected+'>Class of '+v.Year+'</option>');
+            })
+        });
+
+    }
+
     function loadSelectOptionCurriculumASC(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOptionASC";
         $.get(url,function (data_json) {

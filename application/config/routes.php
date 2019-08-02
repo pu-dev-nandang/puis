@@ -157,6 +157,7 @@ $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 // --- IT Version ---- ADD Bismar
 $route['it/version'] = 'page/it/c_it/version_data';
 $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
+$route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
 
 
 
@@ -755,6 +756,7 @@ $route['api/__changeTahunAkademik'] = 'api/c_api/changeTahunAkademik';
 $route['api/__insertKurikulum'] = 'api/c_api/insertKurikulum';
 $route['api/__getKurikulumSelectOption'] = 'api/c_api/getKurikulumSelectOption';
 $route['api/__getKurikulumSelectOptionASC'] = 'api/c_api/getKurikulumSelectOptionASC';
+$route['api/__getStudentYear'] = 'api/c_api/getStudentYear';
 
 
 $route['api/__getDosenSelectOption'] = 'api/c_api/getDosenSelectOption';
@@ -1297,6 +1299,8 @@ $route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 
 $route['api3/__crudGroupStd'] = 'api/c_api3/crudGroupStd';
+
+$route['api3/__crudCheckDataKRS'] = 'api/c_api3/crudCheckDataKRS';
 
 
 

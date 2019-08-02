@@ -44,10 +44,20 @@ class C_it extends It_Controler {
      
     }
 
+    public function redundancy_krs_online(){
+
+        $department = parent::__getDepartement();
+        $data = '';
+        $page = $this->load->view('page/'.$department.'/academic/redundancy_krs_online',$data,true);
+        $this->temp($page);
+
+    }
+
     public function version_menu(){
       $department = parent::__getDepartement();
 
-      $data['NIP']=$NIP;
+//      $data['NIP']=$NIP;
+      $data['NIP']= $this->session->userdata('NIP');
       $content = $this->load->view('page/'.$department.'/academic/academic_menu',$data,true);
       $this->temp($content);
 

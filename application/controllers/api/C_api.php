@@ -10021,4 +10021,10 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getStudentYear(){
+        $data = $this->db->query('SELECT Year FROM db_academic.auth_students GROUP BY Year ORDER BY Year DESC')->result_array();
+
+        return print_r(json_encode($data));
+    }
+
 }
