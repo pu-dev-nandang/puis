@@ -411,6 +411,10 @@
                        IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
                        // IPK = parseFloat(Data_mhs[i]['IPK']).toFixed(2);
                        IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
+                       console.log(IPK)
+                       if (isNaN(IPK)) {
+                         IPK =0;
+                       }
                    }
                    catch(err) {
                        IPS = 0;
@@ -523,7 +527,7 @@
                               '<th style="width: 55px;">Deadline</th>'+
                               '<th style="width: 55px;">Payment Date</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
-          table += '<th style="width: 100px;">Action</th>' ;                    
+          table += '<th style="width: 100px;">Action</th>' ;
         <?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
           //table += '<th style="width: 100px;">Action</th>' ;
         <?php endif ?>
