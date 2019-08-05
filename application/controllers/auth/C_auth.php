@@ -250,54 +250,6 @@ class C_auth extends Globalclass {
 
     }
 
-    public function checkRedudantKRS($Year){
-
-        // Get Student
-        $SemesterID = 15;
-
-        $db = 'ta_'.$Year;
-
-        $dataStd = $this->db->query('SELECT s.NPM, s.Name FROM  '.$db.'.students s 
-                                                ORDER BY s.NPM ASC ')->result_array();
-
-        if(count($dataStd)>0){
-
-            for($i=0;$i<count($dataStd);$i++){
-
-                // KRS Approve
-                $dataSP = $this->db->query('SELECT sp.ID, sp.ScheduleID, sch.ClassGroup FROM '.$db.'.study_planning sp
-                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sp.ScheduleID)
-                                                WHERE sp.SemesterID = '.$SemesterID.' 
-                                                AND sp.NPM = "'.$dataStd[$i]['NPM'].'"
-                                                ORDER BY sp.ScheduleID ASC ')->result_array();
-
-                // KRS Online
-                $dataKO = $this->db->query('SELECT sk.ID, sk.ScheduleID, sch.ClassGroup FROM db_academic.std_krs sk 
-                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sk.ScheduleID)
-                                                WHERE sk.SemesterID = '.$SemesterID.' 
-                                                AND sk.NPM = "'.$dataStd[$i]['NPM'].'"
-                                                AND sk.Status = "3" 
-                                                ORDER BY sk.ScheduleID ASC ')->result_array();
-
-                $dataStd[$i]['A'] = $dataSP;
-                $dataStd[$i]['B'] = $dataKO;
-
-            }
-
-        }
-
-
-
-
-        $data['SP'] = $dataStd;
-        $data['Year'] = $Year;
-
-
-        $this->load->view('template/checkKRS',$data);
-
-
-    }
-
     public function getClassOf(){
         $data = $this->db->query('SELECT ast.Year FROM db_academic.auth_students ast 
                                                   GROUP BY ast.Year');

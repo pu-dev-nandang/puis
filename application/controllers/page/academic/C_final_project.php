@@ -29,6 +29,12 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function monitoring_yudisium(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/monitoring_yudisium',$data,true);
+        $this->menu_transcript($page);
+    }
+
     public function setting_transcript(){
         $data['Transcript'] = $this->db->get('db_academic.setting_transcript')->result_array()[0];
         $data['Graduation'] = $this->db->get('db_academic.graduation')->result_array();

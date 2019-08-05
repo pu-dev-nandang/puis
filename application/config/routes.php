@@ -30,7 +30,6 @@ $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/
 
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
-$route['cekKRS/(:any)'] = 'auth/c_auth/checkRedudantKRS/$1';
 
 $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 
@@ -131,6 +130,7 @@ $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/
 
 // ---- Final Project ----
 $route['academic/final-project'] =  'page/academic/c_final_project';
+$route['academic/monitoring-yudisium'] =  'page/academic/c_final_project/monitoring_yudisium';
 
 
 // --- Modal Academic ----
@@ -159,6 +159,7 @@ $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 $route['it/version'] = 'page/it/c_it/version_data';
 $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
+$route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
 
 

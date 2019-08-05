@@ -5,6 +5,9 @@
         <li class="<?php if($this->uri->segment(2)=='final-project') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/final-project'); ?>">Final Project</a>
         </li>
+        <li class="<?php if($this->uri->segment(2)=='monitoring-yudisium') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/monitoring-yudisium'); ?>">Monitoring Yudisium</a>
+        </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">
 
