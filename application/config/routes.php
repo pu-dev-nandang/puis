@@ -990,6 +990,7 @@ $route['rest2/__reject_payment_from_fin'] = 'api/c_rest2/reject_payment_from_fin
 $route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
 $route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
 $route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget_real_detail_byMonthYear';
+$route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_budget_onprocess_detail_byMonthYear';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
