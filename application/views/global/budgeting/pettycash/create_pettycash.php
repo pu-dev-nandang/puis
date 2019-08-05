@@ -71,32 +71,58 @@
 	function LoadFirstLoad()
 	{
 		var ID_payment = ClassDt.ID_payment;
-		__loadRuleInput().then(function(data){
-			var access = data['access'];
-			if (access.length > 0) {
-				ClassDt.RuleAccess = data;
-				var se_content = $('#Content_entry');
-				
-				if (ID_payment != '') {
-						__load_data_payment().then(function(data2){
+		if (ID_payment != '') {
+			__load_data_payment().then(function(data2){
+				ClassDt.Departement = data2.payment[0].Departement;
+				__loadRuleInput().then(function(data){
+					var access = data['access'];
+					if (access.length > 0) {
+						ClassDt.RuleAccess = data;
+						var se_content = $('#Content_entry');
+
+						ClassDt.DtExisting = data2;
+						Make_PostBudgetDepartment_existing();
+						makeDomHTML(se_content);
+					}
+					else
+					{
+						if (DivSession == 'NA.9') {
+							var se_content = $('#Content_entry');
 							ClassDt.DtExisting = data2;
 							Make_PostBudgetDepartment_existing();
 							makeDomHTML(se_content);
-						})
+						}
+						else
+						{
+							$("#Content_entry").empty();
+							$("#Content_entry").html('<h2 align = "center">Your not authorize these modul</h2>');
+						}
+						
+					}
+
+					loadingEnd(500);
+				})
+
+			})	
+		}
+		else
+		{
+			__loadRuleInput().then(function(data){
+				var access = data['access'];
+				if (access.length > 0) {
+					ClassDt.RuleAccess = data;
+					var se_content = $('#Content_entry');
+					makeDomHTML(se_content);
 				}
 				else
 				{
-					makeDomHTML(se_content);
+					$("#Content_entry").empty();
+					$("#Content_entry").html('<h2 align = "center">Your not authorize these modul</h2>');
 				}
-			}
-			else
-			{
-				$("#Content_entry").empty();
-				$("#Content_entry").html('<h2 align = "center">Your not authorize these modul</h2>');
-			}
 
-			loadingEnd(500);
-		})
+				loadingEnd(500);
+			})
+		}
 
 	}
 
