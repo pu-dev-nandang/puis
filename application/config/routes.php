@@ -1404,6 +1404,7 @@ $route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
 
 // spb
 $route['budgeting_menu/pembayaran/spb/create_spb'] = 'page/budgeting/c_spb/create_spb';
+$route['budgeting_menu/pembayaran/spb/create_spb/(:any)'] = 'page/budgeting/c_spb/create_spb/$1'; // edit or view
 $route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/configuration';
 $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
