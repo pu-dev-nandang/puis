@@ -217,4 +217,13 @@
 		    {},
 		]);
 	})
+
+	$(document).off('click', '.ShowProcess').on('click', '.ShowProcess',function(e) {
+		var ID_budget_left = $(this).attr('IDData');
+		var CodeURL = jwt_encode(ID_budget_left,"UAP)(*");
+		var url = base_url_js+'budgeting_onprocess_detail/'+CodeURL;
+		FormSubmitAuto(url, 'POST', [
+		    {},
+		]);
+	})
 </script>

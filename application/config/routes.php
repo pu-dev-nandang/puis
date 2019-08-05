@@ -1474,6 +1474,7 @@ $route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
 
 // budget remaining
 $route['budgeting_real_detail/(:any)'] = 'page/budgeting/c_budgeting/budgeting_real_detail/$1';
+$route['budgeting_onprocess_detail/(:any)'] = 'page/budgeting/c_budgeting/budgeting_onprocess_detail/$1';
 
 
 // Purchasing
