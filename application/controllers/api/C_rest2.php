@@ -4001,4 +4001,84 @@ class C_rest2 extends CI_Controller {
             }
     }
 
+    public function load_budget_onprocess_detail_byMonthYear()
+    {
+        try {
+               $dataToken = $this->getInputToken2();
+               $auth = $this->m_master->AuthAPI($dataToken);
+               if ($auth) {
+                   $this->load->model('budgeting/m_budgeting');
+                   $this->load->model('budgeting/m_pr_po');
+                   $ID_budget_left = $dataToken['ID_budget_left'];
+                   $Year = $dataToken['Year'];
+                   $Month = $dataToken['Month'];
+                   $rs = array();
+                   $sql = 'select * from (
+                                select a.Type,a.Code,b.Perihal,a.Code_po_create,a.CreatedBy as CreatedPayment,c.Name as NameCreatedPayment,b.ID_payment,b.Invoice,a.CreatedAt from db_payment.payment as a
+                                join 
+                                    (
+                                        select ID_payment,Perihal,Invoice  from db_payment.spb
+                                        where ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.bank_advance as a
+                                       join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.cash_advance  as a
+                                       join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.petty_cash 
+                                       as a
+                                       join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                    ) as b
+                                    on a.ID = b.ID_payment
+                                join db_employees.employees as c on a.CreatedBy = c.NIP
+                                where b.ID_payment not in (
+                                            select ap.ID_payment from db_budgeting.ap as ap
+                                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                                        )
+                                       AND
+                                       YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
+                                UNION
+                                select "Purchase Request",a.PRCode,"","",a.CreatedBy,c.Name,NULL, b.SubTotal,a.CreatedAt as Invoice from db_budgeting.pr_create as a
+                                join (
+                                    select d.ID as ID_payment,a.PRCode,a.SubTotal from db_budgeting.pr_detail as a
+                                    left join db_purchasing.pre_po_detail as b on a.ID = b.ID_pr_detail
+                                    left join db_purchasing.po_detail as c on b.ID = c.ID_pre_po_detail
+                                    left join db_payment.payment as d on d.Code_po_create = c.Code
+                                    where a.ID_budget_left = '.$ID_budget_left.' and a.Status = 1
+
+                                ) as b
+                                on a.PRCode = b.PRCode
+                                join db_employees.employees as c on a.CreatedBy = c.NIP
+                                left join (
+                                            select ap.ID_payment from db_budgeting.ap as ap
+                                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                                        )   as ap on ap.ID_payment = b.ID_payment
+                                where YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
+
+                        ) cc order by  CreatedAt asc,Code asc       
+
+                            
+                        ';
+                    $query=$this->db->query($sql, array())->result_array();
+                    $rs = $query;
+                   echo json_encode($rs);
+               }
+               else
+               {
+                   // handling orang iseng
+                   echo '{"status":"999","message":"Not Authorize"}';
+               }
+           }
+           catch(Exception $e) {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+           }
+    }
+
 }
