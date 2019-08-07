@@ -35,47 +35,52 @@
 
 </style>
 <div class="row"  >
-  <div class="col-md-3 col-md-offset-9" >
-<input type="text" class="form-control" placeholder="Search">
 </div>
-</div>
-<div class="row"  >
-  <div class="col-md-5" >
-    <div class="panel panel-default">
-      <div class="panel-heading"></div>
-      <div class="panel-body">
+<?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
+  <div class="row"  >
+    <div class="col-md-5" >
+      <div class="panel panel-default">
+        <div class="panel-heading"></div>
+        <div class="panel-body">
+          <div class="form-group">
+      			<label>Division</label>
+      			<select class="select2-select-00 full-width-fix" id="formQNA_Division_ID">
+      				<?php for($i = 0; $i < count($G_division); $i++): ?>
+      					<option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
+      				<?php endfor ?>
+      			 </select>
+      		</div>
+          <div class="form-group">
+              <label>Type</label>
+              <input class="form-control" id="formQNA_Type" />
+          </div>
         <div class="form-group">
-    			<label>Division</label>
-    			<select class="select2-select-00 full-width-fix" id="formQNA_Division_ID">
-    				<?php for($i = 0; $i < count($G_division); $i++): ?>
-    					<option value="<?php echo $G_division[$i]['ID'] ?>" > <?php echo $G_division[$i]['Division'] ?> </option>
-    				<?php endfor ?>
-    			 </select>
-    		</div>
+            <label>Question</label>
+            <input class="form-control" id="formQNA_Questions" />
+        </div>
         <div class="form-group">
-            <label>Type</label>
-            <input class="form-control" id="formQNA_Type" />
+            <label>Answer</label>
+            <input class="form-control" id="formQNA_Answers" />
         </div>
-      <div class="form-group">
-          <label>Question</label>
-          <input class="form-control" id="formQNA_Questions" />
-      </div>
-      <div class="form-group">
-          <label>Answer</label>
-          <input class="form-control" id="formQNA_Answers" />
-      </div>
-      <div class="form-group">
-          <label>File</label>
-        <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-        <input type="file" name="userfile" id="upload_files" accept="">
-          </form>
-        </div>
-        <div class="form-group" style="text-align: right;">
-            <button class="btn btn-primary" id="saveFormQNA">Save</button>
+        <div class="form-group">
+            <label>File</label>
+          <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+          <input type="file" name="userfile" id="upload_files" accept="">
+            </form>
+          </div>
+          <div class="form-group" style="text-align: right;">
+              <button class="btn btn-primary" id="saveFormQNA">Save</button>
+          </div>
+
+
+
+
+
         </div>
       </div>
     </div>
   </div>
+<?php } ?>
 
 
 <div class="row">
@@ -158,17 +163,11 @@ $('#saveFormQNA').click(function () {
     formQNA_Division_ID!='' && formQNA_Division_ID!=null &&
     formQNA_Type!='' && formQNA_Type!=null &&
     formQNA_Questions!='' && formQNA_Questions!=null &&
-    formQNA_Answers!='' && formQNA_Answers!=null &&
-    upload_files !='' && upload_files!=null
+    formQNA_Answers!='' && formQNA_Answers!=null
+
   ){
 
-    var input = $('#upload_files');
-    var files = input[0].files[0];
 
-    var sz = parseFloat(files.size) / 1000000; // ukuran MB
-    var ext = files.type.split('/')[1];
-
-    if(Math.floor(sz)<=8){
       loading_button('#saveFormQNA');
 
       var url = base_url_js+'api3/__crudqna';
@@ -189,7 +188,10 @@ $('#saveFormQNA').click(function () {
 
           toastr.success('Data saved','Success');
 
-          upload_qna(jsonResult.ID,'');
+          if (upload_files!=null && upload_files!=''){
+            upload_qna(jsonResult.ID,'');
+          }
+
 
           setTimeout(function () {
           $('#saveFormQNA').html('Save').prop('disabled',false);
@@ -202,9 +204,7 @@ $('#saveFormQNA').click(function () {
           }, 500);
 
         });
-    } else {
-      toastr.warning('Max Size 8 MB','warning');
-    }
+
 
 
 
