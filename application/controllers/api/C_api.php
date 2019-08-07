@@ -8564,6 +8564,7 @@ class C_api extends CI_Controller {
 
                 $dataUpdtAuth = (array) $data_arr['dataAuth'];
                 $dataUpdtAuth['LastUpdate']=date('Y-m-d H:i:s');
+                $dataUpdtAuth['UpdatedBy'] = $this->session->userdata('NIP');
                 $this->db->where('NPM', $NPM);
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
                 $this->db->reset_query();
