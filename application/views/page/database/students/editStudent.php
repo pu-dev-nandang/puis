@@ -129,6 +129,13 @@
                             <input class="form-control formBiodata" id="formJacket">
                         </td>
                     </tr>
+                    <tr>
+                        <th>Access Card Number</th>
+                        <th>:</th>
+                        <td>
+                            <input class="form-control formBiodata" id="formAcc" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" maxlength="10">
+                        </td>
+                    </tr>
                 </table>
 
                 <div style="text-align: right;">
@@ -193,7 +200,7 @@
                             <input class="form-control" id="formMentorEmail" readonly>
                         </td>
                     </tr>
-                    
+
                 </table>
 
 
@@ -333,7 +340,7 @@
                         </td>
                     </tr>
                 </table>
-                
+
             </div>
         </div>
 
@@ -347,7 +354,7 @@
     $(document).ready(function () {
         loadDataStd();
     });
-    
+
     $('#btnSaveBiodata').click(function () {
 
         var DB_Student = "<?php echo $DB_Student; ?>";
@@ -370,7 +377,8 @@
             var formHP = $('#formHP').val();
             var formEmail = $('#formEmail').val();
             var formEmailPU = $('#formEmailPU').val();
-            var formKtp = $('#formKtp').val(); 
+            var formKtp = $('#formKtp').val();
+            var formAcc = $('#formAcc').val();
 
             var data = {
                 action : 'updateBiodataStudent',
@@ -386,12 +394,14 @@
                     HP : formHP,
                     Email : formEmail,
                     Address : formAddress,
-                    Jacket : formJacket
+                    Jacket : formJacket,
+
                 },
                 dataAuth : {
                     Name : formName,
                     KTPNumber : formKtp,
-                    EmailPU : formEmailPU
+                    EmailPU : formEmailPU,
+                    Access_Card_Number : formAcc,
                 }
             };
 
@@ -421,7 +431,7 @@
 
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudStudent';
-        
+
         $.post(url,{token:token},function (jsonResult) {
             // console.log(jsonResult);
             if(jsonResult.length>0){
@@ -440,29 +450,29 @@
                 $('#formJacket').val(d.Jacket);
 
                 //---data parent --
-                $('#formNameFather').val(d.Father); 
-                $('#formStatusFather').val(d.StatusFather); 
-                $('#formEducationFather').val(d.EducationFather); 
-                $('#formOccuFather').val(d.OccupationFather); 
-                $('#formPhoneFather').val(d.PhoneFather); 
-                //$('#formHpFather').val(d.Jacket); 
-                $('#formEmailFather').val(d.EmailFather); 
-                $('#formAddressFather').val(d.AddressFather); 
-                $('#formNameMother').val(d.Mother); 
-                $('#formStatusMother').val(d.StatusMother); 
-                $('#formEducationMother').val(d.EducationMother); 
-                $('#formOccupationMother').val(d.OccupationMother); 
-                $('#formPhoneMother').val(d.PhoneMother); 
-                //$('#formHpMother').val(d.Jacket); 
-                $('#formEmailMother').val(d.EmailMother); 
-                $('#formAddressMother').val(d.AddressMother); 
+                $('#formNameFather').val(d.Father);
+                $('#formStatusFather').val(d.StatusFather);
+                $('#formEducationFather').val(d.EducationFather);
+                $('#formOccuFather').val(d.OccupationFather);
+                $('#formPhoneFather').val(d.PhoneFather);
+                //$('#formHpFather').val(d.Jacket);
+                $('#formEmailFather').val(d.EmailFather);
+                $('#formAddressFather').val(d.AddressFather);
+                $('#formNameMother').val(d.Mother);
+                $('#formStatusMother').val(d.StatusMother);
+                $('#formEducationMother').val(d.EducationMother);
+                $('#formOccupationMother').val(d.OccupationMother);
+                $('#formPhoneMother').val(d.PhoneMother);
+                //$('#formHpMother').val(d.Jacket);
+                $('#formEmailMother').val(d.EmailMother);
+                $('#formAddressMother').val(d.AddressMother);
 
                 //--- data academic ---
-                $('#formProgramStudy').val(d.ProdiName); 
-                $('#formStatusAcademic').val(d.StatusStudentDesc); 
-                $('#formMentorAcademic').val(d.Mentor); 
-                $('#formMentorEmail').val(d.MentorEmailPU); 
-                
+                $('#formProgramStudy').val(d.ProdiName);
+                $('#formStatusAcademic').val(d.StatusStudentDesc);
+                $('#formMentorAcademic').val(d.Mentor);
+                $('#formMentorEmail').val(d.MentorEmailPU);
+
                 $( "#formDateOfBirth" )
                     .datepicker({
                         showOtherMonths:true,
