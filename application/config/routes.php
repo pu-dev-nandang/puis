@@ -29,7 +29,8 @@ $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/
 
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
-$route['cekKRS/(:any)'] = 'auth/c_auth/checkRedudantKRS/$1';
+
+$route['toStdPlanning/(:any)/(:any)'] = 'auth/c_auth/toStdPlanning/$1/$2';
 
 $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 
@@ -129,7 +130,9 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-$route['academic/final-project'] =  'page/academic/c_final_project';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+$route['academic/final-project/monitoring-yudisium'] =  'page/academic/c_final_project/monitoring_yudisium';
+$route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 
 
 // --- Modal Academic ----
@@ -158,6 +161,7 @@ $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 $route['it/version'] = 'page/it/c_it/version_data';
 $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
+$route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
 
 
@@ -641,6 +645,13 @@ $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_s
 
 // -- report admission to finance
 $route['finance/report_admission/(:any)'] =  'page/finance/c_report/report_admission/$1';
+
+// Finance Yudisium
+$route['finance/monitoring-yudisium'] =  'page/finance/c_finance/monitoring_yudisium';
+
+
+$route['library/monitoring-yudisium'] =  'page/library/c_library/monitoring_yudisium';
+
 
 
 
@@ -1302,6 +1313,9 @@ $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 $route['api3/__crudGroupStd'] = 'api/c_api3/crudGroupStd';
 
 $route['api3/__crudCheckDataKRS'] = 'api/c_api3/crudCheckDataKRS';
+
+$route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
+
 
 
 

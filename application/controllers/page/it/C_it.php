@@ -53,6 +53,15 @@ class C_it extends It_Controler {
 
     }
 
+    public function overwrite_course(){
+
+        $department = parent::__getDepartement();
+        $data = '';
+        $page = $this->load->view('page/'.$department.'/academic/overwrite_course',$data,true);
+        $this->temp($page);
+
+    }
+
     public function version_menu(){
       $department = parent::__getDepartement();
 

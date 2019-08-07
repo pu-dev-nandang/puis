@@ -178,7 +178,9 @@
 
             ?>
         </ul>
-
+        <div class="sidebar-title">
+            <span>Manual Menu</span>
+        </div>
         <ul id="nav">
 
             <li class="<?php if($this->uri->segment(2)=='version'){echo"current";}?>">
@@ -198,6 +200,12 @@
                         <a href="<?= base_url('it/academic/redundancy-krs-online') ?>">
                             <i class="icon-angle-right"></i>
                             Redundancy Krs Online
+                        </a>
+                    </li>
+                    <li class="<?= ($this->uri->segment(3)=='overwrite-course') ? "current open" : ""?>">
+                        <a href="<?= base_url('it/academic/overwrite-course') ?>">
+                            <i class="icon-angle-right"></i>
+                            Overwrite Course
                         </a>
                     </li>
                 </ul>

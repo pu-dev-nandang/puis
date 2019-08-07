@@ -228,6 +228,13 @@
                     Download Log VA
                 </a>
             </li> -->
+
+            <li class="<?php if($this->uri->segment(2)=='monitoring-yudisium'){echo "current";} ?>">
+                <a href="<?php echo base_url('finance/monitoring-yudisium'); ?>">
+                    <i class="fa fa-graduation-cap"></i>
+                    Monitoring Yudisium
+                </a>
+            </li>
         </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
