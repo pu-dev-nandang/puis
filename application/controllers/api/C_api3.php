@@ -1372,4 +1372,163 @@ class C_api3 extends CI_Controller {
 
     }
 
+    public function crudYudisium(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='viewYudisiumList'){
+
+            $requestData= $_REQUEST;
+
+            $SemesterID = $data_arr['SemesterID'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%" 
+            OR uc.Tingkat LIKE "%'.$search.'%"
+             OR uc.Benefit LIKE "%'.$search.'%"';
+            }
+
+            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, ats.IjazahSMA, mk.MKCode,   
+                                        mk.NameEng AS CourseEng, sc.ClassGroup, 
+                                        ats.ClearentLibrary, ats.ClearentLibrary_By, ats.ClearentLibrary_At, em1.Name AS ClearentLibrary_Name,    
+                                        ats.ClearentFinance, ats.ClearentFinance_By, ats.ClearentFinance_At, em2.Name AS ClearentFinance_Name,    
+                                        ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name, 
+                                        ats.ID AS AUTHID  
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
+                                        LEFT JOIN db_employees.employees em1 ON (ats.ClearentLibrary_By = em1.NIP)
+                                        LEFT JOIN db_employees.employees em2 ON (ats.ClearentFinance_By = em2.NIP)
+                                        LEFT JOIN db_employees.employees em3 ON (ats.ClearentKaprodi_By = em3.NIP)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                // Get score
+                $dbStd = 'ta_'.$row['ClassOf'];
+                $dataScore = $this->db->select('Score')->get_where($dbStd.'.study_planning',array(
+                    'ID' => $row['SPID']
+                ))->result_array();
+
+
+                // Score
+                $Score = ($dataScore[0]['Score']!=null && $dataScore[0]['Score']!='') ? $dataScore[0]['Score'] : '';
+
+                $DeptID = $this->session->userdata('IDdepartementNavigation');
+
+                // Ijazah
+                $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
+                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/ijazah_student/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
+                    : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
+                if($DeptID=='6' || $DeptID==6){
+
+                    $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
+
+                    $ijazah = '<form id="formupload_files_'.$row['AUTHID'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                        <i class="fa fa-upload"></i>
+                                        <input type="file" name="userfile" class="uploadIjazahStudentFile" data-old="'.$fileIjazahOld.'" data-npm="'.$row['NPM'].'" data-id="'.$row['AUTHID'].'" id="upload_files_'.$row['AUTHID'].'" accept="application/pdf" style="display: none;">
+                                    </label>
+                                </div>
+                        </form>'.$ijazahBtnD;
+
+                } else {
+                    $ijazah = $ijazahBtnD;
+                }
+
+
+                // Library
+                $dateTm = ($row['ClearentLibrary_At']!='' && $row['ClearentLibrary_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentLibrary_At'])).'</div>' : '';
+                if($DeptID=='11' || $DeptID==11){
+                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentLibrary">Clearent</button>';
+                } else {
+                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
+                        : 'Waiting Library Clearent';
+                }
+
+
+
+                // Finance
+                $dateTm = ($row['ClearentFinance_At']!='' && $row['ClearentFinance_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentFinance_At'])).'</div>' : '';
+                if($DeptID=='9' || $DeptID==9){
+                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentFinance">Clearent</button>';
+                } else {
+                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
+                        : 'Waiting Finance Clearent';
+                }
+
+
+                // kaprodi
+                $dateTm = ($row['ClearentKaprodi_At']!='' && $row['ClearentKaprodi_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentKaprodi_At'])).'</div>' : '';
+                $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
+                    : 'Waiting Approval';
+//                    : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+
+                $c_Kaprodi = ($row['ClearentFinance']!='0' && $row['ClearentLibrary']!='0' &&
+                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Library & Finance Clearent</span>';
+
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'</div>';
+                $nestedData[] = '<div>'.$Score.'</div>';
+                $nestedData[] = '<div>'.$ijazah.'</div>';
+                $nestedData[] = '<div>'.$c_Library.'</div>';
+                $nestedData[] = '<div>'.$c_Finance.'</div>';
+                $nestedData[] = '<div>'.$c_Kaprodi.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='updateClearent'){
+
+            $ID = $data_arr['ID'];
+            $C = $data_arr['C'];
+
+            $arr = array(
+                $C => '1',
+                $C.'_By' => $this->session->userdata('NIP'),
+                $C.'_At' => $this->m_rest->getDateTimeNow()
+            );
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.auth_students',$arr);
+
+            return print_r(1);
+
+        }
+
+    }
+
 }

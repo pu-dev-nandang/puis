@@ -44,4 +44,35 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function uploadIjazahStudent(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $id = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/ijazah_student/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!='' && is_file('./uploads/ijazah_student/'.$old)){
+            unlink('./uploads/ijazah_student/'.$old);
+        }
+
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            // Error
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+            // Sukses
+            $this->db->set('IjazahSMA', $fileName);
+            $this->db->where('ID', $id);
+            $this->db->update('db_academic.auth_students');
+            return print_r(1);
+        }
+    }
+
 }
