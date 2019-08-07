@@ -291,7 +291,7 @@
             });
 
         } else {
-            toastr.warning('Please, Fill in form requered','Warning')
+            toastr.warning('Please, Fill in form requered','Warning');
         }
 
     });

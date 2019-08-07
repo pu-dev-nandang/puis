@@ -229,6 +229,7 @@ class C_api3 extends CI_Controller {
     public function crudExternalAccreditation(){
 
         $data_arr = $this->getInputToken2();
+
         if($data_arr['action']=='updateNewAE'){
 
             $dataForm = (array) $data_arr['dataForm'];
@@ -739,9 +740,6 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($data));
         }
-        else if($data_arr['action']=='readSumberDana_SumberDanaID'){
-            $D = $data_arr['SumberDanaID'];
-        }
         else if($data_arr['action']=='updateSumberDana'){
 
             $ID = $data_arr['ID'];
@@ -792,7 +790,8 @@ class C_api3 extends CI_Controller {
             }
             return print_r(json_encode(array('ID'=>$ID)));
 
-        } else if($data_arr['action']=='readPerolehanDana'){
+        }
+        else if($data_arr['action']=='readPerolehanDana'){
 
             $data = $this->db->query('SELECT pd.*, sd.SumberDana, sdt.Label AS SumberDanaType FROM db_agregator.perolehan_dana pd
                                               LEFT JOIN db_agregator.sumber_dana sd ON (sd.ID = pd.SumberDanaID)
@@ -808,6 +807,127 @@ class C_api3 extends CI_Controller {
             $this->db->delete('db_agregator.perolehan_dana');
 
             return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='updatePenggunaanDana'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.penggunaan_dana',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.penggunaan_dana',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(json_encode(array(
+                'ID' => $ID
+            )));
+
+        }
+        else if($data_arr['action']=='viewPenggunaanDana'){
+            $data = $this->db->query('SELECT pd.*, jp.Jenis AS JP FROM db_agregator.penggunaan_dana pd 
+                                                  LEFT JOIN db_agregator.jenis_penggunaan jp ON (pd.JPID = jp.ID) ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removePenggunaanDana'){
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete('db_agregator.penggunaan_dana');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateJenisDana'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = array('Jenis' => $data_arr['Jenis']);
+
+            if($ID!=''){
+                // Update
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.jenis_penggunaan',$dataForm);
+
+            } else {
+                $this->db->insert('db_agregator.jenis_penggunaan',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(1);
+
+
+        }
+        else if($data_arr['action']=='viewJenisDana'){
+
+            $data = $this->db->get('db_agregator.jenis_penggunaan')->result_array();
+            return print_r(json_encode($data));
+        }
+
+    }
+
+    public function crudAgregatorTB5(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='updatePAM'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.prestasi_mahasiswa',$dataForm);
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='viewPAM'){
+
+            $data = $this->db->get_where('db_agregator.prestasi_mahasiswa', array(
+                'Type' => $data_arr['Type']
+            ))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='removePAM'){
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete('db_agregator.prestasi_mahasiswa');
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='viewIPK'){
+
+            $Year = $data_arr['Year'];
+
+            $data = $this->db->query('SELECT * FROM db_academic.auth_students ast 
+                                                          WHERE ast.StatusStudentID = "1" 
+                                                          AND ast.Year = "'.$Year.'" ')->result_array();
+
+
 
         }
 
@@ -1007,7 +1127,419 @@ class C_api3 extends CI_Controller {
 
     }
 
-    public function crudqna(){
+
+    public function crudAgregator(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='updateTable'){
+
+            $ID = ($data_arr['ID']!='') ? $data_arr['ID'] : '';
+            $table = $data_arr['table'];
+            $dataForm = (array) $data_arr['dataForm'];
+            $OldFile = '';
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update(''.$table,$dataForm);
+
+
+
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert(''.$table,$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+
+            return print_r(json_encode(array(
+                'ID' => $ID,
+                'File' => $OldFile
+            )));
+
+        }
+
+    }
+
+    public function crudGroupStd(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='view_GS'){
+
+            $ProdiID = $data_arr['ProdiID'];
+
+            $data = $this->db->order_by('ID','ASC')->get_where('db_academic.prodi_group',array(
+                'ProdiID' => $ProdiID
+            ))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='update_GS'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID',$ID);
+                $this->db->update('db_academic.prodi_group',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_academic.prodi_group',$dataForm);
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='viewStudent_GS'){
+            $data = $this->db->select('ID,NPM, Name, ProdiGroupID')->get_where('db_academic.auth_students',array(
+                'ProdiGroupID' => $data_arr['ProdiGroupID']
+            ))->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='viewStudentNew_GS'){
+
+            $data = $this->db->query('SELECT ID, NPM, Name, ProdiGroupID FROM db_academic.auth_students 
+                                          WHERE Year = "'.$data_arr['Year'].'"
+                                           AND ProdiID = "'.$data_arr['ProdiID'].'"
+                                            AND (ProdiGroupID IS NULL OR ProdiGroupID ="")')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateStudent_GS'){
+
+            $arrID = (array) $data_arr['arrID'];
+
+            for ($i=0;$i<count($arrID);$i++){
+
+                // Update
+                $this->db->where('ID',$arrID[$i]);
+                $this->db->update('db_academic.auth_students',array(
+                    'ProdiGroupID' => $data_arr['ProdiGroupID']
+                ));
+                $this->db->reset_query();
+
+                // get nip
+                $dataN = $this->db->select('NPM')->get_where('db_academic.auth_students',array(
+                    'ID' => $arrID[$i]
+                ))->result_array();
+
+                $this->db->insert('db_academic.prodi_group_log',array(
+                    'NPM' => $dataN[0]['NPM'],
+                    'ProdiGroupID' => $data_arr['ProdiGroupID'],
+                    'Status' => 'in',
+                    'UpdatedBy' => $this->session->userdata('NIP')
+                ));
+
+
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='removeFMGrStudent_GS'){
+
+            $this->db->where('ID',$data_arr['ID']);
+            $this->db->update('db_academic.auth_students',array(
+                'ProdiGroupID' => ''
+            ));
+
+            $this->db->reset_query();
+
+            $this->db->insert('db_academic.prodi_group_log',array(
+                'NPM' => $data_arr['NPM'],
+                'ProdiGroupID' => $data_arr['ProdiGroupID'],
+                'Status' => 'out',
+                'UpdatedBy' => $this->session->userdata('NIP')
+            ));
+
+
+            return print_r(1);
+
+
+
+        }
+
+    }
+
+
+    public function crudCheckDataKRS(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='checkDataKRS'){
+
+            $Year = $data_arr['Year'];
+            $SemesterID = $data_arr['SemesterID'];
+
+            $db = 'ta_'.$Year;
+
+            $dataStd = $this->db->query('SELECT s.NPM, s.Name FROM  '.$db.'.students s 
+                                                ORDER BY s.NPM ASC ')->result_array();
+
+            $result = [];
+            if(count($dataStd)>0){
+
+                for($i=0;$i<count($dataStd);$i++){
+
+                    // KRS Approve
+                    $dataSP = $this->db->query('SELECT sp.ID, sp.ScheduleID, sch.ClassGroup FROM '.$db.'.study_planning sp
+                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sp.ScheduleID)
+                                                WHERE sp.SemesterID = '.$SemesterID.' 
+                                                AND sp.NPM = "'.$dataStd[$i]['NPM'].'"
+                                                ORDER BY sp.ScheduleID ASC ')->result_array();
+
+                    // KRS Online
+                    $dataKO = $this->db->query('SELECT sk.ID, sk.ScheduleID, sch.ClassGroup FROM db_academic.std_krs sk 
+                                                LEFT JOIN db_academic.schedule sch ON (sch.ID = sk.ScheduleID)
+                                                WHERE sk.SemesterID = '.$SemesterID.' 
+                                                AND sk.NPM = "'.$dataStd[$i]['NPM'].'"
+                                                AND sk.Status = "3" 
+                                                ORDER BY sk.ScheduleID ASC ')->result_array();
+
+
+
+                    if(count($dataSP)!= count($dataKO)){
+
+                        $dataStd[$i]['A'] = $dataSP;
+                        $dataStd[$i]['B'] = $dataKO;
+                        array_push($result,$dataStd[$i]);
+                    }
+
+                }
+
+            }
+
+            return print_r(json_encode($result));
+
+        }
+        else if($data_arr['action']=='removeRedundancy'){
+
+            $Year = $data_arr['Year'];
+            $NPM = $data_arr['NPM'];
+            $SemesterID = $data_arr['SemesterID'];
+            $ScheduleID = $data_arr['ScheduleID'];
+
+            $db = 'ta_'.$Year.'.study_planning';
+
+            // Cek apakah double
+            $data = $this->db->query('SELECT sp.ID FROM '.$db.' sp WHERE sp.SemesterID = "'.$SemesterID.'" 
+                                                AND sp.NPM = "'.$NPM.'"
+                                                 AND sp.ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+            $result = array(
+                'Status' => '0'
+            );
+
+            if(count($data)>1){
+
+
+                // Get ID Attendance
+                $dataAttd = $this->db->select('ID')->get_where('db_academic.attendance',array(
+                    'SemesterID' => $SemesterID,
+                    'ScheduleID' => $ScheduleID
+                ))->result_array();
+
+                if(count($dataAttd)>0){
+                    for ($i=0;$i<count($dataAttd);$i++){
+                        $this->db->where(array(
+                            'ID_Attd' => $dataAttd[$i]['ID'],
+                            'NPM' => $NPM
+                        ));
+                        $this->db->delete('db_academic.attendance_students');
+                    }
+                }
+
+                // Remove di SP
+                $this->db->where('ID', $data_arr['SPID']);
+                $this->db->delete($db);
+
+                $result = array(
+                    'Status' => '1'
+                );
+
+
+            }
+
+            return print_r(json_encode($result));
+
+        }
+
+    }
+
+    public function crudYudisium(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='viewYudisiumList'){
+
+            $requestData= $_REQUEST;
+
+            $SemesterID = $data_arr['SemesterID'];
+
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+
+                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%" 
+            OR uc.Tingkat LIKE "%'.$search.'%"
+             OR uc.Benefit LIKE "%'.$search.'%"';
+            }
+
+            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, ats.IjazahSMA, mk.MKCode,   
+                                        mk.NameEng AS CourseEng, sc.ClassGroup, 
+                                        ats.ClearentLibrary, ats.ClearentLibrary_By, ats.ClearentLibrary_At, em1.Name AS ClearentLibrary_Name,    
+                                        ats.ClearentFinance, ats.ClearentFinance_By, ats.ClearentFinance_At, em2.Name AS ClearentFinance_Name,    
+                                        ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name, 
+                                        ats.ID AS AUTHID  
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
+                                        LEFT JOIN db_employees.employees em1 ON (ats.ClearentLibrary_By = em1.NIP)
+                                        LEFT JOIN db_employees.employees em2 ON (ats.ClearentFinance_By = em2.NIP)
+                                        LEFT JOIN db_employees.employees em3 ON (ats.ClearentKaprodi_By = em3.NIP)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ';
+
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                // Get score
+                $dbStd = 'ta_'.$row['ClassOf'];
+                $dataScore = $this->db->select('Score')->get_where($dbStd.'.study_planning',array(
+                    'ID' => $row['SPID']
+                ))->result_array();
+
+
+                // Score
+                $Score = ($dataScore[0]['Score']!=null && $dataScore[0]['Score']!='') ? $dataScore[0]['Score'] : '';
+
+                $DeptID = $this->session->userdata('IDdepartementNavigation');
+
+                // Ijazah
+                $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
+                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/ijazah_student/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
+                    : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
+                if($DeptID=='6' || $DeptID==6){
+
+                    $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
+
+                    $ijazah = '<form id="formupload_files_'.$row['AUTHID'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                        <i class="fa fa-upload"></i>
+                                        <input type="file" name="userfile" class="uploadIjazahStudentFile" data-old="'.$fileIjazahOld.'" data-npm="'.$row['NPM'].'" data-id="'.$row['AUTHID'].'" id="upload_files_'.$row['AUTHID'].'" accept="application/pdf" style="display: none;">
+                                    </label>
+                                </div>
+                        </form>'.$ijazahBtnD;
+
+                } else {
+                    $ijazah = $ijazahBtnD;
+                }
+
+
+                // Library
+                $dateTm = ($row['ClearentLibrary_At']!='' && $row['ClearentLibrary_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentLibrary_At'])).'</div>' : '';
+                if($DeptID=='11' || $DeptID==11){
+                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentLibrary">Clearent</button>';
+                } else {
+                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
+                        : 'Waiting Library Clearent';
+                }
+
+
+
+                // Finance
+                $dateTm = ($row['ClearentFinance_At']!='' && $row['ClearentFinance_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentFinance_At'])).'</div>' : '';
+                if($DeptID=='9' || $DeptID==9){
+                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentFinance">Clearent</button>';
+                } else {
+                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
+                        : 'Waiting Finance Clearent';
+                }
+
+
+                // kaprodi
+                $dateTm = ($row['ClearentKaprodi_At']!='' && $row['ClearentKaprodi_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentKaprodi_At'])).'</div>' : '';
+                $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
+                    : 'Waiting Approval';
+//                    : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+
+                $c_Kaprodi = ($row['ClearentFinance']!='0' && $row['ClearentLibrary']!='0' &&
+                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Library & Finance Clearent</span>';
+
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'</div>';
+                $nestedData[] = '<div>'.$Score.'</div>';
+                $nestedData[] = '<div>'.$ijazah.'</div>';
+                $nestedData[] = '<div>'.$c_Library.'</div>';
+                $nestedData[] = '<div>'.$c_Finance.'</div>';
+                $nestedData[] = '<div>'.$c_Kaprodi.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+
+
+        else if($data_arr['action']=='updateClearent'){
+
+            $ID = $data_arr['ID'];
+            $C = $data_arr['C'];
+
+            $arr = array(
+                $C => '1',
+                $C.'_By' => $this->session->userdata('NIP'),
+                $C.'_At' => $this->m_rest->getDateTimeNow()
+            );
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.auth_students',$arr);
+
+            return print_r(1);
+
+        }
+
+    }
+
+  
+  public function crudqna(){
 
         $data_arr = $this->getInputToken2();
 
@@ -1035,8 +1567,7 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $Previlege = $data_arr['Previlege'];
-
-            $dataSearch = '';
+          $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
                 $dataSearch = ' WHERE  ls.Questions LIKE "%'.$search.'%"
@@ -1045,14 +1576,14 @@ class C_api3 extends CI_Controller {
 
             $queryDefault = 'SELECT qna.*, ls.Questions FROM db_employees.qna qna '.$dataSearch;
 
-            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+          $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
             $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
             $no = $requestData['start'] + 1;
             $data = array();
-
+          
             for($i=0;$i<count($query);$i++){
 
                 $nestedData=array();
@@ -1082,8 +1613,8 @@ class C_api3 extends CI_Controller {
 
                 $data[] = $nestedData;
                 $no++;
-
-            }
+              
+               }
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
@@ -1094,8 +1625,8 @@ class C_api3 extends CI_Controller {
             echo json_encode($json_data);
 
         }
-
+  
+  
     }
-
 
 }

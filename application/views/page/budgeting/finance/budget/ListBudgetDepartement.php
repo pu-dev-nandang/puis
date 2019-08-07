@@ -4,7 +4,7 @@
 				<div class="row">
 					<div class="col-md-6 col-md-offset-3">
 						<div class="form-group">
-							<label>Year</label>
+							<label>Period</label>
 							<select class="select2-select-00 full-width-fix" id="Years">
 							     <!-- <option></option> -->
 							 </select>

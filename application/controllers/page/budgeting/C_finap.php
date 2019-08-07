@@ -35,10 +35,10 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin ';
         $joinaction = ' right join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
-                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin
+                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin
                                  from db_payment.payment as a join
                                  ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
                                    UNION 
@@ -72,14 +72,26 @@ class C_finap extends Budgeting_Controler {
 
          // get Department
          $WhereFiltering = '';
+         if (array_key_exists('token', $_POST)) {
+             $dataToken = $this->getInputToken();
+             if (array_key_exists('Years', $dataToken)) {
+                 $WhereFiltering .= ' and (Year = "'.$dataToken['Years'].'" or YEAR(CreateATPayFin) = "'.$dataToken['Years'].'" ) ';
+             }
+
+             if (array_key_exists('Month', $dataToken)) {
+                 if ($dataToken['Month'] != 'all') {
+                     $WhereFiltering .= ' and MONTH(CreateATPayFin) = '.(int)$dataToken['Month'];
+                 }
+             }
+         }
           
          $requestData = $_REQUEST;
-         $StatusQuery = ' and Status = 2';
+         $StatusQuery = '';
          $sqltotalData = 'select count(*) as total  from (
                      select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                          c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                          a.JsonStatus,
-                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                      from db_purchasing.po_create as a
                      left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                      left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -106,7 +118,7 @@ class C_finap extends Budgeting_Controler {
                      select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                          c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                          a.JsonStatus,
-                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                      from db_purchasing.po_create as a
                      left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                      left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -141,7 +153,7 @@ class C_finap extends Budgeting_Controler {
              // $nestedData[] = $row['CodeSupplier'].' || '.$row['NamaSupplier'];
              $nestedData[] = $row['StatusNamepay'];
              $nestedData[] = '';
-             $nestedData[] = $row['PayFinNameCreatedBy'];
+             $nestedData[] = $row['PayFinNameCreatedBy'].'<br>'.'At : '.$row['CreateATPayFin'];;
              // find PR in po_detail
                  $arr_temp = array();
                  $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -151,27 +163,34 @@ class C_finap extends Budgeting_Controler {
                  where d.Code = ?
                  ';
                  $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
-                 for ($j=0; $j < count($query_get_pr); $j++) { 
-                     if (count($arr_temp) == 0) {
-                         $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                     }
-                     else
-                     {
-                         // check exist
-                         $bool = true;
-                         for ($k=0; $k < count($arr_temp); $k++) { 
-                             if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
-                                 $bool = false;    
-                                 break;
-                             }
-                         }
-
-                         if ($bool) {
-                             $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                         }
-
-                     }
+                 if (count($query_get_pr)  == 0) {
+                     $arr_temp[] = array();
                  }
+                 else
+                 {
+                    for ($j=0; $j < count($query_get_pr); $j++) { 
+                        if (count($arr_temp) == 0) {
+                            $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                        }
+                        else
+                        {
+                            // check exist
+                            $bool = true;
+                            for ($k=0; $k < count($arr_temp); $k++) { 
+                                if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                    $bool = false;    
+                                    break;
+                                }
+                            }
+
+                            if ($bool) {
+                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                            }
+
+                        }
+                    }
+                 }
+                 
                  // pass data spb
                  $arr_temp[] = array(
                      'CodeSPB' => $row['CodeSPB'],
@@ -214,7 +233,14 @@ class C_finap extends Budgeting_Controler {
                 $TypePay = $G_payment[0]['Type'];
                 $CodeSPB =  $G_payment[0]['Code'];
                 $G_po = $this->m_pr_po->Get_data_po_by_Code($Code_po_create);
-                $PRCode = $G_po['po_detail'][0]['PRCode'];
+                if ($Code_po_create == '' || $Code_po_create == null) {
+                    $PRCode = ''; 
+                }
+                else
+                {
+                   $PRCode = $G_po['po_detail'][0]['PRCode']; 
+                }
+                
                 $data = array(
                     'ID_payment_fin' => $ID_payment_fin,
                     'ID_payment' => $ID_payment,

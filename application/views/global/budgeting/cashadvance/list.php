@@ -1,4 +1,28 @@
 <div class="row btn-read">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="thumbnail">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Year</label>
+              <select class="select2-select-00 full-width-fix" id="Years">
+                   <!-- <option></option> -->
+               </select>
+            </div>  
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Month</label>
+              <select class="select2-select-00 full-width-fix" id="Month">
+                   <!-- <option></option> -->
+               </select>
+            </div>  
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+<div class="row btn-read">
 	<div class="col-md-12">
 		<div class="table-responsive" id = "DivTable">
 			
@@ -19,8 +43,43 @@ $(document).ready(function() {
 
 function LoadFirstLoad()
 {
-	LoadDataForTable();
+  load_table_activated_period_years();
+	// LoadDataForTable();
 }
+
+
+function load_table_activated_period_years()
+{
+   // load Year
+   $("#Years").empty();
+   var url = base_url_js+'budgeting/table_all/cfg_dateperiod/1';
+   var thisYear = (new Date()).getFullYear();
+   $.post(url,function (resultJson) {
+    var response = jQuery.parseJSON(resultJson);
+    for(var i=0;i<response.length;i++){
+        //var selected = (i==0) ? 'selected' : '';
+        var selected = (response[i].Activated==1) ? 'selected' : '';
+        $('#Years').append('<option value="'+response[i].Year+'" '+selected+'>'+response[i].Year+'</option>');
+    }
+    $('#Years').select2({
+       //allowClear: true
+    });
+
+    // load bulan
+    var S_bulan = $('#Month');
+    SelectOptionloadBulan(S_bulan,'choice');
+
+    LoadDataForTable();
+   }); 
+}
+
+$(document).off('click', '#Years').on('click', '#Years',function(e) {
+  LoadDataForTable();
+})
+
+$(document).off('click', '#Month').on('click', '#Month',function(e) {
+  LoadDataForTable();
+})
 
 function LoadDataForTable()
 {
@@ -50,12 +109,16 @@ function LoadDataForTable()
 	        '</table>';
 	$("#DivTable").html(table_html);
 
+  var Years = $('#Years option:selected').val();
+  var Month = $('#Month option:selected').val();
 	var data = {
     	IDDepartementPUBudget : IDDepartementPUBudget,
     	sessionNIP : sessionNIP,
 	    auth : 's3Cr3T-G4N',
 	    length : G_ApproverLength,
       Type : 'Cash Advance',
+      Years : Years,
+      Month : Month,
 	};
 	var token = jwt_encode(data,"UAP)(*");
 

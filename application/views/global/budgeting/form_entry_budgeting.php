@@ -19,7 +19,7 @@
 			</div>
 			<div class="col-xs-6">
 				<div class="form-group">
-					<label>Year</label>
+					<label>Period</label>
 					<select class="select2-select-00 full-width-fix" id="Year">
 						<?php for($i=0; $i < count($arr_Year); $i++): ?>
 							<?php $selected = ($arr_Year[$i]['Activated'] == 1) ? 'selected' : '' ?>

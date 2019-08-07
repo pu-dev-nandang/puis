@@ -355,7 +355,7 @@ class C_rest2 extends CI_Controller {
                            $fieldaction = ', poi.InvoicePO,poi.InvoicePayPO,InvoiceLeftPO,poi.Status as StatusPOI,poi.ID as ID_poi ';
                            $joinaction = ' join db_purchasing.po_invoice_status as poi on a.Code = poi.Code_po_create ';
                            // $whereaction = ' and StatusPOI = 0';
-                           $whereaction = '';
+                           $whereaction = ' and POPrint_Approve IS NOT NULL and POPrint_Approve != "" ';
                            $OrderBY = 'StatusPOI asc,';
                         }
                         
@@ -370,6 +370,17 @@ class C_rest2 extends CI_Controller {
                         $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                         // $WhereFiltering2 .= ' or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\'';
                     }
+
+                    if (array_key_exists('Years', $dataToken)) {
+                        $WhereFiltering .= ' and Year = "'.$dataToken['Years'].'" ';
+                    }
+
+                    if (array_key_exists('Month', $dataToken)) {
+                        if ($dataToken['Month'] != 'all') {
+                            $WhereFiltering .= ' and MONTH(CreatedAt) = '.(int)$dataToken['Month'];
+                        }
+                    }
+
                      $this->load->model('budgeting/m_pr_po');
                     $requestData= $_REQUEST;
                     $StatusQuery = ($Status == 'All') ? '' : ' and Status = '.$Status;
@@ -377,7 +388,7 @@ class C_rest2 extends CI_Controller {
                                 select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status,a.POPrint_Approve '.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -404,7 +415,7 @@ class C_rest2 extends CI_Controller {
                                 select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                     c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                     a.JsonStatus,
-                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                    if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status,a.POPrint_Approve '.$fieldaction.'
                                 from db_purchasing.po_create as a
                                 left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                                 left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -472,7 +483,7 @@ class C_rest2 extends CI_Controller {
                         }
 
                         $nestedData = array_merge($nestedData,$arr);
-                        $nestedData[] = $row['NameCreateBy'];
+                        $nestedData[] = $row['NameCreateBy'].'<br>'.'At : '.$row['CreatedAt'];
                         // find PR in po_detail
                             $arr_temp = array();
                             $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2033,7 +2044,7 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB ';
+               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB,spb.CreatedAt as CreatedAtSPB ';
                // $joinaction = ' right join db_purchasing.spb_created as spb on spb.Code_po_create = a.Code
                $joinaction = ' right join (select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb")
                                 as spb on spb.Code_po_create = a.Code
@@ -2057,6 +2068,16 @@ class C_rest2 extends CI_Controller {
                     $NIP = $dataToken['sessionNIP'];
                     $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementSPB = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
                 }
+
+                if (array_key_exists('Years', $dataToken)) {
+                    $WhereFiltering .= ' and (Year = "'.$dataToken['Years'].'" or YEAR(CreatedAtSPB) = "'.$dataToken['Years'].'" ) ';
+                }
+
+                if (array_key_exists('Month', $dataToken)) {
+                    if ($dataToken['Month'] != 'all') {
+                        $WhereFiltering .= ' and MONTH(CreatedAtSPB) = '.(int)$dataToken['Month'];
+                    }
+                }
                  
                 $requestData = $_REQUEST;
                 $StatusQuery = ' and Status = 2';
@@ -2064,7 +2085,7 @@ class C_rest2 extends CI_Controller {
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2090,7 +2111,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2157,7 +2178,7 @@ class C_rest2 extends CI_Controller {
                     }
 
                     $nestedData = array_merge($nestedData,$arr);
-                    $nestedData[] = $row['SPBNameCreatedBy'];
+                    $nestedData[] = $row['SPBNameCreatedBy'].'<br>'.'At : '.$row['CreatedAtSPB'];
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2469,7 +2490,8 @@ class C_rest2 extends CI_Controller {
                 $WhereFiltering = ' and ID_payment not in (select ID_payment from db_budgeting.ap where Status = 2)';
                  
                 $requestData = $_REQUEST;
-                $StatusQuery = ' and Status = 2';
+                // $StatusQuery = ' and Status = 2';
+                $StatusQuery = '';
                 $sqltotalData = 'select count(*) as total  from (
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
@@ -2543,25 +2565,31 @@ class C_rest2 extends CI_Controller {
                         where d.Code = ?
                         ';
                         $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
-                        for ($j=0; $j < count($query_get_pr); $j++) { 
-                            if (count($arr_temp) == 0) {
-                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                            }
-                            else
-                            {
-                                // check exist
-                                $bool = true;
-                                for ($k=0; $k < count($arr_temp); $k++) { 
-                                    if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
-                                        $bool = false;    
-                                        break;
-                                    }
-                                }
-
-                                if ($bool) {
+                        if (count($query_get_pr)  == 0) {
+                            $arr_temp[] = array();
+                        }
+                        else
+                        {
+                            for ($j=0; $j < count($query_get_pr); $j++) { 
+                                if (count($arr_temp) == 0) {
                                     $arr_temp[] = $query_get_pr[$j]['PRCode'];
                                 }
+                                else
+                                {
+                                    // check exist
+                                    $bool = true;
+                                    for ($k=0; $k < count($arr_temp); $k++) { 
+                                        if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                            $bool = false;    
+                                            break;
+                                        }
+                                    }
 
+                                    if ($bool) {
+                                        $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    }
+
+                                }
                             }
                         }
                         // pass data spb
@@ -2652,7 +2680,14 @@ class C_rest2 extends CI_Controller {
                     $ID_payment = $dataToken['ID_payment'];
                     $po_payment_data = $dataToken['po_payment_data'];
                     $po_payment_data = json_decode(json_encode($po_payment_data),true);
-                    $dt = $po_payment_data['dtspb'];
+                    if (array_key_exists('dtspb', $po_payment_data)) {
+                        $dt = $po_payment_data['dtspb'];
+                    }
+                    else
+                    {
+                        $dt = $po_payment_data['payment'];
+                    }
+                    
                     $Invoice = $dt[0]['Detail'][0]['Invoice'];
                     $Code_po_create =  $dt[0]['Code_po_create'];
                     if ($Code_po_create != '' && $Code_po_create != null) {
@@ -2695,17 +2730,46 @@ class C_rest2 extends CI_Controller {
                                       break;
                                   } 
                                   $ID_budget_left = $po_detail[$i]['ID_budget_left'];
+                                  /*
+                                    Note : jika terjadi perubahan harga pada po maka update data using dulu dengan keterangan dibawah
+                                  */
+
+                                  $SubTotal_PO = $po_detail[$i]['Subtotal'];
+                                  $Subtotal_PR =  $po_detail[$i]['Subtotal_PR'];
+                                  if ($SubTotal_PO != $Subtotal_PR) {
+                                     /*
+                                           using kurangi dengan Subtotal_PR terlebih dahulu, lalu baru ditambahkan dengan  SubTotal_PO
+                                     */
+
+                                     $_G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                      $_ValueUsing= $_G[0]['Using'];
+                                      $_ValueUsing = $_ValueUsing - $Subtotal_PR;
+                                      $_ValueUsing = $_ValueUsing + $SubTotal_PO;
+                                      $arr_save['Using'] = $_ValueUsing;
+                                      $this->db->where('ID',$ID_budget_left);
+                                      $this->db->update('db_budgeting.budget_left',$arr_save);
+                                  }   
+
                                   $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
                                   $ValueUsing= $G[0]['Using'];
                                   $ValueInvoice= $G[0]['Value'];
                                   $InvoiceAP = 0;   
                                   // $bool2 = true;
                                   if ($ValueUsing >= $InvoiceLeft) {
-                                      $ValueInvoice = $ValueInvoice - $InvoiceLeft;
-                                      $ValueUsing = $ValueUsing - $InvoiceLeft;
-                                      $InvoiceAP = $InvoiceLeft;  
-                                      $InvoiceLeft = $InvoiceLeft - $InvoiceLeft;
-                                      // $bool2 = false;
+                                      if ($InvoiceLeft <= $SubTotal_PO) {
+                                        $ValueInvoice = $ValueInvoice - $InvoiceLeft;
+                                        $ValueUsing = $ValueUsing - $InvoiceLeft;
+                                        $InvoiceAP = $InvoiceLeft; 
+                                        $InvoiceLeft = $InvoiceLeft - $InvoiceLeft;
+                                      }
+                                      else
+                                      {
+                                        $ValueInvoice = $ValueInvoice - $SubTotal_PO;
+                                        $ValueUsing = $ValueUsing - $SubTotal_PO;
+                                        $InvoiceAP = $SubTotal_PO; 
+                                        $InvoiceLeft = $InvoiceLeft - $SubTotal_PO;
+                                      }
+                                      
                                   }
                                   else
                                   {
@@ -2757,6 +2821,93 @@ class C_rest2 extends CI_Controller {
                     else
                     {
                         // NON PO
+                        $DetailPayment = $dt[0]['Detail'];
+                        $DetailPaymentType = $DetailPayment[0]['Detail'];
+                        $Invoice = $DetailPayment[0]['Invoice'];
+                        $Total = 0;
+                        // get total budget left
+                        for ($i=0; $i < count($DetailPaymentType); $i++) { 
+                            $ID_budget_left = $DetailPaymentType[$i]['ID_budget_left'];
+                            $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                            $ValueInvoice = $G[0]['Value'];
+                            $Total += $ValueInvoice;
+                        }
+
+                        $InvoiceLeft = $Invoice;
+                        if ($Total >= $Invoice) {
+                            // insert ke table ap dulu
+                            $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                            $UploadVoucher = json_encode($UploadVoucher);
+                            $dtime =  date('Y-m-d H:i:s');
+
+                            $arr = array(
+                              'ID_payment' => $ID_payment,
+                              'Status' => 2,
+                              'JsonStatus' => json_encode(array()),
+                              'CreatedBy' => $dataToken['NIP'],
+                              'CreatedAt' => $dtime,
+                              'PostingDate' => $dtime,
+                              'Code' => '',
+                              'NoVoucher' => $dataToken['NoVoucher'],
+                              'UploadVoucher' => $UploadVoucher,
+                            );
+                            $this->db->insert('db_budgeting.ap',$arr);
+                            $ID_ap = $this->db->insert_id();
+
+                            for ($i=0; $i < count($DetailPaymentType); $i++) { 
+                                if ($InvoiceLeft <= 0) {
+                                    break;
+                                }
+
+                                $ID_budget_left = $DetailPaymentType[$i]['ID_budget_left'];
+                                $InvoiceByr =  $DetailPaymentType[$i]['Invoice'];
+
+                                $G = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                $ValueUsing= $G[0]['Using'];
+                                $ValueInvoice= $G[0]['Value'];
+                                $InvoiceAP = 0;   
+
+                                if ($ValueUsing >= $InvoiceByr) {
+                                    $ValueInvoice = $ValueInvoice - $InvoiceByr;
+                                    $ValueUsing = $ValueUsing - $InvoiceByr;
+                                    $InvoiceAP = $InvoiceByr;  
+                                    $InvoiceLeft = $InvoiceLeft - $InvoiceByr;
+                                    // $bool2 = false;
+                                }
+                                else
+                                {
+                                  $ValueInvoice = $ValueInvoice - $ValueUsing;
+                                  $InvoiceAP = $ValueUsing;
+                                  $ValueUsing = $ValueUsing - $ValueUsing;
+                                  $InvoiceLeft = $InvoiceLeft - $ValueUsing;
+                                }
+
+                                // insert ke budget_payment
+                                $arr_ap = array(
+                                  'ID_ap' => $ID_ap,
+                                  'ID_budget_left' => $ID_budget_left,
+                                  'Invoice' => $InvoiceAP,
+                                );
+                                $this->db->insert('db_budgeting.budget_payment',$arr_ap);
+
+                                // update budget_left
+                                $arr_budget_left = array(
+                                  'Value' =>  $ValueInvoice,
+                                  'Using' => $ValueUsing,                                   
+                                );
+
+                                $this->db->where('ID',$ID_budget_left);
+                                $this->db->update('db_budgeting.budget_left',$arr_budget_left);
+                            }
+
+                        }
+                        else
+                        {
+                            $rs['Status'] = 0;
+                            $rs['msg'] = 'Post Budget mencukupi untuk melakukan pembayaran';
+                        }
+
+                        // print_r($dt);die();
                     }
 
                     echo json_encode($rs);
@@ -2825,16 +2976,27 @@ class C_rest2 extends CI_Controller {
                 $WhereFiltering = '';
                 if ($IDDepartementPUBudget != 'NA.9') {
                     $NIP = $dataToken['sessionNIP'];
-                    $WhereFiltering = ' or (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                    $WhereFiltering = ' and (Departement = "'.$IDDepartementPUBudget.'" or JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  DepartementPay = "'.$IDDepartementPUBudget.'" or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+                }
+
+                if (array_key_exists('Years', $dataToken)) {
+                    $WhereFiltering .= ' and (Year = "'.$dataToken['Years'].'" or YEAR(PayCreateAt) = "'.$dataToken['Years'].'" ) ';
+                }
+
+                if (array_key_exists('Month', $dataToken)) {
+                    if ($dataToken['Month'] != 'all') {
+                        $WhereFiltering .= ' and MONTH(PayCreateAt) = '.(int)$dataToken['Month'];
+                    }
                 }
                  
                 $requestData = $_REQUEST;
-                $StatusQuery = ' or Status = 2';
+                // $StatusQuery = ' or Status = 2';
+                $StatusQuery = '';
                 $sqltotalData = 'select count(*) as total  from (
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2861,7 +3023,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2937,7 +3099,7 @@ class C_rest2 extends CI_Controller {
                     }
 
                     $nestedData = array_merge($nestedData,$arr);
-                    $nestedData[] = $row['PayNameCreatedBy'];
+                    $nestedData[] = $row['PayNameCreatedBy'].'<br>'.'At : '.$row['PayCreateAt'];
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -3731,6 +3893,192 @@ class C_rest2 extends CI_Controller {
                  // handling orang iseng
                  echo '{"status":"999","message":"Not Authorize"}';
             }
+    }
+
+    public function load_budget_real_detail_byMonthYear()
+    {
+        try {
+                $dataToken = $this->getInputToken2();
+                $auth = $this->m_master->AuthAPI($dataToken);
+                if ($auth) {
+                    $this->load->model('budgeting/m_budgeting');
+                    $this->load->model('budgeting/m_pr_po');
+                    $ID_budget_left = $dataToken['ID_budget_left'];
+                    $Year = $dataToken['Year'];
+                    $Month = $dataToken['Month'];
+                    $rs = array();
+                    $sql = '
+                            select aa.*,bb.Name as  NameCreatedPayment from (
+                                select a.ID as ID_ap,a.Code as CodeAP,a.ID_payment,a.PostingDate,a.CreatedBy as CreatedPayment,
+                                c.Type as TypePayment,c.Code as CodeSPB,c.Code_po_create
+                                from db_budgeting.ap as a join (select * from db_budgeting.budget_payment) as b on a.ID = b.ID_ap
+                                join db_payment.payment as c on a.ID_payment = c.ID
+                                where YEAR(a.PostingDate) = '.$Year.' and MONTH(a.PostingDate) = '.$Month.' and b.ID_budget_left = '.$ID_budget_left.'
+                                group by b.ID_ap
+                                UNION
+                                select a.ID,"","",a.CreateAt,a.CreateBy,"Revisi","",""
+                                from db_budgeting.budget_adjustment as a
+                                where YEAR(a.CreateAt) = '.$Year.' and MONTH(a.CreateAt) = '.$Month.' and a.ID_budget_left = '.$ID_budget_left.'
+                            ) aa
+                            join db_employees.employees as bb on bb.NIP = aa.CreatedPayment
+                            order by aa.PostingDate asc
+                           ';
+                     $query=$this->db->query($sql, array())->result_array();
+                     $rs = $query;
+                     for ($i=0; $i < count($rs); $i++) { 
+                         $TypePayment = $rs[$i]['TypePayment'];
+                         $ID_ap = $rs[$i]['ID_ap'];
+                         if ($TypePayment != 'Revisi') {
+                             $__bp = $this->m_master->caribasedprimary('db_budgeting.budget_payment','ID_ap',$ID_ap);
+                             $Tot = 0;
+                             for ($j=0; $j < count($__bp); $j++) { 
+                                $Type = $__bp[$j]['Type'];
+                                if ($ID_budget_left == $__bp[$j]['ID_budget_left']) {
+                                    if ($Type == 'Less') {
+                                        $Tot = $Tot - $__bp[$j]['Invoice'];
+                                    }
+                                    else
+                                    {
+                                        $Tot = $Tot + $__bp[$j]['Invoice'];
+                                    }
+                                }
+                                
+                             }
+
+                              $rs[$i]['bpd'] = $__bp;
+                              $rs[$i]['Invoice'] = $Tot;
+                         }
+                         else
+                         {
+                            $__bp = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_ap);
+                            for ($j=0; $j < count($__bp); $j++) { 
+                                $Typebpd = $__bp[$j]['Type'];
+                                if ($Typebpd == 'Mutasi') {
+                                    $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_a',$__bp[$j]['ID']);
+                                    if (count($d) > 0 ) {
+                                       $stMutasi = 'Mutasi ke '; 
+                                       $ID_budget_adjustment_b = $d[0]['ID_budget_adjustment_b'];
+                                       $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_b);
+                                       $ID_budget_left_b = $dd[0]['ID_budget_left'];
+                                       $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_b);
+                                       $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
+                                    }
+                                    else
+                                    {
+                                        $stMutasi = 'DiMutasi dari';
+                                        $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_b',$__bp[$j]['ID']);
+                                        $ID_budget_adjustment_a = $d[0]['ID_budget_adjustment_a'];
+                                        $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_a);
+                                        $ID_budget_left_a = $dd[0]['ID_budget_left'];
+                                        $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_a);
+                                        $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
+                                    }
+                                     $__bp[$j]['detail'] = $stMutasi;
+
+                                }   
+                                else
+                                {
+                                    $__bp[$j]['detail'] = '';
+                                }
+                            }
+                            $rs[$i]['bpd'] = $__bp;
+                            $rs[$i]['Invoice'] = $__bp[0]['Invoice'];
+
+                         }
+                     }
+                    
+                    echo json_encode($rs);
+                }
+                else
+                {
+                    // handling orang iseng
+                    echo '{"status":"999","message":"Not Authorize"}';
+                }
+            }
+            catch(Exception $e) {
+                 // handling orang iseng
+                 echo '{"status":"999","message":"Not Authorize"}';
+            }
+    }
+
+    public function load_budget_onprocess_detail_byMonthYear()
+    {
+        try {
+               $dataToken = $this->getInputToken2();
+               $auth = $this->m_master->AuthAPI($dataToken);
+               if ($auth) {
+                   $this->load->model('budgeting/m_budgeting');
+                   $this->load->model('budgeting/m_pr_po');
+                   $ID_budget_left = $dataToken['ID_budget_left'];
+                   $Year = $dataToken['Year'];
+                   $Month = $dataToken['Month'];
+                   $rs = array();
+                   $sql = 'select * from (
+                                select a.Type,a.Code,b.Perihal,a.Code_po_create,a.CreatedBy as CreatedPayment,c.Name as NameCreatedPayment,b.ID_payment,b.Invoice,a.CreatedAt from db_payment.payment as a
+                                join 
+                                    (
+                                        select ID_payment,Perihal,Invoice  from db_payment.spb
+                                        where ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.bank_advance as a
+                                       join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.cash_advance  as a
+                                       join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       UNION 
+                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.petty_cash 
+                                       as a
+                                       join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                    ) as b
+                                    on a.ID = b.ID_payment
+                                join db_employees.employees as c on a.CreatedBy = c.NIP
+                                where b.ID_payment not in (
+                                            select ap.ID_payment from db_budgeting.ap as ap
+                                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                                        )
+                                       AND
+                                       YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
+                                UNION
+                                select "Purchase Request",a.PRCode,"","",a.CreatedBy,c.Name,NULL, b.SubTotal,a.CreatedAt as Invoice from db_budgeting.pr_create as a
+                                join (
+                                    select d.ID as ID_payment,a.PRCode,a.SubTotal from db_budgeting.pr_detail as a
+                                    left join db_purchasing.pre_po_detail as b on a.ID = b.ID_pr_detail
+                                    left join db_purchasing.po_detail as c on b.ID = c.ID_pre_po_detail
+                                    left join db_payment.payment as d on d.Code_po_create = c.Code
+                                    where a.ID_budget_left = '.$ID_budget_left.' and a.Status = 1
+
+                                ) as b
+                                on a.PRCode = b.PRCode
+                                join db_employees.employees as c on a.CreatedBy = c.NIP
+                                left join (
+                                            select ap.ID_payment from db_budgeting.ap as ap
+                                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                                        )   as ap on ap.ID_payment = b.ID_payment
+                                where YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
+
+                        ) cc order by  CreatedAt asc,Code asc       
+
+                            
+                        ';
+                    $query=$this->db->query($sql, array())->result_array();
+                    $rs = $query;
+                   echo json_encode($rs);
+               }
+               else
+               {
+                   // handling orang iseng
+                   echo '{"status":"999","message":"Not Authorize"}';
+               }
+           }
+           catch(Exception $e) {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+           }
     }
 
 }

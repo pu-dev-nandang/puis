@@ -1893,28 +1893,19 @@ class C_budgeting extends Budgeting_Controler {
     public function BudgetLeft()
     {
         $this->auth_ajax();
-        $Departement = $this->session->userdata('IDDepartementPUBudget');
-        switch ($Departement) {
-            case 'NA.9':
-                $this->BudgetRemainingFinance();
-                break;
+        // $Departement = $this->session->userdata('IDDepartementPUBudget');
+        // switch ($Departement) {
+        //     case 'NA.9':
+        //         $this->BudgetRemainingFinance();
+        //         break;
             
-            default:
-                $this->BudgetRemainingPerDiv();
-                break;
-        }
-    }
-
-    public function BudgetRemainingFinance()
-    {
+        //     default:
+        //         $this->BudgetRemainingPerDiv();
+        //         break;
+        // }
         $arr_result = array('html' => '','jsonPass' => '');
-        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/BudgetRemaining',$this->data,true);
+        $arr_result['html'] = $this->load->view('global/budgeting/BudgetRemaining',$this->data,true);
         echo json_encode($arr_result);
-    }
-
-    public function BudgetRemainingPerDiv()
-    {
-
     }
 
     public function getListBudgetingRemaining()
@@ -2142,6 +2133,56 @@ class C_budgeting extends Budgeting_Controler {
         $this->data['arr_Year'] = $this->m_master->showData_array('db_budgeting.cfg_dateperiod');
         $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/report_anggaran_per_years',$this->data,true);
         echo json_encode($arr_result);
+    }
+
+    public function budgeting_real_detail($token)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($token,$key);
+            $ID_budget_left = $token;
+            $Departement = $this->session->userdata('IDDepartementPUBudget');
+            $G_data = $this->m_budgeting->FindBudgetLeft_Department($ID_budget_left,$Departement);
+            if (count($G_data) > 0) {
+                $G_budget_left_payment = $this->m_budgeting->get_budget_left_group_by_month($ID_budget_left);
+                $this->data['ID_budget_left'] = $ID_budget_left;
+                $this->data['G_budget_left_payment'] = $G_budget_left_payment;
+                $this->data['G_data'] = $G_data;
+                $content = $this->load->view('global/budgeting/detail_budget_left_real',$this->data,true);
+                $this->temp($content);   
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
+        } catch (Exception $e) {
+            show_404($log_error = TRUE);
+        }
+    }
+
+    public function budgeting_onprocess_detail($token)
+    {
+        try {
+            $key = "UAP)(*";
+            $token = $this->jwt->decode($token,$key);
+            $ID_budget_left = $token;
+            $Departement = $this->session->userdata('IDDepartementPUBudget');
+            $G_data = $this->m_budgeting->FindBudgetLeft_Department($ID_budget_left,$Departement);
+            if (count($G_data) > 0) {
+                $G_budget_left_payment = $this->m_budgeting->get_budget_left_onprocess_group_by_month($ID_budget_left);
+                $this->data['ID_budget_left'] = $ID_budget_left;
+                $this->data['G_budget_left_payment'] = $G_budget_left_payment;
+                $this->data['G_data'] = $G_data;
+                $content = $this->load->view('global/budgeting/detail_budget_left_onprocess',$this->data,true);
+                $this->temp($content);   
+            }
+            else
+            {
+                show_404($log_error = TRUE);
+            }
+        } catch (Exception $e) {
+            show_404($log_error = TRUE);
+        }
     }
 
 }

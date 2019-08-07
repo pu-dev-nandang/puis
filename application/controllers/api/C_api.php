@@ -4229,6 +4229,23 @@ class C_api extends CI_Controller {
                     );
 
                     $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+                    $SPID = $this->db->insert_id();
+
+
+                    $dataUpdateKRS_std = array(
+                        'SPID' => $SPID,
+                        'ClassOf' => trim(explode('_',$DBStudent)[1]),
+                        'SemesterID' => $dataInsert['SemesterID'],
+                        'NPM' => $dataInsert['NPM'],
+                        'ScheduleID' => $dataInsert['ScheduleID'],
+                        'TypeSchedule' => $dataInsert['TypeSP'],
+                        'CDID' => $dataInsert['CDID'],
+                        'MKID' => $dataC[0]['MKID'],
+                        'Credit' => $dataC[0]['TotalSKS'],
+                        'EntredBy' => $this->session->userdata('NIP')
+                    );
+
+                    $this->db->insert('db_academic.std_study_planning', $dataUpdateKRS_std);
 
                 }
                 return print_r(1);
@@ -4333,13 +4350,16 @@ class C_api extends CI_Controller {
                 if(count($ArrToApproveAll)>0){
                     for($i=0;$i<count($ArrToApproveAll);$i++){
 
-                        $this->approveByKaprodi($ArrToApproveAll[$i]
-                            ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
 
                         // Insert Logging
                         $Log_dataInsert = (array) $ArrToApproveAll_Logging[$i];
                         $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                         $insert_id = $this->db->insert_id();
+
+
+                        $this->approveByKaprodi($ArrToApproveAll[$i]
+                            ,$data_arr['MhswID'],$data_arr['ApprovalAt'],$Log_dataInsert['CreatedBy']);
 
                         $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
                             array('IDDivision' => '6'))->result_array();
@@ -4371,13 +4391,15 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='ApprovedByKaprodi'){
-                $this->approveByKaprodi($data_arr['ID']
-                    ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
 
                 // Insert Logging
                 $Log_dataInsert = (array) $data_arr['Logging'];
                 $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                 $insert_id = $this->db->insert_id();
+
+                $this->approveByKaprodi($data_arr['ID']
+                    ,$data_arr['MhswID'],$data_arr['ApprovalAt'],$Log_dataInsert['CreatedBy']);
 
                 $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
                     array('IDDivision' => '6'))->result_array();
@@ -4610,6 +4632,14 @@ class C_api extends CI_Controller {
                         $this->db->delete($DBStudent.'.study_planning');
                         $this->db->reset_query();
 
+                        $this->db->where(array(
+                            'SemesterID' => $std['SemesterID'],
+                            'ScheduleID' => $std['ScheduleID'],
+                            'NPM' => $std['NPM']
+                        ));
+                        $this->db->delete('db_academic.std_study_planning');
+                        $this->db->reset_query();
+
                         // Trakhir hapus di std krs
                         $this->db->where('ID',$SKID);
                         $this->db->delete('db_academic.std_krs');
@@ -4808,7 +4838,7 @@ class C_api extends CI_Controller {
 
     }
 
-    public function approveByKaprodi($SKID,$MhswID,$ApprovalAt){
+    public function approveByKaprodi($SKID,$MhswID,$ApprovalAt,$EntredBy){
         $dataInsert = $this->db->query('SELECT sk.*, auts.Year FROM db_academic.std_krs sk
                                                                     LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
                                                                     WHERE sk.ID = "'.$SKID.'" LIMIT 1 ')->result_array()[0];
@@ -4849,6 +4879,22 @@ class C_api extends CI_Controller {
 
         $DBStudent = 'ta_'.$dataInsert['Year'];
         $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+        $insert_id = $this->db->insert_id();
+
+        // insert to std_study_planning
+        $arrStdP = array(
+            'SPID' =>   $insert_id,
+            'ClassOf' => $dataInsert['Year'],
+            'SemesterID' => $dataInsert['SemesterID'],
+            'NPM' => $dataInsert['NPM'],
+            'ScheduleID' => $dataInsert['ScheduleID'],
+            'TypeSchedule' => $dataInsert['TypeSP'],
+            'CDID' => $dataInsert['CDID'],
+            'MKID' => $dataC[0]['MKID'],
+            'Credit' => $dataC[0]['TotalSKS'],
+            'EntredBy' => $EntredBy
+        );
+        $this->db->insert('db_academic.std_study_planning', $arrStdP);
         $this->db->reset_query();
 
         $arrUpdate = array(
@@ -4858,6 +4904,8 @@ class C_api extends CI_Controller {
         $this->db->where('ID', $SKID);
         $this->db->update('db_academic.std_krs',$arrUpdate);
         $this->db->reset_query();
+
+
     }
 
     public function crudYearAcademic()
@@ -8160,7 +8208,8 @@ class C_api extends CI_Controller {
 
             
 
-            $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" /><form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+            $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" />
+            <form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                                 <input id="formPhoto" class="hide" value="" hidden />
                                 <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
                                         <i class="fa fa-upload"></i>
@@ -10018,6 +10067,12 @@ class C_api extends CI_Controller {
 
     public function getLecturerAcademicPosition(){
         $data = $this->db->order_by('ID','ASC')->get('db_employees.lecturer_academic_position')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getStudentYear(){
+        $data = $this->db->query('SELECT Year FROM db_academic.auth_students GROUP BY Year ORDER BY Year DESC')->result_array();
+
         return print_r(json_encode($data));
     }
 

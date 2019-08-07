@@ -568,7 +568,7 @@ class M_budgeting extends CI_Model {
     public function get_budget_remaining($Year,$Departement)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.SubTotal as PriceBudgetAwal
          from
             (
                    select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
@@ -1031,6 +1031,107 @@ class M_budgeting extends CI_Model {
     {
         $sql = 'select * from db_budgeting.cfg_set_userrole order by MaxLimit asc
                 ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
+    public function FindBudgetLeft_Department($ID_budget_left,$Departement)
+    {
+        $DepartementSess = $this->session->userdata('IDDepartementPUBudget');
+        $AddSql ='where cba.Departement = "'.$Departement.'"';
+        if ($DepartementSess == 'NA.9') {
+            $AddSql = '';
+        }
+        $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.SubTotal as PriceBudgetAwal
+         from
+            (
+                   select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
+               a.SubTotal,a.CreatedBy,a.CreatedAt,a.LastUpdateBy,a.LastUpdateAt,b.UnitDiv,b.CodeHeadAccount,
+                     b.RealisasiPostName,b.Desc,c.Name as NameHeadAccount,c.CodePost,d.PostName,dp.NameDepartement as NameUnitDiv,dp.Code as CodeDiv,
+                             cba.Departement,cba.`Year`
+               from db_budgeting.creator_budget as a left join db_budgeting.cfg_postrealisasi as b on a.CodePostRealisasi = b.CodePostRealisasi
+               LEFT JOIN db_budgeting.cfg_head_account as c on b.CodeHeadAccount = c.CodeHeadAccount
+               LEFT JOIN db_budgeting.cfg_post as d on c.CodePost = d.CodePost
+               LEFT JOIN (
+                select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                UNION
+                select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                UNION
+                select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+               ) as dp on b.UnitDiv = dp.ID
+                             left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
+                             '.$AddSql.' 
+            ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget where dd.ID = ?
+            ';
+        $query=$this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;
+    }
+
+    public function get_budget_left_group_by_month($ID_budget_left)
+    {
+        $sql = 'SELECT DISTINCT YEAR(a.PostingDate) AS "Year", MONTH(a.PostingDate) AS "Month" FROM db_budgeting.ap as a
+                join db_budgeting.budget_payment as b on a.ID = b.ID_ap                
+                where b.ID_budget_left = ?
+                ';
+        $query=$this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;
+        
+    }
+
+    public function get_budget_left_onprocess_group_by_month($ID_budget_left)
+    {
+        // print_r($ID_budget_left);die();
+        $sql = 'SELECT DISTINCT YEAR(CreatedAt) AS "Year", MONTH(CreatedAt) AS "Month" FROM 
+                (
+                    select * from (
+                        select a.CreatedAt,b.ID_payment from db_payment.payment as a
+                        join 
+                            (
+                                select ID_payment,Perihal  from db_payment.spb
+                                where ID_budget_left = '.$ID_budget_left.'
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.bank_advance as a
+                               join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_bank_advance
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.cash_advance  as a
+                               join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_cash_advance
+                               UNION 
+                               select a.ID_payment,a.Perihal from db_payment.petty_cash 
+                               as a
+                               join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_petty_cash
+                            ) as b
+                            on a.ID = b.ID_payment
+                    ) as py
+                    where py.ID_payment not in (
+                            select ap.ID_payment from db_budgeting.ap as ap
+                            join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                        )
+                    UNION
+                    select a.CreatedAt,b.ID_payment from db_budgeting.pr_create as a
+                    join (
+                        select d.ID as ID_payment,a.PRCode from db_budgeting.pr_detail as a
+                        left join db_purchasing.pre_po_detail as b on a.ID = b.ID_pr_detail
+                        left join db_purchasing.po_detail as c on b.ID = c.ID_pre_po_detail
+                        left join db_payment.payment as d on d.Code_po_create = c.Code
+                        where a.ID_budget_left = '.$ID_budget_left.'
+                        group by d.ID 
+
+                    ) as b
+                    on a.PRCode = b.PRCode
+                    left join (
+                                select ap.ID_payment from db_budgeting.ap as ap
+                                join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
+                                where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                            )   as ap on ap.ID_payment = b.ID_payment
+                    
+                ) aa
+                ';
+             
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }  

@@ -226,7 +226,9 @@
 		var CodeSPB = $(this).attr('CodeSPB');
 		var Code_po_create = $(this).attr('Code_po_create');
 		var PR = $(this).attr('prcode');
-
+		ClassDt.all_po_payment = [];
+		ClassDt.po_payment_data = [];
+		ClassDt.po_data = [];
 		if (Code_po_create != '' && Code_po_create != null) {
 			Get_data_spb_grpo(Code_po_create).then(function(data){
 				ClassDt.all_po_payment = data;
@@ -241,7 +243,12 @@
 		}
 		else
 		{
-			MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			
+			__load_data_payment(ID_payment).then(function(data){
+				ClassDt.po_payment_data = data;
+				MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR);
+			})
+			
 		}
 		
 	})
@@ -269,19 +276,22 @@
 	function __getRsViewGRPO_SPB(ID_payment,Dataselected)
 	{
 		var arr=[];
-		var dtspb = Dataselected.dtspb;
-		var dtspb_rs = [];
-		// get indeks array
-		for (var i = 0; i < dtspb.length; i++) {
-			if (ID_payment == dtspb[i].ID) {
-				break;
+		if (typeof Dataselected.dtspb !== "undefined") {
+			var dtspb = Dataselected.dtspb;
+			var dtspb_rs = [];
+			// get indeks array
+			for (var i = 0; i < dtspb.length; i++) {
+				if (ID_payment == dtspb[i].ID) {
+					break;
+				}
 			}
-		}
 
-		dtspb_rs[0] = dtspb[i];
-		arr = {
-			dtspb : dtspb_rs,
-		};
+			dtspb_rs[0] = dtspb[i];
+			arr = {
+				dtspb : dtspb_rs,
+			};
+		}
+		
 
 		return arr;
 	}
@@ -317,7 +327,7 @@
 				break;
 			}
 		}
-		console.log(dtspb_all);
+		
 		if (index__ >= 0) {
 			for (var z = 0; z < dtspb_all.length; z++) {
 				var ID_payment = dtspb_all[z].ID;
@@ -349,10 +359,15 @@
 					var po_data = ClassDt.po_data;
 					var po_create = po_data.po_create;
 					var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
+					var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
+					var ahrefPO_SPK = '<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a>';
+					if (POPrint_Approve != null && POPrint_Approve != '') {
+						ahrefPO_SPK = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+POPrint_Approve[0]+'" target="_blank" class = "Fileexist">'+Code_po_create+'</a>'
+					}
 					html += '<tr>'+
 								'<td class = "TD1"><label>PO / SPK Code</label></td>'+
 								'<td>:</td>'+
-								'<td>'+'<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a></td>'+
+								'<td>'+ahrefPO_SPK+'</td>'+
 							'</tr>';
 
 					var pre_po_supplier = po_data.pre_po_supplier;
@@ -399,9 +414,36 @@
 				    FolderPayment = "cashadvance";
 				    break;
 				  case "Petty Cash":
-				    FolderPayment = "pettycash";  
+				    FolderPayment = "pettycash";
+				    break;   
 				  default:
 				    FolderPayment = '';
+				}
+
+				// check IOM exist or not
+				var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+				if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+					UploadIOM = UploadIOM[0];
+					html += '<tr>'+
+								'<td class = "TD1"><label>IOM</label></td>'+
+								'<td>:</td>'+
+								'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+							'</tr>';
+				}
+
+				if (Code_po_create != '' && Code_po_create != null) {
+					// make GRPO
+					var TDGRPO = '-';
+					var Good_Receipt = dtspb[0].Good_Receipt;
+					if (Good_Receipt.length > 0) {
+						TDGRPO = '<button class = "btn btn-primary ShowGRPOMODAL" id_payment = "'+ID_payment+'">Show GRPO</button>';
+					}	
+					html += '<tr>'+
+								'<td class = "TD1"><label>GRPO</label></td>'+
+								'<td>:</td>'+
+								'<td>'+TDGRPO+'</td>'+
+							'</tr>';	
+
 				}		
 				
 				// check for document invoice
@@ -455,10 +497,35 @@
 		return html;
 	}
 
+	function __load_data_payment(ID_payment)
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__Get_data_payment_user';
+		var data = {
+		    ID_payment : ID_payment,
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
 	function MakeDomHtml(ID_payment,TypePay,CodeSPB,Code_po_create,PR)
 	{
 		var html = '';
-		html += __showHistory(ID_payment,Code_po_create,PR);
+		if (PR != '' && PR != null) {
+			html += __showHistory(ID_payment,Code_po_create,PR);
+		}
+		
 		html += '<div class ="row FormPage" style ="margin-top:30px;">'+
 						'<div class = "col-xs-8 col-md-offset-2" style = "min-width: 600px;overflow: auto;">'+
 							'<div class="well">'+
@@ -481,10 +548,15 @@
 			var po_data = ClassDt.po_data;
 			var po_create = po_data.po_create;
 			var TypeCode_PO = po_create[0]['TypeCode'].toLowerCase();
+			var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
+			var ahrefPO_SPK = '<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a>';
+			if (POPrint_Approve != null && POPrint_Approve != '') {
+				ahrefPO_SPK = '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+POPrint_Approve[0]+'" target="_blank" class = "Fileexist">'+Code_po_create+'</a>'
+			}
 			html += '<tr>'+
 						'<td class = "TD1"><label>PO / SPK Code</label></td>'+
 						'<td>:</td>'+
-						'<td>'+'<a href = "javascript:void(0)" Code_po_create = "'+Code_po_create+'" class = "printpo" TypeCode = "'+TypeCode_PO+'">'+Code_po_create+'</a></td>'+
+						'<td>'+ahrefPO_SPK+'</td>'+
 					'</tr>';
 
 			var pre_po_supplier = po_data.pre_po_supplier;
@@ -530,13 +602,49 @@
 		    FolderPayment = "cashadvance";
 		    break;
 		  case "Petty Cash":
-		    FolderPayment = "pettycash";  
+		    FolderPayment = "pettycash";
+		     break;  
 		  default:
 		    FolderPayment = '';
-		}		
+		}
+		// console.log('*'+TypePay+'*');		
+		// console.log('*'+FolderPayment+'*');		
 		var po_payment_data = ClassDt.po_payment_data;
 		// check for document invoice
-		var dtspb = po_payment_data.dtspb;
+		if (typeof po_payment_data.dtspb !== "undefined") {
+			var dtspb = po_payment_data.dtspb;
+		}
+		else
+		{
+			var dtspb = po_payment_data.payment;
+		}
+		
+		// check IOM exist or not
+		var UploadIOM = jQuery.parseJSON(dtspb[0].UploadIOM);
+		if (UploadIOM != '' && UploadIOM != null && UploadIOM != undefined) {
+			UploadIOM = UploadIOM[0];
+			html += '<tr>'+
+						'<td class = "TD1"><label>IOM</label></td>'+
+						'<td>:</td>'+
+						'<td>'+'<a href = "'+base_url_js+'fileGetAny/budgeting-'+FolderPayment+'-'+UploadIOM+'" target="_blank" class = "Fileexist">'+dtspb[0].NoIOM+'</a>'+'</td>'+
+					'</tr>';
+		}
+
+		if (Code_po_create != '' && Code_po_create != null) {
+			// make GRPO
+			var TDGRPO = '-';
+			var Good_Receipt = dtspb[0].Good_Receipt;
+			if (Good_Receipt.length > 0) {
+				TDGRPO = '<button class = "btn btn-primary ShowGRPOMODAL" id_payment = "'+ID_payment+'">Show GRPO</button>';
+			}	
+			html += '<tr>'+
+						'<td class = "TD1"><label>GRPO</label></td>'+
+						'<td>:</td>'+
+						'<td>'+TDGRPO+'</td>'+
+					'</tr>';	
+
+		}	
+
 		if (typeof dtspb[0].Detail[0]['UploadInvoice'] !== "undefined") {
 			var UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
 			if (UploadInvoice.length > 0 && UploadInvoice != '' && UploadInvoice != null && UploadInvoice != undefined) {
@@ -597,14 +705,20 @@
 	}
 
 	$(document).off('click', '.printpr').on('click', '.printpr',function(e) {
-		var url = base_url_js+'save2pdf/print/prdeparment';
+		// var url = base_url_js+'save2pdf/print/prdeparment';
+		// var PRCode = $(this).attr('prcode');
+		// data = {
+		//   PRCode : PRCode,
+		// }
+		// var token = jwt_encode(data,"UAP)(*");
+		// FormSubmitAuto(url, 'POST', [
+		//     { name: 'token', value: token },
+		// ]);
 		var PRCode = $(this).attr('prcode');
-		data = {
-		  PRCode : PRCode,
-		}
-		var token = jwt_encode(data,"UAP)(*");
+		var PRCodeURL = jwt_encode(PRCode,"UAP)(*");
+		var url = base_url_js+'budgeting_pr/'+PRCodeURL;
 		FormSubmitAuto(url, 'POST', [
-		    { name: 'token', value: token },
+		    {},
 		]);
 	})
 
@@ -625,16 +739,31 @@
 		var ID_payment = $(this).attr('id_payment');
 		var po_data = ClassDt.po_data;
 		var Dataselected = ClassDt.all_po_payment;
-		var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
 
-		var url = base_url_js+'save2pdf/print/pre_pembayaran';
-		var data = {
-		  ID_payment : ID_payment,
-		  dt_arr : dt_arr,
-		  po_data : po_data,
-		  Dataselected : Dataselected,
+			var url = base_url_js+'save2pdf/print/pre_pembayaran';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			}
+			var token = jwt_encode(data,"UAP)(*");
 		}
-		var token = jwt_encode(data,"UAP)(*");
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user';
+		}
+		
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
@@ -781,6 +910,7 @@
 				  },
 				  error: function (data) {
 				    toastr.error("Connection Error, Please try again", 'Error!!');
+				    loadingEnd(500);
 				  }
 				})
 			}
@@ -873,6 +1003,104 @@
 	    {
 	      return true;
 	    }
+	}
+
+	$(document).off('click', '.ShowGRPOMODAL').on('click', '.ShowGRPOMODAL',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var data = ClassDt.all_po_payment;
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment,data);
+		var dtspb = dt_arr.dtspb;
+		var dtgood_receipt_spb = dtspb[0].Good_Receipt;
+		var html = '';
+		for (var i = 0; i < dtgood_receipt_spb.length; i++) {
+			var FileDocument = jQuery.parseJSON(dtgood_receipt_spb[i]['FileDocument']);
+			FileDocument = FileDocument[0];
+			var FileTandaTerima = jQuery.parseJSON(dtgood_receipt_spb[i]['FileTandaTerima']);
+			FileTandaTerima = FileTandaTerima[0];
+			var dtgood_receipt_detail = dtgood_receipt_spb[i].Detail;
+			var OPPo_detail_edit = '';
+			for (var j = 0; j < dtgood_receipt_detail.length; j++) {
+				OPPo_detail_edit += OPPo_detail(dtgood_receipt_detail[j].ID_po_detail,[],dtgood_receipt_detail[j].QtyDiterima,'disabled');
+			}
+
+				html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Good Receipt PO </h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<br>'+
+						'<div id = "page_po_item">'+
+							OPPo_detail_edit+
+						'</div>'+
+						'<br>'+
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">No Document</label>'+	
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+												'</div>'+
+										'</div>'+
+						'</div>'+				
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">No Tanda Terima</label>'	+
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...." value="'+dtgood_receipt_spb[i]['NoTandaTerima']+'" disabled>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
+												'</a>'+
+												'</div>'+
+										'</div>'+
+						'</div>'+
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">Tanggal</label>'	+
+												'<div class="col-sm-4">'+'<div class="input-group input-append date datetimepicker">'+
+			                            '<input data-format="yyyy-MM-dd" class="form-control TglGRPO" type=" text" readonly="" value="'+dtgood_receipt_spb[i]['Date']+'" disabled>'+
+			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+			                		'</div></div>'+
+						'</div>'+
+					'</div></div></div>';
+		}
+
+		var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		    '';
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info GRPO</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html(footer);
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+	})
+
+	function OPPo_detail(IDselected = null,arr_IDPass=[],value_qty=0,action_btn='')
+	{
+		var h = '';
+		var po_data = ClassDt.po_data;
+		var po_detail= po_data.po_detail;
+		h = '<div class = "form-horizontal GroupingItem" style="margin-top:15px;">'+
+				'<div class="form-group">'+
+					'<label class = "col-sm-2">Item</label>'
+			;
+		h += '<div class="col-sm-6"><select class = " form-control Item" '+action_btn+'>'+
+				'<option value = "" disabled selected>--Pilih Item--</option>';
+			for (var i = 0; i < po_detail.length; i++) {
+				var bool = true;
+				for (var k = 0; k < arr_IDPass.length; k++) {
+					if (po_detail[i].ID_po_detail ==arr_IDPass[k] ) {
+						bool = false;
+						break;
+					}
+				}
+				if (bool) {
+					// get qty left
+
+					var selected = (IDselected == po_detail[i].ID_po_detail) ? 'selected' : '';
+					h += '<option value = "'+po_detail[i].ID_po_detail+'" '+selected+' qtypr="'+po_detail[i].QtyPR+'">'+po_detail[i].Item+'</option>';
+				}
+				
+			}
+		h += '</select></div>';	
+
+		h += '<div class="col-sm-2"><input type="text" class="form-control QtyDiterima" value="'+value_qty+'" '+action_btn+'></div>';
+		h += '</div></div>';
+		return h;
 	}
 
 	

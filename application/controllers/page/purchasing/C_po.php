@@ -882,6 +882,30 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+
+            // notification
+              $CodeUrl = str_replace('/', '-', $Code);
+              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              $NIPApprovalNext = $JsonStatus[1]['NIP'];
+              $NIP = $this->session->userdata('NIP');
+              // Send Notif for next approval
+                  $data = array(
+                      'auth' => 's3Cr3T-G4N',
+                      'Logging' => array(
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
+                                      'CreatedBy' => $NIP,
+                                    ),
+                      'To' => array(
+                                'NIP' => array($NIPApprovalNext),
+                              ),
+                      'Email' => 'No', 
+                  );
+
+                  $url = url_pas.'rest2/__send_notif_browser';
+                  $token = $this->jwt->encode($data,"UAP)(*");
+                  $this->m_master->apiservertoserver($url,$token);
         }
         else
         {
@@ -1555,6 +1579,30 @@ class C_po extends Transaksi_Controler {
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
+
+            // notification
+              $CodeUrl = str_replace('/', '-', $Code);
+              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              $NIPApprovalNext = $JsonStatus[1]['NIP'];
+              $NIP = $this->session->userdata('NIP');
+              // Send Notif for next approval
+                  $data = array(
+                      'auth' => 's3Cr3T-G4N',
+                      'Logging' => array(
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'URLDirect' => 'global/purchasing/transaction/spk/list/'.$CodeUrl,
+                                      'CreatedBy' => $NIP,
+                                    ),
+                      'To' => array(
+                                'NIP' => array($NIPApprovalNext),
+                              ),
+                      'Email' => 'No', 
+                  );
+
+                  $url = url_pas.'rest2/__send_notif_browser';
+                  $token = $this->jwt->encode($data,"UAP)(*");
+                  $this->m_master->apiservertoserver($url,$token);
         }
         else
         {
@@ -1665,6 +1713,31 @@ class C_po extends Transaksi_Controler {
           $this->data['G_data_bank'] = $G_data_bank;
        $page['content'] = $this->load->view('page/'.$this->data['department'].'/transaksi/po/pembayaran',$this->data,true);
        $this->page_po($page); 
+    }
+
+    public function upload_file_Approve()
+    {
+       $rs = array('status' => 0,'msg' => '');
+       $Input = $this->getInputToken();
+       $Code = $Input['Code'];
+       // check file sebelumnya, jika ada maka hapus
+       $G_data = $this->m_master->caribasedprimary('db_purchasing.po_create','Code',$Code);
+       $F_POPrint_Approve = $G_data[0]['POPrint_Approve'];
+       if ($F_POPrint_Approve != '' && $F_POPrint_Approve != null) {
+           $arr_file = (array) json_decode($F_POPrint_Approve,true);
+           $filePath = 'budgeting\\po\\'.$arr_file[0]; // pasti ada file karena required
+           $path = FCPATH.'uploads\\'.$filePath;
+           unlink($path);
+       }
+
+
+       $POPrint_Approve = $this->m_master->uploadDokumenMultiple(uniqid(),'fileData',$path = './uploads/budgeting/po');
+       $POPrint_Approve = json_encode($POPrint_Approve);
+       $dataSave['POPrint_Approve']  = $POPrint_Approve;
+       $this->db->where('Code',$Code);
+       $this->db->update('db_purchasing.po_create',$dataSave);
+       $rs['status'] = 1;
+       echo json_encode($rs);
     }
 
 }

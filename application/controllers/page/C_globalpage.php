@@ -62,6 +62,24 @@ class C_globalpage extends Budgeting_Controler {
                     }
                 }
              }
+
+             // allow untuk user pr
+                $dt__ = $this->m_pr_po->Get_data_po_by_Code($Code);
+                $po_detail = $dt__['po_detail'];
+                $PRCode = $po_detail[0]['PRCode'];
+                $G_pr = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $JsonStatusPR = (array)json_decode($G_pr[0]['JsonStatus'],true);
+                if (!$bool) { // for user
+                   $NIP = $this->session->userdata('NIP');
+                   for ($i=0; $i < count($JsonStatusPR); $i++) { 
+                       $NIP_ = $JsonStatusPR[$i]['NIP'];
+                       if ($NIP == $NIP_) {
+                           $bool = true;
+                           break;
+                       }
+                   }
+                }
+
              $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
              $data['G_pay_type'] = $G_pay_type;
              $data['bool'] = $bool;
@@ -114,6 +132,23 @@ class C_globalpage extends Budgeting_Controler {
                     }
                 }
              }
+
+             // allow untuk user pr
+                $dt__ = $this->m_pr_po->Get_data_po_by_Code($Code);
+                $po_detail = $dt__['po_detail'];
+                $PRCode = $po_detail[0]['PRCode'];
+                $G_pr = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCode);
+                $JsonStatusPR = (array)json_decode($G_pr[0]['JsonStatus'],true);
+                if (!$bool) { // for user
+                   $NIP = $this->session->userdata('NIP');
+                   for ($i=0; $i < count($JsonStatusPR); $i++) { 
+                       $NIP_ = $JsonStatusPR[$i]['NIP'];
+                       if ($NIP == $NIP_) {
+                           $bool = true;
+                           break;
+                       }
+                   }
+                }
 
              $G_pay_type = $this->m_master->showData_array('db_purchasing.pay_type');
              $data['G_pay_type'] = $G_pay_type;
