@@ -982,6 +982,7 @@ $route['rest2/__paid_payment_from_fin'] = 'api/c_rest2/paid_payment_from_fin';
 $route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
 $route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget_real_detail_byMonthYear';
 $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_budget_onprocess_detail_byMonthYear';
+$route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1404,10 +1405,12 @@ $route['budgeting/config/authUser/cud'] = 'page/budgeting/c_menu/authUser_cud';
 
 // spb
 $route['budgeting_menu/pembayaran/spb/create_spb'] = 'page/budgeting/c_spb/create_spb';
-$route['budgeting_menu/pembayaran/spb/create_spb/(:any)'] = 'page/budgeting/c_spb/create_spb/$1'; // edit or view
+$route['budgeting_menu/pembayaran/spb/(:any)'] = 'page/budgeting/c_spb/create_spb/$1'; // edit or view
 $route['budgeting_menu/pembayaran/spb/configuration'] = 'page/budgeting/c_spb/configuration';
 $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
+$route['budgeting/submit_spb_user'] = 'page/budgeting/c_spb/submit_spb_user';
+
 
 // bankadvance
 $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';

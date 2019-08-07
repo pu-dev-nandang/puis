@@ -4081,4 +4081,93 @@ class C_rest2 extends CI_Controller {
            }
     }
 
+    public function Supplier_DataIntable_server_side()
+    {
+        $action = $this->input->post('action');
+        $condition = ' and a.Approval = 1';
+
+        $requestData= $_REQUEST;
+        $sql = 'select count(*) as total from db_purchasing.m_supplier as a where a.Active = 1 '.$condition;
+        $query = $this->db->query($sql)->result_array();
+        $totalData = $query[0]['total'];
+        $No = $requestData['start'] + 1;
+
+        $sql = 'select a.*,b.Name as NameCreated,c.CategoryName
+                from db_purchasing.m_supplier as a 
+                join db_employees.employees as b on a.CreatedBy = b.NIP
+                join db_purchasing.m_categorysupplier as c on a.CategorySupplier = c.ID
+               ';
+
+        $sql.= ' where ( a.CodeSupplier LIKE "'.$requestData['search']['value'].'%" or a.NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or a.PICName LIKE "'.$requestData['search']['value'].'%" or a.DetailInfo LIKE "%'.$requestData['search']['value'].'%" or c.CategoryName LIKE "'.$requestData['search']['value'].'%" or a.CategorySupplier LIKE "%'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or a.DetailItem LIKE "%'.$requestData['search']['value'].'%"
+                ) and a.Active = 1 and c.Active = 1'.$condition;
+        $sql.= ' ORDER BY a.ID Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+        $query = $this->db->query($sql)->result_array();
+
+        $data = array();
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+             $nestedData[] = $row['CategoryName'];
+            $nestedData[] = $row['CodeSupplier'];
+            $nestedData[] = '<label>'.$row['NamaSupplier'].'</label><br>'.$row['Website'].'<br>'.'PIC : '.$row['PICName'].'<br>'.'Alamat : '.$row['Alamat'];
+            $nestedData[] = 'Telp : '.$row['NoTelp'].' <br> Hp : '.$row['NoHp'];
+            $DetailInfo = $row['DetailInfo'];
+            $DetailInfo = json_decode($DetailInfo);
+            $temp = '';
+            if ($DetailInfo != "" || $DetailInfo != null) {
+                $temp = '<ul>';
+                foreach ($DetailInfo as $key => $value) {
+                    $temp .= '<li>'.$key.' :  '.$value.'</li>';
+                }
+
+                $temp .= '</ul>';
+
+            }
+
+            $nestedData[] = $temp;
+            $DetailItem = $row['DetailItem'];
+            $DetailItem = json_decode($DetailItem);
+            $temp = '';
+            if ($DetailItem != "" || $DetailItem != null) {
+                $temp = '<ul>';
+                foreach ($DetailItem as $key => $value) {
+                    $temp .= '<li>'.$key.' :  '.$value.'</li>';
+                }
+
+                $temp .= '</ul>';
+
+            }
+            $nestedData[] = $temp;
+
+            if ($action == 'All_approval') {
+                $btn = '<button type="button" class="btn btn-warning btn-edit btn-edit-supplier" code="'.$row['ID'].'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-supplier" code="'.$row['ID'].'"> <i class="fa fa-trash" aria-hidden="true"></i> </button>';
+            }
+            elseif ($action == 'non_approval')
+            {
+                $btn = '<button type="button" class="btn btn-default btn-edit btn-approve-supplier" code="'.$row['ID'].'"> <i class="fa fa-handshake-o" aria-hidden="true"></i> Approve</button>';
+            }
+            else
+            {
+                $btn = '';
+            }
+
+            $nestedData[] = $row['NameCreated'];
+            $nestedData[] = $btn;
+            $data[] = $nestedData;
+
+            $No++;
+        }
+
+        // print_r($data);
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
 }

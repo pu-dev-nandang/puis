@@ -55,6 +55,19 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         else{
             try {
                 // read token
+                $key = "UAP)(*";
+                $ID_payment = $this->jwt->decode($tokenSPB,$key);
+                $this->data['ID_payment'] = $ID_payment;
+                // print_r($ID_payment);die();
+                $G_dt_payment = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                $this->data['SPBCode'] = $G_dt_payment[0]['Code'];
+                $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+                $Year = $get[0]['Year'];
+                $this->data['Year'] = $Year;
+
+                $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
+                $arr_result = array('data' =>$getData);
+                $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);   
             }
             //catch exception
             catch(Exception $e) {
@@ -866,6 +879,210 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             $this->m_spb->payment_circulation_sheet($ID_payment,'Good Receipt added<br>{'.$Desc.'}');
         // insert to po_circulation_sheet
             $this->m_pr_po->po_circulation_sheet($Code_po_create,'Good Receipt added<br>{'.$Desc.'}');
+    }
+
+    public function submit_spb_user()
+    {
+        $action = $this->input->post('Action');
+        switch ($action) {
+            case 1:
+                $ID_payment = $this->input->post('ID_payment');
+                $key = "UAP)(*";
+                $ID_payment = $this->jwt->decode($ID_payment,$key);
+                if ($ID_payment == '') {
+                    $this->PaymentToIssued_user();
+                }
+                else
+                {
+                    $this->PaymentToIssued_edit_user();
+                }
+                
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function PaymentToIssued_user()
+    {
+        $msg = '';
+        $St_error = 1;
+        $BudgetChange = 0;
+        $input = $this->getInputToken();
+        $Year = $this->input->post('Year');
+        $key = "UAP)(*";
+        $Year = $this->jwt->decode($Year,$key);
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $ID_payment = $this->input->post('ID_payment');
+        $key = "UAP)(*";
+        $ID_payment = $this->jwt->decode($ID_payment,$key);
+
+        $NoIOM = $this->input->post('NoIOM');
+        $key = "UAP)(*";
+        $NoIOM = $this->jwt->decode($NoIOM,$key);
+
+        $BudgetRemaining = $this->input->post('BudgetRemaining');
+        $key = "UAP)(*";
+        $BudgetRemaining = $this->jwt->decode($BudgetRemaining,$key);
+        $BudgetRemaining =  (array)  json_decode(json_encode($BudgetRemaining),true);
+
+        $BudgetLeft_awal = $this->input->post('BudgetLeft_awal');
+        $key = "UAP)(*";
+        $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
+        $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
+
+        $dataInput = $this->input->post('dataInput');
+        $key = "UAP)(*";
+        $dataInput = $this->jwt->decode($dataInput,$key);
+        $dataInput = (array)  json_decode(json_encode($dataInput),true);
+
+        $StatusPayment = '';
+
+        // adding Supporting_documents
+            $Supporting_documents = array();
+            $Supporting_documents = json_encode($Supporting_documents); 
+            $UploadInvoice = array();
+            $UploadInvoice = json_encode($UploadInvoice); 
+            $UploadTandaTerima = array();
+            $UploadTandaTerima = json_encode($UploadTandaTerima); 
+           
+            if (array_key_exists('Supporting_documents', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/spb');
+                $Supporting_documents = json_encode($uploadFile); 
+            }
+
+            if (array_key_exists('UploadInvoice', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/spb');
+                $UploadInvoice = json_encode($uploadFile); 
+            }
+
+            if (array_key_exists('UploadTandaTerima', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/spb');
+                $UploadTandaTerima = json_encode($uploadFile); 
+            }
+
+        // RuleApproval
+            // check Subtotal
+                $Amount = 0;
+                for ($i=0; $i < count($input); $i++) {
+                    $data = $input[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+                    // print_r($data_arr);
+                    $SubTotal = $data_arr['SubTotal'];
+                    $Amount = $Amount + $SubTotal;
+                }
+            $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            if (count($JsonStatus) > 1) {
+                $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
+                if ($BoolBudget) {
+                    $Code = $this->m_spb->Get_SPBCode($Departement);
+                    $dataSave = array(
+                        'Code' => $Code,
+                        'Type' => 'Spb',
+                        'CreatedAt' => date('Y-m-d H:i:s'),
+                        'CreatedBy' => $this->session->userdata('NIP'),
+                        'Status' => 1,
+                        'JsonStatus' => json_encode($JsonStatus),
+                        'NoIOM' => $NoIOM,
+                        'UploadIOM' => $Supporting_documents,
+                        'Departement' => $Departement,
+                    );
+                     $this->db->insert('db_payment.payment',$dataSave);
+                     $ID_payment =$this->db->insert_id();
+                     $StatusPayment = 1;
+                     // passing show name JsonStatus
+                     for ($i=0; $i < count($JsonStatus); $i++) { 
+                         $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
+                         $Name = $Name[0]['Name'];
+                         $JsonStatus[$i]['Name'] = $Name;
+                     }
+
+                     // insert ke table spb
+                     $dataSave = array(
+                         'ID_payment' => $ID_payment,
+                         'CodeSupplier' => $dataInput['CodeSupplier'],
+                         'UploadInvoice' => $UploadInvoice ,
+                         'NoInvoice' => $dataInput['NoInvoice'] ,
+                         'UploadTandaTerima' => $UploadTandaTerima,
+                         'NoTandaTerima' => $dataInput['NoTandaTerima'] ,
+                         'Datee' => $dataInput['Datee'],
+                         'Perihal' => $dataInput['Perihal'],
+                         'No_Rekening' => $dataInput['No_Rekening'],
+                         'ID_bank' => $dataInput['ID_bank'],
+                         'Invoice' => $dataInput['Invoice'],
+                         'TypeInvoice' => $dataInput['TypeInvoice'],
+                     );
+                     $this->db->insert('db_payment.spb',$dataSave);
+                     $ID_spb = $this->db->insert_id();
+
+                     for ($i=0; $i < count($input); $i++) {
+                         $data = $input[$i]; 
+                         $key = "UAP)(*";
+                         $data_arr = (array) $this->jwt->decode($data,$key);
+                         $PassNumber = $data_arr['PassNumber'];
+                             $dataSave = array(
+                                 'ID_spb' =>$ID_spb,
+                                 'ID_budget_left' => $data_arr['ID_budget_left'],
+                                 'NamaBiaya' => $data_arr['NamaBiaya'],
+                                 'Invoice' => $data_arr['SubTotal'],
+                             ); 
+                             $this->db->insert('db_payment.spb_detail',$dataSave);
+                     }
+
+                     // Update to budget_left
+                         $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
+
+                     // insert to spb_circulation_sheet
+                         $this->m_spb->payment_circulation_sheet($ID_payment,'Input Petty Cash');
+
+                     // get CodeURL
+                     $key = "UAP)(*";
+                     $token = $this->jwt->encode($ID_payment,$key);
+                     $CodeUrl = $token;    
+
+                     // send notifikasi
+                         $IDdiv = $Departement;
+                         $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                         // $NameDepartement = $G_div[0]['NameDepartement'];
+                         $Code = $G_div[0]['Code'];
+                         $data = array(
+                             'auth' => 's3Cr3T-G4N',
+                             'Logging' => array(
+                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> SPB has been Created by '.$Code,
+                                             'Description' => 'SPB has been Created by '.$Code.'('.$this->session->userdata('Name').')',
+                                             'URLDirect' => 'budgeting_menu/pembayaran/spb/'.$CodeUrl,
+                                             'CreatedBy' => $this->session->userdata('NIP'),
+                                           ),
+                             'To' => array(
+                                       'NIP' => array($JsonStatus[1]['NIP']),
+                                     ),
+                             'Email' => 'No', 
+                         );
+                         $url = url_pas.'rest2/__send_notif_browser';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         $this->m_master->apiservertoserver($url,$token);
+                }
+                else
+                {
+                    $BudgetChange = 1;
+                }  
+            }
+            else
+            {
+                $St_error = 0;
+                $msg = 'Limit : '.$Amount.' not set in RAD';
+            }
+
+            echo json_encode(array('ID_payment' => $ID_payment,'JsonStatus' => json_encode($JsonStatus),'St_error' => $St_error,'msg'=>$msg,'StatusPayment' => $StatusPayment,'BudgetChange' => $BudgetChange));  
     }
 
 }

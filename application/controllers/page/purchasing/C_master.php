@@ -1014,7 +1014,7 @@ class C_master extends Purchasing_Controler {
         }
 
         // print_r($data);
-
+        
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
             "recordsTotal"    => intval($totalData),

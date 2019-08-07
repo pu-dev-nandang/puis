@@ -201,10 +201,22 @@ class M_global extends CI_Model {
                     $Detail = array();
                     switch ($Type) {
                         case 'Spb':
-                            $G_dt = $this->m_master->caribasedprimary('db_payment.spb','ID_payment',$ID);
-                            for ($j=0; $j < count($G_dt); $j++) { 
+                            // $G_dt = $this->m_master->caribasedprimary('db_payment.spb','ID_payment',$ID);
+                            $sql__ = 'select a.*,b.NamaSupplier,b.Website,b.PICName,b.Alamat
+                                      from db_payment.spb as a left join db_purchasing.m_supplier as b on a.CodeSupplier = b.CodeSupplier
+                                      where a.ID_payment = ?
+                                    ';
+                            $G_dt = $this->db->query($sql__, array($ID))->result_array();
+                            for ($j=0; $j < count($G_dt); $j++) {
                                $ID_budget_left =  $G_dt[$j]['ID_budget_left'];
-                               $G_dt[$j]['DataPostBudget'] = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+                               $ID_spb = $G_dt[$j]['ID'];
+                               $__Detail = $this->m_master->caribasedprimary('db_payment.spb_detail','ID_spb',$ID_spb);
+                               for ($k=0; $k < count($__Detail); $k++) {
+                                   $ID_budget_left =  $__Detail[$k]['ID_budget_left'];
+                                   $__Detail[$k]['DataPostBudget'] = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+                               }
+
+                               $G_dt[$j]['Detail'] = $__Detail;
                             }
                             $Detail = $G_dt;
                             break;
