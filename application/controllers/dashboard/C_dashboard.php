@@ -66,7 +66,7 @@ class C_dashboard extends Globalclass {
                                     $content = $this->load->view('dashboard/dashboard',$data,true);
                                 }
                                 $this->temp($content);
-                            }    
+                            }
                         }
                         else
                         {
@@ -80,7 +80,7 @@ class C_dashboard extends Globalclass {
                             }
                             $this->temp($content);
                         }
-                        
+
                     }
                     else
                     {
@@ -100,7 +100,7 @@ class C_dashboard extends Globalclass {
                             {
                                 $content = $this->load->view('dashboard/dashboard',$data,true);
                             }
-                            
+
                             $this->temp($content);
                         }
                     }
@@ -133,7 +133,7 @@ class C_dashboard extends Globalclass {
                                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                                 }
                                 $this->temp($content);
-                            }    
+                            }
                         }
                         else
                         {
@@ -147,7 +147,7 @@ class C_dashboard extends Globalclass {
                             }
                             $this->temp($content);
                         }
-                        
+
                     }
                     else
                     {
@@ -167,7 +167,7 @@ class C_dashboard extends Globalclass {
                             {
                                 $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                             }
-                            
+
                             $this->temp($content);
                         }
                     }
@@ -180,14 +180,14 @@ class C_dashboard extends Globalclass {
                     $this->temp($content);
                     break;
             }
-           
+
         }
         else
         {
             $content = $this->load->view('dashboard/dashboard',$data,true);
             $this->temp($content);
         }
-        
+
     }
 
     public function change_departement(){
@@ -226,7 +226,7 @@ class C_dashboard extends Globalclass {
         }
 
         echo 'test';*/
-        
+
 
         $client = new Client(new Version1X('//localhost:3000'));
 
@@ -275,7 +275,7 @@ class C_dashboard extends Globalclass {
     //             $arrDB[] = $keyB;
     //         }
     //       }
-          
+
     //     }
 
     //     rsort($arrDB);
@@ -288,7 +288,7 @@ class C_dashboard extends Globalclass {
     //     $Paid_Off = array();
     //     $Unpaid_Off = array();
     //     $unsetPaid = array();
-    //     for ($i=0; $i < count($arrDB); $i++) { 
+    //     for ($i=0; $i < count($arrDB); $i++) {
     //         // if ($arrDB[$i] != $Year) {
 
     //             $a_Paid_Off = 0;
@@ -297,9 +297,9 @@ class C_dashboard extends Globalclass {
     //                 // get Data Mahasiswa
     //                 $sql = 'select a.NPM,a.Name,b.NameEng from '.$arrDB[$i].'.students as a join db_academic.program_study as b on a.ProdiID = b.ID where a.StatusStudentID in (3,2,8) ';
     //                 $query=$this->db->query($sql, array())->result_array();
-    //                 for ($u=0; $u < count($query); $u++) { 
+    //                 for ($u=0; $u < count($query); $u++) {
 
-    //                   // cek BPP 
+    //                   // cek BPP
     //                   $sqlBPP = 'select * from db_finance.payment where PTID = 2 and NPM = ? '.$Semester; //  limit 1
     //                   $queryBPP=$this->db->query($sqlBPP, array($query[$u]['NPM']))->result_array();
     //                   $arrBPP = array(
@@ -309,12 +309,12 @@ class C_dashboard extends Globalclass {
     //                     'DetailPaymentBPP' => '',
     //                   );
     //                     if (count($queryBPP) > 0) {
-    //                         for ($t=0; $t < count($queryBPP); $t++) { 
+    //                         for ($t=0; $t < count($queryBPP); $t++) {
     //                           // cek payment students
     //                           $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryBPP[$t]['ID']);
     //                           $PayBPP = 0;
     //                           $SisaBPP = 0;
-    //                           for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                           for ($r=0; $r < count($Q_invStudent); $r++) {
     //                             if ($Q_invStudent[$r]['Status'] == 1) { // lunas
     //                               $PayBPP = $PayBPP + $Q_invStudent[$r]['Invoice'];
     //                             }
@@ -323,7 +323,7 @@ class C_dashboard extends Globalclass {
     //                               $SisaBPP = $SisaBPP + $Q_invStudent[$r]['Invoice'];
     //                             }
     //                           }
-                              
+
     //                           $arrBPP = array(
     //                             'BPP' => (int)$queryBPP[$t]['Invoice'],
     //                             'PayBPP' => (int)$PayBPP,
@@ -334,7 +334,7 @@ class C_dashboard extends Globalclass {
     //                         }
     //                     }
 
-    //                   // cek Credit 
+    //                   // cek Credit
     //                   $sqlCr = 'select * from db_finance.payment where PTID = 3 and NPM = ? '.$Semester; // limit 1
     //                   $queryCr=$this->db->query($sqlCr, array($query[$u]['NPM']))->result_array();
     //                   $arrCr = array(
@@ -344,12 +344,12 @@ class C_dashboard extends Globalclass {
     //                     'DetailPaymentCr' => '',
     //                   );
     //                     if (count($queryCr) > 0) {
-    //                         for ($t=0; $t < count($queryCr); $t++) { 
+    //                         for ($t=0; $t < count($queryCr); $t++) {
     //                           // cek payment students
     //                           $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryCr[$t]['ID']);
     //                           $PayCr = 0;
     //                           $SisaCr = 0;
-    //                           for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                           for ($r=0; $r < count($Q_invStudent); $r++) {
     //                             if ($Q_invStudent[$r]['Status'] == 1) { // lunas
     //                               $PayCr = $PayCr + $Q_invStudent[$r]['Invoice'];
     //                             }
@@ -370,7 +370,7 @@ class C_dashboard extends Globalclass {
     //                     }
 
 
-    //                     // cek SPP 
+    //                     // cek SPP
     //                     $sqlSPP = 'select * from db_finance.payment where PTID = 1 and NPM = ? '.$Semester; //  limit 1
     //                     $querySPP=$this->db->query($sqlSPP, array($query[$u]['NPM']))->result_array();
     //                     $arrSPP = array(
@@ -380,12 +380,12 @@ class C_dashboard extends Globalclass {
     //                       'DetailPaymentSPP' => '',
     //                     );
     //                       if (count($querySPP) > 0) {
-    //                           for ($t=0; $t < count($querySPP); $t++) { 
+    //                           for ($t=0; $t < count($querySPP); $t++) {
     //                             // cek payment students
     //                             $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$querySPP[$t]['ID']);
     //                             $PaySPP = 0;
     //                             $SisaSPP = 0;
-    //                             for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                             for ($r=0; $r < count($Q_invStudent); $r++) {
     //                               if ($Q_invStudent[$r]['Status'] == 1) { // lunas
     //                                 $PaySPP = $PaySPP + $Q_invStudent[$r]['Invoice'];
     //                               }
@@ -394,7 +394,7 @@ class C_dashboard extends Globalclass {
     //                                 $SisaSPP = $SisaSPP + $Q_invStudent[$r]['Invoice'];
     //                               }
     //                             }
-                                
+
     //                             $arrSPP = array(
     //                               'SPP' => (int)$querySPP[$t]['Invoice'],
     //                               'PaySPP' => (int)$PaySPP,
@@ -405,7 +405,7 @@ class C_dashboard extends Globalclass {
     //                           }
     //                       }
 
-    //                       // cek lain-lain 
+    //                       // cek lain-lain
     //                       $sqlAn = 'select * from db_finance.payment where PTID = 4 and NPM = ? '.$Semester; //  limit 1
     //                       $queryAn=$this->db->query($sqlAn, array($query[$u]['NPM']))->result_array();
     //                       $arrAn = array(
@@ -415,12 +415,12 @@ class C_dashboard extends Globalclass {
     //                         'DetailPaymentAn' => '',
     //                       );
     //                         if (count($queryAn) > 0) {
-    //                             for ($t=0; $t < count($queryAn); $t++) { 
+    //                             for ($t=0; $t < count($queryAn); $t++) {
     //                               // cek payment students
     //                               $Q_invStudent = $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$queryAn[$t]['ID']);
     //                               $PayAn = 0;
     //                               $SisaAn = 0;
-    //                               for ($r=0; $r < count($Q_invStudent); $r++) { 
+    //                               for ($r=0; $r < count($Q_invStudent); $r++) {
     //                                 if ($Q_invStudent[$r]['Status'] == 1) { // lunas
     //                                   $PayAn = $PayAn + $Q_invStudent[$r]['Invoice'];
     //                                 }
@@ -429,7 +429,7 @@ class C_dashboard extends Globalclass {
     //                                   $SisaAn = $SisaAn + $Q_invStudent[$r]['Invoice'];
     //                                 }
     //                               }
-                                  
+
     //                               $arrAn = array(
     //                                 'An' => (int)$queryAn[$t]['Invoice'],
     //                                 'PayAn' => (int)$PayAn,
@@ -453,11 +453,11 @@ class C_dashboard extends Globalclass {
     //                         elseif ( $arrBPP['DetailPaymentBPP'] != '' || $arrCr['DetailPaymentCr'] != '' ||  $arrBPP['SisaBPP'] > 0 || $arrCr['SisaCr'] > 0 ||  $arrSPP['SisaSPP'] > 0 || $arrAn['SisaAn'] > 0) { // belum lunas
     //                           $a_Unpaid_Off = $a_Unpaid_Off + 1;
 
-    //                         }     
-                            
-    //                     }  
+    //                         }
 
-    //                 } // loop per mhs    
+    //                     }
+
+    //                 } // loop per mhs
 
     //             $strUnk = $unk.'.6818181818181817';
     //             $YearDB = explode('_', $arrDB[$i]);
@@ -502,21 +502,21 @@ class C_dashboard extends Globalclass {
     {
         $requestData= $_REQUEST;
         // print_r($requestData);
-        $sql = 'select count(*) as total 
-                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+        $sql = 'select count(*) as total
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.semester as c on a.SemesterID = c.ID
                 join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e
                 on a.ID = e.ID_payment and e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() group by a.ID';
         $query=$this->db->query($sql, array())->result_array();
         $totalData = count($query);
 
-        $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description 
-                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+        $sql = 'select a.*, b.Year,b.EmailPU,b.Pay_Cond,c.Name as NameSemester, d.Description
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.semester as c on a.SemesterID = c.ID
                 join db_finance.payment_type as d on a.PTID = d.ID join db_finance.payment_students as e
                 on a.ID = e.ID_payment
             ';
-        $Year = date('Y');    
+        $Year = date('Y');
         $sql.= ' where ( e.Status = 0 and DATE_FORMAT(e.Deadline,"%Y-%m-%d") <= curdate() ) and  (a.NPM like "'.$requestData['search']['value'].'%" or d.Description like "'.$requestData['search']['value'].'%" or c.Name like "'.$requestData['search']['value'].'%" ) and b.Year !='.$Year.' group by a.ID';
         $sql.= ' ORDER BY a.NPM ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -560,7 +560,7 @@ class C_dashboard extends Globalclass {
             $Year = $Year[1];
             $arrDB[] = $Year;
           }
-          
+
         }
 
         rsort($arrDB);
@@ -575,12 +575,12 @@ class C_dashboard extends Globalclass {
         $Unpaid_Off = array();
         $Unset_Paid = array();
         for ($i=0; $i < count($arrDB); $i++) {
-            // lunas 
+            // lunas
             $sqlPaid_Off = 'select count(*) as total from (
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    left JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b
                     ON a.ID_register_verified = b.ID
                     left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
@@ -604,13 +604,13 @@ class C_dashboard extends Globalclass {
 
                     ) SubQuery where StatusPayment = "Lunas";
                 ';
-            $queryPaid_Off = $this->db->query($sqlPaid_Off)->result_array();  
+            $queryPaid_Off = $this->db->query($sqlPaid_Off)->result_array();
 
             $sqlUnpaid_Off = 'select count(*) as total from (
                     select a.ID as ID_register_formulir,
                     if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment
                     from db_admission.register_formulir as a
-                    left JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b
                     ON a.ID_register_verified = b.ID
                     left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
@@ -634,12 +634,12 @@ class C_dashboard extends Globalclass {
 
                     ) SubQuery where StatusPayment = "Belum Lunas";
                 ';
-            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array(); 
+            $queryUnpaid_Off = $this->db->query($sqlUnpaid_Off)->result_array();
 
             $sqlUnset_Paid = 'select count(*) as total from (
                     select a.ID as ID_register_formulir
                     from db_admission.register_formulir as a
-                    left JOIN db_admission.register_verified as b 
+                    left JOIN db_admission.register_verified as b
                     ON a.ID_register_verified = b.ID
                     left JOIN db_admission.register_verification as c
                     ON b.RegVerificationID = c.ID
@@ -663,7 +663,7 @@ class C_dashboard extends Globalclass {
 
                     ) SubQuery;
                 ';
-            $queryUnset_Paid = $this->db->query($sqlUnset_Paid)->result_array();   
+            $queryUnset_Paid = $this->db->query($sqlUnset_Paid)->result_array();
 
              $Paid_Off[] = array($arrDB[$i],$queryPaid_Off[0]['total']);
              $Unpaid_Off[] = array($arrDB[$i],$queryUnpaid_Off[0]['total']);
@@ -686,7 +686,7 @@ class C_dashboard extends Globalclass {
             $Year = $Year[1];
             $arrDB[] = $Year;
           }
-          
+
         }
 
         rsort($arrDB);
@@ -699,7 +699,7 @@ class C_dashboard extends Globalclass {
 
         $Paid_Off = array();
         $Return_Formulir = array();
-        for ($i=0; $i < count($arrDB); $i++) { 
+        for ($i=0; $i < count($arrDB); $i++) {
             // lunas
             $sql = 'select count(*) as total from(
                 select FormulirCode from db_admission.formulir_number_online_m where Status = 1 and Years = "'.$arrDB[$i].'"
@@ -712,7 +712,7 @@ class C_dashboard extends Globalclass {
             $sqlReturn_Formulir = 'select count(*) as total from(
                         select a.ID as ID_register_formulir
                         from db_admission.register_formulir as a
-                        left JOIN db_admission.register_verified as b 
+                        left JOIN db_admission.register_verified as b
                         ON a.ID_register_verified = b.ID
                         left JOIN db_admission.register_verification as c
                         ON b.RegVerificationID = c.ID
@@ -725,21 +725,21 @@ class C_dashboard extends Globalclass {
 
             $Paid_Off[] = array($arrDB[$i],$query[0]['total']);
             $Return_Formulir[] = array($arrDB[$i],$queryReturn_Formulir[0]['total']);
-            
+
         }
         $arr_json = array('Paid_Off'=> $Paid_Off,'Return_Formulir' => $Return_Formulir);
         echo json_encode($arr_json);
-        
+
 
     }
 
     public function SummaryFormulirPerSales()
     {
-        $arr_result = array();   
+        $arr_result = array();
         // get all grouping from sales
             $set_ta = $this->m_master->showData_array('db_admission.set_ta');
             $Ta = $set_ta[0]['Ta'];
-            $sql = 'select a.PIC,if(b.Name IS NULL or b.Name = "","Unknown",b.Name) as Name,count(*) as total from db_admission.sale_formulir_offline as a 
+            $sql = 'select a.PIC,if(b.Name IS NULL or b.Name = "","Unknown",b.Name) as Name,count(*) as total from db_admission.sale_formulir_offline as a
                     left join db_employees.employees as b on a.PIC = b.NIP
                     left join db_admission.formulir_number_offline_m as c
                     on a.FormulirCodeOffline = c.FormulirCode
@@ -747,13 +747,13 @@ class C_dashboard extends Globalclass {
                     group by a.PIC
                     ';
             $query=$this->db->query($sql, array($Ta))->result_array();
-            for ($i=0; $i < count($query); $i++) { 
+            for ($i=0; $i < count($query); $i++) {
                 $Name = explode(" ", trim($query[$i]['Name']));
                 $Name = $Name[0];
                 $arr_result[] = array($i,$query[$i]['total'],$Name);
             }
         $arr_json = array('arr_result'=> $arr_result);
-        echo json_encode($arr_json);             
+        echo json_encode($arr_json);
 
     }
 
@@ -764,7 +764,7 @@ class C_dashboard extends Globalclass {
         // valueFormulir
             $sql = 'select sum(Price_Form) as total from
                     (
-                        select a.Price_Form from db_admission.sale_formulir_offline as a 
+                        select a.Price_Form from db_admission.sale_formulir_offline as a
                             left join db_admission.formulir_number_offline_m as c
                             on a.FormulirCodeOffline = c.FormulirCode
                             where c.Years = ?
@@ -776,7 +776,7 @@ class C_dashboard extends Globalclass {
             $sqlTuitionFee = 'select sum(Invoice) as total from(
                         select e.Invoice
                         from db_admission.register_formulir as a
-                        left JOIN db_admission.register_verified as b 
+                        left JOIN db_admission.register_verified as b
                         ON a.ID_register_verified = b.ID
                         left JOIN db_admission.register_verification as c
                         ON b.RegVerificationID = c.ID
@@ -790,7 +790,7 @@ class C_dashboard extends Globalclass {
             $queryTuitionFee=$this->db->query($sqlTuitionFee, array($Ta))->result_array();
 
         $arr_json = array('Formulir'=> ($query[0]['total'] == null || $query[0]['total'] == "") ? 0 : $query[0]['total'],'tuition_fee' => ($queryTuitionFee[0]['total'] == null || $queryTuitionFee[0]['total'] == "") ? 0 : $queryTuitionFee[0]['total']);
-        echo json_encode($arr_json);         
+        echo json_encode($arr_json);
     }
 
     public function Help()
@@ -809,8 +809,45 @@ class C_dashboard extends Globalclass {
             $content = $this->load->view('global/help/help',$data,true);
             $this->temp($content);
         }
-       
+
     }
+
+    public function upload_help(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $ID = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/help/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!=''  && is_file('./uploads/help/'.$old)){
+            unlink('./uploads/help/'.$old);
+        }
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            // Update DB
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.user_qna',array(
+                'File' => $fileName
+            ));
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
+
+    }
+
 
 
 }
