@@ -1,6 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+
+require_once( BASEPATH .'database/DB.php' );
+$db =& DB();
+
+$dataMode = $db->get_where('db_it.m_config',array(
+    'ID' => 3
+))->result_array();
+
+if($dataMode[0]['MaintenanceMode']=='1'){
+    $s = '(:any)';
+    for ($i=1;$i<=10;$i++){
+        $route[$s] = 'dashboard/c_dashboard/maintenance';
+        $s = $s.'/(:any)';
+    }
+
+}
+
+
 $route['default_controller'] = 'c_login';
 $route['404_override'] = 'dashboard/c_dashboard/page404';
 $route['404_override'] = 'c_login/page404r';
@@ -219,8 +237,8 @@ $route['academic/master/edit-student'] = 'page/academic/c_m_student/edit_student
 // --- Master ----
 
 // test routes from db
-require_once( BASEPATH .'database/DB.php' );
-$db =& DB();
+
+
 $query = $db->get('db_admission.cfg_sub_menu');
 $result = $query->result();
 foreach( $result as $row )

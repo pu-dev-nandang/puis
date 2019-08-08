@@ -14,6 +14,10 @@ class C_dashboard extends Globalclass {
         $this->load->model('m_menu');
     }
 
+    public function maintenance(){
+        parent::checkMaintenanceMode();
+    }
+
     public function index()
     {
         $data['department'] = parent::__getDepartement();
