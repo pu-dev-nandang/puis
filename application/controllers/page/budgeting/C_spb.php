@@ -1061,7 +1061,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                          $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
 
                      // insert to spb_circulation_sheet
-                         $this->m_spb->payment_circulation_sheet($ID_payment,'Input Petty Cash');
+                         $this->m_spb->payment_circulation_sheet($ID_payment,'Input SPB');
 
                      // get CodeURL
                      $key = "UAP)(*";
