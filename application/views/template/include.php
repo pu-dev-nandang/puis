@@ -323,7 +323,7 @@
 <!-- <script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script> -->
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script> 
+<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js');?>"></script>
 
 <!-- Countdown -->
@@ -556,6 +556,24 @@
                for(var i=0;i<jsonResult.length;i++){
                    var dt = jsonResult[i];
                    var sc = (selected==dt.ID) ? 'selected' : '';
+                   // var v = (option=="Name") ? dt.Name : dt.ID;
+                   $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+               }
+           }
+        });
+
+    }
+
+    function loadSelectOptionSemester_admission(element,selected) {
+
+        var token = jwt_encode({action:'read'},'UAP)(*');
+        var url = base_url_js+'api/__crudTahunAkademik';
+        $.post(url,{token:token},function (jsonResult) {
+
+           if(jsonResult.length>0){
+               for(var i=0;i<jsonResult.length;i++){
+                   var dt = jsonResult[i];
+                   var sc = (selected==dt.Year && dt.Code==1) ? 'selected' : '';
                    // var v = (option=="Name") ? dt.Name : dt.ID;
                    $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
                }
@@ -1025,7 +1043,7 @@
 
         });
     }
-    
+
     function loadSelectOptionScheoolBy(CityID,element,selected) {
         var url = base_url_js+'api/__getSchoolByCityID/'+CityID;
         $.getJSON(url,function (jsonResult)  {
@@ -1295,7 +1313,7 @@
         var ReadMinus = function(bilangan)
         {
             var bool = false;
-            var number_string = bilangan.toString(); 
+            var number_string = bilangan.toString();
             var a = number_string.substr(0, 1);
             var n = number_string.length;
             if (a  == '-') {
@@ -1615,9 +1633,9 @@
             }
         });
     }
-    
+
     function loadSelectOptionPathway(element,selected) {
-        
+
         var url = base_url_js+'rest2/__getPathway';
         $.getJSON(url,function (jsonResult) {
            if(jsonResult.length>0){
@@ -1627,7 +1645,7 @@
                })
            }
         });
-        
+
     }
 
     function loadYearOfBirth(element,selected){
@@ -1708,17 +1726,17 @@
     }
 
     function findAndReplace(string, target, replacement) {
-     
+
      var i = 0, length = string.length;
-     
+
      for (i; i < length; i++) {
-     
+
        string = string.replace(target, replacement);
-     
+
      }
-     
+
      return string;
-     
+
     }
 
     function isObject(value) {
@@ -1735,7 +1753,7 @@
                 type: 'hidden',
                 name: this.name,
                 value: this.value
-            }));    
+            }));
         });
         form.attr('target', blank);
         form.appendTo('body').submit();
@@ -1843,15 +1861,15 @@
       return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, replaceStr);
     }
 
-    function br2nl (str, replaceMode) {   
-        
+    function br2nl (str, replaceMode) {
+
       var replaceStr = (replaceMode) ? "\n" : '';
       // Includes <br>, <BR>, <br />, </br>
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
     }
     // for text area
-  
+
     $(document).on('blur','input[typeof=number][data-form=phone]',function () {
         var formPhone = $(this).val();
 
