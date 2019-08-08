@@ -50,20 +50,30 @@ abstract class Globalclass extends MyAbstract{
 
     public function template($content)
     {
-        $depertment = $this->__getDepartement();
+
         $data['include'] = $this->load->view('template/include','',true);
-        if($depertment!=null && $depertment!=''){
 
+        // Cek mode
+        $dataMode = $this->db->get_where('db_it.m_config',array(
+            'ID' => 3
+        ))->result_array();
 
-            $data['header'] = $this->menu_header();
-            $data['navigation'] = $this->menu_navigation();
-            $data['crumbs'] = $this->crumbs();
-
-            $data['content'] = $content;
-            $this->load->view('template/template',$data);
+        if($dataMode[0]['MaintenanceMode']=='1'){
+            $this->load->view('template/maintenance',$data);
         } else {
-            $this->load->view('template/userfalse',$data);
+            $depertment = $this->__getDepartement();
+            if($depertment!=null && $depertment!=''){
+                $data['header'] = $this->menu_header();
+                $data['navigation'] = $this->menu_navigation();
+                $data['crumbs'] = $this->crumbs();
+
+                $data['content'] = $content;
+                $this->load->view('template/template',$data);
+            } else {
+                $this->load->view('template/userfalse',$data);
+            }
         }
+
 
     }
 
