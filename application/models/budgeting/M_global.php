@@ -409,4 +409,16 @@ class M_global extends CI_Model {
             }
     }
 
+    public function get_year_department_by_budget_left($ID_budget_left)
+    {
+        $sql = '
+                select a.Departement,a.Year from db_budgeting.creator_budget_approval as a
+                join db_budgeting.creator_budget as b on a.ID = b.ID_creator_budget_approval 
+                join db_budgeting.budget_left as c on b.ID = c.ID_creator_budget
+                where c.ID = ?
+                ';
+        $query = $this->db->query($sql, array($ID_budget_left))->result_array();
+        return $query;
+    }
+
 }

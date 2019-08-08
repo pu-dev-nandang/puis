@@ -47,10 +47,29 @@ class C_pettycash extends Budgeting_Controler {
         $key = "UAP)(*";
         $ID_payment = $this->jwt->decode($token,$key);
         $this->data['ID_payment'] = $ID_payment;
-        $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
-        $Year = $get[0]['Year'];
-        $this->data['Year'] = $Year;
-        $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        // get year and Department existing by budget left
+            $__get_budget_left = function($ID_payment)
+            {
+                $Year = date('Y');
+                $Departement = $this->session->userdata('IDDepartementPUBudget');
+                $arr = array(
+                    'Year' => $Year,
+                    'Departement' => $Departement,
+                );
+
+                $G_ = $this->m_master->caribasedprimary('db_payment.petty_cash','ID_payment',$ID_payment);
+                $G__detail = $this->m_master->caribasedprimary('db_payment.petty_cash_detail','ID_petty_cash',$G_[0]['ID']);
+                $ID_budget_left = $G__detail[0]['ID_budget_left'];
+                $q = $this->m_global->get_year_department_by_budget_left($ID_budget_left);
+                $arr['Year'] = $q[0]['Year'];
+                $arr['Departement'] = $q[0]['Departement'];
+                return $arr;
+            };
+            $t = $__get_budget_left($ID_payment);
+            $Year = $t['Year'];
+            $IDDepartementPUBudget = $t['Departement'];
+        $this->data['Year'] = $Year;  
+
         // get budgeting/detail_budgeting_remaining
             $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
             $arr_result = array('data' =>$getData);

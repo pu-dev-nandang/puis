@@ -163,6 +163,7 @@ function LoadDataForTable()
           }
           else
           {
+            code_url2 = jwt_encode(ID_payment,"UAP)(*");
             var URLRedirect = 'budgeting_menu/pembayaran/spb/'+code_url2;
           }
 

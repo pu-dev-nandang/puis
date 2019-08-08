@@ -2080,7 +2080,7 @@ class C_rest2 extends CI_Controller {
                 }
                  
                 $requestData = $_REQUEST;
-                $StatusQuery = ' and Status = 2';
+                $StatusQuery = '';
                 $sqltotalData = 'select count(*) as total  from (
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
@@ -2128,7 +2128,7 @@ class C_rest2 extends CI_Controller {
                       or SPBNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or SPBCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
-                $sql.= ' ORDER BY ID_po_create Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $sql.= ' ORDER BY ID_payment Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $query = $this->db->query($sql)->result_array();
 
                 $No = $requestData['start'] + 1;
@@ -2188,27 +2188,34 @@ class C_rest2 extends CI_Controller {
                         where d.Code = ?
                         ';
                         $query_get_pr=$this->db->query($sql_get_pr, array($row['Code']))->result_array();
-                        for ($j=0; $j < count($query_get_pr); $j++) { 
-                            if (count($arr_temp) == 0) {
-                                $arr_temp[] = $query_get_pr[$j]['PRCode'];
-                            }
-                            else
-                            {
-                                // check exist
-                                $bool = true;
-                                for ($k=0; $k < count($arr_temp); $k++) { 
-                                    if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
-                                        $bool = false;    
-                                        break;
-                                    }
-                                }
-
-                                if ($bool) {
+                        if (count($query_get_pr)  == 0) {
+                            $arr_temp[] = array();
+                        }
+                        else
+                        {
+                            for ($j=0; $j < count($query_get_pr); $j++) { 
+                                if (count($arr_temp) == 0) {
                                     $arr_temp[] = $query_get_pr[$j]['PRCode'];
                                 }
+                                else
+                                {
+                                    // check exist
+                                    $bool = true;
+                                    for ($k=0; $k < count($arr_temp); $k++) { 
+                                        if ($arr_temp[$k]==$query_get_pr[$j]['PRCode']) {
+                                            $bool = false;    
+                                            break;
+                                        }
+                                    }
 
+                                    if ($bool) {
+                                        $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    }
+
+                                }
                             }
                         }
+                        
                         // pass data spb
                         $arr_temp[] = array(
                             'CodeSPB' => $row['CodeSPB'],
@@ -4017,21 +4024,23 @@ class C_rest2 extends CI_Controller {
                                 select a.Type,a.Code,b.Perihal,a.Code_po_create,a.CreatedBy as CreatedPayment,c.Name as NameCreatedPayment,b.ID_payment,b.Invoice,a.CreatedAt from db_payment.payment as a
                                 join 
                                     (
-                                        select ID_payment,Perihal,Invoice  from db_payment.spb
-                                        where ID_budget_left = '.$ID_budget_left.'
+                                        select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice  from db_payment.spb as a
+                                        join db_payment.spb_detail as b on a.ID = b.ID_spb 
+                                        where b.ID_budget_left = '.$ID_budget_left.'
+                                        group by a.ID_payment
                                        UNION 
-                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.bank_advance as a
+                                       select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.bank_advance as a
                                        join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
                                        where b.ID_budget_left = '.$ID_budget_left.'
                                        UNION 
-                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.cash_advance  as a
+                                       select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.cash_advance  as a
                                        join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
-                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
                                        UNION 
-                                       select a.ID_payment,a.Perihal,b.Invoice from db_payment.petty_cash 
+                                       select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.petty_cash 
                                        as a
                                        join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
-                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
                                     ) as b
                                     on a.ID = b.ID_payment
                                 join db_employees.employees as c on a.CreatedBy = c.NIP
@@ -4045,11 +4054,12 @@ class C_rest2 extends CI_Controller {
                                 UNION
                                 select "Purchase Request",a.PRCode,"","",a.CreatedBy,c.Name,NULL, b.SubTotal,a.CreatedAt as Invoice from db_budgeting.pr_create as a
                                 join (
-                                    select d.ID as ID_payment,a.PRCode,a.SubTotal from db_budgeting.pr_detail as a
+                                    select d.ID as ID_payment,a.PRCode, a.SubTotal from db_budgeting.pr_detail as a
                                     left join db_purchasing.pre_po_detail as b on a.ID = b.ID_pr_detail
                                     left join db_purchasing.po_detail as c on b.ID = c.ID_pre_po_detail
                                     left join db_payment.payment as d on d.Code_po_create = c.Code
                                     where a.ID_budget_left = '.$ID_budget_left.' and a.Status = 1
+                                    group by a.PRCode
 
                                 ) as b
                                 on a.PRCode = b.PRCode
@@ -4062,7 +4072,6 @@ class C_rest2 extends CI_Controller {
                                 where YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
 
                         ) cc order by  CreatedAt asc,Code asc       
-
                             
                         ';
                     $query=$this->db->query($sql, array())->result_array();

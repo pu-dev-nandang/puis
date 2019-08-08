@@ -200,8 +200,10 @@
 		var Perihal = '';
 		var ID_bank = '';
 		var NoRekening = '';
+		var IsiInput = '';
+		var NoIOM = '';
 		if (ClassDt.ID_payment !='') {
-			console.log(ClassDt);
+			// console.log(ClassDt);
 			var DtExisting = ClassDt.DtExisting;
 			var dtspb = DtExisting.payment;
 			Dis = 'disabled';
@@ -222,7 +224,10 @@
 			NoTandaTerima = DetailPayment[0].NoTandaTerima;			
 			Datee = DetailPayment[0].Datee;	
 			Perihal = DetailPayment[0].Perihal;
-			ID_bank = DetailPayment[0].ID_bank;		
+			ID_bank = DetailPayment[0].ID_bank;
+			NoRekening = DetailPayment[0].No_Rekening;
+			IsiInput = 	AddingTable_existing();
+			NoIOM = dtspb[0].NoIOM;
 		}	
 		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
@@ -335,7 +340,7 @@
 											'<b>&</b>'+
 										'</div>'+
 										'<div class="col-xs-5">'+
-											'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening">'+
+											'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening" value = "'+NoRekening+'">'+
 										'</div>'+
 									'</div>'+		
 								'</td>'+
@@ -375,6 +380,7 @@
 											'</tr>'+
 										'</thead>'+
 										'<tbody>'+
+											IsiInput+
 										'</tbody>'+
 									'</table>'+
 								'</td>'+	
@@ -392,7 +398,7 @@
 						'<div class = "col-md-6">'+
 							'<div class = "form-group" style="width:350px;">'+
 								'<label>NoIOM</label>'+
-								'<input type="text" class="form-control" id = "NoIOM">'+
+								'<input type="text" class="form-control" id = "NoIOM" value = "'+NoIOM+'">'+
 							'</div>'+
 							'<div class = "form-group">'+
 								'<label>Upload IOM</label>'+
@@ -415,8 +421,6 @@
 					'</div>'+
 				'</div></div></div>';
 		se_content.html(html);			
-		se_content.find('.Money_Pembayaran,.Money_harga').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-		se_content.find('.Money_Pembayaran,.Money_harga').maskMoney('mask', '9894');
 
 		se_content.find('.datetimepicker').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
@@ -427,8 +431,401 @@
 			    //allowClear: true
 			});
 		}
+		else
+		{
+			se_content.find('.SubTotal,.Money_harga').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+			se_content.find('.SubTotal,.Money_harga').maskMoney('mask', '9894');
+			$('.SubTotal:last').trigger('keyup');
+
+			var Supporting_documents = jQuery.parseJSON(dtspb[0]['UploadIOM']);
+			var htmlSupporting_documents = '';
+			var htmlSupporting_documents = '';
+			if (Supporting_documents != null) {
+				if (Supporting_documents.length > 0) {
+					for (var i = 0; i < Supporting_documents.length; i++) {
+						htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-spb-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
+					}
+				}
+			}
+			$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
+
+			if (dtspb[0]['Status'] == -1) {
+				var row = $('#tblDetail tbody tr:not(:last)');
+				row.find('td').find('input:not(.Detail),select,button:not(.Detail),textarea').prop('disabled',true);
+				$('.btn-add-item').prop('disabled',false);
+			}
+			else
+			{
+				$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+				$('input,textarea').prop('disabled',true);
+			}
+
+			var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
+			var bool = true;
+			for (var i = 1; i < JsonStatus.length; i++) {
+				if (JsonStatus[i].Status == 1) {
+					bool = false;
+					break;
+				}
+			}
+
+			if (!bool) {
+				if (dtspb[0]['Status'] == 2) {
+					se_content.find('button').not('.print_page').remove();
+				}
+				
+			}
+			makepage_status();
+			makeSignaturesSPB(se_content,JsonStatus);
+			if (JsonStatus[0].NIP != sessionNIP) {
+				$('#add_approver').remove();
+			}
+			// __BudgetRemaining();
+		}
+		MakeButton();
+	}
+
+	function makeSignaturesSPB(se_content,JsonStatus)
+	{
+		var html = '<div class= "row" style = "margin-top : 20px;">'+
+						'<div class = "col-xs-12">'+
+							'<a href="javascript:void(0)" class="btn btn-default btn-default-success" type="button" id="add_approver"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>'+
+							'<table class = "table borderless">'+
+								'<thead>'+
+									'<tr>'
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<th '+style+'>'+
+						JsonStatus[i].NameTypeDesc+
+					'</th>';	
+		}
+
+		html += '</tr>';
+
+		html += '</thead>'+
+					'<tbody>'+
+						'<tr style = "height : 20px">';
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var v = '-';
+			if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+				v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+			}
+			else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+			{
+				v = '<i class="fa fa-check" style="color: green;"></i>';
+			}
+			else
+			{
+				v = '-';
+			}
+
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<td '+style+'>'+
+						v+
+					'</td>';	
+		}
+
+		html += '</tr></tbody>';				
+		html += '<tfoot>'+
+					'<tr>';
+
+		for (var i = 0; i < JsonStatus.length; i++) {
+			var style = '';
+			if (i == 0) {
+				style = 'style = "text-align :left"';
+			}
+			else if(parseInt(JsonStatus.length)-1 == i){
+				style = 'style = "text-align :right"';
+			}
+			else
+			{
+				style = 'style = "text-align :center"';
+			}
+			html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+		}
+
+		html += '</tr></tfoot></table></div></div>';
+		se_content.find('#r_signatures').html(html);
+	}
+
+	function makepage_status()
+	{
+		var Dataselected2 = ClassDt.DtExisting;
+		var dtspb = Dataselected2.payment;
+		var StatusName = '';
+		switch(dtspb[0]['Status']) {
+				  case 0:
+				  case '0':
+				  	StatusName = 'Draft';
+				    break;
+				  case 1:
+				  case '1':
+				  	StatusName = 'Issued & Approval Process';
+				    break;
+				  case 2:
+				  case '2':
+				  	StatusName = 'Approval Done';
+				    break;
+				  case -1:
+				  case '-1':
+				  	StatusName = 'Reject';
+				    break;       
+				  case 4:
+				  case '4':
+				  	StatusName = 'Cancel';
+				    break;    
+		}
+
+		$('#page_status').html('<div style = "color : red">Status : '+StatusName+'</div><div><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+dtspb[0]['Code']+'">Info</a></div></div>');
 
 	}
+
+	function MakeButton()
+	{
+		var dt = ClassDt.RuleAccess;
+		if (ClassDt.ID_payment != '') { 
+			var DtExisting = ClassDt.DtExisting;
+			var dataa = DtExisting['payment'];
+			if (dataa[0].Status == -1) {
+				var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+							'<button class = "btn btn-success submit" ID_payment = "'+ClassDt.ID_payment+'" action = "1">Submit</button>'+
+						   '</div>';
+				var r_access = dt['access'];
+				var rule = dt['rule'];
+				// allow access dengan ID_m_userrole: "1"
+				var bool = false;
+				for (var i = 0; i < r_access.length; i++) {
+					var ID_m_userrole = r_access[i].ID_m_userrole;
+					// search rule Entry = 1
+					for (var j = 0; j < rule.length; j++) {
+						var ID_m_userrole_ = rule[j].ID_m_userrole;
+						if (ID_m_userrole == ID_m_userrole_) {
+							var Entry = rule[j].Entry
+							if (Entry == 1) {
+								bool = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (bool) {
+					$('#r_action').html(html);
+				}
+				else
+				{
+					// check rule entry
+					$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',true);
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea').prop('disabled',true);
+				}
+			}
+			else if(dataa[0].Status == 1)
+			{
+				var btn_edit = '';
+				var html = '';
+				// after submit dan sebelum approval bisa melakukan edit
+					var booledit = false;
+					var r_access = dt['access'];
+					var rule = dt['rule'];
+					for (var i = 0; i < r_access.length; i++) {
+						var ID_m_userrole = r_access[i].ID_m_userrole;
+						// search rule Entry = 1
+						for (var j = 0; j < rule.length; j++) {
+							var ID_m_userrole_ = rule[j].ID_m_userrole;
+							if (ID_m_userrole == ID_m_userrole_) {
+								var Entry = rule[j].Entry
+								if (Entry == 1) {
+									booledit = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (booledit) {
+						var JsonStatus = jQuery.parseJSON(dataa[0].JsonStatus);
+						var booledit2 = false;
+						for (var i = 1; i < JsonStatus.length; i++) {
+							if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+								booledit2 = true;
+								break;
+							}
+						}
+
+						if (!booledit2) {
+							btn_edit = '<button class = "btn btn-primary" id = "btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>&nbsp<button class = "btn btn-success submit" id = "SaveSubmit" ID_payment = "'+ClassDt.ID_payment+'" action = "1" disabled>Submit</button>&nbsp';
+						}
+					}
+
+				var JsonStatus = jQuery.parseJSON(dataa[0].JsonStatus);
+				var bool = false;
+				var HierarkiApproval = 0; // for check hierarki approval;
+				var NumberOfApproval = 0; // for check hierarki approval;
+				for (var i = 0; i < JsonStatus.length; i++) {
+					NumberOfApproval++;
+					if (JsonStatus[i]['Status'] == 0) {
+						// check status before
+						if (i > 0) {
+							var ii = i - 1;
+							if (JsonStatus[ii]['Status'] == 1) {
+								HierarkiApproval++;
+							}
+
+							// if (JsonStatus[ii]['NameTypeDesc'] != 'Approval by') {
+							// 	HierarkiApproval++;
+							// }
+							// HierarkiApproval++;
+						}
+						else
+						{
+							HierarkiApproval++;
+						}
+						
+						// if (NIP == JsonStatus[i]['NIP'] && JsonStatus[i]['NameTypeDesc'] == 'Approval by') {
+						if (NIP == JsonStatus[i]['NIP']) {
+							bool = true;
+							break;
+						}
+					}
+					else
+					{
+						HierarkiApproval++;
+					}
+				}
+
+				html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+btn_edit;
+
+				if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+					html += '<button class = "btn btn-primary" id = "Approve" action = "approve" ID_payment = "'+ClassDt.ID_payment+'" approval_number = "'+NumberOfApproval+'">Approve</button>'+
+									'&nbsp'+
+									'<button class = "btn btn-inverse" id = "Reject" action = "reject" ID_payment = "'+ClassDt.ID_payment+'" approval_number = "'+NumberOfApproval+'">Reject</button>'+
+							'</div>';
+					
+				}
+
+				$("#r_action").html(html);
+			}
+			else
+			{
+				if (dataa[0].Status == 2) {
+					var html = '<div class = "col-md-12">'+
+				   							'<div class = "pull-right">'+
+				   								'<button class="btn btn-default" id="pdfprint" ID_payment = "'+ClassDt.ID_payment+'"> <i class = "fa fa-file-pdf-o"></i> Print PDF</button>'+
+				   							'</div>'+
+				   						'</div>';
+				   	$("#r_action").html(html);
+				}
+				// remove edit approval jika telah approve semua
+				$('#add_approver').remove();
+			}
+
+			// show button add new pr
+			$('.btn-add-new-pr').removeClass('hide');
+
+		}
+		else
+		{
+			var html = '<div class = "col-md-6 col-md-offset-6" align = "right">'+
+						'<button class = "btn btn-success submit" id = "SaveSubmit" id_dataa = "" ID_payment = "" action = "1">Submit</button>'+
+					   '</div>';
+			var r_access = dt['access'];
+			var rule = dt['rule'];
+			// allow access dengan ID_m_userrole: "1"
+			var bool = false;
+			for (var i = 0; i < r_access.length; i++) {
+				var ID_m_userrole = r_access[i].ID_m_userrole;
+				// search rule Entry = 1
+				for (var j = 0; j < rule.length; j++) {
+					var ID_m_userrole_ = rule[j].ID_m_userrole;
+					if (ID_m_userrole == ID_m_userrole_) {
+						var Entry = rule[j].Entry
+						if (Entry == 1) {
+							bool = true;
+							break;
+						}
+					}
+				}
+			}
+
+			if (bool) {
+				$('#r_action').html(html);
+			}
+			else
+			{
+				// check rule entry
+				$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',true);
+			}		   
+		}
+		
+	}
+
+	function AddingTable_existing()
+	{
+		var html = '';
+		var DtExisting = ClassDt.DtExisting;
+		var DtExisting = DtExisting.payment;
+		var action = '<td><button type="button" class="btn btn-danger btn-delete btn-delete-item"> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button></td>';
+		var DetailPayment = DtExisting[0].Detail;
+		var DetailTypePayment = DetailPayment[0].Detail;
+		var Budget =  JSON.parse(localStorage.getItem("PostBudgetDepartment"));
+		for (var i = 0; i < DetailTypePayment.length; i++) {
+					var ID_budget_left = DetailTypePayment[i]['ID_budget_left'];
+					var remaining = 0;
+					for (var j = 0; j < Budget.length; j++) {
+						var ID_budget_left_ = Budget[j].ID;
+						if (ID_budget_left == ID_budget_left_) {
+							remaining = parseInt(Budget[j].Value) - parseInt(Budget[j].Using);
+							break;
+						}
+					}
+
+					var DataPostBudget = DetailTypePayment[i]['DataPostBudget'];
+					ClassDt.Year = DataPostBudget[0].Year;
+
+
+					html += '<tr>'+
+								'<td>'+(i+1)+'</td>'+
+								'<td>'+
+									'<div class="input-group">'+
+										'<input type="text" class="form-control PostBudgetItem" readonly id_budget_left = "'+ID_budget_left+'" remaining = "'+remaining+'" value = "'+DataPostBudget[0]['RealisasiPostName']+'">'+
+										'<span class="input-group-btn">'+
+											'<button class="btn btn-default SearchPostBudget" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+										'</span>'+
+									'</div>'+
+									'<label class = "lblBudget">'+DataPostBudget[0]['RealisasiPostName']+'</label>'+
+								'</td>'+
+								'<td>'+
+									'<input type="text" class="form-control NamaBiaya" value = "'+DetailTypePayment[i]['NamaBiaya']+'">'+
+									'<label class = "lblNamaBiaya"></label>'+
+								'</td>'+	
+								'<td><input type="text" class="form-control SubTotal" value = "'+parseInt(DetailTypePayment[i]['Invoice'])+'"></td>'+
+			                	action
+			                '</tr>';
+		}
+		return html;
+	}
+
 
 	function OPBank(IDselected = null,Dis='')
 	{
@@ -821,9 +1218,9 @@
 			var ID_payment = ClassDt.ID_payment;
 			var action = "1";
 			if (validation_input() && __CekBudgetRemaining() ) {
-				console.log('ok validation')
+				// console.log('ok validation')
 				SubmitData(ID_payment,action,'.submit');
-				$('.submit').prop('disabled',false).html(htmltext);
+				// $('.submit').prop('disabled',false).html(htmltext);
 			}
 			else
 			{
@@ -1385,4 +1782,222 @@
 		ClassDt.PostBudgetDepartment = arr_budget_departement;
 		localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
 	}
+
+	$(document).off('click', '#btnEditInput').on('click', '#btnEditInput',function(e) {
+		var row = $('#tblDetail tbody tr:last');
+		row.find('td').find('input:not(.PostBudgetItem),button').prop('disabled',false);
+		$('.submit').prop('disabled',false);
+		$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',false);
+		$('#NoIOM').prop('disabled',false);
+		$('#Perihal').prop('disabled',false);
+		$(this).remove();
+	})
+
+	$(document).off('click', '.btn_circulation_sheet').on('click', '.btn_circulation_sheet',function(e) {
+	    var url = base_url_js+'rest2/__show_info_payment';
+	    var ID_payment = ClassDt.ID_payment;
+	    var Code = $(this).attr('code');
+   		var data = {
+   		    ID_payment : ID_payment,
+   		    auth : 's3Cr3T-G4N',
+   		};
+   		var token = jwt_encode(data,"UAP)(*");
+   		$.post(url,{ token:token },function (data_json) {
+   			var html = '<div class = "row"><div class="col-md-12"><div class="well">';
+   				html += '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal">'+
+                      '<caption><h4>Circulation Sheet</h4></caption>'+
+                      '<thead>'+
+                          '<tr>'+
+                              '<th style="width: 5px;">No</th>'+
+                              '<th style="width: 55px;">Desc</th>'+
+                              '<th style="width: 55px;">Date</th>'+
+                              '<th style="width: 55px;">By</th>';
+		        html += '</tr>' ;
+		        html += '</thead>' ;
+		        html += '<tbody>' ;
+		        html += '</tbody>' ;
+		        html += '</table></div></div></div>' ;
+
+   			var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+   			    '';
+   			$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info SPB Code : '+Code+'</h4>');
+   			$('#GlobalModalLarge .modal-body').html(html);
+   			$('#GlobalModalLarge .modal-footer').html(footer);
+   			$('#GlobalModalLarge').modal({
+   			    'show' : true,
+   			    'backdrop' : 'static'
+   			});
+
+   			// make datatable
+   				var table = $('#TblModal').DataTable({
+   				      "data" : data_json['payment_circulation_sheet'],
+   				      'columnDefs': [
+   					      {
+   					         'targets': 0,
+   					         'searchable': false,
+   					         'orderable': false,
+   					         'className': 'dt-body-center',
+   					         'render': function (data, type, full, meta){
+   					             return '';
+   					         }
+   					      },
+   					      {
+   					         'targets': 1,
+   					         'render': function (data, type, full, meta){
+   					             return full.Desc;
+   					         }
+   					      },
+   					      {
+   					         'targets': 2,
+   					         'render': function (data, type, full, meta){
+   					             return full.Date;
+   					         }
+   					      },
+   					      {
+   					         'targets': 3,
+   					         'render': function (data, type, full, meta){
+   					             return full.Name;
+   					         }
+   					      },
+   				      ],
+   				      'createdRow': function( row, data, dataIndex ) {
+   				      		$(row).find('td:eq(0)').attr('style','width : 10px;')
+   				      	
+   				      },
+   				});
+
+   				table.on( 'order.dt search.dt', function () {
+   				        table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+   				            cell.innerHTML = i+1;
+   				        } );
+   				} ).draw();
+
+   		});
+	})
+
+	$(document).off('click', '#Approve').on('click', '#Approve',function(e) {
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve');
+			var ID_payment = $(this).attr('ID_payment');
+			var approval_number = $(this).attr('approval_number');
+			// var url = base_url_js + 'rest/__approve_pr';
+			var url = base_url_js + 'rest/__approve_payment_user';
+			var data = {
+				ID_payment : ID_payment,
+				approval_number : approval_number,
+				NIP : NIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+				DtExisting : ClassDt.DtExisting,
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				if (resultJson['Reload'] == 1) {
+					toastr.info(resultJson['msg']);
+					LoadFirstLoad();
+				}
+				else
+				{
+					LoadFirstLoad();
+					toastr.success('Approve Successful');
+					$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				}
+			}).fail(function() {
+			  $('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+
+	})
+
+	$(document).off('click', '#Reject').on('click', '#Reject',function(e) {
+		if (confirm('Are you sure ?')) {
+			var ID_payment = $(this).attr('ID_payment');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="100"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest/__approve_payment_user';
+				var data = {
+					ID_payment : ID_payment,
+					approval_number : approval_number,
+					NIP : NIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					DtExisting : ClassDt.DtExisting,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					// if (resultJson == '') {
+					// 	LoadFirstLoad();
+					// }
+					// else
+					// {
+					// 	// $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					// }
+					if (resultJson['Reload'] == 1) {
+						toastr.info(resultJson['msg']);
+						LoadFirstLoad();
+					}
+					else
+					{
+						LoadFirstLoad();
+						toastr.success('Reject Successful');
+						$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
+	})
+
+	$(document).off('click', '#pdfprint').on('click', '#pdfprint',function(e) {
+		var ID_payment =ClassDt.ID_payment;
+		var DataPayment = ClassDt.DtExisting;
+		var dt = DataPayment.payment;
+		var data = {
+		  ID_payment : ID_payment,
+		  TypePay : dt[0].Type,
+		  DataPayment : DataPayment,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		var url = base_url_js+'save2pdf/print/payment_user';
+		
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 </script>
