@@ -1,4 +1,10 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
+<style type="text/css">
+    #example_budget.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+</style>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menu">
     <ul class="nav nav-tabs">
         <li role="presentation">

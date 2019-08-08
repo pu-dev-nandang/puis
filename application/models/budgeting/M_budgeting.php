@@ -1088,8 +1088,9 @@ class M_budgeting extends CI_Model {
                         select a.CreatedAt,b.ID_payment from db_payment.payment as a
                         join 
                             (
-                                select ID_payment,Perihal  from db_payment.spb
-                                where ID_budget_left = '.$ID_budget_left.'
+                                select a.ID_payment,a.Perihal  from db_payment.spb as a
+                                join db_payment.spb_detail as b on a.ID = b.ID_spb 
+                                where b.ID_budget_left = '.$ID_budget_left.'
                                UNION 
                                select a.ID_payment,a.Perihal from db_payment.bank_advance as a
                                join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
