@@ -1382,15 +1382,15 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $SemesterID = $data_arr['SemesterID'];
+            $ProdiID = (isset($data_arr['ProdiID'])) ? $data_arr['ProdiID'] : '';
+            $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
 
 
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-
-                $dataSearch = ' WHERE  lmk.Lembaga LIKE "%'.$search.'%" 
-            OR uc.Tingkat LIKE "%'.$search.'%"
-             OR uc.Benefit LIKE "%'.$search.'%"';
+                $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%" 
+                                OR ats.NPM LIKE "%'.$search.'%" )';
             }
 
             $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, ats.IjazahSMA, mk.MKCode,   
@@ -1406,7 +1406,7 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em1 ON (ats.ClearentLibrary_By = em1.NIP)
                                         LEFT JOIN db_employees.employees em2 ON (ats.ClearentFinance_By = em2.NIP)
                                         LEFT JOIN db_employees.employees em3 ON (ats.ClearentKaprodi_By = em3.NIP)
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ';
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.' '.$dataSearch;
 
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -1483,14 +1483,25 @@ class C_api3 extends CI_Controller {
 
 
                 // kaprodi
-                $dateTm = ($row['ClearentKaprodi_At']!='' && $row['ClearentKaprodi_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentKaprodi_At'])).'</div>' : '';
-                $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                $dateTm = ($row['ClearentKaprodi_At']!='' && $row['ClearentKaprodi_At']!=null)
+                    ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentKaprodi_At'])).'</div>'
+                    : '';
+
+                if($ProdiID!=''){
+                    $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
-                    : 'Waiting Approval';
-//                    : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+                    : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+
+                } else {
+                    $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
+                        : 'Waiting Approval Kaprodi';
+                }
+
+
 
                 $c_Kaprodi = ($row['ClearentFinance']!='0' && $row['ClearentLibrary']!='0' &&
-                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Library & Finance Clearent</span>';
+                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded ,Library & Finance Clearent</span>';
 
 
                 $nestedData[] = '<div>'.$no.'</div>';
@@ -1522,10 +1533,11 @@ class C_api3 extends CI_Controller {
 
             $ID = $data_arr['ID'];
             $C = $data_arr['C'];
+            $NIP = (isset($data_arr['NIP'])) ? $data_arr['NIP'] : '';
 
             $arr = array(
                 $C => '1',
-                $C.'_By' => $this->session->userdata('NIP'),
+                $C.'_By' => ($NIP!='') ? $NIP : $this->session->userdata('NIP'),
                 $C.'_At' => $this->m_rest->getDateTimeNow()
             );
 
