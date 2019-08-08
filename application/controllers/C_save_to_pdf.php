@@ -3958,15 +3958,19 @@ class C_save_to_pdf extends CI_Controller {
 
          // Get Semester
         $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE ID = "'.$filterSemester.'" ')->result_array();
+
+        $datawarek1 = $this->db->get_where('db_employees.employees',
+        array('PositionMain' => '2.2','StatusEmployeeID'=>'3' ))
+        ->result_array();
         //print_r($dataSmt); exit;
 
         $dtsmtr = $dataSmt[0]['Name'];
         $tahun = substr($dtsmtr,0,-6);
 
         if ($dataSmt[0]['Code'] == '1'){
-            $angkasmter = 'Ganjil'; 
+            $angkasmter = 'Ganjil';
         }else {
-            $angkasmter = 'Genap'; 
+            $angkasmter = 'Genap';
         }
 
         $pdf = new FPDF('P','mm','A4');
@@ -4086,12 +4090,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         $pdf->Cell($fill,$h,$Student['Faculty'],$border,0,'L');
 
-        if ($Student['Faculty'][0]=='T') 
+        if ($Student['Faculty'][0]=='T')
         {
-            $pdf->SetX(103);  
+            $pdf->SetX(103);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
-            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');   
+            $pdf->Cell($fill,$h,$Student['FacultyEng'],$border,0,'L');
         }else{
             $pdf->SetX(102);
             $pdf->SetFont('Arial','I',$fn_e);
@@ -4113,12 +4117,12 @@ class C_save_to_pdf extends CI_Controller {
 
         // print_r($Student['Prodi']);exit();
 
-        if ($Student['Prodi'][0]=='A') 
+        if ($Student['Prodi'][0]=='A')
         {
-            $pdf->SetX(108);  
+            $pdf->SetX(108);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,0,'L');
-            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');   
+            $pdf->Cell($fill,$h,$Student['ProdiEng'],$border,0,'L');
         }
         else if ($Student['Prodi'][0]=='K')
         {
@@ -4174,9 +4178,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','I',$fn_e);
         $pdf->Cell(67,$h,'/  Study Program',$border,0,'L');
 
-        if ($Student['Prodi'][0]=='M') 
+        if ($Student['Prodi'][0]=='M')
         {
-            $pdf->SetX(152);  
+            $pdf->SetX(152);
             $pdf->SetFont('Arial','I',$fn_e);
             $pdf->Cell($sp,$h,'/',$border,1,'L');
 
@@ -4228,7 +4232,7 @@ class C_save_to_pdf extends CI_Controller {
 
         // $pdf->SetX(37);
         // $pdf->SetFont('Arial','I',$fn_e);
-        // $pdf->Cell($label,$h,'/ Status',$border,1,'L');                                      
+        // $pdf->Cell($label,$h,'/ Status',$border,1,'L');
         $pdf->Ln(5);
         // ===== Tanggal Yudisium =====
         $pdf->SetX($x);
@@ -4253,17 +4257,17 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($fillFull,$h,'di Universitas Agung Podomoro.',$border,1,'L');
         $pdf->Ln(1);
 
-        if ($Student['Gender'][0]=='P') 
+        if ($Student['Gender'][0]=='P')
         {
-            $Kelamin='Her'; //kolom disesuaikan      
+            $Kelamin='Her'; //kolom disesuaikan
         }else{
             $Kelamin='His';
         }
 
         if ($dataSmt[0]['Code'] == '1'){
-            $angkasmterx = 'Odd'; 
+            $angkasmterx = 'Odd';
         }else {
-            $angkasmterx = 'Even'; 
+            $angkasmterx = 'Even';
         }
 
         $pdf->SetX($x);
@@ -4283,14 +4287,14 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('Arial','I',$fn_e);
 
 
-        if ($Student['Gender'][0]=='P') 
+        if ($Student['Gender'][0]=='P')
         {
-            $Kelamin='Her'; //kolom disesuaikan      
+            $Kelamin='Her'; //kolom disesuaikan
         }else{
             $Kelamin='His';
         }
 
-        // print_r($Kelamin);exit(); 
+        // print_r($Kelamin);exit();
         $pdf->Cell($fillFull,$h,$Kelamin. ' certificate is in process.',$border,1,'L');
         $y = $pdf->GetY()+7;
         $pdf->Ln(4);
@@ -4319,7 +4323,9 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->SetX($x);
         $pdf->SetFont('Arial','BU',$fn_b);
-        $pdf->Cell($fillFull,$h,'Johana Rosalina Kristyanti, Ph. D',$border,1,'L');
+
+        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].' '.$datawarek1[0]['TitleBehind'];
+        $pdf->Cell($fillFull,$h,$warek1,$border,1,'L');
         //================ hormat kami ========================
         //================ Tanda tangan =======================
         $pdf->SetX($x);
@@ -4331,7 +4337,7 @@ class C_save_to_pdf extends CI_Controller {
         $y = $pdf->GetY()+7;
         $pdf->Ln(15);
         //================ hormat kami ========================
-        
+
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('SKLS_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
@@ -5346,10 +5352,10 @@ Phone: (021) 29200456';
         for ($i=0; $i < ( $maxLen - $aa ); $i++) {
             $NoKwitansi = '0'.$NoKwitansi;
         }
-        
+
         // check tahun berdasarkan No_Ref
          $G_dt = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['NoFormRef']);
-         $YearsWR_MKT = substr($G_dt[0]['Years'], 2,2); 
+         $YearsWR_MKT = substr($G_dt[0]['Years'], 2,2);
 
         // $nomorWr = $InputDate[0].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$NoKwitansi;
         $nomorWr = $G_dt[0]['Years'].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$YearsWR_MKT.' / '.$NoKwitansi;
@@ -5472,7 +5478,7 @@ Phone: (021) 29200456';
           $input = $this->getInputToken($token);
           $PRCode = $input['PRCode'];
           $PRCodeReplace = str_replace('/', '-', $PRCode);
-          $filename = '__'.$PRCodeReplace.'.pdf';  
+          $filename = '__'.$PRCodeReplace.'.pdf';
 
           $pr_create = $this->m_pr_po->GetPR_CreateByPRCode($PRCode);
           $pr_detail = $this->m_pr_po->GetPR_DetailByPRCode($PRCode);
@@ -5528,10 +5534,10 @@ Phone: (021) 29200456';
 
           // print_r($pr_detail);die();
           $arr_postName = [];
-          for ($i=0; $i < count($pr_detail); $i++) { 
+          for ($i=0; $i < count($pr_detail); $i++) {
                 $PostName = $pr_detail[$i]['NameHeadAccount'].'['.$pr_detail[$i]['NameDepartement'].']';
                 $bool = true;
-                for ($j=0; $j < count($arr_postName); $j++) { 
+                for ($j=0; $j < count($arr_postName); $j++) {
                     if ($PostName == $arr_postName[$j]) {
                         $bool = false;
                         break;
@@ -5591,20 +5597,20 @@ Phone: (021) 29200456';
                 $Spec = '';
                 $arr = array();
                 foreach ($DetailCatalog as $key => $value) {
-                    $arr[] = $key.' : '.$value; 
+                    $arr[] = $key.' : '.$value;
                 }
 
                 $Spec = implode(',', $arr);
                 if ($pr_detail[$i]['Spec_add'] != '' || $pr_detail[$i]['Spec_add'] != null) {
                    $Spec = implode(',', $arr)."\n".$pr_detail[$i]['Spec_add'];
                 }
-                
-                
+
+
                 $DateNeeded = date("d M Y", strtotime($pr_detail[0]['DateNeeded']));
                 // if ($pr_detail[$i]['Need'] != '' || $pr_detail[$i]['Need'] != null) {
                 //     $DateNeeded .= "\n".'Need : '.$pr_detail[$i]['Need'];
                 // }
-                
+
                 $UnitCost = 'Rp '.number_format($pr_detail[$i]['UnitCost'],2,',','.');
                 $Subtotal= 'Rp '.number_format($pr_detail[$i]['SubTotal'],2,',','.');
                 $fpdf->Row(array(
@@ -5622,12 +5628,12 @@ Phone: (021) 29200456';
 
                 $total = $total + $pr_detail[$i]['SubTotal'];
                 $no++;
-                $y += $h; 
+                $y += $h;
              }
 
              $Max = 15;
              $h=4.4;
-             for ($i=0; $i <$Max - count($pr_detail) ; $i++) { 
+             for ($i=0; $i <$Max - count($pr_detail) ; $i++) {
                  $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
                  $fpdf->Cell($w_desc,$h,'',$border,0,'C',true);
                  $fpdf->Cell($w_spec,$h,'',$border,0,'L',true);
@@ -5683,18 +5689,18 @@ Phone: (021) 29200456';
              for ($i=0; $i < count($JsonStatus); $i++) {
                  if ($JsonStatus[$i]['Visible'] == 'Yes') {
                       $fpdf->Cell($w_approved,$h,$JsonStatus[$i]['NameTypeDesc'],$border,0,'C',true);
-                  } 
-                
+                  }
+
              }
 
              $y += $h;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFillColor(255, 255, 255);
              // $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
-             for ($i=0; $i < count($JsonStatus); $i++) {    
+             for ($i=0; $i < count($JsonStatus); $i++) {
                 if ($JsonStatus[$i]['Visible'] == 'Yes') {
                  $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
-                } 
+                }
              }
 
              $CreatedBy = $pr_create[0]['CreatedBy'];
@@ -5708,9 +5714,9 @@ Phone: (021) 29200456';
                 if ($JsonStatus[$i]['Visible'] == 'Yes') {
                  $Approver = $JsonStatus[$i]['NIP'];
                  $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
-                 $NameApprover = $G_CreatedBy[0]['Name'];    
+                 $NameApprover = $G_CreatedBy[0]['Name'];
                  $fpdf->Cell($w_approved,$h,$NameApprover,$border,0,'C',true);
-                } 
+                }
              }
 
              $y += $h;
@@ -5723,7 +5729,7 @@ Phone: (021) 29200456';
                  $ApproveAt = $JsonStatus[$i]['ApproveAt'];
                   $ApproveAt = date("d M Y", strtotime($ApproveAt));
                  $fpdf->Cell($w_approved,$h,'Date : '.$ApproveAt,$border,0,'L',true);
-                } 
+                }
              }
 
 
@@ -5731,19 +5737,19 @@ Phone: (021) 29200456';
                 if ($pr_create[0]['Status'] ==  2) {
                     $fpdf->SetFont('Arial','B',50);
                     $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Approve',35);  
+                    $fpdf->RotatedText(35,190,'Approve',35);
                 }
                 elseif ($pr_create[0]['Status'] ==  3) {
                     $fpdf->SetFont('Arial','B',50);
                     $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Reject',35); 
+                    $fpdf->RotatedText(35,190,'Reject',35);
                 }
-                 
-               
+
+
 
              // show image in the next page
                  $arr_image = array();
-                 for ($i=0; $i < count($pr_detail); $i++) { 
+                 for ($i=0; $i < count($pr_detail); $i++) {
                      if ($pr_detail[$i]['UploadFile'] == '' || $pr_detail[$i]['UploadFile'] == null) {
                          $PhotoCatalog = $pr_detail[$i]['Photo'];
                          if ($PhotoCatalog != '' && $PhotoCatalog != null) {
@@ -5753,7 +5759,7 @@ Phone: (021) 29200456';
                              );
                              // search name is exist
                              $bool = false;
-                             for ($j=0; $j < count($arr_image); $j++) { 
+                             for ($j=0; $j < count($arr_image); $j++) {
                                  $Name = $arr_image[$j]['Name'];
                                  if ($Name == $url_arr['Name']) {
                                      $bool = true;
@@ -5763,22 +5769,22 @@ Phone: (021) 29200456';
                              if (!$bool) {
                                  $arr_image[] = $url_arr;
                              }
-                             
+
                          }
                      }
                      else
                      {
                         $Photo = $pr_detail[$i]['UploadFile'];
                         $Photo = (array)json_decode($Photo,true);
-                        
-                        for ($ll=0; $ll < count($Photo); $ll++) { 
+
+                        for ($ll=0; $ll < count($Photo); $ll++) {
                             $url_arr = array(
                                'url' => './uploads/budgeting/pr/'.$Photo[$ll],
                                'Name' => $Photo[$ll],
                             );
                             // search name is exist
                             $bool = false;
-                            for ($j=0; $j < count($arr_image); $j++) { 
+                            for ($j=0; $j < count($arr_image); $j++) {
                                 $Name = $arr_image[$j]['Name'];
                                 if ($Name == $url_arr['Name']) {
                                     $bool = true;
@@ -5789,19 +5795,19 @@ Phone: (021) 29200456';
                                 $arr_image[] = $url_arr;
                             }
                         }
-                       
+
                      }
                  }
                  // end show image in the next page
-               
-            // for ($i=0; $i < count($arr_image); $i++) { 
+
+            // for ($i=0; $i < count($arr_image); $i++) {
             //     $fpdf->AddPage();
             //     $fpdf->Image($arr_image[$i]['url'],100,40,100);
             // }
 
-          $fpdf->Output($filename,'I');  
+          $fpdf->Output($filename,'I');
 
-            
+
         } catch (Exception $e) {
             // handling orang iseng
             echo $e;
@@ -5819,7 +5825,7 @@ Phone: (021) 29200456';
           $input = (array) json_decode(json_encode($input),true);
           $customlayout=array('53.98','85.60');
           $pdf = new FPDF('P','mm',$customlayout);
-          for ($i=0; $i < count($input); $i++) { 
+          for ($i=0; $i < count($input); $i++) {
              $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
              $pdf->AddPage();
              $pdf->SetAutoPageBreak(true, 0);
@@ -5840,10 +5846,10 @@ Phone: (021) 29200456';
              // $pdf->SetTextColor(255,255,255);
              // $pdf->Cell(0,5,$input[$i]['email'],0,0,'C');
           }
-         
+
          $pdf->Output('I','ID_Card.pdf');
 
-            
+
         } catch (Exception $e) {
             // handling orang iseng
             echo $e;
@@ -5919,13 +5925,13 @@ Phone: (021) 29200456';
         }
 
         $dataLect = $this->db->query('SELECT em.*, ps.Name AS ProdiName
-                                                  FROM db_employees.employees em 
+                                                  FROM db_employees.employees em
                                                   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                                                   WHERE em.NIP = "'.$NIP.'" LIMIT 1')->result_array();
 
         // Get Semester
-        $dataSmt = $this->db->query('SELECT s.Name, ay.kuliahStart FROM db_academic.semester s LEFT 
-                                            JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID) 
+        $dataSmt = $this->db->query('SELECT s.Name, ay.kuliahStart FROM db_academic.semester s LEFT
+                                            JOIN db_academic.academic_years ay ON (ay.SemesterID = s.ID)
                                             WHERE s.ID = "'.$SemesterID.'" ')->result_array();
 
         if(count($dataLect)>0){
@@ -5940,14 +5946,14 @@ Phone: (021) 29200456';
             $thn = ($dateGen!='') ? explode('-',$dateGen)[0] : '';
 
             // Get Mata kuliah
-            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule s 
+            $dataMK = $this->db->query('SELECT mk.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
-                                                  WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID 
+                                                  WHERE s.SemesterID = "'.$SemesterID.'" AND s.Coordinator = "'.$NIP.'" GROUP BY s.ID
                                                   UNION ALL
                                                   SELECT mk2.NameEng, cd.TotalSKS AS Credit FROM db_academic.schedule_details_course sdc2
-                                                  LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID) 
+                                                  LEFT JOIN db_academic.schedule s2 ON (s2.ID = sdc2.ScheduleID)
                                                   LEFT JOIN db_academic.mata_kuliah mk2 ON (mk2.ID = sdc2.MKID)
                                                   LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc2.CDID)
                                                   LEFT JOIN db_academic.schedule_team_teaching stt ON (sdc2.ScheduleID = stt.ScheduleID)
@@ -6090,7 +6096,7 @@ Phone: (021) 29200456';
         $IDRequest = $data_arr['IDRequest'];
 
         $dataLect = $this->db->query('SELECT em.*, ps.Name AS ProdiName, fs.Name AS NameFak
-                                                  FROM db_employees.employees em 
+                                                  FROM db_employees.employees em
                                                   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                                                   LEFT JOIN db_academic.faculty fs ON (ps.FacultyID = fs.FacultyID)
                                                   WHERE em.NIP = "'.$NIP.'" LIMIT 1')->result_array();
@@ -6137,7 +6143,7 @@ Phone: (021) 29200456';
                 $time2 = date('H:i', strtotime($dataRequest[0]['EndDate']));
 
             }
-            
+
             $DateConfirm = date('dd M yy', strtotime($dataRequest[0]['DateConfirm']));
             $description = $dataRequest[0]['DescriptionAddress'];
             $nametask = trim($dataRequest[0]['ForTask']);
@@ -6164,7 +6170,7 @@ Phone: (021) 29200456';
 
         // Get Number
         $dataNumbering = $this->db->query('SELECT count(*) as total FROM db_employees.request_document WHERE IDTypeFiles = 15 AND Year(RequestDate) = '.$thn .' and IDRequest <= '.$dataRequest[0]['IDRequest'])->result_array();
-        
+
         $dataNum = $this->m_rest->genrateNumberingString($dataNumbering[0]['total'],3);
 
         $pdf = new FPDF('P','mm','A4');
