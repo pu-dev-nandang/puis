@@ -126,7 +126,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='final-project'){echo "current";} ?>">
-                <a href="<?php echo base_url('academic/final-project'); ?>">
+                <a href="<?php echo base_url('academic/final-project/list-student'); ?>">
                     <i class="fa fa-flag"></i>
                     Final Project
                 </a>

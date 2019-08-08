@@ -31,15 +31,9 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
 		$this->menu_horizontal($page);
     }
 
-    public function create_spb()
+    public function create_spb($tokenSPB = null)
     {
-    	/*
-			1.SPB bisa dicreate dari user manapun dengan trigerr PO / SPK done
-			2.Show PO dengan status Done.
-			3.filtering by pr
-    	*/
-
-            // get data bank rest/__Databank
+           // get data bank rest/__Databank
                 $data = array(
                     'auth' => 's3Cr3T-G4N', 
                 );
@@ -47,10 +41,16 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 $token = $this->jwt->encode($data,$key);
                 $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
                 $this->data['G_data_bank'] = $G_data_bank;
-
-        if (empty($_GET)) {
-           $this->data['action_mode'] = 'add';
+                $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        if ($tokenSPB == null) {
            $this->data['SPBCode'] = '';
+           $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+           $Year = $get[0]['Year'];
+           $this->data['Year'] = $Year;
+
+           $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
+           $arr_result = array('data' =>$getData);
+           $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);    
         }
         else{
             try {
@@ -63,16 +63,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             
         }   
 
-        // check purchasing & non purchasing
-        if ($this->session->userdata('IDDepartementPUBudget') == 'NA.4') { // purchasing
-            $page = $this->load->view('global/budgeting/spb/create_spb',$this->data,true);
-            
-        }
-        else
-        {
-            $page = $this->load->view('global/budgeting/spb/create_spb_user',$this->data,true);
-        }
-
+        $page = $this->load->view('global/budgeting/spb/InfoSPB_User',$this->data,true);
         $this->menu_horizontal($page);  
 
 		
@@ -217,6 +208,29 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
 
             $this->db->insert('db_payment.spb',$dataSave2);
 
+            // send to notifikasi ke approval 1
+            // Notif to next step approval & User
+                $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                $CodeUrl = str_replace('/', '-', $Code);
+                // Send Notif for next approval
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code,
+                                        'Description' => 'Please approve SPB '.$Code,
+                                        'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($NIPApprovalNext),
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+
             // insert to spb_circulation_sheet
                 $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
             // insert to po_circulation_sheet
@@ -336,6 +350,30 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 $dataSave2['TypeInvoice'] = $Input['TypeInvoice'];
                 $this->db->where('ID_payment',$ID_payment);
                 $this->db->update('db_payment.spb',$dataSave2);
+
+                // send to notifikasi ke approval 1
+                // Notif to next step approval & User
+                    $Code = $G_data[0]['Code'];
+                    $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                    $CodeUrl = str_replace('/', '-', $Code);
+                    // Send Notif for next approval
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code.' after edited',
+                                            'Description' => 'Please approve SPB '.$Code.' after edited',
+                                            'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => array(
+                                      'NIP' => array($NIPApprovalNext),
+                                    ),
+                            'Email' => 'No', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
 
                 // insert to spb_circulation_sheet
                     $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);

@@ -501,6 +501,8 @@
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
 		var InvoiceleftPO = $('.C_radio_pr:checked').attr('invoiceleftpo');
 		var Supplier = $('.C_radio_pr:checked').attr('supplier');
+		var NumberCheck = se_content.closest('.FormPage').attr('number');
+		NumberCheck = parseInt(NumberCheck); // untuk edit pergantian type payment
 
 		var data = ClassDt.Dataselected;
 		var dtspb = data.dtspb;
@@ -509,6 +511,9 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
+				if (NumberCheck == i) { // untuk edit pergantian type payment
+					break;
+				}
 				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;
@@ -731,6 +736,8 @@
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
 		var InvoiceleftPO = $('.C_radio_pr:checked').attr('invoiceleftpo');
 		var Supplier = $('.C_radio_pr:checked').attr('supplier');
+		var NumberCheck = se_content.closest('.FormPage').attr('number');
+		NumberCheck = parseInt(NumberCheck); // untuk edit pergantian type payment
 
 		var data = ClassDt.Dataselected;
 		var dtspb = data.dtspb;
@@ -739,6 +746,9 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
+				if (NumberCheck == i) { // untuk edit pergantian type payment
+					break;
+				}
 				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;
@@ -1278,6 +1288,8 @@
 		var InvoicePO = $('.C_radio_pr:checked').attr('invoicepo');
 		var InvoiceleftPO = $('.C_radio_pr:checked').attr('invoiceleftpo');
 		var Supplier = $('.C_radio_pr:checked').attr('supplier');
+		var NumberCheck = se_content.closest('.FormPage').attr('number');
+		NumberCheck = parseInt(NumberCheck); // untuk edit pergantian type payment
 
 		var data = ClassDt.Dataselected;
 		var dtspb = data.dtspb;
@@ -1286,6 +1298,9 @@
 			var InvoiceleftPO = parseInt(InvoicePO);
 			var c = 0;
 			for (var i = 0; i < dtspb.length; i++) {
+				if (NumberCheck == i) { // untuk edit pergantian type payment
+					break;
+				}
 				if (dtspb[i]['Detail'][0].Invoice != null && dtspb[i]['Detail'][0].Invoice != 'null') {
 					InvoiceleftPO -= parseInt(dtspb[i]['Detail'][0].Invoice);
 					c++;

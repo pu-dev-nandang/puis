@@ -53,7 +53,7 @@
                     <span class="title">General Affair</span>
                 </a>
             </li>
-            <li class="departement1 <?php if($departement=='cooperation'){echo 'current';} ?>"
+            <li class="departement <?php if($departement=='cooperation'){echo 'current';} ?>"
                 division="7"
                 data-dpt="cooperation">
                 <a href="javascript:void(0);">

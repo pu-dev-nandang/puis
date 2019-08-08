@@ -1158,4 +1158,201 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Output($filename,'I');
     }
 
+    public function payment_user()
+    {
+        $token = $this->input->post('token');
+        $Input = $this->getInputToken($token);
+        $TypePay = $Input['TypePay'];
+        switch ($TypePay) {
+            case 'Petty Cash':
+                $this->PdfPettyCash_User($Input);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function PdfPettyCash_User($Input)
+    {
+        $ID_payment = $Input['ID_payment'];
+        $DataPayment = $Input['DataPayment'];
+        $DataPayment = json_decode(json_encode($DataPayment),true);
+        $dt_arr = $DataPayment['payment'];
+        // print_r($DataPayment);die();
+         $fpdf = new Pdf_mc_table('l','mm','A5');
+         $fpdf->AddPage();
+         $fpdf->SetMargins(10,0,10,0);
+         $x = 10;
+         $y = 10;
+         $FontIsianHeader = 8;
+         $FontIsian = 7;
+         // Logo
+         $fpdf->Image('./images/YPAP_logo_petty_cash.png',7,5,50);
+         // Header
+         $fpdf->SetXY($x,$y);
+         $fpdf->SetFont('Arial','B',12);
+         $fpdf->Cell(0, 10, 'PETTY CASH VOUCHER', 0, 1, 'C', 0);
+         $fpdf->Image('./images/logo_tr.png',150,5,50);
+
+         $fpdf->SetFont('Arial','',$FontIsian);
+         $Date = date('Y-m-d',strtotime($dt_arr[0]['CreatedAt']));
+         $DateWr = $this->getDateIndonesian($Date);
+         $fpdf->Cell(0, 10, 'Tanggal : '.$DateWr, 0, 1, 'L', 0);
+
+         // buat table petty cash
+         $w_dibayar = 80;
+         $w_NomorAcc = 55;
+         $w_JumlahRupiah = 55;
+         $border = 1;
+         $h=4.4;
+         $y = $fpdf->GetY();
+         $fpdf->SetXY($x,$y);
+         $fpdf->SetFillColor(255, 255, 255);
+         $fpdf->SetFont('Arial','B',$FontIsianHeader);
+         $fpdf->Cell($w_dibayar,$h,'DIBAYAR UNTUK',$border,0,'C',true);
+         $fpdf->Cell($w_NomorAcc,$h,'NOMOR ACC',$border,0,'C',true);
+         $fpdf->Cell($w_JumlahRupiah,$h,'JUMLAH RUPIAH',$border,1,'C',true);
+
+         $fpdf->SetFont('Arial','',$FontIsian);
+         $fpdf->SetWidths(array($w_dibayar,$w_NomorAcc,$w_JumlahRupiah));
+         $fpdf->SetLineHeight(5);
+         $fpdf->SetAligns(array('L','L','C'));
+
+         $MaxItem = 10;
+         $total = $dt_arr[0]['Detail'][0]['Invoice'];
+         $arr_DetailItem = $dt_arr[0]['Detail'][0]['Detail'];
+         for ($i=0; $i < count($arr_DetailItem); $i++) { 
+            $dibayar = $arr_DetailItem[$i]['NamaBiaya'];
+            $NomorAcc = $arr_DetailItem[$i]['NomorAcc'];
+            $JumlahRupiah = 'Rp '.number_format($arr_DetailItem[$i]['Invoice'],2,',','.');
+            $fpdf->Row(array(
+               $dibayar,
+               $NomorAcc,
+               $JumlahRupiah,
+            ));
+         }
+
+         for ($i=0; $i < $MaxItem - count($arr_DetailItem); $i++) { 
+            $fpdf->Row(array(
+               '',
+               '',
+               '',
+            ));
+         }
+         $y = $fpdf->GetY();
+         $x__ = $w_dibayar+$w_NomorAcc;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell( ($x__-10) ,$h,'',0,0,'L',true);
+         $fpdf->SetFont('Arial','B',$FontIsianHeader);
+         $fpdf->Cell(10,$h,'Total',0,0,'L',true);
+         $fpdf->Cell($w_JumlahRupiah,$h,'Rp '.number_format($total,2,',','.'),$border,1,'C',true);
+
+         // show terbilang
+         $y = $fpdf->GetY()+5;
+         $data = array(
+             'bilangan' => $total,
+             'auth' => 's3Cr3T-G4N', 
+         );
+         $key = "UAP)(*";
+         $token = $this->jwt->encode($data,$key);
+         $_ajax_terbilang = $this->m_master->apiservertoserver(base_url().'rest2/__ajax_terbilang',$token);
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(0,$h,'Terbilang (Rupiah) : '.$_ajax_terbilang[0].' Rupiah',0,1,'L',true);
+
+         $fpdf->SetFont('Arial','',$FontIsian);
+         $y = $fpdf->GetY()+10;
+         $fpdf->SetXY($x,$y);
+         $JsonStatus = $dt_arr[0]['JsonStatus'];
+         $JsonStatus = json_decode($JsonStatus,true);
+         $w__ = 190 / count($JsonStatus);
+         $w__ = (int)$w__;
+         $c__ = 0;
+
+         for ($i=0; $i < count($JsonStatus); $i++) {
+            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                // Name
+                $a_ = $c__;
+                
+                if ( ($a_ + $w__)<= 190) {
+                    $w = $w__;
+                    $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',true);
+                    $c__ += $w__;
+                }
+                else
+                {
+                    // sisa
+                    $w = 190 - $a_;
+                    $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',true);
+                }
+
+            } 
+             
+         }
+
+
+         $y = $fpdf->GetY()+15;
+         $fpdf->SetXY($x,$y);
+         $w__ = 190 / count($JsonStatus);
+         $w__ = (int)$w__;
+         $c__ = 0;
+         for ($i=0; $i < count($JsonStatus); $i++) {
+            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                // Name
+                $a_ = $c__;
+                
+                if ( ($a_ + $w__)<= 190) {
+                    $w = $w__;
+                    $fpdf->Cell($w__,5,'',0,0,'L',true);
+                    $c__ += $w__;
+                }
+                else
+                {
+                    // sisa
+                    $w = 190 - $a_;
+                    $fpdf->Cell($w__,5,'',0,0,'L',true);
+                }
+
+            } 
+             
+         }
+
+         $y = $fpdf->GetY();
+         $fpdf->SetXY($x,$y);
+         $w__ = 190 / count($JsonStatus);
+         $w__ = (int)$w__;
+         $c__ = 0;
+         for ($i=0; $i < count($JsonStatus); $i++) {
+            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                // Name
+                $a_ = $c__;
+                
+                if ( ($a_ + $w__)<= 190) {
+                    $w = $w__;
+                    $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',true);
+                    $c__ += $w__;
+                }
+                else
+                {
+                    // sisa
+                    $w = 190 - $a_;
+                    $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',true);
+                }
+
+            } 
+             
+         }
+
+         // footer
+         $fpdf->SetFillColor(20,56,127);
+         $fpdf->Rect(0,145.5,210,3,'F');
+         $fpdf->SetTextColor(255,255,255);
+         $fpdf->SetFont('Arial','',$FontIsian);
+         $fpdf->text(50,148,'APL Tower Lt. 5, Podomoro City Jln. LetJend. S. Parman Kav. 28. Jakarta Barat 11470 T. 021 292 00456 F. 021 292 00455');
+
+         $filename = '__'.'PettyCash_'.$ID_payment.'.pdf';  
+         $fpdf->Output($filename,'I');
+    }
+
 }

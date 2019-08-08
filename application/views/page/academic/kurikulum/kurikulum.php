@@ -123,7 +123,6 @@
         modal_add_mk(semester,'edit',CDID);
     });
 
-
     function pageKurikulum() {
 
 
@@ -227,8 +226,5 @@
             });
         });
     }
-    
-
-
 
 </script>

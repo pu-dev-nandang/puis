@@ -172,6 +172,34 @@ class C_cashadvance extends Budgeting_Controler {
                 );
 
              $this->db->insert('db_payment.cash_advance_detail',$dataSave);
+
+             // Notif to next step approval
+                 $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                 $Type = 'Cash Advance';
+                 $urlType = 'ca';
+                 $NIP = $this->session->userdata('NIP');
+                 $key = "UAP)(*";
+                 $token = $this->jwt->encode($ID_payment,$key);
+                 $CodeUrl = $token;
+                 // Send Notif for next approval
+                     $data = array(
+                         'auth' => 's3Cr3T-G4N',
+                         'Logging' => array(
+                                         'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$Type,
+                                         'Description' => 'Please approve '.$Type,
+                                         'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                         'CreatedBy' => $NIP,
+                                       ),
+                         'To' => array(
+                                   'NIP' => array($NIPApprovalNext),
+                                 ),
+                         'Email' => 'No', 
+                     );
+
+                     $url = url_pas.'rest2/__send_notif_browser';
+                     $token = $this->jwt->encode($data,"UAP)(*");
+                     $this->m_master->apiservertoserver($url,$token);
+             
             // insert to spb_circulation_sheet
                 $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
             // insert to po_circulation_sheet
@@ -283,6 +311,34 @@ class C_cashadvance extends Budgeting_Controler {
                         'Invoice' => $Input['Biaya'],
                     );
                 $this->db->insert('db_payment.cash_advance_detail',$dataSave);
+
+                // Notif to next step approval
+                    $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                    $Type = 'Cash Advance';
+                    $urlType = 'ca';
+                    $NIP = $this->session->userdata('NIP');
+                    $key = "UAP)(*";
+                    $token = $this->jwt->encode($ID_payment,$key);
+                    $CodeUrl = $token;
+                    // Send Notif for next approval
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$Type.' after edited',
+                                            'Description' => 'Please approve '.$Type.' after edited',
+                                            'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
+                                            'CreatedBy' => $NIP,
+                                          ),
+                            'To' => array(
+                                      'NIP' => array($NIPApprovalNext),
+                                    ),
+                            'Email' => 'No', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                
                 // insert to spb_circulation_sheet
                     $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
                 // insert to po_circulation_sheet

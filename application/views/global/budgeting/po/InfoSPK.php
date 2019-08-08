@@ -367,6 +367,7 @@
 						'</div>'+
 						'<div id = "r_footer"></div>'+
 						'<div id = "r_signatures"></div>'+
+						'<div id = "r_upload_file" class = "noPrint"></div>'+
 						'<div id = "r_action" style = "margin-left : -15px;margin-right:-15px;"></div>';
 
 			$('#PageContain').html(html);
@@ -394,10 +395,45 @@
 			makeFooter();
 			makeDocPenawaran();
 			makeSignatures();
+			// make Upload File
+			makeUploadFile();
 			makeAction();
 			loadingEnd(1000);									
 
 		})
+	}
+
+	function makeUploadFile()
+	{
+		var html = '';
+		var po_data = ClassDt.po_data;
+		var po_create = po_data['po_create'];
+		var Status = po_create[0]['Status'];
+		if (Status == 2) {
+			html = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+							'<div class = "col-md-6">'+
+								'<div class = "form-group">'+
+									'<label>Upload File</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" accept="image/*,application/pdf">'+
+								'</div>'+
+							'</div>'+
+						'</div>';
+
+			$('#r_upload_file').html(html);
+			// just admin to do upload the file
+			var JsonStatus = po_create[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] != sessionNIP && DivisionID != '4') {
+		  		$('#BrowseFileSD').closest('.col-md-6').find('.form-group').remove();
+		  	}			
+			var POPrint_Approve = jQuery.parseJSON(po_create[0]['POPrint_Approve']);
+			if (POPrint_Approve != null && POPrint_Approve != '') {
+				var htUpload = '';
+				htUpload += '<a href = "'+base_url_js+'fileGetAny/budgeting-po-'+POPrint_Approve[0]+'" target="_blank" class = "Fileexist">File Approve'+'</a>';
+				$('#BrowseFileSD').closest('.col-md-6').append(htUpload);
+			}
+			
+		}
 	}
 
 	function makeDocPenawaran()
@@ -1417,6 +1453,124 @@
 	$(document).off('click', '.btn-add-new-po').on('click', '.btn-add-new-po',function(e) {
 	  var page = $(this).attr('page');
 	  window.location.href = base_url_js+page;
-	}) 	
+	})
+
+	$(document).off('change', '#BrowseFileSD').on('change', '#BrowseFileSD',function(e) {
+	    var Code = ClassDt.Code;
+	    // console.log(ID_element);
+	    var ev = $(this);
+	    var ID_element = 'BrowseFileSD';
+	    if (file_validation(ev,'Upload File')) {
+	      SaveFileUpload(Code,ID_element);
+	    }
+	      
+	});
+
+	function SaveFileUpload(Code,ID_element)
+	{
+	    var form_data = new FormData();
+	    //var fileData = document.getElementById(ID_element).files[0];
+	    var url = base_url_js + "po_spk/upload_file_Approve";
+	    var DataArr = {
+	                    Code : Code,
+	                  };
+	    var token = jwt_encode(DataArr,"UAP)(*");
+	    form_data.append('token',token);
+	    //form_data.append('fileData',fileData);
+	    var files = $('#'+ID_element)[0].files;
+	    for(var count = 0; count<files.length; count++)
+	    {
+	     form_data.append("fileData[]", files[count]);
+	    }
+	    $.ajax({
+	      type:"POST",
+	      url:url,
+	      data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+	      contentType: false,       // The content type used when sending data to the server.
+	      cache: false,             // To unable request pages to be cached
+	      processData:false,
+	      dataType: "json",
+	      success:function(data)
+	      {
+	        if(data.status == 1) {
+	          Get_data_po().then(function(data){
+	          		ClassDt.po_data = data;
+	          		WriteHtml();
+	          })
+	          toastr.options.fadeOut = 100000;
+	          toastr.success(data.msg, 'Success!');
+	        }
+	        else
+	        {
+	          toastr.options.fadeOut = 100000;
+	          toastr.error(data.msg, 'Failed!!');
+	        }
+	      setTimeout(function () {
+	          toastr.clear();
+	        },1000);
+
+	      },
+	      error: function (data) {
+	        toastr.error(data.msg, 'Connection error, please try again!!');
+	      }
+	    })
+	}
+
+	function file_validation(ev,TheName = '')
+	{
+	    var files = ev[0].files;
+	    var error = '';
+	    var msgStr = '';
+	    var max_upload_per_file = 4;
+	    if (files.length > 0) {
+	    	if (files.length > max_upload_per_file) {
+	    	  msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+	    	}
+	    	else
+	    	{
+	    	  for(var count = 0; count<files.length; count++)
+	    	  {
+	    	   var no = parseInt(count) + 1;
+	    	   var name = files[count].name;
+	    	   var extension = name.split('.').pop().toLowerCase();
+	    	   if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+	    	   {
+	    	    msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+	    	    //toastr.error("Invalid Image File", 'Failed!!');
+	    	    // return false;
+	    	   }
+
+	    	   var oFReader = new FileReader();
+	    	   oFReader.readAsDataURL(files[count]);
+	    	   var f = files[count];
+	    	   var fsize = f.size||f.fileSize;
+	    	   // console.log(fsize);
+
+	    	   if(fsize > 2000000) // 2mb
+	    	   {
+	    	    msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+	    	    //toastr.error("Image File Size is very big", 'Failed!!');
+	    	    //return false;
+	    	   }
+	    	   
+	    	  }
+	    	}
+	    }
+	    else
+	    {
+	    	msgStr += 'Upload File '+TheName + ' Required';
+	    }
+	    
+
+	    if (msgStr != '') {
+	      toastr.error(msgStr, 'Failed!!');
+	      return false;
+	    }
+	    else
+	    {
+	      return true;
+	    }
+	} 	
 </script>
 <?php endif ?>	

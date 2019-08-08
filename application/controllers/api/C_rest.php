@@ -2201,6 +2201,11 @@ class C_rest extends CI_Controller {
                 $this->load->model('budgeting/m_budgeting');
                 $this->load->model('budgeting/m_pr_po');
                 $PRCode = $dataToken['PRCode'];
+                // untuk redirect notifikasi
+                $key = "UAP)(*";
+                $PRCodeURL = $this->jwt->encode($PRCode,$key);
+                $URLDirect = 'budgeting_pr/'.$PRCodeURL;
+
                 $approval_number = $dataToken['approval_number'];
                 $NIP = $dataToken['NIP'];
                 $G_emp = $this->m_master->SearchNameNIP_Employees_PU_Holding($NIP);
@@ -2308,7 +2313,7 @@ class C_rest extends CI_Controller {
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$Code,
                                                             'Description' => 'Please approve PR '.$PRCode.' of '.$Code,
-                                                            'URLDirect' => 'budgeting_pr',
+                                                            'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
                                             'To' => array(
@@ -2327,7 +2332,7 @@ class C_rest extends CI_Controller {
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  PR '.$PRCode.' has been Approved',
                                                             'Description' => 'PR '.$PRCode.' of '.$Code.' has been approved by '.$NameFor_NIP,
-                                                            'URLDirect' => 'budgeting_pr',
+                                                            'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
                                             'To' => array(
@@ -2399,7 +2404,7 @@ class C_rest extends CI_Controller {
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' of '.$Code.' has been done',
                                                             'Description' => 'PR '.$PRCode.' of '.$Code.' has been done',
-                                                            'URLDirect' => 'budgeting_pr',
+                                                            'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
                                             'To' => array(
@@ -2454,7 +2459,7 @@ class C_rest extends CI_Controller {
                                             'Logging' => array(
                                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Rejected',
                                                             'Description' => 'PR '.$PRCode.' has been Rejected by '.$NameFor_NIP,
-                                                            'URLDirect' => 'budgeting_pr',
+                                                            'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
                                             'To' => array(

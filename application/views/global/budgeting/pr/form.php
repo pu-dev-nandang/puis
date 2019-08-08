@@ -49,8 +49,17 @@
 		  }
 		  else
 		  {
-		  	$("#pageContent").empty();
-		  	$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
+		  	// console.log(DivSession);
+		  	if (DivSession == 'NA.9') {
+		  		ClassDt.RuleAccess = response;
+		  		load_htmlPR();
+		  	}
+		  	else
+		  	{
+		  		$("#pageContent").empty();
+		  		$("#pageContent").html('<h2 align = "center">Your not authorize these modul</h2>');
+		  	}
+		  	
 		  }
 		});
 	}
