@@ -717,6 +717,10 @@ class C_save_to_pdf extends CI_Controller {
 
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
+        $datawarek1 = $this->db->get_where('db_employees.employees',
+        array('PositionMain' => '2.2','StatusEmployeeID'=>'3' ))
+        ->result_array();
+
 
 //        print_r($data_arr);
 //        exit;
@@ -846,9 +850,11 @@ class C_save_to_pdf extends CI_Controller {
         $kabag = (count($dataKabagAkademik)>0) ? $dataKabagAkademik[0]['Name'] : '' ;
         $pdf->Cell($w_ttd,$h,$kabag,1,0,'C');
 
-        $dataRektorat1 = $this->m_save_to_pdf->getEmployeesByPositionMain('2.2');
-        $Rektorat1 = (count($dataRektorat1)>0) ? $dataRektorat1[0]['Name'] : '' ;
-        $pdf->Cell($w_ttd,$h,$Rektorat1,1,1,'C');
+        // $dataRektorat1 = $this->m_save_to_pdf->getEmployeesByPositionMain('2.2');
+        // $Rektorat1 = (count($dataRektorat1)>0) ? $dataRektorat1[0]['Name'] : '' ;
+        $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].' '.$datawarek1[0]['TitleBehind'];
+        //$pdf->Cell($fillFull,$h,$warek1,$border,1,'L');
+        $pdf->Cell($w_ttd,$h,$warek1,1,1,'C');
 
         $pdf->SetFont('Times','',7);
         $pdf->Cell($w_ttd,$h,'Staff SAS',1,0,'C');
@@ -867,6 +873,7 @@ class C_save_to_pdf extends CI_Controller {
     private function header_monitoringAttendanceByRangeDate($pdf,$data_arr){
         $totalTgl = count($data_arr['PDFarrDate']);
         $dateHeaderObj = (array) $data_arr['PDFarrDate'];
+
         $wTgl = 4;
 
         $pdf->Ln(5);
