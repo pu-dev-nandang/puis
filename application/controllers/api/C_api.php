@@ -9068,7 +9068,7 @@ class C_api extends CI_Controller {
                                     OR auts.Name '.$wl.')';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
                                           FROM db_academic.auth_students auts
                                           LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
@@ -9088,7 +9088,7 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             // Credit
-            $dataCredit = $this->m_api->getMaxCredit('ta_'.$row['Year'],$row['NPM'],$data_arr['Year'],$data_arr['SemesterID'],$data_arr['ProdiID']);
+            $dataCredit = $this->m_api->getMaxCredit('ta_'.$row['Year'],$row['NPM'],$row['Year'],$data_arr['SemesterID'],$row['ProdiID']);
 
             // Get Course in std_krs
             $dataCourse = $this->db->query('SELECT sk.Status, mk.NameEng AS CourseEng, cd.TotalSKS AS Credit FROM db_academic.std_krs sk
