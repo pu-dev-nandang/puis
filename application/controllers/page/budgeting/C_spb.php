@@ -94,7 +94,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
             }
             
         }   
-
+        $G_depart = $this->m_budgeting->SearchDepartementBudgeting($IDDepartementPUBudget);
+        $this->data['NameDepartement'] = $G_depart[0]['NameDepartement'];
         $page = $this->load->view('global/budgeting/spb/InfoSPB_User',$this->data,true);
         $this->menu_horizontal($page);  
 
@@ -1279,7 +1280,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     */
                      $BackBudgetToBeforeCreate = $this->m_global->BackBudgetToBeforeCreate($ID_payment,$Year,$Departement);
 
-                     $G_detail = $this->m_master->caribasedprimary('db_payment.spb_detail','ID_spb',$ID_spb);
+                     // $G_detail = $this->m_master->caribasedprimary('db_payment.spb_detail','ID_spb',$ID_spb);
                      $this->db->where(array('ID_spb' => $ID_spb));
                      $this->db->delete('db_payment.spb_detail');
 

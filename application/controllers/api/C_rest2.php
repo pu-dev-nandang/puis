@@ -4031,7 +4031,7 @@ class C_rest2 extends CI_Controller {
                                        UNION 
                                        select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.bank_advance as a
                                        join db_payment.bank_advance_detail as b on a.ID = b.ID_bank_advance 
-                                       where b.ID_budget_left = '.$ID_budget_left.'
+                                       where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
                                        UNION 
                                        select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.cash_advance  as a
                                        join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
@@ -4047,7 +4047,7 @@ class C_rest2 extends CI_Controller {
                                 where b.ID_payment not in (
                                             select ap.ID_payment from db_budgeting.ap as ap
                                             join db_budgeting.budget_payment as bp on ap.ID = bp.ID_ap
-                                            where bp.ID_budget_left != '.$ID_budget_left.' group by bp.ID_ap 
+                                            where bp.ID_budget_left = '.$ID_budget_left.' group by bp.ID_ap 
                                         )
                                        AND
                                        YEAR(a.CreatedAt) = '.$Year.' and MONTH(a.CreatedAt) = '.$Month.' 
@@ -4074,6 +4074,7 @@ class C_rest2 extends CI_Controller {
                         ) cc order by  CreatedAt asc,Code asc       
                             
                         ';
+                        // print_r($sql);die();
                     $query=$this->db->query($sql, array())->result_array();
                     $rs = $query;
                    echo json_encode($rs);

@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+require_once( BASEPATH .'database/DB.php' );
+// $route['(:any)'] = 'c_login';
 
 $route['default_controller'] = 'c_login';
 $route['404_override'] = 'dashboard/c_dashboard/page404';
@@ -209,7 +211,6 @@ $route['academic/master/edit-student'] = 'page/academic/c_m_student/edit_student
 // --- Master ----
 
 // test routes from db
-require_once( BASEPATH .'database/DB.php' );
 $db =& DB();
 $query = $db->get('db_admission.cfg_sub_menu');
 $result = $query->result();
@@ -1414,7 +1415,12 @@ $route['budgeting/submit_spb_user'] = 'page/budgeting/c_spb/submit_spb_user';
 
 // bankadvance
 $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
+$route['budgeting/submit_bank_advance_user'] = 'page/budgeting/c_ba/submit_bank_advance_user';
+
 $route['budgeting/submitba_realisasi_by_po'] = 'page/budgeting/c_ba/submitba_realisasi_by_po';
+$route['budgeting_menu/pembayaran/bank_advance/create_ba_user'] = 'page/budgeting/c_ba/create_ba_user';
+$route['budgeting_menu/pembayaran/bank_advance/(:any)'] = 'page/budgeting/c_ba/create_ba_user/$1'; // edit or view
+
 
 // cashadvance
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';

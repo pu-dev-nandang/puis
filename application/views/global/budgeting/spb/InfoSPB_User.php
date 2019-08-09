@@ -28,21 +28,7 @@
 	localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(<?php echo $detail_budgeting_remaining ?>));
 	localStorage.setItem("PostBudgetDepartment", JSON.stringify(<?php echo $detail_budgeting_remaining ?>));
 	var DivSession = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
-	var DivSessionName = '';
-	<?php 
-	    $d = $this->session->userdata('IDDepartementPUBudget');
-	    $d = explode('.', $d);
-	 ?>
-	<?php if ($d == 'AC'): ?>
-	     DivSessionName = '<?php echo $this->session->userdata('prodi_active') ?>';
-	<?php elseif($d == 'FT'): ?> 
-	    DivSessionName = '<?php echo $this->session->userdata('faculty_active') ?>';   
-	<?php else: ?>
-	     <?php $P = $this->session->userdata('PositionMain'); 
-	            $P = $P['Division'];
-	     ?>
-	     DivSessionName = '<?php echo $P ?>'; 
-	<?php endif ?> 
+	var DivSessionName = '<?php echo $NameDepartement ?>';
 	var NIP = sessionNIP;
 	var S_Table_example_budget = '';
 
@@ -1605,7 +1591,9 @@
 		       		if (St_error == 0) {
 		       			if (data['BudgetChange'] == 1) {
 		       				ClassDt.ID_payment = data['ID_payment'];
-		       				LoadFirstLoad();
+		       				ReloadBudgetRemaining().then(function(data2){
+		       					LoadFirstLoad();
+		       				})
 		       			}
 		       			toastr.error(msg,'!!!Failed');
 		       		}
@@ -1689,7 +1677,9 @@
 		       				$('#page_status').html('Status : '+Status);
 		       				// Update Variable ClassDt
 		       				ClassDt.ID_payment = data['ID_payment'];
-		       				LoadFirstLoad();
+		       				ReloadBudgetRemaining().then(function(data2){
+		       					LoadFirstLoad();
+		       				})
 		       			}
 
 		       		}
@@ -1714,6 +1704,36 @@
 		    $(ID_element).prop('disabled',false).html(nmbtn);
 		  }
 		})
+	}
+
+	function ReloadBudgetRemaining()
+	{
+		// load lagi Budget remaining
+		var def = jQuery.Deferred();
+		var Year = ClassDt.Year;
+		var Departement = ClassDt.Departement;
+		var url = base_url_js+"budgeting/detail_budgeting_remaining";
+		var data = {
+				    Year : Year,
+					Departement : Departement,
+				};
+		var token = jwt_encode(data,'UAP)(*');
+		$.post(url,{token:token},function (resultJson) {
+			var response = jQuery.parseJSON(resultJson);
+			ClassDt.PostBudgetDepartment = response.data;
+			ClassDt.PostBudgetDepartment_awal = response.data;
+			localStorage.setItem("PostBudgetDepartment", JSON.stringify(ClassDt.PostBudgetDepartment));
+			localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(ClassDt.PostBudgetDepartment_awal));
+			__BudgetRemaining(); 
+			loadingEnd(1500);
+			def.resolve(response);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject(); 
+		}).always(function() {
+		                
+		});
+		return def.promise();
 	}
 
 	function NameStatus(Status)
