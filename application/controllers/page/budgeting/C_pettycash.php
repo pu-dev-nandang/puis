@@ -37,7 +37,9 @@ class C_pettycash extends Budgeting_Controler {
         // get budgeting/detail_budgeting_remaining
             $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
             $arr_result = array('data' =>$getData);
-        $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);          
+        $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);
+        $G_depart = $this->m_budgeting->SearchDepartementBudgeting($IDDepartementPUBudget);
+        $this->data['NameDepartement'] = $G_depart[0]['NameDepartement'];          
 		$page = $this->load->view('global/budgeting/pettycash/create_pettycash',$this->data,true);
 		$this->menu_horizontal($page);
     }
@@ -73,7 +75,9 @@ class C_pettycash extends Budgeting_Controler {
         // get budgeting/detail_budgeting_remaining
             $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
             $arr_result = array('data' =>$getData);
-        $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);          
+        $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);
+        $G_depart = $this->m_budgeting->SearchDepartementBudgeting($IDDepartementPUBudget);
+        $this->data['NameDepartement'] = $G_depart[0]['NameDepartement'];          
         $page = $this->load->view('global/budgeting/pettycash/create_pettycash',$this->data,true);
         $this->menu_horizontal($page);
     }

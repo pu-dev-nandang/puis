@@ -166,7 +166,7 @@ function LoadDataForTable()
           }
           else
           {
-            var URLRedirect = 'budgeting_menu/pembayaran/URLRedirect/'+code_url2;
+            var URLRedirect = 'budgeting_menu/pembayaran/bank_advance/'+code_url2;
           }
 
    	    	$( row ).find('td:eq(1)').html('<div align = "left">'+'<a href="'+base_url_js+URLRedirect+'" ID_payment="'+ID_payment+'">'+Perihal+'</a>'+'<br>Created : '+data[parseInt(data.length) - 2]+'<br>'+PRHTML+'</div>');

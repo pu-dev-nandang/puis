@@ -1,4 +1,10 @@
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
+<style type="text/css">
+    #example_budget.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+</style>
 <div class="tabbable tabbable-custom tabbable-full-width btn-read menu">
     <ul class="nav nav-tabs">
         <li role="presentation">
@@ -14,8 +20,8 @@
         <li class="<?php echo ($this->uri->segment(3) == 'bank_advance' &&  ($this->uri->segment(4) == '' || $this->uri->segment(4) == null)  ) ? 'active' : '' ?>">
             <a href="<?php echo base_url().'budgeting_menu/pembayaran/bank_advance'?>">List</a>
         </li>
-        <li class="<?php echo ($this->uri->segment(4) == 'create_ba') ? 'active' : '' ?>">
-            <a href="<?php echo base_url().'budgeting_menu/pembayaran/spb/create_ba'?>">Entry</a>
+        <li class="<?php echo ($this->uri->segment(4) == 'create_ba_user') ? 'active' : '' ?>">
+            <a href="<?php echo base_url().'budgeting_menu/pembayaran/bank_advance/create_ba_user'?>">Entry</a>
         </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">

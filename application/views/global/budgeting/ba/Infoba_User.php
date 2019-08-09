@@ -1,6 +1,9 @@
 <div id="Content_entry">
 
 </div>
+<div id="Realisasi_entry">
+
+</div>
 <script type="text/javascript">
 	localStorage.setItem("PostBudgetDepartment_awal", JSON.stringify(<?php echo $detail_budgeting_remaining ?>));
 	localStorage.setItem("PostBudgetDepartment", JSON.stringify(<?php echo $detail_budgeting_remaining ?>));
@@ -19,6 +22,7 @@
 		PostBudgetDepartment : <?php echo $detail_budgeting_remaining ?>,
 		PostBudgetDepartment_awal : <?php echo $detail_budgeting_remaining ?>,
 		DtExisting : [],
+		G_data_bank : <?php echo json_encode($G_data_bank) ?>,
 	};
 
 	$(document).ready(function() {
@@ -137,18 +141,38 @@
 
 	function makeDomHTML(se_content)
 	{
+		var Dis = '';
+		var TypePay = '';
+		var ID_bank = '';
+		if (ClassDt.ID_payment != '') { // exist
+			Dis = 'disabled';
+			var DtExisting = ClassDt.DtExisting;
+			DtExisting = DtExisting.payment;
+			var DetailPayment = DtExisting[0].Detail;
+			TypePay = DetailPayment[0].TypePay;
+			ID_bank = DetailPayment[0].ID_bank;
+
+		}
 		var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
 			html += '<div class="col-md-4">'+
-						'<div><a href="'+base_url_js+'budgeting_menu/pembayaran/pettycash" class="btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>'+
+						'<div><a href="'+base_url_js+'budgeting_menu/pembayaran/bank_advance" class="btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>'+
 						'<div style = "margin-top:10px;"><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ClassDt.ID_payment+'">Info</a></div>'+
 						'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
 						'<p id = "labelDepartment">Department : '+DivSessionName+'</p>'+
-						'<p id = "Date">'+'Tanggal : <?php echo date('Y-m-d') ?>'+'</p>'+
 						'<div class="input-group" style = "width:350px;">'+
+							'<span class="input-group-btn">'+
+								'Tanggal : &nbsp'+
+							'</span>'+
+							'<div class="input-group input-append date datetimepicker">'+
+	                            '<input data-format="yyyy-MM-dd" class="form-control Date_Needed" type=" text" readonly="" value = "'+''+'">'+
+	                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+	                		'</div>'+
+						'</div>'+
+						'<div class="input-group" style = "width:350px;margin-top:10px;">'+
 							'<span class="input-group-btn">'+
 								'Perihal : &nbsp'+
 							'</span>'+
-							'<input type="text" class="form-control" id = "Perihal">'+
+							'<input type="text" class="form-control" id = "Perihal" '+Dis+'>'+
 						'</div>'+
 						'<p id = "labelCode"></p>'+
 						'<p id = "Status"></p>'+
@@ -185,7 +209,6 @@
 										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">BUDGET</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 30%;">DIBAYAR UNTUK</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">NOMOR ACC</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 25%;">JUMLAH RUPIAH</th>'+
 			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">ACTION</th>'+
 									'</tr></thead>'+
@@ -203,8 +226,8 @@
 						  '</div>';
 
 		var Supporting_documents = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
-							'<div class = "col-md-6">'+
-								'<div class = "form-group" style="width:350px;">'+
+							'<div class = "col-md-4">'+
+								'<div class = "form-group">'+
 									'<label>NoIOM</label>'+
 									'<input type="text" class="form-control" id = "NoIOM">'+
 								'</div>'+
@@ -213,7 +236,28 @@
 									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
 								'</div>'+
 							'</div>'+
-						'</div>';				  					  
+							'<div class = "col-md-4">'+
+								'<div class = "form-group">'+
+									'<label>Uang diberikan melalui</label>'+
+									OPTypePay(TypePay,Dis)+
+								'</div>'+
+								'<div class = "form-group">'+
+									'<label>No Rekening</label>'+
+									'<input type="text" class="form-control" id = "No_Rekening" placeholder = "No Rekening" '+Dis+'>'+
+								'</div>'+
+							'</div>'+
+							'<div class = "col-md-4">'+
+								'<div class = "form-group">'+
+									'<label>Bank</label>'+
+									OPBank(ID_bank,Dis)+
+								'</div>'+
+								'<div class = "form-group">'+
+									'<label>Nama Penerima</label>'+
+									'<input type="text" class="form-control" id = "Nama_Penerima" placeholder = "Nama Penerima" '+Dis+'>'+
+								'</div>'+
+							'</div>'+		
+						'</div>'
+						;			
 
 		var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
 						  '</div>';	
@@ -222,6 +266,10 @@
 						  '</div>';					
 			
 		se_content.html(html+htmlBtnAdd+htmlInput+htmlgrandtotal+htmlTerbilang+Supporting_documents+htmlApproval+htmlButton);
+
+		se_content.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
 
 		if (ClassDt.ID_payment != '') { // exist
 			makeApproval();
@@ -234,8 +282,11 @@
 			// show data
 				$('#labelDepartment').html('Department : '+DtExisting[0].NameDepartement);
 				$('#labelPeriod').html('Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label>');
-				$('#Date').html('Tanggal : '+moment(DtExisting[0].CreatedAt).format('YYYY-MM-DD'));
+				// $('#Date').html('Tanggal : '+moment(DtExisting[0].CreatedAt).format('YYYY-MM-DD'));
 				$('#Perihal').val(DetailPayment[0].Perihal);
+				$('.Date_Needed').val(DetailPayment[0].Date_Needed);
+				$('#No_Rekening').val(DetailPayment[0].No_Rekening);
+				$('#Nama_Penerima').val(DetailPayment[0].Nama_Penerima);
 				$('#NoIOM').val(DtExisting[0].NoIOM);
 				var StatusName = NameStatus(DtExisting[0]['Status']);
 				$('#Status').html('Status : '+StatusName);
@@ -246,11 +297,11 @@
 				if (Supporting_documents != null) {
 					if (Supporting_documents.length > 0) {
 						for (var i = 0; i < Supporting_documents.length; i++) {
-							htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-pettycash-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-pettycash-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
+							htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-ba-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-ba-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
 						}
 					}
 				}
-				$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
+				$('#BrowseFileSD').closest('.col-md-4').append(htmlSupporting_documents);
 
 			if (DtExisting[0]['Status'] == -1) {
 				var row = $('#table_input tbody tr:not(:last)');
@@ -265,7 +316,344 @@
 
 			__BudgetRemaining();
 		}
-		MakeButton();	
+		else
+		{
+			$('.TypePay').trigger('change');
+		}
+		MakeButton();
+
+		if (ClassDt.ID_payment != '') { // exist
+			if (DtExisting[0].Status == 2) {
+				var DivPageRealisasi = $('#Realisasi_entry');
+				makePagerealisasi(DtExisting,DivPageRealisasi); 
+			}
+		}
+
+	}
+
+	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
+	{
+		var html = '';
+		var dtspb = DataPaymentSelected;
+		var JsonStatusdtspb = dtspb[0].JsonStatus;
+		JsonStatusdtspb = jQuery.parseJSON(JsonStatusdtspb);
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var Dis = 'disabled';
+		if (JsonStatusdtspb[0]['NIP'] == sessionNIP) {
+			Dis = '';
+		}
+		var ID_Realisasi = '';
+		var ID_payment_type = Detail[0].ID;
+		var UploadInvoice = '';
+		var LinkFileInvoice = '';
+		var NoInvoice = '';
+		var UploadTandaTerima = '';
+		var LinkUploadTandaTerima = '';
+		var NoTandaTerima = '';
+		var Date_Realisasi = '';
+		var JsonStatus = '';
+		var StatusRealiasi = '';
+		var btn_hide_submit = '';
+		var btnRealisasi = '<button class="btn btn-success submitRealisasiBA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		if (Realisasi.length > 0) { // exist
+			Dis = 'disabled';
+			StatusRealiasi = Realisasi[0].Status;
+			btn_hide_submit = 'hide';
+			btnRealisasi = '<button class="btn btn-primary hide btnEditInputRealisasiBA"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+									'<button class="btn btn-success submitRealisasiBA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+			if (StatusRealiasi == 2) {
+				Dis = 'disabled';
+				btnRealisasi = '';
+			}
+
+			ID_Realisasi = Realisasi[0].ID;
+			UploadInvoice = jQuery.parseJSON(Realisasi[0]['UploadInvoice']);
+			UploadInvoice = UploadInvoice[0];
+			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-bankadvance-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoInvoice = Realisasi[0].NoInvoice;
+			UploadTandaTerima = jQuery.parseJSON(Realisasi[0]['UploadTandaTerima']);
+			UploadTandaTerima = UploadTandaTerima[0];
+			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-bankadvance-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+			NoTandaTerima = Realisasi[0].NoTandaTerima;
+			Date_Realisasi = Realisasi[0].Date_Realisasi;
+			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+		}
+
+		var RealisasiDetail = RealisasiDetailFunction(Detail);
+
+
+		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
+					'<div class = "col-md-offset-2 col-xs-8">'+
+						'<div align="center"><h2>REALISASI</h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<table class="table borderless" style="font-weight: bold;">'+
+							'<thead></thead>'+
+							'<tbody>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'NO KWT/INV'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<label>No Invoice</label>'+
+										'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value="'+NoInvoice+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Invoice</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+'><br>'+
+										'<div id = "FileInvoice">'+
+										LinkFileInvoice+
+										'</div>'+
+										'<br>'+
+										'<label>No Tanda Terima</label>'+
+										'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+NoTandaTerima+'" '+Dis+'>'+
+										'<br>'+
+										'<label style="color: red">Upload Tanda Terima</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+										'<div id = "FileTT" '+Dis+'>'+
+										LinkUploadTandaTerima+
+										'</div>'+
+									'</td>'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'TANGGAL REALISASI'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasiBA" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
+				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+				                		'</div>'+
+									'</td>	'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'REALISASI'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										RealisasiDetail+
+									'</td>	'+			
+								'</tr>'+
+							'</tbody>'+
+						'</table>'+
+						'<div id="r_signatures_realisasi"></div>'+
+						'<div id = "r_action_realisasi">'+
+							'<div class="row">'+
+								'<div class="col-md-12">'+
+									'<div class="pull-right">'+
+										btnRealisasi+
+									'</div>'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+					'</div>'+	
+				'</div>';		
+		DivPageRealisasi.append(html);
+		DivPageRealisasi.find('.datetimepicker').datetimepicker({
+			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+		});
+
+		if (Realisasi.length > 0) {
+			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
+			makeActionRealisasi(DivPageRealisasi,Realisasi);
+		}
+
+		$(".InvoiceDetail").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+		$(".InvoiceDetail").maskMoney('mask', '9894');
+		
+	}
+
+	function makeActionRealisasi(DivPageRealisasi,Realisasi)
+	{
+		var dtspb = Realisasi;
+		var html = '<div class = "row noPrint"><div class = "col-xs-12"></div></div>'; 
+		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiBA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
+		var btn_submit = '<button class="btn btn-success submitRealisasiBA" disabled> Submit</button>';
+		
+		// var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		var btn_approve = '';
+		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		var btn_reject = '';
+		var btn_print = '';
+		var Status = dtspb[0]['Status'];
+		switch(Status) {
+		  case 0:
+		  case '0':
+		  case -1:
+		  case '-1':
+		  case 4:
+		  case '4':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		  	}
+		    break;
+		  case 1:
+		  case '1':
+		    var JsonStatus = dtspb[0]['JsonStatus'];
+		    JsonStatus = jQuery.parseJSON(JsonStatus);
+		    if (JsonStatus[0]['NIP'] == sessionNIP) {
+		    	var booledit2 = true;
+		    	for (var i = 1; i < JsonStatus.length; i++) {
+		    		if (JsonStatus[i].Status == 1 || JsonStatus[i].Status == '1') {
+		    			booledit2 = false;
+		    			break;
+		    		}
+		    	}
+
+		    	if (booledit2) {
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_edit+'&nbsp'+btn_submit+'</div>');
+		    	}
+		    }
+
+		    // for approval
+		    	var bool = false;
+		    	var HierarkiApproval = 0; // for check hierarki approval;
+		    	var NumberOfApproval = 0; // for check hierarki approval;
+		    	var NIP = sessionNIP;
+		    	for (var i = 0; i < JsonStatus.length; i++) {
+		    		NumberOfApproval++;
+		    		if (JsonStatus[i]['Status'] == 0) {
+		    			// check status before
+		    			if (i > 0) {
+		    				var ii = i - 1;
+		    				if (JsonStatus[ii]['Status'] == 1) {
+		    					HierarkiApproval++;
+		    				}
+		    			}
+		    			else
+		    			{
+		    				HierarkiApproval++;
+		    			}
+
+		    			if (NIP == JsonStatus[i]['NIP']) {
+		    				bool = true;
+		    				break;
+		    			}
+		    		}
+		    		else
+		    		{
+		    			HierarkiApproval++;
+		    		}
+		    	}
+
+
+		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
+		    		// $('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		// $('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    	}
+
+		    break;
+		  case 2:
+		  case '2':
+		  	var JsonStatus = dtspb[0]['JsonStatus'];
+		  	JsonStatus = jQuery.parseJSON(JsonStatus);
+		  	if (JsonStatus[0]['NIP'] == sessionNIP) {
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+		  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
+		  	}
+		    break;
+		  default:
+		    // code block
+		}
+	}
+
+	function makeSignaturesRealiasi (DivPageRealisasi,JsonStatus)
+	{
+		if (JsonStatus != '') {
+			var html = '<div class= "row" style = "margin-top : 20px;">'+
+							'<div class = "col-xs-12">'+
+								'<a href="javascript:void(0)" class="btn btn-default btn-default-success" type="button" id="add_approver"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>'+
+								'<table class = "table borderless">'+
+									'<thead>'+
+										'<tr>'
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<th '+style+'>'+
+							JsonStatus[i].NameTypeDesc+
+						'</th>';	
+			}
+
+			html += '</tr>';
+
+			html += '</thead>'+
+						'<tbody>'+
+							'<tr style = "height : 20px">';
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var v = '-';
+				if (JsonStatus[i].Status == '2' || JsonStatus[i].Status == 2) {
+					v = '<i class="fa fa-times" aria-hidden="true" style="color: red;"></i>';
+				}
+				else if(JsonStatus[i].Status == '1' || JsonStatus[i].Status == 1 )
+				{
+					v = '<i class="fa fa-check" style="color: green;"></i>';
+				}
+				else
+				{
+					v = '-';
+				}
+
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'>'+
+							v+
+						'</td>';	
+			}
+
+			html += '</tr></tbody>';				
+			html += '<tfoot>'+
+						'<tr>';
+
+			for (var i = 0; i < JsonStatus.length; i++) {
+				var style = '';
+				if (i == 0) {
+					style = 'style = "text-align :left"';
+				}
+				else if(parseInt(JsonStatus.length)-1 == i){
+					style = 'style = "text-align :right"';
+				}
+				else
+				{
+					style = 'style = "text-align :center"';
+				}
+				html += '<td '+style+'><b>'+JsonStatus[i].Name+'</b></td>';		
+			}
+
+			html += '</tr></tfoot></table></div></div>';
+			DivPageRealisasi.find('#r_signatures_realisasi').html(html);
+		}
 	}
 
 	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
@@ -315,10 +703,6 @@
 									'<input type="text" class="form-control NamaBiaya" value = "'+DetailTypePayment[i]['NamaBiaya']+'">'+
 									'<label class = "lblNamaBiaya"></label>'+
 								'</td>'+	
-								'<td>'+
-									'<input type="text" class="form-control NomorAcc" value = "'+DetailTypePayment[i]['NomorAcc']+'">'+
-									'<label class = "lblNomorAcc"></label>'+
-								'</td>'+
 								'<td><input type="text" class="form-control SubTotal" value = "'+parseInt(DetailTypePayment[i]['Invoice'])+'"></td>'+
 			                	action
 			                '</tr>';
@@ -343,10 +727,6 @@
 					'<td>'+
 						'<input type="text" class="form-control NamaBiaya">'+
 						'<label class = "lblNamaBiaya"></label>'+
-					'</td>'+
-					'<td>'+
-						'<input type="text" class="form-control NomorAcc">'+
-						'<label class = "lblNomorAcc"></label>'+
 					'</td>'+
 					'<td><input type="text" class="form-control SubTotal" value = "0" disabled></td>'+
                 	action
@@ -852,11 +1232,10 @@
 				4.Validation File Upload
 			*/
 
-			var CekBudgetRemaining = __CekBudgetRemaining();
-			var validation = validation_input();
 			var ID_payment = $(this).attr('ID_payment');
 			var action = $(this).attr('action');
-			if (validation && CekBudgetRemaining) {
+			if (validation_input() && __CekBudgetRemaining() ) {
+				// console.log('asd');
 				SubmitData(ID_payment,action,'#SaveSubmit');
 				// $('#SaveSubmit').prop('disabled',false).html(htmltext);
 			}
@@ -895,6 +1274,18 @@
 		}
 		else
 		{
+			if (ClassDt.ID_payment == '') {
+				$(".BrowseFileSD").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev = $(this);
+					if (!file_validation2(ev) ) {
+					  $("#SaveSubmit").prop('disabled',true);
+					  find = false;
+					  return false;
+					}
+				})
+			}
+
 			$(".PostBudgetItem").each(function(){
 				var fillItem = $(this).closest('tr');
 				var PostBudgetItem = $(this).val();
@@ -908,13 +1299,6 @@
 				if (NamaBiaya == '') {
 					find = false;
 					toastr.error("Dibayar untuk is required",'!!!Error');
-					return false;
-				}
-
-				var DateNeeded = fillItem.find('.NomorAcc').val();
-				if (DateNeeded == '') {
-					find = false;
-					toastr.error("lblNomorAcc is required",'!!!Error');
 					return false;
 				}
 
@@ -940,21 +1324,51 @@
 				return false;
 			}
 
-			if (ClassDt.ID_payment == '') {
-				$(".BrowseFileSD").each(function(){
-					var IDFile = $(this).attr('id');
-					var ev = $(this);
-					if (!file_validation2(ev) ) {
-					  $("#SaveSubmit").prop('disabled',true);
-					  find = false;
-					  return false;
-					}
-				})
+			var Date_Needed = $('.Date_Needed').val();
+			if (Date_Needed == '') {
+				find = false;
+				toastr.error("Tanggal is required",'!!!Error');
+				return false;
 			}
 
+			var Perihal = $('#Perihal').val();
+			if (Perihal == '') {
+				find = false;
+				toastr.error("Perihal is required",'!!!Error');
+				return false;
+			}
+
+			var Nama_Penerima = $('#Nama_Penerima').val();
+			if (Nama_Penerima == '') {
+				find = false;
+				toastr.error("Nama_Penerima is required",'!!!Error');
+				return false;
+			}
+
+			var TypePay = $('.TypePay option:selected').val();
+			if (TypePay == 'Transfer') {
+				var tt = $('.dtbank option:selected').val(); 
+				result = Validation_required(tt,'Bank');
+				if (result['status'] == 0) {
+				  toastr.error(result['messages'],'!!!Error');	
+				  find = false;
+				  return false;
+				}
+
+				var tt = $('#No_Rekening').val();
+				result = Validation_required(tt,'No Rekening');
+				if (result['status'] == 0) {
+				  if (result['status'] == 0) {
+				    toastr.error(result['messages'],'!!!Error');	
+				    find = false;
+				    return false;
+				  }
+				  find = false;
+				  return false;
+				}  
+			}
 		}
 		return find;
-
 	}
 
 	function file_validation2(ev)
@@ -1087,18 +1501,19 @@
 		var FormInsertDetail = [];
 		var form_data = new FormData();
 		var PassNumber = 0;
+		var Total = 0;
 		$(".PostBudgetItem").each(function(){
 			var ID_budget_left = $(this).attr('id_budget_left');
 			var fillItem = $(this).closest('tr');
 			var NamaBiaya = fillItem.find('.NamaBiaya').val();
-			var NomorAcc = fillItem.find('.NomorAcc').val();
 			var SubTotal = fillItem.find('.SubTotal').val();
 			SubTotal = findAndReplace(SubTotal, ".","");
+			SubTotal = parseInt(SubTotal);
+			Total += SubTotal;
 
 			 var data = {
 			 	ID_budget_left : ID_budget_left,
 			 	NamaBiaya : NamaBiaya,
-			 	NomorAcc : NomorAcc,
 			 	SubTotal : SubTotal,
 			 	PassNumber : PassNumber,
 			 }
@@ -1115,11 +1530,23 @@
 			 form_data.append("Supporting_documents[]", UploadFile[count]);
 			}
 		}
-		
-		// return;
 
 		var token = jwt_encode(FormInsertDetail,"UAP)(*");
 		form_data.append('token',token);
+
+		var FormInsert = {
+			ID_payment : ID_payment,
+			Date_Needed : $('.Date_Needed').val(),
+			Perihal : Perihal,
+			TypePay : $('.TypePay option:selected').val(),
+			ID_bank : (typeof $('.dtbank').val() !== 'undefined') ? $('.dtbank option:selected').val() : '',
+			No_Rekening : (typeof $('#No_Rekening').val() !== 'undefined') ? $('#No_Rekening').val() : '',
+			Nama_Penerima : $('#Nama_Penerima').val(),
+			Invoice : Total,
+		};
+
+		var token = jwt_encode(FormInsert,"UAP)(*");
+		form_data.append('FormInsert',token);
 
 		token = jwt_encode(ID_payment,"UAP)(*");
 		form_data.append('ID_payment',token);
@@ -1145,7 +1572,7 @@
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
 		form_data.append('BudgetLeft_awal',token);
 
-		var url = base_url_js + "budgeting/submit_pettycash_user"
+		var url = base_url_js + "budgeting/submit_bank_advance_user"
 		$.ajax({
 		  type:"POST",
 		  url:url,
@@ -1167,6 +1594,7 @@
 		       				ReloadBudgetRemaining().then(function(data2){
 		       					LoadFirstLoad();
 		       				})
+		       				
 		       			}
 		       			toastr.error(msg,'!!!Failed');
 		       		}
@@ -1254,6 +1682,7 @@
 		       				ReloadBudgetRemaining().then(function(data2){
 		       					LoadFirstLoad();
 		       				})
+		       				// LoadFirstLoad();
 		       			}
 
 		       		}
@@ -1495,6 +1924,9 @@
 		$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',false);
 		$('#NoIOM').prop('disabled',false);
 		$('#Perihal').prop('disabled',false);
+		$('.TypePay').prop('disabled',false);
+		$('#Nama_Penerima').prop('disabled',false);
+		$('.TypePay').trigger('change');	
 		$(this).remove();
 	})
 
@@ -1631,7 +2063,7 @@
 		var url = base_url_js+'save2pdf/print/payment_user';
 		var data = {
 		  ID_payment : ID_payment,
-		  TypePay : 'Petty Cash',
+		  TypePay : 'Bank Advance',
 		  DataPayment : ClassDt.DtExisting,
 		}
 		var token = jwt_encode(data,"UAP)(*");
@@ -1639,5 +2071,276 @@
 		    { name: 'token', value: token },
 		]);
 	})
+
+	function OPTypePay(NameSelected = '',Dis='')
+	{
+		var h = '';
+		var dt = ['Cash','Transfer'];
+		h = '<select class = " form-control TypePay" '+Dis+'>';
+			for (var i = 0; i < dt.length; i++) {
+				var selected = (NameSelected == dt[i]) ? 'selected' : '';
+				h += '<option value = "'+dt[i]+'" '+selected+' >'+dt[i]+'</option>';
+			}
+		h += '</select>';	
+
+		return h;
+	}
+
+	function OPBank(IDselected = null,Dis='')
+	{
+		var h = '';
+		var dtbank = ClassDt.G_data_bank;
+		h = '<select class = " form-control dtbank" '+Dis+'>';
+			var temp = ['Read','Write'];
+			if (IDselected != null) {
+				var selected = (IDselected == 0) ? 'selected' : '';
+				h += '<option value = "0" '+selected+' >'+'--No Choose--'+'</option>';
+			}
+			for (var i = 0; i < dtbank.length; i++) {
+				var selected = (IDselected == dtbank[i].ID) ? 'selected' : '';
+				h += '<option value = "'+dtbank[i].ID+'" '+selected+' >'+dtbank[i].Name+'</option>';
+			}
+		h += '</select>';	
+
+		return h;
+	}
+
+	$(document).off('change', '.TypePay').on('change', '.TypePay',function(e) {
+		if ($(this).val() == 'Cash') {
+			$('#No_Rekening').prop('disabled',true);
+			$('.dtbank').prop('disabled',true);
+		}
+		else
+		{
+			$('#No_Rekening').prop('disabled',false);
+			$('.dtbank').prop('disabled',false);
+		}
+	})
+
+	function RealisasiDetailFunction(DetailPayment)
+	{
+		var html = '';
+		var RealisasiArr = DetailPayment[0].Realisasi;
+		if (RealisasiArr.length == 0) {
+			var PaymentDetail = DetailPayment[0].Detail;
+			var IsiTable = '';
+			for (var i = 0; i < PaymentDetail.length; i++) {
+				IsiTable += '<tr id_payment_detail = "'+PaymentDetail[i].ID+'">'+
+								'<td>'+PaymentDetail[i].NamaBiaya+'</td>'+
+								'<td>'+'<input type = "text" class = "form-control InvoiceDetail" value = "'+parseInt(PaymentDetail[i].Invoice)+'" maxmoney = "'+parseInt(PaymentDetail[i].Invoice)+'">'+'</td>'+
+							'</tr>';	
+
+			}
+			html += '<table class = "table" id = "PaymentDetailRealisasi">'+
+						'<thead>'+
+							'<tr>'+
+								'<th>Dibayar Untuk </th>'+
+								'<th>Invoice </th>'+
+							'</tr>'+
+						'</thead>'+
+						'<tbody>'+
+							IsiTable+
+						'</tbody>'+
+					'</table>';				
+
+
+
+		}
+		else
+		{
+
+		}
+
+		return html;
+	}
+
+	$(document).off('click', '.submitRealisasiBA').on('click', '.submitRealisasiBA',function(e) {
+		// validation
+		var ev = $(this).closest('.realisasi_page');
+		var DataPaymentSelected = ClassDt.DtExisting;
+		var dtspb = DataPaymentSelected.payment;
+		var Detail = dtspb[0].Detail;
+		var Realisasi = Detail[0].Realisasi;
+		var action = 'add';
+		if (Realisasi.length > 0) {
+			var action = 'edit';
+		}
+		if (confirm('Are you sure?')) {
+			var validation = validation_input_ba_realisasi(ev,action);
+			if (validation) {
+				submitBA_realisasi('.submitRealisasiBA',ev,action);
+			}
+		}
+
+	})
+
+	function validation_input_ba_realisasi(ev,action)
+	{
+		var find = true;
+		var data = {
+			NoInvoice : ev.find('.NoInvoice').val(),
+			NoTandaTerima : ev.find('.NoTT').val(),
+			Date_Realisasi : ev.find('.TglRealisasiBA').val(),
+		};
+
+		if (validation__(data) ) {
+			if (action == 'add') {
+				// Upload Tanda Terima 
+				ev.find(".BrowseTT").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Tanda Terima ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+
+				// Upload Invoice 
+				ev.find(".BrowseInvoice").each(function(){
+					var IDFile = $(this).attr('id');
+					var ev2 = $(this);
+					if (!file_validation2(ev2,'Invoice ') ) {
+					  find = false;
+					  return false;
+					}
+				})
+			}
+
+			// validation max InvoiceDetail
+			var bbooll = true;
+			$('.InvoiceDetail').each(function(){
+				var maxmoney = parseInt($(this).attr('maxmoney'));
+				var v = parseInt($(this).val());
+				if (v > maxmoney) {
+					bbooll = false;
+					return;
+				}
+			})
+
+			if (!bbooll) {
+				toastr.error('Invoice Realisasi melebih Invoice permintaan','!!!Error');
+				return false;
+			}
+
+		}
+		else
+		{
+			find = false;
+		}
+
+		return find;
+	}
+
+	function validation__(arr)
+	{
+		var toatString = "";
+		var result = "";
+		for(var key in arr) {
+		   switch(key)
+		   {
+		    default :
+		          result = Validation_required(arr[key],key);
+		          if (result['status'] == 0) {
+		            toatString += result['messages'] + "<br>";
+		          }       
+		   }
+
+		}
+		if (toatString != "") {
+		  toastr.error(toatString, 'Failed!!');
+		  return false;
+		}
+
+		return true;
+	}
+
+	function submitBA_realisasi(elementbtn,ev,action)
+	{
+		loadingStart();
+		var ID_Realisasi = ev.attr('ID_Realisasi');
+		var ID_payment = ClassDt.ID_payment;
+		var DataPaymentSelected = ClassDt.DtExisting;
+		var dtspb = DataPaymentSelected.payment;
+		var Detail = dtspb[0].Detail;
+		var ID_payment_type = Detail[0].ID; // ID Cash Advance
+		var form_data = new FormData();
+
+		if ( ev.find('.BrowseInvoice').length ) {
+			var UploadFile = ev.find('.BrowseInvoice')[0].files;
+			form_data.append("UploadInvoice[]", UploadFile[0]);
+		}
+
+		if ( ev.find('.BrowseTT').length ) {
+			var UploadFile = ev.find('.BrowseTT')[0].files;
+			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		}
+
+		
+		var NoInvoice = ev.find('.NoInvoice').val();
+		var NoTandaTerima = ev.find('.NoTT').val();
+		var Date_Realisasi = ev.find('.TglRealisasiBA').val();
+
+		var data = {
+			ID_Realisasi : ID_Realisasi,
+			NoInvoice : NoInvoice,
+			NoTandaTerima : NoTandaTerima,
+			Date_Realisasi : Date_Realisasi,
+			ID_payment_type : ID_payment_type,
+			ID_payment : ID_payment,
+			action : action,
+		};
+
+		var token = jwt_encode(data,"UAP)(*");
+		form_data.append('token',token);
+
+		var FormInsertDetail = [];
+		$('.InvoiceDetail').each(function(){
+			var tr = $(this).closest('tr');
+			var ID_payment_detail = tr.attr('id_payment_detail');
+			var maxmoney = parseInt($(this).attr('maxmoney'));
+			var v = parseInt($(this).val());
+			var d = {
+				ID_payment_detail : ID_payment_detail,
+				InvoiceDetail : maxmoney,
+				InvoiceRealisasi : v,
+			}
+
+			FormInsertDetail.push(d);
+		})
+
+		var token = jwt_encode(FormInsertDetail,"UAP)(*");
+		form_data.append('FormInsertDetail',token);
+
+		// var url = base_url_js + "budgeting/submitba_realisasi_by_po"
+		var url = base_url_js + "budgeting/submitba_realisasi_by_user"
+		$.ajax({
+		  type:"POST",
+		  url:url,
+		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+		  contentType: false,       // The content type used when sending data to the server.
+		  cache: false,             // To unable request pages to be cached
+		  processData:false,
+		  dataType: "json",
+		  success:function(data)
+		  {
+		  	if (data.Status == 0) {
+		  		loadingEnd(500);
+		  		toastr.error("Connection Error, Please try again", 'Error!!');
+		  	}
+		  	else{
+		  		toastr.success('Saved');
+		  		setTimeout(function () {
+		  			loadFirst();
+		  			loadingEnd(500);
+		  		},1500);
+		  	}
+		    
+		  },
+		  error: function (data) {
+		    toastr.error("Connection Error, Please try again", 'Error!!');
+		    loadingEnd(500);
+		  }
+		})
+	}
 
 </script>
