@@ -1336,6 +1336,9 @@ $route['api3/__crudGroupStd'] = 'api/c_api3/crudGroupStd';
 $route['api3/__crudCheckDataKRS'] = 'api/c_api3/crudCheckDataKRS';
 
 $route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
+$route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
+
+$route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
 

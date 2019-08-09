@@ -8,12 +8,23 @@
     #tableListStd tbody tr td {
         text-align: center;
     }
+    #tableProdi tr th, #tableProdi tr td {
+        text-align: center;
+    }
 </style>
 
 <div class="row">
-    <div class="col-md-2 col-md-offset-1">
+    <div class="col-md-4">
         <div class="well">
-            <button class="btn btn-block btn-default btn-default-primary" id="btnLimitCredit" disabled>Set Limit Credit</button>
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-block btn-default btn-default-primary" id="btnLimitCredit" disabled>Set Limit Credit</button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-block btn-default btn-default-warning" id="btnDefaultCredit">Set Default Credit</button>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="col-md-8">
@@ -48,6 +59,8 @@
         <div id="loadTable"></div>
     </div>
 </div>
+
+
 
 
 <script>
@@ -458,6 +471,93 @@
             });
 
         }
+
+    });
+
+</script>
+
+<!-- Set Default Credit -->
+<script>
+    $('#btnDefaultCredit').click(function () {
+
+        var token = jwt_encode({action:'viewAllProdi'},'UAP)(*');
+        var url = base_url_js+'api3/__crudAllProgramStudy';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Programme Study</h4>');
+
+            $('#GlobalModal .modal-body').html('<div class="">' +
+                '    <table class="table table-striped" id="tableProdi">' +
+                '        <thead>' +
+                '        <tr>' +
+                '            <th style="width: 1%;">No</th>' +
+                '            <th>Programme Study</th>' +
+                '            <th style="width: 15%;">Credit Semester 1</th>' +
+                '        </tr>' +
+                '        </thead>' +
+                '        <tbody id="listProdi"></tbody>' +
+                '    </table>' +
+                '</div>');
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    $('#listProdi').append('<tr>' +
+                        '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
+                        '<td style="text-align: left;"><b>'+v.NameEng+'</b><br/>'+v.Name+'</td>' +
+                        '<td><input class="form-control inputUpdate" data-id="'+v.ID+'" type="number" value="'+v.DefaultCredit+'"></td>' +
+                        '</tr>');
+                });
+            }
+
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button class="btn btn-success" id="btnSaveP">Save</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+            
+            $('#btnSaveP').click(function () {
+
+                loading_buttonSm('#btnSaveP');
+                $('#inputUpdate, button[data-dismiss=modal]').prop('disabled',true)
+
+                var dataUpdate = [];
+                $('.inputUpdate').each(function () {
+                   var arr = {
+                       ID : $(this).attr('data-id'),
+                       Credit : $(this).val()
+                   };
+
+                    dataUpdate.push(arr);
+
+                });
+
+                var data = {
+                    action : 'updateCreditAllProdi',
+                    dataForm : dataUpdate
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudAllProgramStudy';
+
+                $.post(url,{token:token},function (result) {
+                    getStudents();
+                    toastr.success('Data saved','Success');
+                    setTimeout(function () {
+                        $('#btnSaveP').html('Save').prop('disabled',false);
+                        $('#inputUpdate, button[data-dismiss=modal]').prop('disabled',false)
+                    },500);
+
+                });
+
+            });
+
+            
+
+        });
+
+
 
     });
 
