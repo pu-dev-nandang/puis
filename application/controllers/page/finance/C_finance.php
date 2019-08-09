@@ -43,6 +43,12 @@ class C_finance extends Finnance_Controler {
         $this->temp($content);
     }
 
+    public function monitoring_yudisium()
+    {
+        $content = $this->load->view('page/'.$this->data['department'].'/yudisium/monitoring_yudisium','',true);
+        $this->temp($content);
+    }
+
     public function confirmed_verfikasi_pembayaran_registration_online()
     {
         $input = $this->getInputToken();

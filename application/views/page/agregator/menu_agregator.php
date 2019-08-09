@@ -122,10 +122,10 @@
             var token = jwt_encode(data,'UAP)(*');
 
             $.post(url,{token:token},function (result) {
-
+                loadDataTable();
                 toastr.success('Data removed','Success');
                 setTimeout(function () {
-                    loadDataTable();
+                    // loadDataTable();
                 },500);
 
             });

@@ -323,7 +323,7 @@
 <!-- <script type="text/javascript" src="<?php echo base_url('assets/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js');?>"></script> -->
 
 <script type="text/javascript" src="<?php echo base_url('assets/inputmask/jquery.inputmask.bundle.min.js');?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script> 
+<script type="text/javascript" src="<?php echo base_url('assets/datepicter/js/bootstrap-datetimepicker.min.js');?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/plugins/bootstrap-toggle/js/bootstrap-toggle.min.js');?>"></script>
 
 <!-- Countdown -->
@@ -564,6 +564,24 @@
 
     }
 
+    function loadSelectOptionSemester_admission(element,selected) {
+
+        var token = jwt_encode({action:'read'},'UAP)(*');
+        var url = base_url_js+'api/__crudTahunAkademik';
+        $.post(url,{token:token},function (jsonResult) {
+
+           if(jsonResult.length>0){
+               for(var i=0;i<jsonResult.length;i++){
+                   var dt = jsonResult[i];
+                   var sc = (selected==dt.Year && dt.Code==1) ? 'selected' : '';
+                   // var v = (option=="Name") ? dt.Name : dt.ID;
+                   $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
+               }
+           }
+        });
+
+    }
+
     function loadSelectOptionProgramCampus(element,selected) {
         var url = base_url_js+'api/__crudProgramCampus';
         var token = jwt_encode({action:'read'},'UAP)(*');
@@ -585,6 +603,34 @@
                 var selc = (data[i].ID==selected) ? 'selected' : '';
                 $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
             }
+        });
+    }
+
+    function loadSelectOptionLevelEducation(element,selected) {
+        var url = base_url_js+"api/__getLevelEducation";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Level+' - '+v.Description+'</option>');
+            });
+
+        });
+    }
+
+    function loadSelectOptionLecturerAcademicPosition(element,selected) {
+        var url = base_url_js+"api/__getLecturerAcademicPosition";
+        $.get(url,function (jsonResult) {
+
+            $.each(jsonResult,function (i,v) {
+
+                var sc = (selected!='' && typeof selected !== 'undefined' && parseInt(selected) == parseInt(v.ID))
+                    ? 'selected' : '';
+                $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Position+'</option>');
+            });
+
         });
     }
 
@@ -625,6 +671,20 @@
                 $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>Asc. Year - '+data_json[i].Year+'</option>');
             }
         });
+    }
+
+    function loadSelectOptionStudentYear(element,selected) {
+        var url = base_url_js+"api/__getStudentYear";
+        $.get(url,function (jsonResult) {
+            // console.log(data_json);
+
+            $.each(jsonResult,function (i, v) {
+                var selected = (v.Year==selected && selected!='' && selected!=null &&
+                typeof selected !== 'undefined') ? 'selected' : '';
+                $(element).append('<option value="'+v.Year+'" '+selected+'>Class of '+v.Year+'</option>');
+            })
+        });
+
     }
 
     function loadSelectOptionCurriculumASC(element,selected) {
@@ -997,7 +1057,7 @@
 
         });
     }
-    
+
     function loadSelectOptionScheoolBy(CityID,element,selected) {
         var url = base_url_js+'api/__getSchoolByCityID/'+CityID;
         $.getJSON(url,function (jsonResult)  {
@@ -1267,7 +1327,7 @@
         var ReadMinus = function(bilangan)
         {
             var bool = false;
-            var number_string = bilangan.toString(); 
+            var number_string = bilangan.toString();
             var a = number_string.substr(0, 1);
             var n = number_string.length;
             if (a  == '-') {
@@ -1563,9 +1623,33 @@
             }
         });
     }
-    
+
+    function loadSelectOptionEmployeesStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusEmployee2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionLecturerStatus2(element,selected) {
+        var url = base_url_js+'api/__getStatusLecturer2';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+                var d = jsonResult[i];
+                var sc = (selected!='' && typeof selected !== "undefined" && selected==d.IDStatus) ? 'selected' : '';
+                var color = (d.IDStatus<0) ? 'style="color:red;"' : '';
+                $(element).append('<option value="'+d.IDStatus+'" '+color+' '+sc+'>'+d.Description+'</option>');
+            }
+        });
+    }
+
     function loadSelectOptionPathway(element,selected) {
-        
+
         var url = base_url_js+'rest2/__getPathway';
         $.getJSON(url,function (jsonResult) {
            if(jsonResult.length>0){
@@ -1575,7 +1659,7 @@
                })
            }
         });
-        
+
     }
 
     function loadYearOfBirth(element,selected){
@@ -1656,17 +1740,17 @@
     }
 
     function findAndReplace(string, target, replacement) {
-     
+
      var i = 0, length = string.length;
-     
+
      for (i; i < length; i++) {
-     
+
        string = string.replace(target, replacement);
-     
+
      }
-     
+
      return string;
-     
+
     }
 
     function isObject(value) {
@@ -1683,7 +1767,7 @@
                 type: 'hidden',
                 name: this.name,
                 value: this.value
-            }));    
+            }));
         });
         form.attr('target', blank);
         form.appendTo('body').submit();
@@ -1731,30 +1815,30 @@
     }
 
     function getCustomtoFixed(dataValue,digit) {
-        var exTitik = dataValue.toFixed(4).toString().split('.');
-        var exKoma = dataValue.toFixed(4).toString().split(',');
+        // var exTitik = dataValue.toFixed(4).toString().split('.');
+        // var exKoma = dataValue.toFixed(4).toString().split(',');
 
-        var s = 0;
-        var s2 = 0;
-        var after = 0;
+        // var s = 0;
+        // var s2 = 0;
+        // var after = 0;
 
-        var result = dataValue;
-        if(exTitik.length>1){
-            s = exTitik[1].substr(digit,1);
-            s2 = exTitik[1].substr(0,digit);
-            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
-            result = exTitik[0]+'.'+after;
-
-
-        } else if(exKoma.length>1){
-            s = exKoma[1].substr(digit,1);
-            s2 = exKoma[1].substr(0,digit);
-            after = (parseInt(s)<5) ? parseInt(s2) : parseInt(s2) + 1;
-            result = exKoma[0]+'.'+after;
-        }
+        // var result = dataValue;
+        // if(exTitik.length>1){
+        //     s = exTitik[1].substr(digit,1);
+        //     s2 = exTitik[1].substr(0,digit);
+        //     after = (parseFloat(s)<5) ? parseFloat(s2) : parseFloat(s2) + 1;
+        //     result = exTitik[0]+'.'+after;
 
 
-        return parseFloat(result);
+        // } else if(exKoma.length>1){
+        //     s = exKoma[1].substr(digit,1);
+        //     s2 = exKoma[1].substr(0,digit);
+        //     after = (parseFloat(s)<5) ? parseFloat(s2) : parseFloat(s2) + 1;
+        //     result = exKoma[0]+'.'+after;
+        // }
+
+        var result = parseFloat(dataValue).toFixed(digit);
+        return result;
     }
 
     function checkFormRequired(elm,value) {
@@ -1791,15 +1875,15 @@
       return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, replaceStr);
     }
 
-    function br2nl (str, replaceMode) {   
-        
+    function br2nl (str, replaceMode) {
+
       var replaceStr = (replaceMode) ? "\n" : '';
       // Includes <br>, <BR>, <br />, </br>
      str = str.replace(/<\s*\/?br\s*[\/]?>/gi, replaceStr);
       return str.replace(/<\s*\/?td\s*[\/]?>/gi, '');
     }
     // for text area
-  
+
     $(document).on('blur','input[typeof=number][data-form=phone]',function () {
         var formPhone = $(this).val();
 
@@ -1828,6 +1912,10 @@
         }
 
         return v;
+    }
+
+    function checkValue(v) {
+        return (v!='' && v!=null) ? v : '';
     }
 
     window.getUrlParameter = function getUrlParameter(sParam) {

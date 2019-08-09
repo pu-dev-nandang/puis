@@ -55,11 +55,14 @@
 <div class="row">
     <div class="col-md-6">
         <div class="row">
-            <div class="col-md-6">
-                <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card"></i> Select Student</button>
+            <div class="col-md-4">
+                <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card margin-right"></i> Select Student</button>
             </div>
-            <div class="col-md-6">
-                <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card"></i> Print ID Card</button>
+            <div class="col-md-4">
+                <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card margin-right"></i> Print ID Card</button>
+            </div>
+            <div class="col-md-4" style="border-left: 1px solid #ccc;">
+                <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
             </div>
         </div>
     </div>
@@ -67,6 +70,7 @@
 
 <div class="row" style="margin-top: 10px">
     <div class="col-md-12">
+        <hr/>
         <div id="divDataStudent"></div>
     </div>
 </div>

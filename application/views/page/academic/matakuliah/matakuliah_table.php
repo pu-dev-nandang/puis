@@ -8,24 +8,36 @@
             <th>Name (Indonesian)</th>
             <th>Name (English)</th>
             <th>Study Programme</th>
+            <th  class="hide" style="width: 50px;">Type</th>
+            <th  class="hide" style="width: 50px;">Yudusium Filter</th>
             <th style="width: 50px;">Type</th>
         </tr>
         </thead>
         <tbody>
         <?php $no=1; foreach ($data_mk as $item_mk) {
-            $TypeMK = '<span class="label label-default">Mandiri</span>';
+
+            $TypeMK = '<div><span class="label label-default">Mandiri</span></div>';
             if($item_mk['TypeMK']=='2'){
-                $TypeMK = '<span class="label label-primary"><b>MKDU</b></span>';
+                $TypeMK = '<div><span class="label label-primary"><b>MKDU</b></span></div>';
             } else if($item_mk['TypeMK']=='3'){
-                    $TypeMK = '<span class="label label-warning"><b>MKU</b></span>';
-                }
+                $TypeMK = '<div><span class="label label-warning"><b>MKU</b></span></div>';
+            }
+
+            $TypeMKFilter = 'Mandiri';
+            if($item_mk['TypeMK']=='2'){
+                $TypeMKFilter = 'MKDU';
+            } else if($item_mk['TypeMK']=='3'){
+                $TypeMKFilter = 'MKU';
+            }
             ?>
             <tr>
                 <td class="td-center">
                     <div><?php echo $no++; ?></div>
                 </td>
                 <td>
-                    <div><?php echo $item_mk['MKCode']; ?></div>
+                    <div><?php echo $item_mk['MKCode']; ?>
+                        <?= ($item_mk['Yudisium']=='1') ? '<div><span class="label label-info">Yudisium Filter</span></div>' : ''; ?>
+                    </div>
                 </td>
                 <td>
                     <div>
@@ -40,6 +52,8 @@
 
 <!--                <td>--><?php //echo $item_mk['Code'].' | '.$item_mk['NameProdiEng']; ?><!--</td>-->
                 <td><?php echo $item_mk['NameProdiEng']; ?></td>
+                <td class="hide"><?php echo $TypeMKFilter; ?></td>
+                <td class="hide"><?= ($item_mk['Yudisium']=='1') ? 'Yudisium Filter' : 'Not As Yudisium Filter'; ?></td>
                 <td><?php echo $TypeMK; ?></td>
             </tr>
         <?php } ?>
