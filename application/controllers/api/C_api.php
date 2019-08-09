@@ -8224,10 +8224,13 @@ class C_api extends CI_Controller {
             // show formulir number
                 $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<br/><span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
 
+                $IDCard = ($row['Access_Card_Number']!='' && $row['Access_Card_Number']!=null) ? $row['Access_Card_Number'] : '-';
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a>
+                                                            <br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>
+                                                            <hr style="margin-top: 3px;margin-bottom: 5px;"/>IDCard : '.$IDCard;
             $nestedData[] = '<div  style="text-align:center;">'.$row['Year'].''.$gp.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
