@@ -448,6 +448,7 @@
                 $('#formEmailPU').val(d.EmailPU);
                 $('#formAddress').val(d.Address);
                 $('#formJacket').val(d.Jacket);
+                $('#formAcc').val(d.Access_Card_Number);
 
                 //---data parent --
                 $('#formNameFather').val(d.Father);
