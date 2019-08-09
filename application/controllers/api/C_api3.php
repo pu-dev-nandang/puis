@@ -551,7 +551,7 @@ class C_api3 extends CI_Controller {
 
                 $dataFileName = $this->db->select('File')->get_where('db_agregator.university_collaboration',
                     array(
-                       'ID' => $ID
+                        'ID' => $ID
                     ))->result_array();
 
                 $FileName = (count($dataFileName)>0) ? $dataFileName[0]['File'] : '';
@@ -1490,7 +1490,7 @@ class C_api3 extends CI_Controller {
                 if($ProdiID!=''){
                     $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
-                    : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
 
                 } else {
                     $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
@@ -1550,8 +1550,8 @@ class C_api3 extends CI_Controller {
 
     }
 
-  
-  public function crudqna(){
+
+    public function crudqna(){
 
         $data_arr = $this->getInputToken2();
 
@@ -1579,7 +1579,7 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $Previlege = $data_arr['Previlege'];
-          $dataSearch = '';
+            $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
                 $dataSearch = ' WHERE  ls.Questions LIKE "%'.$search.'%"
@@ -1588,14 +1588,14 @@ class C_api3 extends CI_Controller {
 
             $queryDefault = 'SELECT qna.*, ls.Questions FROM db_employees.qna qna '.$dataSearch;
 
-          $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
             $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
             $no = $requestData['start'] + 1;
             $data = array();
-          
+
             for($i=0;$i<count($query);$i++){
 
                 $nestedData=array();
@@ -1625,8 +1625,8 @@ class C_api3 extends CI_Controller {
 
                 $data[] = $nestedData;
                 $no++;
-              
-               }
+
+            }
 
             $json_data = array(
                 "draw"            => intval( $requestData['draw'] ),
@@ -1637,8 +1637,38 @@ class C_api3 extends CI_Controller {
             echo json_encode($json_data);
 
         }
-  
-  
+
+
+    }
+
+    public function crudAllProgramStudy(){
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='viewAllProdi'){
+            $data = $this->db->get_where('db_academic.program_study',array(
+                'Status' => 1
+            ))->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateCreditAllProdi'){
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if(count($dataForm)>0){
+                for($i=0;$i<count($dataForm);$i++){
+                    $d = (array) $dataForm[$i];
+                    $this->db->set('DefaultCredit', $d['Credit']);
+                    $this->db->where('ID', $d['ID']);
+                    $this->db->update('db_academic.program_study');
+                }
+            }
+
+            return print_r(1);
+
+        }
+    }
+
+    public function crudOverwriteCourse(){
+
     }
 
 }
