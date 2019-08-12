@@ -459,7 +459,8 @@ class C_rest2 extends CI_Controller {
                         $arr = array();
                         if (count($JsonStatus) > 0) {
                             for ($j=1; $j < count($JsonStatus); $j++) {
-                                $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                                // $getName = $this->m_master->caribasedprimary('db_employees.employees','NIP',$JsonStatus[$j]['NIP']);
+                                $getName = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$j]['NIP']);
                                 $Name = $getName[0]['Name'];
                                 $StatusInJson = $JsonStatus[$j]['Status'];
                                 switch ($StatusInJson) {
