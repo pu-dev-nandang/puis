@@ -1181,6 +1181,9 @@ class C_save_to_pdf3 extends CI_Controller {
             case 'Bank Advance':
                 $this->PdfBA_User($Input);
                 break;
+            case 'Cash Advance':
+                $this->PdfCA_User($Input);
+                break;
             default:
                 # code...
                 break;
@@ -1694,6 +1697,168 @@ class C_save_to_pdf3 extends CI_Controller {
         $JsonStatus = json_decode($JsonStatus,true);
         $y = $fpdf->GetY()+20;
         $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function PdfCA_User($input)
+    {
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['DataPayment'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['payment'];
+        $filename = '__'.$ID_payment.'.pdf'; 
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
+
+        $y += 15;
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,$h, 'PENYELESAIAN UANG MUKA', 0, 1, 'C', 0);
+
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Penyelesaian Uang Muka atas biaya  : ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->Cell(0,$h, 'Cash Advance Pembelian ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','',10);
+        $fpdf->Cell(50,$h, 'Tanggal diterima uang muka', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->SetTextColor(255,0,0);
+        $fpdf->Cell(40,$h, $this->getDateIndonesian($dtspb[0]['Detail'][0]['Date_Needed']), 0, 1, 'L', 0);
+        $fpdf->SetTextColor(0,0,0);
+        $fpdf->Cell(50,$h, 'Uang Muka yang diterima ', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        $y = $fpdf->getY()+5;
+
+        $fpdf->SetY($y);
+        $fpdf->Cell(50,$h, 'Biaya ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+
+        // $fpdf->Cell(90,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 1, 0, 'L', 0);
+        // $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        $w_dibayar = 60;
+        $w_JumlahRupiah = 50;
+        $border = 1;
+        $h=6;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->SetWidths(array($w_dibayar,$w_JumlahRupiah));
+        $fpdf->SetLineHeight(6);
+        $fpdf->SetAligns(array('C','L','C'));
+        $total = $dtspb[0]['Detail'][0]['Invoice'];
+        $arr_DetailItem = $dtspb[0]['Detail'][0]['Detail'];
+        $no = 1;
+        $fpdf->SetX(90);
+        for ($i=0; $i < count($arr_DetailItem); $i++) {
+           $dibayar = $arr_DetailItem[$i]['NamaBiaya'];
+           $JumlahRupiah = 'Rp '.number_format($arr_DetailItem[$i]['Invoice'],2,',','.');
+           $fpdf->Row(array(
+              $dibayar,
+              $JumlahRupiah,
+           ));
+           $fpdf->SetX(90);
+           $no++;
+        }
+        
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->Cell(150,$h, 'Total biaya ', 0, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+
+        $y = $fpdf->getY()+10;
+        $fpdf->SetY($y);
+        $fpdf->Cell(150,5, 'Jakarta, '.$this->getDateIndonesian($dtspb[0]['CreatedAt']), 0, 1, 'L', 0);
+
+        $JsonStatus = $dtspb[0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;

@@ -1425,9 +1425,16 @@ $route['budgeting_menu/pembayaran/bank_advance/(:any)'] = 'page/budgeting/c_ba/c
 
 // cashadvance
 $route['budgeting_menu/pembayaran/cashadvance/create_cashadvance'] = 'page/budgeting/c_cashadvance/create_cashadvance';
+$route['budgeting_menu/pembayaran/cashadvance/(:any)'] = 'page/budgeting/c_cashadvance/create_cashadvance/$1'; // edit or view
 $route['budgeting_menu/pembayaran/cashadvance/configuration'] = 'page/budgeting/c_cashadvance/configuration';
 $route['budgeting/submitca'] = 'page/budgeting/c_cashadvance/submitca';
 $route['budgeting/submitca_realisasi_by_po'] = 'page/budgeting/c_cashadvance/submitca_realisasi_by_po';
+
+// user
+$route['budgeting/submit_cash_advance_user'] = 'page/budgeting/c_cashadvance/submit_cash_advance_user';
+$route['budgeting/submitca_realisasi_by_user'] = 'page/budgeting/c_cashadvance/submitca_realisasi_by_user';
+
+
 
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';

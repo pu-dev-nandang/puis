@@ -31,8 +31,69 @@ class C_cashadvance extends Budgeting_Controler {
 		$this->menu_horizontal($page);
     }
 
-    public function create_cashadvance()
-    {
+    public function create_cashadvance($tokenPayment = null)
+    {   
+           // get data bank rest/__Databank
+                $data = array(
+                    'auth' => 's3Cr3T-G4N', 
+                );
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($data,$key);
+                $G_data_bank = $this->m_master->apiservertoserver(base_url().'rest/__Databank',$token);
+                $this->data['G_data_bank'] = $G_data_bank;
+                $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
+        if ($tokenPayment == null) {
+           $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+           $Year = $get[0]['Year'];
+           $this->data['Year'] = $Year;
+
+           $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
+           $arr_result = array('data' =>$getData);
+           $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);    
+        }
+        else{
+            try {
+                // read token
+                $key = "UAP)(*";
+                $ID_payment = $this->jwt->decode($tokenPayment,$key);
+                $this->data['ID_payment'] = $ID_payment;
+                // print_r($ID_payment);die();
+                $G_dt_payment = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+                // get year and Department existing by budget left
+                    $__get_budget_left = function($ID_payment)
+                    {
+                        $Year = date('Y');
+                        $Departement = $this->session->userdata('IDDepartementPUBudget');
+                        $arr = array(
+                            'Year' => $Year,
+                            'Departement' => $Departement,
+                        );
+
+                        $G_payType = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID_payment);
+                        $G_pay_detail = $this->m_master->caribasedprimary('db_payment.cash_advance_detail','ID_cash_advance',$G_payType[0]['ID']);
+                        $ID_budget_left = $G_pay_detail[0]['ID_budget_left'];
+                        $q = $this->m_global->get_year_department_by_budget_left($ID_budget_left);
+                        $arr['Year'] = $q[0]['Year'];
+                        $arr['Departement'] = $q[0]['Departement'];
+                        return $arr;
+                    };
+
+                    $t = $__get_budget_left($ID_payment);
+                    $Year = $t['Year'];
+                    $IDDepartementPUBudget = $t['Departement'];
+                $this->data['Year'] = $Year;    
+                $getData = $this->m_budgeting->get_budget_remaining($Year,$IDDepartementPUBudget);
+                $arr_result = array('data' =>$getData);
+                $this->data['detail_budgeting_remaining'] = json_encode($arr_result['data']);   
+            }
+            //catch exception
+            catch(Exception $e) {
+                 show_404($log_error = TRUE); 
+            }
+            
+        }   
+        $G_depart = $this->m_budgeting->SearchDepartementBudgeting($IDDepartementPUBudget);
+        $this->data['NameDepartement'] = $G_depart[0]['NameDepartement'];
 		$page = $this->load->view('global/budgeting/cashadvance/create_cashadvance',$this->data,true);
 		$this->menu_horizontal($page);
     }
@@ -448,6 +509,510 @@ class C_cashadvance extends Budgeting_Controler {
 
                 $this->db->where('ID',$ID_Realisasi);
                 $this->db->update('db_payment.cash_advance_realisasi',$dataSave);
+                $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
+                $rs['Status']= 1;
+                break;
+            default:
+                # code...
+                break;
+        }
+        echo json_encode($rs);
+    }
+
+    public function submit_cash_advance_user()
+    {
+        $action = $this->input->post('Action');
+        switch ($action) {
+            case 1:
+                $ID_payment = $this->input->post('ID_payment');
+                $key = "UAP)(*";
+                $ID_payment = $this->jwt->decode($ID_payment,$key);
+                if ($ID_payment == '') {
+                    $this->PaymentToIssued_user();
+                }
+                else
+                {
+                    $this->PaymentToIssued_edit_user();
+                }
+                
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function PaymentToIssued_user()
+    {
+        $msg = '';
+        $St_error = 1;
+        $BudgetChange = 0;
+        $input = $this->getInputToken();
+        $Year = $this->input->post('Year');
+        $key = "UAP)(*";
+        $Year = $this->jwt->decode($Year,$key);
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $ID_payment = $this->input->post('ID_payment');
+        $key = "UAP)(*";
+        $ID_payment = $this->jwt->decode($ID_payment,$key);
+
+        $NoIOM = $this->input->post('NoIOM');
+        $key = "UAP)(*";
+        $NoIOM = $this->jwt->decode($NoIOM,$key);
+
+        $BudgetRemaining = $this->input->post('BudgetRemaining');
+        $key = "UAP)(*";
+        $BudgetRemaining = $this->jwt->decode($BudgetRemaining,$key);
+        $BudgetRemaining =  (array)  json_decode(json_encode($BudgetRemaining),true);
+
+        $BudgetLeft_awal = $this->input->post('BudgetLeft_awal');
+        $key = "UAP)(*";
+        $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
+        $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
+
+        $FormInsert = $this->input->post('FormInsert');
+        $key = "UAP)(*";
+        $FormInsert = $this->jwt->decode($FormInsert,$key);
+        $FormInsert = (array)  json_decode(json_encode($FormInsert),true);
+
+        $StatusPayment = '';
+
+        // adding Supporting_documents
+            $Supporting_documents = array();
+            $Supporting_documents = json_encode($Supporting_documents); 
+           
+            if (array_key_exists('Supporting_documents', $_FILES)) {
+                // do upload file
+                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/cashadvance');
+                $Supporting_documents = json_encode($uploadFile); 
+            }
+
+        // RuleApproval
+            // check Subtotal
+                $Amount = 0;
+                for ($i=0; $i < count($input); $i++) {
+                    $data = $input[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+                    // print_r($data_arr);
+                    $SubTotal = $data_arr['SubTotal'];
+                    $Amount = $Amount + $SubTotal;
+                }
+            $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            if (count($JsonStatus) > 1) {
+                $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
+                if ($BoolBudget) {
+                    $dataSave = array(
+                        'Type' => 'Cash Advance',
+                        'CreatedAt' => date('Y-m-d H:i:s'),
+                        'CreatedBy' => $this->session->userdata('NIP'),
+                        'Status' => 1,
+                        'JsonStatus' => json_encode($JsonStatus),
+                        'NoIOM' => $NoIOM,
+                        'UploadIOM' => $Supporting_documents,
+                        'Departement' => $Departement,
+                    );
+                     $this->db->insert('db_payment.payment',$dataSave);
+                     $ID_payment =$this->db->insert_id();
+                     $StatusPayment = 1;
+                     // passing show name JsonStatus
+                     for ($i=0; $i < count($JsonStatus); $i++) { 
+                         $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
+                         $Name = $Name[0]['Name'];
+                         $JsonStatus[$i]['Name'] = $Name;
+                     }
+
+                     // insert ke table spb
+                     $FormInsert['ID_payment'] = $ID_payment;
+                     $dataSave = $FormInsert;
+                     $this->db->insert('db_payment.cash_advance',$dataSave);
+                     $ID_cash_advance = $this->db->insert_id();
+
+                     for ($i=0; $i < count($input); $i++) {
+                         $data = $input[$i]; 
+                         $key = "UAP)(*";
+                         $data_arr = (array) $this->jwt->decode($data,$key);
+                         $PassNumber = $data_arr['PassNumber'];
+                             $dataSave = array(
+                                 'ID_cash_advance' =>$ID_cash_advance,
+                                 'ID_budget_left' => $data_arr['ID_budget_left'],
+                                 'NamaBiaya' => $data_arr['NamaBiaya'],
+                                 'Invoice' => $data_arr['SubTotal'],
+                             ); 
+                             $this->db->insert('db_payment.cash_advance_detail',$dataSave);
+                     }
+
+                     // Update to budget_left
+                         $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
+
+                     // insert to spb_circulation_sheet
+                         $this->m_spb->payment_circulation_sheet($ID_payment,'Input Cash Advance');
+
+                     // get CodeURL
+                     $key = "UAP)(*";
+                     $token = $this->jwt->encode($ID_payment,$key);
+                     $CodeUrl = $token;    
+
+                     // send notifikasi
+                         $IDdiv = $Departement;
+                         $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                         // $NameDepartement = $G_div[0]['NameDepartement'];
+                         $Code = $G_div[0]['Code'];
+                         $data = array(
+                             'auth' => 's3Cr3T-G4N',
+                             'Logging' => array(
+                                             'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Cash Advance has been Created by '.$Code,
+                                             'Description' => 'Cash Advance has been Created by '.$Code.'('.$this->session->userdata('Name').')',
+                                             'URLDirect' => 'budgeting_menu/pembayaran/cashadvance/'.$CodeUrl,
+                                             'CreatedBy' => $this->session->userdata('NIP'),
+                                           ),
+                             'To' => array(
+                                       'NIP' => array($JsonStatus[1]['NIP']),
+                                     ),
+                             'Email' => 'No', 
+                         );
+                         $url = url_pas.'rest2/__send_notif_browser';
+                         $token = $this->jwt->encode($data,"UAP)(*");
+                         $this->m_master->apiservertoserver($url,$token);
+                }
+                else
+                {
+                    $BudgetChange = 1;
+                }  
+            }
+            else
+            {
+                $St_error = 0;
+                $msg = 'Limit : '.$Amount.' not set in RAD';
+            }
+
+            echo json_encode(array('ID_payment' => $ID_payment,'JsonStatus' => json_encode($JsonStatus),'St_error' => $St_error,'msg'=>$msg,'StatusPayment' => $StatusPayment,'BudgetChange' => $BudgetChange));  
+    }
+
+    public function PaymentToIssued_edit_user()
+    {
+        $msg = '';
+        $St_error = 1;
+        $BudgetChange = 0;
+        $input = $this->getInputToken();
+        $Year = $this->input->post('Year');
+        $key = "UAP)(*";
+        $Year = $this->jwt->decode($Year,$key);
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $ID_payment = $this->input->post('ID_payment');
+        $key = "UAP)(*";
+        $ID_payment = $this->jwt->decode($ID_payment,$key);
+
+        $NoIOM = $this->input->post('NoIOM');
+        $key = "UAP)(*";
+        $NoIOM = $this->jwt->decode($NoIOM,$key);
+
+        $BudgetRemaining = $this->input->post('BudgetRemaining');
+        $key = "UAP)(*";
+        $BudgetRemaining = $this->jwt->decode($BudgetRemaining,$key);
+        $BudgetRemaining =  (array)  json_decode(json_encode($BudgetRemaining),true);
+
+        $BudgetLeft_awal = $this->input->post('BudgetLeft_awal');
+        $key = "UAP)(*";
+        $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
+        $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
+
+        $FormInsert = $this->input->post('FormInsert');
+        $key = "UAP)(*";
+        $FormInsert = $this->jwt->decode($FormInsert,$key);
+        $FormInsert = (array)  json_decode(json_encode($FormInsert),true);
+
+        $StatusPayment = '';
+
+        $dataSave = array(
+            'Status' => 1,
+        );
+        $G_data = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
+
+        if (array_key_exists('Supporting_documents', $_FILES)) {
+            // do upload file
+            $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/cashadvance');
+            $F_Supporting_documents = $G_data[0]['UploadIOM'];
+            $F_Supporting_documents = (array) json_decode($F_Supporting_documents,true);
+            // for ($i=0; $i < count($F_Supporting_documents); $i++) { 
+            //     $uploadFile[] = $F_Supporting_documents[$i];
+            // }
+            //print_r($uploadFile);
+            $uploadFile = array_merge($uploadFile,$F_Supporting_documents);
+            $Supporting_documents = json_encode($uploadFile);
+            $dataSave['UploadIOM'] = $Supporting_documents; 
+        }
+
+        $JsonStatus = $G_data[0]['JsonStatus'];
+        $JsonStatus = (array) json_decode($JsonStatus,true);
+        // jika Status sama dengan 1 #  untuk ketika submit masih bisa edit sebelum approval
+        $b = true;
+        if ($G_data[0]['Status'] == 1) {
+            for ($i=1; $i < count($JsonStatus); $i++) { // skip index 0 karena admin
+                if ($JsonStatus[$i]['Status'] == 1) {
+                    $b = false;
+                    break;
+                }
+            }
+
+            if (!$b) {
+                $St_error = 0;
+                $BudgetChange = 1;
+                $msg = 'The data has been approve and will do to reload';
+            }
+        }
+
+        if ($G_data[0]['Status'] == -1 || $b) {
+            // update JsonStatus menjadi 0
+            for ($i=1; $i < count($JsonStatus); $i++) { // skip index 0 karena admin
+                $JsonStatus[$i]['Status'] = 0;
+            }
+            $dataSave['JsonStatus'] = json_encode($JsonStatus);
+                // RuleApproval
+                    // check Subtotal
+                        $Amount = 0;
+                        for ($i=0; $i < count($input); $i++) {
+                            $data = $input[$i]; 
+                            $key = "UAP)(*";
+                            $data_arr = (array) $this->jwt->decode($data,$key);
+                            // print_r($data_arr);
+                            $SubTotal = $data_arr['SubTotal'];
+                            $Amount = $Amount + $SubTotal;
+                        }
+            $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // new approval
+            $dataSave['JsonStatus'] = json_encode($JsonStatus2);
+
+        }
+
+        if (count($JsonStatus2) > 1) {
+            $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
+            if ($BoolBudget) {
+                $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
+                $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
+                $this->db->where('ID',$ID_payment);
+                $this->db->update('db_payment.payment',$dataSave);
+                $StatusPayment = 1;
+                // passing show name JsonStatus
+                for ($i=0; $i < count($JsonStatus); $i++) { 
+                    $Name = $this->m_master->SearchNameNIP_Employees_PU_Holding($JsonStatus[$i]['NIP']);
+                    $Name = $Name[0]['Name'];
+                    $JsonStatus[$i]['Name'] = $Name;
+                } 
+
+                 // update ke table spb
+                // get data PaymentType
+                    $G_data_ = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID_payment);
+                 $dataSave = $FormInsert;
+
+                 $this->db->where('ID_payment',$ID_payment);
+                 $this->db->update('db_payment.cash_advance',$dataSave);
+                 $G_dt_spb = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID_payment);
+                 $ID_cash_advance = $G_dt_spb[0]['ID'];
+
+                 if ($this->db->affected_rows() > 0 )
+                 {
+                    /*
+                        Note : 
+                        Pengembalian Post Budget using ke awal sebelum pr tercreate
+                    */
+                     $BackBudgetToBeforeCreate = $this->m_global->BackBudgetToBeforeCreate($ID_payment,$Year,$Departement);
+
+                     // $G_detail = $this->m_master->caribasedprimary('db_payment.cash_advance_detail','ID_cash_advance',$ID_cash_advance);
+                     $this->db->where(array('ID_cash_advance' => $ID_cash_advance));
+                     $this->db->delete('db_payment.cash_advance_detail');
+
+                     for ($i=0; $i < count($input); $i++) {
+                         $data = $input[$i]; 
+                         $key = "UAP)(*";
+                         $data_arr = (array) $this->jwt->decode($data,$key);
+                         $PassNumber = $data_arr['PassNumber'];
+                             $dataSave = array(
+                                 'ID_cash_advance' =>$ID_cash_advance,
+                                 'ID_budget_left' => $data_arr['ID_budget_left'],
+                                 'NamaBiaya' => $data_arr['NamaBiaya'],
+                                 'Invoice' => $data_arr['SubTotal'],
+                             ); 
+                             $this->db->insert('db_payment.cash_advance_detail',$dataSave);
+                     }
+
+                     // Update to budget_left
+                         $this->m_pr_po->Update_budget_left_pr($BudgetLeft_awal,$BudgetRemaining,$input);
+
+                     // insert to spb_circulation_sheet
+                         $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Cash Advance');
+
+                         // get CodeURL
+                         $key = "UAP)(*";
+                         $token = $this->jwt->encode($ID_payment,$key);
+                         $CodeUrl = $token;    
+
+                         // send notifikasi
+                             $IDdiv = $Departement;
+                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                             // $NameDepartement = $G_div[0]['NameDepartement'];
+                             $Code = $G_div[0]['Code'];
+                             $data = array(
+                                 'auth' => 's3Cr3T-G4N',
+                                 'Logging' => array(
+                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Cash Advance has been Revised by '.$Code,
+                                                 'Description' => 'Cash Advance has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                 'URLDirect' => 'budgeting_menu/pembayaran/cashadvance/'.$CodeUrl,
+                                                 'CreatedBy' => $this->session->userdata('NIP'),
+                                               ),
+                                 'To' => array(
+                                           'NIP' => array($JsonStatus[1]['NIP']),
+                                         ),
+                                 'Email' => 'No', 
+                             );
+                             $url = url_pas.'rest2/__send_notif_browser';
+                             $token = $this->jwt->encode($data,"UAP)(*");
+                             $this->m_master->apiservertoserver($url,$token);
+
+                 }
+                 else
+                 {
+                     //return FALSE;
+                      $ID_payment = '';
+                 }
+                 
+            }
+            else
+            {
+                $BudgetChange = 1;
+            }  
+        }
+        else
+        {
+            $St_error = 0;
+            $msg = 'Limit : '.$Amount.' not set in RAD';
+        }
+
+        echo json_encode(array('ID_payment' => $ID_payment,'JsonStatus' => json_encode($JsonStatus),'St_error' => $St_error,'msg'=>$msg,'StatusPayment' => $StatusPayment,'BudgetChange' => $BudgetChange));
+    }
+
+    public function submitca_realisasi_by_user()
+    {
+        $rs = array('Status' => 0,'Change' => 0);
+        $Input = $this->getInputToken();
+        $action = $Input['action'];
+        $ID_payment = $Input['ID_payment'];
+        switch ($action) {
+            case 'add':
+                $ID_cash_advance = $Input['ID_payment_type'];
+                $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/cashadvance');
+                $UploadInvoice = json_encode($UploadInvoice); 
+
+                $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
+                $UploadTandaTerima = json_encode($UploadTandaTerima);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $Status = 1;
+                $dataSave = array(
+                    'ID_cash_advance' => $ID_cash_advance,
+                    'UploadInvoice' => $UploadInvoice,
+                    'NoInvoice' => $Input['NoInvoice'],
+                    'UploadTandaTerima' => $UploadTandaTerima,
+                    'NoTandaTerima' => $Input['NoTandaTerima'],
+                    'Date_Realisasi' =>  $Input['Date_Realisasi'],
+                    'Status' => $Status,
+                    'JsonStatus' => $JsonStatus,
+                );
+
+                $this->db->insert('db_payment.cash_advance_realisasi',$dataSave);
+                
+                // $G = $this->m_master->caribasedprimary('db_payment.bank_advance_detail','ID_bank_advance',$ID_bank_advance);
+                $FormInsertDetail = $this->input->post('FormInsertDetail');
+                $key = "UAP)(*";
+                $FormInsertDetail = $this->jwt->decode($FormInsertDetail,$key);
+                $FormInsertDetail =  (array)  json_decode(json_encode($FormInsertDetail),true);
+                for ($i=0; $i < count($FormInsertDetail); $i++) { 
+                    $dataSave = array(
+                        'ID_cash_advance_detail' => $FormInsertDetail[$i]['ID_payment_detail'],
+                        'InvoiceRealisasi' => $FormInsertDetail[$i]['InvoiceRealisasi'],
+                        'Status' => 1,
+                    );
+                    $this->db->insert('db_payment.cash_advance_realisasi_detail',$dataSave);
+                }
+
+                 $this->m_spb->payment_circulation_sheet($ID_payment,'Input Realisasi');
+                $rs['Status']= 1;
+                break;
+            case 'edit':
+                $ID_Realisasi = $Input['ID_Realisasi'];
+                $ID_cash_advance = $Input['ID_payment_type'];
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $Status = 1;
+                $dataSave = array(
+                    'ID_cash_advance' => $ID_cash_advance,
+                    'NoInvoice' => $Input['NoInvoice'],
+                    'NoTandaTerima' => $Input['NoTandaTerima'],
+                    'Date_Realisasi' =>  $Input['Date_Realisasi'],
+                    'Status' => $Status,
+                    'JsonStatus' => $JsonStatus,
+                );
+                $G_data_ = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
+                // delete old file and upload new file if user do upload
+                if (array_key_exists('UploadInvoice', $_FILES)) {
+                    // remove old file
+                    if ($G_data_[0]['UploadInvoice'] != '' && $G_data_[0]['UploadInvoice'] != null) {
+                        $arr_file = (array) json_decode($G_data_[0]['UploadInvoice'],true);
+                        $filePath = 'budgeting\\cashadvance\\'.$arr_file[0]; // pasti ada file karena required
+                        $path = FCPATH.'uploads\\'.$filePath;
+                        unlink($path);
+                    }
+
+                    // do upload file
+                    $UploadInvoice = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadInvoice',$path = './uploads/budgeting/cashadvance');
+                    $UploadInvoice = json_encode($UploadInvoice); 
+                    $dataSave['UploadInvoice'] = $UploadInvoice; 
+                }
+
+                if (array_key_exists('UploadTandaTerima', $_FILES)) {
+                    // remove old file
+                        if ($G_data_[0]['UploadTandaTerima'] != '' && $G_data_[0]['UploadTandaTerima'] != null) {
+                            $arr_file = (array) json_decode($G_data_[0]['UploadTandaTerima'],true);
+                            $filePath = 'budgeting\\cashadvance\\'.$arr_file[0]; // pasti ada file karena required
+                            $path = FCPATH.'uploads\\'.$filePath;
+                            unlink($path);
+                        }
+
+                    // do upload file
+                    $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
+                    $UploadTandaTerima = json_encode($UploadTandaTerima); 
+                    $dataSave['UploadTandaTerima'] = $UploadTandaTerima; 
+                }
+
+                $this->db->where('ID',$ID_Realisasi);
+                $this->db->update('db_payment.cash_advance_realisasi',$dataSave);
+
+                // bank_advance_detail delete first and insert again
+                    $FormInsertDetail = $this->input->post('FormInsertDetail');
+                    $key = "UAP)(*";
+                    $FormInsertDetail = $this->jwt->decode($FormInsertDetail,$key);
+                    $FormInsertDetail =  (array)  json_decode(json_encode($FormInsertDetail),true);
+
+                    for ($i=0; $i < count($FormInsertDetail); $i++) { 
+                        $this->db->where('ID_cash_advance_detail',$FormInsertDetail[$i]['ID_payment_detail']);
+                        $this->db->delete('db_payment.cash_advance_realisasi_detail');
+                    }
+
+                    for ($i=0; $i < count($FormInsertDetail); $i++) { 
+                        $dataSave = array(
+                            'ID_cash_advance_detail' => $FormInsertDetail[$i]['ID_payment_detail'],
+                            'InvoiceRealisasi' => $FormInsertDetail[$i]['InvoiceRealisasi'],
+                            'Status' => 1,
+                        );
+                        $this->db->insert('db_payment.cash_advance_realisasi_detail',$dataSave);
+                    }
+
                 $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
                 $rs['Status']= 1;
                 break;
