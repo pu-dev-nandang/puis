@@ -587,7 +587,7 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
            
             if (array_key_exists('Supporting_documents', $_FILES)) {
                 // do upload file
-                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/ba');
+                $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/bankadvance');
                 $Supporting_documents = json_encode($uploadFile); 
             }
 
@@ -739,7 +739,7 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
 
         if (array_key_exists('Supporting_documents', $_FILES)) {
             // do upload file
-            $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/spb');
+            $uploadFile = $this->m_master->uploadDokumenMultiple(uniqid(),'Supporting_documents',$path = './uploads/budgeting/bankadvance');
             $F_Supporting_documents = $G_data[0]['UploadIOM'];
             $F_Supporting_documents = (array) json_decode($F_Supporting_documents,true);
             // for ($i=0; $i < count($F_Supporting_documents); $i++) { 
