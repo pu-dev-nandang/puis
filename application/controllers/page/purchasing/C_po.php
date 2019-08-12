@@ -180,7 +180,12 @@ class C_po extends Transaksi_Controler {
         $sql = 'select a.*,b.Name as NamaUser,b.NIP,c.Departement,c.ID as ID_set_roleuser,c.Visible,c.TypeDesc
                 from db_purchasing.cfg_m_userrole as a left join (select * from db_purchasing.cfg_approval_spk where Departement = ? ) as c
                 on a.ID = c.ID_m_userrole
-                left join db_employees.employees as b on b.NIP = c.NIP 
+                left join 
+                (select NIP,Name from db_employees.employees
+                 UNION 
+                 select NIK as NIP,Name from db_employees.holding
+                )
+                as b on b.NIP = c.NIP 
                 order by a.ID asc
                 ';
         $query=$this->db->query($sql, array($Departement))->result_array();
