@@ -114,7 +114,33 @@ function LoopAjaxCallback()
 				         'targets': 1,
 				         'render': function (data, type, full, meta){
 				         	var html = '';
-				         	html = full.Type;
+				         	if (full.Type == 'Purchase Request') {
+				         		var tokenLink = jwt_encode(full.Code,"UAP)(*");
+				         		html = '<a href="'+base_url_js+'budgeting_pr/'+tokenLink+'"   target="_blank">'+full.Type+'</a>';
+				         	}
+				         	else
+				         	{
+				         		var linkpay = '';
+				         		switch(full.Type) {
+				         		  case 'Petty Cash':
+				         		    linkpay = 'pettycash';
+				         		    break;
+				         		  case 'Spb':
+				         		    linkpay = 'spb';
+				         		    break;
+				         		  case 'Bank Advance':
+				         		    linkpay = 'bank_advance';
+				         		    break;
+				         		  case 'Cash Advance':
+				         		    linkpay = 'cashadvance';
+				         		    break;
+				         		  default:
+				         		    // code block
+				         		}
+				         		var tokenLink = jwt_encode(full.ID_payment,"UAP)(*");
+				         		html = '<a href="'+base_url_js+'budgeting_menu/pembayaran/'+linkpay+'/'+tokenLink+'"   target="_blank">'+full.Type+'</a>';
+				         	}
+				         	
 				         	if (full.Code != '' && full.Code != null) {
 				         		html += '<br/>Code :'+full.Code;
 				         	}	

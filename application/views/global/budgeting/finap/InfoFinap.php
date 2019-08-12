@@ -868,6 +868,7 @@
 	}
 
 	$(document).off('click', '#Approve_realisasi').on('click', '#Approve_realisasi',function(e) {
+		// console.log(ClassDt);return;
 		if (confirm('Are you sure ?')) {
 			loading_button('#Approve_realisasi');
 			var ID_payment = ClassDt.ID_payment;
@@ -882,6 +883,7 @@
 				NIP : sessionNIP,
 				action : 'approve',
 				auth : 's3Cr3T-G4N',
+				payment_data : ClassDt.po_payment_data,
 			}
 
 			var token = jwt_encode(data,"UAP)(*");

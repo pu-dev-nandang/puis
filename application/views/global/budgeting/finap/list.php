@@ -39,7 +39,14 @@ $(document).ready(function() {
 
 function LoadFirstLoad()
 {
-	load_table_activated_period_years();
+  if (IDDepartementPUBudget != 'NA.9') {
+    $('#DivTable').html('<h2 align="center">Your are not authorize</h2>');
+  }
+  else
+  {
+    load_table_activated_period_years();
+  }
+	
 	// LoadDataForTable();
 }
 

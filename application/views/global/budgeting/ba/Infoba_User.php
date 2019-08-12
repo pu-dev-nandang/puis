@@ -462,6 +462,7 @@
 		});
 
 		if (Realisasi.length > 0) {
+			$('.InvoiceDetail').prop('disabled',true);
 			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
 			makeActionRealisasi(DivPageRealisasi,Realisasi);
 		}
@@ -1087,18 +1088,20 @@
 				var html = '';
 				// after submit dan sebelum approval bisa melakukan edit
 					var booledit = false;
-					var r_access = dt['access'];
-					var rule = dt['rule'];
-					for (var i = 0; i < r_access.length; i++) {
-						var ID_m_userrole = r_access[i].ID_m_userrole;
-						// search rule Entry = 1
-						for (var j = 0; j < rule.length; j++) {
-							var ID_m_userrole_ = rule[j].ID_m_userrole;
-							if (ID_m_userrole == ID_m_userrole_) {
-								var Entry = rule[j].Entry
-								if (Entry == 1) {
-									booledit = true;
-									break;
+					if (dt["access"] != undefined) {
+						var r_access = dt['access'];
+						var rule = dt['rule'];
+						for (var i = 0; i < r_access.length; i++) {
+							var ID_m_userrole = r_access[i].ID_m_userrole;
+							// search rule Entry = 1
+							for (var j = 0; j < rule.length; j++) {
+								var ID_m_userrole_ = rule[j].ID_m_userrole;
+								if (ID_m_userrole == ID_m_userrole_) {
+									var Entry = rule[j].Entry
+									if (Entry == 1) {
+										booledit = true;
+										break;
+									}
 								}
 							}
 						}
@@ -2148,7 +2151,29 @@
 		}
 		else
 		{
+			var PaymentDetail = DetailPayment[0].Detail;
+			var IsiTable = '';
+			for (var i = 0; i < PaymentDetail.length; i++) {
+				var RealisasiDetail = PaymentDetail[i].Realisasi;
+				var InvoiceRealisasi = RealisasiDetail[0].InvoiceRealisasi;
+				// console.log(InvoiceRealisasi);
+				IsiTable += '<tr id_payment_detail = "'+PaymentDetail[i].ID+'">'+
+								'<td>'+PaymentDetail[i].NamaBiaya+'</td>'+
+								'<td>'+'<input type = "text" class = "form-control InvoiceDetail" value = "'+parseInt(InvoiceRealisasi)+'" maxmoney = "'+parseInt(PaymentDetail[i].Invoice)+'">'+'</td>'+
+							'</tr>';	
 
+			}
+			html += '<table class = "table" id = "PaymentDetailRealisasi">'+
+						'<thead>'+
+							'<tr>'+
+								'<th>Dibayar Untuk </th>'+
+								'<th>Invoice </th>'+
+							'</tr>'+
+						'</thead>'+
+						'<tbody>'+
+							IsiTable+
+						'</tbody>'+
+					'</table>';
 		}
 
 		return html;
@@ -2210,7 +2235,8 @@
 			var bbooll = true;
 			$('.InvoiceDetail').each(function(){
 				var maxmoney = parseInt($(this).attr('maxmoney'));
-				var v = parseInt($(this).val());
+				var v = findAndReplace($(this).val(), ".","");
+			 	v = parseInt(v);
 				if (v > maxmoney) {
 					bbooll = false;
 					return;
@@ -2298,7 +2324,8 @@
 			var tr = $(this).closest('tr');
 			var ID_payment_detail = tr.attr('id_payment_detail');
 			var maxmoney = parseInt($(this).attr('maxmoney'));
-			var v = parseInt($(this).val());
+			var v = findAndReplace($(this).val(), ".","");
+			v = parseInt(v);
 			var d = {
 				ID_payment_detail : ID_payment_detail,
 				InvoiceDetail : maxmoney,
@@ -2312,7 +2339,7 @@
 		form_data.append('FormInsertDetail',token);
 
 		// var url = base_url_js + "budgeting/submitba_realisasi_by_po"
-		var url = base_url_js + "budgeting/submitba_realisasi_by_user"
+		var url = base_url_js + "budgeting/submitba_realisasi_by_user";
 		$.ajax({
 		  type:"POST",
 		  url:url,
@@ -2330,7 +2357,10 @@
 		  	else{
 		  		toastr.success('Saved');
 		  		setTimeout(function () {
-		  			loadFirst();
+		  			__RemoveContentRealisasi();
+		  			ReloadBudgetRemaining().then(function(data2){
+		  				LoadFirstLoad();
+		  			})
 		  			loadingEnd(500);
 		  		},1500);
 		  	}
@@ -2342,5 +2372,32 @@
 		  }
 		})
 	}
+
+	function __RemoveContentRealisasi()
+	{
+		var se_content = $('.realisasi_page');
+		if (se_content.length) {
+			se_content.remove();
+		}
+	}
+
+	$(document).off('click', '.btnEditInputRealisasiBA').on('click', '.btnEditInputRealisasiBA',function(e) {
+		var Status = $(this).attr('status');
+		if (Status != 2) {
+			var ev2 = $(this).closest('.realisasi_page');
+			ev2.find('input').not('.TglRealisasiBA').prop('disabled',false);
+			ev2.find('button').prop('disabled',false);
+			//ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
+			$('.InvoiceDetail').prop('disabled',false);
+			$(this).remove();
+		}
+		else
+		{
+			toastr.info('Realisasi telah approve tidak bisa edit');
+		}	
+	})
 
 </script>

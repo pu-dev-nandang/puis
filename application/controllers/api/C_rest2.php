@@ -3571,12 +3571,53 @@ class C_rest2 extends CI_Controller {
                                 if ($datasave['Status'] == 2) {
                                     $Desc = "Realisasi Approve and finished at : ".date('Y-m-d H:i:s');
 
-                                    // Notif All Approve to JsonStatus allkey
-                                        // $arr_to = array();
-                                        // for ($i=0; $i < count($JsonStatus); $i++) { 
-                                        //     $arr_to[] = $JsonStatus[$i]['NIP'];
-                                        // }
+                                    // update budget left
+                                        if (array_key_exists('payment_data', $dataToken)) {
+                                            $payment_data = $dataToken['payment_data'];
+                                            $payment_data = json_decode(json_encode($payment_data),true);
+                                            $payment_ = $payment_data['payment'];
+                                            $FinanceAP = $payment_[0]['FinanceAP'];
+                                            $ID_ap = $FinanceAP[0]['ID']; 
+                                            $Detail = $payment_[0]['Detail'];
+                                            $DetailPay = $Detail[0]['Detail'];
+                                            for ($i=0; $i < count($DetailPay); $i++) { 
+                                                $Invoice1 = $DetailPay[$i]['Invoice']; // invoice pengajuan
+                                                $Realisasi = $DetailPay[$i]['Realisasi'];
+                                                $Invoice2 = $Realisasi[0]['InvoiceRealisasi']; // InvoiceRealisasi
+                                                $ID_budget_left = $DetailPay[$i]['ID_budget_left'];
+                                                if ($Invoice1 != $Invoice2) {
+                                                    /*
+                                                        Note : 
+                                                        Invoice1 selalu lebih besar dari $Invoice2
+                                                        
+                                                    */
+                                                    $Reason = 'Pengembalian';    
+                                                    $Pengembalian =  $Invoice1 - $Invoice2;  // add auto pengembalian
+                                                    // insert ke table db_budgeting.budget_payment
+                                                    $data_arr_payment = array(
+                                                        'Type' => 'Add',
+                                                        'ID_ap' => $ID_ap,
+                                                        'ID_budget_left' => $ID_budget_left,
+                                                        'Invoice' => $Pengembalian,
+                                                        'Reason' => $Reason,
+                                                    );
 
+                                                    $this->db->insert('db_budgeting.budget_payment',$data_arr_payment);
+
+                                                    // update budget left
+                                                    $G_budget_left_re = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                                                    $Value1 = $G_budget_left_re[0]['Value'];
+                                                    $ValueUPD = $Value1 + $Pengembalian;
+                                                    $data_arr_budget = array(
+                                                        'Value' => $ValueUPD, 
+                                                    );
+
+                                                    $this->db->where('ID',$ID_budget_left);
+                                                    $this->db->update('db_budgeting.budget_left',$data_arr_budget);
+                                                }
+                                            }
+                                        }
+                                    
                                         for ($i=0; $i < count($JsonStatus); $i++) {
                                             $NIPJson =  $JsonStatus[$i]['NIP'];
                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
