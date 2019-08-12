@@ -63,12 +63,20 @@
 	};
 
 	$(document).ready(function() {
-		$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
-		Get_data_payment().then(function(data){
-			$('.C_radio:first').prop('checked',true);
-			$('.C_radio:first').trigger('change');
+		var IDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+		if (IDDepartementPUBudget != 'NA.9') {
+			$('#page_payment_list').html('<h2 align="center">Your are not authorize</h2>');
 			loadingEnd(500);
-		})
+		}
+		else
+		{
+			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+			Get_data_payment().then(function(data){
+				$('.C_radio:first').prop('checked',true);
+				$('.C_radio:first').trigger('change');
+				loadingEnd(500);
+			})
+		}
 	});
 
 	function Get_data_payment(){

@@ -1488,6 +1488,7 @@ $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 $route['budgeting/submit_bank_advance_user'] = 'page/budgeting/c_ba/submit_bank_advance_user';
 
 $route['budgeting/submitba_realisasi_by_po'] = 'page/budgeting/c_ba/submitba_realisasi_by_po';
+$route['budgeting/submitba_realisasi_by_user'] = 'page/budgeting/c_ba/submitba_realisasi_by_user';
 $route['budgeting_menu/pembayaran/bank_advance/create_ba_user'] = 'page/budgeting/c_ba/create_ba_user';
 $route['budgeting_menu/pembayaran/bank_advance/(:any)'] = 'page/budgeting/c_ba/create_ba_user/$1'; // edit or view
 

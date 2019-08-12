@@ -129,7 +129,17 @@ function LoopAjaxCallback()
 				         'targets': 1,
 				         'render': function (data, type, full, meta){
 				         	var html = '';
-				         	html = full.TypePayment;
+				         	if (full.TypePayment != 'Revisi') {
+				         		// a href to finap
+				         		var ID_ap = full.ID_ap;
+				         		var tokenLink = jwt_encode(ID_ap,"UAP)(*");
+				         		html = '<a href="'+base_url_js+'finance_ap/global/'+tokenLink+'" target="_blank">'+full.TypePayment+'</a>';
+				         	}
+				         	else
+				         	{
+				         		html = full.TypePayment;
+				         	}
+				         	
 				         	if (full.CodeSPB != '' && full.CodeSPB != null) {
 				         		html += '<br/>Code :'+full.CodeSPB;
 				         	}	
