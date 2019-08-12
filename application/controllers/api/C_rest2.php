@@ -3419,8 +3419,20 @@ class C_rest2 extends CI_Controller {
                     $rs = array('Status' => 1,'Change' => 0,'msg' => '');
                     $ID_payment = $dataToken['ID_payment'];
                     $ID_Realisasi = $dataToken['ID_Realisasi'];
+
+                    $payment_data = $dataToken['payment_data'];
+                    $payment_data = json_decode(json_encode($payment_data),true);
+                    if (array_key_exists('payment', $payment_data)) {
+                        $payment_ = $payment_data['payment'];
+                    }
+                    else
+                    {
+                        $payment_ = $payment_data['dtspb'];
+                    }
+                    $FinanceAP = $payment_[0]['FinanceAP'];
+                    $ID_ap = $FinanceAP[0]['ID']; 
                     $key = "UAP)(*";
-                    $token = $this->jwt->encode($ID_payment,$key);
+                    $token = $this->jwt->encode($ID_ap,$key);
 
                     $CodeUrl = $token;
                     $approval_number = $dataToken['approval_number'];
@@ -3572,12 +3584,12 @@ class C_rest2 extends CI_Controller {
                                     $Desc = "Realisasi Approve and finished at : ".date('Y-m-d H:i:s');
 
                                     // update budget left
-                                        if (array_key_exists('payment_data', $dataToken)) {
-                                            $payment_data = $dataToken['payment_data'];
-                                            $payment_data = json_decode(json_encode($payment_data),true);
-                                            $payment_ = $payment_data['payment'];
-                                            $FinanceAP = $payment_[0]['FinanceAP'];
-                                            $ID_ap = $FinanceAP[0]['ID']; 
+                                        // if (array_key_exists('payment_data', $dataToken)) {
+                                            // $payment_data = $dataToken['payment_data'];
+                                            // $payment_data = json_decode(json_encode($payment_data),true);
+                                            // $payment_ = $payment_data['payment'];
+                                            // $FinanceAP = $payment_[0]['FinanceAP'];
+                                            // $ID_ap = $FinanceAP[0]['ID']; 
                                             $Detail = $payment_[0]['Detail'];
                                             $DetailPay = $Detail[0]['Detail'];
                                             for ($i=0; $i < count($DetailPay); $i++) { 
@@ -3616,7 +3628,7 @@ class C_rest2 extends CI_Controller {
                                                     $this->db->update('db_budgeting.budget_left',$data_arr_budget);
                                                 }
                                             }
-                                        }
+                                        // }
                                     
                                         for ($i=0; $i < count($JsonStatus); $i++) {
                                             $NIPJson =  $JsonStatus[$i]['NIP'];
