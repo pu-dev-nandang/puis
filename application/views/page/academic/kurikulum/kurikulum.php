@@ -2,6 +2,9 @@
 
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-12" style="text-align: right;">
+      <a href="<?= base_url('academic/curriculum_cross/2014/1') ?>" style="float:left;" target="_blank" class="btn btn-default"><b>Check Curriculum Cross</b></a>
+
+
         <div class="btn-group">
             <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 Add Curriculum
