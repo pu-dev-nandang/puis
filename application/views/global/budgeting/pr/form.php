@@ -50,7 +50,7 @@
 		  else
 		  {
 		  	// console.log(DivSession);
-		  	if (DivSession == 'NA.9') {
+		  	if (DivSession == 'NA.9' || DivSession == 'NA.4') { // finance || purchasing
 		  		ClassDt.RuleAccess = response;
 		  		load_htmlPR();
 		  	}
@@ -1833,20 +1833,24 @@
 				return false;
 			}
 
+			var ItemIndex = 1;
 			$(".BrowseFile").each(function(){
 				var IDFile = $(this).attr('id');
 				var ev = $(this);
-				if (!file_validation2(ev) ) {
+				var NameItem = 'Item Number '+ItemIndex;
+				if (!file_validation2(ev,NameItem) ) {
 				  $("#SaveSubmit").prop('disabled',true);
 				  find = false;
 				  return false;
 				}
+				ItemIndex++;
 			})
 
 			$(".BrowseFileSD").each(function(){
 				var IDFile = $(this).attr('id');
 				var ev = $(this);
-				if (!file_validation2(ev) ) {
+				var NameField = 'Support Document';
+				if (!file_validation2(ev,NameField) ) {
 				  $("#SaveSubmit").prop('disabled',true);
 				  find = false;
 				  return false;
@@ -1857,14 +1861,14 @@
 
 	}
 
-	function file_validation2(ev)
+	function file_validation2(ev,TheName = '')
 	{
 	    var files = ev[0].files;
 	    var error = '';
 	    var msgStr = '';
 	    var max_upload_per_file = 4;
 	    if (files.length > max_upload_per_file) {
-	      msgStr += '1 Document should not be more than 4 Files<br>';
+	      msgStr += TheName +' should not be more than 4 Files<br>';
 
 	    }
 	    else
@@ -1876,7 +1880,8 @@
 	       var extension = name.split('.').pop().toLowerCase();
 	       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
 	       {
-	        msgStr += 'File Number '+ no + ' Invalid Type File<br>';
+	        // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
+	        msgStr += TheName +' Invalid Type File<br>';
 	        //toastr.error("Invalid Image File", 'Failed!!');
 	        // return false;
 	       }
@@ -1889,7 +1894,8 @@
 
 	       if(fsize > 2000000) // 2mb
 	       {
-	        msgStr += 'File Number '+ no + ' Image File Size is very big<br>';
+	        // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
+	        msgStr += TheName + ' Image File Size is very big<br>';
 	        //toastr.error("Image File Size is very big", 'Failed!!');
 	        //return false;
 	       }

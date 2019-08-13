@@ -477,7 +477,7 @@ class M_budgeting extends CI_Model {
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
                ) as dp on b.UnitDiv = dp.ID
                where a.ID_creator_budget_approval = ?
-               order by a.ID asc
+               order by c.CodeHeadAccount asc,a.ID asc
        ';
         $query=$this->db->query($sql, array($ID_creator_budget_approval))->result_array();
         return $query;
