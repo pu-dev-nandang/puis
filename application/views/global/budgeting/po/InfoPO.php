@@ -574,7 +574,9 @@
 		var arr = ClassDt.PRCode_arr;
 		var t = '';									
 		for (var i = 0; i < arr.length; i++) {
-			t += '<li>'+arr[i]+'</li>';
+			var tokenLink = jwt_encode(arr[i],"UAP)(*");
+			var ahref = '<a href="'+base_url_js+'budgeting_pr/'+tokenLink+'" target="_blank">'+arr[i]+'</a>'; 
+			t += '<li>'+ahref+'</li>';
 		}
 
 		html += t;

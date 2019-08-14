@@ -865,12 +865,14 @@ class C_po extends Transaksi_Controler {
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
             $arr_post_data_detail = json_decode(json_encode($arr_post_data_detail),true);
+            $Amount = 0;
             for ($i=0; $i < count($arr_post_data_detail); $i++) { 
                 $dataSave = $arr_post_data_detail[$i];
                 unset($dataSave['ID_po_detail']);
                 $ID = $arr_post_data_detail[$i]['ID_po_detail'];
                 $this->db->where('ID',$ID);
                 $this->db->update('db_purchasing.po_detail',$dataSave);
+                $Amount = $Amount +$dataSave['Subtotal'];
             }
 
             $po_data = json_decode(json_encode($po_data),true);
@@ -883,18 +885,20 @@ class C_po extends Transaksi_Controler {
                     $this->m_pr_po->po_circulation_sheet($Code,'PO Edited');
             }
 
+            $JsonStatus = $this->m_pr_po->GetRuleApproval_PO_JsonStatus($Amount);
             $dataSave = array(
                 // 'AnotherCost' => $AnotherCost,
                 'Notes' => $Notes,
                 'ID_pay_type' => $ID_pay_type,
                 'Status' => 1,
+                'JsonStatus' => json_encode($JsonStatus),
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
 
             // notification
               $CodeUrl = str_replace('/', '-', $Code);
-              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              // $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
               $NIPApprovalNext = $JsonStatus[1]['NIP'];
               $NIP = $this->session->userdata('NIP');
               // Send Notif for next approval
@@ -1558,14 +1562,16 @@ class C_po extends Transaksi_Controler {
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
-
             $arr_post_data_detail = json_decode(json_encode($arr_post_data_detail),true);
+            // print_r($arr_post_data_detail);die();
+            // $Amount = 0;
             for ($i=0; $i < count($arr_post_data_detail); $i++) { 
                 $dataSave = $arr_post_data_detail[$i];
                 unset($dataSave['ID_po_detail']);
                 $ID = $arr_post_data_detail[$i]['ID_po_detail'];
                 $this->db->where('ID',$ID);
                 $this->db->update('db_purchasing.po_detail',$dataSave);
+                // $Amount = $Amount +$dataSave['Subtotal'];
             }
 
             $po_data = json_decode(json_encode($po_data),true);
@@ -1579,19 +1585,21 @@ class C_po extends Transaksi_Controler {
                     $this->m_pr_po->po_circulation_sheet($Code,'SPK Edited');
             }
 
+            $JsonStatus = $this->m_pr_po->GetRuleApproval_SPK_JsonStatus();
             $dataSave = array(
                 'JobSpk' => $JobSpk,
                 'Notes' => $Notes,
                 'ID_pay_type' => $ID_pay_type,
                 'Notes2' => $Notes2,
                 'Status' => 1,
+                'JsonStatus' => json_encode($JsonStatus),
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
 
             // notification
               $CodeUrl = str_replace('/', '-', $Code);
-              $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
+              // $JsonStatus = json_decode($po_create[0]['JsonStatus'],true);
               $NIPApprovalNext = $JsonStatus[1]['NIP'];
               $NIP = $this->session->userdata('NIP');
               // Send Notif for next approval

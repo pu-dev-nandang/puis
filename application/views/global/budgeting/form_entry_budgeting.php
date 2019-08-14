@@ -721,6 +721,10 @@ function showButton()
 			{
 				$('#ChooseSubAccount').prop('disabled',false);
 			}
+
+			if (Status == 3) { // reject
+				$('#SaveBudget').remove();
+			}
 			
 		}
 

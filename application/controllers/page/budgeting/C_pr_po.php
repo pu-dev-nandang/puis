@@ -253,8 +253,17 @@ class C_pr_po extends Budgeting_Controler {
         $WhereFiltering = '';
         $IDDepartementPUBudget = $this->session->userdata('IDDepartementPUBudget');
         $NIP = $this->session->userdata('NIP');
-        if ($IDDepartementPUBudget != 'NA.9') {
-            $WhereFiltering .= ' where (a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\')';
+        if ($IDDepartementPUBudget != 'NA.9' && $IDDepartementPUBudget != 'NA.4' ) { // finance or purchasing
+        // if ($IDDepartementPUBudget != 'NA.9') { // finance or purchasing
+            $authData = $this->m_global->authShowListBudgetingPRPO($NIP,$requestData['search']['value']); // auth di approval po,payment dan finap
+            if ($authData) {
+                $WhereFiltering = '';
+            }
+            else
+            {
+                $WhereFiltering .= ' where (a.Departement = "'.$IDDepartementPUBudget.'" or JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\')';
+            }
+            
         }
 
         if (array_key_exists('Years', $_POST)) {
@@ -406,7 +415,7 @@ class C_pr_po extends Budgeting_Controler {
             $Departement = $input['Departement'];
         }
 
-        if (array_key_exists('PRCodeVal', $input)) { // change department
+        if (array_key_exists('PRCodeVal', $input)) { 
             $PRCodeVal = $input['PRCodeVal'];
             $G_data = $this->m_master->caribasedprimary('db_budgeting.pr_create','PRCode',$PRCodeVal);
             if (count($G_data) > 0) {
@@ -420,7 +429,7 @@ class C_pr_po extends Budgeting_Controler {
                         break;
                     }
                 }
-                
+
                 if (!$bool) {
                     // $Departement = $this->session->userdata('IDDepartementPUBudget');
                     $Departement = $G_data[0]['Departement'];
@@ -445,7 +454,27 @@ class C_pr_po extends Budgeting_Controler {
                 }
                 else
                 {
-                     $GetRuleAccess = $this->m_pr_po->GetRuleAccess($NIP,$Departement);
+                     // auth di approval po,payment dan finap
+                     $authData = $this->m_global->authShowListBudgetingPRPO($NIP,$PRCodeVal);
+                     if ($authData) {
+                        $GetRuleAccess['rule'] = array();
+                        $access = array();
+                        $t = array(
+                         'Active' => 1,
+                         'DSG' => null,
+                         'Departement' => $this->session->userdata('IDDepartementPUBudget'),
+                         'ID' => 0,
+                         'ID_m_userrole' => 0, //  by pass to view
+                         'NIP' => $NIP,
+                         'Status' => 1,
+                        );
+                        $access[] = $t;
+                        $GetRuleAccess['access'] = $access;
+                     }
+                     else
+                     {
+                        $GetRuleAccess = $this->m_pr_po->GetRuleAccess($NIP,$Departement);
+                     }
                 }
 
             }

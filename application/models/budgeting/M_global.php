@@ -421,4 +421,100 @@ class M_global extends CI_Model {
         return $query;
     }
 
+    public function authShowListBudgetingPRPO($NIP,$PRCode = '',$Code = '') // $Code = Code PO / SPK
+    {
+        if ($PRCode == '' && $Code == '') {
+            return false;
+        }
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin ';
+        $joinaction = ' left join (
+                                 select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
+                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin
+                                 from db_payment.payment as a join
+                                 ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
+                                   UNION 
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.bank_advance_realisasi where ID_bank_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.bank_advance as a
+                                   left join db_payment.bank_advance_realisasi as b on a.ID = b.ID_bank_advance
+                                   UNION 
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
+                                   left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
+                                   UNION 
+                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
+                                   as a
+                                   left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
+                                 )
+                 as b on a.ID = b.ID_payment
+                 join db_budgeting.ap as c on a.ID = c.ID_payment
+                  )
+                         as pay on pay.Code_po_create = a.Code
+                        left join db_employees.employees as e_PayFin on e_PayFin.NIP = pay.CreateBYPayFin
+                        left join db_employees.employees as e_spb on e_spb.NIP = pay.CreatedBy
+                        join (
+                        select * from (
+                        select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
+                        UNION
+                        select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
+                        UNION
+                        select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
+                        ) aa
+                        ) as t_spb_de on pay.Departement = t_spb_de.ID
+                     ';
+        $sqltotalData = 'select count(*) as total  from (
+                    select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
+                        c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
+                        a.JsonStatus,
+                        if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
+                    from db_purchasing.po_create as a
+                    left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
+                    left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
+                    left join db_employees.employees as d on a.CreatedBy = d.NIP
+                    left join db_purchasing.po_detail as e on a.Code = e.Code
+                    left join db_purchasing.pre_po_detail as f on e.ID_pre_po_detail = f.ID
+                    left join db_budgeting.pr_detail as g on f.ID_pr_detail = g.ID
+                    left join db_budgeting.pr_create as h on h.PRCode = g.PRCode
+                    '.$joinaction.'
+                )aa
+               ';
+        $whereQuery = '';
+        if ($PRCode != '') {
+            $whereQuery = 'where PRCode = "'.$PRCode.'"';
+        }
+
+        if ($Code != '') {
+            $whereQuery .= ($whereQuery != '') ? ' and Code ="'.$Code.'"' :  'where Code = "'.$Code.'"';
+        }
+        $sm = ($whereQuery == '') ? 'where' : ' and ';
+        $WhereFiltering = $sm.'(JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+
+        $sqltotalData.= $whereQuery.$WhereFiltering ;
+        $querytotalData = $this->db->query($sqltotalData)->result_array();
+        $totalData = $querytotalData[0]['total'];
+        if ($totalData > 0) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function FilteringDoubleApproval($JsonStatus)
+    {
+        $arr = array();
+        for ($i=0; $i < count($JsonStatus); $i++) { 
+            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                $arr[] = $JsonStatus[$i];
+                for ($j=$i+1; $j < count($JsonStatus); $j++) { 
+                     if ($JsonStatus[$j]['Visible'] == 'Yes') {
+                        if ($JsonStatus[$i]['NIP'] == $JsonStatus[$j]['NIP']) {
+                            $i= $j;    
+                            break;
+                        }
+                     }
+                }
+            }
+        }
+        return $arr;
+    }
+
 }
