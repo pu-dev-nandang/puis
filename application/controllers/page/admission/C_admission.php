@@ -10,7 +10,7 @@ class C_admission extends Admission_Controler {
         $this->load->model('master/m_master');
         $this->load->model('admission/m_admission');
         $this->load->model('m_sendemail');
-        $this->data['department'] = parent::__getDepartement(); 
+        $this->data['department'] = parent::__getDepartement();
         $this->load->model('m_api');
         $this->data['NameMenu'] = $this->GlobalData['NameMenu'];
         // get academic year admission
@@ -23,7 +23,7 @@ class C_admission extends Admission_Controler {
         $data['department'] = parent::__getDepartement();
         $content = "test";
         $this->temp($content);
-        
+
     }
 
     public function verifikasi_dokumen_calon_mahasiswa()
@@ -43,7 +43,7 @@ class C_admission extends Admission_Controler {
         $this->load->library('pagination');
         // $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($tahun,$nama,$status,$FormulirCode),2,6);
         $config = $this->config_pagination_default_ajax($this->m_admission->CountSelectDataCalonMahasiswa($nama,$status,$FormulirCode),2,6);
-  
+
         $this->pagination->initialize($config);
         $page = $this->uri->segment(6);
         $start = ($page - 1) * $config["per_page"];
@@ -56,7 +56,7 @@ class C_admission extends Admission_Controler {
         'register_document_table'   => $content,
         );
         echo json_encode($output);
-        
+
     }
 
     public function proses_document()
@@ -101,11 +101,11 @@ class C_admission extends Admission_Controler {
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
-            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text); 
-         }          
+            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+         }
       }
       else if($Status == 'Done')
-      { 
+      {
         // check status if all done
         $check = $this->m_admission->checkAllstatusDoneVeriDoc($ID_register_document);
         if ($check) {
@@ -115,7 +115,7 @@ class C_admission extends Admission_Controler {
                     ';
             $to = $keyURL['email'];
             $subject = "Podomoro University Document Upload";
-            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);   
+            // $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
         }
 
       }
@@ -222,7 +222,7 @@ class C_admission extends Admission_Controler {
     {
       $max_execution_time = 1000;
       ini_set('memory_limit', '-1');
-      ini_set('max_execution_time', $max_execution_time); //60 
+      ini_set('max_execution_time', $max_execution_time); //60
       $result = array('msg' => '');
       $input = $this->getInputToken();
       $ID_ProgramStudy = $input['program_study'];
@@ -246,7 +246,7 @@ class C_admission extends Admission_Controler {
 
         }
       }
-      
+
       return print_r(json_encode($result));
 
     }
@@ -282,7 +282,7 @@ class C_admission extends Admission_Controler {
         'loadtable'   => $content,
         );
         echo json_encode($output);
-        
+
     }
 
     public function set_nilai_ujian()
@@ -347,10 +347,10 @@ class C_admission extends Admission_Controler {
                 $rs['Status'] = 0;
                 $rs['msg'] = 'No_Ref is used, Please reload your browser';
               }
-              
+
               break;
           case 'edit':
-            /* 
+            /*
               Note :
               Tidak boleh ganti No_Ref
             */
@@ -391,7 +391,7 @@ class C_admission extends Admission_Controler {
               $this->m_master->updateStatusJual2($FormulirCode);
               $this->m_master->delete_id_table($input['CDID'],'sale_formulir_offline');
               // print_r($FormulirCode);
-              break;        
+              break;
       }
 
       echo json_encode($rs);
@@ -571,7 +571,7 @@ class C_admission extends Admission_Controler {
                   Tuition Fee calon mahasiswa telah diset oleh pihak admisi.<br>
                   Silahkan cek pada portal Anda.
               ';
-      $query = $this->m_master->caribasedprimary('db_admission.email_to','Function','Finance');             
+      $query = $this->m_master->caribasedprimary('db_admission.email_to','Function','Finance');
       $to = $query[0]['EmailTo'];
       $subject = "Podomoro University Notify";
       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
@@ -661,12 +661,12 @@ class C_admission extends Admission_Controler {
       $input = $this->getInputToken();
       $arr = array('msg' => '','status'=>0);
       $arr2 = array();
-      for ($i=0; $i < count($input); $i++) { 
+      for ($i=0; $i < count($input); $i++) {
         foreach ($input[$i] as $key => $value) {
           $arr2[] = array($key => $value);
         }
       }
-      
+
       print_r($arr2);
       /*$dataSave = array(
               'ID_ujian_perprody' => $ID_ujian_perprody,
@@ -705,7 +705,7 @@ class C_admission extends Admission_Controler {
                         // update db tentang deadline dan biling
                         $this->m_finance->updateCicilanDeadline($p['msg'],$checkCicilan[0]['ID']);
                         $arr['msg'] = 'Data berhasil diupdate';
-                        $arr['status'] = 1; 
+                        $arr['status'] = 1;
                       }
                     }
                     else
@@ -718,15 +718,15 @@ class C_admission extends Admission_Controler {
                             $to = $getDataPersonal[0]['Email'];
                             $subject = "Podomoro University Change Payment Deadline";
                             $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                      
+
                       if ($p['status']) {
                         // update db tentang deadline dan biling
                         $this->m_finance->updateCicilanDeadline($p['msg'],$checkCicilan[0]['ID']);
                         $arr['msg'] = 'Data berhasil diupdate';
-                        $arr['status'] = 1; 
+                        $arr['status'] = 1;
                       }
                     }
-                } 
+                }
               // create va
               break;
           case 'update_va':
@@ -770,9 +770,9 @@ class C_admission extends Admission_Controler {
                         // update db tentang deadline dan biling
                         $this->m_finance->updateCicilanDeadline($p['msg'],$checkCicilan[0]['ID']);
                         $arr['msg'] = 'Data berhasil diupdate';
-                        $arr['status'] = 1; 
+                        $arr['status'] = 1;
                       }
-                      
+
                     }
               break;
       }*/
@@ -820,7 +820,7 @@ class C_admission extends Admission_Controler {
         );
       }
       $arr2 = array();
-      for ($i=0; $i < count($payment_register); $i++) { 
+      for ($i=0; $i < count($payment_register); $i++) {
         $arr2[$i] = array(
             'Description' => $payment_register[$i]['Description'],
             'Discount' => $payment_register[$i]['Discount'].'%',
@@ -884,7 +884,7 @@ class C_admission extends Admission_Controler {
           $this->m_api->createDBYearAcademicNew($ta);
 
         }
-        
+
         $aa = 1;
         $bb = 1;
         $Q_getLastNPM = $this->m_master->getLastNPM($ta,$ProdiID);
@@ -916,7 +916,7 @@ class C_admission extends Admission_Controler {
             $MaxInc = 4;
             $strlen_aa = strlen($aa);
             $V_aa = $aa;
-            for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) { 
+            for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) {
               $V_aa = '0'.$V_aa;
             }
             $inc = $CodeID.$P_ang.$V_aa;
@@ -932,7 +932,7 @@ class C_admission extends Admission_Controler {
           $Name = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
           $Name = strtolower($Name);
           $Name = ucwords($Name);
-          
+
           $Address = $objWorksheet->getCellByColumnAndRow(12, $i)->getCalculatedValue();
           $Address = strtolower($Address);
           $Address = ucwords($Address);
@@ -947,7 +947,7 @@ class C_admission extends Admission_Controler {
           $ClassOf = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
           $Email = $objWorksheet->getCellByColumnAndRow(20, $i)->getCalculatedValue();
           $Email = strtolower($Email);
-          
+
           $Jacket = $objWorksheet->getCellByColumnAndRow(21, $i)->getCalculatedValue();
           $AnakKe = $objWorksheet->getCellByColumnAndRow(22, $i)->getCalculatedValue();
           $JumlahSaudara = $objWorksheet->getCellByColumnAndRow(23, $i)->getCalculatedValue();
@@ -962,7 +962,7 @@ class C_admission extends Admission_Controler {
           $Mother = $objWorksheet->getCellByColumnAndRow(28, $i)->getCalculatedValue();
           $Mother = strtolower($Mother);
           $Mother = ucwords($Mother);
-          
+
 
           $StatusFather = $objWorksheet->getCellByColumnAndRow(29, $i)->getCalculatedValue();
           $StatusMother = $objWorksheet->getCellByColumnAndRow(30, $i)->getCalculatedValue();
@@ -1079,7 +1079,7 @@ class C_admission extends Admission_Controler {
                 if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
                 if(
                     (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
-                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1) 
+                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
                              > 0 ,"Lunas","-"
                           )
                         ,
@@ -1109,7 +1109,7 @@ class C_admission extends Admission_Controler {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'" 
+                where a.SetTa = "'.$reqTahun.'"
               ) ccc
             ';
 
@@ -1141,7 +1141,7 @@ class C_admission extends Admission_Controler {
             // get tagihan
             $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
             $tagihan = '';
-            for ($j=0; $j < count($getTagihan); $j++) { 
+            for ($j=0; $j < count($getTagihan); $j++) {
                 $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
             }
 
@@ -1189,7 +1189,7 @@ class C_admission extends Admission_Controler {
               if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
               if(
                   (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
-                      if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1) 
+                      if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
                            > 0 ,"Lunas","-"
                         )
                       ,
@@ -1217,7 +1217,7 @@ class C_admission extends Admission_Controler {
               LEFT JOIN db_finance.register_admisi as xy
               on e.ID = xy.ID_register_formulir
               LEFT JOIN db_admission.register_dsn_type_m as xq
-              on xq.ID = xy.TypeBeasiswa 
+              on xq.ID = xy.TypeBeasiswa
               left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = c.FormulirCode
               where a.SetTa = "'.$reqTahun.'"
@@ -1253,7 +1253,7 @@ class C_admission extends Admission_Controler {
           // get tagihan
           $getTagihan = $this->m_admission->getPaymentType_Cost_created($row['ID_register_formulir']);
           $tagihan = '';
-          for ($j=0; $j < count($getTagihan); $j++) { 
+          for ($j=0; $j < count($getTagihan); $j++) {
               $tagihan .= $getTagihan[$j]['Abbreviation'].' : '.'Rp '.number_format($getTagihan[$j]['Pay_tuition_fee'],2,',','.').'<br>';
           }
 
@@ -1311,7 +1311,8 @@ class C_admission extends Admission_Controler {
           $arr_insert_auth = array();
           $arr_insert3 = array(); // for auth_parents
           $arr_insert4 = array();
-          
+          $arr_insert_library = array();
+
           for ($i=0; $i < count($arrInputID); $i++) {
             $data = $this->m_master->caribasedprimary('db_admission.register_formulir','ID',$arrInputID[$i]);
 
@@ -1355,7 +1356,7 @@ class C_admission extends Admission_Controler {
                     $MaxInc = 4;
                     $strlen_aa = strlen($aa);
                     $V_aa = $aa;
-                    for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) { 
+                    for ($j=0; $j < ($MaxInc-$strlen_aa); $j++) {
                       $V_aa = '0'.$V_aa;
                     }
                     $inc = $CodeID.$P_ang.$V_aa;
@@ -1428,7 +1429,7 @@ class C_admission extends Admission_Controler {
             {
               $Jacket = $Jacket[0]['JacketSize'];
             }
-            
+
             $AnakKe = 0;
             $JumlahSaudara = 0;
             $NationExamValue = 0;
@@ -1448,7 +1449,7 @@ class C_admission extends Admission_Controler {
             {
               $OccupationFather  = $OccupationFather[0]['ocu_name'];
             }
-            
+
             $OccupationMother = $this->m_master->caribasedprimary('db_admission.occupation','ocu_code',$data[0]['Mother_ID_occupation']);
             if (count($OccupationMother) == 0) {
               $OccupationMother  = '';
@@ -1457,7 +1458,7 @@ class C_admission extends Admission_Controler {
             {
               $OccupationMother = $OccupationMother[0]['ocu_name'];
             }
-            
+
             $EducationFather = '';
             $EducationMother = '';
             $AddressFather = $data[0]['FatherAddress'];
@@ -1495,7 +1496,7 @@ class C_admission extends Admission_Controler {
                       if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[0])) {
                         copy($this->path_upload_regOnline.$Email.'/'.$explode[0], './uploads/students/'.$ta.'/'.$Photo);
                       }
-                      
+
                     }
                   }
 
@@ -1506,7 +1507,7 @@ class C_admission extends Admission_Controler {
                       copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
                       unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
                      }
-                      
+
                     }
                   }
                   else
@@ -1515,16 +1516,16 @@ class C_admission extends Admission_Controler {
                       copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
                       unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
                     }
-                    
+
                   }
-                  
+
                   // if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
                   //     unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
                   // }
                 // }
-              } 
+              }
 
-              $dataSave = array(  
+              $dataSave = array(
                   'NPM' => $NPM,
                   'ID_reg_doc_checklist' => $getDoc[$z]['ID_reg_doc_checklist'],
                   'Status' => $getDoc[$z]['Status'],
@@ -1610,6 +1611,12 @@ class C_admission extends Admission_Controler {
 
             $arr_insert_auth[] = $temp2;
 
+
+                      $temp2['DateOfBirth'] = $temp['DateOfBirth'];
+                      $temp2['Address'] = $temp['Address'];
+                      $temp2['Email'] = $temp['Email'];
+
+                      $arr_insert_library[] = $temp2;
             $temp3 = array(
                 'NPM' => $NPM,
                 'ProgramID' => 1,
@@ -1625,7 +1632,7 @@ class C_admission extends Admission_Controler {
 
             $arr_insert3[] = $temp3;
 
-            $dataSave = array(  
+            $dataSave = array(
                 'NPM' => $NPM,
                 'FormulirCode' => $data2[0]['FormulirCode'],
                 'DateTime' => date('Y-m-d H:i:s'),
@@ -1642,14 +1649,14 @@ class C_admission extends Admission_Controler {
                  $getPaymentAdmisi = $this->m_master->caribasedprimary('db_finance.payment_admisi','ID_register_formulir',$arrInputID[$i]);
                  $PayFee = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$arrInputID[$i]);
                  $hitung = 0;
-                 for ($x=0; $x < count($PayFee); $x++) { 
+                 for ($x=0; $x < count($PayFee); $x++) {
                    $InvoiceP = $PayFee[$x]['Invoice'];
                    if ($PayFee[$x]['Status'] == 1) {
                      $hitung = $hitung + $InvoiceP;
                    }
-                   
+
                  }
-                 for ($z=0; $z < count($getPaymentAdmisi); $z++) { 
+                 for ($z=0; $z < count($getPaymentAdmisi); $z++) {
                      $Invoice = $getPaymentAdmisi[$z]['Pay_tuition_fee'];
 
                      $dataSave = array(
@@ -1725,9 +1732,9 @@ class C_admission extends Admission_Controler {
                   $subject = "Podomoro University Registration";
                   $ServerName = $_SERVER['SERVER_NAME'];
                   if ($ServerName == 'pcam.podomorouniversity.ac.id') {
-                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);  
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                   }
-                  
+
             $aa++;
           }
           // print_r($arr);
@@ -1737,7 +1744,8 @@ class C_admission extends Admission_Controler {
           $this->db->insert_batch('db_academic.auth_students', $arr_insert_auth);
           $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
           if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
-            $this->m_admission->insert_to_Library($arr_insert_auth);
+          // if(true) {
+            $this->m_admission->insert_to_Library($arr_insert_library);
           }
 
           // send notif
@@ -1752,7 +1760,7 @@ class C_admission extends Admission_Controler {
                 'To' => array(
                           'Div' => array(6,12),
                         ),
-                'Email' => 'No', 
+                'Email' => 'No',
             );
 
             $url = url_pas.'rest2/__send_notif_browser';
@@ -1775,10 +1783,10 @@ class C_admission extends Admission_Controler {
       $excel2 = $excel2->load('report_penjualan_data_18-10-09.xlsx'); // Empty Sheet
       $objWorksheet = $excel2->setActiveSheetIndex(0);
       $CountRow = $objWorksheet->getHighestRow();
-        
+
        $arr_bulan = array(
            'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
-       ); 
+       );
 
        $arr_temp = array();
       for ($i=5; $i < ($CountRow + 1); $i++) {
@@ -1786,7 +1794,7 @@ class C_admission extends Admission_Controler {
         // print_r($FormulirCode.'<br>');
         $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
         $Tanggal = explode(" ", $Tanggal);
-        for ($k=0; $k < count($arr_bulan); $k++) { 
+        for ($k=0; $k < count($arr_bulan); $k++) {
           $month = $Tanggal[1];
           if ($arr_bulan[$k] == $month) {
             $k++;
@@ -1809,7 +1817,7 @@ class C_admission extends Admission_Controler {
           {
             $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
           }
-          
+
         }
         //catch exception
         catch(Exception $e) {
@@ -1839,7 +1847,7 @@ class C_admission extends Admission_Controler {
           $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
           $query2=$this->db->query($sql2, array())->result_array();
           if (count($query2) > 0) {
-            $CityID =$query2[0]['RegionID']; 
+            $CityID =$query2[0]['RegionID'];
           }
           else
           {
@@ -1847,13 +1855,13 @@ class C_admission extends Admission_Controler {
             $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
             $query2=$this->db->query($sql2, array())->result_array();
             if (count($query2) > 0) {
-              $CityID =$query2[0]['RegionID']; 
+              $CityID =$query2[0]['RegionID'];
             }
             else
             {
 
             }
-            
+
           }
 
           $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
@@ -1998,7 +2006,7 @@ class C_admission extends Admission_Controler {
       }
       else
       {
-        $StatusJual = ''; 
+        $StatusJual = '';
       }
 
       // check session division
@@ -2024,7 +2032,7 @@ class C_admission extends Admission_Controler {
                 b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi,b.Link,b.DateFin
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
-                from db_admission.register as a 
+                from db_admission.register as a
                 join db_admission.register_verification as b
                 on a.ID = b.RegisterID
                 join db_admission.register_verified as c
@@ -2046,13 +2054,13 @@ class C_admission extends Admission_Controler {
                 on z.ID = b.SchoolID
                 left join db_academic.program_study as y
                 on b.ID_ProgramStudy = y.ID
-                '.$queryDiv.'  
+                '.$queryDiv.'
                 )
                 as b
                 on a.FormulirCode = b.FormulirCode
           ';
 
-      $sql.= 'where Years = "'.$reqTahun.'" and 
+      $sql.= 'where Years = "'.$reqTahun.'" and
                       (
                         b.FormulirCode like "'.$requestData['search']['value'].'%" or
                         b.No_Ref like "'.$requestData['search']['value'].'%" or
@@ -2071,7 +2079,7 @@ class C_admission extends Admission_Controler {
 
       // cek semester year tahun 2019 aktif untuk hide action
          $semester = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
-         $semesterYear = $semester[0]['Year']; 
+         $semesterYear = $semester[0]['Year'];
 
       $data = array();
       for($i=0;$i<count($query);$i++){
@@ -2137,7 +2145,7 @@ class C_admission extends Admission_Controler {
                             <i class="fa fa-edit"></i> Edit Penjualan
                           </span>
                         </div>
-                      </div>  
+                      </div>
                       ';
           }
 
@@ -2213,10 +2221,10 @@ class C_admission extends Admission_Controler {
         $excel2 = $excel2->load($path); // Empty Sheet
         $objWorksheet = $excel2->setActiveSheetIndex(0);
         $CountRow = $objWorksheet->getHighestRow();
-          
+
          $arr_bulan = array(
              'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
-         ); 
+         );
 
          $arr_temp = array();
          $No_Ref = '';
@@ -2240,7 +2248,7 @@ class C_admission extends Admission_Controler {
           $Tanggal = $objWorksheet->getCellByColumnAndRow(1, $i)->getCalculatedValue();
           $date =  date('Y-m-d', strtotime($Tanggal));
           // $Tanggal = explode(" ", $Tanggal);
-          // for ($k=0; $k < count($arr_bulan); $k++) { 
+          // for ($k=0; $k < count($arr_bulan); $k++) {
           //   $month = $Tanggal[1];
           //   if ($arr_bulan[$k] == $month) {
           //     $k++;
@@ -2263,7 +2271,7 @@ class C_admission extends Admission_Controler {
             {
               $NIP = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
             }
-            
+
           }
           //catch exception
           catch(Exception $e) {
@@ -2303,7 +2311,7 @@ class C_admission extends Admission_Controler {
             $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
             $query2=$this->db->query($sql2, array())->result_array();
             if (count($query2) > 0) {
-              $CityID =$query2[0]['RegionID']; 
+              $CityID =$query2[0]['RegionID'];
             }
             else
             {
@@ -2311,13 +2319,13 @@ class C_admission extends Admission_Controler {
               $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
               $query2=$this->db->query($sql2, array())->result_array();
               if (count($query2) > 0) {
-                $CityID =$query2[0]['RegionID']; 
+                $CityID =$query2[0]['RegionID'];
               }
               else
               {
 
               }
-              
+
             }
 
             $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
@@ -2487,7 +2495,7 @@ class C_admission extends Admission_Controler {
         if (count($chkFormulir) > 0) {
           continue;
         }
-        
+
         // NIM masih null
         $Tanggal = $objWorksheet->getCellByColumnAndRow(2, $i)->getCalculatedValue();
         $Tanggal = date('Y-m-d', strtotime($Tanggal));
@@ -2515,7 +2523,7 @@ class C_admission extends Admission_Controler {
         $get = $this->m_master->caribasedprimary('db_academic.program_study','Name',$Jurusan1);
         if(count($get) == 0){$arr_key_list_err[] = array('err' => 'Prodi tidak ditemukan','No_Ref' => $No_Ref);continue;}
         $ID_program_study = $get[0]['ID'];
-        $Jurusan2 = ''; 
+        $Jurusan2 = '';
         $PhoneNumber = $objWorksheet->getCellByColumnAndRow(10, $i)->getCalculatedValue();
         $PhoneNumber2 = $objWorksheet->getCellByColumnAndRow(11, $i)->getCalculatedValue();
         $PhoneNumber = $PhoneNumber.' / '.$PhoneNumber2;
@@ -2533,7 +2541,7 @@ class C_admission extends Admission_Controler {
         {
           $ID_register_jacket_size_m = $get[0]['ID'];
         }
-        
+
         $Address = $objWorksheet->getCellByColumnAndRow(16, $i)->getCalculatedValue();
         $RTRW = $objWorksheet->getCellByColumnAndRow(17, $i)->getCalculatedValue();
         $Address = 'RT/RW '.$RTRW.', '.$Address;
@@ -2550,7 +2558,7 @@ class C_admission extends Admission_Controler {
         {
           $ID_region = 0;
         }
-        
+
         if(array_key_exists(1,$region_Prov))
         {
           $Prov = $region_Prov[1];
@@ -2571,7 +2579,7 @@ class C_admission extends Admission_Controler {
         {
           $ID_province = 0;
         }
-        
+
 
         $skool1 = $objWorksheet->getCellByColumnAndRow(19, $i)->getCalculatedValue();
         $skool = trim(str_replace("SMA","", $skool1));
@@ -2595,7 +2603,7 @@ class C_admission extends Admission_Controler {
           $sql2 = 'select * from db_admission.region where RegionName like "%'.$city.'%"';
           $query2=$this->db->query($sql2, array())->result_array();
           if (count($query2) > 0) {
-            $CityID =$query2[0]['RegionID']; 
+            $CityID =$query2[0]['RegionID'];
           }
           else
           {
@@ -2603,13 +2611,13 @@ class C_admission extends Admission_Controler {
             $sql2 = 'select * from db_admission.region where RegionName like "%'.$city2.'%"';
             $query2=$this->db->query($sql2, array())->result_array();
             if (count($query2) > 0) {
-              $CityID =$query2[0]['RegionID']; 
+              $CityID =$query2[0]['RegionID'];
             }
             else
             {
 
             }
-            
+
           }
 
           $ProvinceID = $this->m_master->caribasedprimary('db_admission.province_region','RegionID',$CityID);
@@ -2623,8 +2631,8 @@ class C_admission extends Admission_Controler {
             $ProvinceID = 0;
             $ProvinceName = '';
           }
-          
-          
+
+
 
           $dataSave = array(
               'ProvinceID' => $ProvinceID,
@@ -2662,9 +2670,9 @@ class C_admission extends Admission_Controler {
           {
             $Father_ID_occupation = 0;
           }
-          
+
         }
-        
+
         $FatherAddress = $objWorksheet->getCellByColumnAndRow(34, $i)->getCalculatedValue();
 
 
@@ -2693,7 +2701,7 @@ class C_admission extends Admission_Controler {
             {
               $query23[0]['PriceFormulir'] = $get1234[0]['Price_Form'];
             }
-            
+
 
             $sql33 = 'select * from db_admission.va_generate where VA_Status = 1 order by ID asc limit 1';
             $query33=$this->db->query($sql33, array())->result_array();
@@ -2791,7 +2799,7 @@ class C_admission extends Admission_Controler {
             $ID_register_formulir = $this->db->insert_id();
 
             $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
-            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
+            for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) {
                 $dataSave = array(
                         'ID_register_formulir' => $ID_register_formulir,
                         'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
