@@ -3135,7 +3135,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                $TokenDep = $this->jwt->encode($DIVID_budget,"UAP)(*");
                $TokenURL = $this->jwt->encode($url,"UAP)(*");
                $TokenNIP = $this->jwt->encode($NIP,"UAP)(*");
-               $to = $G_emp[0]['EmailPU'];
+               $to = '';
+               if ($G_emp[0]['EmailPU'] != '' && $G_emp[0]['EmailPU'] != null) {
+                   $to = $G_emp[0]['EmailPU'];
+               }
+
+               if ($G_emp[0]['Email'] != '' && $G_emp[0]['Email'] != null) {
+                   if ($to != '') {
+                       $to .= ','.$G_emp[0]['Email'];
+                   }
+                   else
+                   {
+                       $to = $G_emp[0]['Email'];
+                   }
+               }
+               
                $subject = $text;
                $text = 'Dear Mr/Mrs '.$G_emp[0]['Name'].',<br><br>
                             '.$text.'
@@ -3148,8 +3162,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                </tr>
                                </tbody>
                            </table>
-                       ';        
-               $sendEmail = $this->M_sendemail_budgeting->sendEmail($to,$subject,$text);
+                       ';
+               if ($to != '') 
+               {
+                 $sendEmail = $this->M_sendemail_budgeting->sendEmail($to,$subject,$text);
+               }                
+              
             }
         }
     }
