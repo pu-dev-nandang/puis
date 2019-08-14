@@ -2326,6 +2326,9 @@ class C_rest extends CI_Controller {
                                         $token = $this->jwt->encode($data,"UAP)(*");
                                         $this->m_master->apiservertoserver($url,$token);
 
+                                        // send email is holding or warek keatas
+                                             $this->m_master->send_email_budgeting_holding($NIPApprovalNext,$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
                                     // Send Notif for user 
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
@@ -2765,6 +2768,9 @@ class C_rest extends CI_Controller {
                                 $url = url_pas.'rest2/__send_notif_browser';
                                 $token = $this->jwt->encode($data,"UAP)(*");
                                 $this->m_master->apiservertoserver($url,$token);
+
+                                // send email is holding or warek keatas
+                                     $this->m_master->send_email_budgeting_holding($NIPApprovalNext,$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
 
                             // Send Notif for user 
                                 $data = array(

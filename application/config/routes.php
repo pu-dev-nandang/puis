@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+// print_r(md5('010101'));die();
 require_once( BASEPATH .'database/DB.php' );
 $db =& DB();
 
@@ -1018,7 +1019,6 @@ $route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget
 $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_budget_onprocess_detail_byMonthYear';
 $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
 
-
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
 $route['api/__test_data2'] = 'api/c_api/test_data2';
@@ -1526,6 +1526,9 @@ $route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
 // budget remaining
 $route['budgeting_real_detail/(:any)'] = 'page/budgeting/c_budgeting/budgeting_real_detail/$1';
 $route['budgeting_onprocess_detail/(:any)'] = 'page/budgeting/c_budgeting/budgeting_onprocess_detail/$1';
+
+// auto login by url
+$route['__login_to_budget/(:any)/(:any)/(:any)'] = 'c_login/login_to_budget/$1/$2/$3';
 
 
 // Purchasing

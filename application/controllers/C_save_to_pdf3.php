@@ -1490,7 +1490,7 @@ class C_save_to_pdf3 extends CI_Controller {
         // print_r($arr_DetailItem);die();
         $y = $fpdf->GetY();
         $x__ = $w_dibayar+$no;
-        $fpdf->SetXY($x,$y);
+        $fpdf->SetXY($x+1,$y);
         $fpdf->Cell( ($x__-3) ,$h,'',0,0,'L',true);
         $fpdf->SetFont('Arial','B',$FontIsianHeader);
         $fpdf->Cell(10,$h,'Total',0,0,'L',true);
