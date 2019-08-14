@@ -261,6 +261,9 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                      $token = $this->jwt->encode($data,"UAP)(*");
                      $this->m_master->apiservertoserver($url,$token);
 
+                     // send email is holding or warek keatas
+                          $this->m_master->send_email_budgeting_holding($NIPApprovalNext,'NA.4',$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
             // insert to spb_circulation_sheet
                 $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
             // insert to po_circulation_sheet
@@ -399,6 +402,9 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                         $url = url_pas.'rest2/__send_notif_browser';
                         $token = $this->jwt->encode($data,"UAP)(*");
                         $this->m_master->apiservertoserver($url,$token);
+
+                        // send email is holding or warek keatas
+                             $this->m_master->send_email_budgeting_holding($NIPApprovalNext,'NA.4',$data['Logging']['URLDirect'],$data['Logging']['Description']);
 
                 // insert to spb_circulation_sheet
                     $this->m_spb->payment_circulation_sheet($ID_payment,$Desc_circulationSheet);
@@ -678,6 +684,9 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                          $url = url_pas.'rest2/__send_notif_browser';
                          $token = $this->jwt->encode($data,"UAP)(*");
                          $this->m_master->apiservertoserver($url,$token);
+
+                         // send email is holding or warek keatas
+                              $this->m_master->send_email_budgeting_holding($JsonStatus[1]['NIP'],$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
                 }
                 else
                 {
@@ -876,6 +885,9 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                              $url = url_pas.'rest2/__send_notif_browser';
                              $token = $this->jwt->encode($data,"UAP)(*");
                              $this->m_master->apiservertoserver($url,$token);
+
+                             // send email is holding or warek keatas
+                                  $this->m_master->send_email_budgeting_holding($JsonStatus[1]['NIP'],$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
 
                  }
                  else

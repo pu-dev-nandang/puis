@@ -808,6 +808,9 @@ class C_rest2 extends CI_Controller {
                                             $token = $this->jwt->encode($data,"UAP)(*");
                                             $this->m_master->apiservertoserver($url,$token);
 
+                                            // send email is holding or warek keatas
+                                                 $this->m_master->send_email_budgeting_holding($NIPApprovalNext,'NA.4',$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
                                         // Send Notif for user 
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
@@ -2351,6 +2354,9 @@ class C_rest2 extends CI_Controller {
                                         $token = $this->jwt->encode($data,"UAP)(*");
                                         $this->m_master->apiservertoserver($url,$token);
 
+                                        // send email is holding or warek keatas
+                                             $this->m_master->send_email_budgeting_holding($NIPApprovalNext,'NA.4',$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
                                     // Send Notif for user 
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
@@ -3299,6 +3305,9 @@ class C_rest2 extends CI_Controller {
                                         $token = $this->jwt->encode($data,"UAP)(*");
                                         $this->m_master->apiservertoserver($url,$token);
 
+                                        // send email is holding or warek keatas
+                                             $this->m_master->send_email_budgeting_holding($NIPApprovalNext,'NA.4',$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
                                     // Send Notif for user 
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
@@ -3826,12 +3835,23 @@ class C_rest2 extends CI_Controller {
                                     {
                                         // Notif to next step approval & User
                                             $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
+                                            if (array_key_exists('payment', $DtExisting)) {
+                                                $IDdiv = $DtExisting['payment'][0]['Departement'];
+                                            }
+                                            else
+                                            {
+                                                $IDdiv = $DtExisting['dtspb'][0]['Departement'];
+                                            }
+
+                                            $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                            $CodeDept = $G_div[0]['Code'];
+                                           
                                             // Send Notif for next approval
                                                 $data = array(
                                                     'auth' => 's3Cr3T-G4N',
                                                     'Logging' => array(
-                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
-                                                                    'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'].' of '.$CodeDept,
+                                                                    'Description' => 'Please approve '.$G_data[0]['Type'].' of '.$CodeDept,
                                                                     'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
                                                                     'CreatedBy' => $NIP,
                                                                   ),
@@ -3844,6 +3864,9 @@ class C_rest2 extends CI_Controller {
                                                 $url = url_pas.'rest2/__send_notif_browser';
                                                 $token = $this->jwt->encode($data,"UAP)(*");
                                                 $this->m_master->apiservertoserver($url,$token);
+
+                                                // send email is holding or warek keatas
+                                                     $this->m_master->send_email_budgeting_holding($NIPApprovalNext,$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
 
                                             // Send Notif for user 
                                                 $data = array(

@@ -1778,6 +1778,9 @@ class C_budgeting extends Budgeting_Controler {
                         'Email' => 'No', 
                     );
 
+                    // send email is holding or warek keatas
+                         $this->m_master->send_email_budgeting_holding($JsonStatus[1]['NIP'],$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
                     $url = url_pas.'rest2/__send_notif_browser';
                     $token = $this->jwt->encode($data,"UAP)(*");
                     $this->m_master->apiservertoserver($url,$token);                    
