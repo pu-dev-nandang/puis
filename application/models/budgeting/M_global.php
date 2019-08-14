@@ -498,4 +498,23 @@ class M_global extends CI_Model {
         }
     }
 
+    public function FilteringDoubleApproval($JsonStatus)
+    {
+        $arr = array();
+        for ($i=0; $i < count($JsonStatus); $i++) { 
+            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                $arr[] = $JsonStatus[$i];
+                for ($j=$i+1; $j < count($JsonStatus); $j++) { 
+                     if ($JsonStatus[$j]['Visible'] == 'Yes') {
+                        if ($JsonStatus[$i]['NIP'] == $JsonStatus[$j]['NIP']) {
+                            $i= $j;    
+                            break;
+                        }
+                     }
+                }
+            }
+        }
+        return $arr;
+    }
+
 }

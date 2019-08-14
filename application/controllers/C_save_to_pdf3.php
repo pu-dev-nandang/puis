@@ -61,6 +61,7 @@ class C_save_to_pdf3 extends CI_Controller {
     private function GeneratePDFPO($input)
     {
         $this->load->model('master/m_master');
+        $this->load->model('budgeting/m_global');
         $Code = $input['Code'];
         $CodeReplace = str_replace('/', '-', $Code);
         $filename = '__'.$CodeReplace.'.pdf';  
@@ -112,6 +113,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $po_create[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $fpdf->Cell(50, 5,'PIC : '.$JsonStatus[0]['Name'], 0, 1, 'L', 0);
         $fpdf->Cell(50, 5,'Bersama ini kami meminta untuk dikirim barang-barang sebagai berikut :', 0, 1, 'L', 0);
 
@@ -617,6 +619,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     private function GeneratePDFSpb()
     {
+        $this->load->model('budgeting/m_global');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
         $ID_payment = $input['ID_payment'];
@@ -750,6 +753,8 @@ class C_save_to_pdf3 extends CI_Controller {
         
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+
         $y = $fpdf->GetY()+20;
         $fpdf->SetXY($x,$y);
         $w__ = 210 / count($JsonStatus);
@@ -835,6 +840,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     public function GeneratePDFBankAdvance()
     {
+        $this->load->model('budgeting/m_global');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
         $ID_payment = $input['ID_payment'];
@@ -935,6 +941,8 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+
         $y = $fpdf->GetY()+20;
         $fpdf->SetXY($x,$y);
         $w__ = 210 / count($JsonStatus);
@@ -1020,6 +1028,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     public function GeneratePDFCashAdvance()
     {
+        $this->load->model('budgeting/m_global');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
         $ID_payment = $input['ID_payment'];
@@ -1084,6 +1093,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;
@@ -1192,6 +1202,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     public function PdfPettyCash_User($Input)
     {
+        $this->load->model('budgeting/m_global');
         $ID_payment = $Input['ID_payment'];
         $DataPayment = $Input['DataPayment'];
         $DataPayment = json_decode(json_encode($DataPayment),true);
@@ -1282,6 +1293,7 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->SetXY($x,$y);
          $JsonStatus = $dt_arr[0]['JsonStatus'];
          $JsonStatus = json_decode($JsonStatus,true);
+         $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
          $w__ = 190 / count($JsonStatus);
          $w__ = (int)$w__;
          $c__ = 0;
@@ -1372,6 +1384,7 @@ class C_save_to_pdf3 extends CI_Controller {
     }
 
     public function PdfSpb_User($Input){
+        $this->load->model('budgeting/m_global');
         $token = $this->input->post('token');
         $input = $this->getInputToken($token);
         $ID_payment = $input['ID_payment'];
@@ -1497,6 +1510,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $y = $fpdf->GetY()+20;
         $fpdf->SetXY($x,$y);
         $w__ = 210 / count($JsonStatus);
@@ -1582,6 +1596,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     public function PdfBA_User($input)
     {
+        $this->load->model('budgeting/m_global');
         $ID_payment = $input['ID_payment'];
         $dt_arr = $input['DataPayment'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
@@ -1695,6 +1710,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $y = $fpdf->GetY()+20;
         $fpdf->SetXY($x,$y);
         $w__ = 210 / count($JsonStatus);
@@ -1780,6 +1796,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
     public function PdfCA_User($input)
     {
+        $this->load->model('budgeting/m_global');
         $ID_payment = $input['ID_payment'];
         $dt_arr = $input['DataPayment'];
         $dt_arr = json_decode(json_encode($dt_arr),true);
@@ -1859,6 +1876,7 @@ class C_save_to_pdf3 extends CI_Controller {
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;

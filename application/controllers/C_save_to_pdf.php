@@ -5468,6 +5468,7 @@ Phone: (021) 29200456';
           $this->load->model('budgeting/m_budgeting');
           $this->load->model('budgeting/m_pr_po');
           $this->load->model('master/m_master');
+          $this->load->model('budgeting/m_global');
 
           $input = $this->getInputToken($token);
           $PRCode = $input['PRCode'];
@@ -5659,6 +5660,8 @@ Phone: (021) 29200456';
              $y += 10;
              $x = 10;
              $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
+             $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+
              $maxWrec = 130;
              $Wrec = $maxWrec - ( (count($JsonStatus)) * 5 );
              $fpdf->Rect($x,$y,$Wrec,$rect_h);
