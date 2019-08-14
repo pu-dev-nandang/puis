@@ -21,7 +21,7 @@ class M_admission extends CI_Model {
                 where b.Status != 'Done'
                 GROUP BY a.ID
                 ) as a
-                ";          
+                ";
         $query=$this->db->query($sql, array())->result_array();
         $conVertINT = (int) $query[0]['total'];
         return $conVertINT;
@@ -31,19 +31,19 @@ class M_admission extends CI_Model {
     public function CountSelectDataCalonMahasiswa($nama,$status,$FormulirCode)
     {
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       if($nama != '%') {
-          $nama = '"%'.$nama.'%"'; 
+          $nama = '"%'.$nama.'%"';
       }
       else
       {
-        $nama = '"%"'; 
+        $nama = '"%"';
       }
       if($status == 'Belum Done') {
         $status = 'Status != "Done"';
@@ -56,11 +56,11 @@ class M_admission extends CI_Model {
       //$tahun = 'year(RegisterAT) = '.$tahun;
       $sql = "select count(*) as total from (
                 select * from (
-                select a.ID,z.name as name_programstudy,b.FormulirCode, 
-                (select count(*) as total from db_admission.register_document 
+                select a.ID,z.name as name_programstudy,b.FormulirCode,
+                (select count(*) as total from db_admission.register_document
                 where ".$status." and ID_register_formulir = a.ID
                 GROUP BY ID_register_formulir limit 1) as document_undone,
-                (select count(*) as total from db_admission.register_document 
+                (select count(*) as total from db_admission.register_document
                 where Status = 'Progress Checking' and ID_register_formulir = a.ID
                 GROUP BY ID_register_formulir limit 1) as document_progress,
                 a.ID_program_study,d.Name,a.IdentityCard,e.ctr_name as Nationality,concat(a.PlaceBirth,',',a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -69,7 +69,7 @@ class M_admission extends CI_Model {
                 n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,IF(a.KPSReceiverStatus = 'YA',CONCAT('No KPS : ',a.NoKPS),'Tidak') as KPSReceiver,
                 a.UploadFoto,d.RegisterAT,az.No_Ref
                 from db_admission.register_formulir as a
-                Left JOIN db_admission.register_verified as b 
+                Left JOIN db_admission.register_verified as b
                 ON a.ID_register_verified = b.ID
                 Left JOIN db_admission.register_verification as c
                 ON b.RegVerificationID = c.ID
@@ -98,7 +98,7 @@ class M_admission extends CI_Model {
                 Left JOIN db_admission.formulir_number_offline_m as az
                 on b.FormulirCode = az.FormulirCode
                 ) as a
-                where document_undone > 0 and Name like ".$nama." 
+                where document_undone > 0 and Name like ".$nama."
                 and FormulirCode not in(select FormulirCode from db_admission.to_be_mhs) and (FormulirCode like ".$FormulirCode." or No_Ref like ".$FormulirCode.")
               ) aa
               "; // query undone
@@ -112,19 +112,19 @@ class M_admission extends CI_Model {
     {
       $arr_temp = array('data' => array());
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       if($nama != '%') {
-          $nama = '"%'.$nama.'%"'; 
+          $nama = '"%'.$nama.'%"';
       }
       else
       {
-        $nama = '"%"'; 
+        $nama = '"%"';
       }
       if($status == 'Belum Done') {
         $status = 'Status != "Done"';
@@ -136,11 +136,11 @@ class M_admission extends CI_Model {
 
       //$tahun = 'year(RegisterAT) = '.$tahun;
       $sql = "select * from (
-              select a.ID,z.name as name_programstudy,b.FormulirCode, 
-              (select count(*) as total from db_admission.register_document 
+              select a.ID,z.name as name_programstudy,b.FormulirCode,
+              (select count(*) as total from db_admission.register_document
               where ".$status." and ID_register_formulir = a.ID
               GROUP BY ID_register_formulir limit 1) as document_undone,
-              (select count(*) as total from db_admission.register_document 
+              (select count(*) as total from db_admission.register_document
               where Status = 'Progress Checking' and ID_register_formulir = a.ID
               GROUP BY ID_register_formulir limit 1) as document_progress,
               a.ID_program_study,d.Name,a.IdentityCard,e.ctr_name as Nationality,concat(a.PlaceBirth,',',a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -149,7 +149,7 @@ class M_admission extends CI_Model {
               n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,IF(a.KPSReceiverStatus = 'YA',CONCAT('No KPS : ',a.NoKPS),'Tidak') as KPSReceiver,
               a.UploadFoto,d.RegisterAT,az.No_Ref
               from db_admission.register_formulir as a
-              Left JOIN db_admission.register_verified as b 
+              Left JOIN db_admission.register_verified as b
               ON a.ID_register_verified = b.ID
               Left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
@@ -212,7 +212,7 @@ class M_admission extends CI_Model {
                               'FormulirCode' => $key->FormulirCode,
                               'No_Ref' => $key->No_Ref,
                   );
-                          
+
                   $b++;
               }  // exit foreach 2
               $a++;
@@ -222,7 +222,7 @@ class M_admission extends CI_Model {
 
     public function updateStatusVeriDokumen($data_arr,$Status)
     {
-        for ($i=0; $i < count($data_arr); $i++) { 
+        for ($i=0; $i < count($data_arr); $i++) {
           $arr = explode(";", $data_arr[$i]);
           $ID = $arr[0];
           //$NamaFile = ($arr[1] == 'nothing' ? $NamaFile="" : $NamaFile=$arr[1]);
@@ -232,8 +232,8 @@ class M_admission extends CI_Model {
           $sql = "update db_admission.register_document set Status = ?, VerificationBY = ?, VerificationAT = ? where ID = ?";
           // $query=$this->db->query($sql, array($Status,$NamaFile,$VerificationBY,$VerificationAT,$ID));
           $query=$this->db->query($sql, array($Status,$VerificationBY,$VerificationAT,$ID));
-        } 
-        
+        }
+
     }
 
     public function getKeylinkURLFormulirRegistration($ID_Register = null,$email = null)
@@ -244,10 +244,10 @@ class M_admission extends CI_Model {
       switch ($ID_Register) {
         case null:
           $sql = "select a.ID,a.Email from db_admission.register as a
-                  join db_admission.register_verification as b 
+                  join db_admission.register_verification as b
                   on a.ID = b.RegisterID
                   join db_admission.register_verified as c
-                  on b.ID = c.RegVerificationID 
+                  on b.ID = c.RegVerificationID
                   join db_admission.register_formulir as d
                   on c.ID = d.ID_register_verified
                   join db_admission.register_document as e
@@ -261,7 +261,7 @@ class M_admission extends CI_Model {
           }
           $this->getlinkURLFormulirRegistration($RegisterID,$email);
           break;
-        
+
         default:
           $this->load->library('JWT');
           $key = "UAP)(*";
@@ -297,7 +297,7 @@ class M_admission extends CI_Model {
       $query = $this->m_master->caribasedprimary('db_admission.register_document','ID',$ID_register_document);
       $ID_register_formulir = $query[0]['ID_register_formulir'];
       $query = $this->m_master->caribasedprimary('db_admission.register_document','ID_register_formulir',$ID_register_formulir);
-      for ($i=0; $i < count($query); $i++) { 
+      for ($i=0; $i < count($query); $i++) {
         $Status = $query[$i]['Status'];
         if ($Status != 'Done') {
           $check = FALSE;
@@ -311,7 +311,7 @@ class M_admission extends CI_Model {
     {
       $sql = "select count(*) as total from (
               select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
-              from db_admission.register as a 
+              from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
               join db_admission.register_verified as c
@@ -321,7 +321,7 @@ class M_admission extends CI_Model {
               where a.StatusReg = 1
               ) as a right JOIN db_admission.formulir_number_offline_m as b
               on a.FormulirCode = b.FormulirCode
-              ";          
+              ";
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -331,46 +331,46 @@ class M_admission extends CI_Model {
     {
 
       if($NomorFormulir != '%') {
-          $NomorFormulir = '"%'.$NomorFormulir.'%"'; 
+          $NomorFormulir = '"%'.$NomorFormulir.'%"';
       }
       else
       {
-        $NomorFormulir = '"%"'; 
+        $NomorFormulir = '"%"';
       }
 
       if($NomorFormulirRef != '%') {
-          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"'; 
+          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"';
       }
       else
       {
-        $NomorFormulirRef = ''; 
+        $NomorFormulirRef = '';
       }
 
       if($NamaStaffAdmisi != '%') {
-          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"'; 
+          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"';
       }
       else
       {
-        $NamaStaffAdmisi = ''; 
+        $NamaStaffAdmisi = '';
       }
       if($status != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $status = ' and b.Status = '.$status;
       }
       else
       {
-        $status = ''; 
+        $status = '';
       }
 
       if($statusJual != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $statusJual = ' and b.StatusJual = '.$statusJual;
       }
       else
       {
-        $statusJual = ''; 
+        $statusJual = '';
       }
 
       $sql = 'select count(*) as total from (
@@ -379,7 +379,7 @@ class M_admission extends CI_Model {
                                   b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi
                                   from (
                                   select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
-                                  from db_admission.register as a 
+                                  from db_admission.register as a
                                   join db_admission.register_verification as b
                                   on a.ID = b.RegisterID
                                   join db_admission.register_verified as c
@@ -406,7 +406,7 @@ class M_admission extends CI_Model {
                                   on a.FormulirCode = b.FormulirCode
                                   where Years = "'.$tahun.'" and b.FormulirCode like '.$NomorFormulir.$NamaStaffAdmisi.$status.$statusJual.$NomorFormulirRef.'
               ) aa
-              ';          
+              ';
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -416,13 +416,13 @@ class M_admission extends CI_Model {
     {
 
       if($statusJual != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $statusJual = ' and b.StatusJual = '.$statusJual;
       }
       else
       {
-        $statusJual = ''; 
+        $statusJual = '';
       }
 
       // check session division
@@ -442,25 +442,25 @@ class M_admission extends CI_Model {
         }
 
 
-      $sql = 'select count(*) as total from 
-              ( 
-                select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, 
+      $sql = 'select count(*) as total from
+              (
+                select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed,
                 b.StatusJual, b.FullName as NamaPembeli,b.PhoneNumber as PhoneNumberPembeli,b.HomeNumber as HomeNumberPembeli,
-                b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir, 
-                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi from 
-                ( 
+                b.Email as EmailPembeli,b.Sales,b.PIC as SalesNIP,b.SchoolNameFormulir,b.CityNameFormulir,b.DistrictNameFormulir,
+                b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi from
+                (
                   select a.Name as NameCandidate,a.Email,
-                  z.SchoolName,c.FormulirCode,a.StatusReg from db_admission.register as a join db_admission.register_verification as b 
-                  on a.ID = b.RegisterID join db_admission.register_verified as c on c.RegVerificationID = b.ID join db_admission.school as z on z.ID = a.SchoolID where a.StatusReg = 1 
-                ) as a right JOIN 
-                ( 
+                  z.SchoolName,c.FormulirCode,a.StatusReg from db_admission.register as a join db_admission.register_verification as b
+                  on a.ID = b.RegisterID join db_admission.register_verified as c on c.RegVerificationID = b.ID join db_admission.school as z on z.ID = a.SchoolID where a.StatusReg = 1
+                ) as a right JOIN
+                (
                   select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,b.NoKwitansi, b.Email,
-                  c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as CityNameFormulir,z.DistrictName as DistrictNameFormulir, 
+                  c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as CityNameFormulir,z.DistrictName as DistrictNameFormulir,
                   if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,
-                  b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b 
-                  on a.FormulirCode = b.FormulirCodeOffline left join db_employees.employees as c on c.NIP = b.PIC left join db_admission.school as z on z.ID = b.SchoolID 
+                  b.ID_ProgramStudy,y.Name as NameProdi from db_admission.formulir_number_offline_m as a left join db_admission.sale_formulir_offline as b
+                  on a.FormulirCode = b.FormulirCodeOffline left join db_employees.employees as c on c.NIP = b.PIC left join db_admission.school as z on z.ID = b.SchoolID
                   left join db_academic.program_study as y on b.ID_ProgramStudy = y.ID
-                  '.$queryDiv.'  
+                  '.$queryDiv.'
                 ) as b on a.FormulirCode = b.FormulirCode where b.Years = "'.$reqTahun.'" AND
                   (
                     b.FormulirCode like "'.$requestData['search']['value'].'%" or
@@ -477,7 +477,7 @@ class M_admission extends CI_Model {
 
               ) aa
               ';
-              // print_r($sql);die();          
+              // print_r($sql);die();
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -486,7 +486,7 @@ class M_admission extends CI_Model {
     public function totalDataFormulir_offline2()
     {
       $sql = "select count(*) as total from db_admission.sale_formulir_offline
-              ";          
+              ";
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -496,7 +496,7 @@ class M_admission extends CI_Model {
     {
       $sql = "select count(*) as total from (
               select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
-              from db_admission.register as a 
+              from db_admission.register as a
               join db_admission.register_verification as b
               on a.ID = b.RegisterID
               join db_admission.register_verified as c
@@ -506,7 +506,7 @@ class M_admission extends CI_Model {
               where a.StatusReg = 0
               ) as a right JOIN db_admission.formulir_number_online_m as b
               on a.FormulirCode = b.FormulirCode
-              ";          
+              ";
       $query=$this->db->query($sql, array())->result_array();
       $conVertINT = (int) $query[0]['total'];
       return $conVertINT;
@@ -516,26 +516,26 @@ class M_admission extends CI_Model {
     {
       $arr_temp = array('data' => array());
       if($NomorFormulir != '%') {
-          $NomorFormulir = '"%'.$NomorFormulir.'%"'; 
+          $NomorFormulir = '"%'.$NomorFormulir.'%"';
       }
       else
       {
-        $NomorFormulir = '"%"'; 
+        $NomorFormulir = '"%"';
       }
-      
+
       if($status != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $status = ' and b.Status = '.$status;
       }
       else
       {
-        $status = ''; 
+        $status = '';
       }
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
           select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone
-          from db_admission.register as a 
+          from db_admission.register as a
           join db_admission.register_verification as b
           on a.ID = b.RegisterID
           join db_admission.register_verified as c
@@ -555,46 +555,46 @@ class M_admission extends CI_Model {
     {
       $arr_temp = array('data' => array());
       if($NomorFormulir != '%') {
-          $NomorFormulir = '"%'.$NomorFormulir.'%"'; 
+          $NomorFormulir = '"%'.$NomorFormulir.'%"';
       }
       else
       {
-        $NomorFormulir = '"%"'; 
+        $NomorFormulir = '"%"';
       }
 
       if($NomorFormulirRef != '%') {
-          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"'; 
+          $NomorFormulirRef = ' and b.No_Ref like "%'.$NomorFormulirRef.'%"';
       }
       else
       {
-        $NomorFormulirRef = ''; 
+        $NomorFormulirRef = '';
       }
 
       if($NamaStaffAdmisi != '%') {
-          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"'; 
+          $NamaStaffAdmisi = ' and b.Sales like "%'.$NamaStaffAdmisi.'%"';
       }
       else
       {
-        $NamaStaffAdmisi = ''; 
+        $NamaStaffAdmisi = '';
       }
       if($status != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $status = ' and b.Status = '.$status;
       }
       else
       {
-        $status = ''; 
+        $status = '';
       }
 
       if($statusJual != '%') {
-        // $status = '"%'.$status.'%"'; 
+        // $status = '"%'.$status.'%"';
         // $status = 'StatusUsed != '.$status;
         $statusJual = ' and b.StatusJual = '.$statusJual;
       }
       else
       {
-        $statusJual = ''; 
+        $statusJual = '';
       }
 
         $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,b.No_Ref,a.StatusReg,b.Years,b.Status as StatusUsed, b.StatusJual,
@@ -602,7 +602,7 @@ class M_admission extends CI_Model {
                 b.ID as ID_sale_formulir_offline,b.Price_Form,b.DateSale,b.src_name,b.NameProdi,b.NoKwitansi
                 from (
                 select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg
-                from db_admission.register as a 
+                from db_admission.register as a
                 join db_admission.register_verification as b
                 on a.ID = b.RegisterID
                 join db_admission.register_verified as c
@@ -636,7 +636,7 @@ class M_admission extends CI_Model {
     {
       $SellLinkBy = $this->session->userdata('NIP');
 
-      for ($i=0; $i < count($data_arr); $i++) { 
+      for ($i=0; $i < count($data_arr); $i++) {
         if ($data_arr == 'nothing') {
           continue;
         }
@@ -649,13 +649,13 @@ class M_admission extends CI_Model {
     {
       $sql = "select c.Name,a.ID_ujian_perprody,DATE(a.DateTimeTest) as tanggal
               ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),':',(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
-              a.Lokasi from db_admission.register_jadwal_ujian as a 
+              a.Lokasi from db_admission.register_jadwal_ujian as a
               join db_admission.ujian_perprody_m as b
               on a.ID_ujian_perprody = b.ID
               join db_academic.program_study as c
               on c.ID = b.ID_ProgramStudy
               GROUP BY c.Name,DATE(a.DateTimeTest)
-              ";          
+              ";
       $query=$this->db->query($sql, array())->result_array();
       return $query;
     }
@@ -673,14 +673,14 @@ class M_admission extends CI_Model {
     public function getID_register_formulir_programStudy_arr($arr)
     {
       $arr_temp = array();
-      for ($i=0; $i < count($arr); $i++) { 
-        $sql = "select ID from db_admission.register_formulir where ID_program_study = ? and ID in (select ID_register_formulir from db_admission.register_butuh_ujian)";          
+      for ($i=0; $i < count($arr); $i++) {
+        $sql = "select ID from db_admission.register_formulir where ID_program_study = ? and ID in (select ID_register_formulir from db_admission.register_butuh_ujian)";
         $query=$this->db->query($sql, array($arr[$i]['ID_ProgramStudy']))->result_array();
-        for ($j=0; $j < count($query); $j++) { 
+        for ($j=0; $j < count($query); $j++) {
           $arr_temp[] = array('ID_register_formulir' => $query[$j]['ID'],'ID_register_jadwal_ujian' => $arr[$i]['ID_register_jadwal_ujian'],'ID_ProgramStudy'=>$arr[$i]['ID_ProgramStudy']);
         }
       }
-      
+
       return $arr_temp;
     }
 
@@ -689,17 +689,17 @@ class M_admission extends CI_Model {
       $arr_temp = array('result' => '','data' => array());
       $arr = array();
       $x = 0;
-      for ($i=0; $i <  count($arr_ID_ProgramStudy) ; $i++) { 
-        $sql = "select ID,ID_ProgramStudy from db_admission.ujian_perprody_m where ID_ProgramStudy = ? ";          
+      for ($i=0; $i <  count($arr_ID_ProgramStudy) ; $i++) {
+        $sql = "select ID,ID_ProgramStudy from db_admission.ujian_perprody_m where ID_ProgramStudy = ? ";
         $query=$this->db->query($sql, array($arr_ID_ProgramStudy[$i]))->result_array();
         // print_r($query);
           if (count($query) == 0) {
-            $arr_temp['result'] = 'Ujian Masuk Per Prody belum disetting, silahkan inputkan dulu pada Master Registration Ujian Per Prody';  
+            $arr_temp['result'] = 'Ujian Masuk Per Prody belum disetting, silahkan inputkan dulu pada Master Registration Ujian Per Prody';
             break;
           }
           else
           {
-              for ($j=0; $j < count($query); $j++) { 
+              for ($j=0; $j < count($query); $j++) {
                 $arr[$x] = array('ID_ujian_perprody' =>$query[$j]['ID'], 'ID_ProgramStudy' => $query[$j]['ID_ProgramStudy'] );
                 $x++;
               }
@@ -726,12 +726,12 @@ class M_admission extends CI_Model {
         catch(Exception $e)
         {
           continue;
-        } 
-        
-        $sql = "select ID from db_admission.register_jadwal_ujian where ID_ujian_perprody = ? and DateTimeTest = ? and Lokasi = ?";          
+        }
+
+        $sql = "select ID from db_admission.register_jadwal_ujian where ID_ujian_perprody = ? and DateTimeTest = ? and Lokasi = ?";
         $query=$this->db->query($sql, array($arr_ID_ujian_per_prody['data'][$i]['ID_ujian_perprody'],$DateTimeTest,$Lokasi))->result_array();
         $arr = array();
-        for ($j=0; $j < count($query) ; $j++) { 
+        for ($j=0; $j < count($query) ; $j++) {
           $arr_temp[$x] = array('ID_register_jadwal_ujian' => $query[0]['ID'],'ID_ProgramStudy' => $arr_ID_ujian_per_prody['data'][$i]['ID_ProgramStudy'] );
           $x++;
         }
@@ -743,10 +743,10 @@ class M_admission extends CI_Model {
     public function saveDataregister_formulir_jadwal_ujian($arr_id)
     {
       //error_reporting(0);
-      for ($i=0; $i < count($arr_id); $i++) { 
+      for ($i=0; $i < count($arr_id); $i++) {
         try
         {
-          // check ID_register_formulir sudah ada pada jadwal ujian atau belum 
+          // check ID_register_formulir sudah ada pada jadwal ujian atau belum
           $sql = 'select count(*) as total from db_admission.register_formulir_jadwal_ujian where ID_register_formulir = ?';
           $query=$this->db->query($sql, array($arr_id[$i]['ID_register_formulir']))->result_array();
 
@@ -760,14 +760,14 @@ class M_admission extends CI_Model {
             );
             $this->db->insert('db_admission.register_formulir_jadwal_ujian', $dataSave);
           }
-          
+
         }
         catch(Exception $e)
         {
           continue;
         }
       }
-      
+
     }
 
     public function daftar_jadwal_ujian_load_data_now()
@@ -776,7 +776,7 @@ class M_admission extends CI_Model {
         ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
         a.Lokasi,
         h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir,if(h.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = f.FormulirCode limit 1) ,""  ) as No_Ref
-        from db_admission.register_jadwal_ujian as a 
+        from db_admission.register_jadwal_ujian as a
         join db_admission.ujian_perprody_m as b
         on a.ID_ujian_perprody = b.ID
         join db_academic.program_study as c
@@ -823,7 +823,7 @@ class M_admission extends CI_Model {
               }
 
            $where .= ' and f.FormulirCode like "%'.$FormulirCode.'%"';
-         } 
+         }
       }
       else
       {
@@ -853,7 +853,7 @@ class M_admission extends CI_Model {
         a.Lokasi,
         h.Name as NameCandidate,h.Email,i.SchoolName,f.FormulirCode,e.ID as ID_register_formulir,
         if(h.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = f.FormulirCode limit 1) ,""  ) as No_Ref
-        from db_admission.register_jadwal_ujian as a 
+        from db_admission.register_jadwal_ujian as a
         join db_admission.ujian_perprody_m as b
         on a.ID_ujian_perprody = b.ID
         join db_academic.program_study as c
@@ -870,7 +870,7 @@ class M_admission extends CI_Model {
         on h.ID = g.RegisterID
         join db_admission.school as i
         on i.ID = h.SchoolID
-        '.$where.' 
+        '.$where.'
         GROUP BY c.Name,DATE(a.DateTimeTest),e.ID '.' LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       return $query;
@@ -881,7 +881,7 @@ class M_admission extends CI_Model {
     {
       $sql = 'select count(*) as total from (
                 select c.Name as prody
-                from db_admission.register_jadwal_ujian as a 
+                from db_admission.register_jadwal_ujian as a
                 RIGHT JOIN db_admission.ujian_perprody_m as b
                 on a.ID_ujian_perprody = b.ID
                 join db_academic.program_study as c
@@ -909,7 +909,7 @@ class M_admission extends CI_Model {
               ,CONCAT((EXTRACT(HOUR FROM a.DateTimeTest)),":",(EXTRACT(MINUTE FROM a.DateTimeTest))) as jam,
               a.Lokasi,b.NamaUjian,b.Bobot,
               h.Name as NameCandidate,e.ID as ID_register_formulir,b.ID_ProgramStudy
-              from db_admission.register_jadwal_ujian as a 
+              from db_admission.register_jadwal_ujian as a
               RIGHT JOIN db_admission.ujian_perprody_m as b
               on a.ID_ujian_perprody = b.ID
               join db_academic.program_study as c
@@ -940,7 +940,7 @@ class M_admission extends CI_Model {
 
     public function saveDataNilaiUjian($arr)
     {
-      for ($i=0; $i < count($arr['processs1']); $i++) { 
+      for ($i=0; $i < count($arr['processs1']); $i++) {
         $sql = 'select c.ID from db_admission.ujian_perprody_m as a
                 join db_admission.register_jadwal_ujian as b
                 on a.ID = b.ID_ujian_perprody
@@ -948,11 +948,11 @@ class M_admission extends CI_Model {
                 on c.ID_register_jadwal_ujian = b.ID
                 where a.ID = ? and c.ID_register_formulir = ?';
 
-        // print_r($arr[$i]->id_mataujian);        
+        // print_r($arr[$i]->id_mataujian);
         $ID_ujian_perprody = $arr['processs1'][$i]->id_mataujian;
-        $ID_register_formulir = $arr['processs1'][$i]->id_formulir;          
+        $ID_register_formulir = $arr['processs1'][$i]->id_formulir;
         $query=$this->db->query($sql, array($ID_ujian_perprody,$ID_register_formulir))->result_array();
-          for ($j=0; $j < count($query); $j++) { 
+          for ($j=0; $j < count($query); $j++) {
               $ID_register_formulir_jadwal_ujian = $query[$j]['ID'];
               $dataSave = array(
                       'ID_register_formulir_jadwal_ujian' => $ID_register_formulir_jadwal_ujian,
@@ -961,12 +961,12 @@ class M_admission extends CI_Model {
                       'CreateBY' => $this->session->userdata('NIP'),
               );
               $this->db->insert('db_admission.register_hasil_ujian', $dataSave);
-          }        
+          }
       }
 
       // print_r($arr['kelulusan']);
 
-      for ($i=0; $i < count($arr['kelulusan']); $i++) { 
+      for ($i=0; $i < count($arr['kelulusan']); $i++) {
         $a = $arr['kelulusan'][$i];
         if ($a != '') {
           $arr_temp = explode(";", $a);
@@ -985,7 +985,7 @@ class M_admission extends CI_Model {
 
     public function showData($tabel)
     {
-      $sql = "select * from ".$tabel; 
+      $sql = "select * from ".$tabel;
       $query=$this->db->query($sql, array());
       return $query->result_array();
     }
@@ -1026,7 +1026,7 @@ class M_admission extends CI_Model {
       {
         $NoKwitansi = 1;
       }
-      
+
       $FullName = strtolower($input_arr['Name']);
       $dataSave = array(
               'FormulirCodeOffline' => $input_arr['selectFormulirCode'],
@@ -1140,7 +1140,7 @@ class M_admission extends CI_Model {
     public function formulir_offline_salect_PIC($input_arr)
     {
       $this->load->model('m_api');
-      
+
       $SchoolID = $input_arr['School'];
       if ($SchoolID != '') {
         // cari sales berdasarkan wilayah, jika tidak ada maka tampilkan sales secara keseluruhan
@@ -1179,7 +1179,7 @@ class M_admission extends CI_Model {
             $query=$this->db->query($sql, array($SchoolID))->result_array();
             if (count($query) == 0) {
               // $query = $this->m_api->getEmployeesBy('10','13');
-              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2) 
+              $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2)
                       union
                       select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18  and StatusEmployeeID not in (-1,-2)
                     ';
@@ -1189,9 +1189,9 @@ class M_admission extends CI_Model {
       }
       else
       {
-        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2) 
+        $sql = 'select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 10 and StatusEmployeeID not in (-1,-2)
                 union
-                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18  and StatusEmployeeID not in (-1,-2) 
+                select NIP,Name from db_employees.employees where LEFT(PositionMain ,INSTR(PositionMain ,".")-1) = 18  and StatusEmployeeID not in (-1,-2)
               ';
         // tampilkan sales secara keseluruhan
         // $query = $this->m_api->getEmployeesBy('10','13');
@@ -1230,31 +1230,31 @@ class M_admission extends CI_Model {
     public function count_loadData_calon_mahasiswa($Nama,$selectProgramStudy,$Sekolah,$No_Formulir)
     {
       if($Nama != '%') {
-          $Nama = '"%'.$Nama.'%"'; 
+          $Nama = '"%'.$Nama.'%"';
       }
       else
       {
-        $Nama = '"%"'; 
+        $Nama = '"%"';
       }
-      
+
       if($selectProgramStudy != '%') {
-        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+        $selectProgramStudy = '"%'.$selectProgramStudy.'%"';
       }
       else
       {
-        $selectProgramStudy = '"%"'; 
+        $selectProgramStudy = '"%"';
       }
 
       if($Sekolah != '%') {
-        $Sekolah = '"%'.$Sekolah.'%"'; 
+        $Sekolah = '"%'.$Sekolah.'%"';
       }
       else
       {
-        $Sekolah = '"%"'; 
+        $Sekolah = '"%"';
       }
 
       if($No_Formulir == '') {
-          $No_Formulir = ''; 
+          $No_Formulir = '';
       }
       else
       {
@@ -1275,13 +1275,13 @@ class M_admission extends CI_Model {
             $No_Formulir = $Q[0]['FormulirCode'];
           }
 
-        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"'; 
+        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"';
       }
 
         $sql = 'select count(*) as total from (
               select a.ID as ID_register_formulir
               from db_admission.register_formulir as a
-              left JOIN db_admission.register_verified as b 
+              left JOIN db_admission.register_verified as b
               ON a.ID_register_verified = b.ID
               left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
@@ -1309,7 +1309,7 @@ class M_admission extends CI_Model {
               ON n.ID = d.SchoolID
               left join db_academic.program_study as o
               on o.ID = a.ID_program_study
-              where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) '.$No_Formulir.' 
+              where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian) and  a.ID not in (select ID_register_formulir from db_admission.register_nilai) '.$No_Formulir.'
             ) aa';
            $query=$this->db->query($sql, array())->result_array();
            return $query[0]['total'];
@@ -1319,31 +1319,31 @@ class M_admission extends CI_Model {
     {
       $arr_temp = array('data' => array());
       if($Nama != '%') {
-          $Nama = '"%'.$Nama.'%"'; 
+          $Nama = '"%'.$Nama.'%"';
       }
       else
       {
-        $Nama = '"%"'; 
+        $Nama = '"%"';
       }
-      
+
       if($selectProgramStudy != '%') {
-        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+        $selectProgramStudy = '"%'.$selectProgramStudy.'%"';
       }
       else
       {
-        $selectProgramStudy = '"%"'; 
+        $selectProgramStudy = '"%"';
       }
 
       if($Sekolah != '%') {
-        $Sekolah = '"%'.$Sekolah.'%"'; 
+        $Sekolah = '"%'.$Sekolah.'%"';
       }
       else
       {
-        $Sekolah = '"%"'; 
+        $Sekolah = '"%"';
       }
 
       if($No_Formulir == '') {
-          $No_Formulir = ''; 
+          $No_Formulir = '';
       }
       else
       {
@@ -1364,7 +1364,7 @@ class M_admission extends CI_Model {
             $No_Formulir = $Q[0]['FormulirCode'];
           }
 
-        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"'; 
+        $No_Formulir = ' and b.FormulirCode = "'.$No_Formulir.'"';
       }
 
         $sql = 'select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -1373,7 +1373,7 @@ class M_admission extends CI_Model {
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              b.FormulirCode,  if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
             from db_admission.register_formulir as a
-            left JOIN db_admission.register_verified as b 
+            left JOIN db_admission.register_verified as b
             ON a.ID_register_verified = b.ID
             left JOIN db_admission.register_verification as c
             ON b.RegVerificationID = c.ID
@@ -1408,7 +1408,7 @@ class M_admission extends CI_Model {
 
     public function submit_ikut_ujian($input)
     {
-      for ($i=0; $i < count($input); $i++) { 
+      for ($i=0; $i < count($input); $i++) {
         $dataSave = array(
                 'ID_register_formulir' => $input[$i],
         );
@@ -1444,7 +1444,7 @@ class M_admission extends CI_Model {
                     where e.Active = 1 and d.ID not in(select ID_register_formulir from db_admission.register_nilai)
                     and  d.ID not in (select ID_register_formulir from db_admission.register_butuh_ujian)
                     GROUP by d.ID
-                  ) bb 
+                  ) bb
                   '.$addQ.'
               ) aa';
       $query=$this->db->query($sql, array())->result_array();
@@ -1483,7 +1483,7 @@ class M_admission extends CI_Model {
               GROUP by d.ID
              )aa '.$addQ.'
               LIMIT '.$start. ', '.$limit;
-      // print_r($sql);die();        
+      // print_r($sql);die();
       $query=$this->db->query($sql, array())->result_array();
       if (count($query) > 0) {
         $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : $query[0]['ID_program_study']  );
@@ -1492,18 +1492,18 @@ class M_admission extends CI_Model {
       {
         $arr_temp = array('query' => $query,'Prodi' => ($FormulirCode == "") ? $ID_ProgramStudy : ''  );
       }
-     
+
       return $arr_temp;
     }
 
     public function saveDataNilaRapor($arr)
     {
-      for ($i=0; $i < count($arr['processs1']); $i++) { 
+      for ($i=0; $i < count($arr['processs1']); $i++) {
         $ID_ujian_perprody = $arr['processs1'][$i]->id_mataujian;
         $ID_register_formulir = $arr['processs1'][$i]->id_formulir;
-        
+
         $bool = true;
-        for ($j=0; $j < count($arr['rangking']); $j++) { 
+        for ($j=0; $j < count($arr['rangking']); $j++) {
             $id_doc = $arr['rangking'][$j]->id_doc;
             if ($ID_register_formulir == $arr['rangking'][$j]->id_formulir) {
               if ($id_doc == '' || $id_doc == null ) {
@@ -1511,9 +1511,9 @@ class M_admission extends CI_Model {
                 break;
               }
             }
-            
-        } 
-        
+
+        }
+
         if ($bool) {
             $dataSave = array(
                     'ID_ujian_perprody' => $ID_ujian_perprody,
@@ -1524,15 +1524,15 @@ class M_admission extends CI_Model {
                     'CreateBY' => $this->session->userdata('NIP'),
             );
             $this->db->insert('db_admission.register_nilai', $dataSave);
-        }       
-         
+        }
+
       }
 
     }
 
     public function saveDataRangkingRapor($arr)
     {
-      for ($j=0; $j < count($arr['rangking']); $j++) { 
+      for ($j=0; $j < count($arr['rangking']); $j++) {
           $ID_register_formulir = $arr['rangking'][$j]->id_formulir;
           $Rangking = $arr['rangking'][$j]->rangking;
           $id_doc = $arr['rangking'][$j]->id_doc;
@@ -1544,13 +1544,13 @@ class M_admission extends CI_Model {
             );
             $this->db->insert('db_admission.register_rangking', $dataSave);
           }
-      } 
+      }
     }
 
     public function saveDataRaporToFin($arr)
     {
       $arr = (array)json_decode(json_encode($arr),true);
-      for ($i=0; $i < count($arr); $i++) { 
+      for ($i=0; $i < count($arr); $i++) {
         $dt = $arr[$i];
         // print_r($dt);
         $dt['CreateAT'] = date('Y-m-d');
@@ -1562,41 +1562,41 @@ class M_admission extends CI_Model {
     public function count_loadData_calon_mahasiswa_created($Nama,$selectProgramStudy,$Sekolah,$FormulirCode)
     {
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       if($Nama != '%') {
-          $Nama = '"%'.$Nama.'%"'; 
+          $Nama = '"%'.$Nama.'%"';
       }
       else
       {
-        $Nama = '"%"'; 
+        $Nama = '"%"';
       }
-      
+
       if($selectProgramStudy != '%') {
-        $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+        $selectProgramStudy = '"%'.$selectProgramStudy.'%"';
       }
       else
       {
-        $selectProgramStudy = '"%"'; 
+        $selectProgramStudy = '"%"';
       }
 
       if($Sekolah != '%') {
-        $Sekolah = '"%'.$Sekolah.'%"'; 
+        $Sekolah = '"%'.$Sekolah.'%"';
       }
       else
       {
-        $Sekolah = '"%"'; 
+        $Sekolah = '"%"';
       }
 
         $sql = 'select count(*) as total from (
                   select a.ID as ID_register_formulir
                 from db_admission.register_formulir as a
-                Left JOIN db_admission.register_verified as b 
+                Left JOIN db_admission.register_verified as b
                 ON a.ID_register_verified = b.ID
                 Left JOIN db_admission.register_verification as c
                 ON b.RegVerificationID = c.ID
@@ -1626,8 +1626,8 @@ class M_admission extends CI_Model {
                 on o.ID = a.ID_program_study
                 left join db_admission.formulir_number_offline_m as pq
                 on b.FormulirCode = pq.FormulirCode
-                where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-                 
+                where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified")
+
                   and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
               )aa';
            $query=$this->db->query($sql, array())->result_array();
@@ -1638,35 +1638,35 @@ class M_admission extends CI_Model {
     {
       $arr_temp = array('data' => array());
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       if($Nama != '%') {
-          $Nama = '"%'.$Nama.'%"'; 
+          $Nama = '"%'.$Nama.'%"';
       }
       else
       {
-        $Nama = '"%"'; 
+        $Nama = '"%"';
       }
-      
+
       if($selectProgramStudy != '%') {
-        // $selectProgramStudy = '"%'.$selectProgramStudy.'%"'; 
+        // $selectProgramStudy = '"%'.$selectProgramStudy.'%"';
       }
       else
       {
-        $selectProgramStudy = '"%"'; 
+        $selectProgramStudy = '"%"';
       }
 
       if($Sekolah != '%') {
-        $Sekolah = '"%'.$Sekolah.'%"'; 
+        $Sekolah = '"%'.$Sekolah.'%"';
       }
       else
       {
-        $Sekolah = '"%"'; 
+        $Sekolah = '"%"';
       }
 
         $sql = ' select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,g.JenisTempatTinggal,
@@ -1675,7 +1675,7 @@ class M_admission extends CI_Model {
             n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
             b.FormulirCode,  if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
             from db_admission.register_formulir as a
-            Left JOIN db_admission.register_verified as b 
+            Left JOIN db_admission.register_verified as b
             ON a.ID_register_verified = b.ID
             Left JOIN db_admission.register_verification as c
             ON b.RegVerificationID = c.ID
@@ -1705,13 +1705,13 @@ class M_admission extends CI_Model {
             on o.ID = a.ID_program_study
             left join db_admission.formulir_number_offline_m as pq
             on b.FormulirCode = pq.FormulirCode
-            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+            where d.Name like '.$Nama.' and d.SchoolID like '.$Sekolah.' and a.ID_program_study like '.$selectProgramStudy.' and a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified")
 
               and ( b.FormulirCode like '.$FormulirCode.' or pq.No_Ref like '.$FormulirCode.' )
             LIMIT '.$start. ', '.$limit;
-            
+
            $query=$this->db->query($sql, array())->result_array();
-           for ($i=0; $i < count($query); $i++) { 
+           for ($i=0; $i < count($query); $i++) {
              $dt = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$query[$i]['ID_register_formulir']);
              if (count($dt) > 0) {
                $query[$i]['fin'] = 0;
@@ -1739,7 +1739,7 @@ class M_admission extends CI_Model {
      {
       for ($i=0; $i < count($input); $i++) {
         $sql = "delete from db_admission.register_nilai where ID_register_formulir = ".$input[$i];
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
       }
      }
 
@@ -1747,7 +1747,7 @@ class M_admission extends CI_Model {
      {
       for ($i=0; $i < count($input); $i++) {
         $sql = "delete from db_admission.register_nilai_fin where ID_register_formulir = ".$input[$i];
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
       }
      }
 
@@ -1781,25 +1781,25 @@ class M_admission extends CI_Model {
              on a.FileRapor = b.ID where a.ID_register_formulir = ?
             ";
       $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
-      return $query;      
+      return $query;
      }
 
      public function submit_cancel_nilai_rapor_rangking($input)
      {
       for ($i=0; $i < count($input); $i++) {
         $sql = "delete from db_admission.register_rangking where ID_register_formulir = ".$input[$i];
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
       }
      }
 
      public function getDataCalonMhsTuitionFee($limit, $start,$FormulirCode)
      {
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       $arr_temp = array();
@@ -1812,7 +1812,7 @@ class M_admission extends CI_Model {
               as status1,b.FormulirCode,
               if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register_formulir as a
-              left JOIN db_admission.register_verified as b 
+              left JOIN db_admission.register_verified as b
               ON a.ID_register_verified = b.ID
               left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
@@ -1842,8 +1842,8 @@ class M_admission extends CI_Model {
               on o.ID = a.ID_program_study
               left join db_admission.formulir_number_offline_m as px
               on b.FormulirCode = px.FormulirCode
-              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
-              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) 
+              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified")
+              or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi)
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               order by a.ID desc
               LIMIT '.$start. ', '.$limit;
@@ -1854,7 +1854,7 @@ class M_admission extends CI_Model {
       $getDiscount = $this->m_master->showData_array('db_finance.discount');
       $getBeasiswa = $this->m_master->showData_array('db_admission.register_dsn_type_m');
       $getMaxCicilan = $this->m_master->showData_array('db_admission.cfg_cicilan');
-      for ($i=0; $i < count($query); $i++) { 
+      for ($i=0; $i < count($query); $i++) {
 
         // get SKS
         $ID_program_study = $query[$i]['ID_program_study'];
@@ -1872,12 +1872,12 @@ class M_admission extends CI_Model {
                else
                {
                 $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
-               } 
-              
+               }
+
             }
           $Attachment = '';
           // get All Files Uploaded
-             $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']); 
+             $Document = $this->getDataDokumentRegister($query[$i]['ID_register_formulir']);
              // get revision terakhir jika ada
                $NoteRev = '';
                $dataGet = $this->m_master->caribasedprimary('db_finance.register_admisi_rev','ID_register_formulir',$query[$i]['ID_register_formulir']);
@@ -1895,7 +1895,7 @@ class M_admission extends CI_Model {
             $getRangking = $getRangking[0]['Rangking'];
 
           // get Discount
-            for ($j=0; $j < count($jpa); $j++) { 
+            for ($j=0; $j < count($jpa); $j++) {
               if ($getRangking >= $jpa[$j]['StartRange'] && $getRangking <= $jpa[$j]['EndRange'] ) {
                 $DiskonSPP = $jpa[$j]['DiskonSPP'];
                 break;
@@ -1960,7 +1960,7 @@ class M_admission extends CI_Model {
               on a.PTID = b.ID where a.ProdiID = "'.$ID_program_study.'" and a.ClassOf = '.$year.'
               order by b.ID asc';
       $query=$this->db->query($sql, array())->result_array();
-      return $query;       
+      return $query;
      }
 
      public function getPaymentType_Cost_created($ID_register_formulir)
@@ -1973,7 +1973,7 @@ class M_admission extends CI_Model {
 
      public function set_tuition_fee_save($input)
      {
-      for ($i=0; $i < count($input); $i++) { 
+      for ($i=0; $i < count($input); $i++) {
         // echo $input[$i]->PTID;
         $PTID = $input[$i]->PTID;
         $ID_register_formulir = $input[$i]->ID_register_formulir;
@@ -1998,16 +1998,16 @@ class M_admission extends CI_Model {
      {
 
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       $sql= 'select count(*) as total
               from db_admission.register_formulir as a
-              left JOIN db_admission.register_verified as b 
+              left JOIN db_admission.register_verified as b
               ON a.ID_register_verified = b.ID
               left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
@@ -2037,7 +2037,7 @@ class M_admission extends CI_Model {
               on o.ID = a.ID_program_study
               left join db_admission.formulir_number_offline_m as px
               on b.FormulirCode = px.FormulirCode
-              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified") 
+              where ( a.ID in (select ID_register_formulir from db_admission.register_nilai where Status = "Verified")
               or a.ID in (select ID_register_formulir from db_admission.register_kelulusan_ujian where Kelulusan = "Lulus") ) and a.ID not in (select ID_register_formulir from db_finance.register_admisi) and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )';
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];
@@ -2048,18 +2048,18 @@ class M_admission extends CI_Model {
      {
 
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       $sql= 'select count(*) as total from
               (
-                 select a.ID 
+                 select a.ID
                  from db_admission.register_formulir as a
-                 left JOIN db_admission.register_verified as b 
+                 left JOIN db_admission.register_verified as b
                  ON a.ID_register_verified = b.ID
                  left JOIN db_admission.register_verification as c
                  ON b.RegVerificationID = c.ID
@@ -2081,11 +2081,11 @@ class M_admission extends CI_Model {
                  on a.ID = p.ID_register_formulir
                  left join db_admission.formulir_number_offline_m as px
                  on px.FormulirCode = b.FormulirCode
-                 where ('.$Status.') 
+                 where ('.$Status.')
                  and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
                  and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
-                 group by a.ID 
-              ) aa 
+                 group by a.ID
+              ) aa
               ';
       $query=$this->db->query($sql, array())->result_array();
       if (count($query) > 0) {
@@ -2095,7 +2095,7 @@ class M_admission extends CI_Model {
       {
         return 0;
       }
-      
+
      }
 
      // public function getDataCalonMhsTuitionFee_delete($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
@@ -2103,11 +2103,11 @@ class M_admission extends CI_Model {
      {
 
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       $arr_temp = array();
@@ -2118,7 +2118,7 @@ class M_admission extends CI_Model {
               as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
               if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref
               from db_admission.register_formulir as a
-              left JOIN db_admission.register_verified as b 
+              left JOIN db_admission.register_verified as b
               ON a.ID_register_verified = b.ID
               left JOIN db_admission.register_verification as c
               ON b.RegVerificationID = c.ID
@@ -2140,21 +2140,21 @@ class M_admission extends CI_Model {
               on a.ID = p.ID_register_formulir
               left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = b.FormulirCode
-              where ('.$Status.') 
+              where ('.$Status.')
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
-              group by a.ID 
+              group by a.ID
               order by p.ID desc
               LIMIT '.$start. ', '.$limit;
       $query=$this->db->query($sql, array())->result_array();
       $this->load->model('master/m_master');
       $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
-      for ($i=0; $i < count($query); $i++) { 
+      for ($i=0; $i < count($query); $i++) {
         $DiskonSPP = 0;
         // get Price
             $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
             $arr_temp2 = array();
-            for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
+            for ($k=0; $k < count($getPaymentType_Cost); $k++) {
               // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
               $arr_temp2 = $arr_temp2 + array(
                 $getPaymentType_Cost[$k]['Abbreviation'] => 'Rp. '.number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
@@ -2165,28 +2165,28 @@ class M_admission extends CI_Model {
         // get file dan type beasiswa
            $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
            if (count($getBeasiswa) > 0) {
-             $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+             $getBeasiswa = $getBeasiswa[0]['DiscountType'];
            }
            else
            {
-            $getBeasiswa = '-'; 
+            $getBeasiswa = '-';
            }
 
         // get File
           $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
           if (count($getFile) > 0) {
-            $getFile = $getFile[0]['Attachment']; 
+            $getFile = $getFile[0]['Attachment'];
           }
           else
           {
-           $getFile = '-'; 
+           $getFile = '-';
           }
-            
+
         if ($query[$i]['status1'] == 'Rapor') {
           // check rangking
             $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
             $getRangking = $getRangking[0]['Rangking'];
-            
+
             $arr_temp[$i] = array(
               'ID_register_formulir' => $query[$i]['ID_register_formulir'],
               'Name' => $query[$i]['Name'],
@@ -2236,15 +2236,15 @@ class M_admission extends CI_Model {
       if ($approved != null) {
         $addQ = ' and Status = "'.$approved.'"';
       }
-      for ($i=0; $i < count($input); $i++) { 
+      for ($i=0; $i < count($input); $i++) {
         $sql = "delete from db_finance.register_admisi where ID_register_formulir = ".$input[$i].' '.$addQ;
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
 
         $sql = "delete from db_finance.payment_admisi where ID_register_formulir = ".$input[$i];
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
 
         $sql = "delete from db_finance.payment_pre where ID_register_formulir = ".$input[$i];
-        $query=$this->db->query($sql, array()); 
+        $query=$this->db->query($sql, array());
       }
      }
 
@@ -2252,11 +2252,11 @@ class M_admission extends CI_Model {
      {
 
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
       $sql= ' select count(*) as total from (
@@ -2271,11 +2271,11 @@ class M_admission extends CI_Model {
     public function getDataCalonMhsTuitionFee_approved($limit, $start,$FormulirCode,$Status = 'p.Status = "Created" or p.Status = "Approved"')
     {
       if($FormulirCode != '%') {
-          $FormulirCode = '"%'.$FormulirCode.'%"'; 
+          $FormulirCode = '"%'.$FormulirCode.'%"';
       }
       else
       {
-        $FormulirCode = '"%"'; 
+        $FormulirCode = '"%"';
       }
 
      $arr_temp = array();
@@ -2286,7 +2286,7 @@ class M_admission extends CI_Model {
              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID
              from db_admission.register_formulir as a
-             left JOIN db_admission.register_verified as b 
+             left JOIN db_admission.register_verified as b
              ON a.ID_register_verified = b.ID
              left JOIN db_admission.register_verification as c
              ON b.RegVerificationID = c.ID
@@ -2308,19 +2308,19 @@ class M_admission extends CI_Model {
              on a.ID = p.ID_register_formulir
              left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = b.FormulirCode
-              where ('.$Status.') 
+              where ('.$Status.')
               and ( b.FormulirCode like '.$FormulirCode.' or px.No_Ref like '.$FormulirCode.' )
               and b.FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)
              group by a.ID order by p.ID desc LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
      $this->load->model('master/m_master');
      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
-     for ($i=0; $i < count($query); $i++) { 
+     for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
            $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
            $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
+           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
              // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
              $arr_temp2 = $arr_temp2 + array(
                $getPaymentType_Cost[$k]['Abbreviation'] => number_format($getPaymentType_Cost[$k]['Pay_tuition_fee'],2,',','.'),
@@ -2331,21 +2331,21 @@ class M_admission extends CI_Model {
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
             if (count($getBeasiswa) > 0) {
-              $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+              $getBeasiswa = $getBeasiswa[0]['DiscountType'];
             }
             else
             {
-             $getBeasiswa = '-'; 
+             $getBeasiswa = '-';
             }
 
             // get File
             $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
             if (count($getFile) > 0) {
-              $getFile = $getFile[0]['Attachment']; 
+              $getFile = $getFile[0]['Attachment'];
             }
             else
             {
-             $getFile = '-'; 
+             $getFile = '-';
             }
 
             // check Revision
@@ -2355,7 +2355,7 @@ class M_admission extends CI_Model {
          // check rangking
            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
            $getRangking = $getRangking[0]['Rangking'];
-           
+
            $arr_temp[$i] = array(
             'ID_register_formulir' => $query[$i]['ID_register_formulir'],
             'Name' => $query[$i]['Name'],
@@ -2413,7 +2413,7 @@ class M_admission extends CI_Model {
              if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
              as status1,d.VA_number
              from db_admission.register_formulir as a
-             JOIN db_admission.register_verified as b 
+             JOIN db_admission.register_verified as b
              ON a.ID_register_verified = b.ID
              JOIN db_admission.register_verification as c
              ON b.RegVerificationID = c.ID
@@ -2446,7 +2446,7 @@ class M_admission extends CI_Model {
             LIMIT '.$start. ', '.$limit;
      $query=$this->db->query($sql, array())->result_array();
      $this->load->model('master/m_master');
-     for ($i=0; $i < count($query); $i++) { 
+     for ($i=0; $i < count($query); $i++) {
        $getCicilan = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$query[$i]['ID_register_formulir']);
        $arr_temp[$i] = array(
           'ID_register_formulir' => $query[$i]['ID_register_formulir'],
@@ -2458,7 +2458,7 @@ class M_admission extends CI_Model {
           'Email' => $query[$i]['Email'],
        );
        for ($j=0; $j < count($getCicilan); $j++) {
-         $arr_temp2 = array(); 
+         $arr_temp2 = array();
          $arr_temp2 = array(
           'Cicilan_'.($j + 1) => array(
                                       'Invoice' => number_format($getCicilan[$j]['Invoice'],2,',','.'),
@@ -2472,7 +2472,7 @@ class M_admission extends CI_Model {
             $a = $this->m_master->showData_array('db_admission.cfg_cicilan');
            if (count($getCicilan) != $a[0]['max_cicilan']) {
              $b = $a[0]['max_cicilan'] - count($getCicilan);
-             for ($k=0; $k < $b; $k++) { 
+             for ($k=0; $k < $b; $k++) {
                $arr_temp3 = array();
                  $arr_temp3 = array(
                   'Cicilan_'.($j + 1 + $k + 1) => array(
@@ -2483,7 +2483,7 @@ class M_admission extends CI_Model {
                                               'ID' => '',
                                               )
                 );
-                $arr_temp2 = $arr_temp2 + $arr_temp3; 
+                $arr_temp2 = $arr_temp2 + $arr_temp3;
              }
            }
          }
@@ -2500,7 +2500,7 @@ class M_admission extends CI_Model {
       $sql = "select a.*,c.FormulirCode,d.ID_program_study,e.Name as NameProdyIND,e.NameEng as NameProdyEng from db_admission.register as a join db_admission.register_verification as b
 
               on a.ID = b.RegisterID join db_admission.register_verified as c on b.ID = c.RegVerificationID
-              join db_admission.register_formulir as d on d.ID_register_verified = c.ID 
+              join db_admission.register_formulir as d on d.ID_register_verified = c.ID
               join db_academic.program_study as e on d.ID_program_study = e.ID
               LEFT JOIN db_admission.sale_formulir_offline AS sfo ON (sfo.FormulirCodeOffline = c.FormulirCode)
               where d.ID = ?
@@ -2619,7 +2619,7 @@ class M_admission extends CI_Model {
       $temp['CreateAT'] = date('Y-m-d');
       $temp['CreateBY'] = $this->session->userdata('NIP');
       $this->db->insert('db_finance.register_admisi', $temp);
-        
+
 
       foreach ($data2 as $key => $value) {
             $a = explode('-', $key);
@@ -2629,19 +2629,19 @@ class M_admission extends CI_Model {
               $temp2['Pay_tuition_fee'] = $this->m_master->ClearPricetoDB($data2->$a[1]);
               $temp2['PTID'] = $get[0]['ID'];
               $temp2['ID_register_formulir'] = $data2->id_formulir;
-              
+
               $arr[] = $temp2;
             }
-            
+
       }
       $this->db->insert_batch('db_finance.payment_admisi', $arr);
-      
+
 
       // save data cicilan pada table payment_pre
         $ID_register_formulir = $data2->id_formulir;
         $data1 = $input['data1'];
         $arr2 = array();
-        for ($i=0; $i < count($data1); $i++) { 
+        for ($i=0; $i < count($data1); $i++) {
           $temp3 = array();
           $temp3['ID_register_formulir'] = $ID_register_formulir;
           $temp3['Invoice'] = $data1[$i]->Payment;
@@ -2651,10 +2651,10 @@ class M_admission extends CI_Model {
 
         $this->db->insert_batch('db_finance.payment_pre', $arr2);
 
-        /* 31-05-2019 
+        /* 31-05-2019
           Perubahan set tuition fee tanpa approve finance
           dan PDF langsung cetak by admission
-        */  
+        */
         /* Adding  and update after insert */
           $No_Surat = $this->m_finance->getNumberSuratTuitionFee($data2->id_formulir);
           $dataSave__ = array(
@@ -2669,9 +2669,9 @@ class M_admission extends CI_Model {
 
           /* Create PDF file */
           $getData = $this->m_finance->tuition_fee_calon_mhs_by_ID($data2->id_formulir,'Approved');
-          $cicilan = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$data2->id_formulir); 
+          $cicilan = $this->m_master->caribasedprimary('db_finance.payment_pre','ID_register_formulir',$data2->id_formulir);
           $this->Tuition_PDF_SendEmail($getData,$cicilan);
-        /* End Adding */ 
+        /* End Adding */
 
     }
 
@@ -2758,7 +2758,7 @@ class M_admission extends CI_Model {
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','B',$setFont);
-        $this->mypdf->Cell(0, 0, $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'], 0, 1, 'L', 0); 
+        $this->mypdf->Cell(0, 0, $Personal[0]['Name'].'-'.$Personal[0]['FormulirCode'], 0, 1, 'L', 0);
 
         // Address
         $setXvalue = $setX;
@@ -2766,7 +2766,7 @@ class M_admission extends CI_Model {
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','B',$setFont);
-        $this->mypdf->Cell(0, 0, $Personal[0]['Address'], 0, 1, 'L', 0); 
+        $this->mypdf->Cell(0, 0, $Personal[0]['Address'], 0, 1, 'L', 0);
 
         // City
         $setXvalue = $setX;
@@ -2774,7 +2774,7 @@ class M_admission extends CI_Model {
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','',$setFont);
-        $this->mypdf->Cell(0, 0, $Personal[0]['RegionAddress'].' '.$Personal[0]['ProvinceAddress'], 0, 1, 'L', 0); 
+        $this->mypdf->Cell(0, 0, $Personal[0]['RegionAddress'].' '.$Personal[0]['ProvinceAddress'], 0, 1, 'L', 0);
 
         // School
         $setXvalue = $setX;
@@ -2782,7 +2782,7 @@ class M_admission extends CI_Model {
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','',$setFont);
-        $this->mypdf->Cell(0, 0, $Personal[0]['SchoolName'], 0, 1, 'L', 0); 
+        $this->mypdf->Cell(0, 0, $Personal[0]['SchoolName'], 0, 1, 'L', 0);
 
         // Hp
         $setXvalue = $setX;
@@ -2790,7 +2790,7 @@ class M_admission extends CI_Model {
         $this->mypdf->SetXY($setXvalue,$setY);
         $this->mypdf->SetTextColor(0,0,0);
         $this->mypdf->SetFont('Arial','',$setFont);
-        $this->mypdf->Cell(0, 0, 'No.Tlp/Hp     : '.$Personal[0]['PhoneNumber'], 0, 1, 'L', 0); 
+        $this->mypdf->Cell(0, 0, 'No.Tlp/Hp     : '.$Personal[0]['PhoneNumber'], 0, 1, 'L', 0);
 
         // Hp
         $setXvalue = $setX;
@@ -2832,7 +2832,7 @@ class M_admission extends CI_Model {
 
             $setY = $setY + 10;
             $height = 5;
-            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetXY($setX,$setY);
             $this->mypdf->SetFillColor(255, 255, 255);
             $this->mypdf->Cell(50,$height,'Nama Lengkap - Nomor Formulir',1,0,'C',true);
             $this->mypdf->Cell(40,$height,'Program Study',1,0,'C',true);
@@ -2841,12 +2841,12 @@ class M_admission extends CI_Model {
             $ProdiTbl = $Personal[0]['NamePrody'];
             foreach ($arr_discount as $key => $value) {
                 $setY = $setY + $height;
-                $this->mypdf->SetXY($setX,$setY); 
+                $this->mypdf->SetXY($setX,$setY);
                 $this->mypdf->SetFillColor(255, 255, 255);
                 $this->mypdf->Cell(50,$height,$NameTbl,1,0,'C',true);
                 $this->mypdf->Cell(40,$height,$ProdiTbl,1,0,'C',true);
                 $this->mypdf->Cell(80,$height,'Beasiswa Pot '.$key.' '.(int)$value.'%',1,1,'C',true);
-            } 
+            }
 
         }
 
@@ -2859,25 +2859,25 @@ class M_admission extends CI_Model {
 
         $setY = $setY + 5;
         $height = 5;
-        
-        $this->mypdf->SetXY($setX,$setY); 
+
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','B',$setFont);
         $this->mypdf->Cell(50,$height,'Pembayaran Semester 1',1,0,'C',true);
         $this->mypdf->Cell(25,$height,'SPP',1,0,'C',true);
-        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true); 
-        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true); 
+        $this->mypdf->Cell(25,$height,'BPP Semester',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Biaya SKS',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Lain-lain',1,0,'C',true);
+        $this->mypdf->Cell(25,$height,'Total Biaya',1,1,'C',true);
 
         $setY = $setY + $height;
-        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','',$setFont);
         $this->mypdf->Cell(50,$height,'Biaya Normal',1,0,'L',true);
-        
+
         // get tuition fee
-        
+
            $sql23 = 'select a.Abbreviation,b.Cost from db_finance.payment_type as a join db_finance.tuition_fee as b on a.ID = b.PTID where ClassOf = ? and ProdiID = ?';
            $query23=$this->db->query($sql23, array($Personal[0]['SetTa'],$Personal[0]['ID_program_study']))->result_array();
            $totalTuitionFee = 0;
@@ -2900,14 +2900,14 @@ class M_admission extends CI_Model {
                     $this->mypdf->Cell(25,$height,number_format($keya['Cost'],2,',','.'),1,0,'L',true);
                     $totalTuitionFee = $totalTuitionFee + $keya['Cost'];
                 }
-                
+
             }
             // total
                  $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
 
 
             $setY = $setY + $height;
-            $this->mypdf->SetXY($setX,$setY); 
+            $this->mypdf->SetXY($setX,$setY);
             $this->mypdf->SetFillColor(255, 255, 255);
             $this->mypdf->SetFont('Arial','',$setFont);
             $this->mypdf->Cell(50,$height,'Beasiswa yang diterima',1,0,'L',true);
@@ -2931,13 +2931,13 @@ class M_admission extends CI_Model {
                         $totalTuitionFee = $totalTuitionFee + $cost;
                     }
                 }
-                
+
             }
-            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+            $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
 
 
         $setY = $setY + $height;
-        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(255, 255, 255);
         $this->mypdf->SetFont('Arial','B',$setFont);
         $this->mypdf->Cell(50,$height,'Biaya yang harus dibayar',1,0,'L',true);
@@ -2948,12 +2948,12 @@ class M_admission extends CI_Model {
                 if ($PTIDSelect[$i]['Abbreviation'] == $key ) {
                     $this->mypdf->Cell(25,$height,number_format($Personal[0][$key],2,',','.'),1,0,'L',true);
                     $totalTuitionFee = $totalTuitionFee + $Personal[0][$key];
-                } 
-            } 
-           
+                }
+            }
+
         }
 
-        $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true); 
+        $this->mypdf->Cell(25,$height,number_format($totalTuitionFee,2,',','.'),1,0,'L',true);
 
         $setXvalue = $setX;
         $setY = $setY + 7;
@@ -2964,7 +2964,7 @@ class M_admission extends CI_Model {
 
          $setY = $setY + $height;
 
-        $this->mypdf->SetXY($setX,$setY); 
+        $this->mypdf->SetXY($setX,$setY);
         $this->mypdf->SetFillColor(226, 226, 226);
         $this->mypdf->Cell(40,$height,'Pembayaran',1,0,'C',true);
         $this->mypdf->Cell(60,$height,'Tanggal',1,0,'C',true);
@@ -2973,8 +2973,8 @@ class M_admission extends CI_Model {
         $cicilan_tulis = array('Cicilan Pertama','Cicilan Kedua','Cicilan Ketiga','Cicilan Keempat','Cicilan Kelima','Cicilan Keenam','Cicilan Ketujuh');
 
         for ($i=0; $i < count($arr_cicilan); $i++) {
-            $setY = $setY + $height; 
-            $this->mypdf->SetXY($setX,$setY); 
+            $setY = $setY + $height;
+            $this->mypdf->SetXY($setX,$setY);
             $this->mypdf->SetFillColor(255, 255, 255);
             $this->mypdf->Cell(40,$height,$cicilan_tulis[$i],1,0,'L',true);
             $Deadline = date('Y-m-d', strtotime($arr_cicilan[$i]['Deadline']));
@@ -3049,7 +3049,7 @@ class M_admission extends CI_Model {
         $this->mypdf->writeHTML('<b>'.$NameTbl.'</b>');
 
 
-        
+
         $setXvalue = $setX;
         $setY = $setY + 10;
         $this->mypdf->SetXY($setXvalue,$setY);
@@ -3161,7 +3161,7 @@ class M_admission extends CI_Model {
          $text = 'Dear '.$Personal[0]['Name'].',<br><br>
                      Plase find attached your Tuition Fee.<br>
                      For Detail your payment, please see in '.url_registration."login/";
-         if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {            
+         if($_SERVER['SERVER_NAME']!='localhost' && $_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') {
             // $to = $Personal[0]['Email'].','.'admission@podomorouniversity.ac.id';
             $to = 'admission@podomorouniversity.ac.id';
          }
@@ -3182,7 +3182,7 @@ class M_admission extends CI_Model {
                 if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
                 if(
                     (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
-                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1) 
+                        if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
                              > 0 ,"Lunas","-"
                           )
                         ,
@@ -3212,14 +3212,14 @@ class M_admission extends CI_Model {
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
               ) ccc';
-              
+
       $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
               or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
-              ';        
-              
+              ';
+
       $query=$this->db->query($sql, array())->result_array();
-      return $query[0]['total'];    
+      return $query[0]['total'];
     }
 
     public function getSaleFormulirOfflineBetwwen($date1,$date2,$SelectSetTa,$SelectSortBy)
@@ -3241,7 +3241,7 @@ class M_admission extends CI_Model {
                 where b.DateSale >= "'.$date1.'" and b.DateSale <= "'.$date2.'" and a.Years = ? order by '.$SelectSortBy.' asc
                 ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
-      return $query;             
+      return $query;
     }
 
     public function getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy)
@@ -3263,7 +3263,7 @@ class M_admission extends CI_Model {
                 where YEAR(b.DateSale) = "'.$SelectYear.'" AND MONTH(b.DateSale) = "'.$SelectMonth.'" and a.Years = ? order by '.$SelectSortBy.' asc
                 ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
-      return $query;             
+      return $query;
     }
 
     public function getSaleFormulirOfflinePerTA($SelectSetTa)
@@ -3285,7 +3285,7 @@ class M_admission extends CI_Model {
                 where a.Years = ? order by a.No_Ref asc
                 ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
-      return $query;             
+      return $query;
     }
 
     public function getRegisterData($date1,$date2,$SelectSetTa,$SelectSortBy)
@@ -3333,7 +3333,7 @@ class M_admission extends CI_Model {
             where a.SetTa = ? and a.RegisterAT >= "'.$date1.'" and a.RegisterAT <= "'.$date2.'" order by '.$SelectSortBy.' asc
             ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
-      for ($i=0; $i < count($query); $i++) { 
+      for ($i=0; $i < count($query); $i++) {
           // check no ref jika offline
           $row = $query[$i];
           $Off = $row['StatusReg']; // 1 offline, 0 online
@@ -3359,9 +3359,9 @@ class M_admission extends CI_Model {
             5 = 3 Pas Foto Terbaru Ukuran 3x4 Dengan Warna Latar Belakang Merah
             9 = 1 Surat Rekomendasi Dari Sekolah
             8 = 1 Surat Pernyataan Bebas Narkoba
-            6 = 1 Lembar Essay Mengenai 
+            6 = 1 Lembar Essay Mengenai
           */
-            for ($j=0; $j < count($get3); $j++) { 
+            for ($j=0; $j < count($get3); $j++) {
               switch ($get3[$j]['ID_reg_doc_checklist']) {
                 case 7:
                   if ($get3[$j]['Status'] == "Done") {
@@ -3425,7 +3425,7 @@ class M_admission extends CI_Model {
                 {
                   $arr_temp = $arr_temp + array('Essay' => '');
                 }
-                break;               
+                break;
                 default:
                   # code...
                   break;
@@ -3436,7 +3436,7 @@ class M_admission extends CI_Model {
 
       } // exit loop
 
-      return $query;        
+      return $query;
 
     }
 
@@ -3485,7 +3485,7 @@ class M_admission extends CI_Model {
             where a.SetTa = ? and YEAR(a.RegisterAT) = "'.$SelectYear.'" AND MONTH(a.RegisterAT) = "'.$SelectMonth.'" order by '.$SelectSortBy.' asc
             ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
-      for ($i=0; $i < count($query); $i++) { 
+      for ($i=0; $i < count($query); $i++) {
           // check no ref jika offline
           $row = $query[$i];
           $Off = $row['StatusReg']; // 1 offline, 0 online
@@ -3511,9 +3511,9 @@ class M_admission extends CI_Model {
             5 = 3 Pas Foto Terbaru Ukuran 3x4 Dengan Warna Latar Belakang Merah
             9 = 1 Surat Rekomendasi Dari Sekolah
             8 = 1 Surat Pernyataan Bebas Narkoba
-            6 = 1 Lembar Essay Mengenai 
+            6 = 1 Lembar Essay Mengenai
           */
-            for ($j=0; $j < count($get3); $j++) { 
+            for ($j=0; $j < count($get3); $j++) {
               switch ($get3[$j]['ID_reg_doc_checklist']) {
                 case 7:
                   if ($get3[$j]['Status'] == "Done") {
@@ -3577,7 +3577,7 @@ class M_admission extends CI_Model {
                 {
                   $arr_temp = $arr_temp + array('Essay' => '');
                 }
-                break;               
+                break;
                 default:
                   # code...
                   break;
@@ -3588,7 +3588,7 @@ class M_admission extends CI_Model {
 
       } // exit loop
 
-      return $query; 
+      return $query;
     }
 
     public function getHasilUjian($ID_register_formulir)
@@ -3602,14 +3602,14 @@ class M_admission extends CI_Model {
             on c.ID = d.ID_register_formulir_jadwal_ujian
             where c.ID_register_formulir = ? ';
         $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
-        return $query;       
+        return $query;
     }
 
     public function getkelulusan($ID_register_formulir)
     {
         $sql = 'select * from db_admission.register_kelulusan_ujian where ID_register_formulir = ?';
         $query=$this->db->query($sql, array($ID_register_formulir))->result_array();
-        return $query;  
+        return $query;
     }
 
     public function getDataCalonMhsTuitionFee_approved_ALL($Year,$Prodi,$Status = 'p.Status = "Created" or p.Status = "Approved"')
@@ -3623,7 +3623,7 @@ class M_admission extends CI_Model {
              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
              if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID,n.CityName as CitySchool
              from db_admission.register_formulir as a
-             left JOIN db_admission.register_verified as b 
+             left JOIN db_admission.register_verified as b
              ON a.ID_register_verified = b.ID
              left JOIN db_admission.register_verification as c
              ON b.RegVerificationID = c.ID
@@ -3645,17 +3645,17 @@ class M_admission extends CI_Model {
              on a.ID = p.ID_register_formulir
              left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = b.FormulirCode
-              where ('.$Status.') and d.SetTa = ? '.$Prodi.' 
+              where ('.$Status.') and d.SetTa = ? '.$Prodi.'
              group by a.ID order by a.ID desc';
      $query=$this->db->query($sql, array($Year))->result_array();
      $this->load->model('master/m_master');
      $jpa = $this->m_master->showData_array('db_admission.register_dsn_jpa');
-     for ($i=0; $i < count($query); $i++) { 
+     for ($i=0; $i < count($query); $i++) {
        $DiskonSPP = 0;
        // get Price
            $getPaymentType_Cost = $this->getPaymentType_Cost_created($query[$i]['ID_register_formulir']);
            $arr_temp2 = array();
-           for ($k=0; $k < count($getPaymentType_Cost); $k++) { 
+           for ($k=0; $k < count($getPaymentType_Cost); $k++) {
              // $arr_temp2 = $arr_temp2 + array($getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Cost']);
              $arr_temp2 = $arr_temp2 + array(
                $getPaymentType_Cost[$k]['Abbreviation'] => $getPaymentType_Cost[$k]['Pay_tuition_fee'],
@@ -3666,21 +3666,21 @@ class M_admission extends CI_Model {
            // get file dan type beasiswa
             $getBeasiswa = $this->m_master->caribasedprimary('db_admission.register_dsn_type_m','ID',$query[$i]['TypeBeasiswa']);
             if (count($getBeasiswa) > 0) {
-              $getBeasiswa = $getBeasiswa[0]['DiscountType']; 
+              $getBeasiswa = $getBeasiswa[0]['DiscountType'];
             }
             else
             {
-             $getBeasiswa = '-'; 
+             $getBeasiswa = '-';
             }
 
             // get File
             $getFile = $this->m_master->caribasedprimary('db_admission.register_document','ID',$query[$i]['FileBeasiswa']);
             if (count($getFile) > 0) {
-              $getFile = $getFile[0]['Attachment']; 
+              $getFile = $getFile[0]['Attachment'];
             }
             else
             {
-             $getFile = '-'; 
+             $getFile = '-';
             }
 
             // check Revision
@@ -3701,7 +3701,7 @@ class M_admission extends CI_Model {
          // check rangking
            $getRangking = $this->getRangking($query[$i]['ID_register_formulir']);
            $getRangking = $getRangking[0]['Rangking'];
-           
+
            $arr_temp[$i] = array(
             'ID_register_formulir' => $query[$i]['ID_register_formulir'],
             'Name' => $query[$i]['Name'],
@@ -3751,18 +3751,21 @@ class M_admission extends CI_Model {
 
     public function insert_to_Library($arr_data)
     {
-      $this->db_server22 = $this->load->database('server22', TRUE); 
+      $this->db_server22 = $this->load->database('server22', TRUE);
       $member_since_date = date('Y-m-d');
       $aa = explode("-", $member_since_date);
       $expire_date = $aa[0] + 4;
       $expire_date = $expire_date.'-'.$aa[1].'-'.$aa[2];
-      for ($i=0; $i < count($arr_data); $i++) { 
+      for ($i=0; $i < count($arr_data); $i++) {
         $dataSave = array(
             'member_id' => $arr_data[$i]['NPM'],
             'member_name' => $arr_data[$i]['Name'],
             'gender' => 0,
+            'birth_date' => $arr_data[$i]['DateOfBirth'],
             'member_type_id' => 2,
+            'member_address' => $arr_data[$i]['Address'],
             'member_mail_address' => $arr_data[$i]['EmailPU'],
+            'member_email' => $arr_data[$i]['Email'],
             'inst_name' => 'Podomoro University',
             'member_since_date' => $member_since_date,
             'register_date' => $member_since_date,
@@ -3772,7 +3775,7 @@ class M_admission extends CI_Model {
         );
         $this->db_server22->insert('library.member', $dataSave);
       }
-      
+
     }
 
     public function getIntakeByYear($Year)
@@ -3792,7 +3795,7 @@ class M_admission extends CI_Model {
        $MingguWr = $this->m_master->GetDateAfterOrBefore(date('Y-m-d'),'-7');
        $MingguWr = $this->m_master->getIndoBulan($MingguWr);
 
-       for ($i=0; $i < count($G_Faculty); $i++) { 
+       for ($i=0; $i < count($G_Faculty); $i++) {
          $FacultyID = $G_Faculty[$i]['FacultyID'];
          $temp['Faculty'] = $G_Faculty[$i]['Name'];
          $temp['Prodi'] = array();
@@ -3813,12 +3816,12 @@ class M_admission extends CI_Model {
               'Label'=> 'Perubahan',
               'Detail' => array(),
             ),
-            
+
          );
          // find Program Study
          $G_program_study = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$FacultyID);
          $arr_temp = array();
-         for ($j=0; $j < count($G_program_study); $j++) { 
+         for ($j=0; $j < count($G_program_study); $j++) {
            $temp['Prodi'][] = $G_program_study[$j]['Name'];
            // cari intake tahun lalu dulu
               $ProdiID = $G_program_study[$j]['ID'];
@@ -3832,27 +3835,27 @@ class M_admission extends CI_Model {
                else
                {
                 $sql = 'select count(*) as total from (
-                         select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, 
+                         select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody,
                         e.ID as ID_register_formulir,
-                        if(a.StatusReg = 1, 
+                        if(a.StatusReg = 1,
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
-                        if(a.StatusReg = 1, 
+                        if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                         (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
-                        from db_admission.register as a 
-                        join db_admission.school as b on a.SchoolID = b.ID 
-                        LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
-                        LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
-                        LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
-                        LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
-                        left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
-                         where a.SetTa = "'.($Year-1).'" 
+                        from db_admission.register as a
+                        join db_admission.school as b on a.SchoolID = b.ID
+                        LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
+                        LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID
+                        LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified
+                        LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
+                        left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
+                         where a.SetTa = "'.($Year-1).'"
                         ) ccc where ID_program_study = ? and C_bayar > 0';
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                          $total = $query[0]['total'];
                          $c1 = $total;
                }
-              
+
               $temp['Value'][0]['Detail'][] = $c1;
 
             // cari intake Tahun by variable Year
@@ -3864,21 +3867,21 @@ class M_admission extends CI_Model {
               else
               {
                 $sql = 'select count(*) as total from (
-                         select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, 
+                         select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody,
                         e.ID as ID_register_formulir,
-                        if(a.StatusReg = 1, 
+                        if(a.StatusReg = 1,
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
-                        if(a.StatusReg = 1, 
+                        if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                         (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
-                        from db_admission.register as a 
-                        join db_admission.school as b on a.SchoolID = b.ID 
-                        LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
-                        LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
-                        LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
-                        LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
-                        left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
-                         where a.SetTa = "'.$Year.'" 
+                        from db_admission.register as a
+                        join db_admission.school as b on a.SchoolID = b.ID
+                        LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
+                        LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID
+                        LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified
+                        LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
+                        left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
+                         where a.SetTa = "'.$Year.'"
                         ) ccc where ID_program_study = ? and C_bayar > 0';
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
@@ -3895,21 +3898,21 @@ class M_admission extends CI_Model {
                 else
                 {
                   $sql = 'select count(*) as total from (
-                           select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, 
+                           select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody,
                           e.ID as ID_register_formulir,
-                          if(a.StatusReg = 1, 
+                          if(a.StatusReg = 1,
                           (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
-                          if(a.StatusReg = 1, 
+                          if(a.StatusReg = 1,
                           (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
                           (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB(NOW(), INTERVAL 7 DAY) ) as C_bayar
-                          from db_admission.register as a 
-                          join db_admission.school as b on a.SchoolID = b.ID 
-                          LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID 
-                          LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID 
-                          LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified 
-                          LEFT join db_academic.program_study as d on e.ID_program_study = d.ID 
-                          left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline  
-                           where a.SetTa = "'.$Year.'" 
+                          from db_admission.register as a
+                          join db_admission.school as b on a.SchoolID = b.ID
+                          LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
+                          LEFT JOIN db_admission.register_verified as c on z.ID = c.RegVerificationID
+                          LEFT JOIN db_admission.register_formulir as e on c.ID = e.ID_register_verified
+                          LEFT join db_academic.program_study as d on e.ID_program_study = d.ID
+                          left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
+                           where a.SetTa = "'.$Year.'"
                           ) ccc where ID_program_study = ? and C_bayar > 0';
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
