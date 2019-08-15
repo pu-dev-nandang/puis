@@ -2,7 +2,7 @@
     <div class="col-md-6 col-md-offset-3">
       <div class="thumbnail">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group">
               <label>Year</label>
               <select class="select2-select-00 full-width-fix" id="Years">
@@ -10,11 +10,22 @@
                </select>
             </div>  
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group">
               <label>Month</label>
               <select class="select2-select-00 full-width-fix" id="Month">
                    <!-- <option></option> -->
+               </select>
+            </div>  
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Realisasi Status</label>
+              <select class="form-control" id="RealisasiStatus">
+                   <option value="%">All</option>
+                   <option value="0" selected>Belum Realisasi</option>
+                   <option value="1">Realisasi Belum Konfirmasi</option>
+                   <option value="2">Realisasi Sudah Konfirmasi</option>
                </select>
             </div>  
           </div>
@@ -82,18 +93,26 @@ $(document).off('click', '#Month').on('click', '#Month',function(e) {
   LoadDataForTable();
 })
 
+$(document).off('change', '#RealisasiStatus').on('change', '#RealisasiStatus',function(e) {
+  LoadDataForTable();
+})
+
 function LoadDataForTable()
 {
 	$("#DivTable").empty();
 	var table_html = '<table class="table table-bordered" id = "tableData_payment" style="width: 100%;">'+
 	            '<thead>'+
 	            '<tr>'+
-	                '<th  width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-                  '<th  style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
-	                '<th  style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
-	                '<th  style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-	                '<th  style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
+	                '<th  rowspan = "2" width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+                  '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
+	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+	                '<th  colspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
               '</tr>'+
+              '<tr>'+
+                '<td style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</td>'+
+                '<td style = "text-align: center;background: #20485A;color: #FFFFFF;">Reminder</td>'+
+              '</tr>'+  
 	            '</thead>'+
 	            '<tbody id="dataRow"></tbody>'+
 	        '</table>';
@@ -109,9 +128,11 @@ function Get_data_payment(){
 
    var Years = $('#Years option:selected').val();
    var Month = $('#Month option:selected').val();
+   var RealisasiStatus = $('#RealisasiStatus option:selected').val();
    	var data = {
          Years : Years,
          Month : Month,
+         RealisasiStatus : RealisasiStatus,
    	};
    	var token = jwt_encode(data,"UAP)(*");
 
@@ -147,7 +168,8 @@ function Get_data_payment(){
 	    	       var ID_payment_fin = ListPR[1].ID_payment_fin;
 	    	       var StatusPayFin = ListPR[1].StatusPayFin;
 	    	       var RealisasiStatus = ListPR[1].RealisasiStatus;
-	    	       var RealisasiTotal = ListPR[1].RealisasiTotal;
+               var RealisasiTotal = ListPR[1].RealisasiTotal;
+	    	       var ReminderTotal = ListPR[1].ReminderTotal;
 	    	       var CodeSPB = ListPR[1].CodeSPB;
 	    	       var TypePay = ListPR[1].TypePay;
 	    	       var Perihal = ListPR[1].Perihal;
@@ -177,16 +199,21 @@ function Get_data_payment(){
     		    	$( row ).find('td:eq(3)').html(st);
     		    	$( row ).find('td:eq(3)').attr('align','center');
     		    	var htmlrealisasi = '';
+              var htmlreminder = '';
     		    	if (RealisasiTotal > 0) {
     		    		htmlrealisasi = '<i class="fa fa-check" style="color: green;"></i>';
+                htmlreminder = '<div class="TotReminder" tot = "'+ReminderTotal+'" align="center">Total Reminder : '+ReminderTotal+'</div>'
     		    	}
     		    	else
     		    	{
     		    		htmlrealisasi = '<i class="fa fa-minus-circle" style="color: red;"></i>';
+                htmlreminder = '<div class="TotReminder" tot = "'+ReminderTotal+'" align="center">Total Reminder : '+ReminderTotal+'</div>'+
+                                  '<div align = "center"><button class = "btn btn-primary btnSendReminder" ID_payment = "'+ID_payment+'"><i class="fa fa-envelope-open" aria-hidden="true"></i> Send Reminder</button></div>';
     		    	}
 
     		    	if (RealisasiStatus == 2) {
     		    		htmlrealisasi += '<br><div style = "color:green;">Done</div>';
+                htmlreminder = '<div class="TotReminder" tot = "'+ReminderTotal+'" align="center">Total Reminder : '+ReminderTotal+'</div>';
     		    	}
     		    	else
     		    	{
@@ -194,6 +221,8 @@ function Get_data_payment(){
     		    	}
     		    	$( row ).find('td:eq(4)').html(htmlrealisasi);
     		    	$( row ).find('td:eq(4)').attr('align','center');
+
+              $( row ).find('td:eq(5)').html(htmlreminder);
 	    },
    	    "initComplete": function(settings, json) {
    	        def.resolve(json);
@@ -202,4 +231,31 @@ function Get_data_payment(){
    return def.promise();
 }
 
+$(document).off('click', '.btnSendReminder').on('click', '.btnSendReminder',function(e) {
+  var ev = $(this).closest('td');
+  if (confirm('Are you sure ?')) {
+    var ID_payment = $(this).attr('ID_payment');
+    var url = base_url_js+"finance_ap/send_reminder_realisasi";
+      data = {
+        ID_payment : ID_payment,
+      };
+    var token = jwt_encode(data,"UAP)(*");
+    ev.find('.btnSendReminder').html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+    ev.find('.btnSendReminder').prop('disabled',true);
+    $.post(url,{ token:token },function (resultJson) {
+      
+    }).done(function(resultJson) {
+      var response = jQuery.parseJSON(resultJson);
+      var tot = response.total;
+      ev.find('.TotReminder').attr('tot',tot);
+      ev.find('.TotReminder').html('Total Reminder : '+tot);
+      ev.find('.btnSendReminder').html('<i class="fa fa-envelope-open" aria-hidden="true"></i> Send Reminder');
+      ev.find('.btnSendReminder').prop('disabled',false);
+      toastr.success('Reminder send');
+    });
+  }
+});
+
 </script>
+
+

@@ -1517,6 +1517,8 @@ $route['budgeting_menu/pembayaran/pettycash/(:any)'] = 'page/budgeting/c_pettyca
 $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
+$route['finance_ap/send_reminder_realisasi'] = 'page/budgeting/c_finap/send_reminder_realisasi';
+
 
 
 // pr adding
