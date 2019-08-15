@@ -75,7 +75,7 @@
 			// var NextInc = parseInt(resultJson.length) * parseInt(UserType.length);
 			// nextInc berdasarkan index
 			var MaxLimit = [];
-			console.log(dt);
+			// console.log(dt);
 			for (var i = 0; i < dt.length; i++) {
 				var temp = {};
 				temp['MaxLimit'] = dt[i].MaxLimit;

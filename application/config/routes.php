@@ -1436,6 +1436,14 @@ $route['budgeting/config_pr/Set_Approval']= 'page/budgeting/c_pr_po/Set_Approval
 $route['budgeting/get_cfg_set_roleuser_pr/(:any)'] = 'page/budgeting/c_pr_po/get_cfg_set_roleuser_pr/$1';
 $route['budgeting/save_cfg_set_roleuser_pr'] = 'page/budgeting/c_pr_po/save_cfg_set_roleuser_pr';
 
+$route['budgeting/config_pr/Set_Template']= 'page/budgeting/c_pr_po/Set_Template';
+$route['budgeting/config_pr/Set_Template/Master']= 'page/budgeting/c_pr_po/Set_Template_Master';
+$route['budgeting/_GetTemplate']= 'page/budgeting/c_pr_po/GetTemplate';
+$route['budgeting/form_template_master']= 'page/budgeting/c_pr_po/form_template_master';
+$route['budgeting/template_master_save']= 'page/budgeting/c_pr_po/template_master_save';
+
+
+
 
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
