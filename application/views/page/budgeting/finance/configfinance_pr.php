@@ -48,6 +48,9 @@
         <li class="<?php if($request=='Set_Approval'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "Set_Approval">Approval</a>
         </li>
+        <li class="<?php if($request=='template'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "Set_Template">Template</a>
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div id = "pageContent">
