@@ -3171,4 +3171,77 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
         }
     }
+
+    public function send_email_budgeting_All($NIP,$DIVID_budget,$url,$text)
+    {
+        $this->load->library('JWT');
+        $this->load->model('budgeting/M_sendemail_budgeting');
+        $G_emp = $this->caribasedprimary('db_employees.employees','NIP',$NIP);
+        if (count($G_emp) > 0 ) {
+            $PositionMain = $G_emp[0]['PositionMain'];
+            $P = explode('.', $PositionMain);
+
+             /*
+                 Uri Segment
+                 2 : NIP
+                 3 : Division Budgeting
+                 4 : url redirect
+            
+             */
+            $TokenDep = $this->jwt->encode($DIVID_budget,"UAP)(*");
+            $TokenURL = $this->jwt->encode($url,"UAP)(*");
+            $TokenNIP = $this->jwt->encode($NIP,"UAP)(*");
+            $to = '';
+            if ($G_emp[0]['EmailPU'] != '' && $G_emp[0]['EmailPU'] != null) {
+                $to = $G_emp[0]['EmailPU'];
+            }
+
+            if ($G_emp[0]['Email'] != '' && $G_emp[0]['Email'] != null) {
+                if ($to != '') {
+                    $to .= ','.$G_emp[0]['Email'];
+                }
+                else
+                {
+                    $to = $G_emp[0]['Email'];
+                }
+            }
+            
+            $subject = $text;
+            $text = 'Dear Mr/Mrs '.$G_emp[0]['Name'].',<br><br>
+                         '.$text.'
+                        <table width="50" cellspacing="0" cellpadding="12" border="0">
+                            <tbody>
+                            <tr>
+                                <td bgcolor="#51a351" align="center">
+                                    <a href="'.url_pas.'__login_to_budget/'.$TokenNIP.'/'.$TokenDep.'/'.$TokenURL.'" style="font:bold 16px/1 Helvetica,Arial,sans-serif;color:#ffffff;text-decoration:none;background-color: #51a351;" target="_blank" >View</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    ';
+            if ($to != '') 
+            {
+              $sendEmail = $this->M_sendemail_budgeting->sendEmail($to,$subject,$text);
+            } 
+        }
+    }
+
+    public function getEmployeeByDepartment($IDDivision)
+    {
+        $sql = "select * from db_employees.employees
+                where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+                ";
+        $query=$this->db->query($sql, array($IDDivision))->result_array();
+        return $query;
+    }
+
+    public function getEmployeeByDepartmentByPosition($IDDivision)
+    {
+        $sql = "select * from db_employees.employees
+                where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+                and SPLIT_STR(PositionMain, '.', 2) <= 12 
+                ";
+        $query=$this->db->query($sql, array($IDDivision))->result_array();
+        return $query;
+    }
 }
