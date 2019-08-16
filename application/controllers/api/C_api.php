@@ -8019,6 +8019,127 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($data_arr['action']=='viewInformation'){
+                $data = $this->db->query('SELECT ats.*,    
+                                        em1.Name AS MentorFP1Name, em1.TitleAhead AS TitleAhead1, em1.TitleBehind AS TitleBehind1, 
+                                        em2.Name AS MentorFP2Name, em2.TitleAhead AS TitleAhead2, em2.TitleBehind AS TitleBehind2,
+                                        fp.TitleInd, fp.TitleEng
+                                        FROM db_academic.auth_students ats
+                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2) 
+                                        LEFT JOIN db_academic.final_project fp ON (ats.NPM = fp.NPM)
+                                        WHERE ats.NPM = "'.$data_arr['NPM'].'" ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='checkRegistration'){
+                $data = $this->db->get_where('db_academic.final_project',array(
+                    'NPM' => $data_arr['NPM']
+                ))->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateFinalProject'){
+                $ID = $data_arr['ID'];
+                $formData = (array) $data_arr['formData'];
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                if($ID!='') {
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_academic.final_project', $formData);
+                } else {
+                    $this->db->insert('db_academic.final_project', $formData);
+                    $ID = $this->db->insert_id();
+                }
+
+                return print_r(json_encode(array('ID' => $ID )));
+
+            }
+            else if($data_arr['action']=='getAllStdReg'){
+
+                $Status = $data_arr['Status'];
+                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project fp 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='updateDataSchFP'){
+                $ID = $data_arr['ID'];
+                $dataForm = (array) $data_arr['dataForm'];
+                $Lecturer = (array) $data_arr['Lecturer'];
+                $Student = (array) $data_arr['Student'];
+
+                if($ID!=''){
+
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                    $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_academic.final_project_schedule',$dataForm);
+
+                    // Get Std lama
+                    $dataStdLama = $this->db->get_where('db_academic.final_project_schedule_student',array(
+                        'FPSID' => $ID
+                    ))->result_array();
+
+                    if(count($dataStdLama)>0){
+                        // Update Status
+                        for($j=0;$j<count($dataStdLama);$j++){
+                            $this->db->where('NPM',$dataStdLama[$j]['NPM']);
+                            $this->db->update('db_academic.final_project',array(
+                                'Status' => '1'
+                            ));
+                        }
+                    }
+
+                    $tables = array('db_academic.final_project_schedule_lecturer', 'db_academic.final_project_schedule_student');
+                    $this->db->where('FPSID', $ID);
+                    $this->db->delete($tables);
+
+                } else {
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                    $this->db->insert('db_academic.final_project_schedule',$dataForm);
+                    $ID = $this->db->insert_id();
+                }
+
+
+                // Adding Lecturer
+                if(count($Lecturer)>0){
+                    for($i=0;$i<count($Lecturer);$i++){
+                        $tp = ($i==0) ? '1' : '0';
+                        $arr = array(
+                            'FPSID' => $ID,
+                            'NIP' => $Lecturer[$i],
+                            'Type' => $tp
+                        );
+                        $this->db->insert('db_academic.final_project_schedule_lecturer',$arr);
+                    }
+                }
+
+                // Adding Std
+                if(count($Student)>0){
+                    for($i=0;$i<count($Student);$i++){
+                        $arr = array(
+                            'FPSID' => $ID,
+                            'NPM' => $Student[$i]
+                        );
+                        $this->db->insert('db_academic.final_project_schedule_student',$arr);
+
+                        // Update Status
+                        $this->db->where('NPM',$Student[$i]);
+                        $this->db->update('db_academic.final_project',array(
+                            'Status' => '2'
+                        ));
+                    }
+                }
+
+
+                return print_r(1);
+
+            }
         }
     }
 
@@ -9723,6 +9844,9 @@ class C_api extends CI_Controller {
 
 
                          $query1=$this->db->query($sql1, array())->result_array();
+
+                         print_r($sql1);
+
                          $Invoice = 0;
 
                          for ($k=1; $k <= 14; $k++) {

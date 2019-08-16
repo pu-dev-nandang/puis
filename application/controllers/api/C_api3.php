@@ -1397,7 +1397,8 @@ class C_api3 extends CI_Controller {
                                         mk.NameEng AS CourseEng, sc.ClassGroup, 
                                         ats.ClearentLibrary, ats.ClearentLibrary_By, ats.ClearentLibrary_At, em1.Name AS ClearentLibrary_Name,    
                                         ats.ClearentFinance, ats.ClearentFinance_By, ats.ClearentFinance_At, em2.Name AS ClearentFinance_Name,    
-                                        ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name, 
+                                        ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name,
+                                        ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
                                         ats.ID AS AUTHID  
                                         FROM db_academic.std_study_planning ssp
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
@@ -1406,12 +1407,15 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em1 ON (ats.ClearentLibrary_By = em1.NIP)
                                         LEFT JOIN db_employees.employees em2 ON (ats.ClearentFinance_By = em2.NIP)
                                         LEFT JOIN db_employees.employees em3 ON (ats.ClearentKaprodi_By = em3.NIP)
+                                        
+                                        LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
                                         WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.' '.$dataSearch;
 
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
-            $query = $this->db->query($sql)->result_array();
+                                                                                                     $query = $this->db->query($sql)->result_array();
             $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
             $no = $requestData['start'] + 1;
@@ -1427,6 +1431,7 @@ class C_api3 extends CI_Controller {
                 $dataScore = $this->db->select('Score')->get_where($dbStd.'.study_planning',array(
                     'ID' => $row['SPID']
                 ))->result_array();
+
 
 
                 // Score
@@ -1454,17 +1459,25 @@ class C_api3 extends CI_Controller {
                     $ijazah = $ijazahBtnD;
                 }
 
+                // Edit Mentor Final Project
+                $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
+                $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
+
+                $btnCrudPembimbing = ($DeptID=='6' || $DeptID==6) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['AUTHID'].'" data-id="'.$row['AUTHID'].'" 
+                data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
+                data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button>' : '';
+
 
                 // Library
                 $dateTm = ($row['ClearentLibrary_At']!='' && $row['ClearentLibrary_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentLibrary_At'])).'</div>' : '';
                 if($DeptID=='11' || $DeptID==11){
                     $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentLibrary">Clearent</button>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentLibrary">Clearance</button>';
                 } else {
                     $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
-                        : 'Waiting Library Clearent';
+                        : 'Waiting Library Clearance';
                 }
 
 
@@ -1474,11 +1487,11 @@ class C_api3 extends CI_Controller {
                 if($DeptID=='9' || $DeptID==9){
                     $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentFinance">Clearent</button>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentFinance">Clearance</button>';
                 } else {
                     $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
-                        : 'Waiting Finance Clearent';
+                        : 'Waiting Finance Clearance';
                 }
 
 
@@ -1490,7 +1503,7 @@ class C_api3 extends CI_Controller {
                 if($ProdiID!=''){
                     $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearent</button>';
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearance</button>';
 
                 } else {
                     $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
@@ -1501,12 +1514,17 @@ class C_api3 extends CI_Controller {
 
 
                 $c_Kaprodi = ($row['ClearentFinance']!='0' && $row['ClearentLibrary']!='0' &&
-                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded ,Library & Finance Clearent</span>';
+                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded ,Library & Finance Clearance</span>';
 
+
+
+
+                $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div>'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
+                $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div>'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
 
                 $nestedData[] = '<div>'.$no.'</div>';
-                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'<br/>'.$btnCrudPembimbing.'</div> ';
+                $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'<div id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div></div>';
                 $nestedData[] = '<div>'.$Score.'</div>';
                 $nestedData[] = '<div>'.$ijazah.'</div>';
                 $nestedData[] = '<div>'.$c_Library.'</div>';
@@ -1546,6 +1564,16 @@ class C_api3 extends CI_Controller {
 
             return print_r(1);
 
+        }
+
+        else if($data_arr['action']=='updateMentorFP'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->update('db_academic.auth_students',$dataForm);
+
+            return print_r(1);
         }
 
     }

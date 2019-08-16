@@ -1045,7 +1045,7 @@ class M_rest extends CI_Model {
                                                         FROM db_academic.schedule_team_teaching stt 
                                                         LEFT JOIN db_academic.schedule s ON (s.ID=stt.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-                                                        WHERE s.SemesterID ="'.$SemesterID.'" 
+                                                        WHERE s.SemesterID ="'.$dataSemester[$i]['ID'].'" 
                                                         AND stt.NIP = "'.$NIP.'"
                                                         AND s.IsSemesterAntara = "0" ')->result_array();
 

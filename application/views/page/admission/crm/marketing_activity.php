@@ -89,8 +89,7 @@
                 <div class="form-group">
                     <label>Participants</label>
                     <div id="viewP">
-                        <select class="select2-select-00 full-width-fix"
-                                size="5" multiple id="formParticipants"></select>
+                        <select class="select2-select-00 full-width-fix" size="5" multiple id="formParticipants"></select>
                     </div>
 
 
