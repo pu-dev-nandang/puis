@@ -15,20 +15,20 @@
                 <label class="control-label">Approval :</label>
             </div>    
             <div class="col-sm-10">
-                <div class="pull-left">
+                <!-- <div class="pull-left">
                     <span data-smt="" class="btn btn-add btn-write btn-add-m_template_form">
                         <i class="icon-plus"></i> Add
                    </span>
                 </div>
-                <br><br>
+                <br><br> -->
                 <table class="table table-bordered tableData" id ="TableApprovalMaster">
                     <thead>
                         <tr>
                             <th>No</th>
                             <th>Name</th>
-                            <th>Type User</th>
-                            <th>Visible</th>
-                            <th>Action</th>
+                            <!-- <th>Type User</th>
+                            <th>Visible</th> -->
+                            <!-- <th>Action</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -47,9 +47,12 @@
 </form>
 <script type="text/javascript">
     var cfg_m_type_approval = <?php echo json_encode($cfg_m_type_approval) ?>;
+    var cfg_m_userrole = <?php echo json_encode($cfg_m_userrole) ?>;
     $(document).ready(function() {
          <?php if ($action == 'edit'): ?>
-            LoadExistingDataMaster();       
+            LoadExistingDataMaster(); 
+         <?php else: ?>
+            LoadDataMasterAdd();         
          <?php endif ?>   
     }); // exit document Function
 
@@ -59,26 +62,36 @@
         $('#NameMaster').val("<?php echo $getData[0]['Name'] ?>");
         var html =  '';
         var  JsonStatus = jQuery.parseJSON(<?php echo json_encode($getData[0]['JsonStatusDefault']) ?>);
-        for (var i = 0; i < JsonStatus.length; i++) {
-            var cmb = OPcmbTypeUser(JsonStatus[i].NameTypeDesc);
-            var visible = OPcmbVisibel(JsonStatus[i].Visible);
+        for (var i = 1; i < cfg_m_userrole.length; i++) {
+            var getSelected = false;
+            for (var j = 0; j < JsonStatus.length; j++) {
+                if (cfg_m_userrole[i].ID == JsonStatus[j].ID_m_userrole) {
+                    getSelected = true;
+                    // var cmb = OPcmbTypeUser(JsonStatus[j].NameTypeDesc);
+                    // var visible = OPcmbVisibel(JsonStatus[j].Visible);
+                    var input = '<input type = "checkbox" value = "'+JsonStatus[j].ID_m_userrole+'" class="chk_MuserRole" checked> '+JsonStatus[j].Name;
+                    break;
+
+                }
+            }
+
             var btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUserMaster" code=""> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-            var input = '<div class = "row">'+
-                        '<div class = "col-xs-8">'+
-                            '<input type = "text" class = "form-control PeopleApprovalMaster" placeholder = "Input..." value="'+JsonStatus[i].NIP+'">'+
-                        '</div>'+
-                        '<div class = "col-xs-4">'+
-                            '<label id = "labelNameApprovalMaster">'+JsonStatus[i].Name+'</label>'+
-                        '</div>'+
-                    '</div>';
-            html += '<tr>'+
-                        '<td></td>'+
-                        '<td>'+input+'</td>'+
-                        '<td>'+cmb+'</td>'+
-                        '<td>'+visible+'</td>'+
-                        '<td>'+btnDelete+'</td>'+
-                    '</tr>'; 
+
+            if (!getSelected) {
+                // var cmb = OPcmbTypeUser();
+                // var visible = OPcmbVisibel();
+                var input = '<input type = "checkbox" value = "'+cfg_m_userrole[i].ID+'" class="chk_MuserRole"> '+cfg_m_userrole[i].NameUserRole;
+            }
+
+           html += '<tr>'+
+                       '<td></td>'+
+                       '<td>'+input+'</td>'+
+                       // '<td>'+cmb+'</td>'+
+                       // '<td>'+visible+'</td>'+
+                       // '<td>'+btnDelete+'</td>'+
+                   '</tr>'; 
         }
+
         $('#TableApprovalMaster tbody').append(html);          
         MakeAutoNumbering();
        <?php endif ?>  
@@ -90,30 +103,27 @@
     })
     
 
-    $(document).off('click', '.btn-add-m_template_form').on('click', '.btn-add-m_template_form',function(e) {
+    function LoadDataMasterAdd()
+    {
         var html = '';
         // adding combo Type User
-            var cmb = OPcmbTypeUser();
-            var visible = OPcmbVisibel();
-            var btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUserMaster" code=""> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
-            var input = '<div class = "row">'+
-                        '<div class = "col-xs-8">'+
-                            '<input type = "text" class = "form-control PeopleApprovalMaster" placeholder = "Input...">'+
-                        '</div>'+
-                        '<div class = "col-xs-4">'+
-                            '<label id = "labelNameApprovalMaster"></label>'+
-                        '</div>'+
-                    '</div>';
-            html = '<tr>'+
-                        '<td></td>'+
-                        '<td>'+input+'</td>'+
-                        '<td>'+cmb+'</td>'+
-                        '<td>'+visible+'</td>'+
-                        '<td>'+btnDelete+'</td>'+
-                    '</tr>';    
+            for (var i = 1; i < cfg_m_userrole.length; i++) {
+               // var cmb = OPcmbTypeUser();
+               // var visible = OPcmbVisibel();
+               var btnDelete = '<button type="button" class="btn btn-danger btn-delete btn-delete-setRoleUserMaster" code=""> <i class="fa fa-trash" aria-hidden="true"></i> Delete</button>';
+               var input = '<input type = "checkbox" value = "'+cfg_m_userrole[i].ID+'" class="chk_MuserRole"> '+cfg_m_userrole[i].NameUserRole;
+               html += '<tr>'+
+                           '<td></td>'+
+                           '<td>'+input+'</td>'+
+                           // '<td>'+cmb+'</td>'+
+                           // '<td>'+visible+'</td>'+
+                           // '<td>'+btnDelete+'</td>'+
+                       '</tr>'; 
+            }
+               
             $('#TableApprovalMaster tbody').append(html);          
             MakeAutoNumbering();
-    })
+    }
 
     function MakeAutoNumbering()
     {
@@ -125,88 +135,51 @@
         })
     }
 
-    function OPcmbVisibel(IDselected = null,Dis='')
-    {
-        var h = '';
-        var temp = ['Yes','No'];
-        h = '<select class = " form-control cmbVisibel" '+Dis+'>';
-            for (var i = 0; i < temp.length; i++) {
-                var selected = (IDselected == temp[i]) ? 'selected' : '';
-                h += '<option value = "'+temp[i]+'" '+selected+' >'+temp[i]+'</option>';
-            }
-        h += '</select>';   
+    // function OPcmbVisibel(IDselected = null,Dis='')
+    // {
+    //     var h = '';
+    //     var temp = ['Yes','No'];
+    //     h = '<select class = " form-control cmbVisibel" '+Dis+'>';
+    //         for (var i = 0; i < temp.length; i++) {
+    //             var selected = (IDselected == temp[i]) ? 'selected' : '';
+    //             h += '<option value = "'+temp[i]+'" '+selected+' >'+temp[i]+'</option>';
+    //         }
+    //     h += '</select>';   
 
-        return h;
-    } 
+    //     return h;
+    // }
 
-    function OPcmbTypeUser(IDselected = null,Dis='')
-    {
-        var h = '';
-        h = '<select class = " form-control cmbTypeUser" '+Dis+'>';
-            for (var i = 0; i < cfg_m_type_approval.length; i++) {
-                var selected = (IDselected == cfg_m_type_approval[i].Name) ? 'selected' : '';
-                h += '<option value = "'+cfg_m_type_approval[i].ID+'" '+selected+' >'+cfg_m_type_approval[i].Name+'</option>';
-            }
-        h += '</select>';   
+    // function OPcmbTypeUser(IDselected = null,Dis='')
+    // {
+    //     var h = '';
+    //     h = '<select class = " form-control cmbTypeUser" '+Dis+'>';
+    //         for (var i = 0; i < cfg_m_type_approval.length; i++) {
+    //             if (IDselected != null) {
+    //                 var selected = (IDselected == cfg_m_type_approval[i].Name) ? 'selected' : '';
+    //             }
+    //             else
+    //             {
+    //                 var selected = (cfg_m_type_approval[i].ID == 3) ? 'selected' : '';
+    //             }
+                
+    //             h += '<option value = "'+cfg_m_type_approval[i].ID+'" '+selected+' >'+cfg_m_type_approval[i].Name+'</option>';
+    //         }
+    //     h += '</select>';   
 
-        return h;
-    }
+    //     return h;
+    // }
 
-    $(document).off('keypress', '.PeopleApprovalMaster').on('keypress', '.PeopleApprovalMaster',function(e) { 
-        var ev = $(this).closest('td');
-        var Nama = $(this).val();
-        var thiss = $(this);
-        $(this).autocomplete({
-          minLength: 3,
-          appendTo: "#TableApprovalMaster",
-          select: function (event, ui) {
-            event.preventDefault();
-            var selectedObj = ui.item;
-            thiss.val(selectedObj.value);
-            ev.find('label[id="labelNameApprovalMaster"]').html(selectedObj.label);
-          },
-          /*select: function (event,  ui)
-          {
-
-          },*/
-          source:
-          function(req, add)
-          {
-            var url = base_url_js+'autocompleteAllUser';
-            var data = {
-                        Nama : Nama,
-                        };
-            var token = jwt_encode(data,"UAP)(*");          
-            $.post(url,{token:token},function (data_json) {
-                var obj = JSON.parse(data_json);
-                add(obj.message) 
-            })
-          } 
-        })
-    })
-
-    
     $(document).off('click', '#ModalbtnSaveFormMaster').on('click', '#ModalbtnSaveFormMaster',function(e) {
         var ID = $(this).attr('kodeuniq');
         var action = $(this).attr('action');
         if (validationFormMaster()) {
             loading_button('#ModalbtnSaveFormMaster');
             var JsonStatus = [];
-            $('.PeopleApprovalMaster').each(function(){
+            $('.chk_MuserRole:checked').each(function(){
                 var ev = $(this).closest('tr');
-                var NIP = $(this).val();
-                var Status = 0;
-                var ApproveAt = '';
-                var Representedby = '';
-                var Visible = ev.find('.cmbVisibel option:selected').val();
-                var NameTypeDesc = ev.find('.cmbTypeUser option:selected').text();
+                var ID_m_userrole = $(this).val();
                 var temp = {
-                    NIP : NIP,
-                    Status : Status,
-                    ApproveAt : ApproveAt,
-                    Representedby : Representedby,
-                    Visible : Visible,
-                    NameTypeDesc : NameTypeDesc,
+                    ID_m_userrole : ID_m_userrole,
                 }
                 JsonStatus.push(temp);
             })
@@ -236,13 +209,14 @@
     function validationFormMaster()
     {
         var bool =true;
-        $('.PeopleApprovalMaster').each(function(){
-            if ($(this).val() == '') {
-                bool = false;
-                toastr.error('Input Approval Required','!Failed');
-                return;
-            }
+        var Count = 0;
+        $('.chk_MuserRole:checked').each(function(){
+            Count++;
         })
+
+        if (Count == 0) {
+            bool = false;
+        }
 
         if (bool) {
             var Name = $('#NameMaster').val();

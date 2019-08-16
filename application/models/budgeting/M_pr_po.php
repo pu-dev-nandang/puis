@@ -397,7 +397,7 @@ class M_pr_po extends CI_Model {
 
     public function GetPR_CreateByPRCode($PRCode)
     {
-        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
+        $sql = 'select a.ID_template,a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done", if(a.Status = 3,"Reject","Cancel") ) ))
                                     as StatusName,a.Status, a.JsonStatus ,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
                                     from db_budgeting.pr_create as a 

@@ -221,7 +221,7 @@
 	  	           }).fail(function() {
 	  	             toastr.error('The Database connection error, please try again', 'Failed!!');
 	  	           }).always(function() {
-	  	           		
+
 
 	  	           });
 				}	

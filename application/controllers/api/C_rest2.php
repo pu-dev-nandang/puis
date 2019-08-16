@@ -4257,4 +4257,28 @@ class C_rest2 extends CI_Controller {
         echo json_encode($json_data);
     }
 
+    public function LoadTemplate_Budgeting()
+    {
+      try {
+       $dataToken = $this->getInputToken2();
+       $auth = $this->m_master->AuthAPI($dataToken);
+        if ($auth) {
+            $sql = 'select b.ID,a.Name,b.ID_m_template,b.StartDate,b.EndDate,b.JsonStatus as JsonStatusDefault,b.CreatedBy,c.Name as NameCreatedBy,b.CreatedAt,b.LastUpdatedBy,d.Name as LastUpdatedName,b.LastUpdatedAt
+                from db_budgeting.m_template as a 
+                join db_budgeting.t_template as b on a.ID = b.ID_m_template
+                join db_employees.employees as c on b.CreatedBy = c.NIP
+                left join db_employees.employees as d on b.LastUpdatedBy = d.NIP
+                where b.Active = 1 and ( b.StartDate <= CURDATE() and b.EndDate >= CURDATE() )
+                order by b.ID desc
+            ';
+            $query=$this->db->query($sql, array())->result_array(); 
+            echo json_encode($query);
+        }
+       }
+       catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"Not Authorize"}';
+       }
+    }
+
 }

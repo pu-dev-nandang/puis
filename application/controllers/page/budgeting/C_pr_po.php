@@ -88,9 +88,37 @@ class C_pr_po extends Budgeting_Controler {
             $JsonStatusDefault = $dt[$i]['JsonStatusDefault'];
             $JsonStatusDefault = json_decode($JsonStatusDefault,true);
             for ($j=0; $j < count($JsonStatusDefault); $j++) { 
-                $NIP = $JsonStatusDefault[$j]['NIP'];
-                $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
-                $JsonStatusDefault[$j]['Name'] = $G_emp[0]['Name']; 
+                $ID_m_userrole = $JsonStatusDefault[$j]['ID_m_userrole'];
+                $G_m_userrole = $this->m_master->caribasedprimary('db_budgeting.cfg_m_userrole','ID',$ID_m_userrole);
+                $JsonStatusDefault[$j]['Name'] = $G_m_userrole[0]['NameUserRole']; 
+            }
+
+            $JsonStatusDefault = json_encode($JsonStatusDefault);
+            $dt[$i]['JsonStatusDefault'] = $JsonStatusDefault;
+        }
+
+        echo json_encode($dt);
+    }
+
+    public function GetTemplateTransaksi()
+    {
+        $this->auth_ajax();
+        $sql = 'select b.ID,a.Name,b.ID_m_template,b.StartDate,b.EndDate,b.JsonStatus as JsonStatusDefault,b.CreatedBy,c.Name as NameCreatedBy,b.CreatedAt,b.LastUpdatedBy,d.Name as LastUpdatedName,b.LastUpdatedAt
+            from db_budgeting.m_template as a 
+            join db_budgeting.t_template as b on a.ID = b.ID_m_template
+            join db_employees.employees as c on b.CreatedBy = c.NIP
+            left join db_employees.employees as d on b.LastUpdatedBy = d.NIP
+            where b.Active = 1 order by b.ID desc
+        ';
+        $query=$this->db->query($sql, array())->result_array();  
+        $dt = $query;
+        for ($i=0; $i < count($dt); $i++) { 
+            $JsonStatusDefault = $dt[$i]['JsonStatusDefault'];
+            $JsonStatusDefault = json_decode($JsonStatusDefault,true);
+            for ($j=0; $j < count($JsonStatusDefault); $j++) { 
+                $ID_m_userrole = $JsonStatusDefault[$j]['ID_m_userrole'];
+                $G_m_userrole = $this->m_master->caribasedprimary('db_budgeting.cfg_m_userrole','ID',$ID_m_userrole);
+                $JsonStatusDefault[$j]['Name'] = $G_m_userrole[0]['NameUserRole']; 
             }
 
             $JsonStatusDefault = json_encode($JsonStatusDefault);
@@ -106,15 +134,16 @@ class C_pr_po extends Budgeting_Controler {
         $this->data['action'] = $input['Action'];
         $this->data['ID'] = $input['CDID'];
         $this->data['cfg_m_type_approval'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');
+        $this->data['cfg_m_userrole'] = $this->m_master->showData_array('db_budgeting.cfg_m_userrole');
         if ($input['Action'] == 'edit') {
             $dt = $this->m_master->caribasedprimary('db_budgeting.m_template','ID',$input['CDID']);
             for ($i=0; $i < count($dt); $i++) { 
                 $JsonStatusDefault = $dt[$i]['JsonStatusDefault'];
                 $JsonStatusDefault = json_decode($JsonStatusDefault,true);
                 for ($j=0; $j < count($JsonStatusDefault); $j++) { 
-                    $NIP = $JsonStatusDefault[$j]['NIP'];
-                    $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
-                    $JsonStatusDefault[$j]['Name'] = $G_emp[0]['Name']; 
+                    $ID_m_userrole = $JsonStatusDefault[$j]['ID_m_userrole'];
+                    $G_m_userrole = $this->m_master->caribasedprimary('db_budgeting.cfg_m_userrole','ID',$ID_m_userrole);
+                    $JsonStatusDefault[$j]['Name'] = $G_m_userrole[0]['NameUserRole']; 
                 }
 
                 $JsonStatusDefault = json_encode($JsonStatusDefault);
@@ -137,12 +166,122 @@ class C_pr_po extends Budgeting_Controler {
                $this->db->insert('db_budgeting.m_template',$Input);
                 break;
             case 'edit':
-               unset($Input['action']);
+                    unset($Input['action']);
+                    $ID = $Input['ID'];
+                    unset($Input['ID']);
+                    $Input['JsonStatusDefault'] = json_encode($Input['JsonStatusDefault']);
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_budgeting.m_template',$Input);
+                break;
+            case 'delete':
                $ID = $Input['ID'];
-               unset($Input['ID']);
-               $Input['JsonStatusDefault'] = json_encode($Input['JsonStatusDefault']);
+               $dataSave = array(
+                'Active' => 0,
+               );
                $this->db->where('ID',$ID);
-               $this->db->update('db_budgeting.m_template',$Input);
+               $this->db->update('db_budgeting.m_template',$dataSave);
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function Set_Template_Transaksi()
+    {
+        $this->auth_ajax();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/config_pr/template/transaksi',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function form_template_transaksi()
+    {
+        $input = $this->getInputToken();
+        $this->data['action'] = $input['Action'];
+        $this->data['ID'] = $input['CDID'];
+        $this->data['cfg_m_type_approval'] = $this->m_master->showData_array('db_budgeting.cfg_m_type_approval');
+        $this->data['cfg_m_userrole'] = $this->m_master->showData_array('db_budgeting.cfg_m_userrole');
+        $__get = function(){
+            $dt = $this->m_master->showDataActive_array('db_budgeting.m_template',1);
+            for ($i=0; $i < count($dt); $i++) { 
+                $JsonStatusDefault = $dt[$i]['JsonStatusDefault'];
+                $JsonStatusDefault = json_decode($JsonStatusDefault,true);
+                for ($j=0; $j < count($JsonStatusDefault); $j++) { 
+                    $ID_m_userrole = $JsonStatusDefault[$j]['ID_m_userrole'];
+                    $G_m_userrole = $this->m_master->caribasedprimary('db_budgeting.cfg_m_userrole','ID',$ID_m_userrole);
+                    $JsonStatusDefault[$j]['Name'] = $G_m_userrole[0]['NameUserRole']; 
+                }
+
+                $JsonStatusDefault = json_encode($JsonStatusDefault);
+                $dt[$i]['JsonStatusDefault'] = $JsonStatusDefault;
+            }
+            return $dt;
+        };
+
+        $this->data['m_template']= $__get();
+        if ($input['Action'] == 'edit') {
+            $sql = 'select a.Name,b.ID_m_template,b.StartDate,b.EndDate,b.JsonStatus as JsonStatusDefault,b.CreatedBy,c.Name,b.CreatedAt,b.LastUpdatedBy,d.Name as LastUpdatedName,b.LastUpdatedAt
+                from db_budgeting.m_template as a 
+                join db_budgeting.t_template as b on a.ID = b.ID_m_template
+                join db_employees.employees as c on b.CreatedBy = c.NIP
+                left join db_employees.employees as d on b.LastUpdatedBy = d.NIP
+                where b.Active = 1 and b.ID = ?
+            ';
+            $query=$this->db->query($sql, array($input['CDID']))->result_array();  
+            $dt = $query;
+            for ($i=0; $i < count($dt); $i++) { 
+                $JsonStatusDefault = $dt[$i]['JsonStatusDefault'];
+                $JsonStatusDefault = json_decode($JsonStatusDefault,true);
+                for ($j=0; $j < count($JsonStatusDefault); $j++) { 
+                    $ID_m_userrole = $JsonStatusDefault[$j]['ID_m_userrole'];
+                    $G_m_userrole = $this->m_master->caribasedprimary('db_budgeting.cfg_m_userrole','ID',$ID_m_userrole);
+                    $JsonStatusDefault[$j]['Name'] = $G_m_userrole[0]['NameUserRole']; 
+                }
+
+                $JsonStatusDefault = json_encode($JsonStatusDefault);
+                $dt[$i]['JsonStatusDefault'] = $JsonStatusDefault;
+            }
+            $this->data['getData'] = $dt;
+            // print_r($input);
+        }
+        echo $this->load->view('page/budgeting/'.$this->data['department'].'/config_pr/template/form_transaksi',$this->data,true);
+    }
+
+    public function template_transaksi_save()
+    {
+        $Input = $this->getInputToken();
+        $action = $Input['action'];
+        switch ($action) {
+            case 'add':
+               unset($Input['ID']);
+               unset($Input['action']);
+               $Input['JsonStatus'] = json_encode($Input['JsonStatus']);
+               $Input['CreatedBy'] = $this->session->userdata('NIP');
+               $Input['CreatedAt'] = date('Y-m-d H:i:s');
+               $this->db->insert('db_budgeting.t_template',$Input);
+                break;
+            case 'edit':
+                $ID = $Input['ID'];
+                $G_data = $this->m_master->caribasedprimary('db_budgeting.t_template','ID',$ID);
+                if ($G_data[0]['Activated'] == 1) {
+                    unset($Input['action']);
+                    
+                    unset($Input['ID']);
+                    $Input['JsonStatus'] = json_encode($Input['JsonStatus']);
+                    $Input['LastUpdatedBy'] = $this->session->userdata('NIP');
+                    $Input['LastUpdatedAt'] = date('Y-m-d H:i:s');
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_budgeting.t_template',$Input);
+                }
+                break;
+            case 'delete':
+               $ID = $Input['ID'];
+               $dataSave = array(
+                'Active' => 0,
+               );
+               $this->db->where('ID',$ID);
+               $this->db->update('db_budgeting.t_template',$dataSave);
                 break;
             default:
                 # code...
