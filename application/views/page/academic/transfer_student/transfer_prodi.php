@@ -394,7 +394,7 @@
                     toNewNPM : toNewNPM,
                     TransferTypeID : toReason,
                     PaymentProdiID : (formPayemntProdiID!='' && formPayemntProdiID!=null)
-                        ? formPayemntProdiID!=''.split('.')[0] : '',
+                        ? formPayemntProdiID.split('.')[0] : '',
                     PaymentClassOf : formPayemntClassOf,
                     PaymentBintang : formPayemntBintang,
                     CreateAt : dateTimeNow(),

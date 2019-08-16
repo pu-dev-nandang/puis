@@ -29,6 +29,18 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function list_student(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/list_student',$data,true);
+        $this->menu_transcript($page);
+    }
+
+    public function seminar_schedule(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/seminar_schedule',$data,true);
+        $this->menu_transcript($page);
+    }
+
     public function monitoring_yudisium(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/finalproject/monitoring_yudisium',$data,true);
@@ -73,6 +85,12 @@ class C_final_project extends Academic_Controler {
             $this->db->update('db_academic.auth_students');
             return print_r(1);
         }
+    }
+
+    public function scheduling_final_project(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/scheduling_final_project',$data,true);
+        $this->menu_transcript($page);
     }
 
 }
