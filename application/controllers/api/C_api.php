@@ -9845,7 +9845,6 @@ class C_api extends CI_Controller {
 
                          $query1=$this->db->query($sql1, array())->result_array();
 
-                         print_r($sql1);
 
                          $Invoice = 0;
 
