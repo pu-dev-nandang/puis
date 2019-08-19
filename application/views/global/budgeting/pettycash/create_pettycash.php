@@ -135,137 +135,187 @@
 		return def.promise();
 	}
 
+	function __LoadTemplate()
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__LoadTemplate';
+		var data = {
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
+	function OPcmbTemplate(data,IDselected = null,Dis='')
+	{
+	    var h = '';
+	    // h = '<select class = " form-control cmbTemplate" '+Dis+'>';
+	    h += '<option value="" selected>--No Choose--</option>';
+	        for (var i = 0; i < data.length; i++) {
+	            if (IDselected != null) {
+	                var selected = (IDselected == data[i].ID) ? 'selected' : '';
+	            }
+	            h += '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Name+'</option>';
+	        }
+	    // h += '</select>';   
+
+	    return h;
+	}
+
 	function makeDomHTML(se_content)
 	{
-		var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
-			html += '<div class="col-md-4">'+
-						'<div><a href="'+base_url_js+'budgeting_menu/pembayaran/pettycash" class="btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>'+
-						'<div style = "margin-top:10px;"><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ClassDt.ID_payment+'">Info</a></div>'+
-						'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
-						'<p id = "labelDepartment">Department : '+DivSessionName+'</p>'+
-						'<p id = "Date">'+'Tanggal : <?php echo date('Y-m-d') ?>'+'</p>'+
-						'<div class="input-group" style = "width:350px;">'+
-							'<span class="input-group-btn">'+
-								'Perihal : &nbsp'+
-							'</span>'+
-							'<input type="text" class="form-control" id = "Perihal">'+
-						'</div>'+
-						'<p id = "labelCode"></p>'+
-						'<p id = "Status"></p>'+
-					'</div>'+
-					'<div class="col-md-4">'+
-						'<div class="well">'+
-							'<div style="margin-top: -15px">'+
-								'<label>Budget Remaining</label>'+
+		__LoadTemplate().then(function(dataTemplate){
+			var ID_template = null;
+			var html = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;">';
+				html += '<div class="col-md-4">'+
+							'<div><a href="'+base_url_js+'budgeting_menu/pembayaran/pettycash" class="btn btn-warning"> <i class="fa fa-arrow-circle-left"></i> Back to List</a></div>'+
+							'<div style = "margin-top:10px;"><a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ClassDt.ID_payment+'">Info</a></div>'+
+							'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
+							'<p id = "labelDepartment">Department : '+DivSessionName+'</p>'+
+							'<p id = "Date">'+'Tanggal : <?php echo date('Y-m-d') ?>'+'</p>'+
+							'<div class="input-group" style = "width:350px;">'+
+								'<span class="input-group-btn">'+
+									'Template : &nbsp'+
+								'</span>'+
+								'<select class ="form-control SelectTemplate"></select>'+
 							'</div>'+
-							'<div id = "Page_Budget_Remaining">'+
-								''+
+							'<div class="input-group" style = "width:350px;margin-top:10px;">'+
+								'<span class="input-group-btn">'+
+									'Perihal : &nbsp'+
+								'</span>'+
+								'<input type="text" class="form-control" id = "Perihal">'+
 							'</div>'+
+							'<p id = "labelCode"></p>'+
+							'<p id = "Status"></p>'+
 						'</div>'+
-					'</div>';
-			html += '</div>';
-
-        var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
-							'<div class = "col-md-3">'+
-								'<button type="button" class="btn btn-default btn-add-item"> <i class="icon-plus"></i> Add Item</button>'+
+						'<div class="col-md-4">'+
+							'<div class="well">'+
+								'<div style="margin-top: -15px">'+
+									'<label>Budget Remaining</label>'+
+								'</div>'+
+								'<div id = "Page_Budget_Remaining">'+
+									''+
+								'</div>'+
 							'</div>'+
 						'</div>';
+				html += '</div>';
 
-		var IsiInput = '';
-		if (ClassDt.ID_payment !='') {
-			IsiInput = AddingTable_existing();
-		}				
-
-		var htmlInput = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_input">'+
-							'<div class = "col-md-12">'+
-								'<div class="table-responsive">'+
-									'<table class="table table-bordered tableData" id ="table_input" style = "min-width: 1200px;">'+
-									'<thead>'+
-									'<tr>'+
-										'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">BUDGET</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 30%;">DIBAYAR UNTUK</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">NOMOR ACC</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 25%;">JUMLAH RUPIAH</th>'+
-			                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">ACTION</th>'+
-									'</tr></thead>'+
-									'<tbody>'+IsiInput+'</tbody></table>'+
+	        var htmlBtnAdd = '<div class = "row" style = "margin-left : 0px">'+
+								'<div class = "col-md-3">'+
+									'<button type="button" class="btn btn-default btn-add-item"> <i class="icon-plus"></i> Add Item</button>'+
 								'</div>'+
-							'</div>'+
-						  '</div>';
-		var htmlgrandtotal = '<div class = "row">'+
-								'<div class = "col-md-offset-6 col-md-6">'+
-									'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
+							'</div>';
+
+			var IsiInput = '';
+			if (ClassDt.ID_payment !='') {
+				IsiInput = AddingTable_existing();
+			}				
+
+			var htmlInput = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_input">'+
+								'<div class = "col-md-12">'+
+									'<div class="table-responsive">'+
+										'<table class="table table-bordered tableData" id ="table_input" style = "min-width: 1200px;">'+
+										'<thead>'+
+										'<tr>'+
+											'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">BUDGET</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 30%;">DIBAYAR UNTUK</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 15%;">NOMOR ACC</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;width : 25%;">JUMLAH RUPIAH</th>'+
+				                            '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">ACTION</th>'+
+										'</tr></thead>'+
+										'<tbody>'+IsiInput+'</tbody></table>'+
+									'</div>'+
 								'</div>'+
-							  '</div>';						  
-						  
-		var htmlTerbilang = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Terbilang">'+
-						  '</div>';
+							  '</div>';
+			var htmlgrandtotal = '<div class = "row">'+
+									'<div class = "col-md-offset-6 col-md-6">'+
+										'<h3 id = "phtmltotal" align = "right"> Total : '+formatRupiah(0)+'</h3>'+
+									'</div>'+
+								  '</div>';						  
+							  
+			var htmlTerbilang = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Terbilang">'+
+							  '</div>';
 
-		var Supporting_documents = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
-							'<div class = "col-md-6">'+
-								'<div class = "form-group" style="width:350px;">'+
-									'<label>NoIOM</label>'+
-									'<input type="text" class="form-control" id = "NoIOM">'+
+			var Supporting_documents = '<div class = "row" style = "margin-top : 10px;margin-left : 0px;margin-right : 0px">'+
+								'<div class = "col-md-6">'+
+									'<div class = "form-group" style="width:350px;">'+
+										'<label>NoIOM</label>'+
+										'<input type="text" class="form-control" id = "NoIOM">'+
+									'</div>'+
+									'<div class = "form-group">'+
+										'<label>Upload IOM</label>'+
+										'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
+									'</div>'+
 								'</div>'+
-								'<div class = "form-group">'+
-									'<label>Upload IOM</label>'+
-									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
-								'</div>'+
-							'</div>'+
-						'</div>';				  					  
+							'</div>';				  					  
 
-		var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
-						  '</div>';	
+			var htmlApproval = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Approval">'+
+							  '</div>';	
 
-		var htmlButton = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Button">'+
-						  '</div>';					
-			
-		se_content.html(html+htmlBtnAdd+htmlInput+htmlgrandtotal+htmlTerbilang+Supporting_documents+htmlApproval+htmlButton);
+			var htmlButton = '<div class = "row" style="margin-left: 0px;margin-right: 0px;margin-top: 5px;" id = "Page_Button">'+
+							  '</div>';					
+				
+			se_content.html(html+htmlBtnAdd+htmlInput+htmlgrandtotal+htmlTerbilang+Supporting_documents+htmlApproval+htmlButton);
 
-		if (ClassDt.ID_payment != '') { // exist
-			makeApproval();
-			$(".SubTotal").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			$(".SubTotal").maskMoney('mask', '9894');
-			$('.btn-add-item').prop('disabled',true);
-			var DtExisting = ClassDt.DtExisting;
-			DtExisting = DtExisting.payment;
-			var DetailPayment = DtExisting[0].Detail;
-			// show data
-				$('#labelDepartment').html('Department : '+DtExisting[0].NameDepartement);
-				$('#labelPeriod').html('Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label>');
-				$('#Date').html('Tanggal : '+moment(DtExisting[0].CreatedAt).format('YYYY-MM-DD'));
-				$('#Perihal').val(DetailPayment[0].Perihal);
-				$('#NoIOM').val(DtExisting[0].NoIOM);
-				var StatusName = NameStatus(DtExisting[0]['Status']);
-				$('#Status').html('Status : '+StatusName);
-			// Show Supporting_documents if exist
-				var Supporting_documents = jQuery.parseJSON(DtExisting[0]['UploadIOM']);
-				// console.log(Supporting_documents);
-				var htmlSupporting_documents = '';
-				if (Supporting_documents != null) {
-					if (Supporting_documents.length > 0) {
-						for (var i = 0; i < Supporting_documents.length; i++) {
-							htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-pettycash-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-pettycash-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
+			if (ClassDt.ID_payment != '') { // exist
+				makeApproval();
+				$(".SubTotal").maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				$(".SubTotal").maskMoney('mask', '9894');
+				$('.btn-add-item').prop('disabled',true);
+				var DtExisting = ClassDt.DtExisting;
+				DtExisting = DtExisting.payment;
+				var DetailPayment = DtExisting[0].Detail;
+				ID_template = DtExisting[0]['ID_template'];
+				// show data
+					$('#labelDepartment').html('Department : '+DtExisting[0].NameDepartement);
+					$('#labelPeriod').html('Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label>');
+					$('#Date').html('Tanggal : '+moment(DtExisting[0].CreatedAt).format('YYYY-MM-DD'));
+					$('#Perihal').val(DetailPayment[0].Perihal);
+					$('#NoIOM').val(DtExisting[0].NoIOM);
+					var StatusName = NameStatus(DtExisting[0]['Status']);
+					$('#Status').html('Status : '+StatusName);
+				// Show Supporting_documents if exist
+					var Supporting_documents = jQuery.parseJSON(DtExisting[0]['UploadIOM']);
+					// console.log(Supporting_documents);
+					var htmlSupporting_documents = '';
+					if (Supporting_documents != null) {
+						if (Supporting_documents.length > 0) {
+							for (var i = 0; i < Supporting_documents.length; i++) {
+								htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-pettycash-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-pettycash-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
+							}
 						}
 					}
+					$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
+
+				if (DtExisting[0]['Status'] == -1) {
+					var row = $('#table_input tbody tr:not(:last)');
+					row.find('td').find('input:not(.Detail),select,button:not(.Detail),textarea').prop('disabled',true);
+					$('.btn-add-item').prop('disabled',false);
 				}
-				$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
+				else
+				{
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea,.SelectTemplate').prop('disabled',true);
+				}
 
-			if (DtExisting[0]['Status'] == -1) {
-				var row = $('#table_input tbody tr:not(:last)');
-				row.find('td').find('input:not(.Detail),select,button:not(.Detail),textarea').prop('disabled',true);
-				$('.btn-add-item').prop('disabled',false);
+				__BudgetRemaining();
 			}
-			else
-			{
-				$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
-				$('input,textarea').prop('disabled',true);
-			}
+			MakeButton();	
 
-			__BudgetRemaining();
-		}
-		MakeButton();	
+			$('.SelectTemplate').empty();
+			$('.SelectTemplate').append(OPcmbTemplate(dataTemplate,ID_template));
+		})
 	}
 
 	$(document).off('click', '.btn-add-item').on('click', '.btn-add-item',function(e) {
@@ -1144,6 +1194,14 @@
 		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
 		form_data.append('BudgetRemaining',token);
 
+		// get value template
+		var ID_template = $('.SelectTemplate').val();
+		if (ID_template == '' || ID_template == null || ID_template == undefined) {
+			ID_template = 0;
+		}
+		token = jwt_encode(ID_template,"UAP)(*");
+		form_data.append('ID_template',token);
+
 		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
 		form_data.append('BudgetLeft_awal',token);
@@ -1498,6 +1556,7 @@
 		$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',false);
 		$('#NoIOM').prop('disabled',false);
 		$('#Perihal').prop('disabled',false);
+		$('.SelectTemplate').prop('disabled',false);
 		$(this).remove();
 	})
 

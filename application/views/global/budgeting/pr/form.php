@@ -644,7 +644,7 @@
 	{
 	    var h = '';
 	    // h = '<select class = " form-control cmbTemplate" '+Dis+'>';
-	    h += '<option value="" selected disabled>--No Choose--</option>';
+	    h += '<option value="" selected>--No Choose--</option>';
 	        for (var i = 0; i < data.length; i++) {
 	            if (IDselected != null) {
 	                var selected = (IDselected == data[i].ID) ? 'selected' : '';
@@ -668,7 +668,6 @@
 	function __LoadTemplate()
 	{
 		var def = jQuery.Deferred();
-		var ID_payment = ClassDt.ID_payment;
 		var url = base_url_js+'rest2/__LoadTemplate';
 		var data = {
 		    auth : 's3Cr3T-G4N',

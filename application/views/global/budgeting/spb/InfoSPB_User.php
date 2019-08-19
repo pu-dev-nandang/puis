@@ -168,307 +168,347 @@
 		return def.promise();
 	}
 
+	function __LoadTemplate()
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__LoadTemplate';
+		var data = {
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
+	}
+
 	function makeDomHTML(se_content)
 	{
-		var html = '';
-		var TypeInvoice = 'Pembayaran 1';
-		var btnSPb = '';
-		var Dis = '';
-		var CodeWr = '';
-		var LinkFileInvoice = '';
-		var LinkUploadTandaTerima = '';
-		var CodeSupplier = '';
-		var Supplier = '';
-		var Supplier_ = '';
-		var NoInvoice = '';
-		var NoTandaTerima = '';
-		var Datee = '';
-		var Perihal = '';
-		var ID_bank = '';
-		var NoRekening = '';
-		var IsiInput = '';
-		var NoIOM = '';
-		if (ClassDt.ID_payment !='') {
-			// console.log(ClassDt);
-			var DtExisting = ClassDt.DtExisting;
-			var dtspb = DtExisting.payment;
-			Dis = 'disabled';
-			CodeWr = dtspb[0]['Code'];
-			UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
-			UploadInvoice = UploadInvoice[0];
-			LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
+		__LoadTemplate().then(function(dataTemplate){
+			var html = '';
+			var TypeInvoice = 'Pembayaran 1';
+			var btnSPb = '';
+			var Dis = '';
+			var CodeWr = '';
+			var LinkFileInvoice = '';
+			var LinkUploadTandaTerima = '';
+			var CodeSupplier = '';
+			var Supplier = '';
+			var Supplier_ = '';
+			var NoInvoice = '';
+			var NoTandaTerima = '';
+			var Datee = '';
+			var Perihal = '';
+			var ID_bank = '';
+			var NoRekening = '';
+			var IsiInput = '';
+			var NoIOM = '';
+			var ID_template = null;
+			if (ClassDt.ID_payment !='') {
+				// console.log(ClassDt);
+				var DtExisting = ClassDt.DtExisting;
+				var dtspb = DtExisting.payment;
+				Dis = 'disabled';
+				CodeWr = dtspb[0]['Code'];
+				UploadInvoice = jQuery.parseJSON(dtspb[0].Detail[0]['UploadInvoice']);
+				UploadInvoice = UploadInvoice[0];
+				LinkFileInvoice = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadInvoice+'" target="_blank" class = "Fileexist">File Document</a>';
 
-			UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
-			UploadTandaTerima = UploadTandaTerima[0];
-			LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
-			var DetailPayment = dtspb[0].Detail;
-			CodeSupplier = DetailPayment[0].CodeSupplier;
-			Supplier = '<label>'+DetailPayment[0].NamaSupplier+'</label><br>'+DetailPayment[0].Website+'<br>PIC : '+DetailPayment[0].PICName+
-						'<br>Alamat : '+DetailPayment[0].Alamat;
-			Supplier_ = DetailPayment[0].NamaSupplier;
-			NoInvoice = DetailPayment[0].NoInvoice;			
-			NoTandaTerima = DetailPayment[0].NoTandaTerima;			
-			Datee = DetailPayment[0].Datee;	
-			Perihal = DetailPayment[0].Perihal;
-			ID_bank = DetailPayment[0].ID_bank;
-			NoRekening = DetailPayment[0].No_Rekening;
-			IsiInput = 	AddingTable_existing();
-			NoIOM = dtspb[0].NoIOM;
-		}	
-		html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
-					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-					'<table class="table borderless" style="font-weight: bold;">'+
-					'<thead></thead>'+
-					'<tbody>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'NOMOR'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<span color = "red">'+CodeWr+'</span>'+
-							'</td>'+
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'VENDOR/SUPPLIER'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<div class="input-group" style = "width:450px;">'+
-									'<input type="text" class="form-control InpSupplierChoice" readonly value = "'+CodeSupplier+'">'+
-									'<span class="input-group-btn">'+
-										'<button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
-									'</span>'+
-								'</div>'+
-								'<label class = "lblSupplierChoice">'+Supplier+'</label>'+	
-							'</td>'+		
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'NO KWT/INV'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<label>No Invoice</label>'+
-								'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value = "'+NoInvoice+'" '+Dis+'>'+
-								'<br>'+
-								'<label style="color: red">Upload Invoice</label>'+
-								'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+' >'+
-								'<div id = "FileInvoice">'+
-								LinkFileInvoice+
-								'</div>'+
-								'<br>'+
-								'<label>No Tanda Terima</label>'+
-								'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value = "'+NoTandaTerima+'" '+Dis+' >'+
-								'<br>'+
-								'<label style="color: red">Upload Tanda Terima</label>'+
-								'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
-								'<div id = "FileTT"  '+Dis+'>'+
-								LinkUploadTandaTerima+
-								'</div>'+
-							'</td>'+			
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'TANGGAL'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+Datee+'">'+
-		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
-		                		'</div>'+
-							'</td>	'+			
-						'</tr>'+
-						'<tr>'+
-							'<td class="TD1">'+
-								'PERIHAL'+
-							'</td>'+
-							'<td class="TD2">'+
-								':'+
-							'</td>'+
-							'<td>'+
-								'<input type = "text" class = "form-control Perihal" placeholder ="Input Perihal..." '+Dis+' value = "'+Perihal+'">'+
-							'</td>	'+			
-						'</tr>'+
-					'</tbody>'+
-					'</table>'+
-					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
-					'<table class="table borderless">'+
-						'<thead>'+
-							'<tr>'+
-								'<td class="TD1">'+
-									'Mohon dibayarkan / ditransfer kepada'+
-								'</td>'+
-								'<td>'+
-									'<b>'+'<div class = "GetSupplierChoice"></div>'+'</b>'+
-								'</td>'+
-							'</tr>'+
-							'<tr style="height: 50px;">'+
-								'<td class="TD1">'+
-									'No Rekening'+
-								'</td>'+
-								'<td>'+
-									'<div class= "row">'+
-										'<div class="col-xs-5">'+
-											OPBank(ID_bank,Dis)+
-										'</div>'+
-										'<div class="col-xs-1">'+
-											'<b>&</b>'+
-										'</div>'+
-										'<div class="col-xs-5">'+
-											'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening" value = "'+NoRekening+'">'+
-										'</div>'+
-									'</div>'+		
-								'</td>'+
-							'</tr>'+
-						'</thead>'+
-					'</table>'+
-					'<table class="table borderless">'+	
+				UploadTandaTerima = jQuery.parseJSON(dtspb[0].Detail[0]['UploadTandaTerima']);
+				UploadTandaTerima = UploadTandaTerima[0];
+				LinkUploadTandaTerima = '<a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+UploadTandaTerima+'" target="_blank" class = "Fileexist">File Document</a>';
+				var DetailPayment = dtspb[0].Detail;
+				CodeSupplier = DetailPayment[0].CodeSupplier;
+				Supplier = '<label>'+DetailPayment[0].NamaSupplier+'</label><br>'+DetailPayment[0].Website+'<br>PIC : '+DetailPayment[0].PICName+
+							'<br>Alamat : '+DetailPayment[0].Alamat;
+				Supplier_ = DetailPayment[0].NamaSupplier;
+				NoInvoice = DetailPayment[0].NoInvoice;			
+				NoTandaTerima = DetailPayment[0].NoTandaTerima;			
+				Datee = DetailPayment[0].Datee;	
+				Perihal = DetailPayment[0].Perihal;
+				ID_bank = DetailPayment[0].ID_bank;
+				NoRekening = DetailPayment[0].No_Rekening;
+				IsiInput = 	AddingTable_existing();
+				NoIOM = dtspb[0].NoIOM;
+				ID_template = dtspb[0]['ID_template'];
+			}	
+			html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Surat Permohonan Pembayaran</h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<table class="table borderless" style="font-weight: bold;">'+
+						'<thead></thead>'+
 						'<tbody>'+
-							'<tr style ="height:40px;">'+
-								'<td colspan = "3" align="center">'+
-									'<u><b>PEMBAYARAN : </b></u>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'Template'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<select class ="form-control SelectTemplate" style = "max-width:400px;"></select>'+
 								'</td>'+
 							'</tr>'+
 							'<tr>'+
-								'<td style="width:150px;">'+
-									'<button type="button" class="btn btn-default btn-add-item"> <i class="icon-plus"></i> Add Item</button>'+
+								'<td class="TD1">'+
+									'NOMOR'+
 								'</td>'+
-								'<td colspan="2">'+
-									'<div class="well">'+
-										'<label>Budget Remaining</label>'+
-										'<div id = "Page_Budget_Remaining">'+
-											''+
-										'</div>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<span color = "red">'+CodeWr+'</span>'+
+								'</td>'+
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'VENDOR/SUPPLIER'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<div class="input-group" style = "width:450px;">'+
+										'<input type="text" class="form-control InpSupplierChoice" readonly value = "'+CodeSupplier+'">'+
+										'<span class="input-group-btn">'+
+											'<button class="btn btn-default SearchVendor" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+										'</span>'+
 									'</div>'+
+									'<label class = "lblSupplierChoice">'+Supplier+'</label>'+	
 								'</td>'+		
 							'</tr>'+
-							'<tr style = "height:100px;">'+
-								'<td colspan="4">'+
-									'<table class = "table" id = "tblDetail" style="background-color:#f9f9f9 !important;">'+
-										'<thead>'+
-											'<tr>'+
-												'<th>'+'No'+'</th>'+
-												'<th>'+'Budget'+'</th>'+
-												'<th>'+'Dibayar Untuk'+'</th>'+
-												'<th>'+'Jumlah Rupiah (Include PPN)'+'</th>'+
-												'<th>'+'Action'+'</th>'+
-											'</tr>'+
-										'</thead>'+
-										'<tbody>'+
-											IsiInput+
-										'</tbody>'+
-									'</table>'+
-								'</td>'+	
+							'<tr>'+
+								'<td class="TD1">'+
+									'NO KWT/INV'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<label>No Invoice</label>'+
+									'<input type = "text" class = "form-control NoInvoice" placeholder = "Input No Invoice...." value = "'+NoInvoice+'" '+Dis+'>'+
+									'<br>'+
+									'<label style="color: red">Upload Invoice</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseInvoice" id="BrowseInvoice" accept="image/*,application/pdf" '+Dis+' >'+
+									'<div id = "FileInvoice">'+
+									LinkFileInvoice+
+									'</div>'+
+									'<br>'+
+									'<label>No Tanda Terima</label>'+
+									'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value = "'+NoTandaTerima+'" '+Dis+' >'+
+									'<br>'+
+									'<label style="color: red">Upload Tanda Terima</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+									'<div id = "FileTT"  '+Dis+'>'+
+									LinkUploadTandaTerima+
+									'</div>'+
+								'</td>'+			
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'TANGGAL'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+			                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+Datee+'">'+
+			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+			                		'</div>'+
+								'</td>	'+			
+							'</tr>'+
+							'<tr>'+
+								'<td class="TD1">'+
+									'PERIHAL'+
+								'</td>'+
+								'<td class="TD2">'+
+									':'+
+								'</td>'+
+								'<td>'+
+									'<input type = "text" class = "form-control Perihal" placeholder ="Input Perihal..." '+Dis+' value = "'+Perihal+'">'+
+								'</td>	'+			
 							'</tr>'+
 						'</tbody>'+
-						'<tfoot>'+
-							'<tr>'+
-								'<td colspan = "3">'+
-									'<p class="terbilang" style="font-weight: bold;">Terbilang : [Nominal auto script]</p>'+
-								'</td>'+
-							'</tr>'+
-						'</tfoot>'+
-					'</table>'+
-					'<div class = "row" style = "margin-top : 10px;">'+
-						'<div class = "col-md-6">'+
-							'<div class = "form-group" style="width:350px;">'+
-								'<label>NoIOM</label>'+
-								'<input type="text" class="form-control" id = "NoIOM" value = "'+NoIOM+'">'+
-							'</div>'+
-							'<div class = "form-group">'+
-								'<label>Upload IOM</label>'+
-								'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
+						'</table>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<table class="table borderless">'+
+							'<thead>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'Mohon dibayarkan / ditransfer kepada'+
+									'</td>'+
+									'<td>'+
+										'<b>'+'<div class = "GetSupplierChoice"></div>'+'</b>'+
+									'</td>'+
+								'</tr>'+
+								'<tr style="height: 50px;">'+
+									'<td class="TD1">'+
+										'No Rekening'+
+									'</td>'+
+									'<td>'+
+										'<div class= "row">'+
+											'<div class="col-xs-5">'+
+												OPBank(ID_bank,Dis)+
+											'</div>'+
+											'<div class="col-xs-1">'+
+												'<b>&</b>'+
+											'</div>'+
+											'<div class="col-xs-5">'+
+												'<input type = "text" class = "form-control NoRekening" placeholder="No Rekening" value = "'+NoRekening+'">'+
+											'</div>'+
+										'</div>'+		
+									'</td>'+
+								'</tr>'+
+							'</thead>'+
+						'</table>'+
+						'<table class="table borderless">'+	
+							'<tbody>'+
+								'<tr style ="height:40px;">'+
+									'<td colspan = "3" align="center">'+
+										'<u><b>PEMBAYARAN : </b></u>'+
+									'</td>'+
+								'</tr>'+
+								'<tr>'+
+									'<td style="width:150px;">'+
+										'<button type="button" class="btn btn-default btn-add-item"> <i class="icon-plus"></i> Add Item</button>'+
+									'</td>'+
+									'<td colspan="2">'+
+										'<div class="well">'+
+											'<label>Budget Remaining</label>'+
+											'<div id = "Page_Budget_Remaining">'+
+												''+
+											'</div>'+
+										'</div>'+
+									'</td>'+		
+								'</tr>'+
+								'<tr style = "height:100px;">'+
+									'<td colspan="4">'+
+										'<table class = "table" id = "tblDetail" style="background-color:#f9f9f9 !important;">'+
+											'<thead>'+
+												'<tr>'+
+													'<th>'+'No'+'</th>'+
+													'<th>'+'Budget'+'</th>'+
+													'<th>'+'Dibayar Untuk'+'</th>'+
+													'<th>'+'Jumlah Rupiah (Include PPN)'+'</th>'+
+													'<th>'+'Action'+'</th>'+
+												'</tr>'+
+											'</thead>'+
+											'<tbody>'+
+												IsiInput+
+											'</tbody>'+
+										'</table>'+
+									'</td>'+	
+								'</tr>'+
+							'</tbody>'+
+							'<tfoot>'+
+								'<tr>'+
+									'<td colspan = "3">'+
+										'<p class="terbilang" style="font-weight: bold;">Terbilang : [Nominal auto script]</p>'+
+									'</td>'+
+								'</tr>'+
+							'</tfoot>'+
+						'</table>'+
+						'<div class = "row" style = "margin-top : 10px;">'+
+							'<div class = "col-md-6">'+
+								'<div class = "form-group" style="width:350px;">'+
+									'<label>NoIOM</label>'+
+									'<input type="text" class="form-control" id = "NoIOM" value = "'+NoIOM+'">'+
+								'</div>'+
+								'<div class = "form-group">'+
+									'<label>Upload IOM</label>'+
+									'<input type="file" data-style="fileinput" class="BrowseFileSD" id="BrowseFileSD" multiple="" accept="image/*,application/pdf">'+
+								'</div>'+
 							'</div>'+
 						'</div>'+
-					'</div>'+
-					'<div id="r_signatures"></div>'+
-					'<div id = "r_action">'+
-						// '<div class="row">'+
-						// 	'<div class="col-md-12">'+
-						// 		'<div class="pull-right">'+
-						// 			'<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
-						// 			'<button class="btn btn-primary hide btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
-						// 			'<button class="btn btn-success submit"> Submit</button>'+
-						// 		'</div>'+
-						// 	'</div>'+
-						// '</div>'+
-						btnSPb+
-					'</div>'+
-				'</div></div></div>';
-		se_content.html(html);			
+						'<div id="r_signatures"></div>'+
+						'<div id = "r_action">'+
+							// '<div class="row">'+
+							// 	'<div class="col-md-12">'+
+							// 		'<div class="pull-right">'+
+							// 			'<button class="btn btn-default hide print_page"> <i class="fa fa-print" aria-hidden="true"></i> Print</button> &nbsp'+
+							// 			'<button class="btn btn-primary hide btnEditInput"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button> &nbsp'+
+							// 			'<button class="btn btn-success submit"> Submit</button>'+
+							// 		'</div>'+
+							// 	'</div>'+
+							// '</div>'+
+							btnSPb+
+						'</div>'+
+					'</div></div></div>';
+			se_content.html(html);			
 
-		se_content.find('.datetimepicker').datetimepicker({
-			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-		});
-
-		if (ClassDt.ID_payment =='') {
-			se_content.find('.dtbank[tabindex!="-1"]').select2({
-			    //allowClear: true
+			se_content.find('.datetimepicker').datetimepicker({
+				format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 			});
-		}
-		else
-		{
-			se_content.find('.SubTotal,.Money_harga').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-			se_content.find('.SubTotal,.Money_harga').maskMoney('mask', '9894');
-			$('.SubTotal:last').trigger('keyup');
 
-			var Supporting_documents = jQuery.parseJSON(dtspb[0]['UploadIOM']);
-			var htmlSupporting_documents = '';
-			var htmlSupporting_documents = '';
-			if (Supporting_documents != null) {
-				if (Supporting_documents.length > 0) {
-					for (var i = 0; i < Supporting_documents.length; i++) {
-						htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-spb-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
-					}
-				}
-			}
-			$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
-
-			if (dtspb[0]['Status'] == -1) {
-				var row = $('#tblDetail tbody tr:not(:last)');
-				row.find('td').find('input:not(.Detail),select,button:not(.Detail),textarea').prop('disabled',true);
-				$('.btn-add-item').prop('disabled',false);
+			if (ClassDt.ID_payment =='') {
+				se_content.find('.dtbank[tabindex!="-1"]').select2({
+				    //allowClear: true
+				});
 			}
 			else
 			{
-				$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
-				$('input,textarea').prop('disabled',true);
-			}
+				se_content.find('.SubTotal,.Money_harga').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+				se_content.find('.SubTotal,.Money_harga').maskMoney('mask', '9894');
+				$('.SubTotal:last').trigger('keyup');
 
-			var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
-			var bool = true;
-			for (var i = 1; i < JsonStatus.length; i++) {
-				if (JsonStatus[i].Status == 1) {
-					bool = false;
-					break;
+				var Supporting_documents = jQuery.parseJSON(dtspb[0]['UploadIOM']);
+				var htmlSupporting_documents = '';
+				var htmlSupporting_documents = '';
+				if (Supporting_documents != null) {
+					if (Supporting_documents.length > 0) {
+						for (var i = 0; i < Supporting_documents.length; i++) {
+							htmlSupporting_documents += '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'fileGetAny/budgeting-spb-'+Supporting_documents[i]+'" target="_blank" class = "Fileexist">File '+(i+1)+'</a>&nbsp<button class="btn-xs btn-default btn-delete btn-default-warning btn-custom btn-delete-file" filepath = "budgeting-spb-'+Supporting_documents[i]+'" type="button" idtable = "'+ClassDt.ID_payment+'" table = "db_payment.payment" field = "UploadIOM" typefield = "1" delimiter = "" fieldwhere = "ID"><i class="fa fa-trash" aria-hidden="true"></i></button></li>';
+						}
+					}
 				}
-			}
+				$('#BrowseFileSD').closest('.col-md-6').append(htmlSupporting_documents);
 
-			if (!bool) {
-				if (dtspb[0]['Status'] == 2) {
-					se_content.find('button').not('.print_page').remove();
+				if (dtspb[0]['Status'] == -1) {
+					var row = $('#tblDetail tbody tr:not(:last)');
+					row.find('td').find('input:not(.Detail),select,button:not(.Detail),textarea').prop('disabled',true);
+					$('.btn-add-item').prop('disabled',false);
 				}
-				
+				else
+				{
+					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
+					$('input,textarea,.SelectTemplate').prop('disabled',true);
+				}
+
+				var JsonStatus = jQuery.parseJSON(dtspb[0]['JsonStatus']);
+				var bool = true;
+				for (var i = 1; i < JsonStatus.length; i++) {
+					if (JsonStatus[i].Status == 1) {
+						bool = false;
+						break;
+					}
+				}
+
+				if (!bool) {
+					if (dtspb[0]['Status'] == 2) {
+						se_content.find('button').not('.print_page').remove();
+					}
+					
+				}
+				makepage_status();
+				makeSignaturesSPB(se_content,JsonStatus);
+				if (JsonStatus[0].NIP != sessionNIP) {
+					$('#add_approver').remove();
+				}
+				// __BudgetRemaining();
 			}
-			makepage_status();
-			makeSignaturesSPB(se_content,JsonStatus);
-			if (JsonStatus[0].NIP != sessionNIP) {
-				$('#add_approver').remove();
-			}
-			// __BudgetRemaining();
-		}
-		MakeButton();
+			MakeButton();	
+
+			$('.SelectTemplate').empty();
+			$('.SelectTemplate').append(OPcmbTemplate(dataTemplate,ID_template));
+		})
+		
 	}
 
 	function makeSignaturesSPB(se_content,JsonStatus)
@@ -1569,6 +1609,14 @@
 		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
 		form_data.append('BudgetRemaining',token);
 
+		// get value template
+		var ID_template = $('.SelectTemplate').val();
+		if (ID_template == '' || ID_template == null || ID_template == undefined) {
+			ID_template = 0;
+		}
+		token = jwt_encode(ID_template,"UAP)(*");
+		form_data.append('ID_template',token);
+
 		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
 		form_data.append('BudgetLeft_awal',token);
@@ -1812,6 +1860,7 @@
 		$('.btn-add-item,input[type="file"],.btn-delete-file').prop('disabled',false);
 		$('#NoIOM').prop('disabled',false);
 		$('#Perihal').prop('disabled',false);
+		$('.SelectTemplate').prop('disabled',false);
 		$(this).remove();
 	})
 
@@ -2022,4 +2071,20 @@
 		    { name: 'token', value: token },
 		]);
 	})
+
+	function OPcmbTemplate(data,IDselected = null,Dis='')
+	{
+	    var h = '';
+	    // h = '<select class = " form-control cmbTemplate" '+Dis+'>';
+	    h += '<option value="" selected>--No Choose--</option>';
+	        for (var i = 0; i < data.length; i++) {
+	            if (IDselected != null) {
+	                var selected = (IDselected == data[i].ID) ? 'selected' : '';
+	            }
+	            h += '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Name+'</option>';
+	        }
+	    // h += '</select>';   
+
+	    return h;
+	}
 </script>

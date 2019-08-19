@@ -157,6 +157,11 @@ class C_pettycash extends Budgeting_Controler {
         $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
         $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
 
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $StatusPayment = '';
 
         // adding Supporting_documents
@@ -179,7 +184,14 @@ class C_pettycash extends Budgeting_Controler {
                     $SubTotal = $data_arr['SubTotal'];
                     $Amount = $Amount + $SubTotal;
                 }
-            $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
+            }
+            else
+            {
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            }
         
             if (count($JsonStatus) > 1) {
                 $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
@@ -193,6 +205,7 @@ class C_pettycash extends Budgeting_Controler {
                         'NoIOM' => $NoIOM,
                         'UploadIOM' => $Supporting_documents,
                         'Departement' => $Departement,
+                        'ID_template' => $ID_template,
                     );
 
                     $this->db->insert('db_payment.payment',$dataSave);
@@ -326,6 +339,11 @@ class C_pettycash extends Budgeting_Controler {
         $BudgetRemaining = $this->jwt->decode($BudgetRemaining,$key);
         $BudgetRemaining =  (array)  json_decode(json_encode($BudgetRemaining),true);
 
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $BudgetLeft_awal = $this->input->post('BudgetLeft_awal');
         $key = "UAP)(*";
         $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
@@ -390,12 +408,22 @@ class C_pettycash extends Budgeting_Controler {
                             $Amount = $Amount + $SubTotal;
                         }
                         
-            $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus2 = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
+            }
+            else
+            {
+                $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            }   
             // new approval
             $dataSave['JsonStatus'] = json_encode($JsonStatus2);
                 if (count($JsonStatus2) > 1) {
                     $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                     if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
+                        $dataSave['ID_template'] = $ID_template;
+                        $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
+                        $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
                         $this->db->where('ID',$ID_payment);
                         $this->db->update('db_payment.payment',$dataSave);
                         $StatusPayment = 1;

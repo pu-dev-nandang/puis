@@ -1423,7 +1423,6 @@ $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
 $route['budgeting/submit_spb_user'] = 'page/budgeting/c_spb/submit_spb_user';
 
-
 // bankadvance
 $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 $route['budgeting/submit_bank_advance_user'] = 'page/budgeting/c_ba/submit_bank_advance_user';
@@ -1452,7 +1451,6 @@ $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
 $route['budgeting/submit_pettycash_user'] = 'page/budgeting/c_pettycash/submit_pettycash_user';
 $route['budgeting_menu/pembayaran/pettycash/(:any)'] = 'page/budgeting/c_pettycash/view_petty_cash_user/$1';
-
 
 // financeAP
 $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';

@@ -851,14 +851,14 @@ class C_pr_po extends Budgeting_Controler {
 
             // get approval template
             if ($ID_template != 0 ) {
-               $JsonStatus = $this->m_pr_po->GetRuleApproval_Template($ID_template); 
+               $JsonStatus = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
             }
             else
             {
                 $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
             }    
             
-            // print_r($JsonStatus);die();
+            // die();
             if (count($JsonStatus) > 1) {
                 $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                 if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
@@ -873,6 +873,7 @@ class C_pr_po extends Budgeting_Controler {
                         'Supporting_documents' => $Supporting_documents,
                         'Year' => $Year,
                         'Departement' => $Departement,
+                        'ID_template' => $ID_template,
                     );
 
                     $this->db->where('PRCode',$PRCode);
@@ -1021,6 +1022,11 @@ class C_pr_po extends Budgeting_Controler {
         $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
         $StatusPR = '';
 
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $dataSave = array(
             'PRCode' => $PRCode,
             'Status' => 1,
@@ -1080,13 +1086,22 @@ class C_pr_po extends Budgeting_Controler {
                             $SubTotal = $data_arr['SubTotal'];
                             $Amount = $Amount + $SubTotal;
                         }
-                        
-            $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus2 = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
+            }
+            else
+            {
+                $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            }              
+            
             // new approval
             $dataSave['JsonStatus'] = json_encode($JsonStatus2);
                 if (count($JsonStatus2) > 1) {
                     $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                     if ($BoolBudget) { // jika Budget yang digunakan belum ada perubahan yang berarti cocok antara client dengan server
+                        $dataSave['ID_template'] = $ID_template;
                         $this->db->where('PRCode',$PRCode);
                         $this->db->update('db_budgeting.pr_create',$dataSave);
                         $StatusPR = 1;
