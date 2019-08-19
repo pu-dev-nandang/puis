@@ -1291,6 +1291,7 @@ class C_budgeting extends Budgeting_Controler {
                     'EntryBudget',
                     'Approval',
                     'ListBudgetDepartement',
+                    'budget_revisi',
                     'report_anggaran_per_years',
                     null
                 );
@@ -2187,5 +2188,23 @@ class C_budgeting extends Budgeting_Controler {
             show_404($log_error = TRUE);
         }
     }
+
+    public function budget_revisi()
+    {
+        $this->auth_ajax();
+        $this->authFin();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/budget_revisi',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function budget_revisi_Revisi()
+    {
+        $this->auth_ajax();
+        $this->authFin();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/budget_revisi/revisi',$this->data,true);
+        echo json_encode($arr_result);
+    } 
 
 }

@@ -1353,6 +1353,9 @@ $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorb
 $route['budgeting/update_approval_budgeting'] = 'page/budgeting/c_budgeting/update_approval_budgeting';
 $route['budgeting/update_approval_pr'] = 'page/budgeting/c_pr_po/update_approval_pr';
 
+$route['budgeting/EntryBudget/budget_revisi'] = 'page/budgeting/c_budgeting/budget_revisi';
+$route['budgeting/EntryBudget/budget_revisi/Revisi'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi';
+
 
 
 $route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
