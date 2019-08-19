@@ -461,8 +461,8 @@
                 '            <tr>' +
                 '                <th style="width: 1%;text-align: center;">No</th>' +
                 '                <th style="text-align: center;">Students</th>' +
-                '                <th style="width: 15%;text-align: center;">Status</th>' +
-                '                <th style="width: 15%;text-align: center;">Attendance</th>' +
+                '                <th style="width: 30%;text-align: center;">Status</th>' +
+                '                <th style="width: 10%;text-align: center;">Attendance</th>' +
                 '            </tr>' +
                 '            </thead>' +
                 '            <tbody id="loadDataStdCuy"></tbody>' +
@@ -482,7 +482,7 @@
             $.each(Planning,function (i,v) {
 
                 var sts = ($.inArray(v.NPM,dataStudent.Approve)!=-1)
-                    ? '<span style="color: green;"><i class="fa fa-check-circle"></i></span>' : '-';
+                    ? '<span style="color: green;"><i class="fa fa-check-circle"></i></span> KRS approved' : 'KRS not yet approved';
                 var stsClass = ($.inArray(v.NPM,dataStudent.Approve)!=-1)
                     ? '' : 'style="color:red;"';
 
@@ -498,6 +498,9 @@
                 if(v.TotalAttd < v.Attendance.length){
                     btnAttd = '<button class="btn btn-sm btn-default btn-default-success btnAddAttdStudent" data-no="'+noAsc+'" data-npm="'+v.NPM+'" data-attd="'+arr_ID_Attd.sort()+'">Add</button>';
                 }
+
+
+                btnAttd = ($.inArray(v.NPM,dataStudent.Approve)!=-1) ? btnAttd : '-';
 
                 $('#loadDataStdCuy').append('<tr '+stsClass+'>' +
                     '<td style="text-align: center;">'+noAsc+'</td>' +
