@@ -397,7 +397,7 @@ class M_pr_po extends CI_Model {
 
     public function GetPR_CreateByPRCode($PRCode)
     {
-        $sql = 'select a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
+        $sql = 'select a.ID_template,a.ID,a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,c.Name as NameCreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done", if(a.Status = 3,"Reject","Cancel") ) ))
                                     as StatusName,a.Status, a.JsonStatus ,a.PRPrint_Approve,a.Notes,a.Supporting_documents,a.PostingDate
                                     from db_budgeting.pr_create as a 
@@ -1554,6 +1554,61 @@ class M_pr_po extends CI_Model {
             return '';
          }
          
+    }
+
+    public function GetRuleApproval_Template($ID_template,$Departement)
+    {
+        $arr = array();
+        $rs = array();
+        $G_dt = $this->m_master->caribasedprimary('db_budgeting.t_template','ID',$ID_template);
+        $G = $this->get_approval_pr($Departement);
+        if (count($G_dt) > 0) {
+           $JsonStatus = $G_dt[0]['JsonStatus'];
+           $JsonStatus = json_decode($JsonStatus,true);
+           // deklare data created / admin
+           $arr[] = array(
+               'NIP' => $this->session->userdata('NIP'),
+               'Status' => 1,
+               'ApproveAt' => date('Y-m-d H:i:s'),
+               'Representedby' => '',
+               'Visible' => $G[0]['Visible'],
+               'NameTypeDesc' => $G[0]['NameTypeDesc'],
+           );
+           for ($j=0; $j < count($JsonStatus); $j++) { 
+               $ID_m_userrole = $JsonStatus[$j]['ID_m_userrole'];
+               for ($k=0; $k < count($G); $k++) { 
+                   if ($ID_m_userrole == $G[$k]['ID'] ) {
+                       $dt = $G[$k];
+                       $arr[] = array(
+                           'NIP' => $dt['NIP'],
+                           'Status' => 0,
+                           'ApproveAt' => '',
+                           'Representedby' => '',
+                           'Visible' => $dt['Visible'],
+                           'NameTypeDesc' => $dt['NameTypeDesc'],
+                       );
+                       break;
+                   }
+               }
+           }
+
+           // filtering jika double
+           for ($i=0; $i < count($arr); $i++) { 
+               $NIP = $arr[$i]['NIP'];
+               $rs[] = $arr[$i];
+               for ($j=$i+1; $j < count($arr); $j++) { 
+                   if ($NIP == $arr[$j]['NIP']) {
+                       $i = $j;
+                   }
+                   else
+                   {
+                    break;
+                   }
+               }
+           }
+        }
+        // print_r($rs);    
+        return $rs;
     }
 
 

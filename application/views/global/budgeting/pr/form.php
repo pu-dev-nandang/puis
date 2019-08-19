@@ -249,6 +249,12 @@
 					'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
 					'<p id = "labelDepartment">Department : '+ClassDt.NmDepartement_Existing+'</p>'+
 					'<p id = "labelPrcode">PR Code : '+ClassDt.PRCodeVal+'</p>'+
+					'<div class="input-group" style = "width:350px;">'+
+						'<span class="input-group-btn">'+
+							'Template : &nbsp'+
+						'</span>'+
+						'<select class ="form-control SelectTemplate"></select>'+
+					'</div>'+
 					'<p id = "Status">Status : '+StatusName+'<br>'+btn_see_pass+'</p>'+
 				'</div>'+
 				'<div class="col-md-4">'+
@@ -402,13 +408,15 @@
 				else
 				{
 					$('button:not(#Log):not(#btnBackToHome):not(.Detail)').prop('disabled',true);
-					$('input,textarea').prop('disabled',true);
+					$('input,textarea,.SelectTemplate').prop('disabled',true);
 				}
 				
 
 		// make kolom approval
 			makeApproval();	
 		MakeButton();
+		// console.log(pr_create);
+		LoadTemplate(pr_create[0].ID_template);
 	}
 
 	function AddingTable_existing()
@@ -539,6 +547,12 @@
 						'<p id = "labelPeriod">Period : <label>'+ClassDt.Year+'/'+(parseInt(ClassDt.Year)+1 )+'</label></p>'+
 						'<p id = "labelDepartment">Department : '+DivSessionName+'</p>'+
 						'<p id = "labelPrcode"></p>'+
+						'<div class="input-group" style = "width:350px;">'+
+							'<span class="input-group-btn">'+
+								'Template : &nbsp'+
+							'</span>'+
+							'<select class ="form-control SelectTemplate"></select>'+
+						'</div>'+
 						'<p id = "Status"></p>'+
 					'</div>'+
 					'<div class="col-md-4">'+
@@ -623,6 +637,53 @@
 
 		$('#dtContent').html(html+htmlBtnAdd+htmlInputPR+htmlInputFooter+htmlApproval+htmlButton);	
 		MakeButton();
+		LoadTemplate();
+	}
+
+	function OPcmbTemplate(data,IDselected = null,Dis='')
+	{
+	    var h = '';
+	    // h = '<select class = " form-control cmbTemplate" '+Dis+'>';
+	    h += '<option value="" selected>--No Choose--</option>';
+	        for (var i = 0; i < data.length; i++) {
+	            if (IDselected != null) {
+	                var selected = (IDselected == data[i].ID) ? 'selected' : '';
+	            }
+	            h += '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Name+'</option>';
+	        }
+	    // h += '</select>';   
+
+	    return h;
+	}
+
+	function LoadTemplate(dtselected = null)
+	{
+		__LoadTemplate().then(function(data){
+			// console.log(data);
+			$('.SelectTemplate').empty();
+			$('.SelectTemplate').append(OPcmbTemplate(data,dtselected));
+		})
+	}
+
+	function __LoadTemplate()
+	{
+		var def = jQuery.Deferred();
+		var url = base_url_js+'rest2/__LoadTemplate';
+		var data = {
+		    auth : 's3Cr3T-G4N',
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$.post(url,{ token:token },function (resultJson) {
+			
+		}).done(function(resultJson) {
+			def.resolve(resultJson);
+		}).fail(function() {
+		  toastr.info('No Result Data');
+		  def.reject();  
+		}).always(function() {
+		                
+		});	
+		return def.promise();
 	}
 
 	function makeApproval()
@@ -872,7 +933,7 @@
 			row.find('input.UnitCost').prop('disabled',false);
 		}
 
-		$('textarea').prop('disabled',false);
+		$('textarea,.SelectTemplate').prop('disabled',false);
 		$('#SaveSubmit').prop('disabled',false);
 		$('.btn-add-pr,input[type="file"],.btn-delete-file').prop('disabled',false);
 		$(this).remove();
@@ -2005,9 +2066,13 @@
 		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
 		form_data.append('BudgetRemaining',token);
 
-		// var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
-		// token = jwt_encode(BudgetLeft_awal,"UAP)(*");
-		// form_data.append('BudgetLeft_awal',token);
+		// get value template
+		var ID_template = $('.SelectTemplate').val();
+		if (ID_template == '' || ID_template == null || ID_template == undefined) {
+			ID_template = 0;
+		}
+		token = jwt_encode(ID_template,"UAP)(*");
+		form_data.append('ID_template',token);
 
 		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");

@@ -1021,6 +1021,8 @@ $route['rest/__approve_payment_user'] = 'api/c_rest2/approve_payment_user';
 $route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget_real_detail_byMonthYear';
 $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_budget_onprocess_detail_byMonthYear';
 $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
+$route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
@@ -1442,11 +1444,12 @@ $route['budgeting/save_cfg_set_roleuser_pr'] = 'page/budgeting/c_pr_po/save_cfg_
 $route['budgeting/config_pr/Set_Template']= 'page/budgeting/c_pr_po/Set_Template';
 $route['budgeting/config_pr/Set_Template/Master']= 'page/budgeting/c_pr_po/Set_Template_Master';
 $route['budgeting/_GetTemplate']= 'page/budgeting/c_pr_po/GetTemplate';
+$route['budgeting/_GetTemplateTransaksi']= 'page/budgeting/c_pr_po/GetTemplateTransaksi';
 $route['budgeting/form_template_master']= 'page/budgeting/c_pr_po/form_template_master';
 $route['budgeting/template_master_save']= 'page/budgeting/c_pr_po/template_master_save';
-
-
-
+$route['budgeting/config_pr/Set_Template/Transaksi']= 'page/budgeting/c_pr_po/Set_Template_Transaksi';
+$route['budgeting/form_template_transaksi']= 'page/budgeting/c_pr_po/form_template_transaksi';
+$route['budgeting/template_transaksi_save']= 'page/budgeting/c_pr_po/template_transaksi_save';
 
 $route['budgeting/EntryBudget/BudgetLeft'] = 'page/budgeting/c_budgeting/BudgetLeft';
 $route['budgeting/getListBudgetingRemaining'] = 'page/budgeting/c_budgeting/getListBudgetingRemaining';
@@ -1493,7 +1496,6 @@ $route['budgeting/submitspb'] = 'page/budgeting/c_spb/submitspb';
 $route['budgeting/submitgrpo'] = 'page/budgeting/c_spb/submitgrpo';
 $route['budgeting/submit_spb_user'] = 'page/budgeting/c_spb/submit_spb_user';
 
-
 // bankadvance
 $route['budgeting/submitba'] = 'page/budgeting/c_ba/submitba';
 $route['budgeting/submit_bank_advance_user'] = 'page/budgeting/c_ba/submit_bank_advance_user';
@@ -1522,7 +1524,6 @@ $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
 $route['budgeting/submit_pettycash_user'] = 'page/budgeting/c_pettycash/submit_pettycash_user';
 $route['budgeting_menu/pembayaran/pettycash/(:any)'] = 'page/budgeting/c_pettycash/view_petty_cash_user/$1';
-
 
 // financeAP
 $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';

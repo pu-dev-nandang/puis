@@ -962,6 +962,11 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
         $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
 
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $dataInput = $this->input->post('dataInput');
         $key = "UAP)(*";
         $dataInput = $this->jwt->decode($dataInput,$key);
@@ -1006,7 +1011,14 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     $SubTotal = $data_arr['SubTotal'];
                     $Amount = $Amount + $SubTotal;
                 }
-            $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
+            }
+            else
+            {
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            } 
             if (count($JsonStatus) > 1) {
                 $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
                 if ($BoolBudget) {
@@ -1021,6 +1033,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         'NoIOM' => $NoIOM,
                         'UploadIOM' => $Supporting_documents,
                         'Departement' => $Departement,
+                        'ID_template' => $ID_template,
                     );
                      $this->db->insert('db_payment.payment',$dataSave);
                      $ID_payment =$this->db->insert_id();
@@ -1146,6 +1159,11 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
         $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
         $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
 
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $dataInput = $this->input->post('dataInput');
         $key = "UAP)(*";
         $dataInput = $this->jwt->decode($dataInput,$key);
@@ -1208,15 +1226,22 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                             $SubTotal = $data_arr['SubTotal'];
                             $Amount = $Amount + $SubTotal;
                         }
-            $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus2 = $this->m_pr_po->GetRuleApproval_Template($ID_template,$Departement); 
+            }
+            else
+            {
+                $JsonStatus2 = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            }   
             // new approval
             $dataSave['JsonStatus'] = json_encode($JsonStatus2);
-
         }
 
         if (count($JsonStatus2) > 1) {
             $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);
             if ($BoolBudget) {
+                $dataSave['ID_template'] = $ID_template;
                 $dataSave['LastUpdatedBy'] = $this->session->userdata('NIP');
                 $dataSave['LastUpdatedAt'] = date('Y-m-d H:i:s');
                 $this->db->where('ID',$ID_payment);

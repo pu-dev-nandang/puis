@@ -1494,7 +1494,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell( ($x__-4) ,$h,'',0,0,'L',true);
         $fpdf->SetFont('Arial','B',$FontIsianHeader);
         $fpdf->Cell(10,$h,'Total',0,0,'L',true);
-        $fpdf->Cell($w_JumlahRupiah,$h,'Rp '.number_format($total,2,',','.'),$border,1,'C',true);
+        $fpdf->Cell($w_JumlahRupiah,$h,'Rp '.number_format($total,2,',','.'),0,1,'C',true);
 
         $y = $fpdf->GetY();
         $y += 5;
