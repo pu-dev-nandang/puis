@@ -821,6 +821,12 @@ class C_pr_po extends Budgeting_Controler {
         $key = "UAP)(*";
         $BudgetLeft_awal = $this->jwt->decode($BudgetLeft_awal,$key);
         $BudgetLeft_awal = (array)  json_decode(json_encode($BudgetLeft_awal),true);
+
+        // get template
+        $ID_template = $this->input->post('ID_template');
+        $key = "UAP)(*";
+        $ID_template = $this->jwt->decode($ID_template,$key);
+
         $StatusPR = '';
         // adding Supporting_documents
             $Supporting_documents = array();
@@ -842,7 +848,16 @@ class C_pr_po extends Budgeting_Controler {
                     $SubTotal = $data_arr['SubTotal'];
                     $Amount = $Amount + $SubTotal;
                 }
-            $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+
+            // get approval template
+            if ($ID_template != 0 ) {
+               $JsonStatus = $this->m_pr_po->GetRuleApproval_Template($ID_template); 
+            }
+            else
+            {
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$input);
+            }    
+            
             // print_r($JsonStatus);die();
             if (count($JsonStatus) > 1) {
                 $BoolBudget = $this->m_pr_po->checkBudgetClientToServer_edit($BudgetLeft_awal,$BudgetRemaining);

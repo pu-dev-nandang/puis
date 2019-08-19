@@ -2067,9 +2067,13 @@
 		token = jwt_encode(ClassDt.BudgetRemaining,"UAP)(*");
 		form_data.append('BudgetRemaining',token);
 
-		// var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment"));
-		// token = jwt_encode(BudgetLeft_awal,"UAP)(*");
-		// form_data.append('BudgetLeft_awal',token);
+		// get value template
+		var ID_template = $('.SelectTemplate').val();
+		if (ID_template == '' || ID_template == null || ID_template == undefined) {
+			ID_template = 0;
+		}
+		token = jwt_encode(ID_template,"UAP)(*");
+		form_data.append('ID_template',token);
 
 		var BudgetLeft_awal = JSON.parse(localStorage.getItem("PostBudgetDepartment_awal"));
 		token = jwt_encode(BudgetLeft_awal,"UAP)(*");
