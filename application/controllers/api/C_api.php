@@ -103,7 +103,7 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
 
@@ -116,7 +116,7 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -171,7 +171,7 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
 
@@ -184,7 +184,7 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -223,12 +223,12 @@ class C_api extends CI_Controller {
             $NIP = $row["NIP"];
 
 
-            
+
             $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
             $nestedData[] = $row["NIP"].' - '.$row["NIDN"];
             //$nestedData[] = $row["NIDN"];
-            
+
             $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.' - '.$Position;
             $nestedData[] = $row["ProdiNameEng"];
@@ -307,7 +307,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $row["DescriptionAddress"];
 
             $NIP = $row["NIP"];
-            $IDRequest = $row["IDRequest"]; 
+            $IDRequest = $row["IDRequest"];
 
             $tokenPDF = $this->jwt->encode(array('NIP' => $NIP, 'IDRequest' => $IDRequest),'UAP)(*');
 
@@ -323,7 +323,7 @@ class C_api extends CI_Controller {
 
             $nestedData[] = '<center><div class="btn-group">'.$status.'</div></center>';
             //$nestedData[] = '<center><div class="btn-group">
-            //  <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> 
+            //  <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button>
             //  <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
 
             $data[] = $nestedData;
@@ -350,7 +350,7 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain not like "%14%")  AND ( ';
 
@@ -363,7 +363,7 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         WHERE (em.PositionMain not like "%14%")';
             $sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -431,9 +431,9 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
 
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
@@ -445,9 +445,9 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus;
             $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -537,10 +537,10 @@ class C_api extends CI_Controller {
         $totalData = $this->db->get_where($db_.'.students',$arryWhere
         )->result_array();
 
-        $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID, 
-                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
+        $sql = 'SELECT s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, s.StatusStudentID,
+                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth,
                           ast.EmailPU
-                          FROM '.$db_.'.students s 
+                          FROM '.$db_.'.students s
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)';
@@ -589,7 +589,7 @@ class C_api extends CI_Controller {
                                     <li role="separator" class="divider"></li>
                                     <li><a href="javascript:void(0);" class="btn-reset-password " data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Reset Password</a></li>
                                     <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row["EmailPU"].'" data-year="'.$dataYear.'" data-npm="'.$row["NPM"].'" data-name="'.$row["Name"].'" data-statusid="'.$row['StatusStudentID'].'">Change Status</a></li>
-                                    
+
                                   </ul>
                                 </div>';
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalStudents " data-npm="'.$row["NPM"].'"><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
@@ -635,12 +635,12 @@ class C_api extends CI_Controller {
                 );
                 $dataWhere = 'WHERE  s.StatusStudentID = "'.$dataStatus.'" ';
             }
-            
+
         }
 
         // $totalData = $this->db->get_where($db_.'.students',$arryWhere
         // )->result_array();
-        $sqlTotalData = 'select count(*) as total  FROM '.$db_.'.students s 
+        $sqlTotalData = 'select count(*) as total  FROM '.$db_.'.students s
                                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                                                       LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
                                                       LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
@@ -648,7 +648,7 @@ class C_api extends CI_Controller {
                                                       LEFT JOIN db_employees.employees emp ON asx.GeneratedBy = emp.NIP
 
                         ';
-                        
+
         if( !empty($requestData['search']['value']) ) {
             if ($dataWhere == '') {
                 $dataWhere = ' where ';
@@ -668,25 +668,25 @@ class C_api extends CI_Controller {
             $sqlTotalData.= '';
         }
 
-        // print_r($sqlTotalData);   
+        // print_r($sqlTotalData);
 
         $query = $this->db->query($sqlTotalData)->result_array();
         $totalData = $query[0]['total'];
-                // )->result_array();             
+                // )->result_array();
 
 
-        // -------------total data---------- //                 
+        // -------------total data---------- //
 
-        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID, 
-                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth, 
+        $sql = 'SELECT asx.FormulirCode, s.NPM, s.Photo, s.Name, s.Gender, s.ClassOf, ps.NameEng AS ProdiNameEng, ps.Name AS ProdiNameInd,s.StatusStudentID,
+                          ss.Description AS StatusStudent, ast.Password, ast.Password_Old, ast.Status AS StatusAuth,
                           ast.EmailPU,asx.GeneratedBy,emp.Name as NameGeneratedBy,asx.No_Ref
-                          FROM '.$db_.'.students s 
+                          FROM '.$db_.'.students s
                           LEFT JOIN db_academic.program_study ps ON (ps.ID = s.ProdiID)
                           LEFT JOIN db_academic.status_student ss ON (ss.ID = s.StatusStudentID)
                           LEFT JOIN db_academic.auth_students ast ON (ast.NPM = s.NPM)
                           LEFT JOIN (
                             select a.NPM,a.FormulirCode,a.GeneratedBy,a.DateTime as DateTimeGeneratedBy,dd.No_Ref
-                            from db_admission.to_be_mhs as a 
+                            from db_admission.to_be_mhs as a
                             left join (
                                 select FormulirCode,No_Ref from db_admission.formulir_number_offline_m
                                 UNION
@@ -783,25 +783,25 @@ class C_api extends CI_Controller {
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
-        
+
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
         $totalData = $this->db->query('SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
-            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP)
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
-            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP)
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
@@ -811,16 +811,16 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.StatusEmployeeID, xx.Totalfiles
-                        FROM db_employees.employees em 
+                        FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
                         LEFT JOIN (SELECT fs.NIP, COUNT(fs.LinkFiles) AS Totalfiles FROM db_employees.files fs INNER JOIN db_employees.master_files mf ON (fs.TypeFiles = mf.ID)
-            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP) 
+            WHERE fs.Active = 1 AND fs.LinkFiles IS NOT NULL GROUP BY fs.NIP) xx ON (em.NIP = xx.NIP)
                         WHERE em.StatusEmployeeID != -2 '.$whereStatus;
             $sql.= 'ORDER BY xx.Totalfiles DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
-        
+
         $query = $this->db->query($sql)->result_array();
         $no = $requestData['start']+1;
 
@@ -832,7 +832,7 @@ class C_api extends CI_Controller {
             $jb = explode('.',$row["PositionMain"]);
             $Division = '';
             $Position = '';
-            
+
 
             if(count($jb)>1){
                 $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
@@ -847,26 +847,26 @@ class C_api extends CI_Controller {
 
             $NIP = $row['NIP'];
             $getotfiles = 0;
-            
+
             $StatusFiles = array();
             $Get_MasterFiles = $this->m_master->showDataFiles_array('db_employees.master_files');
             $StatusFiles = '';
-            for ($j=0; $j < count($Get_MasterFiles); $j++) { 
+            for ($j=0; $j < count($Get_MasterFiles); $j++) {
                 //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 $stDefault =' <span class="badge progress-bar-danger btn-round">'.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
-                
+
                 $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL  ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);
-                    
+
                     if($query2[0]['LinkFiles'] != null){
                         $stDefault =' <span class="label label-success btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                     } else {
                         //$stDefault =' <span class="label label-danger btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                         $stDefault =' <span class="badge progress-bar-danger btn-round"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
                     }
-                }  
+                }
                 $StatusFiles .= $stDefault;
             }
 
@@ -891,7 +891,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$status.'</div>';
             $nestedData[] = $StatusFiles;
             $nestedData[] = '<center><button type="button" style="text-align: center;" class="btn btn-primary btn-round">Files <span class="badge progress-bar-success btn-round"> '.$getotfiles.' </span></button> </center>';
-            
+
             $nestedData[] = '<a class="btn btn-primary btn-round" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';
 
@@ -1029,16 +1029,16 @@ class C_api extends CI_Controller {
         $key = "UAP)(*";
         $data_arr = (array) $this->jwt->decode($token,$key);
 
-        if($data_arr['action']=='deleteversion'){ //delete version data 
+        if($data_arr['action']=='deleteversion'){ //delete version data
             $versionid = $data_arr['versionid'];
             //$dataCek = $this->m_api->deletelistversion($versionid);
-            $this->db->where('IDVersion', $versionid); 
-            $this->db->delete('db_it.version'); 
+            $this->db->where('IDVersion', $versionid);
+            $this->db->delete('db_it.version');
 
-            $this->db->where('IDVersion', $versionid); 
-            $this->db->delete('db_it.version_detail'); 
+            $this->db->where('IDVersion', $versionid);
+            $this->db->delete('db_it.version_detail');
             return print_r(1);
-        } 
+        }
         else if($data_arr['action']=='deletegroupmod'){   //delete module
             $IDModule = $data_arr['versionid'];
             $value = "0";
@@ -1047,20 +1047,20 @@ class C_api extends CI_Controller {
             if(count($check)>0){
                 return print_r(0);
             } else {
-                $this->db->where('IDModule', $IDModule); 
-                $this->db->delete('db_it.module'); 
+                $this->db->where('IDModule', $IDModule);
+                $this->db->delete('db_it.module');
                 return print_r(1);
             }
         }
         else if($data_arr['action']=='delegroups'){   //delete group
-            
+
             $groupid = $data_arr['versionid'];
             $value = "0";
             $check = $this->db->get_where('db_it.module',array('IDGroup'=>$data_arr['versionid']))->result_array();
-         
+
             if(count($check)>0){
                 return print_r(0);
-            } else {  
+            } else {
                 $this->db->where('IDGroup', $data_arr['versionid']);
                 $this->db->delete('db_it.group_module');
                 return print_r(1);
@@ -1068,7 +1068,7 @@ class C_api extends CI_Controller {
         }
     }
 
-    
+
     public function setLecturersAvailabilityDetail($action){
         $token = $this->input->post('token');
         $key = "UAP)(*";
@@ -1362,7 +1362,7 @@ class C_api extends CI_Controller {
                     for($i=0;$i<count($data);$i++){
 
                         // Get Student
-                        $dataStd = $this->db->query('SELECT count(*) AS Total FROM db_academic.sa_student 
+                        $dataStd = $this->db->query('SELECT count(*) AS Total FROM db_academic.sa_student
                                                         WHERE SASemesterID = "'.$data[$i]['ID'].'" ')->result_array();
 
                         $data[$i]['TotalStudent'] = $dataStd[0]['Total'];
@@ -1489,10 +1489,10 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='readSP_KRS'){
 
-                $data = $this->db->query('SELECT aysk.*, ps.NameEng AS ProdiEng, pg.Code AS ProdiGroup FROM db_academic.academic_years_sp_krs_1 aysk 
+                $data = $this->db->query('SELECT aysk.*, ps.NameEng AS ProdiEng, pg.Code AS ProdiGroup FROM db_academic.academic_years_sp_krs_1 aysk
                                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = aysk.ProdiID)
                                                           LEFT JOIN db_academic.prodi_group pg ON (pg.ID = aysk.ProdiGroupID)
-                                                          WHERE aysk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                          WHERE aysk.SemesterID = "'.$data_arr['SemesterID'].'"
                                                           ORDER BY aysk.ID ASC ')->result_array();
 
                 return print_r(json_encode($data));
@@ -1593,12 +1593,12 @@ class C_api extends CI_Controller {
                         $this->db->insert('db_academic.academic_years_special_case', $dataInsert);
                         $insert_id = $this->db->insert_id();
 
-                        $dataDetails = $this->db->query('SELECT s.ClassGroup,aysc.*,mk.NameEng, em.Name AS Lecturers FROM db_academic.academic_years_special_case aysc 
+                        $dataDetails = $this->db->query('SELECT s.ClassGroup,aysc.*,mk.NameEng, em.Name AS Lecturers FROM db_academic.academic_years_special_case aysc
                                             LEFT JOIN db_academic.schedule s ON (s.ID=aysc.DataID)
                                             RIGHT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                             LEFT JOIN  db_employees.employees em ON (em.NIP=aysc.UserID)
-                                            WHERE aysc.ID = "'.$insert_id.'" 
+                                            WHERE aysc.ID = "'.$insert_id.'"
                                             GROUP BY sdc.ScheduleID')->result_array();
 
                         $msg = array(
@@ -1637,10 +1637,10 @@ class C_api extends CI_Controller {
             else if ($data_arr['action']=='readSCKRS'){
                 $SemesterID = $data_arr['SemesterID'];
 
-                $data = $this->db->query('SELECT aysc.ID,ps.ID AS ProdiID,ps.Code, aysc.Start, aysc.End 
+                $data = $this->db->query('SELECT aysc.ID,ps.ID AS ProdiID,ps.Code, aysc.Start, aysc.End
                                               FROM db_academic.academic_years_special_case aysc
                                               LEFT JOIN db_academic.program_study ps ON (ps.ID = aysc.UserID)
-                                              WHERE aysc.SemesterID = "'.$SemesterID.'" 
+                                              WHERE aysc.SemesterID = "'.$SemesterID.'"
                                               AND aysc.Status = "2" ')->result_array();
 
 
@@ -1948,8 +1948,8 @@ class C_api extends CI_Controller {
 //                $dataG = $this->db->get_where('',
 //                        array('ClassGroup' => ))->result_array();
 
-                $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s 
-                                                WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'" 
+                $dataG = $this->db->query('SELECT s.ID FROM db_academic.schedule s
+                                                WHERE s.ClassGroup LIKE "'.$data_arr['Group'].'"
                                                 AND s.SemesterID = "'.$data_arr['SemesterID'].'" ')
                     ->result_array();
                 return print_r(json_encode($dataG));
@@ -1986,7 +1986,7 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='getClassGroup'){
-                $data = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup, em.Name, mk.NameEng AS CourseEng FROM db_academic.schedule s 
+                $data = $this->db->query('SELECT s.ID AS ScheduleID,s.ClassGroup, em.Name, mk.NameEng AS CourseEng FROM db_academic.schedule s
                                                   LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
@@ -2027,8 +2027,8 @@ class C_api extends CI_Controller {
                     $db_ = 'ta_'.$d['Year'];
 
                     // Cek DB Exist
-                    $dbExist = $this->db->query('SELECT SCHEMA_NAME 
-                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                    $dbExist = $this->db->query('SELECT SCHEMA_NAME
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA
                                                     WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
 
                     if(count($dbExist)>0){
@@ -2051,8 +2051,8 @@ class C_api extends CI_Controller {
                 $this->db->reset_query();
 
                 // Delete Attendance
-                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
-                                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
+                                                            WHERE attd.SemesterID = "'.$SemesterID.'"
                                                             AND attd.ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
                 if(count($dataAttd)>0){
@@ -2070,7 +2070,7 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi, 
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.CDID, mk.MKCode, mk.NameEng AS MKNameEng, mk.Name AS MKName, cd.Semester, ps.Name AS Prodi,
                                                     co.Semester AS Offerto, sdc.ProdiGroupID, pg.Code AS ProdiGroup, crr.Year
                                                     FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.prodi_group pg ON (pg.ID = sdc.ProdiGroupID)
@@ -2078,7 +2078,7 @@ class C_api extends CI_Controller {
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                    LEFT JOIN db_academic.course_offerings co ON (co.SemesterID = s.SemesterID AND co.ProdiID = sdc.ProdiID 
+                                                    LEFT JOIN db_academic.course_offerings co ON (co.SemesterID = s.SemesterID AND co.ProdiID = sdc.ProdiID
                                                     AND co.CurriculumID = cd.CurriculumID)
                                                     LEFT JOIN db_academic.curriculum crr ON (crr.ID = cd.CurriculumID)
                                                     WHERE sdc.ScheduleID = "'.$ScheduleID.'" AND s.SemesterID = "'.$SemesterID.'"
@@ -2104,7 +2104,7 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName, 
+                $dataProgram = $this->db->query('SELECT s.ID AS ScheduleID, s.ProgramsCampusID, sem.Name AS SemesterName,
                                                               s.ClassGroup, s.Coordinator, s.TeamTeaching,
                                                              s.SemesterID, s.Attendance , mk.NameEng AS CourseEng, cd.TotalSKS AS TotalCredit
                                                             FROM db_academic.schedule s
@@ -2178,8 +2178,8 @@ class C_api extends CI_Controller {
                 foreach ($dataCL AS $itm){
                     $db_ = 'ta_'.$itm['Year'];
                     // Cek DB Exist
-                    $dbExist = $this->db->query('SELECT SCHEMA_NAME 
-                                                    FROM INFORMATION_SCHEMA.SCHEMATA 
+                    $dbExist = $this->db->query('SELECT SCHEMA_NAME
+                                                    FROM INFORMATION_SCHEMA.SCHEMATA
                                                     WHERE SCHEMA_NAME = "'.$db_.'" ')->result_array();
                     if(count($dbExist)>0){
                         $this->db->where($whereDelete);
@@ -2194,8 +2194,8 @@ class C_api extends CI_Controller {
                 $this->db->reset_query();
 
                 // Delete Attendance
-                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd 
-                                                            WHERE attd.SemesterID = "'.$SemesterID.'" 
+                $dataAttd = $this->db->query('SELECT attd.ID FROM db_academic.attendance attd
+                                                            WHERE attd.SemesterID = "'.$SemesterID.'"
                                                             AND attd.ScheduleID = "'.$ScheduleID.'" ')->result_array();
 
                 if(count($dataAttd)>0){
@@ -2219,8 +2219,8 @@ class C_api extends CI_Controller {
 
                 // Cek apakah Class Group Sudah digunakan
                 $UpdateForm = (array) $data_arr['UpdateForm'];
-                $dataG = $this->db->query('SELECT ID FROM db_academic.schedule s 
-                                                      WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
+                $dataG = $this->db->query('SELECT ID FROM db_academic.schedule s
+                                                      WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
                                                       AND s.ClassGroup LIKE "'.$UpdateForm['ClassGroup'].'"
                                                        AND s.ID != "'.$data_arr['ScheduleID'].'" ')->result_array();
 
@@ -2264,14 +2264,14 @@ class C_api extends CI_Controller {
                 $SemesterID = $data_arr['SemesterID'];
                 $ScheduleID = $data_arr['ScheduleID'];
 
-                $dataSchedule = $this->db->query('SELECT sd.ClassroomID, sd.Credit, sd.DayID, sd.EndSessions,  
+                $dataSchedule = $this->db->query('SELECT sd.ClassroomID, sd.Credit, sd.DayID, sd.EndSessions,
                                                               sd.StartSessions, sd.TimePerCredit, sd.ID AS SDID, cl.Room,
                                                               d.NameEng AS DayEng, s.ClassGroup
                                                               FROM db_academic.schedule_details sd
                                                               LEFT JOIN db_academic.schedule s ON (s.ID = sd.ScheduleID)
                                                               LEFT JOIN db_academic.days d ON (d.ID=sd.DayID)
                                                               LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
-                                                              WHERE s.ID = "'.$ScheduleID.'" 
+                                                              WHERE s.ID = "'.$ScheduleID.'"
                                                               AND s.SemesterID = "'.$SemesterID.'"
                                                               ORDER BY d.ID ASC ')->result_array();
 
@@ -2376,7 +2376,7 @@ class C_api extends CI_Controller {
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
-        
+
         //$whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
         $totalData = $this->db->query('SELECT aa.IDVersion, aa.Version, dd.Division, dd.NameModule, bb.Description, aa.UpdateAt, cc.Name AS NamePIC, dd.NameGroup
                     FROM db_it.version AS aa
@@ -2415,7 +2415,7 @@ class C_api extends CI_Controller {
             //$sql.= 'ORDER BY NIP,em.PositionMain ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
             $sql.= 'ORDER BY aa.IDVersion DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
-        
+
         $query = $this->db->query($sql)->result_array();
         //$sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
         $no = $requestData['start']+1;
@@ -2456,7 +2456,7 @@ class C_api extends CI_Controller {
 
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
-        
+
         $totalData = $this->db->query('SELECT X.IDGroup, X.NameGroup, Y.IDModule, Y.NameModule, Z.ID, Z.Division, Z.ID, Y.Description
         FROM db_it.group_module AS X
         LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
@@ -2480,7 +2480,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup) WHERE Y.Active = 1 AND X.Active = 1 ';
             $sql.= 'ORDER BY X.IDGroup DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
-        
+
         $query = $this->db->query($sql)->result_array();
         $no = $requestData['start']+1;
 
@@ -2514,10 +2514,10 @@ class C_api extends CI_Controller {
 
 
     public function getlistmodule(){
-        
+
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
-        
+
         $totalData = $this->db->query(' SELECT a.IDGroup,a.NameGroup, a.IDDivision, b.Division, a.Active
                      FROM db_it.group_module AS a
                      LEFT JOIN db_employees.division AS b ON a.IDDivision = b.ID
@@ -2541,7 +2541,7 @@ class C_api extends CI_Controller {
                  WHERE a.Active = 1 ';
             $sql.= 'ORDER BY a.IDGroup DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
-        
+
         $query = $this->db->query($sql)->result_array();
         $no = $requestData['start']+1;
 
@@ -2572,21 +2572,21 @@ class C_api extends CI_Controller {
     }
 
     public function getdatarequestdocument(){
-        
+
         $status = $this->input->get('s');
         $requestData= $_REQUEST;
         $NIP = $this->session->userdata('NIP');
-        
+
         $totalData = $this->db->query('SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
                     FROM db_employees.request_document AS a
-                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
                     WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
                     FROM db_employees.request_document AS a
-                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
                     WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1 AND (';
             $sql.= ' b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
@@ -2597,12 +2597,12 @@ class C_api extends CI_Controller {
         else {
             $sql = 'SELECT a.*, b.TypeFiles, b.NameFiles, c.Name
                     FROM db_employees.request_document AS a
-                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID) 
+                    LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (c.NIP = a.NIP)
                     WHERE a.NIP = "'.$NIP.'" AND a.Active = 1 AND b.RequestDocument = 1 ';
             $sql.= 'ORDER BY a.IDRequest DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
-        
+
         $query = $this->db->query($sql)->result_array();
         $no = $requestData['start']+1;
 
@@ -2615,9 +2615,9 @@ class C_api extends CI_Controller {
 
             $StartDate = date('d M Y h:i',strtotime($row['StartDate']));
             $EndDate = date(' d M Y h:i',strtotime($row['EndDate']));
-                   
+
             if($row['ConfirmStatus'] == 1) {
-                
+
                 $token = $this->jwt->encode(array(
                                 'NIP' => $row['NIP'],
                                 'IDRequest' => $row['IDRequest']
@@ -2661,7 +2661,7 @@ class C_api extends CI_Controller {
 
     }
 
-    
+
     public function getversiondetail(){
 
         $token = $this->input->post('token');
@@ -2679,7 +2679,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
                     LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule)
                     WHERE aa.IDVersion = "'.$idversion.'" ')->result_array();
-            echo json_encode($details);   
+            echo json_encode($details);
 
         }
         else if($data_arr['action']=='getedit') {
@@ -2694,7 +2694,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_it.module AS b ON (a.IDGroup = b.IDGroup)
                     LEFT JOIN db_employees.division AS c ON a.IDDivision = c.ID) AS dd ON (bb.IDModule = dd.IDModule)
                     WHERE aa.IDVersion = "'.$idversion.'" ')->result_array();
-            echo json_encode($details);  
+            echo json_encode($details);
 
         }
     }
@@ -2711,7 +2711,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_employees.division Z ON (X.IDDivision = Z.ID)
                     LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
                     WHERE Y.IDModule = "'.$idgroup.'" ')->result_array();
-            echo json_encode($details);   
+            echo json_encode($details);
 
         }
         else if($data_arr['action']=='getedit') {  //get data module
@@ -2723,7 +2723,7 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_it.module AS Y ON (X.IDGroup = Y.IDGroup)
                     WHERE Y.IDModule = "'.$idmodules.'" ')->result_array();
 
-            echo json_encode($details);  
+            echo json_encode($details);
         }
          else if($data_arr['action']=='geteditgroupdata') {
 
@@ -2732,18 +2732,18 @@ class C_api extends CI_Controller {
                          FROM db_it.group_module AS a
                          LEFT JOIN db_employees.division AS b ON a.IDDivision = b.ID
                          WHERE a.IDGroup = "'.$idgroup.'" ')->result_array();
-            echo json_encode($details);  
+            echo json_encode($details);
 
         }
 
     }
 
 
-    
+
 
     function search_module() {
        // if (isset($_REQUEST['q'])) {
-            
+
         //    $results = $this->db->query('SELECT * FROM db_it.group_module WHERE NameGroup LIKE "%'.$_REQUEST['q'].'%" ')->result_array();
 
             //$results = $this->data_model->get_data($_REQUEST['q']);
@@ -2757,19 +2757,19 @@ class C_api extends CI_Controller {
         {
             $data['response'] = 'true'; //Set response
             $data['message'] = array(); //Create array
-            
+
             foreach( $query as $row ) {
-                $data['message'][] = array( 
+                $data['message'][] = array(
                     'id'=>$row->id,
                     'NameGroup' => $row->printable_name,
                         ''
                     );  //Add a row to array
             }
         }
-        
+
             //echo json_encode($data); //echo json string if ajax request
             echo json_encode($data);die;
-             
+
     }
 
     public function getSchedulePerDay(){
@@ -2825,12 +2825,12 @@ class C_api extends CI_Controller {
             $nestedData[] = $courses;
             $nestedData[] = '<div style="text-align:center;">'.$row["Credit"].'</div>';
             $nestedData[] = $coor.''.$TeamTeaching;
-            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)" 
-                                class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" 
-                                data-scheduleid="'.$row['ID'].'" data-flag="sp" 
-                                data-cdid="'.$row['CDID'].'">'.$Students.'</a> of 
-                                <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'" 
-                                data-scheduleid="'.$row['ID'].'" data-flag="std" 
+            $nestedData[] = '<div style="text-align:center;"><a href="javascript:void(0)"
+                                class="btn-sw-std" data-smtid="'.$row['SemesterID'].'"
+                                data-scheduleid="'.$row['ID'].'" data-flag="sp"
+                                data-cdid="'.$row['CDID'].'">'.$Students.'</a> of
+                                <a href="javascript:void(0)" class="btn-sw-std" data-smtid="'.$row['SemesterID'].'"
+                                data-scheduleid="'.$row['ID'].'" data-flag="std"
                                 data-cdid="'.$row['CDID'].'">'.$StudentsNY.'</a></div>';
 
             $nestedData[] = '<div style="text-align:center;">'.substr($row["StartSessions"],0,5).' - '.substr($row["EndSessions"],0,5).'</div>';
@@ -2938,9 +2938,9 @@ class C_api extends CI_Controller {
 
             $search = $requestData['search']['value'];
             $dataSearch = ' AND
-                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%"
                                  OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
-                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%"
                                  ) ';
         }
 
@@ -2963,18 +2963,18 @@ class C_api extends CI_Controller {
 
         if(count($dataTable)>0){
             for($i=0;$i<count($dataTable);$i++){
-                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator  
+                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator
                                                         FROM db_academic.exam_group exg
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'" 
+                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'"
                                                         GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
 
                 if(count($dataC)>0){
                     for($s=0;$s<count($dataC);$s++){
-                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
+                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd
                                                               WHERE exd.ExamID = "'.$dataTable[$i]['ID'].'"
                                                                AND exd.ExamGroupID = "'.$dataC[$s]['ID'].'"
                                                                AND exd.ScheduleID = "'.$dataC[$s]['ScheduleID'].'"
@@ -3102,7 +3102,7 @@ class C_api extends CI_Controller {
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         $whereP = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null)
-            ? ' ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" 
+            ? ' ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'"
             AND ex.Status = "0" AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" '
             : ' ex.SemesterID = "'.$data_arr['SemesterID'].'" AND ex.Type LIKE "'.$data_arr['Type'].'" AND ex.Status = "0" ';
 
@@ -3118,9 +3118,9 @@ class C_api extends CI_Controller {
                                 LEFT JOIN db_employees.employees p2 ON (p2.NIP = ex.Pengawas2)
                                 LEFT JOIN db_employees.employees em ON (em.NIP = ex.InsertBy)
                                 WHERE ( '.$whereP.' ) AND
-                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" 
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%"
                                  OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
-                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%" 
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%"
                                  ) ORDER BY ex.ExamDate, ex.ExamStart, ex.ExamEnd ASC ';
         }
         else {
@@ -3139,18 +3139,18 @@ class C_api extends CI_Controller {
 
         if(count($dataTable)>0){
             for($i=0;$i<count($dataTable);$i++){
-                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator  
+                $dataC = $this->db->query('SELECT exg.ID, exg.ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode, em.Name AS Coordinator
                                                         FROM db_academic.exam_group exg
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         lEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'" 
+                                                        WHERE exg.ExamID = "'.$dataTable[$i]['ID'].'"
                                                         GROUP BY exg.ScheduleID ORDER BY s.ClassGroup ASC')->result_array();
 
                 if(count($dataC)>0){
                     for($s=0;$s<count($dataC);$s++){
-                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd 
+                        $dataSt = $this->db->query('SELECT NPM,DB_Students FROM db_academic.exam_details exd
                                                               WHERE exd.ExamID = "'.$dataTable[$i]['ID'].'"
                                                                AND exd.ExamGroupID = "'.$dataC[$s]['ID'].'"
                                                                AND exd.ScheduleID = "'.$dataC[$s]['ScheduleID'].'"
@@ -3241,9 +3241,9 @@ class C_api extends CI_Controller {
         $data_arr = (array) $this->jwt->decode($token,$key);
 
         $status = ($data_arr['Status']!='') ? ' AND ex.Status = "'.$data_arr['Status'].'" ' : '';
-        $whereP = ' ex.SemesterID = "'.$data_arr['SemesterID'].'" 
+        $whereP = ' ex.SemesterID = "'.$data_arr['SemesterID'].'"
                         AND ex.Type = "'.strtolower($data_arr['Type']).'"
-                        AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'" 
+                        AND ex.InsertByProdiID = "'.$data_arr['ProdiID'].'"
                          '.$status;
 
         $dataSearch = '';
@@ -3253,7 +3253,7 @@ class C_api extends CI_Controller {
                               em3.Name LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%" ) ';
         }
 
-        $queryDefault = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy 
+        $queryDefault = 'SELECT ex.*, cl.Room, em1.Name AS P_Name1, em2.Name AS P_Name2, em3.Name AS Name_InsertBy
                               FROM db_academic.exam ex
                               LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                               LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
@@ -3272,7 +3272,7 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             // Get Course
-            $dataC = $this->db->query('SELECT exg.*, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, em.Name AS Lecturer  
+            $dataC = $this->db->query('SELECT exg.*, mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, em.Name AS Lecturer
                                                     FROM db_academic.exam_group exg
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                     LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
@@ -3291,7 +3291,7 @@ class C_api extends CI_Controller {
                         '</b> | <i class="fa fa-user margin-right"></i> '.$dataC[$s]['Lecturer'].'</p>';
 
                     // Get Students
-                    $dataStd = $this->db->query('SELECT * FROM db_academic.exam_details exd 
+                    $dataStd = $this->db->query('SELECT * FROM db_academic.exam_details exd
                                                   WHERE exd.ExamID = "'.$row['ID'].'"
                                                    AND exd.ExamGroupID = "'.$dataC[$s]['ID'].'"
                                                    AND exd.ScheduleID = "'.$dataC[$s]['ScheduleID'].'" ')
@@ -3943,14 +3943,14 @@ class C_api extends CI_Controller {
     public function review_academicdetail(){
         $NIP = $this->input->get('NIP');
         $viewacademic = $this->m_api->views_academic($NIP);
-        echo json_encode($viewacademic);     
+        echo json_encode($viewacademic);
 
      }
 
      public function review_otherfile(){
         $NIP = $this->input->get('NIP');
         $viewfiles = $this->m_api->views_otherfile($NIP);
-        echo json_encode($viewfiles);     
+        echo json_encode($viewfiles);
 
      }
 
@@ -3959,7 +3959,7 @@ class C_api extends CI_Controller {
         $NIP = $this->input->get('NIP');
         $srata = $this->input->get('s');
         $viewfiles1 = $this->m_api->views_files1($NIP,$srata);
-        echo json_encode($viewfiles1);   
+        echo json_encode($viewfiles1);
      }
 
 
@@ -3972,18 +3972,18 @@ class C_api extends CI_Controller {
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
             $nameuniv = $this->input->get('x');
-            
+
             $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
-            echo json_encode($viewfiles1);   
-        }  
+            echo json_encode($viewfiles1);
+        }
         else if ($academic == 'S2') {
             $NIP = $this->input->get('n');
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
             $nameuniv = $this->input->get('x');
-            
+
             $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
-            echo json_encode($viewfiles1);   
+            echo json_encode($viewfiles1);
 
         }
         else if ($academic == 'S3') {
@@ -3991,20 +3991,20 @@ class C_api extends CI_Controller {
             $fileijazahs1 = $this->input->get('j');
             $filetranscripts1 = $this->input->get('t');
             $nameuniv = $this->input->get('x');
-            
+
             $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
-            echo json_encode($viewfiles1);   
+            echo json_encode($viewfiles1);
         }
         else if ($academic == 'OTF') {
             $NIP = $this->input->get('n');
             $IDfiles = $this->input->get('t');
             //$filetranscripts1 = $this->input->get('t');
-            
+
             $viewfiles1 = $this->m_api->views_editotfiles($NIP,$IDfiles);
-            echo json_encode($viewfiles1);   
+            echo json_encode($viewfiles1);
         }
     }
-     
+
 
     public function insertWilayahURLJson()
     {
@@ -4044,8 +4044,8 @@ class C_api extends CI_Controller {
 
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
-                $data[$i]['Contact'] = $this->db->query('SELECT c.*, em.Name AS CreatedBy_Name FROM db_admission.contact c 
-                                            LEFT JOIN db_employees.employees em ON (c.CreatedBy = em.NIP) 
+                $data[$i]['Contact'] = $this->db->query('SELECT c.*, em.Name AS CreatedBy_Name FROM db_admission.contact c
+                                            LEFT JOIN db_employees.employees em ON (c.CreatedBy = em.NIP)
                                             WHERE c.SchoolID = "'.$data[$i]['ID'].'" ')->result_array();
             }
         }
@@ -4075,7 +4075,7 @@ class C_api extends CI_Controller {
 
     public function getClassGroupAutoComplete($SemesterID){
         $term = $this->input->get('term');
-        $data = $this->db->query('SELECT ID,ClassGroup FROM db_academic.schedule 
+        $data = $this->db->query('SELECT ID,ClassGroup FROM db_academic.schedule
                                       WHERE SemesterID = "'.$SemesterID.'" AND ClassGroup LIKE "%'.$term.'%" LIMIT 7 ')->result_array();
 
         $dataRes = [];
@@ -4160,7 +4160,7 @@ class C_api extends CI_Controller {
                 $countStudent = count($querySeat);
 
                 // Get room
-                $data = $this->db->query('SELECT cl.Room, cl.Seat FROM db_academic.schedule_details sd 
+                $data = $this->db->query('SELECT cl.Room, cl.Seat FROM db_academic.schedule_details sd
                                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                                 WHERE sd.ScheduleID = "'.$dataWhere['ScheduleID'].'" ')->result_array();
 
@@ -4229,6 +4229,23 @@ class C_api extends CI_Controller {
                     );
 
                     $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+                    $SPID = $this->db->insert_id();
+
+
+                    $dataUpdateKRS_std = array(
+                        'SPID' => $SPID,
+                        'ClassOf' => trim(explode('_',$DBStudent)[1]),
+                        'SemesterID' => $dataInsert['SemesterID'],
+                        'NPM' => $dataInsert['NPM'],
+                        'ScheduleID' => $dataInsert['ScheduleID'],
+                        'TypeSchedule' => $dataInsert['TypeSP'],
+                        'CDID' => $dataInsert['CDID'],
+                        'MKID' => $dataC[0]['MKID'],
+                        'Credit' => $dataC[0]['TotalSKS'],
+                        'EntredBy' => $this->session->userdata('NIP')
+                    );
+
+                    $this->db->insert('db_academic.std_study_planning', $dataUpdateKRS_std);
 
                 }
                 return print_r(1);
@@ -4272,7 +4289,7 @@ class C_api extends CI_Controller {
 
                         // Cek Kaprodi
                         $dataKaprodi = $this->db->query('SELECT ps.KaprodiID FROM db_academic.auth_students auts
-                                                                    LEFT JOIN db_academic.program_study ps 
+                                                                    LEFT JOIN db_academic.program_study ps
                                                                     ON (ps.ID = auts.ProdiID)
                                                                     WHERE auts.NPM = "'.$data_arr['NPM'].'" ')->result_array();
 
@@ -4333,13 +4350,16 @@ class C_api extends CI_Controller {
                 if(count($ArrToApproveAll)>0){
                     for($i=0;$i<count($ArrToApproveAll);$i++){
 
-                        $this->approveByKaprodi($ArrToApproveAll[$i]
-                            ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
 
                         // Insert Logging
                         $Log_dataInsert = (array) $ArrToApproveAll_Logging[$i];
                         $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                         $insert_id = $this->db->insert_id();
+
+
+                        $this->approveByKaprodi($ArrToApproveAll[$i]
+                            ,$data_arr['MhswID'],$data_arr['ApprovalAt'],$Log_dataInsert['CreatedBy']);
 
                         $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
                             array('IDDivision' => '6'))->result_array();
@@ -4371,13 +4391,15 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='ApprovedByKaprodi'){
-                $this->approveByKaprodi($data_arr['ID']
-                    ,$data_arr['MhswID'],$data_arr['ApprovalAt']);
+
 
                 // Insert Logging
                 $Log_dataInsert = (array) $data_arr['Logging'];
                 $this->db->insert('db_notifikasi.logging',$Log_dataInsert);
                 $insert_id = $this->db->insert_id();
+
+                $this->approveByKaprodi($data_arr['ID']
+                    ,$data_arr['MhswID'],$data_arr['ApprovalAt'],$Log_dataInsert['CreatedBy']);
 
                 $Log_dataUser = $this->db->select('NIP')->get_where('db_employees.rule_users',
                     array('IDDivision' => '6'))->result_array();
@@ -4408,22 +4430,22 @@ class C_api extends CI_Controller {
                 $ProdiID = $data_arr['ProdiID'];
                 $ApprovalAt = $data_arr['ApprovalAt'];
 
-                $data = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.std_krs sk 
+                $data = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.std_krs sk
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
                                                             LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
-                                                            WHERE sk.SemesterID = "'.$SemesterID.'" 
-                                                            AND cd.ProdiID = "'.$ProdiID.'" 
+                                                            WHERE sk.SemesterID = "'.$SemesterID.'"
+                                                            AND cd.ProdiID = "'.$ProdiID.'"
                                                             AND sk.Status = "2"  ORDER BY sk.NPM ASC')->result_array();
 
                 // Get Anak Bimbingan
-                $dataBim = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.mentor_academic ma 
+                $dataBim = $this->db->query('SELECT sk.*, auts.Year, cd.MKID, cd.TotalSKS FROM db_academic.mentor_academic ma
                                                           LEFT JOIN db_academic.std_krs sk ON (sk.NPM = ma.NPM)
                                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sk.CDID)
                                                           LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
                                                           WHERE ma.NIP = "'.$NIP.'"
                                                           AND sk.SemesterID = "'.$SemesterID.'"
-                                                        
-                                                          AND cd.ProdiID = "'.$ProdiID.'" 
+
+                                                          AND cd.ProdiID = "'.$ProdiID.'"
                                                            AND sk.Status = "1"  ORDER BY sk.NPM ASC ')->result_array();
 
                 if(count($dataBim)>0){
@@ -4574,7 +4596,7 @@ class C_api extends CI_Controller {
 
             else if($data_arr['action']=='deleteAvailabelCourse'){
                 $SKID = $data_arr['SKID'];
-                $dataStd = $this->db->query('SELECT sk.SemesterID, sk.NPM, sk.ScheduleID, sk.CDID, 
+                $dataStd = $this->db->query('SELECT sk.SemesterID, sk.NPM, sk.ScheduleID, sk.CDID,
                                                           auts.Year
                                                           FROM db_academic.std_krs sk
                                                           LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
@@ -4608,6 +4630,14 @@ class C_api extends CI_Controller {
                             'NPM' => $std['NPM']
                         ));
                         $this->db->delete($DBStudent.'.study_planning');
+                        $this->db->reset_query();
+
+                        $this->db->where(array(
+                            'SemesterID' => $std['SemesterID'],
+                            'ScheduleID' => $std['ScheduleID'],
+                            'NPM' => $std['NPM']
+                        ));
+                        $this->db->delete('db_academic.std_study_planning');
                         $this->db->reset_query();
 
                         // Trakhir hapus di std krs
@@ -4771,16 +4801,16 @@ class C_api extends CI_Controller {
                 return print_r($insert_id);
             }
             else if($data_arr['action']=='searchByGroup'){
-                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID , 
-                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup, mk.ID AS MKID 
-                                                    FROM db_academic.schedule_details_course sdc 
+                $data = $this->db->query('SELECT sdc.ID AS SDCID, sdc.ScheduleID, ps.NameEng,s.ID AS ProdiEng,sdc.CDID ,
+                                                    cd.Semester, cr.Year, mk.MKCode, s.ClassGroup, mk.ID AS MKID
+                                                    FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = sdc.ScheduleID)
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.curriculum cr ON (cr.ID = cd.CurriculumID)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
-                                                    WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
-                                                    AND s.ClassGroup 
+                                                    WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                    AND s.ClassGroup
                                                     LIKE "%'.$data_arr['ClassGroup'].'%" ORDER BY cr.Year DESC LIMIT 10')->result_array();
 
                 if(count($data)>0){
@@ -4808,7 +4838,7 @@ class C_api extends CI_Controller {
 
     }
 
-    public function approveByKaprodi($SKID,$MhswID,$ApprovalAt){
+    public function approveByKaprodi($SKID,$MhswID,$ApprovalAt,$EntredBy){
         $dataInsert = $this->db->query('SELECT sk.*, auts.Year FROM db_academic.std_krs sk
                                                                     LEFT JOIN db_academic.auth_students auts ON (auts.NPM = sk.NPM)
                                                                     WHERE sk.ID = "'.$SKID.'" LIMIT 1 ')->result_array()[0];
@@ -4849,6 +4879,22 @@ class C_api extends CI_Controller {
 
         $DBStudent = 'ta_'.$dataInsert['Year'];
         $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+        $insert_id = $this->db->insert_id();
+
+        // insert to std_study_planning
+        $arrStdP = array(
+            'SPID' =>   $insert_id,
+            'ClassOf' => $dataInsert['Year'],
+            'SemesterID' => $dataInsert['SemesterID'],
+            'NPM' => $dataInsert['NPM'],
+            'ScheduleID' => $dataInsert['ScheduleID'],
+            'TypeSchedule' => $dataInsert['TypeSP'],
+            'CDID' => $dataInsert['CDID'],
+            'MKID' => $dataC[0]['MKID'],
+            'Credit' => $dataC[0]['TotalSKS'],
+            'EntredBy' => $EntredBy
+        );
+        $this->db->insert('db_academic.std_study_planning', $arrStdP);
         $this->db->reset_query();
 
         $arrUpdate = array(
@@ -4858,6 +4904,8 @@ class C_api extends CI_Controller {
         $this->db->where('ID', $SKID);
         $this->db->update('db_academic.std_krs',$arrUpdate);
         $this->db->reset_query();
+
+
     }
 
     public function crudYearAcademic()
@@ -4934,7 +4982,7 @@ class C_api extends CI_Controller {
                 $result = [];
 
                 for($i=0;$i<count($prodi);$i++){
-                    $data = $this->db->query('SELECT tf.ID,tf.PTID,tf.Cost,pt.Description,pt.Abbreviation,tf.Pay_Cond FROM db_finance.tuition_fee tf 
+                    $data = $this->db->query('SELECT tf.ID,tf.PTID,tf.Cost,pt.Description,pt.Abbreviation,tf.Pay_Cond FROM db_finance.tuition_fee tf
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 1
@@ -4951,7 +4999,7 @@ class C_api extends CI_Controller {
                 }
 
                 for($i=0;$i<count($prodi);$i++){
-                    $data = $this->db->query('SELECT tf.ID,tf.PTID,tf.Cost,pt.Description,pt.Abbreviation,tf.Pay_Cond FROM db_finance.tuition_fee tf 
+                    $data = $this->db->query('SELECT tf.ID,tf.PTID,tf.Cost,pt.Description,pt.Abbreviation,tf.Pay_Cond FROM db_finance.tuition_fee tf
                                                     LEFT JOIN db_finance.payment_type pt ON (tf.PTID = pt.ID)
                                                     LEFT JOIN db_academic.program_study ps ON (tf.ProdiID = ps.ID)
                                                     WHERE tf.ClassOf = "'.$ClassOf.'" AND tf.ProdiID = "'.$prodi[$i]['ID'].'" and tf.Pay_Cond = 2
@@ -5054,7 +5102,7 @@ class C_api extends CI_Controller {
             $kelulusan = $this->m_admission->getkelulusan($input['ID_register_formulir']);
             $arr['kelulusan'] = $kelulusan;
         }
-        
+
         echo json_encode($arr);
     }
 
@@ -5095,7 +5143,7 @@ class C_api extends CI_Controller {
 
                 // Get Exam ID
 
-                $dataExam = $this->db->query('SELECT ex.ID AS ExamID, s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.Name AS Course FROM db_academic.exam_group exg 
+                $dataExam = $this->db->query('SELECT ex.ID AS ExamID, s.ID AS ScheduleID, s.ClassGroup, mk.NameEng AS CourseEng, mk.Name AS Course FROM db_academic.exam_group exg
                                                             LEFT JOIN db_academic.exam ex ON (ex.ID = exg.ExamID)
                                                             LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = exg.ScheduleID)
@@ -5110,7 +5158,7 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='showDataExamByGroup'){
                 $ExamID = $data_arr['ExamID'];
 
-                $data = $this->db->query('SELECT ex.ExamDate, cl.Room, ex.ExamStart, ex.ExamEnd, 
+                $data = $this->db->query('SELECT ex.ExamDate, cl.Room, ex.ExamStart, ex.ExamEnd,
                                                           em1.Name AS Inv1, em2.Name AS Inv2 FROM db_academic.exam ex
                                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                                           LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
@@ -5198,13 +5246,13 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='save2pdf_DraftQuestions'){
                 $IDExam = $data_arr['IDExam'];
-                $dataPdf = $this->db->query('SELECT ex.Type, sm.Name AS SemesterName, d.NameEng AS DayEng, 
+                $dataPdf = $this->db->query('SELECT ex.Type, sm.Name AS SemesterName, d.NameEng AS DayEng,
                                                       coor.Name AS Coordintor,
-                                                      cl.Room, ex.ExamDate, ex.ExamStart, ex.ExamEnd, 
-                                                      em1.Name AS Pengawas1, em2.Name AS Pengawas2 
+                                                      cl.Room, ex.ExamDate, ex.ExamStart, ex.ExamEnd,
+                                                      em1.Name AS Pengawas1, em2.Name AS Pengawas2
                                                       FROM db_academic.exam ex
-                                                      LEFT JOIN db_academic.schedule s ON (s.ID = ex.ScheduleID)                                                       
-                                                      LEFT JOIN db_employees.employees coor ON (coor.NIP = s.Coordinator)                                                       
+                                                      LEFT JOIN db_academic.schedule s ON (s.ID = ex.ScheduleID)
+                                                      LEFT JOIN db_employees.employees coor ON (coor.NIP = s.Coordinator)
                                                       LEFT JOIN db_academic.semester sm ON (sm.ID = ex.SemesterID)
                                                       LEFT JOIN db_academic.days d ON (d.ID = ex.DayID)
                                                       LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
@@ -5311,11 +5359,11 @@ class C_api extends CI_Controller {
                 $data = $this->db->query('SELECT ex.*,cl.Room FROM db_academic.exam ex
                                                     LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                                     WHERE
-                                                    ex.SemesterID = "'.$data_arr['SemesterID'].'" 
-                                                    AND ex.Type LIKE "'.$data_arr['Type'].'" 
-                                                    AND ex.ExamDate = "'.$data_arr['Date'].'" 
-                                                    AND ex.ExamClassroomID = "'.$data_arr['RoomID'].'" 
-                                                    AND ( ("'.$data_arr['Start'].'" >= ex.ExamStart AND "'.$data_arr['Start'].'" <= ex.ExamEnd) OR 
+                                                    ex.SemesterID = "'.$data_arr['SemesterID'].'"
+                                                    AND ex.Type LIKE "'.$data_arr['Type'].'"
+                                                    AND ex.ExamDate = "'.$data_arr['Date'].'"
+                                                    AND ex.ExamClassroomID = "'.$data_arr['RoomID'].'"
+                                                    AND ( ("'.$data_arr['Start'].'" >= ex.ExamStart AND "'.$data_arr['Start'].'" <= ex.ExamEnd) OR
                                                         ("'.$data_arr['End'].'" >= ex.ExamStart AND "'.$data_arr['End'].'" <= ex.ExamEnd) OR
                                                         ("'.$data_arr['Start'].'" <= ex.ExamStart AND "'.$data_arr['End'].'" >= ex.ExamEnd)
                                                     )
@@ -5402,7 +5450,7 @@ class C_api extends CI_Controller {
 
     public function crudEmployees(){
         $data_arr = $this->getInputToken();
-        
+
         if(count($data_arr)>0){
             if($data_arr['action']=='read'){
                 // $data = $this->db->select('NIP,Name')->get_where('db_employees.employees',
@@ -5412,7 +5460,53 @@ class C_api extends CI_Controller {
                         UNION
                         select NIK as NIP,Name from db_employees.holding
                         ';
-                $data=$this->db->query($sql, array())->result_array();        
+                $data=$this->db->query($sql, array())->result_array();
+                return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='UpdateCertificateLec'){
+
+                $ID = $data_arr['ID'];
+                $dataForm = (array) $data_arr['dataForm'];
+                $FileName = '';
+
+                if($ID!=''){
+                    // Update
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_employees.employees_certificate',$dataForm);
+                    $FileName = $this->db->select('File')
+                        ->get_where('db_employees.employees_certificate',array('ID' => $ID))->result_array()[0]['File'];
+
+                } else {
+                    // Insert
+                    $this->db->insert('db_employees.employees_certificate',$dataForm);
+                    $ID = $this->db->insert_id();
+                }
+
+                return print_r(json_encode(array(
+                    'ID' => $ID,
+                    'FileName' => $FileName
+                )));
+
+            }
+            else if($data_arr['action']=='removeCertificateLec'){
+
+                // Remove File
+                if($data_arr['File']!=''){
+                    unlink('./uploads/certificate/'.$data_arr['File']);
+                }
+
+                // Remove DB
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_employees.employees_certificate');
+
+                return print_r(1);
+            }
+            else if($data_arr['action']=='readCertificateLec'){
+                $data = $this->db->get_where('db_employees.employees_certificate',array(
+                    'NIP' => $data_arr['NIP']
+                ))->result_array();
+
                 return print_r(json_encode($data));
             }
 
@@ -5574,7 +5668,7 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='getEmployeesFiles'){
                 $NIP = $data_arr['NIP'];
-                $data = $this->db->query('SELECT em.NIP AS NIPLec, em.Name, em.Photo, f.* FROM db_employees.employees em 
+                $data = $this->db->query('SELECT em.NIP AS NIPLec, em.Name, em.Photo, f.* FROM db_employees.employees em
                                                   LEFT JOIN db_employees.files f ON (f.NIP = em.NIP)
                                                   WHERE em.NIP = "'.$NIP.'" ')->result_array();
 
@@ -5636,7 +5730,7 @@ class C_api extends CI_Controller {
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
             $this->db->update('db_employees.files', $dataUpdate2);
-            return print_r(1);  
+            return print_r(1);
         }
         else if($data_arr['action']=='editAcademicS2'){
             $formInsert = (array) $data_arr['formInsert'];
@@ -5685,7 +5779,7 @@ class C_api extends CI_Controller {
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
             $this->db->update('db_employees.files', $dataUpdate2);
-            return print_r(1);  
+            return print_r(1);
         }
         else if($data_arr['action']=='editAcademicS3'){
 
@@ -5735,7 +5829,7 @@ class C_api extends CI_Controller {
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
             $this->db->update('db_employees.files', $dataUpdate2);
-            return print_r(1);  
+            return print_r(1);
         }
         else if($data_arr['action']=='EditFilesDocument'){
 
@@ -5748,7 +5842,7 @@ class C_api extends CI_Controller {
             $type = $formInsert['typeotherfiles'];
             $idlinkfiles = $formInsert['idlinkfiles'];
             $linkotherfile = $formInsert['linkotherfile'];
-            
+
             $dataUpdate = array(
                         'No_Document' => $NoDocument,
                         'Date_Files' => $DateDocument,
@@ -5823,7 +5917,7 @@ class C_api extends CI_Controller {
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
-            } 
+            }
             else if($data_arr['action']=='addAcademicS2'){
 
                 $formInsert = (array) $data_arr['formInsert'];
@@ -5876,7 +5970,7 @@ class C_api extends CI_Controller {
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
-            } 
+            }
             else if($data_arr['action']=='addAcademicS3'){
 
                 $formInsert = (array) $data_arr['formInsert'];
@@ -5929,9 +6023,9 @@ class C_api extends CI_Controller {
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
-            } 
+            }
             else if($data_arr['action']=='AddFilesDocument'){
-                
+
                 $formInsert = (array) $data_arr['formInsert'];
                 $NIP = $formInsert['NIP'];
                 $IDuser = $this->session->userdata('NIP');
@@ -5953,7 +6047,7 @@ class C_api extends CI_Controller {
                 $this->db->insert('db_employees.files',$dataSave);
                 return print_r(1);
             }
-            
+
         } //end count
 
      }
@@ -6095,7 +6189,7 @@ class C_api extends CI_Controller {
                 );
                 $this->db->where('IDVersion', $VersionID);
                 $this->db->update('db_it.version',$dataSave1);
-            
+
                 $dataSave2 = array(
                         'IDModule' => $selectmodule,
                         'Description' => $Descriptionversion
@@ -6109,7 +6203,7 @@ class C_api extends CI_Controller {
                 $formInsert = (array) $data_arr['formInsert'];
 
                 $idnamegroup = $formInsert['idnameegroup'];
-                $idmodule = $formInsert['idmodule'];  
+                $idmodule = $formInsert['idmodule'];
                 $IDGroupedit = $formInsert['IDGroupedit'];
                 $Description = $formInsert['Descriptiongroup'];
 
@@ -6117,7 +6211,7 @@ class C_api extends CI_Controller {
                     'IDGroup' => $idnamegroup,
                     'NameModule' => $idmodule,
                     'Description' => $Description
-                    
+
                 );
                 $this->db->where('IDModule', $IDGroupedit);
                 $this->db->update('db_it.module', $dataUpdate);
@@ -6128,13 +6222,13 @@ class C_api extends CI_Controller {
                 $formInsert = (array) $data_arr['formInsert'];
 
                 $iddivision = $formInsert['iddivision'];
-                $IDGroup = $formInsert['IDGroupedit'];  
+                $IDGroup = $formInsert['IDGroupedit'];
                 $Namegroup = $formInsert['Namegroup'];
-                
+
                 $dataUpdate = array(
                     'NameGroup' => $Namegroup,
                     'IDDivision' => $iddivision
-                    
+
                 );
                 $this->db->where('IDGroup', $IDGroup);
                 $this->db->update('db_it.group_module', $dataUpdate);
@@ -6150,7 +6244,7 @@ class C_api extends CI_Controller {
             $User = $this->input->get('u');
             //print_r($fileName);
             //print_r($formData);
-            
+
             $config['upload_path']          = './uploads/files/';
             $config['allowed_types']        = '*';
             $config['max_size']             = 8000; // 8 mb
@@ -6165,7 +6259,7 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($error));
             }
             else {
-                    
+
                 $success = array('success' => $this->upload->data());
                 $success['success']['formGrade'] = 0;
                 // Cek apakah di db sudah ada
@@ -6184,7 +6278,7 @@ class C_api extends CI_Controller {
             }
 
      }
-    
+
 
     public function getProvinsi()
     {
@@ -6386,14 +6480,14 @@ class C_api extends CI_Controller {
                     array('ID'=>$ID))->result_array();
 
 
-                $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s 
+                $coor = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule s
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             WHERE s.ID = "'.$data[0]['ScheduleID'].'"
                                               ')->result_array();
 
-                $teamt = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt 
+                $teamt = $this->db->query('SELECT em.NIP,em.Name FROM db_academic.schedule_team_teaching stt
                                                     LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
-                                                    WHERE stt.ScheduleID = "'.$data[0]['ScheduleID'].'" 
+                                                    WHERE stt.ScheduleID = "'.$data[0]['ScheduleID'].'"
                                                     ')->result_array();
 
                 if(count($teamt)>0){
@@ -6454,11 +6548,11 @@ class C_api extends CI_Controller {
 
                 if($data_arr['CombinedClasses']=='0'){
 
-                    $data = $this->db->query('SELECT s.* FROM db_academic.schedule s 
+                    $data = $this->db->query('SELECT s.* FROM db_academic.schedule s
                                               LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
-                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'" 
-                                              AND CombinedClasses = "0" 
-                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                              WHERE s.SemesterID = "'.$data_arr['SemesterID'].'"
+                                              AND CombinedClasses = "0"
+                                              AND sdc.ProdiID = "'.$data_arr['ProdiID'].'"
                                               ORDER BY s.ClassGroup ASC')->result_array();
 
 
@@ -6522,7 +6616,7 @@ class C_api extends CI_Controller {
 
                 $this->db->query('UPDATE db_academic.attendance_students
                                     SET '.$set.'
-                                    WHERE ID_Attd IN (SELECT ID FROM db_academic.attendance 
+                                    WHERE ID_Attd IN (SELECT ID FROM db_academic.attendance
                                     WHERE SemesterID = "'.$SemesterID.'")');
 
                 return print_r(1);
@@ -6626,7 +6720,7 @@ class C_api extends CI_Controller {
                     // Cek apakah sudah ada di attendance
                     $dataAttdS = $this->db->query('SELECT * FROM db_academic.attendance attd
                                                       LEFT JOIN db_academic.attendance_students attds ON (attds.ID_Attd = attd.ID)
-                                                      WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                      WHERE attd.SemesterID = "'.$SemesterID.'"
                                                       AND attd.ScheduleID = "'.$ScheduleID.'"
                                                        AND attds.NPM = "'.$NPM.'" ')->result_array();
 
@@ -6637,7 +6731,7 @@ class C_api extends CI_Controller {
                         );
                     } else {
                         $dataAttd = $this->db->query('SELECT * FROM db_academic.attendance attd
-                                                      WHERE attd.SemesterID = "'.$SemesterID.'" 
+                                                      WHERE attd.SemesterID = "'.$SemesterID.'"
                                                       AND attd.ScheduleID = "'.$ScheduleID.'"
                                                        ')->result_array();
                         if(count($dataAttd)>0){
@@ -6671,7 +6765,7 @@ class C_api extends CI_Controller {
                 $ID_Attd = $data_arr['ID_Attd'];
 
                 // Get Attendance Student
-                $dataSet = $this->db->query('SELECT attd_s.*, atus.Name FROM db_academic.attendance_students attd_s 
+                $dataSet = $this->db->query('SELECT attd_s.*, atus.Name FROM db_academic.attendance_students attd_s
                                                     LEFT JOIN db_academic.auth_students atus ON (atus.NPM = attd_s.NPM)
                                                     WHERE attd_s.ID_Attd = "'.$ID_Attd.'" ')->result_array();
 
@@ -6841,7 +6935,7 @@ class C_api extends CI_Controller {
         }
     }
 
-    
+
     public function getAgama()
     {
         $generate = $this->m_api->getAgama();
@@ -6863,8 +6957,22 @@ class C_api extends CI_Controller {
     public function getStatusEmployee()
     {
 //        $generate = $this->m_master->showData_array('db_employees.employees_status');
-        $generate = $this->db->query('SELECT * FROM db_employees.employees_status 
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status
               WHERE IDStatus != -2 ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getStatusEmployee2()
+    {
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status
+              WHERE IDStatus != -2 AND (Type = "emp" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
+        echo json_encode($generate);
+    }
+
+    public function getStatusLecturer2()
+    {
+        $generate = $this->db->query('SELECT * FROM db_employees.employees_status
+              WHERE IDStatus != -2 AND (Type = "lec" OR Type = "both") ORDER BY IDStatus DESC')->result_array();
         echo json_encode($generate);
     }
 
@@ -6923,14 +7031,14 @@ class C_api extends CI_Controller {
         if(count($data_arr)>0){
             if($data_arr['action']=='getStudents'){
 
-                $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s 
+                $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s
                                                       LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM)
-                                                      WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                      WHERE s.ProdiID = "'.$data_arr['ProdiID'].'"
                                                       ORDER BY s.NPM ASC')->result_array();
 
-                $dataLC = $this->db->query('SELECT s.NPM, s.Name, lc.Credit, lc.ID AS LCID FROM db_academic.limit_credit lc 
+                $dataLC = $this->db->query('SELECT s.NPM, s.Name, lc.Credit, lc.ID AS LCID FROM db_academic.limit_credit lc
                                                     LEFT JOIN '.$data_arr['DB_Student'].'.students s ON (s.NPM = lc.NPM)
-                                                    WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
+                                                    WHERE s.ProdiID = "'.$data_arr['ProdiID'].'"
                                                     AND lc.SemesterID = "'.$data_arr['SemesterID'].'"
                                                     ORDER BY s.NPM ASC')->result_array();
 
@@ -6971,9 +7079,9 @@ class C_api extends CI_Controller {
 
 
                 // Cek apakah sudah di masukan apa belum
-                $dataS = $this->db->query('SELECT * FROM db_academic.schedule_details_course sdc WHERE 
+                $dataS = $this->db->query('SELECT * FROM db_academic.schedule_details_course sdc WHERE
                                                                     sdc.ScheduleID = "'.$dataInsert['ScheduleID'].'"
-                                                                    AND sdc.ProdiID = "'.$dataInsert['ProdiID'].'" 
+                                                                    AND sdc.ProdiID = "'.$dataInsert['ProdiID'].'"
                                                                     AND sdc.CDID = "'.$dataInsert['CDID'].'" ')->result_array();
 
 
@@ -7003,7 +7111,7 @@ class C_api extends CI_Controller {
 
                 $dataCourse = $this->db->query('SELECT sdc.ScheduleID,sdc.ID AS SDCID, mk.NameEng AS MKNameEng, mk.MKCode FROM db_academic.schedule_details_course sdc
                                                           LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                          WHERE sdc.ScheduleID = "'.$data_arr['ScheduleID'].'" 
+                                                          WHERE sdc.ScheduleID = "'.$data_arr['ScheduleID'].'"
                                                           AND sdc.ProdiID = "'.$data_arr['ProdiID'].'" LIMIT 1')->result_array();
 
                 if(count($dataCourse)>0){
@@ -7158,9 +7266,9 @@ class C_api extends CI_Controller {
                 $wrADDNotesDelete = 'Schedule Exchange';
                 $wrADDNotesDelete_email = 'by '.$wrADDNotesDelete.' that approved by '.$NameApproved;
             }
-            
+
         }
-        
+
         if (!$chk['bool']) {
             // insert table to t_booking_delete
             $this->load->model('m_sendemail');
@@ -7200,7 +7308,7 @@ class C_api extends CI_Controller {
             else{
                 $client = new Client(new Version1X('//10.1.30.17:3000'));
 
-            }    
+            }
                 $client->initialize();
                 // send message to connected clients
                 $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
@@ -7221,7 +7329,7 @@ class C_api extends CI_Controller {
                         $a = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
                         $ID_CategoryRoom = $a[0]['ID_CategoryRoom'];
                         $b = $this->m_master->caribasedprimary('db_academic.classroom','ID_CategoryRoom',$ID_CategoryRoom);
-                        for ($i=0; $i < count($b); $i++) { 
+                        for ($i=0; $i < count($b); $i++) {
                             if ($b[$i]['Seat'] > $ParticipantQty) {
                                 $r[] = $b[$i]['Room'];
                             }
@@ -7229,7 +7337,7 @@ class C_api extends CI_Controller {
 
                         if (count($r) > 0) {
                             $result = 'Following suggestion from our room :<ul>';
-                            for ($i=0; $i < count($r); $i++) { 
+                            for ($i=0; $i < count($r); $i++) {
                                 $result .= '<li>'.$r[$i].'</li>';
                             }
                             $result .='</ul>';
@@ -7253,7 +7361,7 @@ class C_api extends CI_Controller {
                             </ul>
                             <br>
                             Please Create new schedule, if you need it and '.$sg_room.' <br>
-                            
+
                         ';
             $to = $Email;
             $subject = "Podomoro University Venue Reservation";
@@ -7272,7 +7380,7 @@ class C_api extends CI_Controller {
                             </ul>
                             <br>
                             Please Create new schedule, if you need it and '.$sg_room.' <br>
-                            
+
                         ';
             $eAdum = $this->m_master->caribasedprimary('db_reservation.email_to','Ownership','Adum');
             $to = $eAdum[0]['Email'];
@@ -7392,7 +7500,7 @@ class C_api extends CI_Controller {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = ' AND ( sc.ClassGroup LIKE "%'.$search.'%" 
+            $dataSearch = ' AND ( sc.ClassGroup LIKE "%'.$search.'%"
             OR mk.Name LIKE "%'.$search.'%"
              OR mk.NameEng LIKE "%'.$search.'%"
               OR em.Name LIKE "%'.$search.'%" ) ';
@@ -7423,17 +7531,17 @@ class C_api extends CI_Controller {
 
         $queryDefault = 'SELECT sc.ClassGroup,sc.TotalAssigment,
                                         sdc.*,cd.TotalSKS AS Credit, mk.MKCode, mk.Name AS MKName,
-                                        mk.NameEng AS MKNameEng, sc.Coordinator, 
+                                        mk.NameEng AS MKNameEng, sc.Coordinator,
                                         em.Name AS CoordinatorName,
                                         gc.ID AS GradeID, gc.Status AS StatusGrade,
-                                        ris_uts.NIP AS uts_UpdateBy, ris_uts.UpdateAt AS uts_UpdateAt, ris_uts.Status AS uts_Status, 
-                                        ris_uas.NIP AS uas_UpdateBy, ris_uas.UpdateAt AS uas_UpdateAt, ris_uas.Status AS uas_Status 
-                                        FROM db_academic.schedule_details_course sdc 
+                                        ris_uts.NIP AS uts_UpdateBy, ris_uts.UpdateAt AS uts_UpdateAt, ris_uts.Status AS uts_Status,
+                                        ris_uas.NIP AS uas_UpdateBy, ris_uas.UpdateAt AS uas_UpdateAt, ris_uas.Status AS uas_Status
+                                        FROM db_academic.schedule_details_course sdc
                                         LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                         LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
-                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID) 
+                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                        LEFT JOIN db_academic.grade_course gc 
+                                        LEFT JOIN db_academic.grade_course gc
                                           ON (gc.SemesterID = sc.SemesterID AND gc.ScheduleID = sc.ID)
                                           LEFT JOIN db_academic.record_input_score ris_uts ON (ris_uts.ScheduleID = sc.ID AND ris_uts.Type="uts")
                                           LEFT JOIN db_academic.record_input_score ris_uas ON (ris_uas.ScheduleID = sc.ID AND ris_uas.Type="uas")
@@ -7538,7 +7646,7 @@ class C_api extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' AND ( s.ClassGroup LIKE "%'.$search.'%" 
+                $dataSearch = ' AND ( s.ClassGroup LIKE "%'.$search.'%"
             OR auts.Name LIKE "%'.$search.'%"
              OR auts.NPM LIKE "%'.$search.'%"
               OR em.NIP LIKE "%'.$search.'%"
@@ -7548,7 +7656,7 @@ class C_api extends CI_Controller {
 
 
             $DB_ = 'ta_'.$data_arr['Year'];
-            $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, s.TotalAssigment, em.Name AS CoordinatorName, 
+            $queryDefault = 'SELECT s.ID,auts.NPM,auts.Name, s.ClassGroup, s.TotalAssigment, em.Name AS CoordinatorName,
                                      sp.Evaluasi1, sp.Evaluasi2, sp.Evaluasi3, sp.Evaluasi4, sp.Evaluasi5, sp.UTS, sp.UAS,
                                       sp.Score, sp.Grade
                                     FROM '.$DB_.'.study_planning sp
@@ -7570,7 +7678,7 @@ class C_api extends CI_Controller {
 
                 $row = $query[$i];
 
-                $rowMK = $this->db->query('SELECT  mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode 
+                $rowMK = $this->db->query('SELECT  mk.Name AS MKName, mk.NameEng AS MKNameEng, mk.MKCode
                                                               FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                               WHERE sdc.ScheduleID = "'.$row['ID'].'"  GROUP BY sdc.ScheduleID LIMIT 1')->result_array()[0];
@@ -7640,11 +7748,11 @@ class C_api extends CI_Controller {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
                            OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng FROM db_academic.auth_students aut_s 
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
                                       WHERE ( '.$dataWhere.' ) '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
@@ -7664,7 +7772,7 @@ class C_api extends CI_Controller {
             $btnSKPI = '<div  style="text-align:center;">
                             <a href="'.base_url('save2pdf/diploma_supplement').'" target="_blank" class="btn btn-default btn-sm btn-default-warning btn-round btnDownloadSKPI" disabled><i class="fa fa-download margin-right"></i> SKPI</a>
                             <a class="btn btn-default btn-sm btn-default-warning btn-round btnDownloadSkls"data-db="'.$db_.'" data-npm="'.$row['NPM'].'"><i class="fa fa-download margin-right"></i> SKL</a>
-                            
+
                             </div>';
 
 
@@ -7696,9 +7804,9 @@ class C_api extends CI_Controller {
                                             <input id="formCNN'.$row['NPM'].'" class="form-control hide" value="'.$row['CertificateNationalNumber'].'"/>
                                             <span id="viewCNN'.$row['NPM'].'">'.$row['CertificateNationalNumber'].'</span>
                                         </div>
-                                        <div class="col-xs-2">   
+                                        <div class="col-xs-2">
                                             <button class="btn btn-sm btn-success btn-block btnSaveCNN btn-circle hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
-                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCNN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCNN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>
                                         </div>
                                     </div>
 
@@ -7712,12 +7820,12 @@ class C_api extends CI_Controller {
                                             <input id="formCSN'.$row['NPM'].'" class="form-control hide" value="'.$row['CertificateSerialNumber'].'"/>
                                             <span id="viewCSN'.$row['NPM'].'">'.$row['CertificateSerialNumber'].'</span>
                                         </div>
-                                        <div class="col-xs-2">   
+                                        <div class="col-xs-2">
                                             <button class="btn btn-sm btn-success btn-block btnSaveCSN btn-circle hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
-                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCSN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditCSN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>
                                         </div>
                                     </div>
-                                     
+
                                     </div>';
 
              $nestedData[] = '<div  style="text-align:left;">
@@ -7727,12 +7835,12 @@ class C_api extends CI_Controller {
                                             <span id="viewSKLN'.$row['NPM'].'">'.$row['SklNumber'].'</span>
                                         </div>
                                         <div class="col-xs-2">
-                                               
+
                                             <button class="btn btn-sm btn-success btn-block btn-circle btnSaveSKLN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
-                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>   
+                                            <button class="btn btn-sm btn-default btn-block btn-circle btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>
                                         </div>
                                     </div>
-                                     
+
                                     </div>';
 
             $nestedData[] = $btnSKPI;
@@ -7838,11 +7946,11 @@ class C_api extends CI_Controller {
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
-            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+            $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
                            OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ps.Code,  
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ps.Code,
                                       fp.TitleInd, fp.TitleEng
                                       FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
@@ -7905,6 +8013,127 @@ class C_api extends CI_Controller {
                 } else {
                     $dataForm['NPM'] = $data_arr['NPM'];
                     $this->db->insert('final_project',$dataForm);
+                }
+
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='viewInformation'){
+                $data = $this->db->query('SELECT ats.*,    
+                                        em1.Name AS MentorFP1Name, em1.TitleAhead AS TitleAhead1, em1.TitleBehind AS TitleBehind1, 
+                                        em2.Name AS MentorFP2Name, em2.TitleAhead AS TitleAhead2, em2.TitleBehind AS TitleBehind2,
+                                        fp.TitleInd, fp.TitleEng
+                                        FROM db_academic.auth_students ats
+                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2) 
+                                        LEFT JOIN db_academic.final_project fp ON (ats.NPM = fp.NPM)
+                                        WHERE ats.NPM = "'.$data_arr['NPM'].'" ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='checkRegistration'){
+                $data = $this->db->get_where('db_academic.final_project',array(
+                    'NPM' => $data_arr['NPM']
+                ))->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateFinalProject'){
+                $ID = $data_arr['ID'];
+                $formData = (array) $data_arr['formData'];
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                if($ID!='') {
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_academic.final_project', $formData);
+                } else {
+                    $this->db->insert('db_academic.final_project', $formData);
+                    $ID = $this->db->insert_id();
+                }
+
+                return print_r(json_encode(array('ID' => $ID )));
+
+            }
+            else if($data_arr['action']=='getAllStdReg'){
+
+                $Status = $data_arr['Status'];
+                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project fp 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='updateDataSchFP'){
+                $ID = $data_arr['ID'];
+                $dataForm = (array) $data_arr['dataForm'];
+                $Lecturer = (array) $data_arr['Lecturer'];
+                $Student = (array) $data_arr['Student'];
+
+                if($ID!=''){
+
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                    $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_academic.final_project_schedule',$dataForm);
+
+                    // Get Std lama
+                    $dataStdLama = $this->db->get_where('db_academic.final_project_schedule_student',array(
+                        'FPSID' => $ID
+                    ))->result_array();
+
+                    if(count($dataStdLama)>0){
+                        // Update Status
+                        for($j=0;$j<count($dataStdLama);$j++){
+                            $this->db->where('NPM',$dataStdLama[$j]['NPM']);
+                            $this->db->update('db_academic.final_project',array(
+                                'Status' => '1'
+                            ));
+                        }
+                    }
+
+                    $tables = array('db_academic.final_project_schedule_lecturer', 'db_academic.final_project_schedule_student');
+                    $this->db->where('FPSID', $ID);
+                    $this->db->delete($tables);
+
+                } else {
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                    $this->db->insert('db_academic.final_project_schedule',$dataForm);
+                    $ID = $this->db->insert_id();
+                }
+
+
+                // Adding Lecturer
+                if(count($Lecturer)>0){
+                    for($i=0;$i<count($Lecturer);$i++){
+                        $tp = ($i==0) ? '1' : '0';
+                        $arr = array(
+                            'FPSID' => $ID,
+                            'NIP' => $Lecturer[$i],
+                            'Type' => $tp
+                        );
+                        $this->db->insert('db_academic.final_project_schedule_lecturer',$arr);
+                    }
+                }
+
+                // Adding Std
+                if(count($Student)>0){
+                    for($i=0;$i<count($Student);$i++){
+                        $arr = array(
+                            'FPSID' => $ID,
+                            'NPM' => $Student[$i]
+                        );
+                        $this->db->insert('db_academic.final_project_schedule_student',$arr);
+
+                        // Update Status
+                        $this->db->where('NPM',$Student[$i]);
+                        $this->db->update('db_academic.final_project',array(
+                            'Status' => '2'
+                        ));
+                    }
                 }
 
 
@@ -8024,10 +8253,10 @@ class C_api extends CI_Controller {
             $search = $requestData['search']['value'];
 
             if($dataWhere!=''){
-                $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                $dataSearch = 'AND ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
                            OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" ';
             } else {
-                $dataSearch = 'WHERE ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%" 
+                $dataSearch = 'WHERE ( aut_s.Name LIKE "%'.$search.'%" OR aut_s.NPM LIKE "%'.$search.'%"
                            OR ps.Name LIKE "%'.$search.'%"  OR ps.NameEng LIKE "%'.$search.'%" ';
             }
 
@@ -8035,7 +8264,7 @@ class C_api extends CI_Controller {
                 $dataSearch .= ' or fma.FormulirCode LIKE "%'.$search.'%" or fma.No_Ref LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent,  
+        $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent,
                                       pg.Code AS ProdiGroup,fma.FormulirCode,fma.No_Ref
                                       FROM db_academic.auth_students aut_s
                                       LEFT JOIN db_academic.program_study ps ON (ps.ID = aut_s.ProdiID)
@@ -8043,7 +8272,7 @@ class C_api extends CI_Controller {
                                       LEFT JOIN db_academic.status_student ss ON (ss.ID = aut_s.StatusStudentID)
                                       LEFT JOIN (
                                         select a.NPM,a.FormulirCode,a.GeneratedBy,a.DateTime as DateTimeGeneratedBy,dd.No_Ref
-                                        from db_admission.to_be_mhs as a 
+                                        from db_admission.to_be_mhs as a
                                         left join (
                                             select FormulirCode,No_Ref from db_admission.formulir_number_offline_m
                                             UNION
@@ -8090,17 +8319,18 @@ class C_api extends CI_Controller {
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
                             <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'" 
-                            data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" 
+                            <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'"
+                            data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'"
                             data-statusid="'.$row['StatusStudentID'].'">Change Status</a>
                             </li>
                             <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImage.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
                           </ul>
                         </div>';
 
-            
 
-            $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" /><form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+
+            $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" />
+            <form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                                 <input id="formPhoto" class="hide" value="" hidden />
                                 <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
                                         <i class="fa fa-upload"></i>
@@ -8115,10 +8345,13 @@ class C_api extends CI_Controller {
             // show formulir number
                 $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<br/><span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
 
+                $IDCard = ($row['Access_Card_Number']!='' && $row['Access_Card_Number']!=null) ? $row['Access_Card_Number'] : '-';
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a><br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a>
+                                                            <br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>
+                                                            <hr style="margin-top: 3px;margin-bottom: 5px;"/>IDCard : '.$IDCard;
             $nestedData[] = '<div  style="text-align:center;">'.$row['Year'].''.$gp.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$fm.'</div>';
@@ -8155,7 +8388,7 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em 
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em
                                       LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
                                       WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.NIP ASC ';
 
@@ -8255,8 +8488,8 @@ class C_api extends CI_Controller {
         if(count($data_arr>0)) {
             if ($data_arr['action'] == 'readQuestion') {
                 $dataQ = $this->db->query('SELECT ec.Category, eq.* FROM db_academic.edom_question eq
-                                                      LEFT JOIN db_academic.edom_category ec 
-                                                      ON (ec.ID = eq.CategoryID) 
+                                                      LEFT JOIN db_academic.edom_category ec
+                                                      ON (ec.ID = eq.CategoryID)
                                                       ORDER BY eq.Order ASC ')->result_array();
 
                 return print_r(json_encode($dataQ));
@@ -8295,6 +8528,10 @@ class C_api extends CI_Controller {
 
     public function getLecturerEvaluation(){
 
+        $max_execution_time = 3600;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
         $SemesterID = $this->input->get('SemesterID');
         $ProdiID = $this->input->get('ProdiID');
 
@@ -8302,8 +8539,8 @@ class C_api extends CI_Controller {
 
         $dataSelect = 'SELECT s.ID, s.SemesterID, s.ClassGroup, mk.ID AS MKID, mk.MKCode, mk.Name AS Course, mk.NameEng AS CourseEng';
 
-        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$ProdiID.'" 
-                                                    AND em.StatusEmployeeID != "-2" 
+        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$ProdiID.'"
+                                                    AND em.StatusEmployeeID != "-2"
                                                    AND em.StatusEmployeeID != "-1" ';
         $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
@@ -8312,7 +8549,7 @@ class C_api extends CI_Controller {
         if(count($queryDefaultRow)>0){
             for($i=0;$i<count($queryDefaultRow);$i++){
                 $d = $queryDefaultRow[$i];
-                $queryCourse = $dataSelect.' FROM db_academic.schedule s 
+                $queryCourse = $dataSelect.' FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
                                                   WHERE  '.$dataWhere.' AND s.Coordinator = "'.$d['NIP'].'" GROUP BY s.ID
@@ -8334,12 +8571,26 @@ class C_api extends CI_Controller {
                         $dataCourse[$c]['DetailsStudent'] = $dataStd;
 
                         // Data Edom Answer
-                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
+                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea
                                                                       WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
                                                                       AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
-                                                                      AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
+                                                                      AND ea.NIP = "'.$d['NIP'].'"
+                                                                       AND ea.Type = "1" ')->result_array();
+
+                        // Read Details
+                        if(count($dataEd)>0){
+                            for($e=0;$e<count($dataEd);$e++){
+                                $dataDetails = $this->db->get_where('db_academic.edom_answer_details',array(
+                                    'EAID' => $dataEd[$e]['ID'],
+                                    'QuestionID !=' => '12'
+                                ))->result_array();
+
+                                $dataEd[$e]['Details'] = $dataDetails;
+                            }
+                        }
 
                         $dataCourse[$c]['TotalAnswer'] = count($dataEd);
+                        $dataCourse[$c]['DataAnswer'] = $dataEd;
                     }
 
                     $queryDefaultRow[$i]['Course'] = $dataCourse;
@@ -8371,8 +8622,8 @@ class C_api extends CI_Controller {
         }
 
 
-        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data_arr['ProdiID'].'" 
-                                                    AND em.StatusEmployeeID != "-2" 
+        $queryDefault = 'SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data_arr['ProdiID'].'"
+                                                    AND em.StatusEmployeeID != "-2"
                                                    AND em.StatusEmployeeID != "-1" ';
 
 
@@ -8384,7 +8635,7 @@ class C_api extends CI_Controller {
         if(count($queryDefaultRow)>0){
             for($i=0;$i<count($queryDefaultRow);$i++){
                 $d = $queryDefaultRow[$i];
-                $queryCourse = $dataSelect.' FROM db_academic.schedule s 
+                $queryCourse = $dataSelect.' FROM db_academic.schedule s
                                                   LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                   LEFT JOIN db_academic.mata_kuliah mk ON (sdc.MKID = mk.ID)
                                                   WHERE  '.$dataWhere.' AND s.Coordinator = "'.$d['NIP'].'" GROUP BY s.ID
@@ -8405,7 +8656,7 @@ class C_api extends CI_Controller {
                         $dataCourse[$c]['TotalStudent'] = count($dataStd);
 
                         // Data Edom Answer
-                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea 
+                        $dataEd = $this->db->query('SELECT * FROM db_academic.edom_answer ea
                                                                       WHERE ea.SemesterID = "'.$dataCourse[$c]['SemesterID'].'"
                                                                       AND ea.ScheduleID = "'.$dataCourse[$c]['ID'].'"
                                                                       AND ea.NIP = "'.$d['NIP'].'" ')->result_array();
@@ -8461,7 +8712,7 @@ class C_api extends CI_Controller {
                 $DB_Student = $data_arr['DB_Student'];
                 $NPM = $data_arr['NPM'];
                 $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc, au.KTPNumber,
+                                      ss.Description AS StatusStudentDesc, au.KTPNumber, au.Access_Card_Number,
                                       em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$DB_Student.'.students s
                                       LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
@@ -8485,6 +8736,8 @@ class C_api extends CI_Controller {
 
 
                 $dataUpdtAuth = (array) $data_arr['dataAuth'];
+                $dataUpdtAuth['LastUpdate']=date('Y-m-d H:i:s');
+                $dataUpdtAuth['UpdatedBy'] = $this->session->userdata('NIP');
                 $this->db->where('NPM', $NPM);
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
                 $this->db->reset_query();
@@ -8508,7 +8761,7 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $wl = 'LIKE "%'.$search.'%"';
-            $dataSearch = ' AND (s.ClassGroup '.$wl.' 
+            $dataSearch = ' AND (s.ClassGroup '.$wl.'
                                     OR s.Coordinator '.$wl.'
                                     OR em.Name '.$wl.'
                                      OR mk.MKCode '.$wl.'
@@ -8526,12 +8779,12 @@ class C_api extends CI_Controller {
                                       LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                       LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                      
+
                                       LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-                                      
-                                      WHERE ( s.ProgramsCampusID = "'.$data_arr['ProgramCampusID'].'" 
+
+                                      WHERE ( s.ProgramsCampusID = "'.$data_arr['ProgramCampusID'].'"
                                       AND s.SemesterID = "'.$data_arr['SemesterID'].'" '.$whereProdi.' '.$whereDay.' '.$whereCombinedClasses.' )
-                                       '.$dataSearch.' 
+                                       '.$dataSearch.'
                                       GROUP BY s.ID
                                       ORDER BY d.ID,sd.StartSessions, sd.EndSessions, s.ClassGroup ASC ';
 
@@ -8549,11 +8802,11 @@ class C_api extends CI_Controller {
             $SubSesi = ($row['SubSesi']=='1') ? '<br/><span class="label label-warning">Sub-Sesi</span>' : '';
             $Attendance = ($row['Attendance']=='0') ? '<br/><span class="label label-danger"><i class="fa fa-filter margin-right"></i> No Attd</span>' : '';
 
-            $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions, attd.ID AS ID_Attd 
+            $dataSchedule = $this->db->query('SELECT cl.Room, d.NameEng AS DayEng, sd.StartSessions, sd.EndSessions, attd.ID AS ID_Attd
                                                                       FROM db_academic.schedule_details sd
                                                                       LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
                                                                       LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
-                                                                      LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID 
+                                                                      LEFT JOIN db_academic.attendance attd ON (attd.ScheduleID = sd.ScheduleID
                                                                       AND attd.SDID = sd.ID)
                                                                         WHERE sd.ScheduleID = "'.$row['ID'].'"
                                                                          ORDER BY sd.DayID ASC ')->result_array();
@@ -8566,7 +8819,7 @@ class C_api extends CI_Controller {
 
             $TeamTeaching = '';
             if($row['TeamTeaching']=='1'){
-                $dataTeamTeaching = $this->db->query('SELECT stt.NIP, em.Name FROM db_academic.schedule_team_teaching stt 
+                $dataTeamTeaching = $this->db->query('SELECT stt.NIP, em.Name FROM db_academic.schedule_team_teaching stt
                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
                                                                 WHERE stt.ScheduleID = "'.$row['ID'].'" ')->result_array();
 
@@ -8578,20 +8831,20 @@ class C_api extends CI_Controller {
             }
 
             // Daftar Prodi
-            $dataProdi = $this->db->query('SELECT ps.ID AS ProdiID, ps.Code FROM db_academic.schedule_details_course sdc 
+            $dataProdi = $this->db->query('SELECT ps.ID AS ProdiID, ps.Code FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
-                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" 
+                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'"
                                                     GROUP BY sdc.ProdiID ORDER BY ps.Code ASC ')->result_array();
             $Prodi = '';
             if(count($dataProdi)>0){
                 for($p=0;$p<count($dataProdi);$p++){
 
                     // Get Semester
-                    $dataSMT = $this->db->query('SELECT co.Semester  
+                    $dataSMT = $this->db->query('SELECT co.Semester
                                                     FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
                                                     LEFT JOIN db_academic.course_offerings co ON (co.CurriculumID = cd.CurriculumID)
-                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND sdc.ProdiID = "'.$dataProdi[$p]['ProdiID'].'" 
+                                                    WHERE sdc.ScheduleID = "'.$row['ID'].'" AND sdc.ProdiID = "'.$dataProdi[$p]['ProdiID'].'"
                                                     AND co.ProdiID = "'.$dataProdi[$p]['ProdiID'].'" AND co.SemesterID = "'.$data_arr['SemesterID'].'"
                                                     ORDER BY co.Semester ASC ')->result_array();
                     $smt = '';
@@ -8654,7 +8907,7 @@ class C_api extends CI_Controller {
                       <ul class="dropdown-menu">
                         <li><a href="'.base_url('academic/timetables/list/edit/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Course</a></li>
                         <li><a href="'.base_url('academic/timetables/list/edit-schedule/'.$data_arr['SemesterID'].'/'.$row['ID'].'/'.str_replace(" ","-",$row['MKNameEng'])).'">Edit Schedule</a></li>
-                        
+
                         <li role="separator" class="divider"></li>
                         <li><a href="javascript:void(0);" class="btnTimetablesEditDelete" data-group="'.$row['ClassGroup'].'" data-id="'.$row['ID'].'">Delete</a></li>
                       </ul>
@@ -8705,13 +8958,13 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $wl = 'LIKE "%'.$search.'%"';
-            $dataSearch = ' AND (auts.NPM '.$wl.' 
+            $dataSearch = ' AND (auts.NPM '.$wl.'
                                     OR auts.Name '.$wl.')';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year 
-                                          FROM db_academic.auth_students auts 
-                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.' 
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year
+                                          FROM db_academic.auth_students auts
+                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.'
                                           ORDER BY NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -8726,12 +8979,12 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             $db_ = 'ta_'.$row['Year'];
-            $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng, s.ClassGroup, s.ID AS ScheduleID, em.Name AS Lecturer  FROM '.$db_.'.study_planning sp 
+            $dataCourse = $this->db->query('SELECT mk.MKCode, mk.NameEng, s.ClassGroup, s.ID AS ScheduleID, em.Name AS Lecturer  FROM '.$db_.'.study_planning sp
                                                         LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
                                                         LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
-                                                        WHERE sp.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                        WHERE sp.SemesterID = "'.$data_arr['SemesterID'].'"
                                                         AND sp.NPM = "'.$row['NPM'].'"
                                                          GROUP BY sp.ScheduleID ORDER BY mk.MKCode ASC ')->result_array();
 
@@ -8932,15 +9185,15 @@ class C_api extends CI_Controller {
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $wl = 'LIKE "%'.$search.'%"';
-            $dataSearch = ' AND (auts.NPM '.$wl.' 
+            $dataSearch = ' AND (auts.NPM '.$wl.'
                                     OR auts.Name '.$wl.')';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP 
-                                          FROM db_academic.auth_students auts 
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiID, auts.ProdiGroupID, em.Name AS MentorName, em.NIP AS MentorNIP
+                                          FROM db_academic.auth_students auts
                                           LEFT JOIN db_academic.mentor_academic mac ON (mac.NPM = auts.NPM)
                                           LEFT JOIN db_employees.employees em ON (em.NIP = mac.NIP)
-                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.' 
+                                          WHERE ( auts.StatusStudentID = "3" '.$w_year.' '.$w_prodi.' ) '.$dataSearch.'
                                           ORDER BY NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -8956,10 +9209,10 @@ class C_api extends CI_Controller {
             $row = $query[$i];
 
             // Credit
-            $dataCredit = $this->m_api->getMaxCredit('ta_'.$row['Year'],$row['NPM'],$data_arr['Year'],$data_arr['SemesterID'],$data_arr['ProdiID']);
+            $dataCredit = $this->m_api->getMaxCredit('ta_'.$row['Year'],$row['NPM'],$row['Year'],$data_arr['SemesterID'],$row['ProdiID']);
 
             // Get Course in std_krs
-            $dataCourse = $this->db->query('SELECT sk.Status, mk.NameEng AS CourseEng, cd.TotalSKS AS Credit FROM db_academic.std_krs sk 
+            $dataCourse = $this->db->query('SELECT sk.Status, mk.NameEng AS CourseEng, cd.TotalSKS AS Credit FROM db_academic.std_krs sk
                                                             LEFT JOIN db_academic.schedule s ON (s.ID = sk.ScheduleID)
                                                             LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
@@ -9064,7 +9317,7 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent  
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent
                               FROM db_academic.mentor_academic ma
                               LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
@@ -9099,11 +9352,11 @@ class C_api extends CI_Controller {
                         <i class="fa fa-edit"></i>
                       </a>' : '-';
 
-            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk 
+            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk
                                                       LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
                                                       LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = stdk.ScheduleID)
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'"
                                                       AND stdk.NPM = "'.$row['NPM'].'"
                                                        GROUP BY stdk.ScheduleID
                                                        ORDER BY mk.MKCode ')->result_array();
@@ -9176,9 +9429,9 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,   
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
                               ma.NIP AS MentorNIP
-                              FROM  db_academic.auth_students auts 
+                              FROM  db_academic.auth_students auts
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                               LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
@@ -9210,11 +9463,11 @@ class C_api extends CI_Controller {
 
 
             // Course
-            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk 
+            $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk
                                                       LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
                                                       LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = stdk.ScheduleID)
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
-                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'" 
+                                                      WHERE stdk.SemesterID = "'.$data_arr['SemesterID'].'"
                                                       AND stdk.NPM = "'.$row['NPM'].'"
                                                        GROUP BY stdk.ScheduleID
                                                        ORDER BY mk.MKCode ')->result_array();
@@ -9343,7 +9596,7 @@ class C_api extends CI_Controller {
     public function dropdowngroupmodule(){
 
         $data_arr = $this->getInputToken();
-        
+
         if (count($data_arr) > 0) {
 
             if($data_arr['action']=='getLastgroupmodule'){
@@ -9353,7 +9606,7 @@ class C_api extends CI_Controller {
                 $data = $this->db->query('SELECT NameGroup, IDGroup FROM db_it.group_module WHERE IDDivision = "'.$data_arr['filterDivisi'].'" ORDER BY IDDivision ASC ')->result_array();
 
                 return print_r(json_encode($data));
-            } 
+            }
             else if($data_arr['action']=='getLastmodule'){
 
                 $filterDivisi = $data_arr['filterDivisi'];
@@ -9370,7 +9623,7 @@ class C_api extends CI_Controller {
     public function dropdownlistmodule(){
 
         $data_arr = $this->getInputToken();
-        
+
         if (count($data_arr) > 0) {
             if($data_arr['action']=='getListgroupmodule'){
                 $filterGroups = $data_arr['filterGroups'];
@@ -9413,8 +9666,8 @@ class C_api extends CI_Controller {
      }
 
 
-     
-     
+
+
 
     public function crudTransferStudent(){
 
@@ -9449,8 +9702,8 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='readClassOfTransferStd'){
-                $data = $this->db->query('SELECT ClassOf FROM db_finance.tuition_fee 
-                                                    WHERE ProdiID = "'.$data_arr['ProdiID'].'" 
+                $data = $this->db->query('SELECT ClassOf FROM db_finance.tuition_fee
+                                                    WHERE ProdiID = "'.$data_arr['ProdiID'].'"
                                                     GROUP BY ClassOf ORDER BY ClassOf ASC ')->result_array();
 
                 return print_r(json_encode($data));
@@ -9469,7 +9722,7 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='readBintangTransferStd'){
                 $data = $this->db->query('SELECT Pay_Cond FROM db_finance.tuition_fee
                                                         WHERE ProdiID = "'.$data_arr['ProdiID'].'"
-                                                         AND ClassOf = "'.$data_arr['ClassOf'].'" 
+                                                         AND ClassOf = "'.$data_arr['ClassOf'].'"
                                                          GROUP BY Pay_Cond ORDER BY Pay_Cond ASC ')->result_array();
 
                 return print_r(json_encode($data));
@@ -9582,15 +9835,17 @@ class C_api extends CI_Controller {
                      for ($i=0; $i < count($query); $i++) {
                          $PTID = $query[$i]['ID'];
 
-                         $sql1 = 'SELECT * FROM db_finance.tuition_fee tf 
-                                                            WHERE 
-                                                            tf.ProdiID = "'.$data_arr['PaymentProdiID'].'" 
-                                                            AND tf.ClassOf = "'.$data_arr['PaymentClassOf'].'" 
-                                                            AND tf.Pay_Cond = "'.$data_arr['PaymentBintang'].'" 
+                         $sql1 = 'SELECT * FROM db_finance.tuition_fee tf
+                                                            WHERE
+                                                            tf.ProdiID = "'.$data_arr['PaymentProdiID'].'"
+                                                            AND tf.ClassOf = "'.$data_arr['PaymentClassOf'].'"
+                                                            AND tf.Pay_Cond = "'.$data_arr['PaymentBintang'].'"
                                                             AND tf.PTID = "'.$PTID.'" ';
 
 
                          $query1=$this->db->query($sql1, array())->result_array();
+
+
                          $Invoice = 0;
 
                          for ($k=1; $k <= 14; $k++) {
@@ -9757,9 +10012,9 @@ class C_api extends CI_Controller {
 
                                 for($c=0;$c<count($course);$c++){
                                     $dataHistory = $this->db->query('SELECT cd.Semester FROM db_academic.transfer_history_conversion thc
-                                                                                LEFT JOIN db_academic.curriculum_details cd 
+                                                                                LEFT JOIN db_academic.curriculum_details cd
                                                                                 ON (cd.ID = thc.CDID_After)
-                                                                                WHERE thc.TSID = "'.$dt['ID'].'" 
+                                                                                WHERE thc.TSID = "'.$dt['ID'].'"
                                                                                 AND thc.CDID_Before = "'.$course[$c]['CDID'].'"  ')->result_array();
 
                                     $course[$c]['TransferToSemester'] = $dataHistory;
@@ -9839,12 +10094,12 @@ class C_api extends CI_Controller {
                 $Semester = $data_arr['Semester'];
                 $ProdiID = $data_arr['ProdiID'];
 
-                $dataCourse = $this->db->query('SELECT cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit, mk.MKCode, mk.Name, mk.NameEng  
+                $dataCourse = $this->db->query('SELECT cd.ID AS CDID, cd.MKID, cd.TotalSKS AS Credit, mk.MKCode, mk.Name, mk.NameEng
                                                                 FROM db_academic.curriculum_details cd
                                                                 LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                                                 LEFT JOIN db_academic.curriculum c ON (c.ID =  cd.CurriculumID)
-                                                                WHERE cd.Semester = "'.$Semester.'" 
-                                                                 AND c.Year = "'.$ClassOf.'" 
+                                                                WHERE cd.Semester = "'.$Semester.'"
+                                                                 AND c.Year = "'.$ClassOf.'"
                                                                  AND cd.ProdiID = "'.$ProdiID.'" ORDER BY cd.MKID ASC')->result_array();
 
 
@@ -9916,7 +10171,7 @@ class C_api extends CI_Controller {
     public function test_data()
     {
         // $arr = array();
-        // for ($i=0; $i < 15; $i++) { 
+        // for ($i=0; $i < 15; $i++) {
         //     $arr[] = 'A'.$i;
         // }
 
@@ -9926,11 +10181,27 @@ class C_api extends CI_Controller {
     public function test_data2()
     {
         $arr = array();
-        for ($i=0; $i < 15; $i++) { 
+        for ($i=0; $i < 15; $i++) {
             $arr[] = 'A'.$i;
         }
 
         echo json_encode($arr);
+    }
+
+    public function getLevelEducation(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.level_education')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLecturerAcademicPosition(){
+        $data = $this->db->order_by('ID','ASC')->get('db_employees.lecturer_academic_position')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getStudentYear(){
+        $data = $this->db->query('SELECT Year FROM db_academic.auth_students GROUP BY Year ORDER BY Year DESC')->result_array();
+
+        return print_r(json_encode($data));
     }
 
 }

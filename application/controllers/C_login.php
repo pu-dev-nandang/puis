@@ -233,155 +233,155 @@ class C_login extends CI_Controller {
                     echo '{"status":"999","message":"waktu server tidak sesuai NTP atau secret key salah."}';
                 }
                 else {
-                  // content berhasil
-                  // $this->load->model('master/m_master');
-                  $this->load->model('finance/m_finance');
-                  $this->load->model('m_sendemail');
-                  $BNIdbLog = $this->m_master->caribasedprimary('db_va.va_log','trx_id',$data_asli['trx_id']);
-                  $routes_table =$BNIdbLog[0]['routes_table'];
-                  switch ($routes_table) {
-                      case 'db_admission.register':
-                             if ($BNIdbLog[0]['Status'] == 0) {
-                                  $getData = $this->m_master->caribasedprimary('db_admission.register','BilingID',$data_asli['trx_id']);
-                                  $Email = $getData[0]['Email'];
-                                  $RegisterID = $getData[0]['ID'];
-                                  $this->m_master->saveDataToVerification_offline($RegisterID);
-                                  $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
-                                  $RegVerificationID = $getData[0]['ID'];
-                                  $FormulirCode = $this->m_finance->getFormulirCode('online');
-                                  // save data to register_verified
-                                  $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
+                    // content berhasil
+                    // $this->load->model('master/m_master');
+                    $this->load->model('finance/m_finance');
+                    $this->load->model('m_sendemail');
+                    $BNIdbLog = $this->m_master->caribasedprimary('db_va.va_log','trx_id',$data_asli['trx_id']);
+                    $routes_table =$BNIdbLog[0]['routes_table'];
+                    switch ($routes_table) {
+                        case 'db_admission.register':
+                            if ($BNIdbLog[0]['Status'] == 0) {
+                                $getData = $this->m_master->caribasedprimary('db_admission.register','BilingID',$data_asli['trx_id']);
+                                $Email = $getData[0]['Email'];
+                                $RegisterID = $getData[0]['ID'];
+                                $this->m_master->saveDataToVerification_offline($RegisterID);
+                                $getData = $this->m_master->caribasedprimary('db_admission.register_verification','RegisterID',$RegisterID);
+                                $RegVerificationID = $getData[0]['ID'];
+                                $FormulirCode = $this->m_finance->getFormulirCode('online');
+                                // save data to register_verified
+                                $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode);
 
-                                  $text = 'Dear Candidate,<br><br>
+                                $text = 'Dear Candidate,<br><br>
                                               Your payment has been received,<br>
                                               Please click link below to login your portal <br>
                                               '.url_registration."login/".'
-                                          ';        
-                                  $to = $Email;
-                                  $subject = "Podomoro University Link Formulir Registration";
-                                  $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                                  $this->m_master->update_va_log($data_asli);
-                              }
-                              echo '{"status":"000"}';
-                              exit;
-                          break;
-                          case 'db_finance.payment_pre':
-                                  $getData = $this->m_master->caribasedprimary('db_admission.register','VA_number',$BNIdbLog[0]['virtual_account']);
-                                  $Email = $getData[0]['Email'];
-                                  $RegisterID = $getData[0]['ID'];
-                                  $Name = $getData[0]['Name'];
+                                          ';
+                                $to = $Email;
+                                $subject = "Podomoro University Link Formulir Registration";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                $this->m_master->update_va_log($data_asli);
+                            }
+                            echo '{"status":"000"}';
+                            exit;
+                            break;
+                        case 'db_finance.payment_pre':
+                            $getData = $this->m_master->caribasedprimary('db_admission.register','VA_number',$BNIdbLog[0]['virtual_account']);
+                            $Email = $getData[0]['Email'];
+                            $RegisterID = $getData[0]['ID'];
+                            $Name = $getData[0]['Name'];
 
-                                  $getData2 = $this->m_master->caribasedprimary('db_finance.payment_pre','BilingID',$data_asli['trx_id']);
-                                  $ID_register_formulir = $getData2[0]['ID_register_formulir'];
+                            $getData2 = $this->m_master->caribasedprimary('db_finance.payment_pre','BilingID',$data_asli['trx_id']);
+                            $ID_register_formulir = $getData2[0]['ID_register_formulir'];
 
-                                  if ($getData2[0]['Status'] == 0) {
-                                       //update data telah dibayar
-                                       $this->m_finance->update_payment_pre($data_asli['trx_id']);
+                            if ($getData2[0]['Status'] == 0) {
+                                //update data telah dibayar
+                                $this->m_finance->update_payment_pre($data_asli['trx_id']);
 
-                                       // proses cicilan atau generate va kembali
-                                       $p = $this->m_finance->proses_cicilan($ID_register_formulir,$getData);
+                                // proses cicilan atau generate va kembali
+                                $p = $this->m_finance->proses_cicilan($ID_register_formulir,$getData);
 
-                                       $text = 'Dear '.$Name.',<br><br>
+                                $text = 'Dear '.$Name.',<br><br>
                                                    Your payment has been received,<br>
                                                    as much as Rp '.number_format($getData2[0]['Invoice'],2,',','.').'
                                                    <br>'.$p.'
-                                               ';        
-                                       $to = $Email;
-                                       $subject = "Podomoro University Payment thank you";
-                                       $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                                       $this->m_master->update_va_log($data_asli);
-                                   } 
-                                  echo '{"status":"000"}';
-                                  exit;
-                              break;
-                              case 'db_finance.payment_students':
+                                               ';
+                                $to = $Email;
+                                $subject = "Podomoro University Payment thank you";
+                                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                $this->m_master->update_va_log($data_asli);
+                            }
+                            echo '{"status":"000"}';
+                            exit;
+                            break;
+                        case 'db_finance.payment_students':
 
-                                  // Get Status sudah bayar atau belum karena BNi hit lebih dari satu kali
-                                  $getData = $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$data_asli['trx_id']);
-                                  if ($getData[0]['Status'] == 0) {
-                                    // get Informasi Mahasiswa
-                                       $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
-                                       $NPM = $GetPayment[0]['NPM'];
-                                       $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
-                                       $PTIDDesc = $data['PTIDDesc'];
-                                       $SemesterName = $data['SemesterName'];
-                                       $Nama = $data['Nama'];
-                                       $EmailPU = $data['EmailPU'];
-                                       $ProdiEng = $data['ProdiEng'];
+                            // Get Status sudah bayar atau belum karena BNi hit lebih dari satu kali
+                            $getData = $this->m_master->caribasedprimary('db_finance.payment_students','BilingID',$data_asli['trx_id']);
+                            if ($getData[0]['Status'] == 0) {
+                                // get Informasi Mahasiswa
+                                $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
+                                $NPM = $GetPayment[0]['NPM'];
+                                $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
+                                $PTIDDesc = $data['PTIDDesc'];
+                                $SemesterName = $data['SemesterName'];
+                                $Nama = $data['Nama'];
+                                $EmailPU = $data['EmailPU'];
+                                $ProdiEng = $data['ProdiEng'];
 
-                                    // Buat Update dan View Node JS untuk notifikasi
-                                    $this->m_finance->update_payment_MHS($data_asli['trx_id'],$getData[0]['ID_payment']); 
+                                // Buat Update dan View Node JS untuk notifikasi
+                                $this->m_finance->update_payment_MHS($data_asli['trx_id'],$getData[0]['ID_payment']);
 
-                                    if (ENVIRONMENT == 'production') {
-                                      // Send Email
-                                      $text = 'Dear '.$Nama.',<br><br>
+                                if (ENVIRONMENT == 'production') {
+                                    // Send Email
+                                    $text = 'Dear '.$Nama.',<br><br>
                                                   Your payment has been received,<br><br>
                                                   Payment Type : '.$PTIDDesc.'<br>
                                                   Prodi : '.$ProdiEng.'<br>
                                                   SemesterName : '.$SemesterName.'<br><br>
                                                   as much as Rp '.number_format($getData[0]['Invoice'],2,',','.').'
                                                   <br>
-                                              ';        
-                                      $to = $EmailPU;
-                                      $subject = "Podomoro University Payment thank you";
-                                      $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                                    }  
+                                              ';
+                                    $to = $EmailPU;
+                                    $subject = "Podomoro University Payment thank you";
+                                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                                }
 
-                                    $this->m_master->update_va_log($data_asli);
-                                    $this->m_master->saveNotification($data);
+                                $this->m_master->update_va_log($data_asli);
+                                $this->m_master->saveNotification($data);
 
-                                    // send notifikasi
-                                    $client = new Client(new Version1X('//10.1.10.230:3000'));
+                                // send notifikasi
+                                $client = new Client(new Version1X('//10.1.10.230:3000'));
 
-                                    $client->initialize();
-                                    // send message to connected clients
-                                    $client->emit('update_notifikasi', ['update_notifikasi' => '1']);
-                                    $client->close();
-                                    
-                                  }
-                                  
-                                  // find data apakah memiliki beberapa cicilan
-                                  $ID_payment = $getData[0]['ID_payment'];
-                                  $getData3 = $this->m_finance->findDatapayment_studentsBaseID_payment($ID_payment);
-                                  if (count($getData3) > 0) {
-                                    // create va selanjutnya
-                                    $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
-                                    $NPM = $GetPayment[0]['NPM'];
-                                    $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
-                                    $Nama = $data['Nama'];
-                                    $EmailPU = $data['EmailPU'];
-                                    $payment = $getData3[0]['Invoice'];
+                                $client->initialize();
+                                // send message to connected clients
+                                $client->emit('update_notifikasi', ['update_notifikasi' => '1']);
+                                $client->close();
 
-                                    $deli = strpos($payment, '.');
-                                    $payment = substr($payment, 0,$deli);
+                            }
 
-                                    $DeadLinePayment = $getData3[0]['Deadline'];
-                                    $VA_number = $this->m_finance->getVANumberMHS($NPM);
-                                    $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Nama, $EmailPU,$VA_number,'Cicilan',$tableRoutes = 'db_finance.payment_students');
+                            // find data apakah memiliki beberapa cicilan
+                            $ID_payment = $getData[0]['ID_payment'];
+                            $getData3 = $this->m_finance->findDatapayment_studentsBaseID_payment($ID_payment);
+                            if (count($getData3) > 0) {
+                                // create va selanjutnya
+                                $GetPayment = $this->m_master->caribasedprimary('db_finance.payment','ID',$getData[0]['ID_payment']);
+                                $NPM = $GetPayment[0]['NPM'];
+                                $data = $this->m_master->PaymentgetMahasiswaByNPM($NPM);
+                                $Nama = $data['Nama'];
+                                $EmailPU = $data['EmailPU'];
+                                $payment = $getData3[0]['Invoice'];
 
-                                    if ($create_va['status']) {
-                                        // After create va update payment students
-                                        $ab = $this->m_finance->updatePaymentStudentsFromCicilan($create_va['msg']['trx_id'],$getData3[0]['ID']);
-                                        if (ENVIRONMENT == 'production') {
-                                          // Send Email
-                                           $msg = 'Please continue to pay the next installment with VA Number : '.$VA_number. ' <br> as much as Rp '.number_format($getData3[0]['Invoice'],2,',','.');
-                                          $text = 'Dear '.$Nama.',<br><br>
+                                $deli = strpos($payment, '.');
+                                $payment = substr($payment, 0,$deli);
+
+                                $DeadLinePayment = $getData3[0]['Deadline'];
+                                $VA_number = $this->m_finance->getVANumberMHS($NPM);
+                                $create_va = $this->m_finance->create_va_Payment($payment,$DeadLinePayment, $Nama, $EmailPU,$VA_number,'Cicilan',$tableRoutes = 'db_finance.payment_students');
+
+                                if ($create_va['status']) {
+                                    // After create va update payment students
+                                    $ab = $this->m_finance->updatePaymentStudentsFromCicilan($create_va['msg']['trx_id'],$getData3[0]['ID']);
+                                    if (ENVIRONMENT == 'production') {
+                                        // Send Email
+                                        $msg = 'Please continue to pay the next installment with VA Number : '.$VA_number. ' <br> as much as Rp '.number_format($getData3[0]['Invoice'],2,',','.');
+                                        $text = 'Dear '.$Nama.',<br><br>
                                                   '.$msg.'    
-                                                  ';        
-                                          $to = $EmailPU;
-                                          $subject = "Podomoro University Notification";
-                                          $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                                        }  
+                                                  ';
+                                        $to = $EmailPU;
+                                        $subject = "Podomoro University Notification";
+                                        $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
                                     }
-                                  }
-                                  echo '{"status":"000"}';
-                                  exit;
-                              break;
-                      default:
-                          # code...
-                          break;
-                  }
-                  
+                                }
+                            }
+                            echo '{"status":"000"}';
+                            exit;
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
+
                 }
             }
         }
@@ -468,32 +468,32 @@ class C_login extends CI_Controller {
         $PositionMain = $this->session->userdata('PositionMain');
         $Position = $PositionMain['IDPosition'];
         switch ($Position) {
-          case 5: // Dekan
-            $this->load->model('faculty/m_faculty');
-            $this->session->set_userdata('IDdepartementNavigation','34');
-            $this->session->set_userdata('departementNavigation','admin-fakultas');
-            $this->m_faculty->auth(); // get session
-            break;
-          case 6: // KAPRODI
-            $this->load->model('prodi/m_prodi');
-            $this->session->set_userdata('IDdepartementNavigation','15');
-            $this->session->set_userdata('departementNavigation','admin-prodi');
-            $this->m_prodi->auth(); // get session
-            break;
-          case 7: // DOSEN
-            $this->session->set_userdata('IDdepartementNavigation','36');
-            $this->session->set_userdata('departementNavigation','other-division');
-            break;  
-          default:
-            break;
+            case 5: // Dekan
+                $this->load->model('faculty/m_faculty');
+                $this->session->set_userdata('IDdepartementNavigation','34');
+                $this->session->set_userdata('departementNavigation','admin-fakultas');
+                $this->m_faculty->auth(); // get session
+                break;
+            case 6: // KAPRODI
+                $this->load->model('prodi/m_prodi');
+                $this->session->set_userdata('IDdepartementNavigation','15');
+                $this->session->set_userdata('departementNavigation','admin-prodi');
+                $this->m_prodi->auth(); // get session
+                break;
+            case 7: // DOSEN
+                $this->session->set_userdata('IDdepartementNavigation','36');
+                $this->session->set_userdata('departementNavigation','other-division');
+                break;
+            default:
+                break;
         }
     }
 
 
     public function ApiServerToServer()
-    {        
+    {
         $data = file_get_contents('php://input');
-        
+
         $data_json = json_decode($data,true);
 
         if (!$data_json) {
@@ -509,175 +509,183 @@ class C_login extends CI_Controller {
             // $data_json = json_encode($data_json,true);
             // echo '{"status":"FCKGW","data" : '.$echo.'}';
             if ($data_json['client_id'] == '10.1.30.102') {
-              if ($getData['adi'] == 'adi') { 
-                // runscript
-                $this->load->model('m_sendemail');
-                $text = 'Dear Test API server to server
-                        ';        
-                $to = 'it@podomorouniversity.ac.id';
-                $subject = "Podomoro University Test API server to server";
-                $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
-                echo '{"status":"FCKGW","data" : '.$echo.'}';
-              }
-              else
-              {
-                echo '{"status":"Key is wrong"}';
-              }
-              
+                if ($getData['adi'] == 'adi') {
+                    // runscript
+                    $this->load->model('m_sendemail');
+                    $text = 'Dear Test API server to server
+                        ';
+                    $to = 'it@podomorouniversity.ac.id';
+                    $subject = "Podomoro University Test API server to server";
+                    $sendEmail = $this->m_sendemail->sendEmail($to,$subject,null,null,null,null,$text);
+                    echo '{"status":"FCKGW","data" : '.$echo.'}';
+                }
+                else
+                {
+                    echo '{"status":"Key is wrong"}';
+                }
+
             }
             else
             {
-              echo '{"status":"Your are not register"}';
+                echo '{"status":"Your are not register"}';
             }
-            
-          }
+
+        }
     }
 
     public function loginToVenue()
     {
-      try {
-        $token = $this->input->post('token');
-        $key = "s3Cr3T-G4N";
-        $input = (array) $this->jwt->decode($token,$key);
-        if ($input['url'] != url_pas.'loginToVenue') {
-          echo '{"status":"Key is wrong"}';
-        }
-        else
-        {
-          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
-          if (count($dataUser) > 0) {
-            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-            redirect(base_url().'vreservation');
-          }
-        }
+        try {
+            $token = $this->input->post('token');
+            $key = "s3Cr3T-G4N";
+            $input = (array) $this->jwt->decode($token,$key);
+            if ($input['url'] != url_pas.'loginToVenue') {
+                echo '{"status":"Key is wrong"}';
+            }
+            else
+            {
+                $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+                if (count($dataUser) > 0) {
+                    $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+                    redirect(base_url().'vreservation');
+                }
+            }
 
-      }
-      //catch exception
-      catch(Exception $e) {
-        // handling orang iseng
-        echo '{"status":"999","message":"jangan iseng :D"}';
-      }
+        }
+            //catch exception
+        catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
     }
 
     public function loginToAdminProdi()
     {
-      try {
-        $token = $this->input->post('token');
-        $key = "s3Cr3T-G4N";
-        $input = (array) $this->jwt->decode($token,$key);
-        if ($input['url'] != url_pas.'loginToAdminProdi') {
-          echo '{"status":"Key is wrong"}';
-        }
-        else
-        {
-          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
-          if (count($dataUser) > 0) {
-            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-            $this->load->model('prodi/m_prodi');
-            $this->session->set_userdata('IDdepartementNavigation','15');
-            $this->session->set_userdata('departementNavigation','admin-prodi');
-            $this->m_prodi->auth(); // get session
-            redirect(base_url().'dashboard');
-          }
-        }
+        try {
+            $token = $this->input->post('token');
+            $key = "s3Cr3T-G4N";
+            $input = (array) $this->jwt->decode($token,$key);
+            if ($input['url'] != url_pas.'loginToAdminProdi') {
+                echo '{"status":"Key is wrong"}';
+            }
+            else
+            {
+                $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+                if (count($dataUser) > 0) {
+                    $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+                    $this->load->model('prodi/m_prodi');
+                    $this->session->set_userdata('IDdepartementNavigation','15');
+                    $this->session->set_userdata('departementNavigation','admin-prodi');
+                    $this->m_prodi->auth(); // get session
+                    redirect(base_url().'dashboard');
+                }
+            }
 
-      }
-      //catch exception
-      catch(Exception $e) {
-        // handling orang iseng
-        echo '{"status":"999","message":"jangan iseng :D"}';
-      }
+        }
+            //catch exception
+        catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
     }
 
     public function loginToAdminFaculty()
     {
-      try {
-        $token = $this->input->post('token');
-        $key = "s3Cr3T-G4N";
-        $input = (array) $this->jwt->decode($token,$key);
-        if ($input['url'] != url_pas.'loginToAdminFaculty') {
-          echo '{"status":"Key is wrong"}';
-        }
-        else
-        {
-          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
-          if (count($dataUser) > 0) {
-            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-            $this->load->model('faculty/m_faculty');
-            $this->session->set_userdata('IDdepartementNavigation','34');
-            $this->session->set_userdata('departementNavigation','admin-fakultas');
-            $this->m_faculty->auth(); // get session
-            redirect(base_url().'dashboard');
-          }
-        }
+        try {
+            $token = $this->input->post('token');
+            $key = "s3Cr3T-G4N";
+            $input = (array) $this->jwt->decode($token,$key);
+            if ($input['url'] != url_pas.'loginToAdminFaculty') {
+                echo '{"status":"Key is wrong"}';
+            }
+            else
+            {
+                $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+                if (count($dataUser) > 0) {
+                    $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+                    $this->load->model('faculty/m_faculty');
+                    $this->session->set_userdata('IDdepartementNavigation','34');
+                    $this->session->set_userdata('departementNavigation','admin-fakultas');
+                    $this->m_faculty->auth(); // get session
+                    redirect(base_url().'dashboard');
+                }
+            }
 
-      }
-      //catch exception
-      catch(Exception $e) {
-        // handling orang iseng
-        echo '{"status":"999","message":"jangan iseng :D"}';
-      }
+        }
+            //catch exception
+        catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"jangan iseng :D"}';
+        }
     }
 
 
     public function portal()
     {
-      try {
-        $token = $this->input->post('token');
-        $key = "s3Cr3T-G4N";
-        $input = (array) $this->jwt->decode($token,$key);
-        if ($input['url'] != url_pas.'portal') {
-          echo '{"status":"Key is wrong"}';
-        }
-        else
-        {
-          $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
-          if (count($dataUser) > 0) {
-            $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-            // cek User (KaProdi,Dekan & Lecturer)
-            $PositionMain = $this->session->userdata('PositionMain');
-            $Position = $PositionMain['IDPosition'];
-            
-            switch ($Position) {
-              case 5: // Dekan
-                $this->load->model('faculty/m_faculty');
-                $this->session->set_userdata('IDdepartementNavigation','34');
-                $this->session->set_userdata('departementNavigation','admin-fakultas');
-                $this->m_faculty->auth(); // get session
-                redirect(base_url().'dashboard');
-                break;
-              case 6: // KAPRODI
-                $this->load->model('prodi/m_prodi');
-                $this->session->set_userdata('IDdepartementNavigation','15');
-                $this->session->set_userdata('departementNavigation','admin-prodi');
-                $this->m_prodi->auth(); // get session
-                redirect(base_url().'dashboard');
-                break;
-              case 7: // DOSEN
-                $this->session->set_userdata('IDdepartementNavigation','36');
-                $this->session->set_userdata('departementNavigation','other-division');
-                redirect(base_url().'dashboard');
-                break;  
-              default:
-                redirect(base_url().'dashboard');
-                break;
-            }
-            
-          }
-        }
 
-      }
-      //catch exception
-      catch(Exception $e) {
-        // handling orang iseng
-        echo '{"status":"999","message":"Not Authorize"}';
-      }
+
+
+        try {
+            $token = $this->input->post('token');
+            $key = "s3Cr3T-G4N";
+            $input = (array) $this->jwt->decode($token,$key);
+            if ($input['url'] != url_pas.'portal') {
+                echo '{"status":"Key is wrong"}';
+            }
+            else
+            {
+
+//                $data['include'] = $this->load->view('template/include','',true);
+//                $this->load->view('template/loginFromPortalLecturer',$data);
+
+                $dataUser = $this->m_master->caribasedprimary('db_employees.employees','NIP',$input['NIP']);
+                if (count($dataUser) > 0) {
+                    $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+                    // cek User (KaProdi,Dekan & Lecturer)
+                    $PositionMain = $this->session->userdata('PositionMain');
+                    $Position = $PositionMain['IDPosition'];
+
+                    $URLRedirect = ($input['URLRedirect']!='') ? $input['URLRedirect'] : base_url().'dashboard';
+
+                    switch ($Position) {
+                        case 5: // Dekan
+                            $this->load->model('faculty/m_faculty');
+                            $this->session->set_userdata('IDdepartementNavigation','34');
+                            $this->session->set_userdata('departementNavigation','admin-fakultas');
+                            $this->m_faculty->auth(); // get session
+                            break;
+                        case 6: // KAPRODI
+                            $this->load->model('prodi/m_prodi');
+                            $this->session->set_userdata('IDdepartementNavigation','15');
+                            $this->session->set_userdata('departementNavigation','admin-prodi');
+                            $this->m_prodi->auth(); // get session
+                            break;
+                        case 7: // DOSEN
+                            $this->session->set_userdata('IDdepartementNavigation','36');
+                            $this->session->set_userdata('departementNavigation','other-division');
+                            break;
+                        default:
+                            break;
+                    }
+
+                    redirect($URLRedirect);
+
+
+                }
+            }
+
+        }
+            //catch exception
+        catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"Not Authorize"}';
+        }
     }
 
     public function login_to_budget($TokenNIP,$TokenDep,$TokenURL)
     {
-      error_reporting(0);
-      try {
+        error_reporting(0);
+        try {
             $this->load->model('budgeting/m_budgeting');
             $key = "UAP)(*";
             $NIP = $this->jwt->decode($TokenNIP,$key);
@@ -687,45 +695,48 @@ class C_login extends CI_Controller {
             $G_div = $this->m_budgeting->SearchDepartementBudgeting($Dep);
             // cek Department existing or not
             if (count($dataUser) > 0 && count($G_div) > 0) {
-              $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
-              // cek User (KaProdi,Dekan & Lecturer)
-              $PositionMain = $this->session->userdata('PositionMain');
-              $Position = $PositionMain['IDPosition'];
-              switch ($Position) {
-                case 5: // Dekan
-                  $this->load->model('faculty/m_faculty');
-                  $this->session->set_userdata('IDdepartementNavigation','34');
-                  $this->session->set_userdata('departementNavigation','admin-fakultas');
-                  $this->m_faculty->auth(); // get session
-                  redirect(base_url().$UrlRedirect);
-                  break;
-                case 6: // KAPRODI
-                  $this->load->model('prodi/m_prodi');
-                  $this->session->set_userdata('IDdepartementNavigation','15');
-                  $this->session->set_userdata('departementNavigation','admin-prodi');
-                  $this->m_prodi->auth(); // get session
-                  redirect(base_url().$UrlRedirect);
-                  break;
-                case 7: // DOSEN
-                  $this->session->set_userdata('IDdepartementNavigation','36');
-                  $this->session->set_userdata('departementNavigation','other-division');
-                  redirect(base_url().$UrlRedirect);
-                  break;  
-                default:
-                  redirect(base_url().$UrlRedirect);
-                  break;
-              }
-              
+                $this->setSession($dataUser[0]['ID'],$dataUser[0]['NIP']);
+                // cek User (KaProdi,Dekan & Lecturer)
+                $PositionMain = $this->session->userdata('PositionMain');
+                $Position = $PositionMain['IDPosition'];
+                $this->session->set_userdata('lecturer_PUISLogin',true);
+                switch ($Position) {
+                    case 5: // Dekan
+                        $this->load->model('faculty/m_faculty');
+                        $this->session->set_userdata('IDdepartementNavigation','34');
+                        $this->session->set_userdata('departementNavigation','admin-fakultas');
+                        $this->m_faculty->auth(); // get session
+                        redirect(base_url().$UrlRedirect);
+                        break;
+                    case 6: // KAPRODI
+                        $this->load->model('prodi/m_prodi');
+                        $this->session->set_userdata('IDdepartementNavigation','15');
+                        $this->session->set_userdata('departementNavigation','admin-prodi');
+                        $this->m_prodi->auth(); // get session
+                        redirect(base_url().$UrlRedirect);
+                        break;
+                    case 7: // DOSEN
+                        $this->session->set_userdata('IDdepartementNavigation','36');
+                        $this->session->set_userdata('departementNavigation','other-division');
+                        redirect(base_url().$UrlRedirect);
+                        break;
+                    default:
+                        redirect(base_url().$UrlRedirect);
+                        break;
+                }
+
             }
             else
             {
-              redirect(url_sign_out);
+                redirect(url_sign_out);
             }
-          }
-          //catch exception
-          catch(Exception $e) {
+        }
+            //catch exception
+        catch(Exception $e) {
             redirect(url_sign_out);
-          }
+        }
     }
+
+
 
 }

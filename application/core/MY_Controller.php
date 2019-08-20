@@ -27,6 +27,22 @@ class MY_Controller extends CI_Controller {
         $this->load->library('google');
     }
 
+    public function checkMaintenanceMode(){
+
+
+        // Cek mode
+        $dataMode = $this->db->get_where('db_it.m_config',array(
+            'ID' => 3
+        ))->result_array();
+
+        if($dataMode[0]['MaintenanceMode']=='1'){
+            $data['include'] = $this->load->view('template/include','',true);
+            $this->load->view('template/maintenance',$data);
+        }
+
+
+    }
+
 
 }
 
@@ -46,15 +62,21 @@ abstract class Globalclass extends MyAbstract{
     public function __construct()
     {
         parent::__construct();
+
+//        $this->checkMaintenanceMode();
+
+
     }
+
+
 
     public function template($content)
     {
-        $depertment = $this->__getDepartement();
+
         $data['include'] = $this->load->view('template/include','',true);
+
+        $depertment = $this->__getDepartement();
         if($depertment!=null && $depertment!=''){
-
-
             $data['header'] = $this->menu_header();
             $data['navigation'] = $this->menu_navigation();
             $data['crumbs'] = $this->crumbs();
@@ -64,6 +86,7 @@ abstract class Globalclass extends MyAbstract{
         } else {
             $this->load->view('template/userfalse',$data);
         }
+
 
     }
 
@@ -186,6 +209,13 @@ abstract class Student_Life extends Globalclass{
 }
 
 abstract class Lpmi extends Globalclass{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+}
+
+abstract class Library extends Globalclass{
     public function __construct()
     {
         parent::__construct();

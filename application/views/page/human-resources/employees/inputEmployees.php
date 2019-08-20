@@ -252,16 +252,55 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-xs-4">
                         <div class="form-group">
                             <label>Status Employees</label>
                             <select class="form-control" id="formStatusEmployee"></select>
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Status Lecturer</label>
+                            <select class="form-control" id="formStatusLecturer">
+                                <option>* Not Set</option>
+                                <option disabled>------</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Status Forlap</label>
+                            <select class="form-control" id="formStatusForlap">
+                                <option>* Not Set</option>
+                                <option disabled>------</option>
+                                <option value="0">Contract</option>
+                                <option value="1">Permanent</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-4">
                         <div class="form-group">
                             <label>Programme Study</label>
                             <select class="form-control" id="formProgrammeStudy"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Level of Education</label>
+                            <select class="form-control" id="formLevelEducationID"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Academic Position</label>
+                            <select class="form-control" id="formLecturerAcademicPositionID">
+                                <option>* Not Set</option>
+                                <option disabled>------</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -335,9 +374,10 @@
         loadSelectOptionPosition('#form_Other3Position','');
 
         loadSelectOptionReligi('#formReligion','');
-        loadSelectOptionEmployeesStatus('#formStatusEmployee','');
+        loadSelectOptionEmployeesStatus2('#formStatusEmployee',"");
+        loadSelectOptionLecturerStatus2('#formStatusLecturer',"");
 
-        $('#formProgrammeStudy').append('<option value="">-- Non Academic (Employee) --</option>' +
+        $('#formProgrammeStudy').append('<option value="">* Not set</option>' +
             '<option disabled>-------------------</option>');
         loadSelectOptionBaseProdi('#formProgrammeStudy','');
         
@@ -350,6 +390,9 @@
             }
         },1000);
         FuncEvform_MainDivision();
+
+        loadSelectOptionLevelEducation('#formLevelEducationID','');
+        loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID','');
     });
 
     function FuncEvform_MainDivision()
@@ -521,6 +564,15 @@
             var emailPU = (formEmailPU!='')
                 ? formEmailPU+'@podomorouniversity.ac.id'
                 : '';
+
+
+            var formLevelEducationID = $('#formLevelEducationID').val();
+            var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
+
+            var formStatusLecturer = $('#formStatusLecturer').val();
+            var formStatusForlap = $('#formStatusForlap').val();
+
+
             var data = {
                 arr_Prodi : arr_Prodi,
                 action : 'addEmployees',
@@ -529,6 +581,8 @@
                     PositionMain : PositionMain,
                     ProdiID : formProgrammeStudy,
 
+                    LevelEducationID: formLevelEducationID,
+                    LecturerAcademicPositionID: formLecturerAcademicPositionID,
                     // CityID : formProgrammeStudy,
                     // ProvinceID : formProgrammeStudy,
 
@@ -552,6 +606,8 @@
                     PositionOther2 : PositionOther2,
                     PositionOther3 : PositionOther3,
                     StatusEmployeeID : formStatusEmployee,
+                    StatusLecturerID : formStatusLecturer,
+                    StatusForlap : formStatusForlap,
                     Status : '-1'
                 }
             };

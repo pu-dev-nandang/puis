@@ -76,6 +76,16 @@
             '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
             '</td>' +
             '</tr>' +
+            '<tr>' +
+            '   <td colspan="2"></td>' +
+            '   <td>' +
+            '        <div class="checkbox">' +
+            '    <label>' +
+            '      <input type="checkbox" id="formYudisium" value="1"> For Yudisium Filter ' +
+            '    </label>' +
+            '  </div>' +
+            '   </td>' +
+            '</tr>' +
             '</table>' +
             '</div>');
 
@@ -99,6 +109,9 @@
             var valueMK = data[0];
 
             $('#GlobalModal .modal-header').html('<h4 class="modal-title">Mata Kuliah</h4>');
+
+
+            var sc_yudisium = (valueMK.Yudisium=='1') ? 'checked' : '';
 
             $('#GlobalModal .modal-body').html('<div class="row">' +
                 '<table class="table">' +
@@ -130,6 +143,16 @@
                 '<td>' +
                 '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
                 '</td>' +
+                '</tr>' +
+                '<tr>' +
+                '   <td colspan="2"></td>' +
+                '   <td>' +
+                '        <div class="checkbox">' +
+                '    <label>' +
+                '      <input type="checkbox" class="form-mk" id="formYudisium" value="1" '+sc_yudisium+'> For Yudisium Filter ' +
+                '    </label>' +
+                '  </div>' +
+                '   </td>' +
                 '</tr>' +
                 '</table>' +
                 '</div>');
@@ -194,6 +217,7 @@
                             NameEng : NameEng,
                             BaseProdiID : prodi[0].trim(),
                             TypeMK : formTypeMK,
+                            Yudisium : ($('#formYudisium').is(':checked')) ? '1' : '0',
                             UpdateBy : sessionNIP,
                             UpdateAt : dateTimeNow()
                         }
