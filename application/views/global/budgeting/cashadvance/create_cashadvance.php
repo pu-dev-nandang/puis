@@ -532,7 +532,7 @@
 		var btn_approve = '';
 		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
 		var btn_reject = '';
-		var btn_print = '';
+		var btn_print = '<button class="btn btn-default print_page_realisasi" ID_payment = "'+ClassDt.ID_payment+'"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -2456,6 +2456,20 @@
 		{
 			toastr.info('Realisasi telah approve tidak bisa edit');
 		}	
+	})
+
+	$(document).off('click', '.print_page_realisasi').on('click', '.print_page_realisasi',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var url = base_url_js+'save2pdf/print/payment_user_realisasi';
+		var data = {
+		  ID_payment : ID_payment,
+		  DataPayment : ClassDt.DtExisting,
+		}
+		// console.log(data);return;
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
 	})
 
 </script>

@@ -867,7 +867,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $FontIsianHeader = 10;
         $FontIsian = 10;
         $h = 10;
-        $fpdf->SetFont('Arial','B',10);
+        $fpdf->SetFont('Arial','B',12);
         $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
         $y += 15;
         $fpdf->SetXY($x,$y);
@@ -895,6 +895,7 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->Cell(50,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 'TB', 1, 'L', 0);
          $y += 15;
          $fpdf->SetXY($x,$y);
+         $h = 5;
          $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
          $fpdf->SetX(15);
          $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : (pilih salah satu)', 0, 1, 'L', 0);
@@ -1027,6 +1028,195 @@ class C_save_to_pdf3 extends CI_Controller {
     }
 
     public function GeneratePDFCashAdvance()
+    {
+        $this->load->model('budgeting/m_global');
+        $token = $this->input->post('token');
+        $input = $this->getInputToken($token);
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['dt_arr'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['dtspb'];
+
+        $Dataselected = $input['Dataselected'];
+        $Dataselected = json_decode(json_encode($Dataselected),true);
+        
+        $po_data = $input['po_data']; 
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+
+        $filename = '__'.$ID_payment.'.pdf'; 
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
+        $fpdf->SetFont('Arial','B',12);
+        $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'YAYASAN PENDIDIKAN AGUNG PODOMORO / YPAP', 0, 1, 'L', 0);
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'CASH ADVANCE FORM', 0, 1, 'C', 0);
+        $y += 5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Mohon dapat diberikan bank advance dengan perincian sebagai berikut:', 0, 1, 'L', 0);
+        $fpdf->Cell(0,$h, '1.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 0, 1, 'L', 0);
+        $fpdf->SetX($x);
+        $fpdf->Cell(0,$h, '2.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Perincian biaya : ', 0, 0, 'L', 0);
+        $fpdf->SetX(60);
+        $fpdf->Cell(0,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 0, 1, 'L', 0);
+        $y += 35;
+        $fpdf->SetXY(15,$y);
+        $fpdf->Cell(0,$h, 'Jumlah', 0, 0, 'L', 0);
+         $fpdf->SetX(60);
+         $fpdf->Cell(50,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 'TB', 1, 'L', 0);
+         $y += 15;
+         $fpdf->SetXY($x,$y);
+         $h = 5;
+         $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : (pilih salah satu)', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Cash') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Tunai', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Transfer') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Transfer', 0, 1, 'L', 0);
+         $No_Rekening = '...............................................................................';
+         $Name_Penerima = '...............................................................................';
+         $Nama_Bank = '...............................................................................';
+         if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
+             $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
+             $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
+             $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
+             $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
+             $Nama_Bank = $G_bank[0]['Name'];
+         }
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Ke rekening : ', 0, 1, 'L', 0);
+         $h = 5;
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Nama penerima : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Name_Penerima, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Bank : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Nama_Bank, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'No rekening: : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$No_Rekening, 0, 1, 'L', 0);
+         $h = 10;
+         $y = $fpdf->GetY()+ 5;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(50,$h,'4.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(60,$h, 'Dibutuhkan pada tanggal:', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h, $this->getDateIndonesian($dtspb[0]['Detail'][0]['Date_Needed']), 0, 0, 'L', 0);
+        
+
+        $JsonStatus = $dtspb[0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+
+        $y = $fpdf->GetY()+20;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function GeneratePDFCashAdvance_old()
     {
         $this->load->model('budgeting/m_global');
         $token = $this->input->post('token');
@@ -1613,7 +1803,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $FontIsianHeader = 10;
         $FontIsian = 10;
         $h = 10;
-        $fpdf->SetFont('Arial','B',10);
+        $fpdf->SetFont('Arial','B',12);
         $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
         $y += 15;
         $fpdf->SetXY($x,$y);
@@ -1661,7 +1851,7 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(0,$h, 'Jumlah', 0, 0, 'L', 0);
          $fpdf->SetX($w_dibayar+$w_JumlahRupiah+10);
          $fpdf->Cell(50,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 'TB', 1, 'L', 0);
-
+         $h = 5;
          $y = $fpdf->GetY()+5;
          $fpdf->SetXY($x,$y);
          $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
@@ -1813,6 +2003,206 @@ class C_save_to_pdf3 extends CI_Controller {
         $FontIsianHeader = 10;
         $FontIsian = 10;
         $h = 10;
+        $fpdf->SetFont('Arial','B',12);
+        $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'YAYASAN PENDIDIKAN AGUNG PODOMORO / YPAP', 0, 1, 'L', 0);
+        $y += 15;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,0, 'CASH ADVANCE FORM', 0, 1, 'C', 0);
+        $y += 5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Mohon dapat diberikan bank advance dengan perincian sebagai berikut:', 0, 1, 'L', 0);
+        $fpdf->Cell(0,$h, '1.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 0, 1, 'L', 0);
+        $fpdf->SetX($x);
+        $fpdf->Cell(0,$h, '2.', 0, 0, 'L', 0);
+        $fpdf->SetX(15);
+        $fpdf->Cell(0,$h, 'Perincian biaya : ', 0, 0, 'L', 0);
+        $fpdf->SetX(60);
+        // buat table
+        $w_dibayar = 60;
+        $w_JumlahRupiah = 50;
+        $border = 1;
+        $h=6;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->SetWidths(array($w_dibayar,$w_JumlahRupiah));
+        $fpdf->SetLineHeight(6);
+        $fpdf->SetAligns(array('C','L','C'));
+        $total = $dtspb[0]['Detail'][0]['Invoice'];
+        $arr_DetailItem = $dtspb[0]['Detail'][0]['Detail'];
+        $no = 1;
+        for ($i=0; $i < count($arr_DetailItem); $i++) {
+           $dibayar = $arr_DetailItem[$i]['NamaBiaya'];
+           $JumlahRupiah = 'Rp '.number_format($arr_DetailItem[$i]['Invoice'],2,',','.');
+           $fpdf->Row(array(
+              $dibayar,
+              $JumlahRupiah,
+           ));
+           $fpdf->SetX(60);
+           $no++;
+        }
+
+        $y = $fpdf->GetY()+5;
+        $fpdf->SetXY(15,$y);
+        $fpdf->Cell(0,$h, 'Jumlah', 0, 0, 'L', 0);
+         $fpdf->SetX($w_dibayar+$w_JumlahRupiah+10);
+         $fpdf->Cell(50,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 'TB', 1, 'L', 0);
+         $h = 5;
+         $y = $fpdf->GetY()+5;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : (pilih salah satu)', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Cash') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Tunai', 0, 1, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Transfer') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Transfer', 0, 1, 'L', 0);
+         $No_Rekening = '...............................................................................';
+         $Name_Penerima = '...............................................................................';
+         $Nama_Bank = '...............................................................................';
+         if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
+             $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
+             $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
+             $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
+             $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
+             $Nama_Bank = $G_bank[0]['Name'];
+         }
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Ke rekening : ', 0, 1, 'L', 0);
+         $h = 5;
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Nama penerima : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Name_Penerima, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'Bank : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$Nama_Bank, 0, 1, 'L', 0);
+
+         $fpdf->SetX(25);
+         $fpdf->Cell(50,$h,'No rekening: : ', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h,$No_Rekening, 0, 1, 'L', 0);
+         $h = 10;
+         $y = $fpdf->GetY()+ 5;
+         $fpdf->SetXY($x,$y);
+         $fpdf->Cell(50,$h,'4.', 0, 0, 'L', 0);
+         $fpdf->SetX(15);
+         $fpdf->Cell(60,$h, 'Dibutuhkan pada tanggal:', 0, 0, 'L', 0);
+         $fpdf->Cell(50,$h, $this->getDateIndonesian($dtspb[0]['Detail'][0]['Date_Needed']), 0, 0, 'L', 0);
+        
+
+        $JsonStatus = $dtspb[0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+        $y = $fpdf->GetY()+20;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function PdfCA_User_old($input)
+    {
+        $this->load->model('budgeting/m_global');
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['DataPayment'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['payment'];
+        $filename = '__'.$ID_payment.'.pdf'; 
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
 
         $y += 15;
         $fpdf->SetFont('Arial','B',10);
@@ -1875,6 +2265,338 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->Cell(150,5, 'Jakarta, '.$this->getDateIndonesian($dtspb[0]['CreatedAt']), 0, 1, 'L', 0);
 
         $JsonStatus = $dtspb[0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function pre_pembayaran_realisasi_po()
+    {
+        $this->load->model('budgeting/m_global');
+        $token = $this->input->post('token');
+        $input = $this->getInputToken($token);
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['dt_arr'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['dtspb'];
+        // print_r($dtspb);die();
+
+        $Dataselected = $input['Dataselected'];
+        $Dataselected = json_decode(json_encode($Dataselected),true);
+        
+        $po_data = $input['po_data']; 
+        $po_data = json_decode(json_encode($po_data),true);
+        $po_create = $po_data['po_create'];
+
+        $filename = '__Realisasi_'.$ID_payment.'.pdf'; 
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
+
+        $y += 15;
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,$h, 'PENYELESAIAN UANG MUKA', 0, 1, 'C', 0);
+
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Penyelesaian Uang Muka atas biaya  : ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->Cell(0,$h, $dtspb[0]['Type'].' Pembelian ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','',10);
+        $fpdf->Cell(50,$h, 'Tanggal diterima uang muka', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->SetTextColor(255,0,0);
+        $fpdf->Cell(40,$h, $this->getDateIndonesian($dtspb[0]['FinanceAP'][0]['CreatedAt']), 0, 1, 'L', 0);
+        $fpdf->SetTextColor(0,0,0);
+        $fpdf->Cell(50,$h, 'Uang Muka yang diterima ', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->Cell(50,$h, 'Biaya ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(90,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 1, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->Cell(150,$h, 'Total biaya ', 0, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+
+        $y = $fpdf->getY()+10;
+        $fpdf->SetY($y);
+        $fpdf->Cell(150,5, 'Jakarta, '.$this->getDateIndonesian($dtspb[0]['Detail'][0]['Realisasi'][0]['Date_Realisasi']), 0, 1, 'L', 0);
+
+        $JsonStatus = $dtspb[0]['Detail'][0]['Realisasi'][0]['JsonStatus'];
+        $JsonStatus = json_decode($JsonStatus,true);
+        $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['NameTypeDesc'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $y = $fpdf->GetY()+25;
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $y = $fpdf->GetY();
+        $fpdf->SetXY($x,$y);
+        $w__ = 210 / count($JsonStatus);
+        $w__ = (int)$w__;
+        $c__ = 0;
+        for ($i=0; $i < count($JsonStatus); $i++) {
+           if ($JsonStatus[$i]['Visible'] == 'Yes') {
+               // Name
+               $a_ = $c__;
+               
+               if ( ($a_ + $w__)<= 210) {
+                   $w = $w__;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+                   $c__ += $w__;
+               }
+               else
+               {
+                   // sisa
+                   $w = 210 - $a_;
+                   $fpdf->Cell($w__,5,$JsonStatus[$i]['Name'],0,0,'L',0);
+               }
+
+           } 
+            
+        }
+
+        $fpdf->Output($filename,'I');
+    }
+
+    public function payment_user_realisasi()
+    {
+        $this->load->model('budgeting/m_global');
+        $token = $this->input->post('token');
+        $input = $this->getInputToken($token);
+        $ID_payment = $input['ID_payment'];
+        $dt_arr = $input['DataPayment'];
+        $dt_arr = json_decode(json_encode($dt_arr),true);
+        $dtspb = $dt_arr['payment'];
+        $filename = '__Realisasi_'.$ID_payment.'.pdf'; 
+        
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 15;
+        $FontIsianHeader = 10;
+        $FontIsian = 10;
+        $h = 10;
+
+        $y += 15;
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(0,$h, 'PENYELESAIAN UANG MUKA', 0, 1, 'C', 0);
+
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->Cell(0,$h, 'Penyelesaian Uang Muka atas biaya  : ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','B',10);
+        $fpdf->Cell(0,$h, $dtspb[0]['Type'].' Pembelian ', 0, 1, 'L', 0);
+        $fpdf->SetFont('Arial','',10);
+        $fpdf->Cell(50,$h, 'Tanggal diterima uang muka', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->SetTextColor(255,0,0);
+        $fpdf->Cell(40,$h, $this->getDateIndonesian($dtspb[0]['FinanceAP'][0]['CreatedAt']), 0, 1, 'L', 0);
+        $fpdf->SetTextColor(0,0,0);
+        $fpdf->Cell(50,$h, 'Uang Muka yang diterima ', 0, 0, 'L', 0);
+        $fpdf->Cell(100,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        $y = $fpdf->getY()+5;
+        $fpdf->SetY($y);
+        $fpdf->Cell(50,$h, 'Biaya ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+
+
+        // $fpdf->Cell(90,$h, 'Kegiatan : '.$dtspb[0]['Detail'][0]['Perihal'], 1, 0, 'L', 0);
+        // $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        // $y = $fpdf->getY()+5;
+        // $fpdf->SetY($y);
+        // $fpdf->Cell(150,$h, 'Total biaya ', 0, 0, 'L', 0);
+        // $fpdf->Cell(40,$h, 'Rp '.number_format($dtspb[0]['Detail'][0]['Invoice'],2,',','.'), 1, 1, 'L', 0);
+        // buat table
+        $w_dibayar = 60;
+        $w_JumlahRupiah = 50;
+        $border = 1;
+        $h=6;
+        $fpdf->SetFont('Arial','',$FontIsian);
+        $fpdf->SetWidths(array($w_dibayar,$w_JumlahRupiah));
+        $fpdf->SetLineHeight(6);
+        $fpdf->SetAligns(array('C','L','C'));
+        $total = $dtspb[0]['Detail'][0]['Invoice'];
+        $arr_DetailItem = $dtspb[0]['Detail'][0]['Detail'];
+        $no = 1;
+        $totRealisasi = 0;
+        for ($i=0; $i < count($arr_DetailItem); $i++) {
+           $dibayar = $arr_DetailItem[$i]['NamaBiaya'];
+           $totRealisasi += $arr_DetailItem[$i]['Realisasi'][0]['InvoiceRealisasi'];
+           $JumlahRupiah = 'Rp '.number_format($arr_DetailItem[$i]['Realisasi'][0]['InvoiceRealisasi'],2,',','.');
+           $fpdf->Row(array(
+              $dibayar,
+              $JumlahRupiah,
+           ));
+           $fpdf->SetX(70);
+           $no++;
+        }
+
+        $y = $fpdf->GetY()+5;
+        $fpdf->SetXY(10,$y);
+        $fpdf->Cell(0,$h, 'Jumlah', 0, 0, 'L', 0);
+        $fpdf->SetX($w_dibayar+$w_JumlahRupiah+20);
+        $fpdf->Cell(50,$h, 'Rp '.number_format($totRealisasi,2,',','.'), 'TB', 1, 'L', 0);
+
+        // sisa
+        $y = $fpdf->GetY()+5;
+        $fpdf->SetXY(10,$y);
+        $TotalInvoice = $dtspb[0]['Detail'][0]['Invoice'];
+        $absInvoice = abs($TotalInvoice - $totRealisasi);
+        $fpdf->Cell(0,$h, 'Lebih / Kurang', 0, 0, 'L', 0);
+        $fpdf->SetX($w_dibayar+$w_JumlahRupiah+20);
+        $fpdf->Cell(50,$h, 'Rp '.number_format($absInvoice,2,',','.'), 'TB', 1, 'L', 0);
+
+        $y = $fpdf->getY()+10;
+        $fpdf->SetY($y);
+        $fpdf->Cell(150,5, 'Jakarta, '.$this->getDateIndonesian($dtspb[0]['Detail'][0]['Realisasi'][0]['Date_Realisasi']), 0, 1, 'L', 0);
+
+        $JsonStatus = $dtspb[0]['Detail'][0]['Realisasi'][0]['JsonStatus'];
         $JsonStatus = json_decode($JsonStatus,true);
         $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
         $w__ = 210 / count($JsonStatus);
