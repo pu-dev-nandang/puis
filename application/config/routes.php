@@ -1584,6 +1584,7 @@ foreach( $result as $row )
 $route['purchasing/page/catalog/InputCategory'] = 'page/purchasing/c_master/InputCategory';
 $route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
 
+$route['purchasing/SaveFormType'] = 'page/purchasing/c_master/SaveFormType';
 $route['purchasing/page/catalog/FormInputCategory'] = 'page/purchasing/c_master/InputCategory_FormInput';
 $route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
 
@@ -1703,7 +1704,7 @@ $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchang
 
 
 // help
-$route['help'] =  'dashboard/C_dashboard/Help';
+$route['help'] =  'dashboard/C_dashboard/Helcrm/marketing-activityp';
 
 
 // request document
