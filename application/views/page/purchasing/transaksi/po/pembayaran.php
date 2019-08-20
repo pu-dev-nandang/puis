@@ -593,8 +593,8 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "">'+
+								'<div class="input-group input-append date datetimepicker2" style= "width:50%;">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+
 							'</td>	'+			
@@ -2352,7 +2352,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+								'<div class="input-group input-append date datetimepicker2" style= "width:50%;">'+
 		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+dtspb[0].Detail[0]['Datee']+'">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+

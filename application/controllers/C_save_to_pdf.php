@@ -5662,9 +5662,9 @@ Phone: (021) 29200456';
              $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
              $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
 
-             $maxWrec = 130;
+             $maxWrec = 210;
              $Wrec = $maxWrec - ( (count($JsonStatus)) * 5 );
-             $fpdf->Rect($x,$y,$Wrec,$rect_h);
+             $fpdf->Rect($x,$y,$Wrec,15);
              $fpdf->SetXY(($x+2),($y+2) );
              $fpdf->SetFont('Arial','b',$FontIsianHeader);
              $fpdf->Cell(0, 0, 'Notes : ', 0, 0, 'L', 0);
@@ -5674,9 +5674,10 @@ Phone: (021) 29200456';
              $fpdf->MultiCell(($Wrec - 10), 3, $pr_create[0]['Notes'], 0, 1, 'L', 0);
 
              // signature
-             $x = $Wrec + 20;
+             $y = $fpdf->getY()+10;
+             // $x = $Wrec + 20;
              $w_requested = 20;
-             $w_approved = 30;
+             $w_approved = 35;
              $h_signature = 15;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','',$FontIsian);
@@ -5731,16 +5732,16 @@ Phone: (021) 29200456';
 
 
              // watermark
-                if ($pr_create[0]['Status'] ==  2) {
-                    $fpdf->SetFont('Arial','B',50);
-                    $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Approve',35);  
-                }
-                elseif ($pr_create[0]['Status'] ==  3) {
-                    $fpdf->SetFont('Arial','B',50);
-                    $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Reject',35); 
-                }
+                // if ($pr_create[0]['Status'] ==  2) {
+                //     $fpdf->SetFont('Arial','B',50);
+                //     $fpdf->SetTextColor(255,192,203);
+                //     $fpdf->RotatedText(35,190,'Approve',35);  
+                // }
+                // elseif ($pr_create[0]['Status'] ==  3) {
+                //     $fpdf->SetFont('Arial','B',50);
+                //     $fpdf->SetTextColor(255,192,203);
+                //     $fpdf->RotatedText(35,190,'Reject',35); 
+                // }
                  
                
 

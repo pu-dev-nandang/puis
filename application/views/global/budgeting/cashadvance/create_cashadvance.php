@@ -206,7 +206,7 @@
 							'</div>'+
 							'<div class="input-group" style = "width:350px;margin-top:10px;">'+
 								'<span class="input-group-btn">'+
-									'Tanggal : &nbsp'+
+									'Date Needed : &nbsp'+
 								'</span>'+
 								'<div class="input-group input-append date datetimepicker">'+
 		                            '<input data-format="yyyy-MM-dd" class="form-control Date_Needed" type=" text" readonly="" value = "'+''+'">'+
@@ -460,7 +460,7 @@
 										'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+NoTandaTerima+'" '+Dis+'>'+
 										'<br>'+
 										'<label style="color: red">Upload Tanda Terima</label>'+
-										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf" '+Dis+'>'+
 										'<div id = "FileTT" '+Dis+'>'+
 										LinkUploadTandaTerima+
 										'</div>'+

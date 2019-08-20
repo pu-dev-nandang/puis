@@ -245,7 +245,11 @@
 				}
 			}
 		}
-
+		var TDGRPO = '-';
+		var Good_Receipt = dtspb[0].Good_Receipt;
+		if (Good_Receipt.length > 0) {
+			TDGRPO = '<button class = "btn btn-primary ShowGRPOMODAL" id_payment = "'+dtspb[0].ID+'">Show GRPO</button>';
+		}	
 		html += htmlAdd+'<div class = "row"><div class="col-xs-12 page_status"></div><div class = "col-xs-12"><div align="center"><h2>BANK ADVANCE FORM</h2></div>'+
 					'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
 					'<label>Mohon dapat diberikan Bank Advance dengan perincian sebagai berikut:</label>'+
@@ -332,6 +336,11 @@
 		                		'</div>'+
 							'</td>	'+			
 						'</tr>'+
+						'<tr>'+
+							'<td class = "TD1"><label>GRPO</label></td>'+
+							'<td>:</td>'+
+							'<td>'+TDGRPO+'</td>'+
+						'</tr>'+
 					'</tbody>'+
 					'</table>'+
 					'<div id="r_signatures"></div>'+
@@ -367,6 +376,103 @@
 			makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 		}			
 
+	}
+
+	$(document).off('click', '.ShowGRPOMODAL').on('click', '.ShowGRPOMODAL',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var DataPaymentSelected = ClassDt.DataPaymentSelected;
+		var dtspb = DataPaymentSelected.dtspb;
+		var dtgood_receipt_spb = dtspb[0].Good_Receipt;
+		var html = '';
+		for (var i = 0; i < dtgood_receipt_spb.length; i++) {
+			var FileDocument = jQuery.parseJSON(dtgood_receipt_spb[i]['FileDocument']);
+			FileDocument = FileDocument[0];
+			var FileTandaTerima = jQuery.parseJSON(dtgood_receipt_spb[i]['FileTandaTerima']);
+			FileTandaTerima = FileTandaTerima[0];
+			var dtgood_receipt_detail = dtgood_receipt_spb[i].Detail;
+			var OPPo_detail_edit = '';
+			for (var j = 0; j < dtgood_receipt_detail.length; j++) {
+				OPPo_detail_edit += OPPo_detail(dtgood_receipt_detail[j].ID_po_detail,[],dtgood_receipt_detail[j].QtyDiterima,'disabled');
+			}
+
+				html += '<div class = "row"><div class = "col-xs-12"><div align="center"><h2>Good Receipt PO </h2></div>'+
+						'<hr style="height:2px;border:none;color:#333;background-color:#333;margin-top: -3px;">'+
+						'<br>'+
+						'<div id = "page_po_item">'+
+							OPPo_detail_edit+
+						'</div>'+
+						'<br>'+
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">No Document</label>'+	
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+												'</div>'+
+										'</div>'+
+						'</div>'+				
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">No Tanda Terima</label>'	+
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...." value="'+dtgood_receipt_spb[i]['NoTandaTerima']+'" disabled>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
+												'</a>'+
+												'</div>'+
+										'</div>'+
+						'</div>'+
+						'<div class = "form-horizontal" style="margin-top:5px;">'+
+										'<div class="form-group">'+
+											'<label class = "col-sm-2">Tanggal</label>'	+
+												'<div class="col-sm-4">'+'<div class="input-group input-append date datetimepicker">'+
+			                            '<input data-format="yyyy-MM-dd" class="form-control TglGRPO" type=" text" readonly="" value="'+dtgood_receipt_spb[i]['Date']+'" disabled>'+
+			                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
+			                		'</div></div>'+
+						'</div>'+
+					'</div></div></div>';
+		}
+
+		var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+		    '';
+		$('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Info GRPO</h4>');
+		$('#GlobalModalLarge .modal-body').html(html);
+		$('#GlobalModalLarge .modal-footer').html(footer);
+		$('#GlobalModalLarge').modal({
+		    'show' : true,
+		    'backdrop' : 'static'
+		});
+	})
+
+	function OPPo_detail(IDselected = null,arr_IDPass=[],value_qty=0,action_btn='')
+	{
+		var h = '';
+		var po_data = ClassDt.po_data;
+		var po_detail= po_data.po_detail;
+		h = '<div class = "form-horizontal GroupingItem" style="margin-top:15px;">'+
+				'<div class="form-group">'+
+					'<label class = "col-sm-2">Item</label>'
+			;
+		h += '<div class="col-sm-6"><select class = " form-control Item" '+action_btn+'>'+
+				'<option value = "" disabled selected>--Pilih Item--</option>';
+			for (var i = 0; i < po_detail.length; i++) {
+				var bool = true;
+				for (var k = 0; k < arr_IDPass.length; k++) {
+					if (po_detail[i].ID_po_detail ==arr_IDPass[k] ) {
+						bool = false;
+						break;
+					}
+				}
+				if (bool) {
+					// get qty left
+
+					var selected = (IDselected == po_detail[i].ID_po_detail) ? 'selected' : '';
+					h += '<option value = "'+po_detail[i].ID_po_detail+'" '+selected+' qtypr="'+po_detail[i].QtyPR+'">'+po_detail[i].Item+'</option>';
+				}
+				
+			}
+		h += '</select></div>';	
+
+		h += '<div class="col-sm-2"><input type="text" class="form-control QtyDiterima" value="'+value_qty+'" '+action_btn+'></div>';
+		h += '</div></div>';
+		return h;
 	}
 
 	function makePagerealisasi(DataPaymentSelected,DivPageRealisasi)
@@ -446,7 +552,7 @@
 										'<input type = "text" class = "form-control NoTT" placeholder = "Input No Tanda Terima...." value="'+NoTandaTerima+'" '+Dis+'>'+
 										'<br>'+
 										'<label style="color: red">Upload Tanda Terima</label>'+
-										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf">'+
+										'<input type="file" data-style="fileinput" class="BrowseTT" id="BrowseTT" accept="image/*,application/pdf" '+Dis+'>'+
 										'<div id = "FileTT" '+Dis+'>'+
 										LinkUploadTandaTerima+
 										'</div>'+

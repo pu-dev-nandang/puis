@@ -204,7 +204,7 @@
 			var Supplier_ = '';
 			var NoInvoice = '';
 			var NoTandaTerima = '';
-			var Datee = '';
+			var Datee = '<?php echo date('Y-m-d') ?>';
 			var Perihal = '';
 			var ID_bank = '';
 			var NoRekening = '';
@@ -443,9 +443,9 @@
 					'</div></div></div>';
 			se_content.html(html);			
 
-			se_content.find('.datetimepicker').datetimepicker({
-				format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
-			});
+			// se_content.find('.datetimepicker').datetimepicker({
+			// 	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+			// });
 
 			if (ClassDt.ID_payment =='') {
 				se_content.find('.dtbank[tabindex!="-1"]').select2({
