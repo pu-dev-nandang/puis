@@ -441,7 +441,7 @@ class C_employees extends HR_Controler {
 
 
             }
-    } 
+    }
 
 
     public function upload_ijazah(){
@@ -472,7 +472,41 @@ class C_employees extends HR_Controler {
             return print_r(json_encode($success));
         }
 
+    }
 
+    public function upload_certificate(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $ID = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/certificate/';
+        $config['allowed_types']        = 'pdf';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!=''  && is_file('./uploads/certificate/'.$old)){
+            unlink('./uploads/certificate/'.$old);
+        }
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            // Update DB
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.employees_certificate',array(
+                'File' => $fileName
+            ));
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
 
     }
 

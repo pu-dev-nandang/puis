@@ -374,7 +374,23 @@ class C_global extends CI_Controller {
 
         // }
 
+        // $this->db_server22 = $this->load->database('server22', TRUE);
+        // $sql = 'select *,SUBSTRING(member_id,3,2) as angkatan from library.member where Year(register_date) = 2019 and member_type_id = 2 and SUBSTRING(member_id,3,2) = 19';
+        // $query=$this->db_server22->query($sql, array())->result_array();
+        // for ($i=0; $i < count($query); $i++) { 
+        //     $G_dt = $this->m_master->caribasedprimary('ta_2019.students','NPM',$query[$i]['member_id']);
+        //     $birth_date = $G_dt[0]['DateOfBirth'];
+        //     $member_address = $G_dt[0]['Address'];
+        //     $member_email = $G_dt[0]['Email'];
 
+        //     $datasave = array(
+        //         'birth_date' => $birth_date,
+        //         'member_address' => $member_address,
+        //         'member_email' => $member_email,
+        //     );
+        //     $this->db_server22->where('member_id',$query[$i]['member_id']);
+        //     $this->db_server22->update('library.member',$datasave);
+        // }
 
     }
 

@@ -2,7 +2,21 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 // print_r(md5('010101'));die();
 require_once( BASEPATH .'database/DB.php' );
-// $route['(:any)'] = 'c_login';
+$db =& DB();
+
+$dataMode = $db->get_where('db_it.m_config',array(
+    'ID' => 3
+))->result_array();
+
+if($dataMode[0]['MaintenanceMode']=='1'){
+    $s = '(:any)';
+    for ($i=1;$i<=10;$i++){
+        $route[$s] = 'dashboard/c_dashboard/maintenance';
+        $s = $s.'/(:any)';
+    }
+
+}
+
 
 $route['default_controller'] = 'c_login';
 $route['404_override'] = 'dashboard/c_dashboard/page404';
@@ -32,6 +46,9 @@ $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/
 
 $route['foto'] = 'auth/c_auth/foto';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
+
+$route['toStdPlanning/(:any)/(:any)'] = 'auth/c_auth/toStdPlanning/$1/$2';
+
 $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 
 
@@ -130,7 +147,12 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-$route['academic/final-project'] =  'page/academic/c_final_project';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+$route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
+$route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
+$route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';
+$route['academic/final-project/judiciums'] =  'page/academic/c_final_project/monitoring_yudisium';
 
 
 // --- Modal Academic ----
@@ -148,6 +170,7 @@ $route['human-resources/employees/input-employees'] = 'page/hr/c_employees/input
 $route['human-resources/employees/edit-employees/(:num)'] = 'page/hr/c_employees/edit_employees/$1';
 $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
+$route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certificate';
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
 
 // --- Modal Academic ---- ADD Bismar
@@ -157,6 +180,8 @@ $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
 // --- IT Version ---- ADD Bismar
 $route['it/version'] = 'page/it/c_it/version_data';
 $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
+$route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
+$route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
 
 
@@ -176,6 +201,8 @@ $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailRes
 
 $route['database/students'] = 'page/database/c_database/students';
 $route['database/students/(:num)'] = 'page/database/c_database/students/$1';
+$route['database/students-group'] = 'page/database/c_database/students_group';
+
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
 $route['database/employees'] = 'page/database/c_database/employees';
@@ -200,7 +227,7 @@ $route['academic/attendance/monitoring-all-student'] = 'page/academic/c_presensi
 $route['academic/attendance/monitoring-schedule-exchange'] = 'page/academic/c_presensi/monitoring_exchange';
 
 
-// -- master student -- 
+// -- master student --
 $route['academic/master/student'] = 'page/academic/c_m_student';
 $route['academic/master/showStudent'] = 'page/academic/c_m_student/showStudent';
 $route['academic/master/loadPageStudents'] = 'page/academic/c_m_student/loadPageStudents';
@@ -212,7 +239,6 @@ $route['academic/master/edit-student'] = 'page/academic/c_m_student/edit_student
 // --- Master ----
 
 // test routes from db
-$db =& DB();
 $query = $db->get('db_admission.cfg_sub_menu');
 $result = $query->result();
 foreach( $result as $row )
@@ -222,7 +248,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -230,7 +256,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -378,7 +404,7 @@ $route['autocompleteAllUser'] = 'api/c_global/autocompleteAllUser';
 $route['genrateBarcode/(:any)'] = 'api/c_global/genrateBarcode/$1';
 $route['getBarcodeExam'] = 'api/c_global/getBarcodeExam';
 
-//Surat Tugas Keluar 
+//Surat Tugas Keluar
 // $route['suratKeluar/(:any)'] = 'api/c_global/suratKeluar/$1';
 $route['requestsurat'] = 'api/c_global/getlistrequestdoc';
 $route['api/__getrequestnip'] = 'api/c_api/getdatarequestdocument';
@@ -638,6 +664,13 @@ $route['finance/config/policysys/submit'] =  'page/finance/c_config/policy_sys_s
 // -- report admission to finance
 $route['finance/report_admission/(:any)'] =  'page/finance/c_report/report_admission/$1';
 
+// Finance Yudisium
+$route['finance/monitoring-yudisium'] =  'page/finance/c_finance/monitoring_yudisium';
+
+
+$route['library/monitoring-yudisium'] =  'page/library/c_library/monitoring_yudisium';
+
+
 
 
 
@@ -714,6 +747,8 @@ $route['save2excel/student-recap'] =  'c_save_to_excel/student_recap';
 $route['api/__getKurikulumByYear'] = 'api/c_api/getKurikulumByYear';
 $route['api/__getBaseProdi'] = 'api/c_api/getProdi';
 $route['api/__getBaseProdiSelectOption'] = 'api/c_api/getProdiSelectOption';
+$route['api/__getLevelEducation'] = 'api/c_api/getLevelEducation';
+$route['api/__getLecturerAcademicPosition'] = 'api/c_api/getLecturerAcademicPosition';
 $route['api/__getBaseProdiSelectOptionAll'] = 'api/c_api/getProdiSelectOptionAll';
 $route['api/__geteducationLevel'] = 'api/c_api/geteducationLevel';
 
@@ -740,8 +775,8 @@ $route['api/__getEmployees'] = 'api/c_api/getEmployees';
 $route['api/employees/searchnip/(:any)'] = 'api/c_api/searchnip_employees/$1';
 
 $route['api/__getEmployeesHR'] = 'api/c_api/getEmployeesHR';
-$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar 
-$route['api/__delistacaemploy'] = 'api/c_api/delelelistacaemployee'; //add bismar 
+$route['api/__getfileEmployeesHR'] = 'api/c_api/getfileEmployees'; //add bismar
+$route['api/__delistacaemploy'] = 'api/c_api/delelelistacaemployee'; //add bismar
 
 
 $route['api/__setLecturersAvailability'] = 'api/c_api/setLecturersAvailability';
@@ -752,6 +787,7 @@ $route['api/__changeTahunAkademik'] = 'api/c_api/changeTahunAkademik';
 $route['api/__insertKurikulum'] = 'api/c_api/insertKurikulum';
 $route['api/__getKurikulumSelectOption'] = 'api/c_api/getKurikulumSelectOption';
 $route['api/__getKurikulumSelectOptionASC'] = 'api/c_api/getKurikulumSelectOptionASC';
+$route['api/__getStudentYear'] = 'api/c_api/getStudentYear';
 
 
 $route['api/__getDosenSelectOption'] = 'api/c_api/getDosenSelectOption';
@@ -1007,6 +1043,8 @@ $route['api/__getAgama'] = 'api/c_api/getAgama';
 $route['api/__getDivision'] = 'api/c_api/getDivision';
 $route['api/__getPosition'] = 'api/c_api/getPosition';
 $route['api/__getStatusEmployee'] = 'api/c_api/getStatusEmployee';
+$route['api/__getStatusEmployee2'] = 'api/c_api/getStatusEmployee2';
+$route['api/__getStatusLecturer2'] = 'api/c_api/getStatusLecturer2';
 $route['api/__getStatusVersion'] = 'api/c_api/getstatusversion';
 $route['api/__getStatusVersion2'] = 'api/c_api/getstatusversion2';
 $route['api/__getStatusModule'] = 'api/c_api/getstatusmodule';
@@ -1084,6 +1122,8 @@ $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';
 
 $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
+$route['api3/__crudqna'] = 'api/c_api3/crudqna';
+$route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 
 // Penutup API 2 ===
@@ -1092,7 +1132,7 @@ $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
 // for inject //
 
-//Venue Reservation // 
+//Venue Reservation //
 $route['loginToVenue'] = 'c_login/loginToVenue';
 $route['venue_reservation'] = 'page/vreservation/c_global';
 $query = $db->get('db_reservation.cfg_sub_menu');
@@ -1104,7 +1144,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1112,7 +1152,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1218,7 +1258,7 @@ $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
 $route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
-$route['api/__confirmrequest'] = 'api/c_api/confirm_requestdocument'; 
+$route['api/__confirmrequest'] = 'api/c_api/confirm_requestdocument';
 
 // test
 $route['testApprove'] = 'page/finance/c_finance/testApprove';
@@ -1259,6 +1299,19 @@ $route['agregator/seleksi-mahasiswa-baru'] = 'page/agregator/c_agregator/seleksi
 $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asing';
 
 $route['agregator/kecukupan-dosen'] = 'page/agregator/c_agregator/kecukupan_dosen';
+$route['agregator/jabatan-dosen-tetap'] = 'page/agregator/c_agregator/jabatan_dosen_tetap';
+$route['agregator/sertifikasi-dosen'] = 'page/agregator/c_agregator/sertifikasi_dosen';
+$route['agregator/dosen-tidak-tetap'] = 'page/agregator/c_agregator/dosen_tidak_tetap';
+$route['agregator/perolehan-dana'] = 'page/agregator/c_agregator/perolehan_dana';
+$route['agregator/penggunaan-dana'] = 'page/agregator/c_agregator/penggunaan_dana';
+
+$route['agregator/ipk'] = 'page/agregator/c_agregator/ipk';
+$route['agregator/prestasi-akademik-mahasiswa'] = 'page/agregator/c_agregator/prestasi_akademik_mahasiswa';
+$route['agregator/prestasi-non-akademik-mahasiswa'] = 'page/agregator/c_agregator/prestasi_non_akademik_mahasiswa';
+$route['agregator/lama-studi-mahasiswa'] = 'page/agregator/c_agregator/lama_studi_mahasiswa';
+$route['agregator/rasio-kelulusan'] = 'page/agregator/c_agregator/rasio_kelulusan';
+$route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
+$route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 
@@ -1270,6 +1323,26 @@ $route['api3/__crudExternalAccreditation'] = 'api/c_api3/crudExternalAccreditati
 $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalAccreditation';
 
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
+$route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
+$route['api3/__crudAgregatorTB4'] = 'api/c_api3/crudAgregatorTB4';
+$route['api3/__crudAgregatorTB5'] = 'api/c_api3/crudAgregatorTB5';
+$route['api3/__getKecukupanDosen'] = 'api/c_api3/getKecukupanDosen';
+$route['api3/__getJabatanAkademikDosenTetap'] = 'api/c_api3/getJabatanAkademikDosenTetap';
+$route['api3/__getJabatanAkademikDosenTidakTetap'] = 'api/c_api3/getJabatanAkademikDosenTidakTetap';
+$route['api3/__getLecturerCertificate'] = 'api/c_api3/getLecturerCertificate';
+$route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
+
+$route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
+
+$route['api3/__crudGroupStd'] = 'api/c_api3/crudGroupStd';
+
+$route['api3/__crudCheckDataKRS'] = 'api/c_api3/crudCheckDataKRS';
+
+$route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
+$route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
+
+$route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
+
 
 
 
@@ -1286,7 +1359,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1294,7 +1367,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1491,7 +1564,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1499,7 +1572,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1587,7 +1660,7 @@ foreach( $result as $row )
 	if (in_array('(:any)', $Slug)) {
 	   $a = count($Slug) - 1;
 	   $URI = '';
-	   for ($i=0; $i < $a; $i++) { 
+	   for ($i=0; $i < $a; $i++) {
 	   	$URI .= $Slug[$i].'/';
 	   }
 	   $route[ $URI.'(:any)' ] = $row->Controller;
@@ -1595,7 +1668,7 @@ foreach( $result as $row )
 	elseif(in_array('(:num)', $Slug)) {
 		$a = count($Slug) - 1;
 		$URI = '';
-		for ($i=0; $i < $a; $i++) { 
+		for ($i=0; $i < $a; $i++) {
 			$URI .= $Slug[$i].'/';
 		}
 		$route[ $URI.'(:num)' ] = $row->Controller;
@@ -1639,4 +1712,3 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
 
 $route['portal'] = 'c_login/portal';
-

@@ -532,4 +532,37 @@ class C_auth extends Globalclass {
     }
 
 
+    public function toStdPlanning($ta,$NIP){
+
+        $max_execution_time = 360;
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
+
+        $db = 'ta_'.$ta;
+
+        $dataSP = $this->db->order_by('SemesterID ASC, NPM ASC')->get($db.'.study_planning')->result_array();
+
+        if(count($dataSP)>0){
+            foreach ($dataSP AS $item){
+                $arr = array(
+                    'SPID' => $item['ID'],
+                    'ClassOf' => $ta,
+                    'SemesterID' => $item['SemesterID'],
+                    'NPM' => $item['NPM'],
+                    'ScheduleID' => $item['ScheduleID'],
+                    'TypeSchedule' => $item['TypeSchedule'],
+                    'CDID' => $item['CDID'],
+                    'MKID' => $item['MKID'],
+                    'Credit' => $item['Credit'],
+                    'EntredBy' => $NIP
+                );
+
+//                $this->db->insert('db_academic.std_study_planning',$arr);
+            }
+        }
+
+
+    }
+
+
 }

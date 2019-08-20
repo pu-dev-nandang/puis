@@ -2,7 +2,6 @@
 	<div class="panel panel-primary">
         <div class="panel-heading clearfix">
             <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Rule & Service User</h4>
-            <button onclick="testMobile()">Test Notive Mobile</button>
         </div>
         <div class="panel-body">
             <div class="tabbable tabbable-custom tabbable-full-width btn-read setRuleService">

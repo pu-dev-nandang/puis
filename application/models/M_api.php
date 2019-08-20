@@ -226,7 +226,7 @@ class M_api extends CI_Model {
     }
 
     public function __getDosenSelectOption(){
-        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE StatusEmployeeID != -2 AND
+        $data = $this->db->query('SELECT ID,NIP,NIDN,Name FROM db_employees.employees WHERE StatusEmployeeID != -1 AND StatusEmployeeID != -2 AND
                                                                     (PositionMain = "14.5" 
                                                                     OR PositionMain = "14.6" 
                                                                     OR PositionMain = "14.7"

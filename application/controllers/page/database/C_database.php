@@ -222,6 +222,12 @@ class C_database extends Globalclass {
         $this->temp($content);
     }
 
+    public function students_group()
+    {
+        $content = $this->load->view('page/database/students/students_group','',true);
+        $this->temp($content);
+    }
+
     public function edit_students($DB_Student,$NPM,$Name){
 
         $data['DB_Student'] = $DB_Student;

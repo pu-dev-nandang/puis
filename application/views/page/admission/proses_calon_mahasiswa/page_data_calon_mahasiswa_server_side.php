@@ -25,7 +25,7 @@
                          </ul>
                          <br>
                          <div class="thumbnail" style="padding: 10px;">
-                             <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off 
+                             <b>Status : </b><i class="fa fa-circle" style="color:#8ED6EA;"></i> Paid Off
                          </div>
                          <br>
                          <div class="row">
@@ -35,17 +35,17 @@
                                   <option></option>
                               </select>
                             </div>
-                          </div>  
+                          </div>
                          <br>
                          <div class = "row">
                           <div class = "col-md-12">
                             <div class = "table-responsive">
                                 <div id="dataPageLoad" style="margin-top:0px;">
-                                    
+
                                 </div>
                             </div>
                           </div>
-                        </div>    
+                        </div>
                         <!-- <div  class="col-md-12" align="right" id="pagination_link"></div> -->
                     </div>
                 </div>
@@ -60,7 +60,7 @@
 
     function loadTahun()
     {
-        var academic_year_admission = "<?php echo $academic_year_admission ?>"; 
+        var academic_year_admission = "<?php echo $academic_year_admission ?>";
         var thisYear = (new Date()).getFullYear();
         var startTahun = parseInt(thisYear);
         var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
@@ -104,7 +104,7 @@
     });
 
     function loadPage(page) {
-        $("#dataPageLoad").empty(); 
+        $("#dataPageLoad").empty();
         var res = page.split("/");
         switch(res[0]) {
             case 'data-calon-mhs':
@@ -207,9 +207,9 @@
                                 '</div>'+
                                 '<div class = "col-md-3"> <br>'+
                                       '<button class = "btn btn-success btn-edit" id = "generateToBEMhs">Generate</button>'+
-                                '</div>'+  
+                                '</div>'+
                               '</div>'+
-                            '</div>'+  
+                            '</div>'+
                         '</div>';
                 //$("#loadtableNow").empty();
                 $("#dataPageLoad").html(table);
@@ -271,9 +271,9 @@
                           {
                             checkboxArr.push(this.value);
                           }
-                          
+
                        }
-                        
+
                      });
 
                      if (checkboxArr.length > 0) {
@@ -335,16 +335,16 @@
                          toastr.error("Silahkan checked dahulu", 'Failed!!');
                      }
 
-                }) // exit click function    
-
-                loadSelectOptionSemester('#selectSemester',0);
+                }) // exit click function
+                var academic_year_admission = "<?php echo $academic_year_admission ?>";
+                loadSelectOptionSemester_admission('#selectSemester',academic_year_admission);
                 pageHtml = 'to-be-mhs';
 
-                break;    
+                break;
             default:
                 'code block'
         }
-        
+
     }
 
     $(document).on('click','.btn-payment', function () {
@@ -360,8 +360,8 @@
                               '<th style="width: 55px;">Status</th>'+
                               '<th style="width: 55px;">Deadline</th>'+
                               '<th style="width: 55px;">UpdateAt</th>';
-        table += '</tr>' ;  
-        table += '</thead>' ; 
+        table += '</tr>' ;
+        table += '</thead>' ;
         table += '<tbody>' ;
 
         var url = base_url_js+'finance/getPayment_detail_admission';
@@ -371,7 +371,7 @@
         var token = jwt_encode(data,'UAP)(*');
         $.post(url,{token:token},function (resultJson) {
            var DetailPaymentArr = jQuery.parseJSON(resultJson);
-           
+
            var isi = '';
            for (var j = 0; j < DetailPaymentArr.length; j++) {
              var yy = (DetailPaymentArr[j]['Invoice'] != '') ? formatRupiah(DetailPaymentArr[j]['Invoice']) : '-';
@@ -384,10 +384,10 @@
                    '<td>'+ status + '</td>'+
                    '<td>'+ DetailPaymentArr[j]['Deadline'] + '</td>'+
                    '<td>'+ DetailPaymentArr[j]['UpdateAt'] + '</td>'+
-                 '<tr>'; 
+                 '<tr>';
            }
 
-           table += isi+'</tbody>' ; 
+           table += isi+'</tbody>' ;
            table += '</table>' ;
 
            html += table;
@@ -401,10 +401,10 @@
            $('#GlobalModalLarge').modal({
                'show' : true,
                'backdrop' : 'static'
-           });   
+           });
 
         }).fail(function() {
-          toastr.info('No Action...'); 
+          toastr.info('No Action...');
           // toastr.error('The Database connection error, please try again', 'Failed!!');
         }).always(function() {
 
@@ -436,9 +436,9 @@
                     '<th style="width: 55px;">Required</th>'+
                     '<th style="width: 55px;">Attachment</th>'+
                     '<th style="width: 55px;">Status</th>';
-              
-            table += '</tr>' ;  
-            table += '</thead>' ; 
+
+            table += '</tr>' ;
+            table += '</thead>' ;
             table += '<tbody>' ;
             for (var i =0; i < doc.length; i++) {
               table += '<tr>'+
@@ -448,10 +448,10 @@
                           // '<td>'+'<a href = "<?php echo url_registration ?>document/'+Email+'/'+json[i]['Attachment']+'" target="_blank">File</a></td>'+
                           '<td>'+'<a href="javascript:void(0)" class="show_a_href" id = "show'+Email+'" filee = "'+doc[i]['Attachment']+'" Email = "'+Email+'">File</a></td>'+
                           '<td>'+doc[i]['Status'] +'</td>'
-                          ; 
+                          ;
             }
-             
-            table += '</tbody>' ; 
+
+            table += '</tbody>' ;
             table += '</table>' ;
             html += table;
             html += '</div></div>'; // end document
@@ -469,10 +469,10 @@
                                               '<th style="width: 55px;">Exam Name</th>'+
                                               '<th style="width: 55px;">Bobot</th>'+
                                               '<th style="width: 55px;">Value</th>';
-              html += '</tr>' ;  
-              html += '</thead>' ; 
+              html += '</tr>' ;
+              html += '</thead>' ;
               html += '<tbody>' ;
-              
+
               var jmlbobot = 0;
               var Nilai_bobot = 0;
               var nilai = 0;
@@ -481,15 +481,15 @@
                             '<td>'+ (i+1)+'</td>'+
                             '<td>'+ujian[i]['NamaUjian'] +'</td>'+
                             '<td>'+ujian[i]['Bobot'] +'</td>'+
-                            '<td>'+ujian[i]['Value'] +'</td>'; 
+                            '<td>'+ujian[i]['Value'] +'</td>';
 
                 jmlbobot = parseInt(jmlbobot)  + parseInt(ujian[i]['Bobot']);
                 Nilai_bobot = parseInt(Nilai_bobot) + ( (parseInt(ujian[i]['Value']) * parseInt(ujian[i]['Bobot']) ) )
               }
-              
-               nilai = parseInt(Nilai_bobot) / parseInt(jmlbobot); 
 
-              html += '</tbody>' ; 
+               nilai = parseInt(Nilai_bobot) / parseInt(jmlbobot);
+
+              html += '</tbody>' ;
               html += '</table>' ;
 
               html += '<p>Jumlah Bobot : '+jmlbobot+'</p>'+
@@ -523,14 +523,14 @@
                 // window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+aaa[i],'_blank', 'modal=yes');
                 window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+aaa[i],'_blank');
             }
-            
+
         }
         else
         {
             // window.open('<?php echo url_pas ?>'+'uploads/document/'+NPM+'/'+file__,'_blank');
             window.open('<?php echo url_registration ?>'+'document/'+emaiil+'/'+file__,'_blank');
         }
-        
+
     });
 
     $(document).on('click','.Detail', function () {
@@ -553,9 +553,9 @@
                     '<th style="width: 55px;">Discount</th>'+
                     '<th style="width: 55px;">Value</th>'+
                     '<th style="width: 55px;">Status</th>';
-              
-            table += '</tr>' ;  
-            table += '</thead>' ; 
+
+            table += '</tr>' ;
+            table += '</thead>' ;
             table += '<tbody>' ;
             var payment_register = json.payment_register;
             for (var i =0; i < payment_register.length; i++) {
@@ -565,11 +565,11 @@
                           '<td>'+payment_register[i]['Discount'] +'</td>'+
                           '<td>'+payment_register[i]['Pay_tuition_fee'] +'</td>'+
                           '<td>'+payment_register[i]['Status'] +'</td>'+
-                        '<tr>'  
-                          ; 
+                        '<tr>'
+                          ;
             }
 
-            table += '</tbody>' ; 
+            table += '</tbody>' ;
             table += '</table>' ;
 
             var table2 = '';
@@ -582,8 +582,8 @@
                     '<th style="width: 55px;">Invoice</th>'+
                     '<th style="width: 55px;">Status</th>'+
                     '<th style="width: 55px;">Deadline</th>';
-            table2 += '</tr>' ;  
-            table2 += '</thead>' ; 
+            table2 += '</tr>' ;
+            table2 += '</thead>' ;
             table2 += '<tbody>' ;
 
             var payment_pre = json.payment_pre;
@@ -595,12 +595,12 @@
                           '<td>'+payment_pre[i]['Invoice'] +'</td>'+
                           '<td>'+payment_pre[i]['Status'] +'</td>'+
                           '<td>'+payment_pre[i]['Deadline'] +'</td>'+
-                        '<tr>'   
-                          ; 
+                        '<tr>'
+                          ;
             }
 
-            table2 += '</tbody>' ; 
-            table2 += '</table>' ;        
+            table2 += '</tbody>' ;
+            table2 += '</table>' ;
 
             var footer = '<div class="col-sm-12" id="BtnFooter">'+
                             '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
@@ -624,7 +624,7 @@
                 type: 'hidden',
                 name: this.name,
                 value: this.value
-            }));    
+            }));
         });
         form.attr('target', '_blank');
         form.appendTo('body').submit();
@@ -644,5 +644,5 @@
       ]);
 
     });
-    
+
 </script>

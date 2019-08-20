@@ -632,13 +632,14 @@
         });
     }
 
-     function testMobile() {
-         // socket.emit('mobile_notif', {
-         //     Title: 'Judul Notif',
-         //     Message: 'Ini bagian isi',
-         //     dataUser : ['11140001']
-         // });
-     }
+     // function testMobile() {
+     //     socket.emit('mobile_notif', {
+     //         Title: 'Judul Notif',
+     //         Message: 'Ini bagian isi',
+     //         dataUser : ['11140001']
+     //     });
+     // }
+
 
 
     function ReadNotifDivision(){
