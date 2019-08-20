@@ -776,7 +776,7 @@
 			
 			var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
 			var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
-			var btn_print = '';
+			var btn_print = '<button class="btn btn-default print_page_realisasi" ID_payment = "'+ClassDt.ID_payment+'"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 			var Status = dtspb[0]['Status'];
 			switch(Status) {
 			  case 0:
@@ -855,10 +855,8 @@
 			  case '2':
 			  	var JsonStatus = dtspb[0]['JsonStatus'];
 			  	JsonStatus = jQuery.parseJSON(JsonStatus);
-			  	if (JsonStatus[0]['NIP'] == sessionNIP) {
-			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
-			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
-			  	}
+			  	DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			  	DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
 			    break;
 			  default:
 			    // code block
@@ -1079,5 +1077,39 @@
 		h += '</div></div>';
 		return h;
 	}
+
+	$(document).off('click', '.print_page_realisasi').on('click', '.print_page_realisasi',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.all_po_payment;
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+
+			var url = base_url_js+'save2pdf/print/pre_pembayaran_realisasi_po';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+		}
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user_realisasi';
+		}
+		
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 	
 </script>

@@ -1089,7 +1089,7 @@
 		DivPageRealisasi.find('.datetimepicker').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
-
+		// console.log(Realisasi);
 		if (Realisasi.length > 0) {
 			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
 			makeActionRealisasi(DivPageRealisasi,Realisasi);
@@ -1108,7 +1108,7 @@
 		var btn_approve = '';
 		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
 		var btn_reject = '';
-		var btn_print = '';
+		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -1629,7 +1629,7 @@
 		var btn_approve = '';
 		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
 		var btn_reject = '';
-		var btn_print = '';
+		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -4098,5 +4098,25 @@
 		{
 			toastr.info('Realisasi telah approve tidak bisa edit');
 		}	
+	})
+
+	$(document).off('click', '.print_page_realisasi').on('click', '.print_page_realisasi',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var ID_payment = ev.attr('id_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+
+		var url = base_url_js+'save2pdf/print/pre_pembayaran_realisasi_po';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
 	})
 </script>
