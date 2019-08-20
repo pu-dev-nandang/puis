@@ -2205,6 +2205,56 @@ class C_budgeting extends Budgeting_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/budget_revisi/revisi',$this->data,true);
         echo json_encode($arr_result);
+    }
+
+    public function budget_revisi_Revisi_save()
+    {
+        $Input = $this->getInputToken();
+        // add or less budget
+        switch ($Input['Type']) {
+            case 'Add':
+                $ID_budget_left = $Input['ID_budget_left'];
+                $G_ = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                $Value = $G_[0]['Value'];
+                $Invoice = $Input['Invoice'];
+                $Value = $Value + $Invoice;
+                $this->db->where('ID',$ID_budget_left);
+                $this->db->update('db_budgeting.budget_left',array('Value' => $Value));
+                break;
+            case 'Less':
+                $ID_budget_left = $Input['ID_budget_left'];
+                $G_ = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+                $Value = $G_[0]['Value'];
+                $Invoice = $Input['Invoice'];
+                $Value = $Value - $Invoice;
+                $this->db->where('ID',$ID_budget_left);
+                $this->db->update('db_budgeting.budget_left',array('Value' => $Value));
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        $Input['CreateBy'] = $this->session->userdata('NIP');
+        $Input['CreateAt'] = date('Y-m-d H:i:s');
+        $this->db->insert('db_budgeting.budget_adjustment',$Input);
+
+    }
+
+    public function budget_revisi_Revisi_load()
+    {
+        $sql = 'select a.*,b.Name from db_budgeting.budget_adjustment as a 
+                join db_employees.employees as b on a.CreateBy = b.NIP
+                order by a.ID desc limit 500
+            ';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $ID_budget_left = $query[$i]['ID_budget_left'];
+            $query[$i]['DetailPostBudget'] = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+        }
+
+        echo json_encode($query);
+
     } 
 
 }

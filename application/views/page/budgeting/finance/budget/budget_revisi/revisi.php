@@ -51,7 +51,30 @@
 		</div>
 	</div>
 	<div class="col-md-8">
-		
+		<div class="thumbnail">
+			<div class="row">
+				<div class="col-md-12">
+					<div style="padding: 15px;">
+						<h3 class="header-blue">List Revisi Budget</h3>
+					</div>
+					<table id="tblListRevisi" class="table table-bordered display" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>Date & By</th>
+								<th>Post Budget</th>
+								<th>Type</th>
+								<th>Nominal</th>
+								<th>Reason</th>
+							</tr>
+						</thead>
+						<tbody>
+							
+						</tbody>
+					</table>		
+				</div>		
+			</div>			
+		</div>
 	</div>
 </div>
 
@@ -66,6 +89,85 @@
 		getAllDepartementPU__Brevisi_Revisi();
 		$('#Invoice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
 		$('#Invoice').maskMoney('mask', '9894');
+		LoadTableBrevisiRevisi();
+	}
+
+	function LoadTableBrevisiRevisi()
+	{
+		var url = base_url_js+'budgeting/EntryBudget/budget_revisi/Revisi/load';
+		$.post(url,function (data_json) {
+		    var response = jQuery.parseJSON(data_json);
+		    var table = $('#tblListRevisi').DataTable({
+		          "data" : response,
+		          'columnDefs': [
+		    	      {
+		    	         'targets': 0,
+		    	         'searchable': false,
+		    	         'orderable': false,
+		    	         'className': 'dt-body-center',
+		    	         'render': function (data, type, full, meta){
+		    	             return '';
+		    	         }
+		    	      },
+		    	      {
+		    	         'targets': 1,
+		    	         'render': function (data, type, full, meta){
+		    	             return full.CreateAt+'<br>'+full.Name;
+		    	         }
+		    	      },
+		    	      {
+		    	         'targets': 2,
+		    	         'render': function (data, type, full, meta){
+		    	         	var DetailPostBudget = full.DetailPostBudget;
+		    	         	var htmlwr = 'NameUnitDiv : '+DetailPostBudget[0].NameUnitDiv+
+		    	         				 '<br>'+DetailPostBudget[0].NameHeadAccount+'-'+DetailPostBudget[0].RealisasiPostName
+		    	             return htmlwr;
+		    	         }
+		    	      },
+		    	      {
+		    	         'targets': 3,
+		    	         'render': function (data, type, full, meta){
+		    	         	 if (full.Type == 'Add') {
+		    	         	 	return 'Penambahan';
+		    	         	 }
+		    	         	 else
+		    	         	 {
+		    	         	 	return 'Pengurangan';
+		    	         	 }
+		    	             
+		    	         }
+		    	      },
+		    	      {
+		    	         'targets': 4,
+		    	         'render': function (data, type, full, meta){
+		    	         	return formatRupiah(full.Invoice);
+		    	         }
+		    	      },
+		    	      {
+		    	         'targets': 5,
+		    	         'render': function (data, type, full, meta){
+		    	         	return full.Reason;
+		    	         }
+		    	      },
+		          ],
+		          'createdRow': function( row, data, dataIndex ) {
+
+		          },
+		          // 'order': [[1, 'asc']]
+		    });
+
+		    table.on( 'order.dt search.dt', function () {
+		            table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+		                cell.innerHTML = i+1;
+		            } );
+		        } ).draw();	
+		}).done(function() {
+		  // loadTable();
+		}).fail(function() {
+		  toastr.error('The Database connection error, please try again', 'Failed!!');
+		}).always(function() {
+
+		});
 	}
 	
 	function getAllDepartementPU__Brevisi_Revisi()
@@ -149,9 +251,84 @@
 	})
 
 	$(document).off('click', '#btnSubmitBRevisiRevisi').on('click', '#btnSubmitBRevisiRevisi',function(e) {
+		var ev = $(this);
 		if (confirm('Are you sure ?')) {
+			if (validation_BrevisiRevisi()) {
+				var SelectPostBudget = $('#SelectPostBudget option:selected').val();
+				var SelectType = $('#SelectType option:selected').val();
+				var Invoice = $('#Invoice').val();
+				Invoice = findAndReplace(Invoice, ".","");
+				var Reason = $('#Reason').val();
+
+				var data = {
+					ID_budget_left : SelectPostBudget,
+					Type : SelectType,
+					Invoice : Invoice,
+					Reason : Reason,
+				};
+				var token = jwt_encode(data,"UAP)(*");
+				loading_button('#btnSubmitBRevisiRevisi');
+				var url = base_url_js+'budgeting/EntryBudget/budget_revisi/Revisi/save';
+				$.post(url,{token:token},function (data_json) {
+				    LoadPageBudgetRevisi('Revisi');
+				}).done(function() {
+				  // loadTable();
+				}).fail(function() {
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				}).always(function() {
+				 $('#btnSubmitBRevisiRevisi').prop('disabled',false).html('Save');
+
+				});
+			}
+		}	
+	})
+
+	function validation_BrevisiRevisi()
+	{
+		var DepartementBRevisiRevisi = $('#DepartementBRevisiRevisi option:selected').val();
+		var SelectPostBudget = $('#SelectPostBudget option:selected').val();
+		var SelectType = $('#SelectType option:selected').val();
+		var Invoice = $('#Invoice').val();
+		var Reason = $('#Reason').val();
+
+		var arr = {
+			Department : DepartementBRevisiRevisi,
+			PostBudget : SelectPostBudget,
+			Type : SelectType,
+			Invoice : Invoice,
+			Reason : Reason,
+		};
+
+		var toatString = "";
+		var result = "";
+		for(var key in arr) {
+		   switch(key)
+		   {
+		    case  "Department" :
+		    case  "PostBudget" :
+		    case  "Type" :
+		    case  "Reason" :
+		    	  result = Validation_required(arr[key],key);
+		    	  if (result['status'] == 0) {
+		    	    toatString += result['messages'] + "<br>";
+		    	  }	
+		          break;
+		    case  "Invoice" :
+		          var valuee = findAndReplace(arr[key], ".","");
+		          valuee = parseInt(valuee);
+		          if (valuee <= 0) {
+		          	toatString += 'Invoice cannot be zero '+ "<br>";
+		          }
+		          break;
+		   }
 
 		}
-	})
+		if (toatString != "") {
+		  toastr.error(toatString, 'Failed!!');
+		  return false;
+		}
+
+		return true;
+	}
 		
 </script>

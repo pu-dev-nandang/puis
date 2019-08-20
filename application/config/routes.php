@@ -1355,6 +1355,9 @@ $route['budgeting/update_approval_pr'] = 'page/budgeting/c_pr_po/update_approval
 
 $route['budgeting/EntryBudget/budget_revisi'] = 'page/budgeting/c_budgeting/budget_revisi';
 $route['budgeting/EntryBudget/budget_revisi/Revisi'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi';
+$route['budgeting/EntryBudget/budget_revisi/Revisi/save'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi_save';
+$route['budgeting/EntryBudget/budget_revisi/Revisi/load'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi_load';
+
 
 
 
