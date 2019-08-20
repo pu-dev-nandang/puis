@@ -272,14 +272,14 @@
 
 <script>
 
-     var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+     // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
 
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
         // showHTMLMessagesDivision();
         showUnreadLog();
-        socket_messages();
+        // socket_messages();
         wrDepartmentAdmProdi();
 
         if($.cookie("theme")==null || $.cookie("theme") =='' || $.cookie("theme")=='dark'){
@@ -624,9 +624,9 @@
                 });
             }
 
-            socket.emit('update_log', {
-                update_log: '1'
-            });
+            // socket.emit('update_log', {
+            //     update_log: '1'
+            // });
 
 
         });
@@ -641,15 +641,16 @@
      // }
 
 
+
     function ReadNotifDivision(){
         var url = base_url_js+'readNotificationDivision';
         $.get(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
             if (response == 1) {
-                var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                socket.emit('update_notifikasi', {
-                    update_notifikasi: '1'
-                });
+                // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                // socket.emit('update_notifikasi', {
+                //     update_notifikasi: '1'
+                // });
             }
         });
     }
