@@ -208,7 +208,7 @@
 									'</div>'+
 									'<div class="input-group" style = "width:350px;margin-top:10px;">'+
 										'<span class="input-group-btn">'+
-											'Tanggal : &nbsp'+
+											'Date Needed : &nbsp'+
 										'</span>'+
 										'<div class="input-group input-append date datetimepicker">'+
 				                            '<input data-format="yyyy-MM-dd" class="form-control Date_Needed" type=" text" readonly="" value = "'+''+'">'+

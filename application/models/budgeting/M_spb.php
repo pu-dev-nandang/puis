@@ -15,6 +15,7 @@ class M_spb extends CI_Model {
 
     public function checkdt_spb_before_submit($data_verify)
     {
+        // print_r($data_verify);die();
         $bool = true;
         $Code_po_create = $data_verify['Code_po_create'];
         $InvoicePO = $data_verify['InvoicePO'];
@@ -31,9 +32,9 @@ class M_spb extends CI_Model {
             }
         }
 
-        if ($G_dt[0]['Status'] == 1) {
-            $bool = false;
-        }
+        // if ($G_dt[0]['Status'] == 1) {
+        //     $bool = false;
+        // }
 
         return $bool;
     }
