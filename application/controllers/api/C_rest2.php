@@ -4035,39 +4035,43 @@ class C_rest2 extends CI_Controller {
                          else
                          {
                             $__bp = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_ap);
-                            for ($j=0; $j < count($__bp); $j++) { 
-                                $Typebpd = $__bp[$j]['Type'];
-                                if ($Typebpd == 'Mutasi') {
-                                    $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_a',$__bp[$j]['ID']);
-                                    if (count($d) > 0 ) {
-                                       $stMutasi = 'Mutasi ke '; 
-                                       $ID_budget_adjustment_b = $d[0]['ID_budget_adjustment_b'];
-                                       $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_b);
-                                       $ID_budget_left_b = $dd[0]['ID_budget_left'];
-                                       $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_b);
-                                       $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
-                                    }
-                                    else
-                                    {
-                                        $stMutasi = 'DiMutasi dari';
-                                        $d = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_b',$__bp[$j]['ID']);
-                                        $ID_budget_adjustment_a = $d[0]['ID_budget_adjustment_a'];
-                                        $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_a);
-                                        $ID_budget_left_a = $dd[0]['ID_budget_left'];
-                                        $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_a);
-                                        $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
-                                    }
-                                     $__bp[$j]['detail'] = $stMutasi;
-
-                                }   
+                            if ($__bp[0]['Type'] =='Less') { // kasih minus untuk yg less agar dikelompokan ke kolom less
+                                $__bp[0]['Invoice'] = '-'.$__bp[0]['Invoice'];
+                            }
+                            //check mutasi atau tidak
+                            $G_ma = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_a',$ID_ap);
+                            $G_mb = $this->m_master->caribasedprimary('db_budgeting.budget_mutasi','ID_budget_adjustment_b',$ID_ap);
+                            if (count($G_ma) > 0 || count($G_mb) > 0) {
+                               $rs[$i]['TypePayment'] = 'Mutasi';
+                                $d = $G_ma;
+                                if (count($d) > 0 ) {
+                                   $stMutasi = 'Mutasi ke '; 
+                                   $ID_budget_adjustment_b = $d[0]['ID_budget_adjustment_b'];
+                                   $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_b);
+                                   $ID_budget_left_b = $dd[0]['ID_budget_left'];
+                                   $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_b);
+                                   $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
+                                }
                                 else
                                 {
-                                    $__bp[$j]['detail'] = '';
+                                    $stMutasi = 'DiMutasi dari';
+                                    $d = $G_mb;
+                                    $ID_budget_adjustment_a = $d[0]['ID_budget_adjustment_a'];
+                                    $dd = $this->m_master->caribasedprimary('db_budgeting.budget_adjustment','ID',$ID_budget_adjustment_a);
+                                    $ID_budget_left_a = $dd[0]['ID_budget_left'];
+                                    $dt_b = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left_a);
+                                    $stMutasi .=  $dt_b[0]['NameHeadAccount'].'-'.$dt_b[0]['RealisasiPostName'].'('.$dt_b[0]['CodeDepartment'].')';
                                 }
+
+                                $__bp[0]['detail'] = $stMutasi;
+                            }
+                            else
+                            {
+                                $__bp[0]['detail'] = '';
                             }
                             $rs[$i]['bpd'] = $__bp;
                             $rs[$i]['Invoice'] = $__bp[0]['Invoice'];
-
+                            
                          }
                      }
                     

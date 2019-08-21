@@ -2245,6 +2245,10 @@ class C_budgeting extends Budgeting_Controler {
     {
         $sql = 'select a.*,b.Name from db_budgeting.budget_adjustment as a 
                 join db_employees.employees as b on a.CreateBy = b.NIP
+                left join db_budgeting.budget_mutasi as ma on ma.ID_budget_adjustment_a != a.ID
+                left join db_budgeting.budget_mutasi as mb on mb.ID_budget_adjustment_b != a.ID
+                where Type != "Mutasi"  and a.ID not in (select ID_budget_adjustment_a from db_budgeting.budget_mutasi)
+                and a.ID not in (select ID_budget_adjustment_b from db_budgeting.budget_mutasi)
                 order by a.ID desc limit 500
             ';
         $query=$this->db->query($sql, array())->result_array();
@@ -2255,6 +2259,81 @@ class C_budgeting extends Budgeting_Controler {
 
         echo json_encode($query);
 
+    }
+
+    public function budget_revisi_Mutasi()
+    {
+        $this->auth_ajax();
+        $this->authFin();
+        $arr_result = array('html' => '','jsonPass' => '');
+        $arr_result['html'] = $this->load->view('page/budgeting/'.$this->data['department'].'/budget/budget_revisi/Mutasi',$this->data,true);
+        echo json_encode($arr_result);
+    }
+
+    public function budget_revisi_Mutasi_save()
+    {
+        $Input = $this->getInputToken();
+        $data1 = $Input['data1'];
+        $data1 = json_decode(json_encode($data1),true);
+        $data2 = $Input['data2'];
+        $data2 = json_decode(json_encode($data2),true);
+
+        // kurangi data 1 dengan invoice pada budget left
+        $ID_budget_left = $data1['ID_budget_left'];
+        $G_ = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+        $Value = $G_[0]['Value'];
+        $Invoice = $data1['Invoice'];
+        $Value = $Value - $Invoice;
+        $this->db->where('ID',$ID_budget_left);
+        $this->db->update('db_budgeting.budget_left',array('Value' => $Value));
+
+        $data1['CreateBy'] = $this->session->userdata('NIP');
+        $data1['CreateAt'] = date('Y-m-d H:i:s');
+        $this->db->insert('db_budgeting.budget_adjustment',$data1);
+        $ID_budget_adjustment_a = $this->db->insert_id(); 
+
+        // tambahkan data 2 dengan invoice pada budget left
+        $ID_budget_left = $data2['ID_budget_left'];
+        $G_ = $this->m_master->caribasedprimary('db_budgeting.budget_left','ID',$ID_budget_left);
+        $Value = $G_[0]['Value'];
+        $Invoice = $data2['Invoice'];
+        $Value = $Value + $Invoice;
+        $this->db->where('ID',$ID_budget_left);
+        $this->db->update('db_budgeting.budget_left',array('Value' => $Value));
+
+        $data2['CreateBy'] = $this->session->userdata('NIP');
+        $data2['CreateAt'] = date('Y-m-d H:i:s');
+        $this->db->insert('db_budgeting.budget_adjustment',$data2);
+        $ID_budget_adjustment_b = $this->db->insert_id(); 
+
+        $dataSave = array(
+            'ID_budget_adjustment_a' => $ID_budget_adjustment_a,
+            'ID_budget_adjustment_b' => $ID_budget_adjustment_b,
+        );
+
+        $this->db->insert('db_budgeting.budget_mutasi',$dataSave);
+    }
+
+    public function budget_revisi_Mutasi_load()
+    {
+        $sql = 'select a.*,b.ID_budget_left as ID_budget_left_a,b.CreateAt,b.CreateBy,b.Invoice,b.Reason,
+                c.ID_budget_left as ID_budget_left_b,d.Name 
+                from db_budgeting.budget_mutasi as a
+                join db_budgeting.budget_adjustment as b on a.ID_budget_adjustment_a = b.ID
+                join db_budgeting.budget_adjustment as c on a.ID_budget_adjustment_b = c.ID
+                join db_employees.employees as d on b.CreateBy = d.NIP
+                order by a.ID desc limit 500
+            ';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $ID_budget_left = $query[$i]['ID_budget_left_a'];
+            $query[$i]['DetailPostBudget_a'] = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+
+            $ID_budget_left = $query[$i]['ID_budget_left_b'];
+            $query[$i]['DetailPostBudget_b'] = $this->m_pr_po->Get_DataBudgeting_by_ID_budget_left($ID_budget_left);
+        }
+
+        echo json_encode($query);
     } 
 
 }

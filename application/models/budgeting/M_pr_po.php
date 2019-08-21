@@ -294,7 +294,7 @@ class M_pr_po extends CI_Model {
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-               ) as dp on b.UnitDiv = dp.ID
+               ) as dp on c.Departement= dp.ID
                  left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
             ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
                             where dd.ID = ?';
