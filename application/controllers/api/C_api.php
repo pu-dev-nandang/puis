@@ -8067,7 +8067,49 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='readDataSchFP'){
+
+                $SemesterID = $data_arr['SemesterID'];
+
+                $data = $this->db->query('SELECT fpc.*, cl.Room FROM db_academic.final_project_schedule fpc 
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fpc.ClassroomID)
+                                                    WHERE fpc.SemesterID = "'.$SemesterID.'" ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        // Get Std
+                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name  FROM db_academic.final_project_schedule_student sp 
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sp.NPM)
+                                                        WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
+                        $data[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp 
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = sp.NIP)
+                                                        WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
+                    }
+                }
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='removeDataSchFP'){
+
+                $ID = $data_arr['ID'];
+
+                $tables = array('db_academic.final_project_schedule_student', 'db_academic.final_project_schedule_lecturer');
+                $this->db->where('FPSID', $ID);
+                $this->db->delete($tables);
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.final_project_schedule');
+
+                return print_r(1);
+
+            }
             else if($data_arr['action']=='updateDataSchFP'){
+
+                // 0 = blm daftar, 1 = sudah daftar, 2 = Sudah terjadwal sidang proposal, 3 = Lulus Sidang Proposal,
+                // -3 = Tidak Lulus Sidang Proposal, 4 = Sudah terjadwal sidang hasil, 5 = Lulus sidang hasil, -5 = Tidak Lulus sidang hasil
+
                 $ID = $data_arr['ID'];
                 $dataForm = (array) $data_arr['dataForm'];
                 $Lecturer = (array) $data_arr['Lecturer'];
@@ -8080,22 +8122,7 @@ class C_api extends CI_Controller {
                     $this->db->where('ID',$ID);
                     $this->db->update('db_academic.final_project_schedule',$dataForm);
 
-                    // Get Std lama
-                    $dataStdLama = $this->db->get_where('db_academic.final_project_schedule_student',array(
-                        'FPSID' => $ID
-                    ))->result_array();
-
-                    if(count($dataStdLama)>0){
-                        // Update Status
-                        for($j=0;$j<count($dataStdLama);$j++){
-                            $this->db->where('NPM',$dataStdLama[$j]['NPM']);
-                            $this->db->update('db_academic.final_project',array(
-                                'Status' => '1'
-                            ));
-                        }
-                    }
-
-                    $tables = array('db_academic.final_project_schedule_lecturer', 'db_academic.final_project_schedule_student');
+                    $tables = array('db_academic.final_project_schedule_lecturer');
                     $this->db->where('FPSID', $ID);
                     $this->db->delete($tables);
 
@@ -8136,6 +8163,25 @@ class C_api extends CI_Controller {
                     }
                 }
 
+
+
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='removeStudentSchFP'){
+                $ID = $data_arr['ID'];
+                $NPM = $data_arr['NPM'];
+
+                $this->db->where('NPM',$NPM);
+                $this->db->update('db_academic.final_project',array(
+                    'Status' => '1'
+                ));
+
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.final_project_schedule_student');
 
                 return print_r(1);
 
