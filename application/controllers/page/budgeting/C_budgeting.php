@@ -2245,8 +2245,6 @@ class C_budgeting extends Budgeting_Controler {
     {
         $sql = 'select a.*,b.Name from db_budgeting.budget_adjustment as a 
                 join db_employees.employees as b on a.CreateBy = b.NIP
-                left join db_budgeting.budget_mutasi as ma on ma.ID_budget_adjustment_a != a.ID
-                left join db_budgeting.budget_mutasi as mb on mb.ID_budget_adjustment_b != a.ID
                 where Type != "Mutasi"  and a.ID not in (select ID_budget_adjustment_a from db_budgeting.budget_mutasi)
                 and a.ID not in (select ID_budget_adjustment_b from db_budgeting.budget_mutasi)
                 order by a.ID desc limit 500
