@@ -190,7 +190,8 @@ function Get_data_payment(){
 	    	      if (Code_po_create != '') {
 	    	      	 Payment += '<br>PR Code : '+PRHTML;
 	    	      }
-	    	      Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+              // Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+	    	      Payment += '<br>Created : '+ListPR[1].PayNameCreatedBy;
 	    	       
 	    	       $( row ).find('td:eq(1)').html(Payment);
     		    	
