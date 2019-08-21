@@ -1710,7 +1710,7 @@ $route['ga/scheduleexchange/submit_change_status'] = 'page/ga/C_schedule_exchang
 
 
 // help
-$route['help'] =  'dashboard/C_dashboard/Helcrm/marketing-activityp';
+$route['help'] =  'dashboard/C_dashboard/Help';
 
 
 // request document
