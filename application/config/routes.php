@@ -1434,6 +1434,10 @@ $route['budgeting/EntryBudget/budget_revisi/Revisi/save'] = 'page/budgeting/c_bu
 $route['budgeting/EntryBudget/budget_revisi/Revisi/load'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi_load';
 
 
+$route['budgeting/EntryBudget/budget_revisi/Mutasi'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi';
+$route['budgeting/EntryBudget/budget_revisi/Mutasi/save'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi_save';
+$route['budgeting/EntryBudget/budget_revisi/Mutasi/load'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi_load';
+
 
 
 $route['budgeting/EntryBudget/Approval'] = 'page/budgeting/c_budgeting/EntryBudget_Approval';
