@@ -910,7 +910,7 @@ class C_save_to_pdf3 extends CI_Controller {
          $No_Rekening = '...............................................................................';
          $Name_Penerima = '...............................................................................';
          $Nama_Bank = '...............................................................................';
-         if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
+         if ($dtspb[0]['Detail'][0]['ID_bank'] != 0) {
              $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
              $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
              $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
