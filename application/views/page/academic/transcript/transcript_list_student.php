@@ -9,35 +9,7 @@
     }
 </style>
 
-<style>
-  .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
-    padding: 10px 16px;
-    border-radius: 35px;
-    font-size: 24px;
-    line-height: 1.33;
-}
 
-.btn-circle {
-    width: 30px;
-    height: 30px;
-    padding: 6px 0px;
-    border-radius: 15px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.42857;
-}
-
-.btn-round{
-    border-radius: 10px;
-}
-
-.btn-group > .btn:first-child, .btn-group > .btn:last-child {
-     border-radius: 17px;
-}
-
-</style>
 
 <div class="row" style="margin-top: 10px;">
     <div class="col-md-12" style="text-align: right;">
@@ -157,9 +129,7 @@
                     '                <thead>' +
                     '                <tr>' +
                     '                    <th style="width: 3%;" >No</th>' +
-                    '                    <th style="width: 5%;">NIM</th>' +
                     '                    <th>Student</th>' +
-                    '                    <th style="width: 13%;">Prodi</th>' +
                     '                    <th style="width: 25%;">Certificate Serial Number</th>' +
                     '                    <th style="width: 20%;">SKL Number</th>' +
                     '                    <th style="width: 15%;">SKPI</th>' +

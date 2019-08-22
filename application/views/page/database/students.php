@@ -39,6 +39,7 @@
         </div>
     </div>
     <div class="col-md-4">
+        <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
         <div class="well">
             <div class="row">
                 <div class="col-xs-6">
@@ -49,8 +50,11 @@
                 </div>
             </div>
         </div>
+        <?php } ?>
     </div>
 </div>
+
+<?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
 
 <div class="row">
     <div class="col-md-6">
@@ -68,8 +72,11 @@
     </div>
 </div>
 
+<?php } ?>
+
 <div class="row" style="margin-top: 10px">
     <div class="col-md-12">
+
         <hr/>
         <div id="divDataStudent"></div>
     </div>

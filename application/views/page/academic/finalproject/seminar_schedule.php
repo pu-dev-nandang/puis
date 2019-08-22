@@ -16,7 +16,7 @@
                     <select id="filterSemester" class="form-control"></select>
                 </div>
                 <div class="col-md-5">
-                    <select id="" class="form-control">
+                    <select id="filterSeminar" class="form-control">
                         <option value="1">Seminar Proposal</option>
                         <option value="2">Seminar Hasil</option>
                     </select>
@@ -57,7 +57,8 @@
 
         var loadFirst = setInterval(function (args) {
             var filterSemester = $('#filterSemester').val();
-            if(filterSemester!='' && filterSemester!=null){
+            var filterSeminar = $('#filterSeminar').val();
+            if(filterSemester!='' && filterSemester!=null && filterSeminar!='' && filterSeminar!=null){
                 loadSchedule();
                 clearInterval(loadFirst);
             }
@@ -66,17 +67,24 @@
 
 
     });
+
+    $('#filterSeminar,#filterSemester').change(function () {
+        loadSchedule();
+    });
     
     function loadSchedule() {
 
         var filterSemester = $('#filterSemester').val();
+        var filterSeminar = $('#filterSeminar').val();
 
-        if(filterSemester!='' && filterSemester!=null){
+        if(filterSemester!='' && filterSemester!=null &&
+            filterSeminar!='' && filterSeminar!=null){
             var SemesterID = filterSemester.split('.')[0];
 
             var data = {
                 action : 'readDataSchFP',
-                SemesterID : SemesterID
+                SemesterID : SemesterID,
+                Type : filterSeminar
             };
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudFinalProject';
