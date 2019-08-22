@@ -88,7 +88,41 @@ class C_final_project extends Academic_Controler {
     }
 
     public function scheduling_final_project(){
+
+        $ID = $this->input->get('id');
+
         $data['department'] = parent::__getDepartement();
+        $data['ID'] = ($ID!='') ? $ID : '';
+
+        $DataEdit = [];
+        if($ID!=''){
+            $DataEdit = $this->db->query('SELECT fpc.*, cl.Room, cl.Seat, cl.SeatForExam FROM db_academic.final_project_schedule fpc 
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fpc.ClassroomID)
+                                                    WHERE fpc.ID = "'.$ID.'" ')->result_array();
+
+            if(count($DataEdit)>0){
+                for($i=0;$i<count($DataEdit);$i++){
+                    // Get Std
+                    $DataEdit[$i]['Student'] = $this->db->query('SELECT sp.*, fp.Status, ats.Name, em1.Name AS  MentorFP1_Name,  
+                                                         em2.Name AS  MentorFP2_Name FROM db_academic.final_project_schedule_student sp
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = sp.NPM)
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sp.NPM)
+                                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                        WHERE sp.FPSID = "'.$DataEdit[$i]['ID'].'" ')->result_array();
+
+                    $DataEdit[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp 
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = sp.NIP)
+                                                        WHERE sp.FPSID = "'.$DataEdit[$i]['ID'].'" ')->result_array();
+                }
+            }
+
+
+        }
+
+        $data['DataEdit'] = json_encode($DataEdit);
+        $data['ID'] = (count($DataEdit)>0) ? $ID : '';
+
         $page = $this->load->view('page/'.$data['department'].'/finalproject/scheduling_final_project',$data,true);
         $this->menu_transcript($page);
     }

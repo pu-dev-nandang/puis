@@ -1176,9 +1176,9 @@
         })
     }
     
-    function loadSelectOptionStudentRegisterYudisium(element,selected) {
+    function loadSelectOptionStudentYudisium(element,selected,status) {
         var url = base_url_js+'api/__crudFinalProject';
-        var token = jwt_encode({action : 'getAllStdReg',Status:'1'},'UAP)(*');
+        var token = jwt_encode({action : 'getAllStdReg',Status:status},'UAP)(*');
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){
@@ -1198,27 +1198,27 @@
         });
     }
 
-    function loadSelectOptionStudentRegisterSeminarhasil(element,selected) {
-        var url = base_url_js+'api/__crudFinalProject';
-        var token = jwt_encode({action : 'getAllStdReg',Status:'3'},'UAP)(*');
-        $.post(url,{token:token},function (jsonResult) {
-
-            if(jsonResult.length>0){
-
-                $.each(jsonResult,function (i,v) {
-
-                    var mentor1 = (v.Mentor1!=null && v.Mentor1!='') ? '('+v.Mentor1 : '';
-                    var mentor = (v.Mentor2!=null && v.Mentor2!='') ? mentor1+', '+v.Mentor2+')' : mentor1+')';
-
-                    $(element).append('<option value="'+v.NPM+'">'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
-                        .val(selected).trigger('change');
-
-                });
-
-            }
-
-        });
-    }
+    // function loadSelectOptionStudentRegisterSeminarhasil(element,selected) {
+    //     var url = base_url_js+'api/__crudFinalProject';
+    //     var token = jwt_encode({action : 'getAllStdReg',Status:'3'},'UAP)(*');
+    //     $.post(url,{token:token},function (jsonResult) {
+    //
+    //         if(jsonResult.length>0){
+    //
+    //             $.each(jsonResult,function (i,v) {
+    //
+    //                 var mentor1 = (v.Mentor1!=null && v.Mentor1!='') ? '('+v.Mentor1 : '';
+    //                 var mentor = (v.Mentor2!=null && v.Mentor2!='') ? mentor1+', '+v.Mentor2+')' : mentor1+')';
+    //
+    //                 $(element).append('<option value="'+v.NPM+'">'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
+    //                     .val(selected).trigger('change');
+    //
+    //             });
+    //
+    //         }
+    //
+    //     });
+    // }
 
     function loadSelectOptionMenuAgregator(element,selected) {
 

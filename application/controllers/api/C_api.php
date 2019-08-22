@@ -672,7 +672,7 @@ class C_api extends CI_Controller {
 
         $query = $this->db->query($sqlTotalData)->result_array();
         $totalData = $query[0]['total'];
-                // )->result_array();
+        // )->result_array();
 
 
         // -------------total data---------- //
@@ -742,7 +742,7 @@ class C_api extends CI_Controller {
             // $nestedData[] = '<div style="text-align: center;"><img src="'.base_url('uploads/students/').$db_.'/'.$row["Photo"].'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
 
             // show formulir number
-                $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
+            $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
 
             $nestedData[] = $StrFM;
             $nestedData[] = '<a href="javascript:void(0);" data-npm="'.$row["NPM"].'" data-ta="'.$row["ClassOf"].'" class="btnDetailStudent"><b>'.$row["Name"].'</b></a><br/>'.$row["NPM"];
@@ -841,7 +841,7 @@ class C_api extends CI_Controller {
                 $Position = $dataPosition['Position'];
             }
 
-             $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
+            $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
                 ? base_url('uploads/employees/'.$row["Photo"])
                 : base_url('images/icon/userfalse.png');
 
@@ -895,7 +895,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<a class="btn btn-primary btn-round" href="'.base_url('human-resources/academic-details/'.$row["NIP"]).'">
   <i class="icon-list icon-large"></i> Detail</a>';
 
-             $no++;
+            $no++;
             $data[] = $nestedData;
         }
 
@@ -2619,9 +2619,9 @@ class C_api extends CI_Controller {
             if($row['ConfirmStatus'] == 1) {
 
                 $token = $this->jwt->encode(array(
-                                'NIP' => $row['NIP'],
-                                'IDRequest' => $row['IDRequest']
-                            ),'UAP)(*');
+                    'NIP' => $row['NIP'],
+                    'IDRequest' => $row['IDRequest']
+                ),'UAP)(*');
                 $linksurat = base_url('save2pdf/suratTugasKeluar/'.$token);
                 $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ';
             } else if($row['ConfirmStatus'] == -1) {
@@ -2725,7 +2725,7 @@ class C_api extends CI_Controller {
 
             echo json_encode($details);
         }
-         else if($data_arr['action']=='geteditgroupdata') {
+        else if($data_arr['action']=='geteditgroupdata') {
 
             $idgroup = $this->input->get('s');
             $details = $this->db->query('SELECT a.IDGroup, a.NameGroup, a.IDDivision, b.Division, a.Active
@@ -2742,11 +2742,11 @@ class C_api extends CI_Controller {
 
 
     function search_module() {
-       // if (isset($_REQUEST['q'])) {
+        // if (isset($_REQUEST['q'])) {
 
         //    $results = $this->db->query('SELECT * FROM db_it.group_module WHERE NameGroup LIKE "%'.$_REQUEST['q'].'%" ')->result_array();
 
-            //$results = $this->data_model->get_data($_REQUEST['q']);
+        //$results = $this->data_model->get_data($_REQUEST['q']);
         //    echo json_encode($results);
         //}
 
@@ -2762,13 +2762,13 @@ class C_api extends CI_Controller {
                 $data['message'][] = array(
                     'id'=>$row->id,
                     'NameGroup' => $row->printable_name,
-                        ''
-                    );  //Add a row to array
+                    ''
+                );  //Add a row to array
             }
         }
 
-            //echo json_encode($data); //echo json string if ajax request
-            echo json_encode($data);die;
+        //echo json_encode($data); //echo json string if ajax request
+        echo json_encode($data);die;
 
     }
 
@@ -3945,14 +3945,14 @@ class C_api extends CI_Controller {
         $viewacademic = $this->m_api->views_academic($NIP);
         echo json_encode($viewacademic);
 
-     }
+    }
 
-     public function review_otherfile(){
+    public function review_otherfile(){
         $NIP = $this->input->get('NIP');
         $viewfiles = $this->m_api->views_otherfile($NIP);
         echo json_encode($viewfiles);
 
-     }
+    }
 
     public function review_academics1(){
 
@@ -3960,7 +3960,7 @@ class C_api extends CI_Controller {
         $srata = $this->input->get('s');
         $viewfiles1 = $this->m_api->views_files1($NIP,$srata);
         echo json_encode($viewfiles1);
-     }
+    }
 
 
     public function getedit_datas1(){
@@ -5700,32 +5700,32 @@ class C_api extends CI_Controller {
             $file_trans = $formInsert['linktranscripts1'];
 
             $dataUpdate = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $fileName
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $fileName
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $fileName);
             $this->db->update('db_employees.files', $dataUpdate);
-                    //------------------------------------------------\\
+            //------------------------------------------------\\
             $dataUpdate2 = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $file_trans
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $file_trans
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
@@ -5749,32 +5749,32 @@ class C_api extends CI_Controller {
             $file_trans = $formInsert['linktranscripts1'];
 
             $dataUpdate = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $fileName
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $fileName
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $fileName);
             $this->db->update('db_employees.files', $dataUpdate);
-                    //------------------------------------------------\\
+            //------------------------------------------------\\
             $dataUpdate2 = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $file_trans
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $file_trans
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
@@ -5799,32 +5799,32 @@ class C_api extends CI_Controller {
             $file_trans = $formInsert['linktranscripts1'];
 
             $dataUpdate = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $fileName
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $fileName
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $fileName);
             $this->db->update('db_employees.files', $dataUpdate);
-                    //------------------------------------------------\\
+            //------------------------------------------------\\
             $dataUpdate2 = array(
-                    'TypeAcademic' => $type,
-                    'NoIjazah' => $NoIjazah,
-                    'DateIjazah' => $DateIjazah,
-                    'NameUniversity' => $NameUniversity,
-                    'Major' => $Major,
-                    'ProgramStudy' => $ProgramStudy,
-                    'Grade' => $Grade,
-                    'TotalCredit' => $TotalCredit,
-                    'TotalSemester' => $TotalSemester,
-                    'LinkFiles' => $file_trans
+                'TypeAcademic' => $type,
+                'NoIjazah' => $NoIjazah,
+                'DateIjazah' => $DateIjazah,
+                'NameUniversity' => $NameUniversity,
+                'Major' => $Major,
+                'ProgramStudy' => $ProgramStudy,
+                'Grade' => $Grade,
+                'TotalCredit' => $TotalCredit,
+                'TotalSemester' => $TotalSemester,
+                'LinkFiles' => $file_trans
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
@@ -5844,11 +5844,11 @@ class C_api extends CI_Controller {
             $linkotherfile = $formInsert['linkotherfile'];
 
             $dataUpdate = array(
-                        'No_Document' => $NoDocument,
-                        'Date_Files' => $DateDocument,
-                        'Description_Files' => $DescriptionFile,
-                        'LinkFiles' => $linkotherfile
-                    );
+                'No_Document' => $NoDocument,
+                'Date_Files' => $DateDocument,
+                'Description_Files' => $DescriptionFile,
+                'LinkFiles' => $linkotherfile
+            );
             $this->db->where('NIP', $NIP);
             $this->db->where('ID', $idlinkfiles);
             $this->db->update('db_employees.files', $dataUpdate);
@@ -5884,36 +5884,36 @@ class C_api extends CI_Controller {
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
                 $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $fileName,
-                            //'TranscriptFile' => $file_trans,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName,
+                    //'TranscriptFile' => $file_trans,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave);
                 $dataSave2 = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $file_trans,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
@@ -5938,35 +5938,35 @@ class C_api extends CI_Controller {
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
                 $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave);
                 $dataSave2 = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $file_trans,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
@@ -5991,35 +5991,35 @@ class C_api extends CI_Controller {
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($Colomija);
                 $Get_MasterFiles2 = $this->m_master->MasterfileStatus($Colomtra);
                 $dataSave = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $fileName,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $fileName,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave);
                 $dataSave2 = array(
-                            'NIP' => $NIP,
-                            'TypeAcademic' => $type,
-                            'TypeFiles' => $Get_MasterFiles2[0]['ID'],
-                            'NoIjazah' => $NoIjazah,
-                            'DateIjazah' => $DateIjazah,
-                            'NameUniversity' => $NameUniversity,
-                            'Major' => $Major,
-                            'ProgramStudy' => $ProgramStudy,
-                            'Grade' => $Grade,
-                            'TotalCredit' => $TotalCredit,
-                            'TotalSemester' => $TotalSemester,
-                            'LinkFiles' => $file_trans,
-                            'UserCreate' => $IDuser
+                    'NIP' => $NIP,
+                    'TypeAcademic' => $type,
+                    'TypeFiles' => $Get_MasterFiles2[0]['ID'],
+                    'NoIjazah' => $NoIjazah,
+                    'DateIjazah' => $DateIjazah,
+                    'NameUniversity' => $NameUniversity,
+                    'Major' => $Major,
+                    'ProgramStudy' => $ProgramStudy,
+                    'Grade' => $Grade,
+                    'TotalCredit' => $TotalCredit,
+                    'TotalSemester' => $TotalSemester,
+                    'LinkFiles' => $file_trans,
+                    'UserCreate' => $IDuser
                 );
                 $this->db->insert('db_employees.files', $dataSave2);
                 return print_r(1);
@@ -6036,60 +6036,60 @@ class C_api extends CI_Controller {
                 $fileName = $formInsert['fileName'];
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
                 $dataSave = array(
-                                'NIP' => $NIP,
-                                'TypeFiles' => $Get_MasterFiles[0]['ID'],
-                                'No_Document' => $NoDocument,
-                                'Date_Files' => $DateDocument,
-                                'Description_Files' => $DescriptionFile,
-                                'LinkFiles' => $fileName,
-                                'UserCreate' => $IDuser
-                            );
+                    'NIP' => $NIP,
+                    'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    'No_Document' => $NoDocument,
+                    'Date_Files' => $DateDocument,
+                    'Description_Files' => $DescriptionFile,
+                    'LinkFiles' => $fileName,
+                    'UserCreate' => $IDuser
+                );
                 $this->db->insert('db_employees.files',$dataSave);
                 return print_r(1);
             }
 
         } //end count
 
-     }
+    }
 
-     public function confirm_requestdocument(){
+    public function confirm_requestdocument(){
 
         $data_arr = $this->getInputToken();
         $IDuser = $this->session->userdata('NIP');
 
         if($data_arr['action']=='Approved'){
-                $formInsert = (array) $data_arr['formInsert'];
-                $requestID = $formInsert['requestID'];
-                $status = '1';
-                $dates = date("Y-m-d H:i:s");
+            $formInsert = (array) $data_arr['formInsert'];
+            $requestID = $formInsert['requestID'];
+            $status = '1';
+            $dates = date("Y-m-d H:i:s");
 
-                $dataSave = array(
-                        'ConfirmStatus' => $status,
-                        'DateConfirm' => $dates,
-                        'UserConfirm' => $IDuser
-                );
-                $this->db->where('IDRequest', $requestID);
-                $this->db->update('db_employees.request_document',$dataSave);
-                return print_r(1);
+            $dataSave = array(
+                'ConfirmStatus' => $status,
+                'DateConfirm' => $dates,
+                'UserConfirm' => $IDuser
+            );
+            $this->db->where('IDRequest', $requestID);
+            $this->db->update('db_employees.request_document',$dataSave);
+            return print_r(1);
         }
         if($data_arr['action']=='Rejected'){
-                $formInsert = (array) $data_arr['formInsert'];
-                $requestID = $formInsert['requestID'];
-                $status = '-1';
-                $dates = date("Y-m-d H:i:s");
+            $formInsert = (array) $data_arr['formInsert'];
+            $requestID = $formInsert['requestID'];
+            $status = '-1';
+            $dates = date("Y-m-d H:i:s");
 
-                $dataSave = array(
-                        'ConfirmStatus' => $status,
-                        'DateConfirm' => $dates,
-                        'UserConfirm' => $IDuser
-                );
-                $this->db->where('IDRequest', $requestID);
-                $this->db->update('db_employees.request_document',$dataSave);
-                return print_r(1);
+            $dataSave = array(
+                'ConfirmStatus' => $status,
+                'DateConfirm' => $dates,
+                'UserConfirm' => $IDuser
+            );
+            $this->db->where('IDRequest', $requestID);
+            $this->db->update('db_employees.request_document',$dataSave);
+            return print_r(1);
         }
 
 
-     }
+    }
 
 
     public function crudversion(){
@@ -6097,187 +6097,187 @@ class C_api extends CI_Controller {
         $data_arr = $this->getInputToken();
         $IDuser = $this->session->userdata('NIP');
 
-            if($data_arr['action']=='AddGroupModule'){
-                $formInsert = (array) $data_arr['formInsert'];
+        if($data_arr['action']=='AddGroupModule'){
+            $formInsert = (array) $data_arr['formInsert'];
 
-                $Namegroup = strtoupper($formInsert['Namegroup']);
-                $division = $formInsert['division'];
+            $Namegroup = strtoupper($formInsert['Namegroup']);
+            $division = $formInsert['division'];
 
-                $getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
+            $getgroupmodule = $this->db->get_where('db_it.group_module',array('NameGroup'=>$Namegroup, 'IDDivision'=>$division))->result_array();
 
-                if(count($getgroupmodule)>0){
-                    return print_r(0);
-                } else {
-                    $dataSave1 = array(
-                        'NameGroup' => $Namegroup,
-                        'IDDivision' => $division
-                    );
-                    $this->db->insert('db_it.group_module',$dataSave1);
-                    return print_r(1);
-                }
-
-            }
-
-            else if($data_arr['action']=='AddModule') {
-
-                $formInsert = (array) $data_arr['formInsert'];
-
-                $IDGroups = $formInsert['IDGroups'];
-                $Namemodule = strtoupper($formInsert['Namemodule']);
-                $Description = $formInsert['Descriptiongroup'];
-
-                $getdatamodules = $this->db->get_where('db_it.module',array('NameModule'=>$Namemodule))->result_array();
-                if(count($getdatamodules)>0){
-                    return print_r(0);
-                }
-                else {
-                    $dataSave1 = array(
-                            'NameModule' => $Namemodule,
-                            'IDGroup' => $IDGroups,
-                            'Description' => $Description
-                    );
-                    $this->db->insert('db_it.module',$dataSave1);
-                    return print_r(1);
-                }
-            }
-
-            else if($data_arr['action']=='AddVersion') {
-
-                $formInsert = (array) $data_arr['formInsert'];
-
-                $filternamepic = $formInsert['filternamepic'];
-                $filterStatusModule = $formInsert['filterStatusModule'];
-                $Noversion = strtoupper($formInsert['Noversion']);
-                $Descriptionversion = $formInsert['Descriptionversion'];
-
-                $getdataversion = $this->db->get_where('db_it.version',array('Version'=>$Noversion))->result_array();
-                if(count($getdataversion)>0){
-                    return print_r(0);
-                }
-                else {
-                    $dataSave1 = array(
-                            'Version' => $Noversion,
-                            'PIC' => $filternamepic,
-                            'UpdateBy' => $IDuser
-                    );
-                    $this->db->insert('db_it.version',$dataSave1);
-                    $insert_id_logging = $this->db->insert_id();
-
-                    $dataSave2 = array(
-                            'IDVersion' => $insert_id_logging,
-                            'IDModule' => $filterStatusModule,
-                            'Description' => $Descriptionversion
-                    );
-                    $this->db->insert('db_it.version_detail',$dataSave2);
-                    return print_r(1);
-                }
-            }
-            else if($data_arr['action']=='EditVersion') {
-
-                $formInsert = (array) $data_arr['formInsert'];
-
-                $selectmodule = $formInsert['selectmodule'];
-                $selectpic = $formInsert['selectpic'];
-                $noversion = $formInsert['noversion'];
-                $VersionID = strtoupper($formInsert['VersionID']);
-                $Descriptionversion = $formInsert['Descriptionversion'];
-
+            if(count($getgroupmodule)>0){
+                return print_r(0);
+            } else {
                 $dataSave1 = array(
-                        'PIC' => $selectpic,
-                        'Version' => $noversion,
-                        'UpdateBy' => $IDuser
+                    'NameGroup' => $Namegroup,
+                    'IDDivision' => $division
                 );
-                $this->db->where('IDVersion', $VersionID);
-                $this->db->update('db_it.version',$dataSave1);
+                $this->db->insert('db_it.group_module',$dataSave1);
+                return print_r(1);
+            }
+
+        }
+
+        else if($data_arr['action']=='AddModule') {
+
+            $formInsert = (array) $data_arr['formInsert'];
+
+            $IDGroups = $formInsert['IDGroups'];
+            $Namemodule = strtoupper($formInsert['Namemodule']);
+            $Description = $formInsert['Descriptiongroup'];
+
+            $getdatamodules = $this->db->get_where('db_it.module',array('NameModule'=>$Namemodule))->result_array();
+            if(count($getdatamodules)>0){
+                return print_r(0);
+            }
+            else {
+                $dataSave1 = array(
+                    'NameModule' => $Namemodule,
+                    'IDGroup' => $IDGroups,
+                    'Description' => $Description
+                );
+                $this->db->insert('db_it.module',$dataSave1);
+                return print_r(1);
+            }
+        }
+
+        else if($data_arr['action']=='AddVersion') {
+
+            $formInsert = (array) $data_arr['formInsert'];
+
+            $filternamepic = $formInsert['filternamepic'];
+            $filterStatusModule = $formInsert['filterStatusModule'];
+            $Noversion = strtoupper($formInsert['Noversion']);
+            $Descriptionversion = $formInsert['Descriptionversion'];
+
+            $getdataversion = $this->db->get_where('db_it.version',array('Version'=>$Noversion))->result_array();
+            if(count($getdataversion)>0){
+                return print_r(0);
+            }
+            else {
+                $dataSave1 = array(
+                    'Version' => $Noversion,
+                    'PIC' => $filternamepic,
+                    'UpdateBy' => $IDuser
+                );
+                $this->db->insert('db_it.version',$dataSave1);
+                $insert_id_logging = $this->db->insert_id();
 
                 $dataSave2 = array(
-                        'IDModule' => $selectmodule,
-                        'Description' => $Descriptionversion
+                    'IDVersion' => $insert_id_logging,
+                    'IDModule' => $filterStatusModule,
+                    'Description' => $Descriptionversion
                 );
-                $this->db->where('IDVersion', $VersionID);
-                $this->db->update('db_it.version_detail',$dataSave2);
+                $this->db->insert('db_it.version_detail',$dataSave2);
                 return print_r(1);
             }
-            else if($data_arr['action']=='EditGroupModule') {  //edit data module
+        }
+        else if($data_arr['action']=='EditVersion') {
 
-                $formInsert = (array) $data_arr['formInsert'];
+            $formInsert = (array) $data_arr['formInsert'];
 
-                $idnamegroup = $formInsert['idnameegroup'];
-                $idmodule = $formInsert['idmodule'];
-                $IDGroupedit = $formInsert['IDGroupedit'];
-                $Description = $formInsert['Descriptiongroup'];
+            $selectmodule = $formInsert['selectmodule'];
+            $selectpic = $formInsert['selectpic'];
+            $noversion = $formInsert['noversion'];
+            $VersionID = strtoupper($formInsert['VersionID']);
+            $Descriptionversion = $formInsert['Descriptionversion'];
 
-                $dataUpdate = array(
-                    'IDGroup' => $idnamegroup,
-                    'NameModule' => $idmodule,
-                    'Description' => $Description
+            $dataSave1 = array(
+                'PIC' => $selectpic,
+                'Version' => $noversion,
+                'UpdateBy' => $IDuser
+            );
+            $this->db->where('IDVersion', $VersionID);
+            $this->db->update('db_it.version',$dataSave1);
 
-                );
-                $this->db->where('IDModule', $IDGroupedit);
-                $this->db->update('db_it.module', $dataUpdate);
-                return print_r(1);
-            }
-            else if($data_arr['action']=='EditGroups') {  //edit data group
+            $dataSave2 = array(
+                'IDModule' => $selectmodule,
+                'Description' => $Descriptionversion
+            );
+            $this->db->where('IDVersion', $VersionID);
+            $this->db->update('db_it.version_detail',$dataSave2);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='EditGroupModule') {  //edit data module
 
-                $formInsert = (array) $data_arr['formInsert'];
+            $formInsert = (array) $data_arr['formInsert'];
 
-                $iddivision = $formInsert['iddivision'];
-                $IDGroup = $formInsert['IDGroupedit'];
-                $Namegroup = $formInsert['Namegroup'];
+            $idnamegroup = $formInsert['idnameegroup'];
+            $idmodule = $formInsert['idmodule'];
+            $IDGroupedit = $formInsert['IDGroupedit'];
+            $Description = $formInsert['Descriptiongroup'];
 
-                $dataUpdate = array(
-                    'NameGroup' => $Namegroup,
-                    'IDDivision' => $iddivision
+            $dataUpdate = array(
+                'IDGroup' => $idnamegroup,
+                'NameModule' => $idmodule,
+                'Description' => $Description
 
-                );
-                $this->db->where('IDGroup', $IDGroup);
-                $this->db->update('db_it.group_module', $dataUpdate);
-                return print_r(1);
-            }
+            );
+            $this->db->where('IDModule', $IDGroupedit);
+            $this->db->update('db_it.module', $dataUpdate);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='EditGroups') {  //edit data group
+
+            $formInsert = (array) $data_arr['formInsert'];
+
+            $iddivision = $formInsert['iddivision'];
+            $IDGroup = $formInsert['IDGroupedit'];
+            $Namegroup = $formInsert['Namegroup'];
+
+            $dataUpdate = array(
+                'NameGroup' => $Namegroup,
+                'IDDivision' => $iddivision
+
+            );
+            $this->db->where('IDGroup', $IDGroup);
+            $this->db->update('db_it.group_module', $dataUpdate);
+            return print_r(1);
+        }
     }
 
 
-     public function upload_fileAcademic($fileName, $formData){
+    public function upload_fileAcademic($fileName, $formData){
 
-            //$fileName = $this->input->get('fileName');
-            $Colom = $this->input->get('c');
-            $User = $this->input->get('u');
-            //print_r($fileName);
-            //print_r($formData);
+        //$fileName = $this->input->get('fileName');
+        $Colom = $this->input->get('c');
+        $User = $this->input->get('u');
+        //print_r($fileName);
+        //print_r($formData);
 
-            $config['upload_path']          = './uploads/files/';
-            $config['allowed_types']        = '*';
-            $config['max_size']             = 8000; // 8 mb
-            $config['file_name']            = $fileName;
+        $config['upload_path']          = './uploads/files/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
 
-            if(is_file('./uploads/files/'.$fileName)){
-                    unlink('./uploads/files/'.$fileName);
+        if(is_file('./uploads/files/'.$fileName)){
+            unlink('./uploads/files/'.$fileName);
+        }
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+            // Cek apakah di db sudah ada
+            $dataNIP = $this->db->get_where('db_employees.files',array('NIP'=>$User))->result_array();
+            $dataUpdate = array(
+                $Colom => $fileName
+            );
+            if(count($dataNIP)>0){
+                $this->db->where('NIP', $User);
+                $this->db->update('db_employees.files',$dataUpdate);
+            } else {
+                $dataUpdate['NIP'] = $User;
+                $this->db->insert('db_employees.files',$dataUpdate);
             }
-            $this->load->library('upload', $config);
-            if ( ! $this->upload->do_upload('userfile')){
-                $error = array('error' => $this->upload->display_errors());
-                return print_r(json_encode($error));
-            }
-            else {
+            return print_r(json_encode($success));
+        }
 
-                $success = array('success' => $this->upload->data());
-                $success['success']['formGrade'] = 0;
-                // Cek apakah di db sudah ada
-                $dataNIP = $this->db->get_where('db_employees.files',array('NIP'=>$User))->result_array();
-                $dataUpdate = array(
-                    $Colom => $fileName
-                );
-                if(count($dataNIP)>0){
-                    $this->db->where('NIP', $User);
-                    $this->db->update('db_employees.files',$dataUpdate);
-                } else {
-                    $dataUpdate['NIP'] = $User;
-                    $this->db->insert('db_employees.files',$dataUpdate);
-                }
-                return print_r(json_encode($success));
-            }
-
-     }
+    }
 
 
     public function getProvinsi()
@@ -7297,60 +7297,60 @@ class C_api extends CI_Controller {
             $this->db->insert('db_reservation.t_booking_delete', $dataSave);
 
 
-                $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
-                $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking_eq_additional');
+            $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking');
+            $this->m_master->delete_id_table_all_db($get[0]['ID'],'db_reservation.t_booking_eq_additional');
 
             // send email and update notification
             // broadcase update js
-           /* if($_SERVER['SERVER_NAME'] =='localhost') {
-                $client = new Client(new Version1X('//10.1.10.230:3000'));
-            }
-            else{
-                $client = new Client(new Version1X('//10.1.30.17:3000'));
+            /* if($_SERVER['SERVER_NAME'] =='localhost') {
+                 $client = new Client(new Version1X('//10.1.10.230:3000'));
+             }
+             else{
+                 $client = new Client(new Version1X('//10.1.30.17:3000'));
 
-            }
-                $client->initialize();
-                // send message to connected clients
-                $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
-                $client->close();*/
+             }
+                 $client->initialize();
+                 // send message to connected clients
+                 $client->emit('update_schedule_notifikasi', ['update_schedule_notifikasi' => '1','date' => '']);
+                 $client->close();*/
 
-                $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
-                $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
-                $StartNameDay = $Startdatetime->format('l');
-                $EndNameDay = $Enddatetime->format('l');
+            $Startdatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['Start']);
+            $Enddatetime = DateTime::createFromFormat('Y-m-d H:i:s', $get[0]['End']);
+            $StartNameDay = $Startdatetime->format('l');
+            $EndNameDay = $Enddatetime->format('l');
 
 
-                //suggestion room
-                    $ParticipantQty = $get[0]['ParticipantQty'];
-                    //find room besar >= ParticipantQty and category room sama
-                    $sg_room = function($ParticipantQty,$Room){
-                        $result = '';
-                        $r = array();
-                        $a = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
-                        $ID_CategoryRoom = $a[0]['ID_CategoryRoom'];
-                        $b = $this->m_master->caribasedprimary('db_academic.classroom','ID_CategoryRoom',$ID_CategoryRoom);
-                        for ($i=0; $i < count($b); $i++) {
-                            if ($b[$i]['Seat'] > $ParticipantQty) {
-                                $r[] = $b[$i]['Room'];
-                            }
-                        }
+            //suggestion room
+            $ParticipantQty = $get[0]['ParticipantQty'];
+            //find room besar >= ParticipantQty and category room sama
+            $sg_room = function($ParticipantQty,$Room){
+                $result = '';
+                $r = array();
+                $a = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
+                $ID_CategoryRoom = $a[0]['ID_CategoryRoom'];
+                $b = $this->m_master->caribasedprimary('db_academic.classroom','ID_CategoryRoom',$ID_CategoryRoom);
+                for ($i=0; $i < count($b); $i++) {
+                    if ($b[$i]['Seat'] > $ParticipantQty) {
+                        $r[] = $b[$i]['Room'];
+                    }
+                }
 
-                        if (count($r) > 0) {
-                            $result = 'Following suggestion from our room :<ul>';
-                            for ($i=0; $i < count($r); $i++) {
-                                $result .= '<li>'.$r[$i].'</li>';
-                            }
-                            $result .='</ul>';
-                        }
+                if (count($r) > 0) {
+                    $result = 'Following suggestion from our room :<ul>';
+                    for ($i=0; $i < count($r); $i++) {
+                        $result .= '<li>'.$r[$i].'</li>';
+                    }
+                    $result .='</ul>';
+                }
 
-                        return $result;
-                    };
-                    $sg_room = $sg_room($ParticipantQty,$get[0]['Room']);
-                //suggestion room
+                return $result;
+            };
+            $sg_room = $sg_room($ParticipantQty,$get[0]['Room']);
+            //suggestion room
 
-                // send email
-                $Email = $getUser[0]['EmailPU'];
-                $text = 'Dear '.$getUser[0]['Name'].',<br><br>
+            // send email
+            $Email = $getUser[0]['EmailPU'];
+            $text = 'Dear '.$getUser[0]['Name'].',<br><br>
 
                             Your Venue Reservation was conflict '.$wrADDNotesDelete_email.',<br><br>
                             <strong>Your schedule automated delete by System</strong>,<br><br>
@@ -7788,11 +7788,11 @@ class C_api extends CI_Controller {
 
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['NPM'].'</b></div>';
             $nestedData[] = '<div  style="text-align:left;">
                                     <b><i class="fa fa-user margin-right"></i> '.ucwords(strtolower($row['Name'])).'</b><br/>
+                                        '.$row['NPM'].' | '.$row['ProdiNameEng'].'<br/>
                                         <a>'.$row['EmailPU'].'</a></div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['ProdiNameEng'].'</div>';
+
             $nestedData[] = '<div  style="text-align:left;">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -7828,13 +7828,13 @@ class C_api extends CI_Controller {
 
                                     </div>';
 
-             $nestedData[] = '<div  style="text-align:left;">
+            $nestedData[] = '<div  style="text-align:left;">
                                     <div class="">
-                                        <div class="col-xs-10" style="padding-right: 0px;">
+                                        <div class="col-xs-9" style="padding-right: 0px;">
                                             <input id="formSKLN'.$row['NPM'].'" class="form-control hide" value="'.$row['SklNumber'].'"/>
                                             <span id="viewSKLN'.$row['NPM'].'">'.$row['SklNumber'].'</span>
                                         </div>
-                                        <div class="col-xs-2">
+                                        <div class="col-xs-3">
 
                                             <button class="btn btn-sm btn-success btn-block btn-circle btnSaveSKLN hide" data-npm="'.$row['NPM'].'"><i class="fa fa-check-circle"></i></button>
                                             <button class="btn btn-sm btn-default btn-block btn-circle btnEditSKLN" data-npm="'.$row['NPM'].'"><i class="fa fa-pencil-square-o"></i></button>
@@ -8067,7 +8067,51 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='readDataSchFP'){
+
+                $SemesterID = $data_arr['SemesterID'];
+                $Type = $data_arr['Type'];
+
+                $data = $this->db->query('SELECT fpc.*, cl.Room FROM db_academic.final_project_schedule fpc 
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fpc.ClassroomID)
+                                                    WHERE fpc.SemesterID = "'.$SemesterID.'" AND fpc.Type = "'.$Type.'" 
+                                                    ORDER BY fpc.Date, fpc.Start ASC ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        // Get Std
+                        $data[$i]['Student'] = $this->db->query('SELECT sp.*, ats.Name  FROM db_academic.final_project_schedule_student sp 
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sp.NPM)
+                                                        WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
+                        $data[$i]['Examiner'] = $this->db->query('SELECT sp.*, em.Name  FROM db_academic.final_project_schedule_lecturer sp 
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = sp.NIP)
+                                                        WHERE sp.FPSID = "'.$data[$i]['ID'].'" ')->result_array();
+                    }
+                }
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='removeDataSchFP'){
+
+                $ID = $data_arr['ID'];
+
+                $tables = array('db_academic.final_project_schedule_student', 'db_academic.final_project_schedule_lecturer');
+                $this->db->where('FPSID', $ID);
+                $this->db->delete($tables);
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.final_project_schedule');
+
+                return print_r(1);
+
+            }
             else if($data_arr['action']=='updateDataSchFP'){
+
+                // 0 = blm daftar, 1 = sudah daftar, 2 = Sudah terjadwal sidang proposal, 3 = Lulus Sidang Proposal,
+                // -3 = Tidak Lulus Sidang Proposal, 4 = Sudah terjadwal sidang hasil, 5 = Lulus sidang hasil, -5 = Tidak Lulus sidang hasil
+
                 $ID = $data_arr['ID'];
                 $dataForm = (array) $data_arr['dataForm'];
                 $Lecturer = (array) $data_arr['Lecturer'];
@@ -8080,22 +8124,7 @@ class C_api extends CI_Controller {
                     $this->db->where('ID',$ID);
                     $this->db->update('db_academic.final_project_schedule',$dataForm);
 
-                    // Get Std lama
-                    $dataStdLama = $this->db->get_where('db_academic.final_project_schedule_student',array(
-                        'FPSID' => $ID
-                    ))->result_array();
-
-                    if(count($dataStdLama)>0){
-                        // Update Status
-                        for($j=0;$j<count($dataStdLama);$j++){
-                            $this->db->where('NPM',$dataStdLama[$j]['NPM']);
-                            $this->db->update('db_academic.final_project',array(
-                                'Status' => '1'
-                            ));
-                        }
-                    }
-
-                    $tables = array('db_academic.final_project_schedule_lecturer', 'db_academic.final_project_schedule_student');
+                    $tables = array('db_academic.final_project_schedule_lecturer');
                     $this->db->where('FPSID', $ID);
                     $this->db->delete($tables);
 
@@ -8136,6 +8165,25 @@ class C_api extends CI_Controller {
                     }
                 }
 
+
+
+
+                return print_r(1);
+
+            }
+            else if($data_arr['action']=='removeStudentSchFP'){
+                $ID = $data_arr['ID'];
+                $NPM = $data_arr['NPM'];
+
+                $this->db->where('NPM',$NPM);
+                $this->db->update('db_academic.final_project',array(
+                    'Status' => '1'
+                ));
+
+                $this->db->reset_query();
+
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_academic.final_project_schedule_student');
 
                 return print_r(1);
 
@@ -8261,7 +8309,7 @@ class C_api extends CI_Controller {
             }
 
             // adding search Formulir Number
-                $dataSearch .= ' or fma.FormulirCode LIKE "%'.$search.'%" or fma.No_Ref LIKE "%'.$search.'%" )';
+            $dataSearch .= ' or fma.FormulirCode LIKE "%'.$search.'%" or fma.No_Ref LIKE "%'.$search.'%" )';
         }
 
         $queryDefault = 'SELECT aut_s.*, ps.Name AS ProdiName, ps.NameEng AS ProdiNameEng, ss.Description AS StatusStudent,
@@ -8343,9 +8391,18 @@ class C_api extends CI_Controller {
             $gp = ($row['ProdiGroupID']!='' && $row['ProdiGroupID']!=null) ? ' - '.$row['ProdiGroup'] : '';
 
             // show formulir number
-                $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<br/><span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
+            $StrFM = ($row['FormulirCode'] != null && $row['FormulirCode'] != 'null' && $row['FormulirCode'] != "" && (!empty($row['FormulirCode']))) ? '<br/><span style="color: #20525a;">'.$row['FormulirCode'].' / '.$row['No_Ref'].'</span>' : '';
 
-                $IDCard = ($row['Access_Card_Number']!='' && $row['Access_Card_Number']!=null) ? $row['Access_Card_Number'] : '-';
+            $IDCard = ($row['Access_Card_Number']!='' && $row['Access_Card_Number']!=null) ? $row['Access_Card_Number'] : '-';
+
+
+            // Cuma akademik yang bisa edit dan upload foto
+            $DeptID = $this->session->userdata('IDdepartementNavigation');
+            $btnAct = ($DeptID==6 || $DeptID=='6') ? $btnAct : '-';
+            $fm = ($DeptID==6 || $DeptID=='6') ? $fm : '-';
+
+
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
@@ -8921,7 +8978,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:left;"><span style="color:#0968b3;">(Co) '.$row['CoordinatorName'].'</span>'.$TeamTeaching.'</div>';
             $nestedData[] = '<div  style="text-align:center;"><textarea id="detailsStudentCuy'.$no.'" class="hide">'.$stdDetails_cuy.'</textarea>
                                 <a href="javascript:void(0);" data-no="'.$no.'" data-course="'.$row['ClassGroup'].' | '.$row['MKCode'].' - '.$row['MKNameEng'].'" class="showStudentCuy">'.
-                                    count($Student).' of '.count($Student_plan).'</a>
+                count($Student).' of '.count($Student_plan).'</a>
                              </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
@@ -9632,9 +9689,9 @@ class C_api extends CI_Controller {
             }
         }
 
-     }
+    }
 
-     public function dropeditgroupmodule(){
+    public function dropeditgroupmodule(){
         $data_arr = $this->getInputToken();
 
         if (count($data_arr) > 0) {
@@ -9648,9 +9705,9 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
         }
-     }
+    }
 
-     public function dropeditmodule(){
+    public function dropeditmodule(){
         $data_arr = $this->getInputToken();
 
         if (count($data_arr) > 0) {
@@ -9663,7 +9720,7 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
         }
-     }
+    }
 
 
 
@@ -9829,13 +9886,13 @@ class C_api extends CI_Controller {
                     }
 
                 } else {
-                     $sql = 'select * from db_finance.payment_type';
-                     $query=$this->db->query($sql, array())->result_array();
+                    $sql = 'select * from db_finance.payment_type';
+                    $query=$this->db->query($sql, array())->result_array();
 
-                     for ($i=0; $i < count($query); $i++) {
-                         $PTID = $query[$i]['ID'];
+                    for ($i=0; $i < count($query); $i++) {
+                        $PTID = $query[$i]['ID'];
 
-                         $sql1 = 'SELECT * FROM db_finance.tuition_fee tf
+                        $sql1 = 'SELECT * FROM db_finance.tuition_fee tf
                                                             WHERE
                                                             tf.ProdiID = "'.$data_arr['PaymentProdiID'].'"
                                                             AND tf.ClassOf = "'.$data_arr['PaymentClassOf'].'"
@@ -9843,42 +9900,42 @@ class C_api extends CI_Controller {
                                                             AND tf.PTID = "'.$PTID.'" ';
 
 
-                         $query1=$this->db->query($sql1, array())->result_array();
+                        $query1=$this->db->query($sql1, array())->result_array();
 
 
-                         $Invoice = 0;
+                        $Invoice = 0;
 
-                         for ($k=1; $k <= 14; $k++) {
-                             $st = $k;
-                             switch ($PTID) {
-                                 case 1:
-                                 case 4:
-                                     if ($k == 1) {
-                                         $Invoice = $query1[0]['Cost'];
-                                         $st = 15;
-                                     }
-                                     break;
-                                 case 2:
-                                 case 3:
-                                     $Invoice = $query1[0]['Cost'];
-                                     break;
-                                 default:
-                                     $Invoice = 0;
-                                     break;
-                             }
-                             $Semester = $k;
+                        for ($k=1; $k <= 14; $k++) {
+                            $st = $k;
+                            switch ($PTID) {
+                                case 1:
+                                case 4:
+                                    if ($k == 1) {
+                                        $Invoice = $query1[0]['Cost'];
+                                        $st = 15;
+                                    }
+                                    break;
+                                case 2:
+                                case 3:
+                                    $Invoice = $query1[0]['Cost'];
+                                    break;
+                                default:
+                                    $Invoice = 0;
+                                    break;
+                            }
+                            $Semester = $k;
 
-                             $dataSave = array(
-                                 'Semester' => $Semester,
-                                 'PTID' => $PTID,
-                                 'NPM' => $data_arr['toNewNPM'],
-                                 'Invoice' => $Invoice,
-                             );
-                             $this->db->insert('db_finance.m_tuition_fee',$dataSave);
-                             $k = $st;
-                         }
+                            $dataSave = array(
+                                'Semester' => $Semester,
+                                'PTID' => $PTID,
+                                'NPM' => $data_arr['toNewNPM'],
+                                'Invoice' => $Invoice,
+                            );
+                            $this->db->insert('db_finance.m_tuition_fee',$dataSave);
+                            $k = $st;
+                        }
 
-                     }
+                    }
 
                 }
 

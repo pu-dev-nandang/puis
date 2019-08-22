@@ -27,103 +27,180 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="thumbnail" style="padding: 0px">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Transcript & Ijazah</span>
 
-            <div style="margin: 15px">
-                <table class="table table-setting">
-                    <tr>
-                        <td style="width: 50%">Nomor Keputusan Pendirian Perguruan Tinggai</td>
-                        <td style="width: 1%">:</td>
-                        <td>
-                            <input id="formSTID" value="<?php echo $Transcript['ID'] ?>" class="hide" hidden readonly>
-                            <input id="formSTNumberUniv" value="<?php echo $Transcript['NumberUniv'] ?>" class="form-control formST" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tempat Diterbitkan</td>
-                        <td>:</td>
-                        <td>
-                            <input id="formSTPlaceIssued" value="<?php echo $Transcript['PlaceIssued']; ?>" class="form-control formST">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tanggal Diterbitkan</td>
-                        <td>:</td>
-                        <td>
-                            <input id="formSTDateIssuedValue" value="<?php echo $Transcript['DateIssued']; ?>" class="form-control hide" readonly>
-                            <input id="formSTDateIssued" data-desc="Issue" class="form-control formST">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Tanggal Yudisium</td>
-                        <td>:</td>
-                        <td>
-                            <input id="formSTDateOfYudisiumValue" value="<?php echo $Transcript['DateOfYudisium']; ?>" class="form-control hide" readonly>
-                            <input id="formSTDateOfYudisium" data-desc="Yudisium" class="form-control formST">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" style="text-align: right;">
-                            <button class="btn btn-success" id="btnSaveST">Save</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+    <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="thumbnail" style="padding: 0px">
+                    <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Transcript & Ijazah</span>
 
-    </div>
-
-    <div class="col-md-4">
-        <div class="thumbnail" style="padding: 0px">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Graduation Honor</span>
-
-            <div style="margin: 5px;margin-top: 15px;">
-                <table class="table table-bordered" id="tableHonor">
-                    <tr>
-                        <th colspan="2" style="width: 20%">IPK</th>
-                        <th rowspan="2" style="width: 25%">Predicate Indo</th>
-                        <th rowspan="2" style="width: 20%">Predicate Eng</th>
-                        <th rowspan="2" style="width: 2%">Act</th>
-                    </tr>
-                    <tr>
-                        <th style="width: 13%">Start</th>
-                        <th style="width: 13%">End</th>
-                    </tr>
-
-                    <?php
-                        foreach ($Graduation AS $itemG){ ?>
-
+                    <div style="margin: 15px">
+                        <table class="table table-setting">
                             <tr>
-                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGStart<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKStart'] ?></span><input value="<?php echo $itemG['IPKStart'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKStart<?php echo $itemG['ID']; ?>"></td>
-                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGEnd<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKEnd'] ?></span><input value="<?php echo $itemG['IPKEnd'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKEnd<?php echo $itemG['ID']; ?>"></td>
-                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescription<?php echo $itemG['ID'];?>"><?php echo $itemG['Description'] ?></span><input value="<?php echo $itemG['Description'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescription<?php echo $itemG['ID']; ?>"></td>
-                                <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescriptionEng<?php echo $itemG['ID']; ?>"><?php echo $itemG['DescriptionEng'] ?></span><input value="<?php echo $itemG['DescriptionEng'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescriptionEng<?php echo $itemG['ID']; ?>"></td>
+                                <td style="width: 50%">Nomor Keputusan Pendirian Perguruan Tinggai</td>
+                                <td style="width: 1%">:</td>
                                 <td>
-                                    <button class="btn btn-success btn-sm btnSaveG hide" id="btnSaveG<?php echo $itemG['ID']; ?>" data-id="<?php echo $itemG['ID']; ?>">Save</button>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle" id="btnDropDown<?php echo $itemG['ID']; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="javascript:void(0);" class="btnEditG" data-id="<?php echo $itemG['ID']; ?>">Edit</a></li>
-                                            <li role="separator" class="divider"></li>
-                                            <li class="disabled"><a href="javascript:void(0);" class="btnDelG disabled" disabled="disabled" data-id="<?php echo $itemG['ID']; ?>">Delete</a></li>
-                                        </ul>
-                                    </div>
+                                    <input id="formSTID" value="<?php echo $Transcript['ID'] ?>" class="hide" hidden readonly>
+                                    <input id="formSTNumberUniv" value="<?php echo $Transcript['NumberUniv'] ?>" class="form-control formST" />
                                 </td>
                             </tr>
-                        <?php }
-                    ?>
+                            <tr>
+                                <td>Tempat Diterbitkan</td>
+                                <td>:</td>
+                                <td>
+                                    <input id="formSTPlaceIssued" value="<?php echo $Transcript['PlaceIssued']; ?>" class="form-control formST">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Diterbitkan</td>
+                                <td>:</td>
+                                <td>
+                                    <input id="formSTDateIssuedValue" value="<?php echo $Transcript['DateIssued']; ?>" class="form-control hide" readonly>
+                                    <input id="formSTDateIssued" data-desc="Issue" class="form-control formST">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Yudisium</td>
+                                <td>:</td>
+                                <td>
+                                    <input id="formSTDateOfYudisiumValue" value="<?php echo $Transcript['DateOfYudisium']; ?>" class="form-control hide" readonly>
+                                    <input id="formSTDateOfYudisium" data-desc="Yudisium" class="form-control formST">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="text-align: right;">
+                                    <button class="btn btn-success" id="btnSaveST">Save</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <hr/>
+            </div>
 
-<!--                    <button class="btn btn-sm btn-default btn-default-danger"><i class="fa fa-trash"></i></button>-->
-                </table>
+            <div class="col-md-6">
+                <div class="thumbnail" style="padding: 0px">
+                    <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Graduation Honor</span>
 
+                    <div style="margin: 5px;margin-top: 15px;">
+                        <table class="table table-bordered" id="tableHonor">
+                            <tr>
+                                <th colspan="2" style="width: 20%">IPK</th>
+                                <th rowspan="2" style="width: 25%">Predicate Indo</th>
+                                <th rowspan="2" style="width: 20%">Predicate Eng</th>
+                                <th rowspan="2" style="width: 2%">Act</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 13%">Start</th>
+                                <th style="width: 13%">End</th>
+                            </tr>
+
+                            <?php
+                            foreach ($Graduation AS $itemG){ ?>
+
+                                <tr>
+                                    <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGStart<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKStart'] ?></span><input value="<?php echo $itemG['IPKStart'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKStart<?php echo $itemG['ID']; ?>"></td>
+                                    <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGEnd<?php echo $itemG['ID']; ?>"><?php echo $itemG['IPKEnd'] ?></span><input value="<?php echo $itemG['IPKEnd'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formIPKEnd<?php echo $itemG['ID']; ?>"></td>
+                                    <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescription<?php echo $itemG['ID'];?>"><?php echo $itemG['Description'] ?></span><input value="<?php echo $itemG['Description'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescription<?php echo $itemG['ID']; ?>"></td>
+                                    <td><span class="spanGrade<?php echo $itemG['ID'] ?>" id="viewGDescriptionEng<?php echo $itemG['ID']; ?>"><?php echo $itemG['DescriptionEng'] ?></span><input value="<?php echo $itemG['DescriptionEng'] ?>" class="form-control formFillG<?php echo $itemG['ID']; ?> hide" id="formDescriptionEng<?php echo $itemG['ID']; ?>"></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm btnSaveG hide" id="btnSaveG<?php echo $itemG['ID']; ?>" data-id="<?php echo $itemG['ID']; ?>">Save</button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-default dropdown-toggle" id="btnDropDown<?php echo $itemG['ID']; ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="javascript:void(0);" class="btnEditG" data-id="<?php echo $itemG['ID']; ?>">Edit</a></li>
+                                                <li role="separator" class="divider"></li>
+                                                <li class="disabled"><a href="javascript:void(0);" class="btnDelG disabled" disabled="disabled" data-id="<?php echo $itemG['ID']; ?>">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php }
+                            ?>
+
+                            <!--                    <button class="btn btn-sm btn-default btn-default-danger"><i class="fa fa-trash"></i></button>-->
+                        </table>
+
+                    </div>
+                </div>
+                <hr/>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="thumbnail" style="padding: 0px">
+                    <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Temp. Transcript</span>
+                    <div style="padding: 10px;">
+                        <hr/>
+                        <div class="form-group">
+                            <label>No Transcript</label>
+                            <input class="form-control" id="formTemp_No" value="<?php echo $TempTranscript['No']; ?>" />
+                        </div>
+                        <div class="form-group">
+                            <label>Tempat Terbit</label>
+                            <input class="form-control" id="formTemp_Place" value="<?php echo $TempTranscript['Place']; ?>" />
+                        </div>
+                        <div class="form-group">
+                            <label>Tanggal Terbit</label>
+                            <input id="formTemp_TsDateValue" value="<?php echo $TempTranscript['Date']; ?>" class="form-control hide" readonly>
+                            <input id="formTemp_TsDate" data-desc="TempTS" class="form-control">
+                        </div>
+                        <hr/>
+                        <div style="text-align: right;">
+                            <button class="btn btn-success" id="btnSaveTemp_TS">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="thumbnail" style="padding: 0px;min-height: 100px;">
+                    <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  SKPI</span>
 
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2" style="margin-top: 20px;">
+                            <div class="well">
+                                <div class="">
+                                    <select class="form-control" id="filterSKPI">
+                                        <option value="4">Higher Education System in Indonesia</option>
+                                        <option value="5">Level of Education and Conditional of Learning</option>
+                                        <option value="6">Semester Credit Unit and Duration of Study</option>
+                                        <option disabled>-----------------</option>
+                                        <option value="7">Indonesian Qualification Framework (KKNI)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <hr/>
+                        </div>
+                    </div>
+
+
+                    <div class="row" style="padding: 10px;">
+                        <div class="col-md-6">
+                            <div class="text-center"><b>Indonesia</b></div>
+                            <br/>
+                            <textarea rows="5" class="form-control" id="formIndo"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center"><b>English</b></div>
+                            <br/>
+                            <textarea rows="5" class="form-control" id="formEng"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row" style="padding: 10px;">
+                        <div class="col-md-12 text-right">
+                            <hr/>
+                            <button class="btn btn-default btn-default-success" id="btnSaveSKPI">Save</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
+
 
     <div class="col-md-4">
         <div class="thumbnail" style="padding: 0px">
@@ -168,77 +245,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-2">
-        <div class="thumbnail" style="padding: 0px">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i> Temp. Transcript</span>
-            <div style="padding: 10px;">
-                <hr/>
-                <div class="form-group">
-                    <label>No Transcript</label>
-                    <input class="form-control" id="formTemp_No" value="<?php echo $TempTranscript['No']; ?>" />
-                </div>
-                <div class="form-group">
-                    <label>Tempat Terbit</label>
-                    <input class="form-control" id="formTemp_Place" value="<?php echo $TempTranscript['Place']; ?>" />
-                </div>
-                <div class="form-group">
-                    <label>Tanggal Terbit</label>
-                    <input id="formTemp_TsDateValue" value="<?php echo $TempTranscript['Date']; ?>" class="form-control hide" readonly>
-                    <input id="formTemp_TsDate" data-desc="TempTS" class="form-control">
-                </div>
-                <hr/>
-                <div style="text-align: right;">
-                    <button class="btn btn-success" id="btnSaveTemp_TS">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="thumbnail" style="padding: 0px;min-height: 100px;">
-            <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  SKPI</span>
 
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2" style="margin-top: 20px;">
-                    <div class="well">
-                        <div class="">
-                            <select class="form-control" id="filterSKPI">
-                                <option value="4">Higher Education System in Indonesia</option>
-                                <option value="5">Level of Education and Conditional of Learning</option>
-                                <option value="6">Semester Credit Unit and Duration of Study</option>
-                                <option disabled>-----------------</option>
-                                <option value="7">Indonesian Qualification Framework (KKNI)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <hr/>
-                </div>
-            </div>
-
-
-            <div class="row" style="padding: 10px;">
-                <div class="col-md-6">
-                    <div class="text-center"><b>Indonesia</b></div>
-                    <br/>
-                    <textarea rows="5" class="form-control" id="formIndo"></textarea>
-                </div>
-                <div class="col-md-6">
-                    <div class="text-center"><b>English</b></div>
-                    <br/>
-                    <textarea rows="5" class="form-control" id="formEng"></textarea>
-                </div>
-            </div>
-
-            <div class="row" style="padding: 10px;">
-                <div class="col-md-12 text-right">
-                    <hr/>
-                    <button class="btn btn-default btn-default-success" id="btnSaveSKPI">Save</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
 <br />
 
 <div class="row">
