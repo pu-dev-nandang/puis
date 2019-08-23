@@ -3330,7 +3330,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,3);
         $pdf->Cell(115,7,'',0,0,'L');
-        $pdf->Cell(27,7,'Nomor Ijazah National / ',0,0,'L');
+        $pdf->Cell(27,7,'Nomor Ijazah Nasional / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell(25,7,'National Certificate Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
@@ -3638,12 +3638,12 @@ class C_save_to_pdf extends CI_Controller {
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
-        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
 
         $Rektorat = $dataStudent['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
         $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
 
         // Foto
         $pdf->SetFont('dinpromedium','',$font_medium);
@@ -3920,13 +3920,13 @@ class C_save_to_pdf extends CI_Controller {
         // Dekan --
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
-        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
         // Rektor
         $Rektorat = $dataIjazah['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
         $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
         $komaRektor = ($titleBRektor!='') ? ',' : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
         // ----
         $pdf->SetFont('dinpromedium','',$fn_b);
         $yy = 9.2; // novie
@@ -5748,12 +5748,12 @@ Phone: (021) 29200456';
                 // if ($pr_create[0]['Status'] ==  2) {
                 //     $fpdf->SetFont('Arial','B',50);
                 //     $fpdf->SetTextColor(255,192,203);
-                //     $fpdf->RotatedText(35,190,'Approve',35);  
+                //     $fpdf->RotatedText(35,190,'Approve',35);
                 // }
                 // elseif ($pr_create[0]['Status'] ==  3) {
                 //     $fpdf->SetFont('Arial','B',50);
                 //     $fpdf->SetTextColor(255,192,203);
-                //     $fpdf->RotatedText(35,190,'Reject',35); 
+                //     $fpdf->RotatedText(35,190,'Reject',35);
                 // }
 
 
