@@ -1086,10 +1086,10 @@
 			var ev2 = $(this).closest('#pageContent');
 			ev2.find('input').not('.TglBA').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
-			ev2.find('select').prop('disabled',false);
-			ev2.find('.dtbank[tabindex!="-1"]').select2({
-			    //allowClear: true
-			});
+			// ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true
+			// });
 			$(this).remove();
 			ev2.find('.TypePay').trigger('change');
 		}

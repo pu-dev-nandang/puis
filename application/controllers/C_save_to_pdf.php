@@ -5708,12 +5708,27 @@ Phone: (021) 29200456';
              $fpdf->SetXY($x,$y);
              $fpdf->SetFillColor(255, 255, 255);
              // $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
+             $Sx = $x;
              for ($i=0; $i < count($JsonStatus); $i++) {
                 if ($JsonStatus[$i]['Visible'] == 'Yes') {
-                 $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                      $Approver = $JsonStatus[$i]['NIP'];
+                      $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                      $Signatures = $G_CreatedBy[0]['Signatures'];
+                      // print_r($Signatures);
+                     if (file_exists('./uploads/signature/'.$Signatures)) {
+                        $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                        $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY(),$w_approved,$h_signature);
+                     }
+                     else
+                     {
+                        $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                     }
+
+                     $Sx += $w_approved;
+                 
                 }
              }
-
+             // die();
              $CreatedBy = $pr_create[0]['CreatedBy'];
              $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
              $NameRequester = $G_CreatedBy[0]['Name'];
@@ -6059,7 +6074,7 @@ Phone: (021) 29200456';
             $y = $pdf->GetY()+20;
 
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-            $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40); 
 
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');

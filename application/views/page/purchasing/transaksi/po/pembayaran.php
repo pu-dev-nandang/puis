@@ -773,8 +773,8 @@
 		var dtspb = dt_arr.dtspb;
 		// console.log(dtspb);
 		var Invoice = 0;
-		var TypePay = "Transfer";
-		var ID_bank = 7;
+		var TypePay = "Cash";
+		var ID_bank = 0;
 		var NoRekening = "";
 		var Nama_Penerima = "";
 		var Date_Needed = "";
@@ -881,7 +881,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								OPTypePay(TypePay,Dis)+	
+								OPTypePay(TypePay,'disabled')+	
 							'</td>'+		
 						'</tr>'+
 						'<tr>'+
@@ -971,6 +971,8 @@
 				makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 			}
 		}
+
+		$('.TypePay').trigger('change');
 
 	}
 
@@ -3438,10 +3440,10 @@
 			var ev2 = $(this).closest('.pageFormInput');
 			ev2.find('input').not('.TglBA').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
-			ev2.find('select').prop('disabled',false);
-			ev2.find('.dtbank[tabindex!="-1"]').select2({
-			    //allowClear: true
-			});
+			// ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true`
+			// });
 			$(this).remove();
 			ev2.find('.TypePay').trigger('change');
 		}
