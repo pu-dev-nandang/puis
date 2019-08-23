@@ -33,6 +33,7 @@
 ***/uploads/budgeting/pr/
 ***/uploads/budgeting/po/
 **/uploads/budgeting/
+#**/uploads/DGS/
 document/*
 /uploads/syllabus_sap/*.pdf
 /uploads/vreservation/*.pdf
