@@ -1027,22 +1027,46 @@ class C_save_to_pdf3 extends CI_Controller {
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;
+         $Sx = $x;
         for ($i=0; $i < count($JsonStatus); $i++) {
            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                $Approver = $JsonStatus[$i]['NIP'];
+                $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                $Signatures = $G_CreatedBy[0]['Signatures'];
                // Name
                $a_ = $c__;
                
                if ( ($a_ + $w__)<= 210) {
                    $w = $w__;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                    $c__ += $w__;
                }
                else
                {
                    // sisa
                    $w = 210 - $a_;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                }
+
+               $Sx += $w__;
 
            } 
             
