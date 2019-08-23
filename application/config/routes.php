@@ -1344,9 +1344,6 @@ $route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
 $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
-
-
-
 // budgeting & PR
 $route['budgeting'] = 'page/budgeting/c_budgeting';
 
@@ -1530,7 +1527,6 @@ $route['budgeting/submit_cash_advance_user'] = 'page/budgeting/c_cashadvance/sub
 $route['budgeting/submitca_realisasi_by_user'] = 'page/budgeting/c_cashadvance/submitca_realisasi_by_user';
 
 
-
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
@@ -1542,8 +1538,6 @@ $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
 $route['finance_ap/send_reminder_realisasi'] = 'page/budgeting/c_finap/send_reminder_realisasi';
-
-
 
 // pr adding
 $route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
@@ -1715,5 +1709,7 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 
 // request document
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
-
 $route['portal'] = 'c_login/portal';
+
+// don't show Digital Signature
+$route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
