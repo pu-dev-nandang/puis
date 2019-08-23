@@ -1279,7 +1279,7 @@ $route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_f
 
 $route['announcement/edit-announcement/(:num)'] = 'page/announcement/c_announcement/edit_announcement/$1';
 
-
+// Agregator
 $route['agregator/setting'] = 'page/agregator/c_agregator/setting';
 
 $route['agregator/akreditasi-eksternal'] = 'page/agregator/c_agregator/akreditasi_eksternal';
@@ -1307,6 +1307,8 @@ $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tun
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
+//$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
+
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
