@@ -442,7 +442,9 @@ class C_cashadvance extends Budgeting_Controler {
                 $UploadTandaTerima = json_encode($UploadTandaTerima);
                 $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
                 $Status = 1;
+                $CodePettyCash = $this->m_global->Get_PettyCashCode();
                 $dataSave = array(
+                    'CodePettyCash' => $CodePettyCash,
                     'ID_cash_advance' => $ID_cash_advance,
                     'UploadInvoice' => $UploadInvoice,
                     'NoInvoice' => $Input['NoInvoice'],

@@ -30,6 +30,7 @@
 
 </div>
 <script type="text/javascript">
+	var Onetime = 0;
 	var ClassDt = {
 		htmlPage_payment_list : function(){
 			var html = '';
@@ -81,69 +82,214 @@
 
 	function Get_data_payment(){
        var def = jQuery.Deferred();
+       var UriSegment = "<?php echo $sget ?>";
        var data = {
    		   auth : 's3Cr3T-G4N',
        };
        var token = jwt_encode(data,"UAP)(*");
-       	var table = $('#tableData_payment').DataTable({
-       		"fixedHeader": true,
-       	    "processing": true,
-       	    "destroy": true,
-       	    "serverSide": true,
-       	    "lengthMenu": [[5], [5]],
-       	    "iDisplayLength" : 5,
-       	    "ordering" : false,
-       	    "ajax":{
-       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
-       	        ordering : false,
-       	        type: "post",  // method  , by default get
-       	        data : {token : token},
-       	        error: function(){  // error handling
-       	            $(".employee-grid-error").html("");
-       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-       	            $("#employee-grid_processing").css("display","none");
-       	            def.reject();
+       if (UriSegment != '' && UriSegment != null) {
+       	var tokenSearch = jwt_decode(UriSegment,"UAP)(*");
+       	if (Onetime == 0) {
+   		       	var table = $('#tableData_payment').DataTable({
+   		       		"fixedHeader": true,
+   		       	    "processing": true,
+   		       	    "destroy": true,
+   		       	    "serverSide": true,
+   		       	    "lengthMenu": [[5], [5]],
+   		       	    "oSearch": {"sSearch": tokenSearch},
+   		       	    "iDisplayLength" : 5,
+   		       	    "ordering" : false,
+   		       	    "ajax":{
+   		       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+   		       	        ordering : false,
+   		       	        type: "post",  // method  , by default get
+   		       	        data : {token : token},
+   		       	        error: function(){  // error handling
+   		       	            $(".employee-grid-error").html("");
+   		       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+   		       	            $("#employee-grid_processing").css("display","none");
+   		       	            def.reject();
 
-       	        },
-       	    },
-    	    'createdRow': function( row, data, dataIndex ) {
-    	    	       var ListPR = data[parseInt(data.length) - 1];
-    	    	       var PRHTML = '';
-    	    	       PRHTML += ListPR[0];
-    	    	       var ID_payment = ListPR[1].ID_payment;
-    	    	       var CodeSPB = ListPR[1].CodeSPB;
-    	    	       var TypePay = ListPR[1].TypePay;
-    	    	       var Perihal = ListPR[1].Perihal;
-    	    	       var Code_po_create = '';
-    	    	       if (data[1] != null && data[1] != '') {
-    	    	       	var Code_po_create = data[1];
-    	    	       }
+   		       	        },
+   		       	    },
+   		    	    'createdRow': function( row, data, dataIndex ) {
+   		    	    	       var ListPR = data[parseInt(data.length) - 1];
+   		    	    	       var PRHTML = '';
+   		    	    	       PRHTML += ListPR[0];
+   		    	    	       var ID_payment = ListPR[1].ID_payment;
+   		    	    	       var CodeSPB = ListPR[1].CodeSPB;
+   		    	    	       var TypePay = ListPR[1].TypePay;
+   		    	    	       var Perihal = ListPR[1].Perihal;
+   		    	    	       var Code_po_create = '';
+   		    	    	       if (data[1] != null && data[1] != '') {
+   		    	    	       	var Code_po_create = data[1];
+   		    	    	       }
 
-    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
-    	    	       var Payment = input_radio + ' Type : '+TypePay;
-    	    	       if (TypePay == 'Spb') {
-    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
-    	    	       }
-    	    	      if (Code_po_create != '') {
-    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
-    	    	      }
-    	    	      if (Code_po_create != '') {
-    	    	      	 Payment += '<br>PR Code : '+PRHTML;
-    	    	      }
+   		    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+   		    	    	       var Payment = input_radio + ' Type : '+TypePay;
+   		    	    	       if (TypePay == 'Spb') {
+   		    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+   		    	    	       }
+   		    	    	      if (Code_po_create != '') {
+   		    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+   		    	    	      }
+   		    	    	      if (Code_po_create != '') {
+   		    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+   		    	    	      }
 
-    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
-    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
-    	    	       
-    	    	       $( row ).find('td:eq(1)').html(Payment);
-	    		    	
-	    		    	$( row ).find('td:eq(2)').attr('align','center');
-	    		    	$( row ).find('td:eq(4)').attr('align','center');
-	    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
-    	    },
-       	    "initComplete": function(settings, json) {
-       	        def.resolve(json);
-       	    }
-       	});
+   		    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+   		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+   		    	    	       
+   		    	    	       $( row ).find('td:eq(1)').html(Payment);
+   			    		    	
+   			    		    	$( row ).find('td:eq(2)').attr('align','center');
+   			    		    	$( row ).find('td:eq(4)').attr('align','center');
+   			    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+   		    	    },
+   		       	    "initComplete": function(settings, json) {
+   		       	    	// $('.C_radio:first').prop('checked', true);
+   		       	    	// $('.C_radio:checked').trigger('change');
+   		       	    	// $('.C_radio:first').trigger('click');
+   		       	        def.resolve(json);
+   		       	    }
+   		       	});
+       		Onetime++;       	
+       	}
+       	else
+       	{
+		       	var table = $('#tableData_payment').DataTable({
+		       		"fixedHeader": true,
+		       	    "processing": true,
+		       	    "destroy": true,
+		       	    "serverSide": true,
+		       	    "lengthMenu": [[5], [5]],
+		       	    "oSearch": {"sSearch": tokenSearch},
+		       	    "iDisplayLength" : 5,
+		       	    "ordering" : false,
+		       	    "ajax":{
+		       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+		       	        ordering : false,
+		       	        type: "post",  // method  , by default get
+		       	        data : {token : token},
+		       	        error: function(){  // error handling
+		       	            $(".employee-grid-error").html("");
+		       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+		       	            $("#employee-grid_processing").css("display","none");
+		       	            def.reject();
+
+		       	        },
+		       	    },
+		    	    'createdRow': function( row, data, dataIndex ) {
+		    	    	       var ListPR = data[parseInt(data.length) - 1];
+		    	    	       var PRHTML = '';
+		    	    	       PRHTML += ListPR[0];
+		    	    	       var ID_payment = ListPR[1].ID_payment;
+		    	    	       var CodeSPB = ListPR[1].CodeSPB;
+		    	    	       var TypePay = ListPR[1].TypePay;
+		    	    	       var Perihal = ListPR[1].Perihal;
+		    	    	       var Code_po_create = '';
+		    	    	       if (data[1] != null && data[1] != '') {
+		    	    	       	var Code_po_create = data[1];
+		    	    	       }
+
+		    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+		    	    	       var Payment = input_radio + ' Type : '+TypePay;
+		    	    	       if (TypePay == 'Spb') {
+		    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+		    	    	       }
+		    	    	      if (Code_po_create != '') {
+		    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+		    	    	      }
+		    	    	      if (Code_po_create != '') {
+		    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+		    	    	      }
+
+		    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+		    	    	       
+		    	    	       $( row ).find('td:eq(1)').html(Payment);
+			    		    	
+			    		    	$( row ).find('td:eq(2)').attr('align','center');
+			    		    	$( row ).find('td:eq(4)').attr('align','center');
+			    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+		    	    },
+		       	    "initComplete": function(settings, json) {
+		       	    	// $('.C_radio:first').prop('checked', true);
+		       	    	// $('.C_radio:checked').trigger('change');
+		       	    	// $('.C_radio:first').trigger('click');
+		       	        def.resolve(json);
+		       	    }
+		       	});
+       	}
+
+       }
+       else
+       {
+   	       	var table = $('#tableData_payment').DataTable({
+   	       		"fixedHeader": true,
+   	       	    "processing": true,
+   	       	    "destroy": true,
+   	       	    "serverSide": true,
+   	       	    "lengthMenu": [[5], [5]],
+   	       	    "oSearch": {"sSearch": tokenSearch},
+   	       	    "iDisplayLength" : 5,
+   	       	    "ordering" : false,
+   	       	    "ajax":{
+   	       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+   	       	        ordering : false,
+   	       	        type: "post",  // method  , by default get
+   	       	        data : {token : token},
+   	       	        error: function(){  // error handling
+   	       	            $(".employee-grid-error").html("");
+   	       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+   	       	            $("#employee-grid_processing").css("display","none");
+   	       	            def.reject();
+
+   	       	        },
+   	       	    },
+   	    	    'createdRow': function( row, data, dataIndex ) {
+   	    	    	       var ListPR = data[parseInt(data.length) - 1];
+   	    	    	       var PRHTML = '';
+   	    	    	       PRHTML += ListPR[0];
+   	    	    	       var ID_payment = ListPR[1].ID_payment;
+   	    	    	       var CodeSPB = ListPR[1].CodeSPB;
+   	    	    	       var TypePay = ListPR[1].TypePay;
+   	    	    	       var Perihal = ListPR[1].Perihal;
+   	    	    	       var Code_po_create = '';
+   	    	    	       if (data[1] != null && data[1] != '') {
+   	    	    	       	var Code_po_create = data[1];
+   	    	    	       }
+
+   	    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+   	    	    	       var Payment = input_radio + ' Type : '+TypePay;
+   	    	    	       if (TypePay == 'Spb') {
+   	    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+   	    	    	       }
+   	    	    	      if (Code_po_create != '') {
+   	    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+   	    	    	      }
+   	    	    	      if (Code_po_create != '') {
+   	    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+   	    	    	      }
+
+   	    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+   	    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+   	    	    	       
+   	    	    	       $( row ).find('td:eq(1)').html(Payment);
+   		    		    	
+   		    		    	$( row ).find('td:eq(2)').attr('align','center');
+   		    		    	$( row ).find('td:eq(4)').attr('align','center');
+   		    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+   	    	    },
+   	       	    "initComplete": function(settings, json) {
+   	       	    	// $('.C_radio:first').prop('checked', true);
+   	       	    	// $('.C_radio:checked').trigger('change');
+   	       	    	// $('.C_radio:first').trigger('click');
+   	       	        def.resolve(json);
+   	       	    }
+   	       	});
+       }
+       	
        return def.promise();
 	}
 

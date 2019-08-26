@@ -616,6 +616,24 @@
 								'</td>'+
 							'</tr>';
 
+				// show petty cash
+				var PettyCashHtml = '';
+				if (Type == 'Cash Advance') {
+					var CodePettyCash = Realisasi[0]['CodePettyCash'];
+					a_href = '<a href = "javascript:void(0)" class ="ViewPettyCash" code = "'+CodePettyCash+'" ID_Realisasi = "'+ID_Realisasi+'" ID_payment = "'+dtspb[0].ID+'">'+CodePettyCash+'</a>';
+					PettyCashHtml = '<tr>'+
+										'<td class="TD1">'+
+											'Petty Cash'+
+										'</td>'+
+										'<td class="TD2">'+
+											':'+
+										'</td>'+
+										'<td>'+
+											a_href+
+										'</td>	'+			
+									'</tr>';
+				}			
+
 				html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
 							'<div class = "col-xs-12">'+
 								'<div align="center"><h2>REALISASI</h2></div>'+
@@ -653,6 +671,7 @@
 												Date_Realisasi+
 											'</td>	'+			
 										'</tr>'+
+										PettyCashHtml+
 										htmldetail+
 									'</tbody>'+
 								'</table>'+
@@ -947,6 +966,7 @@
 					action : 'reject',
 					auth : 's3Cr3T-G4N',
 					NoteDel : NoteDel,
+					payment_data : ClassDt.DataPaymentPO,
 				}
 
 				var token = jwt_encode(data,"UAP)(*");
@@ -1102,6 +1122,45 @@
 			  ID_payment : ID_payment,
 			  TypePay : dt[0].Type,
 			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user_realisasi';
+		}
+		
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+
+	$(document).off('click', '.ViewPettyCash').on('click', '.ViewPettyCash',function(e) {
+		var CodePettyCash = $(this).attr('code');
+		var ID_Realisasi = $(this).attr('ID_Realisasi');
+		var ID_payment = $(this).attr('id_payment');
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.all_po_payment;
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+
+			var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			  CodePettyCash : CodePettyCash,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+		}
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			  CodePettyCash : CodePettyCash,
 			}
 			var token = jwt_encode(data,"UAP)(*");
 			var url = base_url_js+'save2pdf/print/payment_user_realisasi';

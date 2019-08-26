@@ -28,6 +28,11 @@ class C_finap extends Budgeting_Controler {
 
     public function create_ap()
     {
+        $this->data['sget'] = '';
+        if ( isset($_GET['token']) ) {
+            $this->data['sget'] = $_GET['token'];
+        }
+       
         $page = $this->load->view('global/budgeting/finap/create_ap',$this->data,true);
         $this->menu_horizontal($page);
     }
@@ -47,10 +52,10 @@ class C_finap extends Budgeting_Controler {
                                    UNION 
                                    select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
                                    left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
-                                   UNION 
-                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
-                                   as a
-                                   left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
+                                   #UNION 
+                                   #select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
+                                   #as a
+                                   #left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
                                  )
                  as b on a.ID = b.ID_payment
                  join db_budgeting.ap as c on a.ID = c.ID_payment

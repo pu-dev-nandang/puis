@@ -125,7 +125,7 @@ class M_global extends CI_Model {
 
     public function JsonStatusRealisasi()
     {
-        // approval oleh kasubag finance
+        // approval oleh  kabag finance & kasubag finance
         $arr = array();
         // insert created by
         $arr[] = array(
@@ -141,8 +141,8 @@ class M_global extends CI_Model {
                        SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
                              a.StatusEmployeeID
                 FROM   db_employees.employees as a
-                where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
-                                                        // Finance                                  // kasubag
+                where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 11";
+                                                        // Finance                                  // kabag
         $query=$this->db->query($sql, array())->result_array();        
 
         if (count($query) > 0) {
@@ -154,12 +154,47 @@ class M_global extends CI_Model {
               'Visible' => 'Yes',
               'NameTypeDesc' => 'Approval by',
             );
+
+            $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
+                           SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
+                                 a.StatusEmployeeID
+                    FROM   db_employees.employees as a
+                    where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
+            $query=$this->db->query($sql, array())->result_array();                                                   // Finance                                  // kasubag
+            $arr[] = array(
+              'NIP' => $query[0]['NIP'] ,
+              'Status' => 0,
+              'ApproveAt' => '',
+              'Representedby' => '',
+              'Visible' => 'No',
+              'NameTypeDesc' => 'Approval by',
+            );
         }
         else
         {
             die();
         }
         return $arr;
+    }
+    
+    public function JsonStatusRealisasi2($JsonStatus)
+    {
+        // + kasubag finance
+        $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
+                       SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
+                             a.StatusEmployeeID
+                FROM   db_employees.employees as a
+                where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
+        $query=$this->db->query($sql, array())->result_array();                                                   // Finance                                  // kasubag
+        $JsonStatus[] = array(
+          'NIP' => $query[0]['NIP'] ,
+          'Status' => 0,
+          'ApproveAt' => '',
+          'Representedby' => '',
+          'Visible' => 'No',
+          'NameTypeDesc' => 'Approval by',
+        );
+        return $JsonStatus;
     }
 
     public function Get_data_payment_user($ID)
@@ -438,10 +473,10 @@ class M_global extends CI_Model {
                                    UNION 
                                    select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
                                    left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
-                                   UNION 
-                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
-                                   as a
-                                   left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
+                                   #UNION 
+                                   #select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
+                                   #as a
+                                   #left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
                                  )
                  as b on a.ID = b.ID_payment
                  join db_budgeting.ap as c on a.ID = c.ID_payment
@@ -515,6 +550,44 @@ class M_global extends CI_Model {
             }
         }
         return $arr;
+    }
+
+    public function Get_PettyCashCode()
+    {
+        /* method PC
+           Code : PC1900001
+           PC : Fix
+           19 : Get Years Now
+           00001 : increment max 5 digit
+        */
+        $Code = '';   
+        $Year = date('Y');
+        $YearSearch = 'PC'.substr($Year, 2,2);
+        $MaxInc = 5;
+        $sql = 'select * from db_payment.cash_advance_realisasi where CodePettyCash like "'.$YearSearch.'%" order by ID desc limit 1';
+        $query=$this->db->query($sql, array())->result_array();
+        if (count($query) > 0 ) {
+            $CodePettyCash = $query[0]['CodePettyCash'];
+            $StrLen = strlen($CodePettyCash);
+            $Inc = substr($CodePettyCash, 4,$MaxInc);
+            $C = (int) $Inc;
+            $C = $C + 1;
+            $strINC = $C;
+            $B = strlen($strINC);
+            for ($i=0; $i < $MaxInc - $B; $i++) { 
+                $strINC = '0'.$strINC;
+            }
+            $Code = 'PC'.substr($Year, 2,2).$strINC;
+        }
+        else
+        {
+            $strINC = '00001';
+            $Code = 'PC'.substr($Year, 2,2).$strINC;
+        }
+        
+
+        return $Code;        
+
     }
 
 }

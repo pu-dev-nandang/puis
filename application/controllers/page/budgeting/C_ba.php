@@ -432,6 +432,12 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
         $Input = $this->getInputToken();
         $action = $Input['action'];
         $ID_payment = $Input['ID_payment'];
+        // for approval
+        $token4 = $this->input->post('token4');
+        $key = "UAP)(*";
+        $token4 = (array) $this->jwt->decode($token4,$key);
+        $Departement = $this->input->post('Departement');
+        $Amount = $this->input->post('Biaya');
         switch ($action) {
             case 'add':
                 $ID_bank_advance = $Input['ID_payment_type'];
@@ -440,7 +446,10 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
 
                 $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/bankadvance');
                 $UploadTandaTerima = json_encode($UploadTandaTerima);
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // approval by RAD + kasubag finance
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $dataSave = array(
                     'ID_bank_advance' => $ID_bank_advance,
@@ -471,7 +480,10 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
             case 'edit':
                 $ID_Realisasi = $Input['ID_Realisasi'];
                 $ID_bank_advance = $Input['ID_payment_type'];
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // approval by RAD + kasubag finance
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $dataSave = array(
                     'ID_bank_advance' => $ID_bank_advance,

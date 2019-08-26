@@ -371,7 +371,7 @@
 		}
 
 		// show page realisasi
-		if (DataPaymentSelected.dtspb[0].Status == 2) {
+		if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 			var DivPageRealisasi = se_content.find('.BAAdd');
 			makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 		}			
@@ -605,10 +605,10 @@
 		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiBA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 		var btn_submit = '<button class="btn btn-success submitRealisasiBA" disabled> Submit</button>';
 		
-		// var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
-		var btn_approve = '';
-		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
-		var btn_reject = '';
+		var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		// var btn_approve = '';
+		var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		// var btn_reject = '';
 		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
@@ -679,8 +679,8 @@
 		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
-		    		// $('#Approve_realisasi').attr('approval_number',NumberOfApproval);
-		    		// $('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    		$('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		$('#Reject_realisasi').attr('approval_number',NumberOfApproval);
 		    	}
 
 		    break;
@@ -1659,6 +1659,25 @@
 			action : action,
 		};
 
+		// pass po_detail agar dapat approval
+		var po_detail = ClassDt.po_data.po_detail;
+		var temp = [];
+		for (var i = 0; i < po_detail.length; i++) {
+			var arr = po_detail[i];
+			var token_ = jwt_encode(arr,"UAP)(*");
+			temp.push(token_);
+		}
+
+		var token4 = jwt_encode(temp,"UAP)(*");
+		form_data.append('token4',token4);
+
+		var Departement = IDDepartementPUBudget;
+		form_data.append('Departement',Departement);
+		var ev1= ev.closest('#pageContent');
+		var Biaya = ev1.find('.Money_Pembayaran').val();
+		Biaya = findAndReplace(Biaya, ".","");
+		form_data.append('Biaya',Biaya);
+
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
 		var url = base_url_js + "budgeting/submitba_realisasi_by_po"
@@ -1729,5 +1748,120 @@
 		FormSubmitAuto(url, 'POST', [
 		    { name: 'token', value: token },
 		]);
+	})
+
+	$(document).off('click', '#Approve_realisasi').on('click', '#Approve_realisasi',function(e) {
+		// console.log(ClassDt);return;
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve_realisasi');
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// var url = base_url_js + 'rest2/__approve_po';
+			var url = base_url_js + 'rest2/__approve_payment_realisasi';
+			var data = {
+				ID_payment : ID_payment,
+				ID_Realisasi : ID_Realisasi,
+				approval_number : approval_number,
+				NIP : sessionNIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+				payment_data : ClassDt.DataPaymentSelected,
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				var rs = resultJson;
+				if (rs.Status == 1) {
+					loadFirst();
+				}
+				else
+				{
+					if (rs.Change == 1) {
+						toastr.info('The Data already have updated by another person,Please check !!!');
+						loadFirst();
+					}
+					else
+					{
+						toastr.error(rs.msg,'!!!Failed');
+					}
+				}
+			}).fail(function() {
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+	})
+
+	$(document).off('click', '#Reject_realisasi').on('click', '#Reject_realisasi',function(e) {
+		if (confirm('Are you sure ?')) {
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_payment_realisasi';
+				var data = {
+					ID_payment : ID_payment,
+					ID_Realisasi : ID_Realisasi,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					payment_data : ClassDt.DataPaymentSelected,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						loadFirst();
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							loadFirst();
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
 	})
 </script>

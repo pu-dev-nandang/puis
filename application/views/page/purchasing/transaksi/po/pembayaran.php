@@ -966,7 +966,8 @@
 
 			// show page realisasi
 			var DataPaymentSelected = dt_arr;
-			if (DataPaymentSelected.dtspb[0].Status == 2) {
+			// console.log(DataPaymentSelected);
+			if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 				var DivPageRealisasi = se_content.find('.BAAdd');
 				makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 			}
@@ -1491,7 +1492,8 @@
 
 			// show page realisasi
 			var DataPaymentSelected = dt_arr;
-			if (DataPaymentSelected.dtspb[0].Status == 2) {
+			// console.log(DataPaymentSelected);
+			if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 				var DivPageRealisasi = se_content.find('.CAAdd');
 				makePagerealisasica(DataPaymentSelected,DivPageRealisasi); 
 			}
@@ -1523,6 +1525,7 @@
 		var StatusRealiasi = '';
 		var btn_hide_submit = '';
 		var btnRealisasi = '<button class="btn btn-success submitRealisasiCA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		var PettyCashHtml = 'Auto Generate by System';
 		if (Realisasi.length > 0) { // exist
 			Dis = 'disabled';
 			StatusRealiasi = Realisasi[0].Status;
@@ -1545,6 +1548,9 @@
 			NoTandaTerima = Realisasi[0].NoTandaTerima;
 			Date_Realisasi = Realisasi[0].Date_Realisasi;
 			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+
+			var CodePettyCash = Realisasi[0]['CodePettyCash'];
+			PettyCashHtml = '<a href = "javascript:void(0)" class ="ViewPettyCash" code = "'+CodePettyCash+'" ID_Realisasi = "'+ID_Realisasi+'">'+CodePettyCash+'</a>';
 		}
 
 		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
@@ -1593,6 +1599,17 @@
 				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasiCA" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
 				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 				                		'</div>'+
+									'</td>	'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'Petty Cash'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										PettyCashHtml+
 									'</td>	'+			
 								'</tr>'+
 							'</tbody>'+
@@ -3927,6 +3944,25 @@
 				action : action,
 			};
 
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var Departement = IDDepartementPUBudget;
+			form_data.append('Departement',Departement);
+			var ev1= ev.closest('.FormPage');
+			var Biaya = ev1.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			form_data.append('Biaya',Biaya);
+
 			var token = jwt_encode(data,"UAP)(*");
 			form_data.append('token',token);
 			var url = base_url_js + "budgeting/submitba_realisasi_by_po"
@@ -4170,4 +4206,29 @@
 		    { name: 'token', value: token },
 		]);
 	})
+
+	$(document).off('click', '.ViewPettyCash').on('click', '.ViewPettyCash',function(e) {
+		var CodePettyCash = $(this).attr('code');
+		var ID_Realisasi = $(this).attr('ID_Realisasi');
+		var ev = $(this).closest('.FormPage');
+		var ID_payment = ev.attr('id_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+		var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		  CodePettyCash : CodePettyCash,
+		}
+		// console.log(data);return;
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+
+	})
+	
 </script>
