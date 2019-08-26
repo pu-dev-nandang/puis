@@ -95,7 +95,8 @@ class C_mobile extends CI_Controller {
                     );
                 }
             }
-        } else {
+        }
+        else {
             // Pengecekan manual
 
             $dataStd = $this->checkUser($data_arr['NPM'],$data_arr['Password']);
@@ -112,6 +113,24 @@ class C_mobile extends CI_Controller {
                 );
             }
 
+        }
+
+        return print_r(json_encode($result));
+
+    }
+
+    public function getSemesterActive(){
+
+        $data_arr = $this->getInputToken();
+
+        $checkStd = $this->db->get_where('db_academic.auth_students',array(
+            'NPM' => $data_arr['NPM'],
+            'Password' => $data_arr['Token']
+        ))->result_array();
+
+        $result = [];
+        if(count($checkStd)>0){
+            $result = $this->db->get_where('db_academic.semester',array('Status' => 1))->result_array();
         }
 
         return print_r(json_encode($result));
