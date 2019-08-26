@@ -1121,6 +1121,10 @@ $route['api3/login'] = 'api/c_mobile/login';
 $route['api3/__readGlobalInfo'] = 'api/c_mobile/readGlobalInfo';
 $route['test_mobile'] = 'api/c_mobile/test_mobile';
 
+
+$route['mobile/__getSemesterActive'] = 'api/c_mobile/getSemesterActive';
+
+
 $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 $route['api3/__crudqna'] = 'api/c_api3/crudqna';
 $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
