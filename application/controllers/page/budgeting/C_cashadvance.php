@@ -1018,6 +1018,33 @@ class C_cashadvance extends Budgeting_Controler {
                 }
 
                  $this->m_spb->payment_circulation_sheet($ID_payment,'Input Realisasi');
+
+                 $JsonStatus = json_decode($JsonStatus,true);
+                 $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                 $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                 $CodeDept = $G_div[0]['Code'];
+                 $key = "UAP)(*";
+                 $token = $this->jwt->encode($ID_payment,$key);
+                 $CodeUrl = $token;
+                 // Send Notif for next approval
+                     $data = array(
+                         'auth' => 's3Cr3T-G4N',
+                         'Logging' => array(
+                                         'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Realisasi '.'Cash Advance'.' of '.$CodeDept,
+                                         'Description' => 'Please approve '.'Cash Advance'.' of '.$CodeDept,
+                                         'URLDirect' => 'budgeting_menu/pembayaran/'.'cashadvance'.'/'.$CodeUrl,
+                                         'CreatedBy' => $this->session->userdata('NIP'),
+                                       ),
+                         'To' => array(
+                                   'NIP' => array($NIPApprovalNext),
+                                 ),
+                         'Email' => 'No', 
+                     );
+
+                     $url = url_pas.'rest2/__send_notif_browser';
+                     $token = $this->jwt->encode($data,"UAP)(*");
+                     $this->m_master->apiservertoserver($url,$token);
+
                 $rs['Status']= 1;
                 break;
             case 'edit':
@@ -1094,6 +1121,33 @@ class C_cashadvance extends Budgeting_Controler {
                     }
 
                 $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
+
+                $JsonStatus = json_decode($JsonStatus,true);
+                $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                $CodeDept = $G_div[0]['Code'];
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($ID_payment,$key);
+                $CodeUrl = $token;
+                // Send Notif for next approval
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Realisasi '.'Cash Advance'.' of '.$CodeDept,
+                                        'Description' => 'Please approve '.'Cash Advance'.' of '.$CodeDept,
+                                        'URLDirect' => 'budgeting_menu/pembayaran/'.'cashadvance'.'/'.$CodeUrl,
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($NIPApprovalNext),
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+
                 $rs['Status']= 1;
                 break;
             default:

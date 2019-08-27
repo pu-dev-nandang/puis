@@ -954,6 +954,27 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
         $Input = $this->getInputToken();
         $action = $Input['action'];
         $ID_payment = $Input['ID_payment'];
+
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $token_pengajuan = $this->input->post('token_pengajuan');
+        $key = "UAP)(*";
+        $token_pengajuan = $this->jwt->decode($token_pengajuan,$key);
+
+        // RuleApproval
+            // check Subtotal
+                $Amount = 0;
+                for ($i=0; $i < count($token_pengajuan); $i++) {
+                    $data = $token_pengajuan[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+                    // print_r($data_arr);
+                    $SubTotal = $data_arr['SubTotal'];
+                    $Amount = $Amount + $SubTotal;
+                }
+
         switch ($action) {
             case 'add':
                 $ID_bank_advance = $Input['ID_payment_type'];
@@ -962,7 +983,9 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
 
                 $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/bankadvance');
                 $UploadTandaTerima = json_encode($UploadTandaTerima);
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token_pengajuan);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $dataSave = array(
                     'ID_bank_advance' => $ID_bank_advance,
@@ -992,12 +1015,41 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                 }
 
                  $this->m_spb->payment_circulation_sheet($ID_payment,'Input Realisasi');
+
+                 $JsonStatus = json_decode($JsonStatus,true);
+                 $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                 $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                 $CodeDept = $G_div[0]['Code'];
+                 $key = "UAP)(*";
+                 $token = $this->jwt->encode($ID_payment,$key);
+                 $CodeUrl = $token;
+                 // Send Notif for next approval
+                     $data = array(
+                         'auth' => 's3Cr3T-G4N',
+                         'Logging' => array(
+                                         'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Realisasi '.'Bank Advance'.' of '.$CodeDept,
+                                         'Description' => 'Please approve '.'Bank Advance'.' of '.$CodeDept,
+                                         'URLDirect' => 'budgeting_menu/pembayaran/'.'bank_advance'.'/'.$CodeUrl,
+                                         'CreatedBy' => $this->session->userdata('NIP'),
+                                       ),
+                         'To' => array(
+                                   'NIP' => array($NIPApprovalNext),
+                                 ),
+                         'Email' => 'No', 
+                     );
+
+                     $url = url_pas.'rest2/__send_notif_browser';
+                     $token = $this->jwt->encode($data,"UAP)(*");
+                     $this->m_master->apiservertoserver($url,$token);
+
                 $rs['Status']= 1;
                 break;
             case 'edit':
                 $ID_Realisasi = $Input['ID_Realisasi'];
                 $ID_bank_advance = $Input['ID_payment_type'];
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token_pengajuan);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $dataSave = array(
                     'ID_bank_advance' => $ID_bank_advance,
@@ -1063,6 +1115,33 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                     }
 
                 $this->m_spb->payment_circulation_sheet($ID_payment,'Edit Realisasi');
+
+                $JsonStatus = json_decode($JsonStatus,true);
+                $NIPApprovalNext = $JsonStatus[1]['NIP'];
+                $G_div = $this->m_budgeting->SearchDepartementBudgeting($Departement);
+                $CodeDept = $G_div[0]['Code'];
+                $key = "UAP)(*";
+                $token = $this->jwt->encode($ID_payment,$key);
+                $CodeUrl = $token;
+                // Send Notif for next approval
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Realisasi '.'Bank Advance'.' of '.$CodeDept,
+                                        'Description' => 'Please approve '.'Bank Advance'.' of '.$CodeDept,
+                                        'URLDirect' => 'budgeting_menu/pembayaran/'.'bank_advance'.'/'.$CodeUrl,
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'NIP' => array($NIPApprovalNext),
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+                
                 $rs['Status']= 1;
                 break;
             default:

@@ -465,7 +465,7 @@ class M_global extends CI_Model {
         $joinaction = ' left join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
                                  ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin
-                                 from db_payment.payment as a join
+                                 from db_payment.payment as a left join
                                  ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
                                    UNION 
                                    select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.bank_advance_realisasi where ID_bank_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.bank_advance as a
@@ -473,18 +473,14 @@ class M_global extends CI_Model {
                                    UNION 
                                    select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
                                    left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
-                                   #UNION 
-                                   #select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
-                                   #as a
-                                   #left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
                                  )
                  as b on a.ID = b.ID_payment
-                 join db_budgeting.ap as c on a.ID = c.ID_payment
+                 left join db_budgeting.ap as c on a.ID = c.ID_payment
                   )
                          as pay on pay.Code_po_create = a.Code
                         left join db_employees.employees as e_PayFin on e_PayFin.NIP = pay.CreateBYPayFin
                         left join db_employees.employees as e_spb on e_spb.NIP = pay.CreatedBy
-                        join (
+                        left join (
                         select * from (
                         select CONCAT("AC.",ID) as ID, NameEng as NameDepartement from db_academic.program_study where Status = 1
                         UNION
@@ -520,8 +516,10 @@ class M_global extends CI_Model {
         }
         $sm = ($whereQuery == '') ? 'where' : ' and ';
         $WhereFiltering = $sm.'(JsonStatus2 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or  JsonStatus REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' or JsonStatus3 REGEXP \'"NIP":"[[:<:]]'.$NIP.'[[:>:]]"\' ) ';
+        // $WhereFiltering = '';
 
         $sqltotalData.= $whereQuery.$WhereFiltering ;
+        // print_r($sqltotalData);die();
         $querytotalData = $this->db->query($sqltotalData)->result_array();
         $totalData = $querytotalData[0]['total'];
         if ($totalData > 0) {

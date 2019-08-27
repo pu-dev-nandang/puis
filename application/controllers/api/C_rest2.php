@@ -3460,6 +3460,10 @@ class C_rest2 extends CI_Controller {
                     $this->load->model('budgeting/m_spb');
                     $rs = array('Status' => 1,'Change' => 0,'msg' => '');
                     $ID_payment = $dataToken['ID_payment'];
+                    $key = "UAP)(*";
+                    $token = $this->jwt->encode($ID_payment,$key);
+                    $CodeUrl2 = $token;
+
                     $ID_Realisasi = $dataToken['ID_Realisasi'];
 
                     $payment_data = $dataToken['payment_data'];
@@ -3573,9 +3577,9 @@ class C_rest2 extends CI_Controller {
                             {
                                 // Notif to next step approval & User
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
-                                    $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                    $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl2;
                                     if ($Dp == 'NA.4') {
-                                         $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                         $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl2;
                                     }
                                    
                                     $b_check = $this->m_master->NonDiv(9,$NIPApprovalNext);
@@ -3603,9 +3607,9 @@ class C_rest2 extends CI_Controller {
                                         $this->m_master->apiservertoserver($url,$token);
 
                                     // Send Notif for user
-                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl2;
                                         if ($Dp == 'NA.4') {
-                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl2;
                                         }
                                         $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
                                         if ($b_check) {
@@ -3688,9 +3692,9 @@ class C_rest2 extends CI_Controller {
                                     
                                         for ($i=0; $i < count($JsonStatus); $i++) {
                                             $NIPJson =  $JsonStatus[$i]['NIP'];
-                                            $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                            $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl2;
                                             if ($Dp == 'NA.4') {
-                                                 $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                                 $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl2;
                                             }
                                             // $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
                                             $b_check = $this->m_master->NonDiv(9,$NIPJson);
@@ -3727,9 +3731,9 @@ class C_rest2 extends CI_Controller {
 
                                 // Notif Reject to JsonStatus key 0
                                     // Send Notif for user
-                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl2;
                                         if ($Dp == 'NA.4') {
-                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl2;
                                         }
                                         $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
                                         if ($b_check) {

@@ -2555,7 +2555,6 @@
 		// ]);
 	})
 
-
 	$(document).off('click', '#Approve_realisasi').on('click', '#Approve_realisasi',function(e) {
 		// console.log(ClassDt);return;
 		if (confirm('Are you sure ?')) {
@@ -2599,6 +2598,76 @@
 			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
 			});
 		}
+	})
+
+	$(document).off('click', '#Reject_realisasi').on('click', '#Reject_realisasi',function(e) {
+		if (confirm('Are you sure ?')) {
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_payment_realisasi';
+				var data = {
+					ID_payment : ID_payment,
+					ID_Realisasi : ID_Realisasi,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					payment_data : ClassDt.DtExisting,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						LoadFirstLoad();
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							LoadFirstLoad();
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
 	})
 
 </script>
