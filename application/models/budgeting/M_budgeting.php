@@ -1099,11 +1099,12 @@ class M_budgeting extends CI_Model {
                                select a.ID_payment,a.Perihal from db_payment.cash_advance  as a
                                join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
                                where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_cash_advance
-                               UNION 
-                               select a.ID_payment,a.Perihal from db_payment.petty_cash 
-                               as a
-                               join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
-                               where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_petty_cash
+                               #UNION 
+                               #select a.ID_payment,a.Perihal from db_payment.petty_cash 
+                               #as a
+                               #join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                               #where b.ID_budget_left = '.$ID_budget_left.' group by b.ID_petty_cash
+
                             ) as b
                             on a.ID = b.ID_payment
                     ) as py

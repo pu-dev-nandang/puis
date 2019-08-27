@@ -4204,11 +4204,12 @@ class C_rest2 extends CI_Controller {
                                        select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.cash_advance  as a
                                        join db_payment.cash_advance_detail as b on a.ID = b.ID_cash_advance 
                                        where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
-                                       UNION 
-                                       select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.petty_cash 
-                                       as a
-                                       join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
-                                       where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
+                                       #UNION 
+                                       #select a.ID_payment,a.Perihal,sum(b.Invoice) as Invoice from db_payment.petty_cash 
+                                       #as a
+                                       #join db_payment.petty_cash_detail as b on a.ID = b.ID_petty_cash 
+                                       #where b.ID_budget_left = '.$ID_budget_left.' group by a.ID_payment
+
                                     ) as b
                                     on a.ID = b.ID_payment
                                 join db_employees.employees as c on a.CreatedBy = c.NIP
