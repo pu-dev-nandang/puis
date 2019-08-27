@@ -346,7 +346,7 @@
 		}
 
 		// show page realisasi
-		if (DataPaymentSelected.dtspb[0].Status == 2) {
+		if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 			var DivPageRealisasi = se_content.find('.CAAdd');
 			makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 		}		
@@ -1154,6 +1154,7 @@
 		var StatusRealiasi = '';
 		var btn_hide_submit = '';
 		var btnRealisasi = '<button class="btn btn-success submitRealisasiCA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		var PettyCashHtml = 'Auto Generate by System';
 		if (Realisasi.length > 0) { // exist
 			Dis = 'disabled';
 			StatusRealiasi = Realisasi[0].Status;
@@ -1176,6 +1177,8 @@
 			NoTandaTerima = Realisasi[0].NoTandaTerima;
 			Date_Realisasi = Realisasi[0].Date_Realisasi;
 			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+			var CodePettyCash = Realisasi[0]['CodePettyCash'];
+			PettyCashHtml = '<a href = "javascript:void(0)" class ="ViewPettyCash" code = "'+CodePettyCash+'" ID_Realisasi = "'+ID_Realisasi+'">'+CodePettyCash+'</a>';
 		}
 
 		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
@@ -1224,6 +1227,17 @@
 				                            '<input data-format="yyyy-MM-dd" class="form-control TglRealisasiCA" type=" text" readonly="" value = "'+Date_Realisasi+'">'+
 				                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 				                		'</div>'+
+									'</td>	'+			
+								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'Petty Cash'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										PettyCashHtml+
 									'</td>	'+			
 								'</tr>'+
 							'</tbody>'+
@@ -1343,10 +1357,10 @@
 		var btn_edit = '<button class="btn btn-primary btnEditInputRealisasiCA" status="'+dtspb[0]['Status']+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button>';
 		var btn_submit = '<button class="btn btn-success submitRealisasiCA" disabled> Submit</button>';
 		
-		// var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
-		var btn_approve = '';
-		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
-		var btn_reject = '';
+		var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
+		// var btn_approve = '';
+		var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
+		// var btn_reject = '';
 		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
@@ -1417,8 +1431,8 @@
 		    	if (bool && HierarkiApproval == NumberOfApproval) { // rule approval
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
 		    		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_approve+'&nbsp'+btn_reject+'</div>');
-		    		// $('#Approve_realisasi').attr('approval_number',NumberOfApproval);
-		    		// $('#Reject_realisasi').attr('approval_number',NumberOfApproval);
+		    		$('#Approve_realisasi').attr('approval_number',NumberOfApproval);
+		    		$('#Reject_realisasi').attr('approval_number',NumberOfApproval);
 		    	}
 
 		    break;
@@ -1614,6 +1628,25 @@
 			action : action,
 		};
 
+		// pass po_detail agar dapat approval
+		var po_detail = ClassDt.po_data.po_detail;
+		var temp = [];
+		for (var i = 0; i < po_detail.length; i++) {
+			var arr = po_detail[i];
+			var token_ = jwt_encode(arr,"UAP)(*");
+			temp.push(token_);
+		}
+
+		var token4 = jwt_encode(temp,"UAP)(*");
+		form_data.append('token4',token4);
+
+		var Departement = IDDepartementPUBudget;
+		form_data.append('Departement',Departement);
+		var ev1= ev.closest('#pageContent');
+		var Biaya = ev1.find('.Money_Pembayaran').val();
+		Biaya = findAndReplace(Biaya, ".","");
+		form_data.append('Biaya',Biaya);
+
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
 		var url = base_url_js + "budgeting/submitca_realisasi_by_po"
@@ -1679,6 +1712,145 @@
 		  dt_arr : dt_arr,
 		  po_data : po_data,
 		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+	$(document).off('click', '#Approve_realisasi').on('click', '#Approve_realisasi',function(e) {
+		// console.log(ClassDt);return;
+		if (confirm('Are you sure ?')) {
+			loading_button('#Approve_realisasi');
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// var url = base_url_js + 'rest2/__approve_po';
+			var url = base_url_js + 'rest2/__approve_payment_realisasi';
+			var data = {
+				ID_payment : ID_payment,
+				ID_Realisasi : ID_Realisasi,
+				approval_number : approval_number,
+				NIP : sessionNIP,
+				action : 'approve',
+				auth : 's3Cr3T-G4N',
+				payment_data : ClassDt.DataPaymentSelected,
+			}
+
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+				var rs = resultJson;
+				if (rs.Status == 1) {
+					loadFirst();
+				}
+				else
+				{
+					if (rs.Change == 1) {
+						toastr.info('The Data already have updated by another person,Please check !!!');
+						loadFirst();
+					}
+					else
+					{
+						toastr.error(rs.msg,'!!!Failed');
+					}
+				}
+			}).fail(function() {
+			  // toastr.info('No Result Data');
+			  toastr.error('The Database connection error, please try again', 'Failed!!');
+			}).always(function() {
+			    //$('#Approve').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+			});
+		}
+	})
+
+	$(document).off('click', '#Reject_realisasi').on('click', '#Reject_realisasi',function(e) {
+		if (confirm('Are you sure ?')) {
+			var ID_payment = ClassDt.ID_payment;
+			var ID_Realisasi = $(this).closest('.realisasi_page').attr('ID_Realisasi');
+			var approval_number = $(this).attr('approval_number');
+			// show modal insert reason
+			$('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Please Input Reason ! </b> <br>' +
+			    '<input type = "text" class = "form-group" id ="NoteDel" style="margin: 0px 0px 15px; height: 30px; width: 329px;" maxlength="30"><br>'+
+			    '<button type="button" id="confirmYes" class="btn btn-primary" style="margin-right: 5px;">Yes</button>' +
+			    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
+			    '</div>');
+			$('#NotificationModal').modal('show');
+
+			$("#confirmYes").click(function(){
+				var NoteDel = $("#NoteDel").val();
+				$('#NotificationModal .modal-header').addClass('hide');
+				$('#NotificationModal .modal-body').html('<center>' +
+				    '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
+				    '                    <br/>' +
+				    '                    Loading Data . . .' +
+				    '                </center>');
+				$('#NotificationModal .modal-footer').addClass('hide');
+				$('#NotificationModal').modal({
+				    'backdrop' : 'static',
+				    'show' : true
+				});
+
+				var url = base_url_js + 'rest2/__approve_payment_realisasi';
+				var data = {
+					ID_payment : ID_payment,
+					ID_Realisasi : ID_Realisasi,
+					approval_number : approval_number,
+					NIP : sessionNIP,
+					action : 'reject',
+					auth : 's3Cr3T-G4N',
+					NoteDel : NoteDel,
+					payment_data : ClassDt.DataPaymentSelected,
+				}
+
+				var token = jwt_encode(data,"UAP)(*");
+				$.post(url,{ token:token },function (resultJson) {
+					var rs = resultJson;
+					if (rs.Status == 1) {
+						loadFirst();
+					}
+					else
+					{
+						if (rs.Change == 1) {
+							toastr.info('The Data already have updated by another person,Please check !!!');
+							loadFirst();
+						}
+						else
+						{
+							toastr.error(rs.msg,'!!!Failed');
+						}
+					}
+					$('#NotificationModal').modal('hide');
+				}).fail(function() {
+				  // toastr.info('No Result Data');
+				  toastr.error('The Database connection error, please try again', 'Failed!!');
+				  $('#NotificationModal').modal('hide');
+				}).always(function() {
+				    // $('#reject').prop('disabled',false).html('<i class="fa fa-handshake-o"> </i> Approve');
+				    //$('#NotificationModal').modal('hide');
+				});
+			})	
+		}
+
+	})
+
+	$(document).off('click', '.ViewPettyCash').on('click', '.ViewPettyCash',function(e) {
+		var CodePettyCash = $(this).attr('code');
+		var ID_Realisasi = $(this).attr('ID_Realisasi');
+		var dt_arr = ClassDt.DataPaymentSelected;
+		var dtspb = dt_arr.dtspb;
+		var ID_payment = dtspb[0]['ID'];
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.DataPaymentPO;
+		// console.log(dt_arr);return;
+
+		var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		  CodePettyCash : CodePettyCash,
 		}
 		var token = jwt_encode(data,"UAP)(*");
 		FormSubmitAuto(url, 'POST', [

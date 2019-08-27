@@ -391,8 +391,101 @@ class M_pr_po extends CI_Model {
                      }  
              }
         }
+
         // print_r($rs);die();
+        // $rs[] = array(
+        //     'NIP' => 2018018,
+        //     'Status' => 1,
+        //     'ApproveAt' => '',
+        //     'Representedby' => '',
+        //     'Visible' => '',
+        //     'NameTypeDesc' => '',
+        // );
+        $rs = $this->__FilteringApprovalDoubleMore($rs); // trial
         return $rs;       
+    }
+
+    public function __FilteringApprovalDoubleMore($JsonStatus)
+    {
+        $rs = array();
+        $pola = array();
+        for ($i=1; $i < count($JsonStatus); $i++) { 
+            $NIP = $JsonStatus[$i]['NIP'];
+            $find = false;
+            for ($j=$i+1; $j < count($JsonStatus); $j++) { 
+                $NIP_ = $JsonStatus[$j]['NIP']; 
+                if ($NIP == $NIP_) {
+                    $pola[] = $i.','.$j;
+                    $find = true;
+                    // break;
+                }
+            }
+
+            if (!$find) {
+                // find di pola
+                $bfind = false;
+                for ($j=0; $j < $i; $j++) { 
+                    $NIP_ = $JsonStatus[$j]['NIP'];
+                    if ($NIP == $NIP_) {
+                        $str = $j.','.$i;
+                        for ($k=0; $k < count($pola); $k++) { 
+                            if ($str == $pola[$k]) {
+                                $bfind = true;
+                                break;
+                            }
+                        }
+                        // $pola[] = $j.','.$i;
+                        // $bfind = true;
+                    } 
+                }    
+                if (!$bfind) {
+                    $pola[] = $i;
+                }
+                
+            }
+        }
+
+        $bpola = true;
+        $interval = 0;
+        $stopLoop = false;
+        for ($i=0; $i < count($pola); $i++) { 
+            $d = explode(',', $pola[$i]);
+            if (count($d) > 1) {
+                for ($j=0; $j < count($d); $j++) {
+                    if ($j == 0) {
+                        $interval = $d[1] - $d[0];
+                    }
+                    else
+                    {
+                        $m = $j - 1;
+                        $c = $d[$j] - $d[$m];
+                        if ($c != $interval) {
+                            $bpola = false;
+                            $stopLoop = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($stopLoop) {
+                break;
+            }
+        }
+
+        if ($bpola) {
+            $rs[] = $JsonStatus[0];
+            for ($i=0; $i < count($pola); $i++) { 
+                $d = explode(',', $pola[$i]);
+                $rs[] = $JsonStatus[$d[0]];
+            }
+        }
+        else
+        {
+            $rs = $JsonStatus;
+        }
+
+        return $rs;
     }
 
     public function GetPR_CreateByPRCode($PRCode)
