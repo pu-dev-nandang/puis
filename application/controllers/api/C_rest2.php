@@ -3490,28 +3490,35 @@ class C_rest2 extends CI_Controller {
 
                     $urlType = '';
                     $tblupdate = '';
+                    $Dp = $G_data[0]['Departement'];
                     switch ($G_data[0]['Type']) {
                         case 'Bank Advance':
-                            $urlType = 'ba';
+                            $urlType = 'bank_advance';
+                            if ($Dp == 'NA.4') {
+                                $urlType = 'ba';
+                            }
                             // get data realisasi
                             $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi','ID',$ID_Realisasi);
                             $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
                             $tblupdate = 'db_payment.bank_advance_realisasi';
                             break;
                         case 'Cash Advance':
-                            $urlType = 'ca';
+                            $urlType = 'cashadvance';
+                            if ($Dp == 'NA.4') {
+                                $urlType = 'ca';
+                            }
                             // get data realisasi
                             $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID',$ID_Realisasi);
                             $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
                             $tblupdate = 'db_payment.cash_advance_realisasi';
                             break;
-                        case 'Petty Cash':
-                             $urlType = 'pc';
-                             // get data realisasi
-                             $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.petty_cash_realisasi','ID',$ID_Realisasi);
-                             $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
-                             $tblupdate = 'db_payment.petty_cash_realisasi';
-                            break;    
+                        // case 'Petty Cash':
+                        //      $urlType = 'pc';
+                        //      // get data realisasi
+                        //      $G_data_realisasi = $this->m_master->caribasedprimary('db_payment.petty_cash_realisasi','ID',$ID_Realisasi);
+                        //      $JsonStatus = (array)json_decode($G_data_realisasi[0]['JsonStatus'],true);
+                        //      $tblupdate = 'db_payment.petty_cash_realisasi';
+                        //     break;    
                         default:
                             die();
                             break;
@@ -3566,7 +3573,11 @@ class C_rest2 extends CI_Controller {
                             {
                                 // Notif to next step approval & User
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
-                                    $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                    $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                    if ($Dp == 'NA.4') {
+                                         $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                    }
+                                   
                                     $b_check = $this->m_master->NonDiv(9,$NIPApprovalNext);
                                     if ($b_check) {
                                         $UrlDirect = 'finance_ap/global/'.$CodeUrl;
@@ -3592,7 +3603,10 @@ class C_rest2 extends CI_Controller {
                                         $this->m_master->apiservertoserver($url,$token);
 
                                     // Send Notif for user
-                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                        if ($Dp == 'NA.4') {
+                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        }
                                         $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
                                         if ($b_check) {
                                             $UrlDirect = 'finance_ap/global/'.$CodeUrl;
@@ -3674,7 +3688,11 @@ class C_rest2 extends CI_Controller {
                                     
                                         for ($i=0; $i < count($JsonStatus); $i++) {
                                             $NIPJson =  $JsonStatus[$i]['NIP'];
-                                            $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                            $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                            if ($Dp == 'NA.4') {
+                                                 $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                            }
+                                            // $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
                                             $b_check = $this->m_master->NonDiv(9,$NIPJson);
                                             if ($b_check) {
                                                 $UrlDirect = 'finance_ap/global/'.$CodeUrl;
@@ -3709,7 +3727,10 @@ class C_rest2 extends CI_Controller {
 
                                 // Notif Reject to JsonStatus key 0
                                     // Send Notif for user
-                                        $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        $UrlDirect = 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl;
+                                        if ($Dp == 'NA.4') {
+                                             $UrlDirect = 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl;
+                                        }
                                         $b_check = $this->m_master->NonDiv(9,$JsonStatus[0]['NIP']);
                                         if ($b_check) {
                                             $UrlDirect = 'finance_ap/global/'.$CodeUrl;
@@ -3952,6 +3973,36 @@ class C_rest2 extends CI_Controller {
                                                 $url = url_pas.'rest2/__send_notif_browser';
                                                 $token = $this->jwt->encode($data,"UAP)(*");
                                                 $this->m_master->apiservertoserver($url,$token);
+
+                                                // notif to ap team atau kasubag fin
+                                                    $sqlAP = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
+                                                                   SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
+                                                                         a.StatusEmployeeID
+                                                            FROM   db_employees.employees as a
+                                                            where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
+                                                    $queryAP=$this->db->query($sqlAP, array())->result_array();
+                                                    if (count($queryAP) > 0) {
+                                                        $NIPAP =  $queryAP[0]['NIP'];
+                                                        $URLDirectAP = 'finance_ap/create_ap?token='.$CodeUrl;
+
+                                                        $data = array(
+                                                            'auth' => 's3Cr3T-G4N',
+                                                            'Logging' => array(
+                                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' of Purchasing has been done for approval',
+                                                                            'Description' => $G_data[0]['Type'].' of Purchasing',
+                                                                            'URLDirect' => $URLDirectAP,
+                                                                            'CreatedBy' => $NIP,
+                                                                          ),
+                                                            'To' => array(
+                                                                      'NIP' => array($NIPAP),
+                                                                    ),
+                                                            'Email' => 'No', 
+                                                        );
+
+                                                        $url = url_pas.'rest2/__send_notif_browser';
+                                                        $token = $this->jwt->encode($data,"UAP)(*");
+                                                        $this->m_master->apiservertoserver($url,$token);
+                                                    }
 
                                         }
                                     }

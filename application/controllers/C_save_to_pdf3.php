@@ -2155,39 +2155,39 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->SetXY($x,$y);
          $fpdf->Cell(0,$h, '3.', 0, 0, 'L', 0);
          $fpdf->SetX(15);
-         $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : (pilih salah satu)', 0, 1, 'L', 0);
+         $fpdf->Cell(50,$h, 'Uang yang diberikan melalui : ', 0, 1, 'L', 0);
          $fpdf->SetX(15);
          $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Cash') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
          $fpdf->SetX(25);
          $fpdf->Cell(50,$h,'Tunai', 0, 1, 'L', 0);
-         $fpdf->SetX(15);
-         $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Transfer') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
-         $fpdf->SetX(25);
-         $fpdf->Cell(50,$h,'Transfer', 0, 1, 'L', 0);
-         $No_Rekening = '...............................................................................';
-         $Name_Penerima = '...............................................................................';
-         $Nama_Bank = '...............................................................................';
-         if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
-             $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
-             $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
-             $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
-             $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
-             $Nama_Bank = $G_bank[0]['Name'];
-         }
-         $fpdf->SetX(25);
-         $fpdf->Cell(50,$h,'Ke rekening : ', 0, 1, 'L', 0);
-         $h = 5;
-         $fpdf->SetX(25);
-         $fpdf->Cell(50,$h,'Nama penerima : ', 0, 0, 'L', 0);
-         $fpdf->Cell(50,$h,$Name_Penerima, 0, 1, 'L', 0);
+         // $fpdf->SetX(15);
+         // $fpdf->Cell(50,$h, ($dtspb[0]['Detail'][0]['TypePay'] == 'Transfer') ? '(..V..)' : '(....)', 0, 0, 'L', 0);
+         // $fpdf->SetX(25);
+         // $fpdf->Cell(50,$h,'Transfer', 0, 1, 'L', 0);
+         // $No_Rekening = '...............................................................................';
+         // $Name_Penerima = '...............................................................................';
+         // $Nama_Bank = '...............................................................................';
+         // if ($dtspb[0]['Detail'][0]['No_Rekening'] != '' && $dtspb[0]['Detail'][0]['No_Rekening'] != null) {
+         //     $No_Rekening = $dtspb[0]['Detail'][0]['No_Rekening'];
+         //     $Name_Penerima = $dtspb[0]['Detail'][0]['Nama_Penerima'];
+         //     $ID_bank = $dtspb[0]['Detail'][0]['ID_bank'];
+         //     $G_bank = $this->m_master->caribasedprimary('db_finance.bank','ID',$ID_bank);
+         //     $Nama_Bank = $G_bank[0]['Name'];
+         // }
+         // $fpdf->SetX(25);
+         // $fpdf->Cell(50,$h,'Ke rekening : ', 0, 1, 'L', 0);
+         // $h = 5;
+         // $fpdf->SetX(25);
+         // $fpdf->Cell(50,$h,'Nama penerima : ', 0, 0, 'L', 0);
+         // $fpdf->Cell(50,$h,$Name_Penerima, 0, 1, 'L', 0);
 
-         $fpdf->SetX(25);
-         $fpdf->Cell(50,$h,'Bank : ', 0, 0, 'L', 0);
-         $fpdf->Cell(50,$h,$Nama_Bank, 0, 1, 'L', 0);
+         // $fpdf->SetX(25);
+         // $fpdf->Cell(50,$h,'Bank : ', 0, 0, 'L', 0);
+         // $fpdf->Cell(50,$h,$Nama_Bank, 0, 1, 'L', 0);
 
-         $fpdf->SetX(25);
-         $fpdf->Cell(50,$h,'No rekening: : ', 0, 0, 'L', 0);
-         $fpdf->Cell(50,$h,$No_Rekening, 0, 1, 'L', 0);
+         // $fpdf->SetX(25);
+         // $fpdf->Cell(50,$h,'No rekening: : ', 0, 0, 'L', 0);
+         // $fpdf->Cell(50,$h,$No_Rekening, 0, 1, 'L', 0);
          $h = 10;
          $y = $fpdf->GetY()+ 5;
          $fpdf->SetXY($x,$y);
@@ -2232,22 +2232,46 @@ class C_save_to_pdf3 extends CI_Controller {
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;
+        $Sx = $x;
         for ($i=0; $i < count($JsonStatus); $i++) {
            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                $Approver = $JsonStatus[$i]['NIP'];
+                $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                $Signatures = $G_CreatedBy[0]['Signatures'];
                // Name
                $a_ = $c__;
                
                if ( ($a_ + $w__)<= 210) {
                    $w = $w__;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                    $c__ += $w__;
                }
                else
                {
                    // sisa
                    $w = 210 - $a_;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                }
+
+               $Sx += $w__;
 
            } 
             
@@ -2752,22 +2776,46 @@ class C_save_to_pdf3 extends CI_Controller {
         $w__ = 210 / count($JsonStatus);
         $w__ = (int)$w__;
         $c__ = 0;
+        $Sx = $x;
         for ($i=0; $i < count($JsonStatus); $i++) {
            if ($JsonStatus[$i]['Visible'] == 'Yes') {
+                $Approver = $JsonStatus[$i]['NIP'];
+                $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                $Signatures = $G_CreatedBy[0]['Signatures'];
                // Name
                $a_ = $c__;
                
                if ( ($a_ + $w__)<= 210) {
                    $w = $w__;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                    $c__ += $w__;
                }
                else
                {
                    // sisa
                    $w = 210 - $a_;
-                   $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   if (file_exists('./uploads/signature/'.$Signatures)) {
+                       // print_r('== '.$Signatures.'<br>');
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                      $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY()-15,15,10);
+                   }
+                   else
+                   {
+                      $fpdf->Cell($w__,5,'',0,0,'L',0);
+                   }
+                   // $fpdf->Cell($w__,5,'',0,0,'L',0);
                }
+
+               $Sx += $w__;
 
            } 
             

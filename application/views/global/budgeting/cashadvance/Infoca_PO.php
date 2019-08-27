@@ -1628,6 +1628,25 @@
 			action : action,
 		};
 
+		// pass po_detail agar dapat approval
+		var po_detail = ClassDt.po_data.po_detail;
+		var temp = [];
+		for (var i = 0; i < po_detail.length; i++) {
+			var arr = po_detail[i];
+			var token_ = jwt_encode(arr,"UAP)(*");
+			temp.push(token_);
+		}
+
+		var token4 = jwt_encode(temp,"UAP)(*");
+		form_data.append('token4',token4);
+
+		var Departement = IDDepartementPUBudget;
+		form_data.append('Departement',Departement);
+		var ev1= ev.closest('#pageContent');
+		var Biaya = ev1.find('.Money_Pembayaran').val();
+		Biaya = findAndReplace(Biaya, ".","");
+		form_data.append('Biaya',Biaya);
+
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
 		var url = base_url_js + "budgeting/submitca_realisasi_by_po"

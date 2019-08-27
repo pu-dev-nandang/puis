@@ -432,6 +432,12 @@ class C_cashadvance extends Budgeting_Controler {
         $Input = $this->getInputToken();
         $action = $Input['action'];
         $ID_payment = $Input['ID_payment'];
+        // for approval
+        $token4 = $this->input->post('token4');
+        $key = "UAP)(*";
+        $token4 = (array) $this->jwt->decode($token4,$key);
+        $Departement = $this->input->post('Departement');
+        $Amount = $this->input->post('Biaya');
         switch ($action) {
             case 'add':
                 $ID_cash_advance = $Input['ID_payment_type'];
@@ -440,7 +446,10 @@ class C_cashadvance extends Budgeting_Controler {
 
                 $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
                 $UploadTandaTerima = json_encode($UploadTandaTerima);
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // approval by RAD + kasubag finance
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $CodePettyCash = $this->m_global->Get_PettyCashCode();
                 $dataSave = array(
@@ -473,7 +482,9 @@ class C_cashadvance extends Budgeting_Controler {
             case 'edit':
                 $ID_Realisasi = $Input['ID_Realisasi'];
                 $ID_cash_advance = $Input['ID_payment_type'];
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token4);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
                 $dataSave = array(
                     'ID_cash_advance' => $ID_cash_advance,
@@ -944,6 +955,26 @@ class C_cashadvance extends Budgeting_Controler {
         $Input = $this->getInputToken();
         $action = $Input['action'];
         $ID_payment = $Input['ID_payment'];
+        $Departement = $this->input->post('Departement');
+        $key = "UAP)(*";
+        $Departement = $this->jwt->decode($Departement,$key);
+
+        $token_pengajuan = $this->input->post('token_pengajuan');
+        $key = "UAP)(*";
+        $token_pengajuan = $this->jwt->decode($token_pengajuan,$key);
+
+        // RuleApproval
+            // check Subtotal
+                $Amount = 0;
+                for ($i=0; $i < count($token_pengajuan); $i++) {
+                    $data = $token_pengajuan[$i]; 
+                    $key = "UAP)(*";
+                    $data_arr = (array) $this->jwt->decode($data,$key);
+                    // print_r($data_arr);
+                    $SubTotal = $data_arr['SubTotal'];
+                    $Amount = $Amount + $SubTotal;
+                }
+
         switch ($action) {
             case 'add':
                 $ID_cash_advance = $Input['ID_payment_type'];
@@ -952,9 +983,14 @@ class C_cashadvance extends Budgeting_Controler {
 
                 $UploadTandaTerima = $this->m_master->uploadDokumenMultiple(uniqid(),'UploadTandaTerima',$path = './uploads/budgeting/cashadvance');
                 $UploadTandaTerima = json_encode($UploadTandaTerima);
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // approval by RAD + kasubag finance
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token_pengajuan);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
+                $CodePettyCash = $this->m_global->Get_PettyCashCode();
                 $Status = 1;
                 $dataSave = array(
+                    'CodePettyCash' => $CodePettyCash,
                     'ID_cash_advance' => $ID_cash_advance,
                     'UploadInvoice' => $UploadInvoice,
                     'NoInvoice' => $Input['NoInvoice'],
@@ -987,9 +1023,14 @@ class C_cashadvance extends Budgeting_Controler {
             case 'edit':
                 $ID_Realisasi = $Input['ID_Realisasi'];
                 $ID_cash_advance = $Input['ID_payment_type'];
-                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi());
+                // approval by RAD + kasubag finance
+                $JsonStatus = $this->m_pr_po->GetRuleApproval_PR_JsonStatus2($Departement,$Amount,$token_pengajuan);
+                $JsonStatus = json_encode($this->m_global->JsonStatusRealisasi2($JsonStatus));
                 $Status = 1;
+                // $CodePettyCash = $this->m_global->Get_PettyCashCode();
                 $dataSave = array(
+                    // 'CodePettyCash' => $CodePettyCash,
                     'ID_cash_advance' => $ID_cash_advance,
                     'NoInvoice' => $Input['NoInvoice'],
                     'NoTandaTerima' => $Input['NoTandaTerima'],

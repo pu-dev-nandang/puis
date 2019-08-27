@@ -291,12 +291,12 @@
 						}
 
 						html += '<tr>'+
-									'<td class = "TD1"><label>No Dokumen</label></td>'+
+									'<td class = "TD1"><label>No Giro</label></td>'+
 									'<td>:</td>'+
 									'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 								'</tr>'+
 								'<tr>'+
-									'<td><label>Upload Dokumen</label></td>'+
+									'<td><label>Upload Voucher</label></td>'+
 									'<td>:</td>'+
 									'<td>'+htmlUploadVoucher+'</td>'+
 								'</tr>';
@@ -405,12 +405,12 @@
 			}
 
 			html += '<tr>'+
-						'<td class = "TD1"><label>No Dokumen</label></td>'+
+						'<td class = "TD1"><label>No Giro</label></td>'+
 						'<td>:</td>'+
 						'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td><label>Upload Dokumen</label></td>'+
+						'<td><label>Upload Voucher</label></td>'+
 						'<td>:</td>'+
 						'<td>'+htmlUploadVoucher+'</td>'+
 					'</tr>';
@@ -1158,12 +1158,11 @@
 			var dt = DataPayment.payment;
 			var data = {
 			  ID_payment : ID_payment,
-			  TypePay : dt[0].Type,
-			  DataPayment : DataPayment,
+			  dt_arr : DataPayment,
 			  CodePettyCash : CodePettyCash,
 			}
 			var token = jwt_encode(data,"UAP)(*");
-			var url = base_url_js+'save2pdf/print/payment_user_realisasi';
+			var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
 		}
 		
 		FormSubmitAuto(url, 'POST', [

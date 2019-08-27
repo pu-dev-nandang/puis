@@ -632,12 +632,12 @@
 				}
 
 				html += '<tr>'+
-							'<td class = "TD1"><label>No Dokumen</label></td>'+
+							'<td class = "TD1"><label>No Giro</label></td>'+
 							'<td>:</td>'+
 							'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 						'</tr>'+
 						'<tr>'+
-							'<td><label>Upload Dokumen</label></td>'+
+							'<td><label>Upload Voucher</label></td>'+
 							'<td>:</td>'+
 							'<td>'+htmlUploadVoucher+'</td>'+
 						'</tr>';
@@ -823,12 +823,12 @@
 		}
 
 		html += '<tr>'+
-					'<td class = "TD1"><label>No Dokumen</label></td>'+
+					'<td class = "TD1"><label>No Giro</label></td>'+
 					'<td>:</td>'+
 					'<td><input type ="text" class = "form-control NoVoucher" style = "width : 350px;"></td>'+
 				'</tr>'+
 				'<tr>'+
-					'<td><label>Upload Dokumen</label></td>'+
+					'<td><label>Upload Voucher</label></td>'+
 					'<td>:</td>'+
 					'<td><input type="file" data-style="fileinput" class="BrowseVoucher" id="BrowseVoucher" accept="image/*,application/pdf"></td>'+
 				'</tr>';
@@ -1186,9 +1186,9 @@
 						'<br>'+
 						'<div class = "form-horizontal" style="margin-top:5px;">'+
 										'<div class="form-group">'+
-											'<label class = "col-sm-2">No Document</label>'+	
-												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
-												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+											'<label class = "col-sm-2">No Giro</label>'+	
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Giro...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Voucher</a>'+
 												'</div>'+
 										'</div>'+
 						'</div>'+				
