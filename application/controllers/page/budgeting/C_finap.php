@@ -88,6 +88,12 @@ class C_finap extends Budgeting_Controler {
                      $WhereFiltering .= ' and MONTH(CreateATPayFin) = '.(int)$dataToken['Month'];
                  }
              }
+
+             if (array_key_exists('TypePaymentSelect', $dataToken)) {
+                 if ($dataToken['TypePaymentSelect'] != '%') {
+                     $WhereFiltering .= ' and TypePay = "'.$dataToken['TypePaymentSelect'].'"';
+                 }
+             }
          }
 
          if (array_key_exists('RealisasiStatus', $dataToken)) {

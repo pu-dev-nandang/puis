@@ -710,7 +710,8 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->SetFont('Arial','',$FontIsian);
         $y += 5;
         $fpdf->SetY($y);
-        $fpdf->Cell(75, $h, 'Mohon dibayarkan / ditransfer kepada', 0, 0, 'L', 0);
+        // $fpdf->Cell(75, $h, 'Mohon dibayarkan / ditransfer kepada', 0, 0, 'L', 0);
+        $fpdf->Cell(75, $h, 'Mohon dibayarkan dengan '.$dtspb[0]['Detail'][0]['TypeBayar'], 0, 0, 'L', 0);
         $fpdf->SetFont('Arial','B',$FontIsian);
         $fpdf->Cell(80, $h,$po_create[0]['NamaSupplier'] , 0, 1, 'L', 0);
         $fpdf->SetFont('Arial','',$FontIsian);
@@ -1729,7 +1730,8 @@ class C_save_to_pdf3 extends CI_Controller {
         $fpdf->SetFont('Arial','',$FontIsian);
         $y += 5;
         $fpdf->SetY($y);
-        $fpdf->Cell(75, $h, 'Mohon dibayarkan / ditransfer kepada', 0, 0, 'L', 0);
+        // $fpdf->Cell(75, $h, 'Mohon dibayarkan / ditransfer kepada', 0, 0, 'L', 0);
+        $fpdf->Cell(75, $h, 'Mohon dibayarkan dengan '.$dtspb[0]['Detail'][0]['TypeBayar'], 0, 0, 'L', 0);
         $fpdf->SetFont('Arial','B',$FontIsian);
         $fpdf->Cell(80, $h,$dtspb[0]['Detail'][0]['NamaSupplier'] , 0, 1, 'L', 0);
         $fpdf->SetFont('Arial','',$FontIsian);

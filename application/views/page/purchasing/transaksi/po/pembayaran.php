@@ -206,6 +206,12 @@
        	        def.resolve(json);
        	    }
        	});
+
+       	table.on( 'search.dt', function () {
+       	     $('#content_input').empty();
+       	     // $('.C_radio:first').prop('checked',true);
+       	     // $('.C_radio:first:checked').trigger('change');
+       	} );
        return def.promise();
 	}
 
@@ -495,6 +501,21 @@
 		return h;
 	}
 
+	function OPTypeBayar(TypeBayar=null,Dis='')
+	{
+		// console.log(TypeBayar);
+		var temp = ['Transfer','Giro'];
+		var h = '';
+		h = '<select class = " form-control dtTypeBayar" style = "width : 80%" '+Dis+'>';
+			for (var i = 0; i < temp.length; i++) {
+				var selected = (TypeBayar == temp[i]) ? 'selected' : '';
+				h += '<option value = "'+temp[i]+'" '+selected+' >'+temp[i]+'</option>';
+			}
+		h += '</select>';
+
+		return h;	
+	}
+
 	function makeDomSPBAdd(action,ID_spb_created,number,se_content)
 	{
 		var Code = $('.C_radio_pr:checked').attr('code');
@@ -620,7 +641,12 @@
 									'Mohon dibayarkan / ditransfer kepada'+
 								'</td>'+
 								'<td>'+
-									'<b>'+Supplier+'</b>'+
+									'<div class = "col-xs-5">'+
+										'<b>'+Supplier+'</b>'+
+									'</div>'+
+									'<div class = "col-xs-5 col-md-offset-1">'+
+										OPTypeBayar()+
+									'</div>'+	
 								'</td>'+
 							'</tr>'+
 							'<tr style="height: 50px;">'+
@@ -1788,7 +1814,7 @@
 									'<div class="form-group">'+
 										'<label class = "col-sm-2">No Document</label>'+	
 											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...."></div>'+
-										'<label class = "col-sm-1">Upload Document</label>'+
+										'<label class = "col-sm-1">Upload</label>'+
 											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf"></div>'+
 									'</div>'+
 					'</div>'+				
@@ -1796,7 +1822,7 @@
 									'<div class="form-group">'+
 										'<label class = "col-sm-2">No Tanda Terima</label>'	+
 											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...."></div>'+
-										'<label class = "col-sm-1">Upload Tanda Terima</label>'+
+										'<label class = "col-sm-1">Upload</label>'+
 											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseTTGRPO" id="BrowseTTGRPO" accept="image/*,application/pdf"></div>'+
 									'</div>'+
 					'</div>'+
@@ -2020,6 +2046,7 @@
 			var Invoice = ev.find('.Money_Pembayaran').val();
 			Invoice = findAndReplace(Invoice, ".","");
 			var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+			var TypeBayar = ev.find('.dtTypeBayar option:selected').val();
 
 			var data = {
 				Code_po_create : Code_po_create,
@@ -2033,10 +2060,11 @@
 				ID_bank : ID_bank,
 				Invoice : Invoice,
 				TypeInvoice  : TypeInvoice,
+				TypeBayar : TypeBayar,
 				ID_payment : ID_payment,
 				action : action,
 			};
-
+			// console.log(data);return;
 			var token = jwt_encode(data,"UAP)(*");
 			form_data.append('token',token);
 
@@ -2406,7 +2434,12 @@
 									'Mohon dibayarkan / ditransfer kepada'+
 								'</td>'+
 								'<td>'+
-									'<b>'+Supplier+'</b>'+
+									'<div class = "col-xs-5">'+
+										'<b>'+Supplier+'</b>'+
+									'</div>'+
+									'<div class = "col-xs-5 col-md-offset-1">'+
+										OPTypeBayar(dtspb[0].Detail[0]['TypeBayar'],'disabled')+
+									'</div>'+	
 								'</td>'+
 							'</tr>'+
 							'<tr style="height: 50px;">'+
@@ -2795,7 +2828,7 @@
 												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
 												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
 												'</div>'+
-											'<label class = "col-sm-1">Upload Document</label>'+
+											'<label class = "col-sm-1">Upload</label>'+
 												'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf" disabled>'+
 												'</div>'+
 										'</div>'+
@@ -2807,7 +2840,7 @@
 												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
 												'</a>'+
 												'</div>'+
-											'<label class = "col-sm-1">Upload Tanda Terima</label>'+
+											'<label class = "col-sm-1">Upload</label>'+
 												'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseTTGRPO" id="BrowseTTGRPO" accept="image/*,application/pdf" disabled>'+
 												'</div>'+
 										'</div>'+

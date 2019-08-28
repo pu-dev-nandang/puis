@@ -35,6 +35,25 @@
 		htmlPage_payment_list : function(){
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
+             '<div class="col-md-6 col-md-offset-3">'+
+                '<div class="thumbnail">'+
+                    '<div class="row">'+
+                      '<div class="col-md-12">'+
+                        '<div class="form-group">'+
+                          '<label>Type</label>'+
+                          '<select class = "form-control TypePaymentSelect">'+
+                            '<option value = "%" selected>All</option>'+
+                            '<option value = "Spb">SPB</option>'+
+                            '<option value = "Cash Advance">Cash Advance</option>'+
+                            '<option value = "Bank Advance">Bank Advance</option>'+
+                          '</select>'+  
+                        '</div>'+  
+                      '</div>'+
+                    '</div>'+
+                '</div>'+
+             '</div>'+
+           '</div>'+
+           '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+  
 					 '<div class col-md-12>'+
 					 	'<div style="padding: 5px;">'+
 					 		'<h3 class="header-blue">Choose Payment</h3>'+
@@ -73,6 +92,7 @@
 		{
 			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
 			Get_data_payment().then(function(data){
+        $('#page_content').empty();
 				$('.C_radio:first').prop('checked',true);
 				$('.C_radio:first').trigger('change');
 				loadingEnd(500);
@@ -83,8 +103,10 @@
 	function Get_data_payment(){
        var def = jQuery.Deferred();
        var UriSegment = "<?php echo $sget ?>";
+       var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
        var data = {
    		   auth : 's3Cr3T-G4N',
+         TypePaymentSelect : TypePaymentSelect,
        };
        var token = jwt_encode(data,"UAP)(*");
        if (UriSegment != '' && UriSegment != null) {
@@ -289,6 +311,12 @@
    	       	    }
    	       	});
        }
+
+       table.on( 'search.dt', function () {
+            $('#page_content').empty();
+            // $('.C_radio:first').prop('checked',true);
+            // $('.C_radio:first:checked').trigger('change');
+       } );
        	
        return def.promise();
 	}
@@ -1079,16 +1107,16 @@
 		var NoVoucher = $('.NoVoucher').val();
 		var toatString = "";
 		var result = "";
-		result = Validation_required(NoVoucher,'No Voucher');
-		if (result['status'] == 0) {
-		  toatString += result['messages'] + "<br>";
-		}
+		// result = Validation_required(NoVoucher,'No Voucher');
+		// if (result['status'] == 0) {
+		//   toatString += result['messages'] + "<br>";
+		// }
 
 		// check file
 		$(".BrowseVoucher").each(function(){
 			var IDFile = $(this).attr('id');
 			var ev2 = $(this);
-			if (!file_validation2(ev2,'Upload Dokumen') ) {
+			if (!file_validation2(ev2,'Upload Voucher') ) {
 			  find = false;
 			  return false;
 			}
@@ -1257,5 +1285,13 @@
 		return h;
 	}
 
+  $(document).off('change', '.TypePaymentSelect').on('change', '.TypePaymentSelect',function(e) {
+    Get_data_payment().then(function(data){
+      $('#page_content').empty();
+      $('.C_radio:first').prop('checked',true);
+      $('.C_radio:first').trigger('change');
+      loadingEnd(500);
+    })
+  })
 	
 </script>

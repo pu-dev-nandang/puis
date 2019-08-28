@@ -638,6 +638,7 @@ class M_pr_po extends CI_Model {
                                     ) aa
                     ) as h on d.Departement = h.ID 
                 where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail) and a.Status = 1
+                order by a.DateNeeded asc
                ';
 
             // for edit in Open PO   
