@@ -406,7 +406,7 @@
 
         var NPM = $(this).attr('data-npm');
 
-        var token = jwt_encode({NPM:NPM},'s3Cr3T-G4N');
+        var token = jwt_encode({NPM:NPM,NIP:sessionNIP},'s3Cr3T-G4N');
 
         var url = base_url_portal_students+'auth/loginFromAkademik?token='+token;
         PopupCenter(url,'xtf','1300','500');

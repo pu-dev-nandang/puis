@@ -1385,7 +1385,6 @@ class C_api3 extends CI_Controller {
             $ProdiID = (isset($data_arr['ProdiID'])) ? $data_arr['ProdiID'] : '';
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
 
-
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
@@ -1415,7 +1414,7 @@ class C_api3 extends CI_Controller {
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
-                                                                                                     $query = $this->db->query($sql)->result_array();
+            $query = $this->db->query($sql)->result_array();
             $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
             $no = $requestData['start'] + 1;

@@ -8032,6 +8032,96 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='viewRegistrationSchedule'){
+
+                $SemesterID = $data_arr['SemesterID'];
+
+                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
+                    'SemesterID' => $SemesterID
+                ))->result_array();
+
+                // Check
+                $getDateNow = $this->m_rest->getDateNow();
+
+                $TARegStart = $data[0]['TARegStart'];
+                $TARegEnd = $data[0]['TARegEnd'];
+
+                $sw = 0;
+                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
+                    $sw = 1;
+                }
+
+                $data[0]['Show'] = $sw;
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='viewDocumentSkripsi'){
+
+                $NPM = $data_arr['NPM'];
+                $data = $this->db->get_where('db_academic.final_project_files',
+                    array('NPM' => $NPM))->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='updateDocumentSkripsi'){
+
+                $NPM = $data_arr['NPM'];
+                $dataForm = (array) $data_arr['dataForm'];
+
+                // Cek ada atau tidak
+                $dataCheck = $this->db->get_where('db_academic.final_project_files',
+                    array('NPM' => $NPM))->result_array();
+
+                if(count($dataCheck)>0){
+                    $this->db->where('NPM', $NPM);
+                    $this->db->update('db_academic.final_project_files',$dataForm);
+                } else {
+                    $this->db->insert('db_academic.final_project_files',$dataForm);
+                }
+
+                return print_r(1);
+
+
+            }
+            else if($data_arr['action']=='viewScheduleStdSeminar'){
+
+                $NPM = $data_arr['NPM'];
+
+                $result = [];
+
+                for($i=1;$i<=2;$i++){
+                    $Type = $i;
+                    $data = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fp.Status, fp.TitleInd, fp.TitleEng, 
+                                                    em1.Name AS M1_Name, em1.TitleAhead AS M1_TitleAhead, em1.TitleBehind AS M1_TitleBehind,
+                                                    em2.Name AS M2_Name, em2.TitleAhead AS M2_TitleAhead, em2.TitleBehind AS M2_TitleBehind
+                                                    FROM db_academic.final_project_schedule fps
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                    LEFT JOIN db_academic.final_project_schedule_student fpss ON (fpss.FPSID = fps.ID)
+                                                    LEFT JOIN db_academic.final_project fp ON (fp.NPM = fpss.NPM)
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                    WHERE fps.Type = "'.$Type.'" AND fpss.NPM = "'.$NPM.'" ')->result_array();
+
+                    if(count($data)>0){
+                        $data[0]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                              WHERE fpsl.FPSID = "'.$data[0]['ID'].'"')->result_array();
+                    }
+
+                    $arr = (count($data)>0) ? $data[0] : [];
+                    array_push($result,$arr);
+                }
+
+
+
+
+
+                return print_r(json_encode($result));
+
+            }
             else if($data_arr['action']=='checkRegistration'){
                 $data = $this->db->get_where('db_academic.final_project',array(
                     'NPM' => $data_arr['NPM']
@@ -8160,7 +8250,7 @@ class C_api extends CI_Controller {
                         // Update Status
                         $this->db->where('NPM',$Student[$i]);
                         $this->db->update('db_academic.final_project',array(
-                            'Status' => '2'
+                            'Status' => $data_arr['StatusStd']
                         ));
                     }
                 }

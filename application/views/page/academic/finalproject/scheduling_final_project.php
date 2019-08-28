@@ -279,7 +279,6 @@
         var formEnd = $('#formEnd').val();
         var formCOPenguji = $('#formCOPenguji').val();
         var formTeamPenguji = $('#formTeamPenguji').val();
-        var formStudent = $('#formStudent').val();
 
         if(filterSemester!='' && filterSemester!=null &&
             formType!='' && formType!=null &&
@@ -288,8 +287,7 @@
         formStart!='' && formStart!=null &&
         formEnd!='' && formEnd!=null &&
         formCOPenguji!='' && formCOPenguji!=null &&
-        formTeamPenguji!='' && formTeamPenguji!=null &&
-        formStudent!='' && formStudent!=null){
+        formTeamPenguji!='' && formTeamPenguji!=null){
 
             loading_modal_show();
 
@@ -309,6 +307,9 @@
 
             var formID = $('#formID').val();
 
+            var formStudent = $('#formStudent').val();
+
+
             var data = {
                 action : 'updateDataSchFP',
                 ID : (formID!='' && formID!=null) ? formID : '',
@@ -320,6 +321,7 @@
                     Start : formStart,
                     End : formEnd
                 },
+                StatusStd : (formType==1 || formType=='1') ? '2' : '4',
                 Lecturer : Lecturer,
                 Student : formStudent
             };
