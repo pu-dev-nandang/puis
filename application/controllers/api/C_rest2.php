@@ -2476,14 +2476,14 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt ';
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.DateNeededAP ';
                $joinaction = ' right join (
                                         select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
-                                        ( select ID_payment,Perihal  from db_payment.spb
+                                        ( select ID_payment,Perihal,"-" as DateNeededAP from db_payment.spb
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.bank_advance
+                                          select ID_payment,Perihal,Date_Needed  from db_payment.bank_advance
                                           UNION 
-                                          select ID_payment,Perihal  from db_payment.cash_advance  
+                                          select ID_payment,Perihal,Date_Needed  from db_payment.cash_advance  
                                         )
                         as b on a.ID = b.ID_payment
                          )
@@ -2556,13 +2556,15 @@ class C_rest2 extends CI_Controller {
                         )aa
                        ';
 
-                $sql.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                $sql.= ' where (Code LIKE "'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
                       or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                       or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
                       or ID_payment = "'.$requestData['search']['value'].'"
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
-                $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                // $sql.= ' ORDER BY PayCreateAt Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $sql.= ' ORDER BY DateNeededAP asc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
                 $query = $this->db->query($sql)->result_array();
 
                 $No = $requestData['start'] + 1;
@@ -2578,6 +2580,7 @@ class C_rest2 extends CI_Controller {
                     $nestedData[] = $row['StatusNamepay'];
                     $nestedData[] = '';
                     $nestedData[] = $row['PayNameCreatedBy'];
+
                     // find PR in po_detail
                         $arr_temp = array();
                         $sql_get_pr = 'select a.ID,a.ID_m_catalog,b.Item,c.ID as ID_pre_po_detail,d.Code,a.PRCode
@@ -2621,6 +2624,7 @@ class C_rest2 extends CI_Controller {
                             'TypePay' => $row['TypePay'],
                             'ID_payment' => $row['ID_payment'],
                             'Perihal' => $row['Perihal'],
+                            'DateNeededAP' => $row['DateNeededAP'],
                         );
 
                     $nestedData[] = $arr_temp;
