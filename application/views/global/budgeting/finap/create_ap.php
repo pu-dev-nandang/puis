@@ -30,10 +30,30 @@
 
 </div>
 <script type="text/javascript">
+	var Onetime = 0;
 	var ClassDt = {
 		htmlPage_payment_list : function(){
 			var html = '';
 			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
+             '<div class="col-md-6 col-md-offset-3">'+
+                '<div class="thumbnail">'+
+                    '<div class="row">'+
+                      '<div class="col-md-12">'+
+                        '<div class="form-group">'+
+                          '<label>Type</label>'+
+                          '<select class = "form-control TypePaymentSelect">'+
+                            '<option value = "%" selected>All</option>'+
+                            '<option value = "Spb">SPB</option>'+
+                            '<option value = "Cash Advance">Cash Advance</option>'+
+                            '<option value = "Bank Advance">Bank Advance</option>'+
+                          '</select>'+  
+                        '</div>'+  
+                      '</div>'+
+                    '</div>'+
+                '</div>'+
+             '</div>'+
+           '</div>'+
+           '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+  
 					 '<div class col-md-12>'+
 					 	'<div style="padding: 5px;">'+
 					 		'<h3 class="header-blue">Choose Payment</h3>'+
@@ -44,7 +64,8 @@
 					 			'<tr>'+
 					 				'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
-					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+                  '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 					 			'</tr>'+
@@ -72,6 +93,7 @@
 		{
 			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
 			Get_data_payment().then(function(data){
+        $('#page_content').empty();
 				$('.C_radio:first').prop('checked',true);
 				$('.C_radio:first').trigger('change');
 				loadingEnd(500);
@@ -81,69 +103,234 @@
 
 	function Get_data_payment(){
        var def = jQuery.Deferred();
+       var UriSegment = "<?php echo $sget ?>";
+       var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
        var data = {
    		   auth : 's3Cr3T-G4N',
+         TypePaymentSelect : TypePaymentSelect,
        };
        var token = jwt_encode(data,"UAP)(*");
-       	var table = $('#tableData_payment').DataTable({
-       		"fixedHeader": true,
-       	    "processing": true,
-       	    "destroy": true,
-       	    "serverSide": true,
-       	    "lengthMenu": [[5], [5]],
-       	    "iDisplayLength" : 5,
-       	    "ordering" : false,
-       	    "ajax":{
-       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
-       	        ordering : false,
-       	        type: "post",  // method  , by default get
-       	        data : {token : token},
-       	        error: function(){  // error handling
-       	            $(".employee-grid-error").html("");
-       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-       	            $("#employee-grid_processing").css("display","none");
-       	            def.reject();
+       if (UriSegment != '' && UriSegment != null) {
+       	var tokenSearch = jwt_decode(UriSegment,"UAP)(*");
+       	if (Onetime == 0) {
+   		       	var table = $('#tableData_payment').DataTable({
+   		       		"fixedHeader": true,
+   		       	    "processing": true,
+   		       	    "destroy": true,
+   		       	    "serverSide": true,
+   		       	    "lengthMenu": [[5], [5]],
+   		       	    "oSearch": {"sSearch": tokenSearch},
+   		       	    "iDisplayLength" : 5,
+   		       	    "ordering" : false,
+   		       	    "ajax":{
+   		       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+   		       	        ordering : false,
+   		       	        type: "post",  // method  , by default get
+   		       	        data : {token : token},
+   		       	        error: function(){  // error handling
+   		       	            $(".employee-grid-error").html("");
+   		       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+   		       	            $("#employee-grid_processing").css("display","none");
+   		       	            def.reject();
 
-       	        },
-       	    },
-    	    'createdRow': function( row, data, dataIndex ) {
-    	    	       var ListPR = data[parseInt(data.length) - 1];
-    	    	       var PRHTML = '';
-    	    	       PRHTML += ListPR[0];
-    	    	       var ID_payment = ListPR[1].ID_payment;
-    	    	       var CodeSPB = ListPR[1].CodeSPB;
-    	    	       var TypePay = ListPR[1].TypePay;
-    	    	       var Perihal = ListPR[1].Perihal;
-    	    	       var Code_po_create = '';
-    	    	       if (data[1] != null && data[1] != '') {
-    	    	       	var Code_po_create = data[1];
-    	    	       }
+   		       	        },
+   		       	    },
+   		    	    'createdRow': function( row, data, dataIndex ) {
+   		    	    	       var ListPR = data[parseInt(data.length) - 1];
+   		    	    	       var PRHTML = '';
+   		    	    	       PRHTML += ListPR[0];
+   		    	    	       var ID_payment = ListPR[1].ID_payment;
+   		    	    	       var CodeSPB = ListPR[1].CodeSPB;
+   		    	    	       var TypePay = ListPR[1].TypePay;
+   		    	    	       var Perihal = ListPR[1].Perihal;
+                          var Date_Needed = ListPR[1].DateNeededAP;
+   		    	    	       var Code_po_create = '';
+   		    	    	       if (data[1] != null && data[1] != '') {
+   		    	    	       	var Code_po_create = data[1];
+   		    	    	       }
 
-    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
-    	    	       var Payment = input_radio + ' Type : '+TypePay;
-    	    	       if (TypePay == 'Spb') {
-    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
-    	    	       }
-    	    	      if (Code_po_create != '') {
-    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
-    	    	      }
-    	    	      if (Code_po_create != '') {
-    	    	      	 Payment += '<br>PR Code : '+PRHTML;
-    	    	      }
+   		    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+   		    	    	       var Payment = input_radio + ' Type : '+TypePay;
+   		    	    	       if (TypePay == 'Spb') {
+   		    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+   		    	    	       }
+   		    	    	      if (Code_po_create != '') {
+   		    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+   		    	    	      }
+   		    	    	      if (Code_po_create != '') {
+   		    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+   		    	    	      }
 
-    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
-    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
-    	    	       
-    	    	       $( row ).find('td:eq(1)').html(Payment);
-	    		    	
-	    		    	$( row ).find('td:eq(2)').attr('align','center');
-	    		    	$( row ).find('td:eq(4)').attr('align','center');
-	    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
-    	    },
-       	    "initComplete": function(settings, json) {
-       	        def.resolve(json);
-       	    }
-       	});
+   		    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+   		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+   		    	    	       
+   		    	    	       $( row ).find('td:eq(1)').html(Payment);
+                         $(row).find('td:eq(3)').html(Date_Needed);
+                         $(row).find('td:eq(4)').html(data[3]);
+   			    		    	
+   			    		    	$( row ).find('td:eq(2)').attr('align','center');
+   			    		    	$( row ).find('td:eq(4)').attr('align','center');
+                      $( row ).find('td:eq(3)').attr('align','center');
+   			    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+   		    	    },
+   		       	    "initComplete": function(settings, json) {
+   		       	    	// $('.C_radio:first').prop('checked', true);
+   		       	    	// $('.C_radio:checked').trigger('change');
+   		       	    	// $('.C_radio:first').trigger('click');
+   		       	        def.resolve(json);
+   		       	    }
+   		       	});
+       		Onetime++;       	
+       	}
+       	else
+       	{
+		       	var table = $('#tableData_payment').DataTable({
+		       		"fixedHeader": true,
+		       	    "processing": true,
+		       	    "destroy": true,
+		       	    "serverSide": true,
+		       	    "lengthMenu": [[5], [5]],
+		       	    "oSearch": {"sSearch": tokenSearch},
+		       	    "iDisplayLength" : 5,
+		       	    "ordering" : false,
+		       	    "ajax":{
+		       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+		       	        ordering : false,
+		       	        type: "post",  // method  , by default get
+		       	        data : {token : token},
+		       	        error: function(){  // error handling
+		       	            $(".employee-grid-error").html("");
+		       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+		       	            $("#employee-grid_processing").css("display","none");
+		       	            def.reject();
+
+		       	        },
+		       	    },
+		    	    'createdRow': function( row, data, dataIndex ) {
+		    	    	       var ListPR = data[parseInt(data.length) - 1];
+		    	    	       var PRHTML = '';
+		    	    	       PRHTML += ListPR[0];
+		    	    	       var ID_payment = ListPR[1].ID_payment;
+		    	    	       var CodeSPB = ListPR[1].CodeSPB;
+		    	    	       var TypePay = ListPR[1].TypePay;
+                       var Perihal = ListPR[1].Perihal;
+		    	    	       var Date_Needed = ListPR[1].DateNeededAP;
+		    	    	       var Code_po_create = '';
+		    	    	       if (data[1] != null && data[1] != '') {
+		    	    	       	var Code_po_create = data[1];
+		    	    	       }
+
+		    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+		    	    	       var Payment = input_radio + ' Type : '+TypePay;
+		    	    	       if (TypePay == 'Spb') {
+		    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+		    	    	       }
+		    	    	      if (Code_po_create != '') {
+		    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+		    	    	      }
+		    	    	      if (Code_po_create != '') {
+		    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+		    	    	      }
+
+		    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+		    	    	       
+		    	    	       $( row ).find('td:eq(1)').html(Payment);
+                       $(row).find('td:eq(3)').html(Date_Needed);
+                       $(row).find('td:eq(4)').html(data[3]);
+			    		    	
+			    		    	$( row ).find('td:eq(2)').attr('align','center');
+			    		    	$( row ).find('td:eq(4)').attr('align','center');
+                    $( row ).find('td:eq(3)').attr('align','center');
+			    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+		    	    },
+		       	    "initComplete": function(settings, json) {
+		       	    	// $('.C_radio:first').prop('checked', true);
+		       	    	// $('.C_radio:checked').trigger('change');
+		       	    	// $('.C_radio:first').trigger('click');
+		       	        def.resolve(json);
+		       	    }
+		       	});
+       	}
+
+       }
+       else
+       {
+   	       	var table = $('#tableData_payment').DataTable({
+   	       		"fixedHeader": true,
+   	       	    "processing": true,
+   	       	    "destroy": true,
+   	       	    "serverSide": true,
+   	       	    "lengthMenu": [[5], [5]],
+   	       	    "oSearch": {"sSearch": tokenSearch},
+   	       	    "iDisplayLength" : 5,
+   	       	    "ordering" : false,
+   	       	    "ajax":{
+   	       	        url : base_url_js+"rest2/__get_data_payment", // json datasource
+   	       	        ordering : false,
+   	       	        type: "post",  // method  , by default get
+   	       	        data : {token : token},
+   	       	        error: function(){  // error handling
+   	       	            $(".employee-grid-error").html("");
+   	       	            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+   	       	            $("#employee-grid_processing").css("display","none");
+   	       	            def.reject();
+
+   	       	        },
+   	       	    },
+   	    	    'createdRow': function( row, data, dataIndex ) {
+   	    	    	       var ListPR = data[parseInt(data.length) - 1];
+   	    	    	       var PRHTML = '';
+   	    	    	       PRHTML += ListPR[0];
+   	    	    	       var ID_payment = ListPR[1].ID_payment;
+   	    	    	       var CodeSPB = ListPR[1].CodeSPB;
+   	    	    	       var TypePay = ListPR[1].TypePay;
+   	    	    	       var Perihal = ListPR[1].Perihal;
+                        var Date_Needed = ListPR[1].DateNeededAP;
+   	    	    	       var Code_po_create = '';
+   	    	    	       if (data[1] != null && data[1] != '') {
+   	    	    	       	var Code_po_create = data[1];
+   	    	    	       }
+
+   	    	    	       var input_radio = '<input class="C_radio" type="radio" name="optradio" id_payment="'+ID_payment+'" TypePay = "'+TypePay+'" CodeSPB= "'+CodeSPB+'" Code_po_create= "'+Code_po_create+'" PRCode= "'+PRHTML+'" >';
+   	    	    	       var Payment = input_radio + ' Type : '+TypePay;
+   	    	    	       if (TypePay == 'Spb') {
+   	    	    	       	Payment += '<br><a href="javascript:void(0)">Code : '+CodeSPB+'</a>';
+   	    	    	       }
+   	    	    	      if (Code_po_create != '') {
+   	    	    	      	 Payment += '<br><label> PO/SPK Code : '+Code_po_create+'</label>';
+   	    	    	      }
+   	    	    	      if (Code_po_create != '') {
+   	    	    	      	 Payment += '<br>PR Code : '+PRHTML;
+   	    	    	      }
+
+   	    	    	       Payment += '<p style = "color : red;">Perihal : '+Perihal+'</p>';
+   	    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
+   	    	    	       
+   	    	    	       $( row ).find('td:eq(1)').html(Payment);
+                        $(row).find('td:eq(3)').html(Date_Needed);
+                        $(row).find('td:eq(4)').html(data[3]);
+   		    		    	
+   		    		    	$( row ).find('td:eq(2)').attr('align','center');
+                    $( row ).find('td:eq(4)').attr('align','center');
+   		    		    	$( row ).find('td:eq(3)').attr('align','center');
+   		    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+   	    	    },
+   	       	    "initComplete": function(settings, json) {
+   	       	    	// $('.C_radio:first').prop('checked', true);
+   	       	    	// $('.C_radio:checked').trigger('change');
+   	       	    	// $('.C_radio:first').trigger('click');
+   	       	        def.resolve(json);
+   	       	    }
+   	       	});
+       }
+
+       table.on( 'search.dt', function () {
+            $('#page_content').empty();
+            // $('.C_radio:first').prop('checked',true);
+            // $('.C_radio:first:checked').trigger('change');
+       } );
+       	
        return def.promise();
 	}
 
@@ -486,12 +673,12 @@
 				}
 
 				html += '<tr>'+
-							'<td class = "TD1"><label>No Dokumen</label></td>'+
+							'<td class = "TD1"><label>No Giro</label></td>'+
 							'<td>:</td>'+
 							'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 						'</tr>'+
 						'<tr>'+
-							'<td><label>Upload Dokumen</label></td>'+
+							'<td><label>Upload Voucher</label></td>'+
 							'<td>:</td>'+
 							'<td>'+htmlUploadVoucher+'</td>'+
 						'</tr>';
@@ -677,12 +864,12 @@
 		}
 
 		html += '<tr>'+
-					'<td class = "TD1"><label>No Dokumen</label></td>'+
+					'<td class = "TD1"><label>No Giro</label></td>'+
 					'<td>:</td>'+
 					'<td><input type ="text" class = "form-control NoVoucher" style = "width : 350px;"></td>'+
 				'</tr>'+
 				'<tr>'+
-					'<td><label>Upload Dokumen</label></td>'+
+					'<td><label>Upload Voucher</label></td>'+
 					'<td>:</td>'+
 					'<td><input type="file" data-style="fileinput" class="BrowseVoucher" id="BrowseVoucher" accept="image/*,application/pdf"></td>'+
 				'</tr>';
@@ -933,16 +1120,16 @@
 		var NoVoucher = $('.NoVoucher').val();
 		var toatString = "";
 		var result = "";
-		result = Validation_required(NoVoucher,'No Voucher');
-		if (result['status'] == 0) {
-		  toatString += result['messages'] + "<br>";
-		}
+		// result = Validation_required(NoVoucher,'No Voucher');
+		// if (result['status'] == 0) {
+		//   toatString += result['messages'] + "<br>";
+		// }
 
 		// check file
 		$(".BrowseVoucher").each(function(){
 			var IDFile = $(this).attr('id');
 			var ev2 = $(this);
-			if (!file_validation2(ev2,'Upload Dokumen') ) {
+			if (!file_validation2(ev2,'Upload Voucher') ) {
 			  find = false;
 			  return false;
 			}
@@ -1040,9 +1227,9 @@
 						'<br>'+
 						'<div class = "form-horizontal" style="margin-top:5px;">'+
 										'<div class="form-group">'+
-											'<label class = "col-sm-2">No Document</label>'+	
-												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
-												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
+											'<label class = "col-sm-2">No Giro</label>'+	
+												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Giro...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
+												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Voucher</a>'+
 												'</div>'+
 										'</div>'+
 						'</div>'+				
@@ -1111,5 +1298,13 @@
 		return h;
 	}
 
+  $(document).off('change', '.TypePaymentSelect').on('change', '.TypePaymentSelect',function(e) {
+    Get_data_payment().then(function(data){
+      $('#page_content').empty();
+      $('.C_radio:first').prop('checked',true);
+      $('.C_radio:first').trigger('change');
+      loadingEnd(500);
+    })
+  })
 	
 </script>

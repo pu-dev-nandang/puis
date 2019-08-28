@@ -85,8 +85,6 @@ class C_agregator extends Globalclass {
         $data['access'] = (count($dataSetting)>0) ? '1' : '0';
         $page = $this->load->view('page/agregator/setting',$data,true);
         $this->menu_agregator($page);
-
-
     }
 
     public function akreditasi_eksternal()
@@ -289,8 +287,6 @@ class C_agregator extends Globalclass {
             ));
         }
     }
-
-
 
 
 }

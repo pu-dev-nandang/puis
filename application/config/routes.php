@@ -734,6 +734,9 @@ $route['save2pdf/print/prdeparment'] =  'C_save_to_pdf/print_prdeparment';
 $route['save2pdf/print/spk_or_po'] =  'C_save_to_pdf3/spk_or_po';
 $route['save2pdf/print/pre_pembayaran'] =  'C_save_to_pdf3/pre_pembayaran';
 $route['save2pdf/print/payment_user'] =  'C_save_to_pdf3/payment_user';
+$route['save2pdf/print/pre_pembayaran_realisasi_po'] =  'C_save_to_pdf3/pre_pembayaran_realisasi_po';
+$route['save2pdf/print/payment_user_realisasi'] =  'C_save_to_pdf3/payment_user_realisasi';
+$route['save2pdf/print/realisasi_petty_cash'] =  'C_save_to_pdf3/realisasi_petty_cash';
 
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
@@ -1288,7 +1291,7 @@ $route['announcement/upload_files'] = 'page/announcement/c_announcement/upload_f
 
 $route['announcement/edit-announcement/(:num)'] = 'page/announcement/c_announcement/edit_announcement/$1';
 
-
+// Agregator
 $route['agregator/setting'] = 'page/agregator/c_agregator/setting';
 
 $route['agregator/akreditasi-eksternal'] = 'page/agregator/c_agregator/akreditasi_eksternal';
@@ -1316,6 +1319,8 @@ $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tun
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
+//$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
+
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
@@ -1344,9 +1349,6 @@ $route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
 $route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
 
 $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
-
-
-
 
 
 // budgeting & PR
@@ -1429,6 +1431,16 @@ $route['budgeting/getCreatorBudget'] = 'page/budgeting/c_budgeting/getCreatorBud
 $route['budgeting/saveCreatorbudget'] = 'page/budgeting/c_budgeting/saveCreatorbudget';
 $route['budgeting/update_approval_budgeting'] = 'page/budgeting/c_budgeting/update_approval_budgeting';
 $route['budgeting/update_approval_pr'] = 'page/budgeting/c_pr_po/update_approval_pr';
+
+$route['budgeting/EntryBudget/budget_revisi'] = 'page/budgeting/c_budgeting/budget_revisi';
+$route['budgeting/EntryBudget/budget_revisi/Revisi'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi';
+$route['budgeting/EntryBudget/budget_revisi/Revisi/save'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi_save';
+$route['budgeting/EntryBudget/budget_revisi/Revisi/load'] = 'page/budgeting/c_budgeting/budget_revisi_Revisi_load';
+
+
+$route['budgeting/EntryBudget/budget_revisi/Mutasi'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi';
+$route['budgeting/EntryBudget/budget_revisi/Mutasi/save'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi_save';
+$route['budgeting/EntryBudget/budget_revisi/Mutasi/load'] = 'page/budgeting/c_budgeting/budget_revisi_Mutasi_load';
 
 
 
@@ -1522,7 +1534,6 @@ $route['budgeting/submit_cash_advance_user'] = 'page/budgeting/c_cashadvance/sub
 $route['budgeting/submitca_realisasi_by_user'] = 'page/budgeting/c_cashadvance/submitca_realisasi_by_user';
 
 
-
 // petty cash
 $route['budgeting_menu/pembayaran/pettycash/create_pettycash'] = 'page/budgeting/c_pettycash/create_pettycash';
 $route['budgeting_menu/pembayaran/pettycash/configuration'] = 'page/budgeting/c_pettycash/configuration';
@@ -1534,8 +1545,6 @@ $route['finance_ap/create_ap'] = 'page/budgeting/c_finap/create_ap';
 $route['finance_ap/list_server_side'] = 'page/budgeting/c_finap/list_server_side';
 $route['finance_ap/global/(:any)'] = 'page/budgeting/c_finap/global_view_finap/$1';
 $route['finance_ap/send_reminder_realisasi'] = 'page/budgeting/c_finap/send_reminder_realisasi';
-
-
 
 // pr adding
 $route['budgeting_pr/(:any)'] = 'page/budgeting/c_pr_po/budgeting_pr_view/$1';
@@ -1582,6 +1591,7 @@ foreach( $result as $row )
 $route['purchasing/page/catalog/InputCategory'] = 'page/purchasing/c_master/InputCategory';
 $route['purchasing/page/catalog/InputCatalog'] = 'page/purchasing/c_master/InputCatalog';
 
+$route['purchasing/SaveFormType'] = 'page/purchasing/c_master/SaveFormType';
 $route['purchasing/page/catalog/FormInputCategory'] = 'page/purchasing/c_master/InputCategory_FormInput';
 $route['purchasing/page/catalog/FormInput'] = 'page/purchasing/c_master/InputCatalog_FormInput';
 
@@ -1706,8 +1716,8 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 
 // request document
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
-
 $route['portal'] = 'c_login/portal';
+
 
 
 // Upload Global
@@ -1717,4 +1727,7 @@ $route['upload/remove-skripsi'] = 'api/c_upload/remove_skripsi';
 // Loging
 $route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
 
+
+// don't show Digital Signature
+$route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
 

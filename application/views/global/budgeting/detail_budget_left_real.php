@@ -129,7 +129,7 @@ function LoopAjaxCallback()
 				         'targets': 1,
 				         'render': function (data, type, full, meta){
 				         	var html = '';
-				         	if (full.TypePayment != 'Revisi') {
+				         	if (full.TypePayment != 'Revisi' && full.TypePayment != 'Mutasi') {
 				         		// a href to finap
 				         		var ID_ap = full.ID_ap;
 				         		var tokenLink = jwt_encode(ID_ap,"UAP)(*");

@@ -20,6 +20,12 @@ class C_master extends Purchasing_Controler {
         $content = $this->load->view('page/'.$this->data['department'].'/master/catalog',$this->data,true);
         $this->temp($content);
     }
+    public function type_payment()
+    {
+      $this->data['data']= $this->m_master->showData_array('db_purchasing.pay_type');
+        $content = $this->load->view('page/'.$this->data['department'].'/master/type_payment',$this->data,true);
+        $this->temp($content);
+    }
 
     public function supplier()
     {
@@ -33,6 +39,13 @@ class C_master extends Purchasing_Controler {
         $arr_result = array('html' => '','jsonPass' => '');
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCategory',$this->data,true);
         echo json_encode($arr_result);
+    }
+     public function SaveFormType()
+    {
+        $Name=$this->input->post('Type');
+        $arr=array('Name' => $Name, );
+        $this->db->insert('db_purchasing.pay_type',$arr);
+        redirect(base_url().'purchasing/master/type_payment');
     }
 
     public function InputCategory_FormInput()

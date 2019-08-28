@@ -278,7 +278,7 @@ class M_pr_po extends CI_Model {
     public function Get_DataBudgeting_by_ID_budget_left($ID_budget_left)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.CodeDiv as CodeDepartment
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.CodeDiv as CodeDepartment,cc.NameUnitDiv
          from
             (
                    select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
@@ -294,7 +294,7 @@ class M_pr_po extends CI_Model {
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-               ) as dp on b.UnitDiv = dp.ID
+               ) as dp on c.Departement= dp.ID
                  left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
             ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
                             where dd.ID = ?';
@@ -391,8 +391,101 @@ class M_pr_po extends CI_Model {
                      }  
              }
         }
+
         // print_r($rs);die();
+        // $rs[] = array(
+        //     'NIP' => 2018018,
+        //     'Status' => 1,
+        //     'ApproveAt' => '',
+        //     'Representedby' => '',
+        //     'Visible' => '',
+        //     'NameTypeDesc' => '',
+        // );
+        $rs = $this->__FilteringApprovalDoubleMore($rs); // trial
         return $rs;       
+    }
+
+    public function __FilteringApprovalDoubleMore($JsonStatus)
+    {
+        $rs = array();
+        $pola = array();
+        for ($i=1; $i < count($JsonStatus); $i++) { 
+            $NIP = $JsonStatus[$i]['NIP'];
+            $find = false;
+            for ($j=$i+1; $j < count($JsonStatus); $j++) { 
+                $NIP_ = $JsonStatus[$j]['NIP']; 
+                if ($NIP == $NIP_) {
+                    $pola[] = $i.','.$j;
+                    $find = true;
+                    // break;
+                }
+            }
+
+            if (!$find) {
+                // find di pola
+                $bfind = false;
+                for ($j=0; $j < $i; $j++) { 
+                    $NIP_ = $JsonStatus[$j]['NIP'];
+                    if ($NIP == $NIP_) {
+                        $str = $j.','.$i;
+                        for ($k=0; $k < count($pola); $k++) { 
+                            if ($str == $pola[$k]) {
+                                $bfind = true;
+                                break;
+                            }
+                        }
+                        // $pola[] = $j.','.$i;
+                        // $bfind = true;
+                    } 
+                }    
+                if (!$bfind) {
+                    $pola[] = $i;
+                }
+                
+            }
+        }
+
+        $bpola = true;
+        $interval = 0;
+        $stopLoop = false;
+        for ($i=0; $i < count($pola); $i++) { 
+            $d = explode(',', $pola[$i]);
+            if (count($d) > 1) {
+                for ($j=0; $j < count($d); $j++) {
+                    if ($j == 0) {
+                        $interval = $d[1] - $d[0];
+                    }
+                    else
+                    {
+                        $m = $j - 1;
+                        $c = $d[$j] - $d[$m];
+                        if ($c != $interval) {
+                            $bpola = false;
+                            $stopLoop = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if ($stopLoop) {
+                break;
+            }
+        }
+
+        if ($bpola) {
+            $rs[] = $JsonStatus[0];
+            for ($i=0; $i < count($pola); $i++) { 
+                $d = explode(',', $pola[$i]);
+                $rs[] = $JsonStatus[$d[0]];
+            }
+        }
+        else
+        {
+            $rs = $JsonStatus;
+        }
+
+        return $rs;
     }
 
     public function GetPR_CreateByPRCode($PRCode)
@@ -545,6 +638,7 @@ class M_pr_po extends CI_Model {
                                     ) aa
                     ) as h on d.Departement = h.ID 
                 where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail) and a.Status = 1
+                order by a.DateNeeded asc
                ';
 
             // for edit in Open PO   
