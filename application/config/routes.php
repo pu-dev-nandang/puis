@@ -1708,3 +1708,13 @@ $route['help'] =  'dashboard/C_dashboard/Help';
 $route['requestdocument'] =  'page/request-document/c_requestdocument/suratKeluar';
 
 $route['portal'] = 'c_login/portal';
+
+
+// Upload Global
+$route['upload/upload-skripsi'] = 'api/c_upload/upload_skripsi';
+$route['upload/remove-skripsi'] = 'api/c_upload/remove_skripsi';
+
+// Loging
+$route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
+
+
