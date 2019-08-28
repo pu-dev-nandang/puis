@@ -64,7 +64,8 @@
 					 			'<tr>'+
 					 				'<th width = "3%" style = "text-align: center;background: #20485A;color: #FFFFFF;">No</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
-					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+                  '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 					 			'</tr>'+
@@ -142,6 +143,7 @@
    		    	    	       var CodeSPB = ListPR[1].CodeSPB;
    		    	    	       var TypePay = ListPR[1].TypePay;
    		    	    	       var Perihal = ListPR[1].Perihal;
+                          var Date_Needed = ListPR[1].DateNeededAP;
    		    	    	       var Code_po_create = '';
    		    	    	       if (data[1] != null && data[1] != '') {
    		    	    	       	var Code_po_create = data[1];
@@ -163,10 +165,13 @@
    		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
    		    	    	       
    		    	    	       $( row ).find('td:eq(1)').html(Payment);
+                         $(row).find('td:eq(3)').html(Date_Needed);
+                         $(row).find('td:eq(4)').html(data[3]);
    			    		    	
    			    		    	$( row ).find('td:eq(2)').attr('align','center');
    			    		    	$( row ).find('td:eq(4)').attr('align','center');
-   			    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+                      $( row ).find('td:eq(3)').attr('align','center');
+   			    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
    		    	    },
    		       	    "initComplete": function(settings, json) {
    		       	    	// $('.C_radio:first').prop('checked', true);
@@ -208,7 +213,8 @@
 		    	    	       var ID_payment = ListPR[1].ID_payment;
 		    	    	       var CodeSPB = ListPR[1].CodeSPB;
 		    	    	       var TypePay = ListPR[1].TypePay;
-		    	    	       var Perihal = ListPR[1].Perihal;
+                       var Perihal = ListPR[1].Perihal;
+		    	    	       var Date_Needed = ListPR[1].DateNeededAP;
 		    	    	       var Code_po_create = '';
 		    	    	       if (data[1] != null && data[1] != '') {
 		    	    	       	var Code_po_create = data[1];
@@ -230,10 +236,13 @@
 		    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
 		    	    	       
 		    	    	       $( row ).find('td:eq(1)').html(Payment);
+                       $(row).find('td:eq(3)').html(Date_Needed);
+                       $(row).find('td:eq(4)').html(data[3]);
 			    		    	
 			    		    	$( row ).find('td:eq(2)').attr('align','center');
 			    		    	$( row ).find('td:eq(4)').attr('align','center');
-			    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+                    $( row ).find('td:eq(3)').attr('align','center');
+			    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
 		    	    },
 		       	    "initComplete": function(settings, json) {
 		       	    	// $('.C_radio:first').prop('checked', true);
@@ -277,6 +286,7 @@
    	    	    	       var CodeSPB = ListPR[1].CodeSPB;
    	    	    	       var TypePay = ListPR[1].TypePay;
    	    	    	       var Perihal = ListPR[1].Perihal;
+                        var Date_Needed = ListPR[1].DateNeededAP;
    	    	    	       var Code_po_create = '';
    	    	    	       if (data[1] != null && data[1] != '') {
    	    	    	       	var Code_po_create = data[1];
@@ -298,10 +308,13 @@
    	    	    	       Payment += 'Created : '+data[parseInt(data.length) - 2];
    	    	    	       
    	    	    	       $( row ).find('td:eq(1)').html(Payment);
+                        $(row).find('td:eq(3)').html(Date_Needed);
+                        $(row).find('td:eq(4)').html(data[3]);
    		    		    	
    		    		    	$( row ).find('td:eq(2)').attr('align','center');
-   		    		    	$( row ).find('td:eq(4)').attr('align','center');
-   		    		    	$( row ).find('td:eq(4)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
+                    $( row ).find('td:eq(4)').attr('align','center');
+   		    		    	$( row ).find('td:eq(3)').attr('align','center');
+   		    		    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" id_payment="'+ID_payment+'">Info</a>');
    	    	    },
    	       	    "initComplete": function(settings, json) {
    	       	    	// $('.C_radio:first').prop('checked', true);
