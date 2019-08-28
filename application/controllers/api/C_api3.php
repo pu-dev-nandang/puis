@@ -1940,8 +1940,16 @@ class C_api3 extends CI_Controller {
         }
     }
 
-    public function crudOverwriteCourse(){
+    public function crudLogging(){
+        $data_arr = $this->getInputToken2();
 
+        if($data_arr['action']=='insertLog'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $this->db->insert('db_employees.log_employees',$dataForm);
+            return print_r(1);
+
+        }
     }
 
 }
