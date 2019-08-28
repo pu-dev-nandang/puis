@@ -497,6 +497,8 @@ class C_rest2 extends CI_Controller {
                             for ($j=0; $j < count($query_get_pr); $j++) { 
                                 if (count($arr_temp) == 0) {
                                     $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                    // $arr_temp[] = ['POPrint_Approve' => $row['POPrint_Approve']];
+                                    
                                 }
                                 else
                                 {
@@ -511,6 +513,7 @@ class C_rest2 extends CI_Controller {
 
                                     if ($bool) {
                                         $arr_temp[] = $query_get_pr[$j]['PRCode'];
+                                        // $arr_temp[] = ['POPrint_Approve' => $row['POPrint_Approve']];
                                     }
 
                                 }
@@ -526,7 +529,7 @@ class C_rest2 extends CI_Controller {
                                     'ID_poi' => $row['ID_poi'],
                                 );
                             }
-
+                        $arr_temp[] = ['POPrint_Approve' => $row['POPrint_Approve']];    
                         $nestedData[] = $arr_temp;
                         $data[] = $nestedData;
                         $No++;
@@ -2481,8 +2484,6 @@ class C_rest2 extends CI_Controller {
                                           select ID_payment,Perihal  from db_payment.bank_advance
                                           UNION 
                                           select ID_payment,Perihal  from db_payment.cash_advance  
-                                          #UNION 
-                                          #select ID_payment,Perihal  from db_payment.petty_cash 
                                         )
                         as b on a.ID = b.ID_payment
                          )
@@ -2502,6 +2503,11 @@ class C_rest2 extends CI_Controller {
 
                 // get Department
                 $WhereFiltering = ' and ID_payment not in (select ID_payment from db_budgeting.ap where Status = 2)';
+                if (array_key_exists('TypePaymentSelect', $dataToken)) {
+                    if ($dataToken['TypePaymentSelect'] != '%') {
+                        $WhereFiltering .=  ' and TypePay = "'.$dataToken['TypePaymentSelect'].'"';
+                    }
+                }
                  
                 $requestData = $_REQUEST;
                 // $StatusQuery = ' and Status = 2';
@@ -3979,6 +3985,16 @@ class C_rest2 extends CI_Controller {
                                                 $this->m_master->apiservertoserver($url,$token);
 
                                                 // notif to ap team atau kasubag fin
+                                                    if (array_key_exists('payment', $DtExisting)) {
+                                                        $IDdiv = $DtExisting['payment'][0]['Departement'];
+                                                    }
+                                                    else
+                                                    {
+                                                        $IDdiv = $DtExisting['dtspb'][0]['Departement'];
+                                                    }
+
+                                                    $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                                                    $CodeDept = $G_div[0]['Code'];
                                                     $sqlAP = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
                                                                    SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
                                                                          a.StatusEmployeeID
@@ -3992,8 +4008,8 @@ class C_rest2 extends CI_Controller {
                                                         $data = array(
                                                             'auth' => 's3Cr3T-G4N',
                                                             'Logging' => array(
-                                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' of Purchasing has been done for approval',
-                                                                            'Description' => $G_data[0]['Type'].' of Purchasing',
+                                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' of '.$CodeDept.' has been done for approval',
+                                                                            'Description' => $G_data[0]['Type'].' of '.$CodeDept.'',
                                                                             'URLDirect' => $URLDirectAP,
                                                                             'CreatedBy' => $NIP,
                                                                           ),

@@ -41,7 +41,7 @@
 		<br>
 		<div id="page_status" class="noPrint"></div>
 	</div>
-	<div class="col-md-8" style="min-width: 800px;overflow: auto;">
+	<div class="col-md-8">
 		<div class="well" id = "pageContent" style="margin-top: 10px;">
 
 		</div>
@@ -145,6 +145,21 @@
 			dtspb : dtspb_rs,
 		};
 		return arr;
+	}
+
+	function OPTypeBayar(TypeBayar=null,Dis='')
+	{
+		// console.log(TypeBayar);
+		var temp = ['Transfer','Giro'];
+		var h = '';
+		h = '<select class = " form-control dtTypeBayar" style = "width : 80%" '+Dis+'>';
+			for (var i = 0; i < temp.length; i++) {
+				var selected = (TypeBayar == temp[i]) ? 'selected' : '';
+				h += '<option value = "'+temp[i]+'" '+selected+' >'+temp[i]+'</option>';
+			}
+		h += '</select>';
+
+		return h;	
 	}
 
 	function MakeDomHtml()
@@ -307,7 +322,12 @@
 									'Mohon dibayarkan / ditransfer kepada'+
 								'</td>'+
 								'<td>'+
-									'<b>'+Supplier+'</b>'+
+									'<div class = "col-xs-5">'+
+										'<b>'+Supplier+'</b>'+
+									'</div>'+
+									'<div class = "col-xs-5 col-md-offset-1">'+
+										OPTypeBayar(dtspb[0].Detail[0]['TypeBayar'],'disabled')+
+									'</div>'+	
 								'</td>'+
 							'</tr>'+
 							'<tr style="height: 50px;">'+
@@ -957,6 +977,7 @@
 		var Invoice = ev.find('.Money_Pembayaran').val();
 		Invoice = findAndReplace(Invoice, ".","");
 		var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+		var TypeBayar = ev.find('.dtTypeBayar option:selected').val();
 
 		var data = {
 			Code_po_create : Code_po_create,
@@ -970,6 +991,7 @@
 			ID_bank : ID_bank,
 			Invoice : Invoice,
 			TypeInvoice  : TypeInvoice,
+			TypeBayar : TypeBayar,
 			ID_payment : ID_payment,
 			action : action,
 		};
