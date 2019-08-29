@@ -2734,7 +2734,11 @@ class C_rest2 extends CI_Controller {
                         $InvoiceLeft = $Invoice;
                         if ($Total >= $Invoice) {
                              // insert ke table ap dulu
-                              $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                                $UploadVoucher = '';
+                                if (array_key_exists('UploadVoucher', $_FILES)) {
+                                    $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                                }
+                              
                               $UploadVoucher = json_encode($UploadVoucher);
                               $dtime =  date('Y-m-d H:i:s');
                               $arr = array(
@@ -2862,7 +2866,10 @@ class C_rest2 extends CI_Controller {
                         $InvoiceLeft = $Invoice;
                         if ($Total >= $Invoice) {
                             // insert ke table ap dulu
-                            $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                            $UploadVoucher = '';
+                            if (array_key_exists('UploadVoucher', $_FILES)) {
+                                $UploadVoucher = $this->m_master->uploadDokumenMultiple('Voucher_'.uniqid(),'UploadVoucher',$path = './uploads/finance');
+                            }
                             $UploadVoucher = json_encode($UploadVoucher);
                             $dtime =  date('Y-m-d H:i:s');
 

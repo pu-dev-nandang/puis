@@ -62,6 +62,7 @@ class C_save_to_pdf3 extends CI_Controller {
     {
         $this->load->model('master/m_master');
         $this->load->model('budgeting/m_global');
+        $this->load->model('budgeting/m_pr_po');
         $Code = $input['Code'];
         $CodeReplace = str_replace('/', '-', $Code);
         $filename = '__'.$CodeReplace.'.pdf';  
@@ -211,6 +212,20 @@ class C_save_to_pdf3 extends CI_Controller {
          $w__ = 210 / count($JsonStatus);
          $w__ = (int)$w__;
          $c__ = 0;
+
+         // update jsonstatus 1 purchasing
+         $G = $this->m_pr_po->get_approval_po('NA.4');
+         $arr_g =  array(
+                        'NIP' => $G[0]['NIP'],
+                        'Name' => $G[0]['NamaUser'],
+                        'Status' => 1,
+                        'ApproveAt' => '',
+                        'Representedby' => '',
+                        'Visible' => $G[0]['Visible'],
+                        'NameTypeDesc' => $G[0]['NameTypeDesc'],
+                    );
+         $JsonStatus[0] = $arr_g;
+         // print_r($JsonStatus);die();
          for ($i=0; $i < count($JsonStatus); $i++) {
             if ($JsonStatus[$i]['Visible'] == 'Yes') {
                 // Name

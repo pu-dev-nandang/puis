@@ -588,4 +588,92 @@ class M_global extends CI_Model {
 
     }
 
+    public function __ChkRealisasi($Departement = null,$TypePayment = null)
+    {
+        /*
+            user tidak bisa create ca atau ba sebelum realisasi sebelumnya selesai
+
+        */
+        if ($Departement == null || $TypePayment == null) {
+            return false;
+        }
+        else
+        {
+            // specially purchasing
+            if ($Departement == 4) {
+                $Departement = 'NA.4';
+            }
+            switch ($TypePayment) {
+                case 'Cash Advance':
+                    $sql = 'select * from db_payment.payment where Type = ? and Departement = ? order by ID desc limit 1';
+                    $query=$this->db->query($sql, array($TypePayment,$Departement))->result_array();
+                    if (count($query) == 0) {
+                        return true;
+                    }
+                    else{
+                        $ID_payment = $query[0]['ID'];
+                        $G_pay = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID_payment);
+                        if (count($G_pay) == 0 ) {
+                            return false;
+                        }
+                        else
+                        {
+                            $ID_TypePay = $G_pay[0]['ID'];
+                            $G_pay_realisasi = $this->m_master->caribasedprimary('db_payment.cash_advance_realisasi','ID_cash_advance',$ID_TypePay);
+                            if (count($G_pay_realisasi) == 0) {
+                                return false;
+                            }
+                            else
+                            {
+                                if ($G_pay_realisasi[0]['Status'] == 2) {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            
+                        }
+                    }   
+                    break;
+                case 'Bank Advance':
+                    $sql = 'select * from db_payment.payment where Type = ? and Departement = ? order by ID desc limit 1';
+                    $query=$this->db->query($sql, array($TypePayment,$Departement))->result_array();
+                    if (count($query) == 0) {
+                        return true;
+                    }
+                    else{
+                        $ID_payment = $query[0]['ID'];
+                        $G_pay = $this->m_master->caribasedprimary('db_payment.bank_advance','ID_payment',$ID_payment);
+                        if (count($G_pay) == 0 ) {
+                            return false;
+                        }
+                        else
+                        {
+                            $ID_TypePay = $G_pay[0]['ID'];
+                            $G_pay_realisasi = $this->m_master->caribasedprimary('db_payment.bank_advance_realisasi','ID_bank_advance',$ID_TypePay);
+                            if (count($G_pay_realisasi) == 0) {
+                                return false;
+                            }
+                            else
+                            {
+                                if ($G_pay_realisasi[0]['Status'] == 2) {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }   
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+        }
+    }
+
 }
