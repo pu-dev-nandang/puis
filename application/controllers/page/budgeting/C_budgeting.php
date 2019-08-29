@@ -1674,7 +1674,36 @@ class C_budgeting extends Budgeting_Controler {
                     $this->db->update('db_budgeting.cfg_dateperiod', $update);
                 
                 // save to log
-                    $this->m_budgeting->log_budget($ID_creator_budget_approval,'Create',$By = $this->session->userdata('NIP'));    
+                    $this->m_budgeting->log_budget($ID_creator_budget_approval,'Create',$By = $this->session->userdata('NIP'));
+
+                // send to approval jika status = 1
+                if ($creator_budget_approval->Status == 1) {
+                    // Send Notif
+                        $IDdiv = $creator_budget_approval->Departement;
+                        $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
+                        // $NameDepartement = $G_div[0]['NameDepartement'];
+                        $Code = $G_div[0]['Code'];
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Set Budget of '.$Code,
+                                            'Description' => 'Budget '.$Code.' has been already set by '.$this->session->userdata('Name'),
+                                            'URLDirect' => 'budgeting_entry',
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => array(
+                                      'NIP' => array($JsonStatus[1]['NIP']),
+                                    ),
+                            'Email' => 'No', 
+                        );
+
+                        // send email is holding or warek keatas
+                             $this->m_master->send_email_budgeting_holding($JsonStatus[1]['NIP'],$IDdiv,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                }        
 
                 $msg = array('Status' => 1,'msg'=>$ID_creator_budget_approval );
                 break;
