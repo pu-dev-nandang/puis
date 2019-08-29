@@ -1305,10 +1305,18 @@ $route['agregator/lama-studi-mahasiswa'] = 'page/agregator/c_agregator/lama_stud
 $route['agregator/rasio-kelulusan'] = 'page/agregator/c_agregator/rasio_kelulusan';
 $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
+$route['agregator/kepuasan_pengguna_lulusan'] = 'page/agregator/c_agregator/kepuasan_pengguna_lulusan';
+$route['agregator/buku-isbn-chapter'] = 'page/agregator/c_agregator/buku_isbn_chapter';
+$route['agregator/teknologi-produk-karya'] = 'page/agregator/c_agregator/teknologi_produk_karya';
+$route['agregator/hki-desain-produk'] = 'page/agregator/c_agregator/hki_desain_produk';
+$route['agregator/hki-paten-sederhana'] = 'page/agregator/c_agregator/hki_paten_sederhana';
+$route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_karya_ilmiah';
+$route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
+$route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
+
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 //$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
-
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
@@ -1319,13 +1327,21 @@ $route['api3/__crudInternationalAccreditation'] = 'api/c_api3/crudInternationalA
 
 $route['api3/__crudAgregatorTB1'] = 'api/c_api3/crudAgregatorTB1';
 $route['api3/__crudAgregatorTB2'] = 'api/c_api3/crudAgregatorTB2';
+$route['api3/__crudAgregatorTB3'] = 'api/c_api3/crudAgregatorTB3';
 $route['api3/__crudAgregatorTB4'] = 'api/c_api3/crudAgregatorTB4';
 $route['api3/__crudAgregatorTB5'] = 'api/c_api3/crudAgregatorTB5';
 $route['api3/__getKecukupanDosen'] = 'api/c_api3/getKecukupanDosen';
 $route['api3/__getJabatanAkademikDosenTetap'] = 'api/c_api3/getJabatanAkademikDosenTetap';
 $route['api3/__getJabatanAkademikDosenTidakTetap'] = 'api/c_api3/getJabatanAkademikDosenTidakTetap';
 $route['api3/__getLecturerCertificate'] = 'api/c_api3/getLecturerCertificate';
+$route['api3/__getRasioDosenMahasiswa'] = 'api/c_api3/getRasioDosenMahasiswa';
 $route['api3/__getAkreditasiProdi'] = 'api/c_api3/getAkreditasiProdi';
+$route['api3/__getLuaranlainnya'] = 'api/c_api3/getLuaran_lainnya';
+$route['api3/__getTeknoProduk'] = 'api/c_api3/getLuaranTekno_produk';
+$route['api3/__getHkiProduk'] = 'api/c_api3/getLuaranHkiproduk';
+$route['api3/__getHkiPaten'] = 'api/c_api3/getLuaranHkipaten';
+$route['api3/__getSitasiKarya'] = 'api/c_api3/getsitasikarya';
+$route['api3/__getRekognisiDosen'] = 'api/c_api3/getrekognisidosen';
 
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 
@@ -1337,9 +1353,6 @@ $route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
 $route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
 
 $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
-
-
-
 
 
 // budgeting & PR
