@@ -291,12 +291,12 @@
 						}
 
 						html += '<tr>'+
-									'<td class = "TD1"><label>No Dokumen</label></td>'+
+									'<td class = "TD1"><label>No Giro</label></td>'+
 									'<td>:</td>'+
 									'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 								'</tr>'+
 								'<tr>'+
-									'<td><label>Upload Dokumen</label></td>'+
+									'<td><label>Upload Voucher</label></td>'+
 									'<td>:</td>'+
 									'<td>'+htmlUploadVoucher+'</td>'+
 								'</tr>';
@@ -405,12 +405,12 @@
 			}
 
 			html += '<tr>'+
-						'<td class = "TD1"><label>No Dokumen</label></td>'+
+						'<td class = "TD1"><label>No Giro</label></td>'+
 						'<td>:</td>'+
 						'<td><label>'+dtspb[0].FinanceAP[0].NoVoucher+'</label></td>'+
 					'</tr>'+
 					'<tr>'+
-						'<td><label>Upload Dokumen</label></td>'+
+						'<td><label>Upload Voucher</label></td>'+
 						'<td>:</td>'+
 						'<td>'+htmlUploadVoucher+'</td>'+
 					'</tr>';
@@ -616,6 +616,24 @@
 								'</td>'+
 							'</tr>';
 
+				// show petty cash
+				var PettyCashHtml = '';
+				if (Type == 'Cash Advance') {
+					var CodePettyCash = Realisasi[0]['CodePettyCash'];
+					a_href = '<a href = "javascript:void(0)" class ="ViewPettyCash" code = "'+CodePettyCash+'" ID_Realisasi = "'+ID_Realisasi+'" ID_payment = "'+dtspb[0].ID+'">'+CodePettyCash+'</a>';
+					PettyCashHtml = '<tr>'+
+										'<td class="TD1">'+
+											'Petty Cash'+
+										'</td>'+
+										'<td class="TD2">'+
+											':'+
+										'</td>'+
+										'<td>'+
+											a_href+
+										'</td>	'+			
+									'</tr>';
+				}			
+
 				html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
 							'<div class = "col-xs-12">'+
 								'<div align="center"><h2>REALISASI</h2></div>'+
@@ -653,6 +671,7 @@
 												Date_Realisasi+
 											'</td>	'+			
 										'</tr>'+
+										PettyCashHtml+
 										htmldetail+
 									'</tbody>'+
 								'</table>'+
@@ -776,7 +795,7 @@
 			
 			var btn_approve = '<button class="btn btn-primary" id="Approve_realisasi" action="approve">Approve</button>';
 			var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
-			var btn_print = '';
+			var btn_print = '<button class="btn btn-default print_page_realisasi" ID_payment = "'+ClassDt.ID_payment+'"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 			var Status = dtspb[0]['Status'];
 			switch(Status) {
 			  case 0:
@@ -855,10 +874,8 @@
 			  case '2':
 			  	var JsonStatus = dtspb[0]['JsonStatus'];
 			  	JsonStatus = jQuery.parseJSON(JsonStatus);
-			  	if (JsonStatus[0]['NIP'] == sessionNIP) {
-			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
-			  		DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
-			  	}
+			  	DivPageRealisasi.find('div[id="r_action_realisasi"]').html(html);
+			  	DivPageRealisasi.find('div[id="r_action_realisasi"]').find('.col-xs-12').html('<div class = "pull-right">'+btn_print+'</div>');
 			    break;
 			  default:
 			    // code block
@@ -949,6 +966,7 @@
 					action : 'reject',
 					auth : 's3Cr3T-G4N',
 					NoteDel : NoteDel,
+					payment_data : ClassDt.DataPaymentPO,
 				}
 
 				var token = jwt_encode(data,"UAP)(*");
@@ -1079,5 +1097,77 @@
 		h += '</div></div>';
 		return h;
 	}
+
+	$(document).off('click', '.print_page_realisasi').on('click', '.print_page_realisasi',function(e) {
+		var ID_payment = $(this).attr('id_payment');
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.all_po_payment;
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+
+			var url = base_url_js+'save2pdf/print/pre_pembayaran_realisasi_po';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+		}
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  TypePay : dt[0].Type,
+			  DataPayment : DataPayment,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/payment_user_realisasi';
+		}
+		
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+
+	$(document).off('click', '.ViewPettyCash').on('click', '.ViewPettyCash',function(e) {
+		var CodePettyCash = $(this).attr('code');
+		var ID_Realisasi = $(this).attr('ID_Realisasi');
+		var ID_payment = $(this).attr('id_payment');
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.all_po_payment;
+		if (typeof Dataselected.dtspb !== "undefined") { // trigger non po/spk
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment,Dataselected);
+
+			var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : dt_arr,
+			  po_data : po_data,
+			  Dataselected : Dataselected,
+			  CodePettyCash : CodePettyCash,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+		}
+		else
+		{
+			var DataPayment = ClassDt.po_payment_data;
+			var dt = DataPayment.payment;
+			var data = {
+			  ID_payment : ID_payment,
+			  dt_arr : DataPayment,
+			  CodePettyCash : CodePettyCash,
+			}
+			var token = jwt_encode(data,"UAP)(*");
+			var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+		}
+		
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
 	
 </script>

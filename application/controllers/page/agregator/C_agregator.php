@@ -85,8 +85,6 @@ class C_agregator extends Globalclass {
         $data['access'] = (count($dataSetting)>0) ? '1' : '0';
         $page = $this->load->view('page/agregator/setting',$data,true);
         $this->menu_agregator($page);
-
-
     }
 
     public function akreditasi_eksternal()
@@ -261,6 +259,71 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function kepuasan_pengguna_lulusan(){
+        $viewPage = 'kepuasan_pengguna_lulusan';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function buku_isbn_chapter(){
+        $viewPage = 'luaran_lainnya';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function teknologi_produk_karya(){
+        $viewPage = 'teknologi_produk_karya';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function hki_desain_produk(){
+        $viewPage = 'hki_produk';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function hki_paten_sederhana(){
+        $viewPage = 'hki_paten';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+    
+    public function sitasi_karya_ilmiah(){
+        $viewPage = 'sitasi_karya_ilmiah';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function rasio_dosen_mahasiswa(){
+        $viewPage = 'rasio_dosen_mahasiswa';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function rekognisi_dosen(){
+        $viewPage = 'rekognisi_dosen';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+
     public function uploadFile(){
 
         $fileName = $this->input->get('fileName');
@@ -289,8 +352,6 @@ class C_agregator extends Globalclass {
             ));
         }
     }
-
-
 
 
 }

@@ -30,6 +30,19 @@
             </div>  
           </div>
         </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group">
+              <label>Type</label>
+              <select class="form-control TypePaymentSelect">
+                   <option value = "%" selected>All</option>
+                   <option value = "Spb">SPB</option>
+                   <option value = "Cash Advance">Cash Advance</option>
+                   <option value = "Bank Advance">Bank Advance</option>
+               </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 </div>
@@ -93,7 +106,7 @@ $(document).off('click', '#Month').on('click', '#Month',function(e) {
   LoadDataForTable();
 })
 
-$(document).off('change', '#RealisasiStatus').on('change', '#RealisasiStatus',function(e) {
+$(document).off('change', '#RealisasiStatus,.TypePaymentSelect').on('change', '#RealisasiStatus,.TypePaymentSelect',function(e) {
   LoadDataForTable();
 })
 
@@ -129,10 +142,12 @@ function Get_data_payment(){
    var Years = $('#Years option:selected').val();
    var Month = $('#Month option:selected').val();
    var RealisasiStatus = $('#RealisasiStatus option:selected').val();
+   var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
    	var data = {
          Years : Years,
          Month : Month,
          RealisasiStatus : RealisasiStatus,
+         TypePaymentSelect : TypePaymentSelect,
    	};
    	var token = jwt_encode(data,"UAP)(*");
 
@@ -190,7 +205,8 @@ function Get_data_payment(){
 	    	      if (Code_po_create != '') {
 	    	      	 Payment += '<br>PR Code : '+PRHTML;
 	    	      }
-	    	      Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+              // Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+	    	      Payment += '<br>Created : '+ListPR[1].PayNameCreatedBy;
 	    	       
 	    	       $( row ).find('td:eq(1)').html(Payment);
     		    	

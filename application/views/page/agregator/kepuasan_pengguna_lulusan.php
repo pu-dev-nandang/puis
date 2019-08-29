@@ -1,7 +1,5 @@
-<!-- <h1>waktu_tunggu_lulusan</h1>
-<h1>lama_studi_mahasiswa</h1> -->
- 
 
+ 
 <style>
     #dataTablesPAM tr th, #dataTablesPAM tr td {
         text-align: center;
@@ -15,38 +13,22 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div class="form-group">
-                <label>Program Pendidikan</label>
+                <label>Aspek Penilaian</label>
                 <input class="hide" id="formID">
-                <select class="form-control" id="programpendidikan"></select>
-            </div>
-            <div class="form-group">
-                <label>Tahun</label>
-                <select class="form-control" id="yearstudy"></select>
+                <select class="form-control" id="aspek_penilaian"></select>
             </div>
 
             <div class="form-group">
-                <label>Rata-rata Masa Tunggu Lulusan</label>
-                <input class="form-control" id="jumlah_ratatunggu">
+                <label>Hasil Penilaian (%)</label>
+                <input class="form-control" id="hasil_penilaian"></input>
             </div>
+
 
             <div class="form-group" style="text-align: right;">
-                <button class="btn btn-primary" id="btnSaveWTL">Save</button>
+                <button class="btn btn-primary" id="btnSaveKPL">Save</button>
             </div>
 
         </div>
-
-      
-       	<div class="col-md-6 col-md-offset-3">
-            <div class="form-group col-md-3">
-            		<label>Awal</label>
-                	<select class="form-control" id="filterAwal"></select>
-            </div>
-           	<div class="form-group col-md-3">
-            	<label>Akhir</label>
-                <select class="form-control" id="filterAkhir"></select>
-           	</div>
-         </div> 	
-          
         <div class="col-md-9">
             <div id="viewTable"></div>
         </div>
@@ -59,9 +41,8 @@
 
     $(document).ready(function () {
 
-        loadDataWTL();
-        selectprogrampendidikan();
-        selectyearstudy();
+        loadDataKPL();
+        selectpenilaian();
 
         $( "#formWaktuPenyelenggaraan" )
             .datepicker({
@@ -77,90 +58,39 @@
             });
     });
 
-    function selectprogrampendidikan() {
+    function selectpenilaian() {
 
         var url = base_url_js+'api3/__crudAgregatorTB5';
-        var token = jwt_encode({action : 'getprogrampendik'},'UAP)(*');
+        var token = jwt_encode({action : 'getpenilaian'},'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
-            $('#programpendidikan').append('<option disabled selected></option>');
+            $('#aspek_penilaian').append('<option disabled selected></option>');
                 for(var i=0;i<jsonResult.length;i++){
-                   $('#programpendidikan').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].NamaProgramPendidikan+' </option>');
+                   $('#aspek_penilaian').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Nama_aspek+' </option>');
                 }
             });
       }
 
-     function selectyearstudy() {
 
-        var url = base_url_js+'api3/__crudAgregatorTB5';
-        var token = jwt_encode({action : 'yearstudy'},'UAP)(*');
-
-        $.post(url,{token:token},function (jsonResult) {
-            $('#yearstudy').append('<option disabled selected></option>');
-                for(var i=0;i<jsonResult.length;i++){
-                   $('#yearstudy').append('<option id="'+jsonResult[i].Year+'"> '+jsonResult[i].Year+' </option>');
-                }
-            });
-      }
-
-    $(document).on('click','.btnActionUpdate',function () {
-
-     	var programpendidikan = $(this).attr('programpendidikan');
-     	var yearstudy = $(this).attr('yearstudy');
-     	var jumlah_ratatunggu = $(this).attr('jumlah_ratatunggu');
-     	
-     	var data = {
-                action : 'update_waktu_tunggu',
-                dataForm : {
-                    ID_programpendik : programpendidikan,
-                    Year : yearstudy,
-                    Masa_tunggu : jumlah_ratatunggu
-                }
-            };
-
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api3/__crudAgregatorTB5';
-
-        $.post(url,{token:token},function (result) {
-
-            	if(result==0 || result=='0') {
-                  toastr.error('Maaf, Gagal Simpan Data !','Error');
-                  $('#NotificationModal').modal('hide');
-                } 
-                else {  
-                	loadDataPAM();
-	                toastr.success('Data saved','Success');
-
-	                $('#programpendidikan').val('');
-	                $('#yearstudy').val('');
-	                $('#jumlah_ratatunggu').val('');
-	                $('#NotificationModal').modal('hide');
-                }
-
-                setTimeout(function (args) {
-                    $('#btnSavePAM').html('Save').prop('disabled',false);
-                },500);
-         });
-     });
-
-
-    $('#btnSaveWTL').click(function () {
+    $('#btnSaveKPL').click(function () {
 
         var formID = $('#formID').val();
-        var programpendidikan = $('#programpendidikan option:selected').attr('id');
-        var yearstudy = $('#yearstudy option:selected').attr('id');
-        var jumlah_ratatunggu = $('#jumlah_ratatunggu').val();
+        var aspek_penilaian = $('#aspek_penilaian option:selected').attr('id');
+        var hasil_penilaian = $('#hasil_penilaian').val();
 
-        if(programpendidikan!='' && programpendidikan!=null &&
-            yearstudy!='' && yearstudy!=null &&
-        	jumlah_ratatunggu!='' && jumlah_ratatunggu!=null){
-            //loading_buttonSm('#btnSaveWTL');
+
+        if(aspek_penilaian!='' && aspek_penilaian!=null &&
+        	hasil_penilaian!='' && hasil_penilaian!=null) {
+
+            //loading_buttonSm('#btnSaveKPL');
+
             var data = {
-                action : 'saveWTL',
+                action : 'saveKPL',
+                //ID : (formID!='' && formID!=null) ? formID : '',
                 dataForm : {
-                    ID_programpendik : programpendidikan,
+                    ID_programpendik : aspek_penilaian,
                     Year : yearstudy,
-                    Masa_tunggu : jumlah_ratatunggu
+                    Persentase : persentase
                 }
             };
 
@@ -172,22 +102,20 @@
             	if(result==0 || result=='0'){
                   //toastr.error('Maaf, Data Sudah Ada !','Error');
                   $('#NotificationModal .modal-body').html('<div style="text-align: center;"><b>Data sudah ada! Apakah Data Mau di Update ? </b><hr/> ' +
-		            '<button type="button" class="btn btn-primary btnActionUpdate" style="margin-right: 5px;" programpendidikan="'+programpendidikan+'" yearstudy="'+yearstudy+'" jumlah_lulusan="'+jumlah_lulusan+'" jumlah_ratastudy="'+jumlah_ratastudy+'">Yes</button>' +
+		            '<button type="button" class="btn btn-primary btnActionUpdate" style="margin-right: 5px;" programpendidikan="'+programpendidikan+'" yearstudy="'+yearstudy+'" jumlah_lulusan="'+persentase+'" >Yes</button>' +
 		            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
 		            '</div>');
 		          $('#NotificationModal').modal('show');
-
                 } 
                 else {  
-                	loadDataWTL();
+                	loadDataKPL();
 	                toastr.success('Data saved','Success');
 	                $('#programpendidikan').val('');
-	                $('#yearstudy').val('');
-	                $('#jumlah_ratatunggu').val('');
+	                $('#persentase').val('');
                 }
 
                 setTimeout(function (args) {
-                    $('#btnSaveWTL').html('Save').prop('disabled',false);
+                    $('#btnSaveKPL').html('Save').prop('disabled',false);
                 },500);
             });
 
@@ -197,7 +125,7 @@
 
     });
     
-    function loadDataWTL() {
+    function loadDataKPL() {
     	
         var thisYear = (new Date()).getFullYear();
 		var startTahun = parseInt(thisYear) - parseInt(3);
@@ -218,21 +146,22 @@
             '                <thead>' +
 			'                <tr>    ' +
 			'                    <th colspan="2" style="border-right: 1px solid #ccc;"></th> ' +
-			'                    <th colspan="3" style="border-right: 1px solid #ccc;">Rata-rata Masa Studi Lulusan pada</th>  ' +
-			//'                    <th style="border-right: 1px solid #ccc;"></th>  ' +
+			'                    <th colspan="4" style="border-right: 1px solid #ccc;">Hasil Penilaian (%)</th>  ' +
 			'                </tr>  ' +
             '                <tr>' +
             '                    <th style="width: 1%;">No</th>' +
-            '                    <th>Program Pendidikan </th>' +
-            					thYear+
-            //'                    <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
+            '                    <th>Aspek Penilaian </th>' +
+            '                    <th>Sangat Baik </th>' +
+            '                    <th>Baik </th>' +
+            '                    <th>Cukup </th>' +
+            '                    <th>Kurang </th>' +
             '                </tr>' +
             '                </thead>' +
             '                <tbody id="listData"></tbody>' +
             '            </table>');
 
         var data = {
-            action : 'viewWaktuTunggu',
+            action : 'viewKesesuaian',
             Type : '1'
         };
 
@@ -244,7 +173,7 @@
             if(jsonResult.length>0){
 
             		for (var i = 0; i < jsonResult.length; i++) {
-            			var masa_tunggu = ''; 
+            			var persentase = ''; 
             			var v = jsonResult[i];
             			var v_ID_programpendik = v.ID_programpendik;
 
@@ -261,13 +190,13 @@
 	                        '<textarea id="viewData_'+v_ID_programpendik+'" class="hide">'+JSON.stringify(v)+'</textarea>';
 
 	                    for (var l = 0; l < arr_years.length; l++) {
-	                    	masa_tunggu += '<td>'+v['Masa_tunggu_'+arr_years[l]]+'</td>';
+	                    	persentase += '<td>'+v['Persentase_'+arr_years[l]]+'</td>';
 	                    }
 
 					 $('#listData').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(parseInt(i)+1 )+'</td>' +
                         '<td style="text-align: left;">'+v.NamaProgramPendidikan+'</td>' +
-                        masa_tunggu+
+                        persentase+
                         //'<td style="border-left: 1px solid #ccc;">'+btn+'</td>' +
                         '</tr>');
             		}
@@ -309,7 +238,7 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
-                loadDataWTL();
+                loadDataKPL();
                 toastr.success('Data removed','Success');
 
             });

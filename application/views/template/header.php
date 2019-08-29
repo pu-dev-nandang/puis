@@ -272,14 +272,14 @@
 
 <script>
 
-     var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+     // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
 
     $(document).ready(function () {
         $('.departement ,.departement1').addClass('hide');
         loadAllowDivision();
         // showHTMLMessagesDivision();
         showUnreadLog();
-        socket_messages();
+        // socket_messages();
         wrDepartmentAdmProdi();
 
         if($.cookie("theme")==null || $.cookie("theme") =='' || $.cookie("theme")=='dark'){
@@ -425,6 +425,24 @@
         var url = base_url_portal_lecturers+'auth/loginFromAkademik?token='+token;
         PopupCenter(url,'xtf','1300','500');
 
+    });
+
+    $(document).on('click','.NotificationLinkRead',function () {
+        var ID_logging_user = $(this).attr('id_logging_user');
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'readLogUser',
+            UserID : sessionNIP,
+            ID_logging_user : ID_logging_user,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+        });
+    });
+
+    $(document).on('click','.ViewAllLogNotification',function () {
+        window.location.href = base_url_js+'ShowLoggingNotification';
     });
 
     $('.departement').click(function () {
@@ -603,8 +621,13 @@
 
                 for(var i=0;i<Details.length;i++){
                     var d = Details[i];
-                    $('#li2ShowLog').append('<li>' +
-                    '                        <a href="'+base_url_js+''+d.URLDirect+'">' +
+                    // console.log(d);
+                    var wrn_read = '';
+                    if (d.StatusRead == 1) {
+                        wrn_read = 'style="background-color: #eaf1fb"';
+                    }
+                    $('#li2ShowLog').append('<li '+wrn_read+'>' +
+                    '                        <a href="'+base_url_js+''+d.URLDirect+'" id_logging_user = "'+d.ID_logging_user+'" class ="NotificationLinkRead" >' +
                     '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
                     '                            <span class="subject"><span class="from">'+d.CreatedName+'</span></span>' +
                     '                            <span class="text">'+d.Title+'</span>' +
@@ -614,7 +637,7 @@
                     '                    </li>');
                 }
                 $('#li2ShowLog').append('<li class="footer">' +
-                                        '<a href="javascript:void(0);">View all logs</a>' +
+                                        '<a href="javascript:void(0);" class = "ViewAllLogNotification">View all logs</a>' +
                                         '</li>');
 
                 $('.img-fitter-notif').imgFitter({
@@ -626,9 +649,9 @@
                 });
             }
 
-            socket.emit('update_log', {
-                update_log: '1'
-            });
+            // socket.emit('update_log', {
+            //     update_log: '1'
+            // });
 
 
         });
@@ -643,15 +666,16 @@
      // }
 
 
+
     function ReadNotifDivision(){
         var url = base_url_js+'readNotificationDivision';
         $.get(url,function (data_json) {
             var response = jQuery.parseJSON(data_json);
             if (response == 1) {
-                var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                socket.emit('update_notifikasi', {
-                    update_notifikasi: '1'
-                });
+                // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                // socket.emit('update_notifikasi', {
+                //     update_notifikasi: '1'
+                // });
             }
         });
     }

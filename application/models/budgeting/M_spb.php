@@ -15,6 +15,7 @@ class M_spb extends CI_Model {
 
     public function checkdt_spb_before_submit($data_verify)
     {
+        // print_r($data_verify);die();
         $bool = true;
         $Code_po_create = $data_verify['Code_po_create'];
         $InvoicePO = $data_verify['InvoicePO'];
@@ -31,9 +32,9 @@ class M_spb extends CI_Model {
             }
         }
 
-        if ($G_dt[0]['Status'] == 1) {
-            $bool = false;
-        }
+        // if ($G_dt[0]['Status'] == 1) {
+        //     $bool = false;
+        // }
 
         return $bool;
     }
@@ -111,7 +112,7 @@ class M_spb extends CI_Model {
                             $G_dt = $this->m_master->caribasedprimary('db_payment.cash_advance','ID_payment',$ID);
                             $tot2 = count($G_dt);
                             for ($j=0; $j < $tot2; $j++) { 
-                                // get bank_advance_detail
+                                // get cash_advance_detail
                                 $ID_cash_advance = $G_dt[$j]['ID'];
                                 $__Detail = $this->m_master->caribasedprimary('db_payment.cash_advance_detail','ID_cash_advance',$ID_cash_advance);
                                 for ($k=0; $k < count($__Detail); $k++) { 

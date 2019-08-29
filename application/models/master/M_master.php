@@ -3237,9 +3237,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getEmployeeByDepartmentByPosition($IDDivision)
     {
+        // $sql = "select * from db_employees.employees
+        //         where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+        //         and SPLIT_STR(PositionMain, '.', 2) <= 12 
+        //         ";
         $sql = "select * from db_employees.employees
                 where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
-                and SPLIT_STR(PositionMain, '.', 2) <= 12 
+                and IsHolding = 'No'
                 ";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
         return $query;

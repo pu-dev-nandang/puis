@@ -155,8 +155,6 @@ class C_api3 extends CI_Controller {
 
             }
 
-
-
             return print_r(json_encode($data));
 
         }
@@ -715,6 +713,24 @@ class C_api3 extends CI_Controller {
         }
     }
 
+
+    public function crudAgregatorTB3(){
+
+        $data_arr = $this->getInputToken2();
+
+        // Rekognisi Dosen
+        if($data_arr['action']=='save_rekognisi_dosen') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            return print_r(1);
+        }
+
+
+    }
+
     public function crudAgregatorTB4(){
 
         $data_arr = $this->getInputToken2();
@@ -901,17 +917,138 @@ class C_api3 extends CI_Controller {
             }
 
             return print_r(1);
-
         }
+
+        else if($data_arr['action']=='updateLamaStudy'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $year = $dataForm['Year'];
+            $ID_programpendik = $dataForm['ID_programpendik'];
+
+            $squery = 'SELECT * FROM db_agregator.lama_studi_mahasiswa WHERE ID_programpendik = "'.$ID_programpendik.'" AND Year = "'.$year.'" ';
+            $dataTable =$this->db->query($squery, array())->result_array();
+
+            if(count($dataTable)>0){
+                return print_r(0);
+            } 
+            else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.lama_studi_mahasiswa',$dataForm);
+                return print_r(1);
+            }
+        }
+
+        else if($data_arr['action']=='update_study') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $year = $dataForm['Year'];
+            $ID_programpendik = $dataForm['ID_programpendik'];
+
+            $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+            $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+            $this->db->where('Year', $year);
+            $this->db->where('ID_programpendik', $ID_programpendik);
+            $this->db->update('db_agregator.lama_studi_mahasiswa',$dataForm);
+            return print_r(1);
+        }
+
         else if($data_arr['action']=='viewPAM'){
 
             $data = $this->db->get_where('db_agregator.prestasi_mahasiswa', array(
                 'Type' => $data_arr['Type']
             ))->result_array();
+            return print_r(json_encode($data));
+
+        }
+
+        else if($data_arr['action']=='viewLamaStudyold'){
+
+            $year = date('Y');
+            $arr_year = array();
+            for ($i=0; $i < 3; $i++) { 
+                $arr_year[] = $year - $i;
+            }
+            $data = $this->db->query('SELECT a.ID,a.ID_programpendik, b.ID AS IDPrograms, b.NamaProgramPendidikan
+                    FROM db_agregator.lama_studi_mahasiswa AS a
+                    INNER JOIN db_agregator.program_pendidikan AS b ON (a.ID_programpendik = b.ID) Group by  a.ID_programpendik  order by a.ID_programpendik asc,a.Year desc ')->result_array();
+            for ($i=0; $i < count($data); $i++) { 
+                for ($j=0; $j < count($arr_year); $j++) { 
+                   $sql = 'select * from db_agregator.lama_studi_mahasiswa where ID_programpendik = '.$data[$i]['ID_programpendik'].' and Year = '.$arr_year[$j];
+                   $query=$this->db->query($sql, array())->result_array();
+                   if (count($query) > 0) {
+                       $data[$i]['Jumlah_lulusan_'.$arr_year[$j]] = $query[0]['Jumlah_lulusan'];
+                       $data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = $query[0]['Jumlah_masa_studi'];
+                   }
+                   else
+                   {
+                    $data[$i]['Jumlah_lulusan_'.$arr_year[$j]] = 0;
+                    $data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = 0;
+                   }
+
+                   $data[$i]['Year'] = $arr_year[$j];
+                }
+            }
+
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='viewLamaStudy'){
+
+            $year = date('Y');
+            $arr_year = array();
+            for ($i=0; $i < 3; $i++) { 
+                $arr_year[] = $year - $i;
+            }
+
+            $data = $this->db->query('SELECT j.ID, k.ID AS EducationLevelID, k.Description 
+                            FROM db_academic.program_study AS j
+                            INNER JOIN db_academic.education_level AS k ON (j.EducationLevelID = k.ID)
+                            GROUP BY k.ID')->result_array();
+
+            for ($i=0; $i < count($data); $i++) { 
+                for ($j=0; $j < count($arr_year); $j++) { 
+                    $id_prody = $data[$i]['ID'];
+
+                    $sql = 'SELECT a.ProdiID, a.Year, a.StatusStudentID, a.GraduationYear,b.Description, xx.EducationLevelID
+                        FROM db_academic.auth_students AS a
+                        LEFT JOIN db_academic.status_student AS b ON (a.StatusStudentID = b.CodeStatus)
+                        LEFT JOIN (SELECT j.ID, k.ID AS EducationLevelID, k.Description FROM db_academic.program_study AS j
+                        INNER JOIN db_academic.education_level AS k ON (j.EducationLevelID = k.ID)) AS xx ON (a.ProdiID = xx.ID)
+                        WHERE a.StatusStudentID = "1" AND xx.EducationLevelID = "'.$data[$i]['EducationLevelID'].'" AND a.GraduationYear = "'.$arr_year[$j].'" ';
+                   //$sql = 'select * from db_agregator.lama_studi_mahasiswa where ID_programpendik = '.$data[$i]['ID_programpendik'].' and Year = '.$arr_year[$j];
+
+                   $query=$this->db->query($sql, array())->result_array();
+
+                   if (count($query) > 0) {
+
+                      $query[$i]['GraduationYear_'.$arr_year[$j]] = $arr_year[$j];
+                      /// $data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = $query[0]['Jumlah_masa_studi'];
+                   }
+                   else {
+                     $data[$i]['GraduationYear_'.$arr_year[$j]] = 0;
+                    //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = 0;
+                   }
+
+                   $query[$i]['TotalYear_'.$arr_year[$j]] = count($query);
+                    //$data[$i]['Total'] = count($query);
+                   //$data[$i]['GraduationYear'] = $arr_year[$j];
+                   //$data[$i]['Total'] = count($query);
+                }
+            }
 
             return print_r(json_encode($data));
 
         }
+
+        else if($data_arr['action']=='getloopdatastudy'){
+
+            $data = $this->db->query('SELECT a.* FROM db_agregator.program_pendidikan AS a')->result_array();
+            return print_r(json_encode($data));
+
+        }
+
         else if($data_arr['action']=='removePAM'){
 
             $this->db->where('ID', $data_arr['ID']);
@@ -922,14 +1059,180 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='viewIPK'){
 
             $Year = $data_arr['Year'];
-
             $data = $this->db->query('SELECT * FROM db_academic.auth_students ast 
                                                           WHERE ast.StatusStudentID = "1" 
                                                           AND ast.Year = "'.$Year.'" ')->result_array();
+        }
+        else if($data_arr['action']=='getprogrampendik'){
+            $data = $this->db->query('SELECT ID, NamaProgramPendidikan FROM db_agregator.program_pendidikan')->result_array();
+            return print_r(json_encode($data));
+        }
 
+        else if($data_arr['action']=='getpenilaian'){
+            $data = $this->db->query('SELECT *  FROM db_agregator.aspek_penilaian')->result_array();
+            return print_r(json_encode($data));
+        }
 
+        else if($data_arr['action']=='yearstudy'){
+            $data = $this->db->query('SELECT ID, Year FROM db_academic.curriculum')->result_array();
+            return print_r(json_encode($data));
+        }
+
+        else if($data_arr['action']=='get_years') {
+
+            //$data_arr = $this->getInputToken();
+
+            if (count($data_arr) > 0) {
+               
+                $filterAwaltahun = $data_arr['filterAwaltahun'];
+                $data = $this->db->query('SELECT ID, YEAR FROM db_academic.curriculum WHERE YEAR > "'.$data_arr['filterAwaltahun'].'" LIMIT 4')->result_array();
+                return print_r(json_encode($data));
+            }
 
         }
+
+        //Waktu Tunggu lulusan
+        else if($data_arr['action']=='saveWTL') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.waktu_tunggu_lulusan',$dataForm);
+            //$ID = $this->db->insert_id();
+            return print_r(1);
+        }
+
+        else if($data_arr['action']=='update_waktu_tunggu') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $year = $dataForm['Year'];
+            $ID_programpendik = $dataForm['ID_programpendik'];
+
+            $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+            $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+            $this->db->where('Year', $year);
+            $this->db->where('ID_programpendik', $ID_programpendik);
+            $this->db->update('db_agregator.waktu_tunggu_lulusan',$dataForm);
+            return print_r(1);
+        }
+
+        else if($data_arr['action']=='viewWaktuTunggu'){
+            $year = date('Y');
+            $arr_year = array();
+            for ($i=0; $i < 3; $i++) { 
+                $arr_year[] = $year - $i;
+            }
+            $data = $this->db->query('SELECT a.ID,a.ID_programpendik, b.ID AS IDPrograms, b.NamaProgramPendidikan
+                    FROM db_agregator.waktu_tunggu_lulusan AS a
+                    INNER JOIN db_agregator.program_pendidikan AS b ON (a.ID_programpendik = b.ID) Group by  a.ID_programpendik  order by a.ID_programpendik asc,a.Year desc ')->result_array();
+            for ($i=0; $i < count($data); $i++) { 
+                for ($j=0; $j < count($arr_year); $j++) { 
+                   $sql = 'select * from db_agregator.waktu_tunggu_lulusan where ID_programpendik = '.$data[$i]['ID_programpendik'].' and Year = '.$arr_year[$j];
+                   $query=$this->db->query($sql, array())->result_array();
+
+                   if (count($query) > 0) {
+                       $data[$i]['Masa_tunggu_'.$arr_year[$j]] = $query[0]['Masa_tunggu'];
+                       //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = $query[0]['Jumlah_masa_studi'];
+                   }
+                   else
+                   {
+                    $data[$i]['Masa_tunggu_'.$arr_year[$j]] = 0;
+                    //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = 0;
+                   }
+
+                   $data[$i]['Year'] = $arr_year[$j];
+                }
+            }
+            return print_r(json_encode($data));
+        }
+
+        // Kesesuaian bidang kerja lulusan
+        else if($data_arr['action']=='saveKBKL') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $year = $dataForm['Year'];
+            $ID_programpendik = $dataForm['ID_programpendik'];
+
+            $squery = 'SELECT * FROM db_agregator.kesesuaian_bidang_kerja WHERE ID_programpendik = "'.$ID_programpendik.'" AND Year = "'.$year.'" ';
+            $dataTable =$this->db->query($squery, array())->result_array();
+
+            if(count($dataTable)>0){
+                return print_r(0);
+            } 
+            else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.kesesuaian_bidang_kerja',$dataForm);
+                return print_r(1);
+            }
+        }
+
+        else if($data_arr['action']=='viewKesesuaian'){
+            $year = date('Y');
+            $arr_year = array();
+            for ($i=0; $i < 3; $i++) { 
+                $arr_year[] = $year - $i;
+            }
+            $data = $this->db->query('SELECT a.ID, a.ID_programpendik, b.ID AS IDPrograms, b.NamaProgramPendidikan
+                    FROM db_agregator.kesesuaian_bidang_kerja AS a
+                    INNER JOIN db_agregator.program_pendidikan AS b ON (a.ID_programpendik = b.ID) Group by  a.ID_programpendik  order by a.ID_programpendik asc,a.Year desc ')->result_array();
+            for ($i=0; $i < count($data); $i++) { 
+                for ($j=0; $j < count($arr_year); $j++) { 
+                   $sql = 'select * from db_agregator.kesesuaian_bidang_kerja where ID_programpendik = '.$data[$i]['ID_programpendik'].' and Year = '.$arr_year[$j];
+                   $query=$this->db->query($sql, array())->result_array();
+
+                   if (count($query) > 0) {
+                       $data[$i]['Persentase_'.$arr_year[$j]] = $query[0]['Persentase'];
+                       //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = $query[0]['Jumlah_masa_studi'];
+                   }
+                   else
+                   {
+                    $data[$i]['Persentase_'.$arr_year[$j]] = 0;
+                    //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = 0;
+                   }
+
+                   $data[$i]['Year'] = $arr_year[$j];
+                }
+            }
+            return print_r(json_encode($data));
+        }
+
+    //Teknologi Produk Karya
+        else if($data_arr['action']=='save_tekno_produk') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.teknologi_produk_karya',$dataForm);
+            return print_r(1);
+        }
+
+    //HKI Desain Produk
+        else if($data_arr['action']=='save_hki_produk') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.hki_desain_produk',$dataForm);
+            return print_r(1);
+        }
+
+     //HKI Desain Produk
+        else if($data_arr['action']=='save_hki_paten') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.hki_paten_sederhana',$dataForm);
+            return print_r(1);
+        }
+
+     //HKI Desain Produk
+        else if($data_arr['action']=='save_sitasi_karya') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.sitasi_karya',$dataForm);
+            return print_r(1);
+        }
+
 
     }
 
@@ -1062,7 +1365,7 @@ class C_api3 extends CI_Controller {
 
     }
 
-    public function getLecturerCertificate(){
+    public function getLecturerCertificate() {
 
         $Status = $this->input->get('s');
 
@@ -1088,11 +1391,95 @@ class C_api3 extends CI_Controller {
             }
         }
 
+        return print_r(json_encode($data));
+    }
+
+    public function getRasioDosenMahasiswa() {
+
+        $Status = $this->input->get('s');
+
+        $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
+            'Status' => 1
+        ))->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+
+                // Total Mahasiswa
+                $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
+                                          WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+
+                $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
+
+                 // Total Lectrure
+                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+
+                $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+                //$dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                //                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
+               // $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
+
+            }
+        }
+
+        return print_r(json_encode($data));
+    }
 
 
+    public function getLuaran_lainnya(){
+
+        $Status = $this->input->get('s');
+        $stat = "('11','12','13','14','15','25','26','27','28') ";
+
+        $data = $this->db->query('SELECT Judul, Tgl_terbit, Ket
+                    FROM db_research.publikasi
+                    WHERE ID_jns_pub IN '.$stat.' ')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLuaranTekno_produk(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.teknologi_produk_karya ORDER BY ID DESC')->result_array();
         return print_r(json_encode($data));
 
     }
+
+    public function getLuaranHkiproduk(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_desain_produk ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLuaranHkipaten(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_paten_sederhana ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getsitasikarya(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_penulis, Judul_artikel, Banyak_artikel, Tahun FROM db_agregator.sitasi_karya ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+
+    }
+
+    public function getrekognisidosen(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT ID_Dosen, Bidang_keahlian, Rekognisi, Tahun FROM db_agregator.rekognisi_dosen ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+
+    }
+
+    
 
     public function getAkreditasiProdi(){
         $data = $this->db->get('db_academic.accreditation')->result_array();

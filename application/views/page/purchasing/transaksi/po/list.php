@@ -183,8 +183,18 @@ $(document).ready(function() {
        	    	$( row ).find('td:eq(5)').attr('align','center');
        	    	$( row ).find('td:eq(5)').html('<a href="javascript:void(0)" class="btn btn-info btn_circulation_sheet" code="'+data[1]+'">Info</a>');
               if (data[4] == 'Approval Done') {
-                $( row ).attr('style','background-color:#8ED6EA;')
+                $( row ).attr('style','background-color:#8ED6EA;');
+
+                if (ListPR[1].POPrint_Approve != null && ListPR[1].POPrint_Approve != '') {
+                  $( row ).find('td:eq(4)').append('<div style="color:Red">Has been uploaded</div>');
+                }
+                else
+                {
+                  $( row ).find('td:eq(4)').append('<div style="color:Red">Not uploaded yet</div>');
+                }
+
               }
+              
               // console.log(data);
        	    },
             dom: 'l<"toolbar">frtip',

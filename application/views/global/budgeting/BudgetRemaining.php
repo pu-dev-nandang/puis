@@ -185,30 +185,6 @@
 
 	}
 
-	function load_budget_remaining__(Year,Departement)
-	{
-		var def = jQuery.Deferred();
-		var url = base_url_js+"budgeting/detail_budgeting_remaining";
-		var data = {
-				    Year : Year,
-					Departement : Departement,
-				};
-		var token = jwt_encode(data,'UAP)(*');
-		$.post(url,{token:token},function (resultJson) {
-			
-		}).done(function(resultJson) {
-			var response2 = jQuery.parseJSON(resultJson);
-			def.resolve(response2);
-		}).fail(function() {
-		  toastr.info('No Result Data'); 
-		  def.reject();
-		}).always(function() {
-		                
-		});
-		return def.promise();
-	}
-
-
 	$(document).off('click', '.ShowReal').on('click', '.ShowReal',function(e) {
 		var ID_budget_left = $(this).attr('IDData');
 		var CodeURL = jwt_encode(ID_budget_left,"UAP)(*");
