@@ -35,5 +35,15 @@ class C_yudisium extends Library {
         $this->menu_yudisium($page);
     }
 
+    public function final_project_details($NPM)
+    {
+        $data['departement'] = $this->__getDepartement();
+        $data['NPM'] = $NPM;
+        $page = $this->load->view('page/'.$data['departement'].'/yudisium/final_project_details',$data,true);
+        $this->menu_yudisium($page);
+    }
+
+
+
 
 }

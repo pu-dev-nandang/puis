@@ -672,6 +672,8 @@ $route['finance/monitoring-yudisium'] =  'page/finance/c_finance/monitoring_yudi
 $route['library/yudisium/final-project'] =  'page/library/c_yudisium/final_project';
 $route['library/yudisium/monitoring-yudisium'] =  'page/library/c_yudisium/monitoring_yudisium';
 
+$route['library/yudisium/final-project/details/(:num)'] =  'page/library/c_yudisium/final_project_details/$1';
+
 
 
 
@@ -1368,6 +1370,9 @@ $route['api3/__crudYudisium'] = 'api/c_api3/crudYudisium';
 $route['api3/__crudOverwriteCourse'] = 'api/c_api3/crudOverwriteCourse';
 
 $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
+
+
+$route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
 
 
 // budgeting & PR
