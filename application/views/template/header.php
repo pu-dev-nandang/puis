@@ -291,6 +291,8 @@
         //     update_log: '1'
         // });
 
+        saveLogUser();
+
     });
 
     $(document).on('click','#btn_announcement',function () {
@@ -786,5 +788,26 @@
           });
         // end cannot delete action   
     }
+
+     function saveLogUser() {
+         var dataURL = window.location.href;
+
+         var url = base_url_js+'api3/__crudLogging';
+
+         var data = {
+             action : 'insertLog',
+             dataForm : {
+                 NIP : sessionNIP,
+                 UserID : sessionNIP,
+                 URL : dataURL
+             }
+         };
+
+         var token = jwt_encode(data,'UAP)(*');
+
+         $.post(url,{token:token},function (result) {
+
+         });
+     }
 
 </script>
