@@ -418,7 +418,7 @@
         var username = $(this).attr('data-nip');
         var password = $(this).attr('data-password');
 
-        var token = jwt_encode({username:username,password:password},'s3Cr3T-G4N');
+        var token = jwt_encode({username:username,password:password,NIP:sessionNIP},'s3Cr3T-G4N');
 
         var url = base_url_portal_lecturers+'auth/loginFromAkademik?token='+token;
         PopupCenter(url,'xtf','1300','500');
