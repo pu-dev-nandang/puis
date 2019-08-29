@@ -2413,6 +2413,40 @@ class C_rest2 extends CI_Controller {
                                         $token = $this->jwt->encode($data,"UAP)(*");
                                         $this->m_master->apiservertoserver($url,$token);
 
+                                        $G_div = $this->m_budgeting->SearchDepartementBudgeting('NA.4');
+                                        $CodeDept = $G_div[0]['Code'];
+                                        $sqlAP = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as PositionMain1,
+                                                       SPLIT_STR(a.PositionMain, '.', 2) as PositionMain2,
+                                                             a.StatusEmployeeID
+                                                FROM   db_employees.employees as a
+                                                where SPLIT_STR(a.PositionMain, '.', 1) = 9 and SPLIT_STR(a.PositionMain, '.', 2) = 12";
+                                        $queryAP=$this->db->query($sqlAP, array())->result_array();
+                                        if (count($queryAP) > 0) {
+                                            $key = "UAP)(*";
+                                            $token = $this->jwt->encode($G_data[0]['ID_payment_'],$key);
+                                            $CodeUrl2 = $token;
+                                            $NIPAP =  $queryAP[0]['NIP'];
+                                            $URLDirectAP = 'finance_ap/create_ap?token='.$CodeUrl2;
+
+                                            $data = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Logging' => array(
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$G_data[0]['Type'].' of '.$CodeDept.' has been done for approval',
+                                                                'Description' => $G_data[0]['Type'].' of '.$CodeDept.'',
+                                                                'URLDirect' => $URLDirectAP,
+                                                                'CreatedBy' => $NIP,
+                                                              ),
+                                                'To' => array(
+                                                          'NIP' => array($NIPAP),
+                                                        ),
+                                                'Email' => 'No', 
+                                            );
+
+                                            $url = url_pas.'rest2/__send_notif_browser';
+                                            $token = $this->jwt->encode($data,"UAP)(*");
+                                            $this->m_master->apiservertoserver($url,$token);
+                                        }
+
                                 }
                             }
 
