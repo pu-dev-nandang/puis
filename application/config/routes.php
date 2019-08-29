@@ -668,7 +668,8 @@ $route['finance/report_admission/(:any)'] =  'page/finance/c_report/report_admis
 $route['finance/monitoring-yudisium'] =  'page/finance/c_finance/monitoring_yudisium';
 
 
-$route['library/monitoring-yudisium'] =  'page/library/c_library/monitoring_yudisium';
+$route['library/yudisium/final-project'] =  'page/library/c_yudisium/final_project';
+$route['library/yudisium/monitoring-yudisium'] =  'page/library/c_yudisium/monitoring_yudisium';
 
 
 
