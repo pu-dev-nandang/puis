@@ -1071,7 +1071,7 @@ class C_admission extends Admission_Controler {
         // print_r($requestData);
         // die();
         $No = $requestData['start'] + 1;
-        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData,$reqTahun);
 
         $sql = 'select ccc.* from (
                 select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
@@ -1181,7 +1181,7 @@ class C_admission extends Admission_Controler {
       // print_r($requestData);
       // die();
       $No = $requestData['start'] + 1;
-      $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+      $totalData = $this->m_admission->getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun);
 
       $sql = 'select ccc.* from (
               select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
