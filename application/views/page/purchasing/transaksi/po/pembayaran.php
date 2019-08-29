@@ -123,6 +123,7 @@
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Supplier</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Invoice</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Left</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Paid</th>'+
 					 			'</tr>'+
 					 		'<thead>'+
 					 		'<tbody id="dataRow"></tbody>'+
@@ -197,6 +198,7 @@
 
 	       	    	$( row ).find('td:eq(4)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoicePO)+'</div>');
 	       	    	$( row ).find('td:eq(5)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoiceLeftPO)+'</div>');
+	       	    	$( row ).find('td:eq(6)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoicePayPO)+'</div>');
 	       	    	if (dtinvoice.StatusPOI == 1) {
 	       	    		$( row ).attr('style','background-color:#8ED6EA;')
 	       	    	}
@@ -798,7 +800,7 @@
 		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
 		var dtspb = dt_arr.dtspb;
 		// console.log(dtspb);
-		var Invoice = 0;
+		var Invoice = parseInt(InvoiceleftPO);
 		var TypePay = "Cash";
 		var ID_bank = 0;
 		var NoRekening = "";
@@ -1353,7 +1355,7 @@
 		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
 		var dtspb = dt_arr.dtspb;
 		// console.log(dtspb);
-		var Invoice = 0;
+		var Invoice = parseInt(InvoiceleftPO);
 		var TypePay = "Cash";
 		var ID_bank = 0;
 		var NoRekening = "";
@@ -3436,8 +3438,9 @@
 			  		}
 			  		else
 			  		{
+			  			// toastr.error("Connection Error, Please try again", 'Error!!');
+			  			toastr.error(data.msg, 'Error!!');
 			  			loadingEnd(500);
-			  			toastr.error("Connection Error, Please try again", 'Error!!');
 			  		}
 			  	}
 			  	else{
@@ -3627,7 +3630,7 @@
 			var token4 = jwt_encode(temp,"UAP)(*");
 			form_data.append('token4',token4);
 
-			var url = base_url_js + "budgeting/submitca"
+			var url = base_url_js + "budgeting/submitca";
 			$.ajax({
 			  type:"POST",
 			  url:url,
@@ -3649,12 +3652,12 @@
 			  				})
 			  			},1000);
 			  			// load first load data
-			  			
 			  		}
 			  		else
 			  		{
+			  			// toastr.error("Connection Error, Please try again", 'Error!!');
+			  			toastr.error(data.msg, 'Error!!');
 			  			loadingEnd(500);
-			  			toastr.error("Connection Error, Please try again", 'Error!!');
 			  		}
 			  	}
 			  	else{
@@ -3822,7 +3825,19 @@
 			}
 			else
 			{
-				toastr.info('Tidak bisa tambah payment, Karena payment sebelumnya belum selesai');
+				// console.log(dtspb);
+				if (dtspb[0].Status == 2) {
+					// get number last
+					var number = $('.FormPage:last').attr('number');
+					number = parseInt(number) + 1;
+					template_html = __template_html('add','',number);
+					$('#content_input').append(template_html);
+				}
+				else
+				{
+					toastr.info('Tidak bisa tambah payment, Karena payment sebelumnya belum selesai');
+				}
+				
 			}
 			// console.log(data);
 		})
@@ -4145,6 +4160,26 @@
 
 			var token = jwt_encode(data,"UAP)(*");
 			form_data.append('token',token);
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var Departement = IDDepartementPUBudget;
+			form_data.append('Departement',Departement);
+			var ev1= ev.closest('.FormPage');
+			var Biaya = ev1.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			form_data.append('Biaya',Biaya);
+
 			var url = base_url_js + "budgeting/submitca_realisasi_by_po"
 			$.ajax({
 			  type:"POST",

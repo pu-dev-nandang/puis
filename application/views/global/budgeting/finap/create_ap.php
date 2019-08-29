@@ -1126,14 +1126,14 @@
 		// }
 
 		// check file
-		$(".BrowseVoucher").each(function(){
-			var IDFile = $(this).attr('id');
-			var ev2 = $(this);
-			if (!file_validation2(ev2,'Upload Voucher') ) {
-			  find = false;
-			  return false;
-			}
-		})
+		// $(".BrowseVoucher").each(function(){
+		// 	var IDFile = $(this).attr('id');
+		// 	var ev2 = $(this);
+		// 	if (!file_validation2(ev2,'Upload Voucher') ) {
+		// 	  find = false;
+		// 	  return false;
+		// 	}
+		// })
 
 		if (toatString != "" || (!find) ) {
 		  toastr.error(toatString, 'Failed!!');
