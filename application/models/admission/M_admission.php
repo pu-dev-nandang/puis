@@ -3174,7 +3174,61 @@ class M_admission extends CI_Model {
 
     }
 
-    public function getCountAllDataPersonal_Candidate($requestData)
+    public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun)
+    {
+      $sql = 'select count(*) as total from (
+              select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
+              xq.DiscountType,
+              if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
+              if(
+                  (select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = e.ID limit 1) = 0 ,
+                      if((select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID limit 1)
+                           > 0 ,"Lunas","-"
+                        )
+                      ,
+                      "Belum Lunas"
+                ) as chklunas,
+              (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
+              ,xx.Name as NameSales,px.No_Ref
+              from db_admission.register as a
+              join db_admission.school as b
+              on a.SchoolID = b.ID
+              LEFT JOIN db_admission.register_verification as z
+              on a.ID = z.RegisterID
+              LEFT JOIN db_admission.register_verified as c
+              on z.ID = c.RegVerificationID
+              LEFT JOIN db_admission.register_formulir as e
+              on c.ID = e.ID_register_verified
+              LEFT join db_academic.program_study as d
+              on e.ID_program_study = d.ID
+              LEFT join db_admission.register_rangking as f
+              on e.ID = f.ID_register_formulir
+              left join db_admission.sale_formulir_offline as xz
+                on c.FormulirCode = xz.FormulirCodeOffline
+              LEFT JOIN db_employees.employees as xx
+              on xz.PIC = xx.NIP
+              LEFT JOIN db_finance.register_admisi as xy
+              on e.ID = xy.ID_register_formulir
+              LEFT JOIN db_admission.register_dsn_type_m as xq
+              on xq.ID = xy.TypeBeasiswa
+              left join db_admission.formulir_number_offline_m as px
+              on px.FormulirCode = c.FormulirCode
+              where a.SetTa = "'.$reqTahun.'"
+            ) ccc
+          ';
+
+      $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+              or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              or NameSales LIKE "'.$requestData['search']['value'].'%"
+              or No_Ref LIKE "'.$requestData['search']['value'].'%"
+                )
+             and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
+      $query=$this->db->query($sql, array())->result_array();
+      return $query[0]['total'];
+    }
+
+    public function getCountAllDataPersonal_Candidate($requestData,$reqTahun)
     {
       $sql = 'select count(*) as total from (
                 select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
@@ -3211,6 +3265,7 @@ class M_admission extends CI_Model {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
+                where a.SetTa = "'.$reqTahun.'"
               ) ccc';
 
       $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
