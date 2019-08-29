@@ -4708,6 +4708,15 @@ class C_api extends CI_Controller {
                         $this->db->delete('db_academic.std_krs');
                         $this->db->reset_query();
 
+                        // Remove di STD Study Planning
+                        $this->db->where(array(
+                            'SemesterID' => $std['SemesterID'],
+                            'ScheduleID' => $std['ScheduleID'],
+                            'NPM' => $std['NPM']
+                        ));
+                        $this->db->delete('db_academic.std_study_planning');
+                        $this->db->reset_query();
+
                     }
                 }
 
@@ -4753,6 +4762,23 @@ class C_api extends CI_Controller {
                         );
 
                         $this->db->insert($DBStudent.'.study_planning', $dataUpdateKRS);
+                        $SPID = $this->db->insert_id();
+
+
+                        $dataUpdateKRS_std = array(
+                            'SPID' => $SPID,
+                            'ClassOf' => trim(explode('_',$DBStudent)[1]),
+                            'SemesterID' => $dInsert['SemesterID'],
+                            'NPM' => $dInsert['NPM'],
+                            'ScheduleID' => $dInsert['ScheduleID'],
+                            'TypeSchedule' => $dInsert['TypeSP'],
+                            'CDID' => $dInsert['CDID'],
+                            'MKID' => $dataC[0]['MKID'],
+                            'Credit' => $dataC[0]['TotalSKS'],
+                            'EntredBy' => $this->session->userdata('NIP')
+                        );
+
+                        $this->db->insert('db_academic.std_study_planning', $dataUpdateKRS_std);
 
 
                     }
