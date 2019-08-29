@@ -155,8 +155,6 @@ class C_api3 extends CI_Controller {
 
             }
 
-
-
             return print_r(json_encode($data));
 
         }
@@ -715,6 +713,24 @@ class C_api3 extends CI_Controller {
         }
     }
 
+
+    public function crudAgregatorTB3(){
+
+        $data_arr = $this->getInputToken2();
+
+        // Rekognisi Dosen
+        if($data_arr['action']=='save_rekognisi_dosen') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            return print_r(1);
+        }
+
+
+    }
+
     public function crudAgregatorTB4(){
 
         $data_arr = $this->getInputToken2();
@@ -1051,6 +1067,12 @@ class C_api3 extends CI_Controller {
             $data = $this->db->query('SELECT ID, NamaProgramPendidikan FROM db_agregator.program_pendidikan')->result_array();
             return print_r(json_encode($data));
         }
+
+        else if($data_arr['action']=='getpenilaian'){
+            $data = $this->db->query('SELECT *  FROM db_agregator.aspek_penilaian')->result_array();
+            return print_r(json_encode($data));
+        }
+
         else if($data_arr['action']=='yearstudy'){
             $data = $this->db->query('SELECT ID, Year FROM db_academic.curriculum')->result_array();
             return print_r(json_encode($data));
@@ -1175,6 +1197,41 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
         }
 
+    //Teknologi Produk Karya
+        else if($data_arr['action']=='save_tekno_produk') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.teknologi_produk_karya',$dataForm);
+            return print_r(1);
+        }
+
+    //HKI Desain Produk
+        else if($data_arr['action']=='save_hki_produk') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.hki_desain_produk',$dataForm);
+            return print_r(1);
+        }
+
+     //HKI Desain Produk
+        else if($data_arr['action']=='save_hki_paten') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.hki_paten_sederhana',$dataForm);
+            return print_r(1);
+        }
+
+     //HKI Desain Produk
+        else if($data_arr['action']=='save_sitasi_karya') { 
+
+            $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['EntredBy'] = $this->session->userdata('NIP');
+            $this->db->insert('db_agregator.sitasi_karya',$dataForm);
+            return print_r(1);
+        }
 
 
     }
@@ -1308,7 +1365,7 @@ class C_api3 extends CI_Controller {
 
     }
 
-    public function getLecturerCertificate(){
+    public function getLecturerCertificate() {
 
         $Status = $this->input->get('s');
 
@@ -1334,11 +1391,95 @@ class C_api3 extends CI_Controller {
             }
         }
 
+        return print_r(json_encode($data));
+    }
+
+    public function getRasioDosenMahasiswa() {
+
+        $Status = $this->input->get('s');
+
+        $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
+            'Status' => 1
+        ))->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+
+                // Total Mahasiswa
+                $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
+                                          WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+
+                $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
+
+                 // Total Lectrure
+                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+
+                $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+                //$dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                //                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
+               // $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
+
+            }
+        }
+
+        return print_r(json_encode($data));
+    }
 
 
+    public function getLuaran_lainnya(){
+
+        $Status = $this->input->get('s');
+        $stat = "('11','12','13','14','15','25','26','27','28') ";
+
+        $data = $this->db->query('SELECT Judul, Tgl_terbit, Ket
+                    FROM db_research.publikasi
+                    WHERE ID_jns_pub IN '.$stat.' ')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLuaranTekno_produk(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.teknologi_produk_karya ORDER BY ID DESC')->result_array();
         return print_r(json_encode($data));
 
     }
+
+    public function getLuaranHkiproduk(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_desain_produk ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getLuaranHkipaten(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_paten_sederhana ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+    }
+
+    public function getsitasikarya(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT Nama_penulis, Judul_artikel, Banyak_artikel, Tahun FROM db_agregator.sitasi_karya ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+
+    }
+
+    public function getrekognisidosen(){
+
+        $Status = $this->input->get('s');
+        $data = $this->db->query('SELECT ID_Dosen, Bidang_keahlian, Rekognisi, Tahun FROM db_agregator.rekognisi_dosen ORDER BY ID DESC')->result_array();
+        return print_r(json_encode($data));
+
+    }
+
+    
 
     public function getAkreditasiProdi(){
         $data = $this->db->get('db_academic.accreditation')->result_array();

@@ -25,7 +25,7 @@
     <div class="col-md-2" id="menuLeft">
 
         <div>
-            <a href="<?= base_url('agregator/setting'); ?>" class="btn btn-default btn-block"><i class="fa fa-cog"></i> Setting</a>
+            <a href="<?= base_url('agregator/setting'); ?>" class="btn btn-primary btn-block"><i class="fa fa-cog"></i> Setting</a>
             <hr/>
         </div>
 
