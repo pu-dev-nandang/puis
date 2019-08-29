@@ -9763,7 +9763,10 @@ class C_api extends CI_Controller {
                 array('UserID' => $UserID, "StatusRead" => "0"))->result_array();
             return print_r(json_encode(count($data)));
         }
-
+        else if($data_arr['action']=='readLogUser'){
+           $this->db->where('ID', $data_arr['ID_logging_user']);
+           $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1'));             
+        }
     }
 
     public function dropdowngroupmodule(){

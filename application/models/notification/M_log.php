@@ -15,9 +15,10 @@ class M_log extends CI_Model {
 //        $IDDivision = $this->session->userdata('IDdepartementNavigation');
 
         $this->db->where('UserID', $UserID);
-        $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
+        // $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
+        $this->db->update('db_notifikasi.logging_user',array('ShowNotif' => '1'));
 
-        $basicQuery = 'SELECT l.* FROM db_notifikasi.logging_user lu 
+        $basicQuery = 'SELECT l.*,lu.StatusRead,lu.ShowNotif,lu.ID as ID_logging_user FROM db_notifikasi.logging_user lu 
                                       LEFT JOIN db_notifikasi.logging l ON (l.ID = lu.IDLogging)
                                       WHERE lu.UserID = "'.$UserID.'" ';
         $limit = 20;

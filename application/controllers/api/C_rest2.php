@@ -4393,4 +4393,78 @@ class C_rest2 extends CI_Controller {
        }
     }
 
+    public function getNotification()
+    {
+        $requestData= $_REQUEST;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( l.Title LIKE "%'.$search.'%" OR l.Description LIKE "%'.$search.'%"
+                           OR l.CreatedName LIKE "%'.$search.'%"  OR l.CreatedBy LIKE "%'.$search.'%")';
+        }
+
+        $dataToken = $this->getInputToken2();
+        $NIP = $dataToken['NIP'];
+        $queryDefault = 'SELECT l.*,lu.StatusRead,lu.ShowNotif,lu.ID as ID_logging_user
+                              FROM db_notifikasi.logging_user lu
+                              LEFT JOIN db_notifikasi.logging l ON (l.ID = lu.IDLogging)
+                              WHERE lu.UserID = "'.$NIP.'" '.$dataSearch.'
+                              ORDER BY l.CreatedAt DESC ';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $URLDirect = $row['URLDirect'];
+            // $urlDirect_lect = (in_array('14.6',$this->session->userdata('AllPosition'))
+            //     || in_array('14.5',$this->session->userdata('AllPosition')))
+            //     ? $row['URLDirectLecturerKaprodi']
+            //     : $row['URLDirectLecturer'];
+
+            // $urlDirect_lect = (
+            // ($row['URLDirectLecturerKaprodi']==null || $row['URLDirectLecturerKaprodi']=='') &&
+            // ($row['URLDirectLecturer']==null || $row['URLDirectLecturer']=='')
+            // ) ? $row['URLDirect'] : base_url().''.$urlDirect_lect;
+
+            // $loginPUIS = (
+            //     ($row['URLDirectLecturerKaprodi']==null || $row['URLDirectLecturerKaprodi']=='') &&
+            //     ($row['URLDirectLecturer']==null || $row['URLDirectLecturer']=='')
+            // ) ? '1' : '0';
+            $loginPUIS  = 1;
+
+            $user = '<b>'.$row['CreatedName'].'</b>
+                        <br/>
+                        <a href="'.url_pas.$URLDirect.'" class="NotificationLinkRead" data-puis="'.$loginPUIS.'" data-href="'.$URLDirect.'" id_logging_user = "'.$row['ID_logging_user'].'">'.$row['Title'].'</a>
+                        <p style="font-size: 12px;color: #9e9e9e;">'.$row['Description'].'</p>
+                        <div style="text-align: right;font-size: 12px;color: #9e9e9e;">'.date('l, d M Y H:i:s',strtotime($row['CreatedAt'])).'</div>';
+
+            $nestedData[] = '<div style="text-align:center;"><img src="'.$row['Icon'].'" style="width: 100%;max-width: 40px;border: 1px solid #FFFFFF;"></div>';
+            $nestedData[] = '<div>'.$user.'</div>';
+            $nestedData[] = $row['StatusRead'];
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
 }

@@ -26,6 +26,7 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['navigation/(:num)'] = 'c_departement/navigation/$1';
 $route['profile'] = 'c_dashboard/profile';
+$route['ShowLoggingNotification'] = 'dashboard/c_dashboard/ShowLoggingNotification';
 $route['page404'] = 'dashboard/c_dashboard/page404';
 
 // FROM PORTAL
@@ -1026,6 +1027,7 @@ $route['rest2/__load_budget_real_detail_byMonthYear'] = 'api/c_rest2/load_budget
 $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_budget_onprocess_detail_byMonthYear';
 $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
+$route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

@@ -427,6 +427,24 @@
 
     });
 
+    $(document).on('click','.NotificationLinkRead',function () {
+        var ID_logging_user = $(this).attr('id_logging_user');
+        var url = base_url_js+'api/__crudLog';
+        var data = {
+            action : 'readLogUser',
+            UserID : sessionNIP,
+            ID_logging_user : ID_logging_user,
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (jsonResult) {
+
+        });
+    });
+
+    $(document).on('click','.ViewAllLogNotification',function () {
+        window.location.href = base_url_js+'ShowLoggingNotification';
+    });
+
     $('.departement').click(function () {
         var url = base_url_js+'change-departement';
         var departement = $(this).attr('data-dpt');
@@ -603,8 +621,13 @@
 
                 for(var i=0;i<Details.length;i++){
                     var d = Details[i];
-                    $('#li2ShowLog').append('<li>' +
-                    '                        <a href="'+base_url_js+''+d.URLDirect+'">' +
+                    // console.log(d);
+                    var wrn_read = '';
+                    if (d.StatusRead == 1) {
+                        wrn_read = 'style="background-color: #eaf1fb"';
+                    }
+                    $('#li2ShowLog').append('<li '+wrn_read+'>' +
+                    '                        <a href="'+base_url_js+''+d.URLDirect+'" id_logging_user = "'+d.ID_logging_user+'" class ="NotificationLinkRead" >' +
                     '                            <span class="photo"><img class="img-rounded img-fitter-notif" data-src="'+d.Icon+'"></span>' +
                     '                            <span class="subject"><span class="from">'+d.CreatedName+'</span></span>' +
                     '                            <span class="text">'+d.Title+'</span>' +
@@ -614,7 +637,7 @@
                     '                    </li>');
                 }
                 $('#li2ShowLog').append('<li class="footer">' +
-                                        '<a href="javascript:void(0);">View all logs</a>' +
+                                        '<a href="javascript:void(0);" class = "ViewAllLogNotification">View all logs</a>' +
                                         '</li>');
 
                 $('.img-fitter-notif').imgFitter({
