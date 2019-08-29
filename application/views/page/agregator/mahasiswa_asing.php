@@ -13,7 +13,7 @@
             <div class="form-group">
                 <label>Year</label>
                 <input class="hide" id="formID">
-                <input class="form-control" id="formYear">
+                <select class="form-control" id="formYear"></select>
             </div>
             <div class="form-group">
                 <label>Prodi</label>
@@ -64,6 +64,7 @@
         loadSelectOptionBaseProdi('#formProdiID','');
 
         filteryear();
+        selectyearstudy();
 
         var firstLoad = setInterval(function () {
 
@@ -86,6 +87,20 @@
         loadDataTable();
 
     });
+
+    function selectyearstudy() {
+
+        var url = base_url_js+'api3/__crudAgregatorTB5';
+        var token = jwt_encode({action : 'yearstudy'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#formYear').append('<option disabled selected></option>');
+                for(var i=0;i<jsonResult.length;i++){
+                   $('#formYear').append('<option id="'+jsonResult[i].Year+'"> '+jsonResult[i].Year+' </option>');
+                }
+            });
+      }
+
 
     function loadDataTable() {
 
