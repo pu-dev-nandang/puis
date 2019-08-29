@@ -1706,4 +1706,101 @@ class C_api3 extends CI_Controller {
         }
     }
 
+    public function crudFileFinalProject(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='viewFileFinalProject'){
+            $requestData= $_REQUEST;
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND
+                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%"
+                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
+                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%"
+                                 ) ';
+            }
+
+            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName FROM db_academic.final_project_files fpf 
+                                          LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
+                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                          '.$dataSearch.' ';
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $dataTable = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $query = $dataTable;
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+                $nestedData = array();
+                $row = $query[$i];
+
+                // 0 = Plan, 1 = Send, 2 = Approve, -2 Rejected
+                $Status = 'Plan';
+                if($row['Status']==1 || $row['Status']=='1'){
+                    $Status = 'Waiting approval';
+                }
+                else if($row['Status']==2 || $row['Status']=='2'){
+                    $Status = 'Approved';
+                }
+                else if($row['Status']==-2 || $row['Status']=='-2'){
+                    $Status = 'Rejected';
+                }
+
+                $Noted = ($row['Noted']!='' && $row['Noted']!=null) ? $row['Noted'] : '';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><a href="'.base_url('library/yudisium/final-project/details/'.$row['NPM']).'" target="_blank"><b>'.$row['Name'].'</b></a><br/>'.$row['NPM'].'<br/>'.$row['ProdiName'].'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['JudulInd'].'</b><br/><i>'.$row['JudulEng'].'</i></div>';
+                $nestedData[] = '<div>'.$Noted.'</div>';
+                $nestedData[] = '<div>'.$Status.'</div>';
+
+                $no++;
+
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+
+        }
+        else if($data_arr['action']=='viewDetailsFileFinalProject'){
+
+            $NPM = $data_arr['NPM'];
+
+            $data = $this->db->query('SELECT fpf.*, ats.Name FROM db_academic.final_project_files fpf 
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
+                                                WHERE fpf.NPM = "'.$NPM.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='updateFileFinalProject'){
+
+            $NPM = $data_arr['NPM'];
+            $dataForm = (array) $data_arr['dataform'];
+
+            $this->db->where('NPM', $NPM);
+            $this->db->update('db_academic.final_project_files',$dataForm);
+
+            return print_r(1);
+
+        }
+
+    }
+
 }
