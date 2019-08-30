@@ -407,84 +407,73 @@ class M_pr_po extends CI_Model {
 
     public function __FilteringApprovalDoubleMore($JsonStatus)
     {
+
+        /*
+            array = a,b,c,d,b,c,d = abcd
+            array = a,b,c,b,c,e = abce
+            array = a,b,c,e,d,b,c = a,e,d,b,c
+        */
+        //  $arr1 = array('a','b','c','d','b','c','d');
+        //  $rs1 = [];
+        //  $rs1[] = $arr1[0];
+        //  for ($i=1; $i < count($arr1); $i++) { 
+        //     $v = $arr1[$i];
+        //     $index = $i;
+        //     for ($j=$i+1; $j < count($arr1); $j++) { 
+        //         $v_ = $arr1[$j];
+        //         if ($v == $v_) {
+        //             $index = $j; // get last
+        //         }
+        //     }
+
+        //     $find = false;
+        //     foreach ($rs1 as $key => $value) {
+        //         if ($key == $index) {
+        //             $find = true;
+        //             break;
+        //         }
+        //     }
+
+        //     if (!$find) {
+        //         $rs1[$index] = $v;
+        //     }
+
+        //  }
+
+        // // $rs1 = array_values($rs1);
+        // ksort($rs1);
+        // $rs1 = array_values($rs1);
+        // print_r($rs1);            
+        // die();
+
         $rs = array();
-        $pola = array();
+        $rs[] = $JsonStatus[0];
         for ($i=1; $i < count($JsonStatus); $i++) { 
             $NIP = $JsonStatus[$i]['NIP'];
-            $find = false;
+            $index = $i;
             for ($j=$i+1; $j < count($JsonStatus); $j++) { 
-                $NIP_ = $JsonStatus[$j]['NIP']; 
+                $NIP_ = $JsonStatus[$j]['NIP'];
                 if ($NIP == $NIP_) {
-                    $pola[] = $i.','.$j;
+                    $index = $j;
+                }
+            }
+
+            $find = false;
+            foreach ($rs as $key => $value) {
+                if ($key == $index) {
                     $find = true;
-                    // break;
+                    break;
                 }
             }
 
             if (!$find) {
-                // find di pola
-                $bfind = false;
-                for ($j=0; $j < $i; $j++) { 
-                    $NIP_ = $JsonStatus[$j]['NIP'];
-                    if ($NIP == $NIP_) {
-                        $str = $j.','.$i;
-                        for ($k=0; $k < count($pola); $k++) { 
-                            if ($str == $pola[$k]) {
-                                $bfind = true;
-                                break;
-                            }
-                        }
-                        // $pola[] = $j.','.$i;
-                        // $bfind = true;
-                    } 
-                }    
-                if (!$bfind) {
-                    $pola[] = $i;
-                }
-                
-            }
-        }
-
-        $bpola = true;
-        $interval = 0;
-        $stopLoop = false;
-        for ($i=0; $i < count($pola); $i++) { 
-            $d = explode(',', $pola[$i]);
-            if (count($d) > 1) {
-                for ($j=0; $j < count($d); $j++) {
-                    if ($j == 0) {
-                        $interval = $d[1] - $d[0];
-                    }
-                    else
-                    {
-                        $m = $j - 1;
-                        $c = $d[$j] - $d[$m];
-                        if ($c != $interval) {
-                            $bpola = false;
-                            $stopLoop = true;
-                            break;
-                        }
-                    }
-                }
+                $rs[$index] = $JsonStatus[$i];
             }
 
-            if ($stopLoop) {
-                break;
-            }
         }
 
-        if ($bpola) {
-            $rs[] = $JsonStatus[0];
-            for ($i=0; $i < count($pola); $i++) { 
-                $d = explode(',', $pola[$i]);
-                $rs[] = $JsonStatus[$d[0]];
-            }
-        }
-        else
-        {
-            $rs = $JsonStatus;
-        }
-
+        ksort($rs);
+        $rs = array_values($rs);
         return $rs;
     }
 

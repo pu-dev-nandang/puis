@@ -1472,6 +1472,17 @@
 						'</tr>'+
 						'<tr>'+
 							'<td class="TD1">'+
+								'Nama Penerima'+
+							'</td>'+
+							'<td class="TD2">'+
+								':'+
+							'</td>'+
+							'<td>'+
+								'<input type = "text" class = "form-control Nama_Penerima" placeholder="Nama Penerima" value = "'+Nama_Penerima+'" '+Dis+'>'+
+							'</td>'+		
+						'</tr>'+
+						'<tr>'+
+							'<td class="TD1">'+
 								'Dibutuhkan pada tanggal:'+
 							'</td>'+
 							'<td class="TD2">'+
@@ -3585,7 +3596,7 @@
 			if (TypePay == 'Cash') {
 				ID_bank = 0;
 			}
-			var Nama_Penerima = sessionName;
+			var Nama_Penerima = ev.find('.Nama_Penerima').val();
 			var Date_Needed = ev.find('.TglCA').val();
 
 			var data = {
