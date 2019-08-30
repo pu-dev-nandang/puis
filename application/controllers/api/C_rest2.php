@@ -2563,8 +2563,8 @@ class C_rest2 extends CI_Controller {
                         )aa
                        ';
 
-                $sqltotalData.= ' where (Code LIKE "%'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "%'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
-                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                $sqltotalData.= ' where (Code LIKE "'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%"  or CodeSPB LIKE "'.$requestData['search']['value'].'%"
                       or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
                       or ID_payment = "'.$requestData['search']['value'].'"
@@ -2591,7 +2591,7 @@ class C_rest2 extends CI_Controller {
                        ';
 
                 $sql.= ' where (Code LIKE "'.$requestData['search']['value'].'%" or TypeCode LIKE "'.$requestData['search']['value'].'%" or NamaSupplier LIKE "'.$requestData['search']['value'].'%" or CodeSupplier LIKE "'.$requestData['search']['value'].'%"
-                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'%" 
+                      or PayNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or PayCreatedBy LIKE "'.$requestData['search']['value'].'" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                       or TypePay LIKE "'.$requestData['search']['value'].'%" or NameDepartementPay LIKE "'.$requestData['search']['value'].'%"
                       or ID_payment = "'.$requestData['search']['value'].'"
@@ -2659,6 +2659,7 @@ class C_rest2 extends CI_Controller {
                             'ID_payment' => $row['ID_payment'],
                             'Perihal' => $row['Perihal'],
                             'DateNeededAP' => $row['DateNeededAP'],
+                            'NamaSupplier' => $row['NamaSupplier'],
                         );
 
                     $nestedData[] = $arr_temp;

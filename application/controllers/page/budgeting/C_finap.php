@@ -40,10 +40,10 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal,pay.PostingDatePaid ';
         $joinaction = ' right join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
-                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin
+                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin,c.PostingDate as PostingDatePaid
                                  from db_payment.payment as a join
                                  ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
                                    UNION 
@@ -241,6 +241,8 @@ class C_finap extends Budgeting_Controler {
                      'ReminderTotal' => $row['ReminderTotal'],
                      'PayCreatedBy' => $row['PayCreatedBy'],
                      'PayNameCreatedBy' => $row['PayNameCreatedBy'],
+                     'PostingDatePaid' => $row['PostingDatePaid'],
+                     'NamaSupplier' => $row['NamaSupplier'],
                  );
 
              $nestedData[] = $arr_temp;
