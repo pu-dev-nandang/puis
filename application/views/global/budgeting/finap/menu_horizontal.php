@@ -20,7 +20,7 @@
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
         <div class="col-xs-12" >
-            <div class="panel panel-primary" style="min-width: 800px;overflow: auto;">
+            <div class="panel panel-primary">
                 <div class="panel-heading clearfix">
                     <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Finance AP</h4>
                 </div>

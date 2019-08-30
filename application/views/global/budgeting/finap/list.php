@@ -120,7 +120,8 @@ function LoadDataForTable()
                   '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
 	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-	                '<th  colspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
+                  '<th  colspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
+                  '<th  rowspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Vendor & Paid Date</th>'+
               '</tr>'+
               '<tr>'+
                 '<td style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</td>'+
@@ -184,7 +185,10 @@ function Get_data_payment(){
 	    	       var StatusPayFin = ListPR[1].StatusPayFin;
 	    	       var RealisasiStatus = ListPR[1].RealisasiStatus;
                var RealisasiTotal = ListPR[1].RealisasiTotal;
-	    	       var ReminderTotal = ListPR[1].ReminderTotal;
+               var ReminderTotal = ListPR[1].ReminderTotal;
+               var NamaSupplier = (ListPR[1].NamaSupplier != null && ListPR[1].NamaSupplier != '') ? ListPR[1].NamaSupplier : '-';
+	    	       var PostingDatePaid = NamaSupplier+'<br>'+ListPR[1].PostingDatePaid;
+               
 	    	       var CodeSPB = ListPR[1].CodeSPB;
 	    	       var TypePay = ListPR[1].TypePay;
 	    	       var Perihal = ListPR[1].Perihal;
@@ -236,8 +240,10 @@ function Get_data_payment(){
     		    		htmlrealisasi += '<br><div style = "color:red;">Realiasi Approval not yet</div>';
     		    	}
     		    	$( row ).find('td:eq(4)').html(htmlrealisasi);
-    		    	$( row ).find('td:eq(4)').attr('align','center');
-
+              $( row ).find('td:eq(4)').attr('align','center');
+    		    	$( row ).find('td:eq(6)').attr('align','center');
+              $(row).find('td:eq(6)').html(PostingDatePaid);
+              // $(row).find('td:eq(7)').html(NamaSupplier);
               $( row ).find('td:eq(5)').html(htmlreminder);
 	    },
    	    "initComplete": function(settings, json) {

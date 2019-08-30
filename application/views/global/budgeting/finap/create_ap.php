@@ -66,7 +66,7 @@
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
                   '<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Date Needed</th>'+
-					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Supplier</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Info</th>'+
 					 			'</tr>'+
 					 		'<thead>'+
@@ -144,6 +144,7 @@
    		    	    	       var TypePay = ListPR[1].TypePay;
    		    	    	       var Perihal = ListPR[1].Perihal;
                           var Date_Needed = ListPR[1].DateNeededAP;
+                          var NamaSupplier = (ListPR[1].NamaSupplier != null && ListPR[1].NamaSupplier != '') ? ListPR[1].NamaSupplier : '-';
    		    	    	       var Code_po_create = '';
    		    	    	       if (data[1] != null && data[1] != '') {
    		    	    	       	var Code_po_create = data[1];
@@ -166,7 +167,9 @@
    		    	    	       
    		    	    	       $( row ).find('td:eq(1)').html(Payment);
                          $(row).find('td:eq(3)').html(Date_Needed);
-                         $(row).find('td:eq(4)').html(data[3]);
+                         // $(row).find('td:eq(4)').html(data[3]);
+                         $(row).find('td:eq(4)').html(NamaSupplier);
+
    			    		    	
    			    		    	$( row ).find('td:eq(2)').attr('align','center');
    			    		    	$( row ).find('td:eq(4)').attr('align','center');
@@ -215,6 +218,8 @@
 		    	    	       var TypePay = ListPR[1].TypePay;
                        var Perihal = ListPR[1].Perihal;
 		    	    	       var Date_Needed = ListPR[1].DateNeededAP;
+                       var NamaSupplier = (ListPR[1].NamaSupplier != null && ListPR[1].NamaSupplier != '') ? ListPR[1].NamaSupplier : '-';
+                       
 		    	    	       var Code_po_create = '';
 		    	    	       if (data[1] != null && data[1] != '') {
 		    	    	       	var Code_po_create = data[1];
@@ -237,7 +242,8 @@
 		    	    	       
 		    	    	       $( row ).find('td:eq(1)').html(Payment);
                        $(row).find('td:eq(3)').html(Date_Needed);
-                       $(row).find('td:eq(4)').html(data[3]);
+                       // $(row).find('td:eq(4)').html(data[3]);
+                       $(row).find('td:eq(4)').html(NamaSupplier);
 			    		    	
 			    		    	$( row ).find('td:eq(2)').attr('align','center');
 			    		    	$( row ).find('td:eq(4)').attr('align','center');
@@ -287,6 +293,8 @@
    	    	    	       var TypePay = ListPR[1].TypePay;
    	    	    	       var Perihal = ListPR[1].Perihal;
                         var Date_Needed = ListPR[1].DateNeededAP;
+                        var NamaSupplier = (ListPR[1].NamaSupplier != null && ListPR[1].NamaSupplier != '') ? ListPR[1].NamaSupplier : '-';
+      
    	    	    	       var Code_po_create = '';
    	    	    	       if (data[1] != null && data[1] != '') {
    	    	    	       	var Code_po_create = data[1];
@@ -309,7 +317,8 @@
    	    	    	       
    	    	    	       $( row ).find('td:eq(1)').html(Payment);
                         $(row).find('td:eq(3)').html(Date_Needed);
-                        $(row).find('td:eq(4)').html(data[3]);
+                        // $(row).find('td:eq(4)').html(data[3]);
+                        $(row).find('td:eq(4)').html(NamaSupplier);
    		    		    	
    		    		    	$( row ).find('td:eq(2)').attr('align','center');
                     $( row ).find('td:eq(4)').attr('align','center');
