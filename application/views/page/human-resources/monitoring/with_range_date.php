@@ -61,7 +61,7 @@
         // loadSelectOptionStatusEmployee('#filterStatusEmployees',4);
 
         loadSelectOptionEmployeesStatus2('#formStatusEmployee',"");
-        loadSelectOptionLecturerStatus2('#formStatusLecturer',"");
+        loadSelectOptionLecturerStatus2('#formStatusLecturer',4);
 
         window.loadFirst = setInterval(function () {
             var filterSemester = $('#filterSemester').val();
