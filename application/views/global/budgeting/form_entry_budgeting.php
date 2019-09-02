@@ -785,7 +785,7 @@ function showButton()
 			$('#ChooseSubAccount').prop('disabled',true);
 
 			$('#content_button').attr('align','right');
-			$('#content_button').html('<button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
+			$('#content_button').append('<br><button type="button" class="btn btn-default" id="ExportExcel" id_creator_budget_approval = "'+arr1[0].ID+'"> <i class="fa fa-file-excel-o"></i> Excel</button>');
 		}
 
 		if (Status ==2) {
