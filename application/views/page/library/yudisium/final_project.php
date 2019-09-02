@@ -53,7 +53,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "NIP"
+                "searchPlaceholder": "NIM, Name Student, Titile TA"
             },
             "ajax":{
                 url : base_url_js+"api3/__crudFileFinalProject", // json datasource

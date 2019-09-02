@@ -1717,11 +1717,9 @@ class C_api3 extends CI_Controller {
             if( !empty($requestData['search']['value']) ) {
 
                 $search = $requestData['search']['value'];
-                $dataSearch = ' AND
-                                 (d.NameEng LIKE "%'.$search.'%" OR cl.Room LIKE "%'.$search.'%"
-                                 OR p1.Name LIKE "%'.$search.'%" OR p2.Name LIKE "%'.$search.'%"
-                                 OR p1.NIP LIKE "%'.$search.'%" OR p2.NIP LIKE "%'.$search.'%"
-                                 ) ';
+                $dataSearch = ' WHERE fpf.NPM LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%" 
+                                OR ps.Name LIKE "%'.$search.'%" OR fpf.JudulInd LIKE "%'.$search.'%" 
+                                 OR fpf.JudulEng LIKE "%'.$search.'%" ';
             }
 
             $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName FROM db_academic.final_project_files fpf 

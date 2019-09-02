@@ -3769,10 +3769,10 @@ class M_api extends CI_Model {
 
     }
 
-    public function showLecturerMonitoring($SemesterID,$StatusEmployeeID,$Start,$End){
+    public function showLecturerMonitoring($SemesterID,$StatusEmployeeID,$StatusLecturerID,$Start,$End){
 
         $dataLecturer = $this->db->query('SELECT NIP, Name FROM db_employees.employees em 
-                                                  WHERE em.StatusEmployeeID = "'.$StatusEmployeeID.'"
+                                                  WHERE em.StatusEmployeeID = "'.$StatusEmployeeID.'" AND em.StatusLecturerID = "'.$StatusLecturerID.'"
                                                   ORDER BY em.NIP ASC ')->result_array();
 
         $res = [];
