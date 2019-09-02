@@ -14,13 +14,20 @@
     <div class="col-md-8 col-md-offset-2">
         <div class="well">
             <div class="row">
-                <div class="col-xs-4">
+                <div class="col-xs-2">
+                    <label>Semester</label>
                     <select class="form-control" id="filterSemester"></select>
                 </div>
-                <div class="col-xs-4">
-                    <select class="form-control" id="filterStatusEmployees"></select>
+                <div class="col-xs-3">
+                    <label>Status Employees</label>
+                    <select class="form-control" id="formStatusEmployee"></select>
+                </div>
+                <div class="col-xs-3">
+                    <label>Status Lecturer</label>
+                    <select class="form-control" id="formStatusLecturer"></select>
                 </div>
                 <div class="col-xs-4">
+                    <label>Range Date</label>
                     <input id="filterRangeStart" class="hide" hidden readonly>
                     <input id="filterRangeEnd" class="hide" hidden readonly>
                     <input id="RangeDate" class="hide" hidden readonly>
@@ -51,19 +58,24 @@
         $('#filterSemester').empty();
         loSelectOptionSemester('#filterSemester','');
 
-        loadSelectOptionStatusEmployee('#filterStatusEmployees',4);
+        // loadSelectOptionStatusEmployee('#filterStatusEmployees',4);
+
+        loadSelectOptionEmployeesStatus2('#formStatusEmployee',"");
+        loadSelectOptionLecturerStatus2('#formStatusLecturer',"");
 
         window.loadFirst = setInterval(function () {
             var filterSemester = $('#filterSemester').val();
-            var filterStatusEmployees = $('#filterStatusEmployees').val();
+            var formStatusEmployee = $('#formStatusEmployee').val();
+            var formStatusLecturer = $('#formStatusLecturer').val();
 
             var filterRangeStart = $('#filterRangeStart').val();
             var filterRangeEnd = $('#filterRangeEnd').val();
 
             if(filterSemester!='' && filterSemester!=null
-                && filterStatusEmployees!='' && filterStatusEmployees!=null
+                && formStatusEmployee!='' && formStatusEmployee!=null
                 && filterRangeStart !='' && filterRangeStart!=null
                 && filterRangeEnd !='' && filterRangeEnd!=null
+                && formStatusLecturer !='' && formStatusLecturer!=null
             ){
                 loadTb();
                 clearInterval(loadFirst);
@@ -76,7 +88,7 @@
         $('#FormHide2PDF').submit();
     });
 
-    $(document).on('change','#filterSemester,#filterStatusEmployees',function () {
+    $(document).on('change','#filterSemester,#formStatusEmployee,#formStatusLecturer',function () {
         loadTb();
     });
 
@@ -135,27 +147,31 @@
         loading_page('#divContrctMonitoring');
 
         var filterSemester = $('#filterSemester').val();
-        var filterStatusEmployees = $('#filterStatusEmployees').val();
+        var formStatusEmployee = $('#formStatusEmployee').val();
+        var formStatusLecturer = $('#formStatusLecturer').val();
 
         var filterRangeStart = $('#filterRangeStart').val();
         var filterRangeEnd = $('#filterRangeEnd').val();
         var RangeDate = $('#RangeDate').val();
 
+
         var token2PDF = [];
 
         if(filterSemester!='' && filterSemester!=null
-            && filterStatusEmployees!='' && filterStatusEmployees!=null
+            && formStatusEmployee!='' && formStatusEmployee!=null
             && filterRangeStart !='' && filterRangeStart!=null
             && filterRangeEnd !='' && filterRangeEnd!=null
+            && formStatusLecturer !='' && formStatusLecturer!=null
         ) {
 
             var SemesterID = filterSemester.split('.')[0];
-            var StatusEmployeeID = filterStatusEmployees;
+            var StatusEmployeeID = formStatusEmployee;
 
             var data = {
               action : 'showLecturerMonitoring',
                 SemesterID : SemesterID,
                 StatusEmployeeID : StatusEmployeeID,
+                StatusLecturerID : formStatusLecturer,
                 Start : filterRangeStart,
                 End : filterRangeEnd
             };
@@ -259,7 +275,7 @@
 
                 token2PDF = {
                     Semester : $('#filterSemester option:selected').text(),
-                    Employees : $('#filterStatusEmployees option:selected').text(),
+                    Employees : $('#formStatusLecturer option:selected').text(),
                     RangeDate : RangeDate,
                     PDFarrDate : PDFarrDate,
                     Details : jsonResult

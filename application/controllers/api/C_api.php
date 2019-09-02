@@ -5684,10 +5684,11 @@ class C_api extends CI_Controller {
 
                 $SemesterID = $data_arr['SemesterID'];
                 $StatusEmployeeID = $data_arr['StatusEmployeeID'];
+                $StatusLecturerID = $data_arr['StatusLecturerID'];
                 $Start = $data_arr['Start'];
                 $End = $data_arr['End'];
 
-                $data = $this->m_api->showLecturerMonitoring($SemesterID,$StatusEmployeeID,$Start,$End);
+                $data = $this->m_api->showLecturerMonitoring($SemesterID,$StatusEmployeeID,$StatusLecturerID,$Start,$End);
 
                 return print_r(json_encode($data));
 
