@@ -3357,11 +3357,11 @@ class M_admission extends CI_Model {
             from db_admission.register as a
             join db_admission.school as b
             on a.SchoolID = b.ID
-            LEFT JOIN db_admission.register_verification as z
+            JOIN db_admission.register_verification as z
             on a.ID = z.RegisterID
-            LEFT JOIN db_admission.register_verified as c
+            JOIN db_admission.register_verified as c
             on z.ID = c.RegVerificationID
-            LEFT JOIN db_admission.register_formulir as e
+            JOIN db_admission.register_formulir as e
             on c.ID = e.ID_register_verified
             LEFT join db_academic.program_study as d
             on e.ID_program_study = d.ID
@@ -3509,11 +3509,11 @@ class M_admission extends CI_Model {
             from db_admission.register as a
             join db_admission.school as b
             on a.SchoolID = b.ID
-            LEFT JOIN db_admission.register_verification as z
+            JOIN db_admission.register_verification as z
             on a.ID = z.RegisterID
-            LEFT JOIN db_admission.register_verified as c
+            JOIN db_admission.register_verified as c
             on z.ID = c.RegVerificationID
-            LEFT JOIN db_admission.register_formulir as e
+            JOIN db_admission.register_formulir as e
             on c.ID = e.ID_register_verified
             LEFT join db_academic.program_study as d
             on e.ID_program_study = d.ID
