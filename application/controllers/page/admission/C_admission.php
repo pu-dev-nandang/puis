@@ -1089,7 +1089,7 @@ class C_admission extends Admission_Controler {
                 ,xx.Name as NameSales,
                 if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
                 from db_admission.register as a
-                join db_admission.school as b
+                LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
                 LEFT JOIN db_admission.register_verification as z
                 on a.ID = z.RegisterID

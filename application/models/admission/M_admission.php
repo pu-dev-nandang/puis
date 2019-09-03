@@ -3191,7 +3191,7 @@ class M_admission extends CI_Model {
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
               ,xx.Name as NameSales,px.No_Ref
               from db_admission.register as a
-              join db_admission.school as b
+              LEFT join db_admission.school as b
               on a.SchoolID = b.ID
               LEFT JOIN db_admission.register_verification as z
               on a.ID = z.RegisterID
