@@ -171,8 +171,8 @@
                         <?php } ?>
 
                         <?php if(in_array(9,$rule_service)){ ?>
-                            <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
-                                <a href="<?php echo base_url('agregator/akreditasi-eksternal'); ?>"><i class="fa fa-flag" aria-hidden="true"></i> Agregator</a>
+                            <li class="<?php if($this->uri->segment(1)=='agregator'){echo 'active';} ?>" id = "PageServiceBudgeting">
+                                <a href="<?php echo base_url('agregator/akreditasi-eksternal'); ?>"><i class="fa fa-flag" aria-hidden="true"></i> Aggregator</a>
                             </li>
                         <?php } ?>
 
@@ -599,7 +599,7 @@
             $('.totalUnreadLog').html(jsonResult);
         });
     }
-    
+
     function showLog() {
         var url = base_url_js+'api/__crudLog';
         var data = {
@@ -775,7 +775,7 @@
     }
 
     function wrDepartmentAdmProdi(){
-        <?php 
+        <?php
             $PositionMain = $this->session->userdata('PositionMain');
             $DivisionID = $PositionMain['IDDivision'];
          ?>
@@ -809,7 +809,7 @@
           waitForEl(element, function() {
             $(element).remove();
           });
-        // end cannot delete action   
+        // end cannot delete action
     }
 
      function saveLogUser() {
