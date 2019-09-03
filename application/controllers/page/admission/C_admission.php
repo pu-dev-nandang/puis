@@ -1087,7 +1087,7 @@ class C_admission extends Admission_Controler {
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
                 ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -1196,7 +1196,8 @@ class C_admission extends Admission_Controler {
                       "Belum Lunas"
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-              ,xx.Name as NameSales,px.No_Ref
+              ,xx.Name as NameSales,
+              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
