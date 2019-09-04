@@ -36,7 +36,7 @@
         <div class="tabbable tabbable-custom tabbable-full-width btn-read menuConfig">
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a href="javascript:void(0)" class="pageAnchor" page = "Set_Rad">RAD</a>
+                    <a href="javascript:void(0)" class="pageAnchor" page = "Set_Rad">RAD PO</a>
                 </li>
                 <li class="">
                     <a href="javascript:void(0)" class="pageAnchor" page = "Set_Approval">Approval PO</a>
