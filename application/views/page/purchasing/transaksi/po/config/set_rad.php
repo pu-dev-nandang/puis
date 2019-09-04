@@ -11,7 +11,7 @@
 	}
 	#tableData9 thead {
 		/*width: calc( 100% - 1.2em );*/
-		width: calc( 100% - 16.4em );
+		width: calc( 100% - 10.2em );
 		/*width: calc( 100% - 0em );*/
 	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
 	}
