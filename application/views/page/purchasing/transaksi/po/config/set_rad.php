@@ -154,7 +154,7 @@
 								'</div>'+	
 							'</div>'+
 						  '</div>';	
-						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+						chk += '<div class = "row">'+
 									'<div class = "col-md-12">'+
 										'<div class = "form-group">'+
 											'<label>Approve</label>'+
@@ -162,7 +162,7 @@
 										'</div>'+	
 									'</div>'+
 								  '</div>';	
-						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+						chk += '<div class = "row">'+
 									'<div class = "col-md-12">'+
 										'<div class = "form-group">'+
 											'<label>Cancel</label>'+
