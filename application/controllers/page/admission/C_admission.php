@@ -1313,7 +1313,7 @@ class C_admission extends Admission_Controler {
           $arr_insert3 = array(); // for auth_parents
           $arr_insert4 = array();
           $arr_insert_library = array();
-
+          $data_arr = array();
           for ($i=0; $i < count($arrInputID); $i++) {
             $data = $this->m_master->caribasedprimary('db_admission.register_formulir','ID',$arrInputID[$i]);
 
@@ -1538,7 +1538,6 @@ class C_admission extends Admission_Controler {
               $this->db->insert('db_admission.doc_mhs', $dataSave);
             }
 
-
             $temp = array(
                         'ProdiID' => $ProdiID,
                         'ProgramID' => $ProgramID,
@@ -1640,6 +1639,14 @@ class C_admission extends Admission_Controler {
                 'GeneratedBy' => $this->session->userdata('NIP'),
             );
             $this->db->insert('db_admission.to_be_mhs', $dataSave);
+
+            // store arr AD
+            $data_arr[] = array(
+              'Name' => $Name,
+              'NIM' => $NPM,
+              'Password' => $pasword_old,
+              'description' => $Q_Prodi[0]['Name'] ,
+            );
 
             //move payment
               $Semester = $input['Semester'];
@@ -1747,6 +1754,18 @@ class C_admission extends Admission_Controler {
           if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
           // if(true) {
             $this->m_admission->insert_to_Library($arr_insert_library);
+
+            // insert to AD
+            $data = array(
+                'auth' => 's3Cr3T-G4N',
+                'Type' => 'Student',
+                'data_arr' => $data_arr,
+            );
+
+            $url = URLAD.'__api/Create';
+            $token = $this->jwt->encode($data,"UAP)(*");
+            $this->m_master->apiservertoserver($url,$token);
+            
           }
 
           // send notif
