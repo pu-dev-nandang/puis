@@ -3248,4 +3248,22 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query=$this->db->query($sql, array($IDDivision))->result_array();
         return $query;
     }
+
+    public function get_data_AD($UserID)
+    {
+        $arr = array();
+        $server = "ldap://10.1.30.2";
+        $ds=ldap_connect($server);
+        $dn = "CN=users,DC=pu,DC=local";
+        $userBind = 'alhadi.rahman'.'@pu.local';
+        $filter="(|(sAMAccountName=$UserID))";
+        $pwdBind = 'IT@podomoro6737ht';
+         if ($bind = ldap_bind($ds, $userBind , $pwdBind)) {
+             $sr = ldap_search($ds, $dn, $filter);
+             $ent= ldap_get_entries($ds,$sr);
+             $arr = $ent;
+        }
+
+        return $arr;
+    }
 }

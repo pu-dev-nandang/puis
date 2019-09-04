@@ -5547,14 +5547,22 @@ class C_api extends CI_Controller {
                 if(count($dataN)>0) {
                     return print_r(0);
                 } else {
-                    $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
-                    $this->db->insert('db_employees.employees',$formInsert);
                     // check fill admin Prodi
                     $ProdiArr = (array) $data_arr['arr_Prodi'];
                     $PositionMain = $formInsert['PositionMain'];
                     $PositionMain = explode('.', $PositionMain);
                     $Position = $PositionMain[1];
                     $Division = $PositionMain[0];
+                    // for AD
+                    $Password = $formInsert['Password_Old'];
+                    $Name = $formInsert['Name'];
+                    $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
+                    $description = $G_div[0]['Description'];
+                    // end AD
+
+                    $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
+                    $this->db->insert('db_employees.employees',$formInsert);
+
                     if ($Position == 6 || $Division == 15) {
                         if ($Division == 15) {
                             for($i=0;$i<count($ProdiArr);$i++){
@@ -5587,6 +5595,27 @@ class C_api extends CI_Controller {
                         'G_user' => 4,
                     );
                     $this->db->insert('db_reservation.previleges_guser', $dataSave);
+
+                   if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                        // insert to make AD
+                        $data_arr = [
+                            [
+                                'Name' => $Name,
+                                'Password' => $Password,
+                                'description' => $description,
+                            ],
+                        ];
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Type' => 'Employee',
+                            'data_arr' => $data_arr,
+                        );
+
+                        $url = URLAD.'__api/Create';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                   }     
+                    // end
 
                     return print_r(1);
                 }
