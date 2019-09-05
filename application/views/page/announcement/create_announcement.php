@@ -368,7 +368,7 @@
     $(document).on('change','.form-filter-student',function () {
         loadStudent2Annc();
     });
-    
+
     function loadStudent2Annc() {
 
         var fpStudent = $('#fpStudent').val();
@@ -782,11 +782,11 @@
                         $.each(ds,function (i,v) {
                             listNPM.push(v.NPM);
                         });
-                        socket.emit('mobile_notif', {
-                            Title: formTitle,
-                            Message: $('#formMessage').val().replace(/<\/?[^>]+(>|$)/g, "").trim(),
-                            dataUser : listNPM
-                        });
+                        // socket.emit('mobile_notif', {
+                        //     Title: formTitle,
+                        //     Message: $('#formMessage').val().replace(/<\/?[^>]+(>|$)/g, "").trim(),
+                        //     dataUser : listNPM
+                        // });
                     }
 
                     // cek apakah file kosong atau tidak

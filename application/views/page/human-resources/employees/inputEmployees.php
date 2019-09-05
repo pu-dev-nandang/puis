@@ -565,7 +565,6 @@
                 ? formEmailPU+'@podomorouniversity.ac.id'
                 : '';
 
-
             var formLevelEducationID = $('#formLevelEducationID').val();
             var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
 

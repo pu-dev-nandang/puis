@@ -2713,7 +2713,7 @@ class C_rest extends CI_Controller {
                 for ($i=0; $i < count($JsonStatus); $i++) {
                     $arr = $JsonStatus[$i];
                     // if Acknowledge by then skipp
-                        if ($arr['NameTypeDesc'] == 'Acknowledge by' || $arr['NameTypeDesc'] != 'Approval by') {
+                        if ($arr['NameTypeDesc'] == 'Requested by') {
                             continue;
                         }
                     $Status = $arr['Status'];
@@ -3550,7 +3550,7 @@ class C_rest extends CI_Controller {
                         (
                             select a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,a.Status,
                                             if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                            as StatusName, a.JsonStatus,a.PostingDate,a.Supporting_documents
+                                            as StatusName, a.JsonStatus,a.PostingDate,a.Supporting_documents,c.DateNeeded
                                             from db_budgeting.pr_create as a 
                             join (
                             select * from (
@@ -3561,13 +3561,24 @@ class C_rest extends CI_Controller {
                             select CONCAT("FT.",ID) as ID, NameEng as NameDepartement from db_academic.faculty where StBudgeting = 1
                             ) aa
                             ) as b on a.Departement = b.ID
+                            join (
+                                    select * from (
+                                            select * from db_budgeting.pr_detail ORDER BY DateNeeded asc
+                                    ) za GROUP BY PRCode
+                            ) as c on c.PRCode = a.PRCode
                         )a
                             LEFT JOIN db_purchasing.pr_status as b on a.PRCode = b.PRCode
                        ';
 
                 $sql.= ' where (a.PRCode LIKE "%'.$requestData['search']['value'].'%" or a.NameDepartement LIKE "'.$requestData['search']['value'].'%") '.$StatusQuery;
-                
-                $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                if ($Status == 'All') {
+                    $sql.= ' ORDER BY a.PRCode Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                }
+                else
+                {
+                     $sql.= ' ORDER BY a.DateNeeded asc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                }
+               
 
                 // for edit in open po
                 if ($dataToken['action_edit'] != '') {

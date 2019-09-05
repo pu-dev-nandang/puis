@@ -278,7 +278,7 @@ class M_pr_po extends CI_Model {
     public function Get_DataBudgeting_by_ID_budget_left($ID_budget_left)
     {
         $sql = 'select dd.ID,dd.`Using`,cc.CodePostRealisasi,cc.Year,cc.RealisasiPostName,cc.PostName,dd.ID_creator_budget,dd.Value
-         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.CodeDiv as CodeDepartment
+         ,cc.Departement,cc.CodeHeadAccount,cc.NameHeadAccount,cc.CodePost,cc.CodeDiv as CodeDepartment,cc.NameUnitDiv
          from
             (
                    select a.ID,a.ID_creator_budget_approval,a.CodePostRealisasi,a.UnitCost,a.Freq,a.DetailMonth,
@@ -294,7 +294,7 @@ class M_pr_po extends CI_Model {
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
                 UNION
                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-               ) as dp on b.UnitDiv = dp.ID
+               ) as dp on c.Departement= dp.ID
                  left join db_budgeting.creator_budget_approval as cba on cba.ID = a.ID_creator_budget_approval
             ) cc join db_budgeting.budget_left as dd on cc.ID = dd.ID_creator_budget
                             where dd.ID = ?';
@@ -391,8 +391,90 @@ class M_pr_po extends CI_Model {
                      }  
              }
         }
+
         // print_r($rs);die();
+        // $rs[] = array(
+        //     'NIP' => 2018018,
+        //     'Status' => 1,
+        //     'ApproveAt' => '',
+        //     'Representedby' => '',
+        //     'Visible' => '',
+        //     'NameTypeDesc' => '',
+        // );
+        $rs = $this->__FilteringApprovalDoubleMore($rs); // trial
         return $rs;       
+    }
+
+    public function __FilteringApprovalDoubleMore($JsonStatus)
+    {
+
+        /*
+            array = a,b,c,d,b,c,d = abcd
+            array = a,b,c,b,c,e = abce
+            array = a,b,c,e,d,b,c = a,e,d,b,c
+        */
+        //  $arr1 = array('a','b','c','d','b','c','d');
+        //  $rs1 = [];
+        //  $rs1[] = $arr1[0];
+        //  for ($i=1; $i < count($arr1); $i++) { 
+        //     $v = $arr1[$i];
+        //     $index = $i;
+        //     for ($j=$i+1; $j < count($arr1); $j++) { 
+        //         $v_ = $arr1[$j];
+        //         if ($v == $v_) {
+        //             $index = $j; // get last
+        //         }
+        //     }
+
+        //     $find = false;
+        //     foreach ($rs1 as $key => $value) {
+        //         if ($key == $index) {
+        //             $find = true;
+        //             break;
+        //         }
+        //     }
+
+        //     if (!$find) {
+        //         $rs1[$index] = $v;
+        //     }
+
+        //  }
+
+        // // $rs1 = array_values($rs1);
+        // ksort($rs1);
+        // $rs1 = array_values($rs1);
+        // print_r($rs1);            
+        // die();
+
+        $rs = array();
+        $rs[] = $JsonStatus[0];
+        for ($i=1; $i < count($JsonStatus); $i++) { 
+            $NIP = $JsonStatus[$i]['NIP'];
+            $index = $i;
+            for ($j=$i+1; $j < count($JsonStatus); $j++) { 
+                $NIP_ = $JsonStatus[$j]['NIP'];
+                if ($NIP == $NIP_) {
+                    $index = $j;
+                }
+            }
+
+            $find = false;
+            foreach ($rs as $key => $value) {
+                if ($key == $index) {
+                    $find = true;
+                    break;
+                }
+            }
+
+            if (!$find) {
+                $rs[$index] = $JsonStatus[$i];
+            }
+
+        }
+
+        ksort($rs);
+        $rs = array_values($rs);
+        return $rs;
     }
 
     public function GetPR_CreateByPRCode($PRCode)
@@ -545,6 +627,7 @@ class M_pr_po extends CI_Model {
                                     ) aa
                     ) as h on d.Departement = h.ID 
                 where a.PRCode = ? and a.ID not IN(select ID_pr_detail from db_purchasing.pre_po_detail) and a.Status = 1
+                order by a.DateNeeded asc
                ';
 
             // for edit in Open PO   

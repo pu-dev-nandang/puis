@@ -11,7 +11,7 @@
 	}
 	#tableData9 thead {
 		/*width: calc( 100% - 1.2em );*/
-		width: calc( 100% - 16.4em );
+		width: calc( 100% - 10.2em );
 		/*width: calc( 100% - 0em );*/
 	    /*width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width */
 	}
@@ -154,7 +154,7 @@
 								'</div>'+	
 							'</div>'+
 						  '</div>';	
-						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+						chk += '<div class = "row">'+
 									'<div class = "col-md-12">'+
 										'<div class = "form-group">'+
 											'<label>Approve</label>'+
@@ -162,7 +162,7 @@
 										'</div>'+	
 									'</div>'+
 								  '</div>';	
-						chk += '<div class = "row" '+'style = "margin-top : 10px"'+'>'+
+						chk += '<div class = "row">'+
 									'<div class = "col-md-12">'+
 										'<div class = "form-group">'+
 											'<label>Cancel</label>'+

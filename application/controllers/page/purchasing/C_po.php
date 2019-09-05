@@ -905,7 +905,7 @@ class C_po extends Transaksi_Controler {
                   $data = array(
                       'auth' => 's3Cr3T-G4N',
                       'Logging' => array(
-                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created PO/SPK : '.$Code,
                                       'Description' => 'Please approve PO/SPK '.$Code,
                                       'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
                                       'CreatedBy' => $NIP,
@@ -1609,7 +1609,7 @@ class C_po extends Transaksi_Controler {
                   $data = array(
                       'auth' => 's3Cr3T-G4N',
                       'Logging' => array(
-                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created PO/SPK : '.$Code,
                                       'Description' => 'Please approve PO/SPK '.$Code,
                                       'URLDirect' => 'global/purchasing/transaction/spk/list/'.$CodeUrl,
                                       'CreatedBy' => $NIP,

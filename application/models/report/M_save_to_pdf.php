@@ -19,8 +19,8 @@ class M_save_to_pdf extends CI_Model {
 
 
         $dataSc = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, sd.StartSessions, sd.EndSessions, em.Name AS Coordinator,
-                                            cl.Room AS ClassRoom 
-                                            FROM db_academic.schedule s 
+                                            cl.Room AS ClassRoom
+                                            FROM db_academic.schedule s
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
@@ -36,13 +36,13 @@ class M_save_to_pdf extends CI_Model {
 
 
         $dataEx = $this->db->query('SELECT s.ID, s.TeamTeaching, s.ClassGroup, ex.StartSessions, ex.EndSessions, em.Name AS Coordinator,
-                                            cl.Room AS ClassRoom  FROM db_academic.schedule_exchange ex 
+                                            cl.Room AS ClassRoom  FROM db_academic.schedule_exchange ex
                                             LEFT JOIN db_academic.attendance attd ON (attd.ID = ex.ID_Attd)
                                             LEFT JOIN db_academic.schedule s ON (attd.ScheduleID = s.ID)
                                             LEFT JOIN db_academic.schedule_details sd ON (sd.ScheduleID = s.ID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
                                             LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ClassroomID)
-                                              WHERE ex.Date = "'.$dateSearch.'" AND (ex.Status = "2" OR ex.Status = "1") 
+                                              WHERE ex.Date = "'.$dateSearch.'" AND (ex.Status = "2" OR ex.Status = "1")
                                               GROUP BY ex.ID')
             ->result_array();
 
@@ -62,7 +62,7 @@ class M_save_to_pdf extends CI_Model {
 
                 $detailTeamTeaching = [];
                 if($d['TeamTeaching']=='1' || $d['TeamTeaching']==1){
-                    $dataEm = $this->db->query('SELECT em.Name FROM db_academic.schedule_team_teaching stt 
+                    $dataEm = $this->db->query('SELECT em.Name FROM db_academic.schedule_team_teaching stt
                                                         LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
                                                         WHERE stt.ScheduleID = "'.$d['ID'].'"')->result_array();
                     if(count($dataEm)>0){
@@ -75,7 +75,7 @@ class M_save_to_pdf extends CI_Model {
                 $d['detailTeamTeaching'] = $detailTeamTeaching;
 
                 // Mendapatkan Matakuliah
-                $dataC = $this->db->query('SELECT mk.NameEng FROM db_academic.schedule_details_course sdc 
+                $dataC = $this->db->query('SELECT mk.NameEng FROM db_academic.schedule_details_course sdc
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
                                                     WHERE sdc.ScheduleID = "'.$d['ID'].'" LIMIT 1')->result_array();
 
@@ -102,7 +102,7 @@ class M_save_to_pdf extends CI_Model {
 
     public function getExamSchedule($SemesterID,$Type,$ExamDate){
 
-        $data = $this->db->query('SELECT ex.*,cl.Room, em1.Name AS Name_P1, em2.Name AS Name_P2 FROM db_academic.exam ex 
+        $data = $this->db->query('SELECT ex.*,cl.Room, em1.Name AS Name_P1, em2.Name AS Name_P2 FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
                                           LEFT JOIN db_employees.employees em2 ON (em2.NIP = ex.Pengawas2)
@@ -113,7 +113,7 @@ class M_save_to_pdf extends CI_Model {
 
         if(count($data)>0){
             for($c=0;$c<count($data);$c++){
-                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode,
                                                     em.Name AS Lecturere
                                                     FROM db_academic.exam_group exg
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
@@ -127,7 +127,7 @@ class M_save_to_pdf extends CI_Model {
 
                 for($r=0;$r<count($dataC);$r++){
                     // Detail Prodi
-                    $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+                    $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc
                                                             LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                             WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
                                                             GROUP BY ps.ID ORDER BY ps.ID')->result_array();
@@ -156,20 +156,20 @@ class M_save_to_pdf extends CI_Model {
                                             LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
                                             LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
                                             LEFT JOIN db_academic.semester_antara sa ON (sa.ID = se.SASemesterID)
-                                            WHERE se.SASemesterID = "'.$SASemesterID.'" 
+                                            WHERE se.SASemesterID = "'.$SASemesterID.'"
                                             AND se.Type = "'.$Type.'"
-                                            AND se.ExamDate = "'.$ExamDate.'" 
+                                            AND se.ExamDate = "'.$ExamDate.'"
                                             ORDER BY se.ExamDate, se.Start, se.End')->result_array();
 
         if(count($data)>0){
             for($c=0;$c<count($data);$c++){
                 $d = $data[$c];
-                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
-                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec 
+                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode,
+                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec
                                                      LEFT JOIN db_academic.sa_schedule ss ON (ss.ID = sec.ScheduleIDSA)
                                                      LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
-                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator) 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
                                                      WHERE sec.ExamIDSA = "'.$d['ID'].'"
                                                      GROUP BY ss.ID ORDER BY ss.ClassGroup ASC
                                                      ')->result_array();
@@ -204,7 +204,7 @@ class M_save_to_pdf extends CI_Model {
 
     public function getExamScheduleWithStudent($SemesterID,$Type,$ExamDate){
 
-        $data = $this->db->query('SELECT ex.ID, ex.SemesterID, ex.Type, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,  
+        $data = $this->db->query('SELECT ex.ID, ex.SemesterID, ex.Type, ex.ExamDate, ex.ExamStart, ex.ExamEnd, cl.Room,
                                           em1.Name AS Name_P1, em2.Name AS Name_P2, s.Code AS CodeSemester FROM db_academic.exam ex
                                           LEFT JOIN db_academic.classroom cl ON (cl.ID = ex.ExamClassroomID)
                                           LEFT JOIN db_employees.employees em1 ON (em1.NIP = ex.Pengawas1)
@@ -218,7 +218,7 @@ class M_save_to_pdf extends CI_Model {
 
         if(count($data)>0){
             for($c=0;$c<count($data);$c++){
-                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
+                $dataC = $this->db->query('SELECT exg.*, s.ClassGroup, mk.NameEng AS Course, mk.MKCode,
                                                     em.Name AS Lecturere
                                                     FROM db_academic.exam_group exg
                                                     LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
@@ -234,7 +234,7 @@ class M_save_to_pdf extends CI_Model {
                     // Get Prodi
                     for($r=0;$r<count($dataC);$r++){
                         // Detail Prodi
-                        $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc 
+                        $dataProdi = $this->db->query('SELECT ps.Code FROM db_academic.schedule_details_course sdc
                                                             LEFT JOIN db_academic.program_study ps ON (ps.ID = sdc.ProdiID)
                                                             WHERE sdc.ScheduleID = "'.$dataC[$r]['ScheduleID'].'"
                                                             GROUP BY ps.ID ORDER BY ps.ID')->result_array();
@@ -279,20 +279,20 @@ class M_save_to_pdf extends CI_Model {
                                             LEFT JOIN db_employees.employees em1 ON (em1.NIP = se.Invigilator1)
                                             LEFT JOIN db_employees.employees em2 ON (em2.NIP = se.Invigilator2)
                                             LEFT JOIN db_academic.semester_antara sa ON (sa.ID = se.SASemesterID)
-                                            WHERE se.SASemesterID = "'.$SASemesterID.'" 
+                                            WHERE se.SASemesterID = "'.$SASemesterID.'"
                                             AND se.Type = "'.$Type.'"
-                                            AND se.ExamDate = "'.$ExamDate.'" 
+                                            AND se.ExamDate = "'.$ExamDate.'"
                                             ORDER BY se.ExamDate, se.Start, se.End')->result_array();
 
         if(count($data)>0){
             for($c=0;$c<count($data);$c++){
                 $d = $data[$c];
-                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode, 
-                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec 
+                $dataC = $this->db->query('SELECT sec.*, ss.ClassGroup, mk.NameEng AS Course, mk.MKCode,
+                                                    em.Name AS Lecturere, ssc.CDID FROM db_academic.sa_exam_course sec
                                                      LEFT JOIN db_academic.sa_schedule ss ON (ss.ID = sec.ScheduleIDSA)
                                                      LEFT JOIN db_academic.sa_schedule_course ssc ON (ssc.ScheduleIDSA = ss.ID)
                                                      LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssc.MKID)
-                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator) 
+                                                    LEFT JOIN db_employees.employees em ON (em.NIP = ss.Coordinator)
                                                      WHERE sec.ExamIDSA = "'.$d['ID'].'"
                                                      GROUP BY ss.ID ORDER BY ss.ClassGroup ASC
                                                      ')->result_array();
@@ -336,7 +336,7 @@ class M_save_to_pdf extends CI_Model {
     public function getExamByID($TypeSemester,$ExamID){
 
         if($TypeSemester==1 || $TypeSemester=='1'){
-            $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.Type, cl.Room, cl.DeretForExam,cl.LectureDesk,  
+            $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.ExamStart, ex.ExamEnd, ex.Type, cl.Room, cl.DeretForExam,cl.LectureDesk,
                                              s.Name AS Semester,
                                              em1.Name AS Name_P1, em2.Name AS Name_P2
                                             FROM db_academic.exam ex
@@ -351,7 +351,7 @@ class M_save_to_pdf extends CI_Model {
                 for($i=0;$i<count($data);$i++){
 
                     // Data Course
-                    $dataC = $this->db->query('SELECT exg.*,s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode FROM db_academic.exam_group exg 
+                    $dataC = $this->db->query('SELECT exg.*,s.ClassGroup, mk.NameEng AS CourseEng, mk.MKCode FROM db_academic.exam_group exg
                                                       LEFT JOIN db_academic.schedule s ON (s.ID = exg.ScheduleID)
                                                       LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
                                                       LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
@@ -382,7 +382,7 @@ class M_save_to_pdf extends CI_Model {
 
         }
         else {
-            $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.Start AS ExamStart, ex.END AS ExamEnd, ex.Type, cl.Room, cl.DeretForExam,cl.LectureDesk, 
+            $data = $this->db->query('SELECT ex.ID, ex.ExamDate, ex.Start AS ExamStart, ex.END AS ExamEnd, ex.Type, cl.Room, cl.DeretForExam,cl.LectureDesk,
                                             s.Name AS Semester,
                                             em1.Name AS Name_P1, em2.Name AS Name_P2
                                             FROM db_academic.sa_exam ex
@@ -426,8 +426,8 @@ class M_save_to_pdf extends CI_Model {
     }
 
     public function getEmployeesByPositionMain($PositionMain){
-        $data = $this->db->query('SELECT NIP,Name FROM db_employees.employees 
-                                            WHERE PositionMain = "'.$PositionMain.'" 
+        $data = $this->db->query('SELECT NIP,Name FROM db_employees.employees
+                                            WHERE PositionMain = "'.$PositionMain.'"
                                             AND (StatusEmployeeID = 3 OR StatusEmployeeID = 2 OR StatusEmployeeID = 1) LIMIT 1')
                                         ->result_array();
         return $data;
@@ -435,13 +435,13 @@ class M_save_to_pdf extends CI_Model {
 
     public function getTranscript($DBStudent,$NPM){
 
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN, 
-                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc, 
-                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, 
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN,
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc,
+                                            edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind,
                                             fp.TitleInd, fp.TitleEng, f.Name AS FacultyName
                                             FROM '.$DBStudent.'.students s
-                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
-                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM)
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
@@ -449,9 +449,9 @@ class M_save_to_pdf extends CI_Model {
                                             WHERE s.NPM = "'.$NPM.'" ')->result_array();
 
 
-        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng, 
-                                          sp.MKID, mk.MKCode 
-                                          FROM '.$DBStudent.'.study_planning sp 
+        $data = $this->db->query('SELECT sp.Credit, sp.Grade, sp.GradeValue, mk.Name AS MKName, mk.NameEng AS MKNameEng,
+                                          sp.MKID, mk.MKCode
+                                          FROM '.$DBStudent.'.study_planning sp
                                           LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                           LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID)
                                           LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
@@ -530,7 +530,7 @@ class M_save_to_pdf extends CI_Model {
 
     public function getGraduation($IPK){
 
-        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
+        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g
                                                   WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
                                                    LIMIT 1')->result_array();
 
@@ -538,14 +538,14 @@ class M_save_to_pdf extends CI_Model {
     }
 
     public function getIjazah($DBStudent,$NPM){
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN, 
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN,
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, aus.KTPNumber,
                                             ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, ps.NoSKBANPT,
-                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
-                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind 
+                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng,
+                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind
                                             FROM '.$DBStudent.'.students s
-                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
-                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM)
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
@@ -554,7 +554,9 @@ class M_save_to_pdf extends CI_Model {
         $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
 
         // Get Rektor
-        $dataRektor = $this->db->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain' => '2.1'),1)->result_array();
+        $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
+                                                    LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
+                                                    WHERE em.PositionMain = "2.1" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();;
 
         $result = array(
             'Student' => $dataStd,
@@ -569,15 +571,15 @@ class M_save_to_pdf extends CI_Model {
 //======================================= tambahan SKL TGL 18-01-2019 =========================================================
 //==============================================================================================================================
     public function getSkls($DBStudent,$NPM){
-        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, 
-                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng, 
-                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, 
-                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng, 
-                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind,f.Name AS Faculty,f.NameEng AS FacultyEng , 
+        $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN,
+                                            ps.Name AS Prodi, ps.NameEng AS ProdiEng,
+                                            ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng,
+                                            edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng,
+                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind,f.Name AS Faculty,f.NameEng AS FacultyEng ,
                                             s.Gender, aus.SklNumber AS SKLN
                                             FROM '.$DBStudent.'.students s
-                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM) 
-                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID) 
+                                            LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM)
+                                            LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
                                             LEFT JOIN db_academic.education_level edl ON (edl.ID = ps.EducationLevelID)
                                             LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                             LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
@@ -597,7 +599,7 @@ class M_save_to_pdf extends CI_Model {
 //==============================================================================================================================
 
     public function getAkreditasiStudy($DBStudent,$NPM){
-        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g 
+        $dataGrade = $this->db->query('SELECT * FROM db_academic.graduation g
                                                   WHERE g.IPKStart <= "'.$IPK.'" AND g.IPKEnd >= "'.$IPK.'"
                                                    LIMIT 1')->result_array();
 

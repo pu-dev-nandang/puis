@@ -1,3 +1,18 @@
+<style>
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+ 
+.btn-round{
+    border-radius: 8px;
+}
+</style> 
 
 
 <style>
@@ -25,7 +40,7 @@
     <div class="col-md-2" id="menuLeft">
 
         <div>
-            <a href="<?= base_url('agregator/setting'); ?>" class="btn btn-default btn-block"><i class="fa fa-cog"></i> Setting</a>
+            <a href="<?= base_url('agregator/setting'); ?>" class="btn btn-primary btn-block btn-round"><i class="fa fa-cog"></i> Setting</a>
             <hr/>
         </div>
 

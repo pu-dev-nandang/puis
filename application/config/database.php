@@ -28,15 +28,9 @@ $db['server22'] = array(
 );
 switch ($ServerName) {
     case 'localhost':
-//        $db['default']['hostname'] = 'localhost';
-//        $db['default']['username'] = 'root';
-//        $db['default']['password'] = '';
-
-
-        $db['default']['hostname'] = '10.1.30.18';
-        $db['default']['username'] = 'db_itpu';
-        $db['default']['password'] = 'Uap)(*&^%';
-
+       $db['default']['hostname'] = 'localhost';
+       $db['default']['username'] = 'root';
+       $db['default']['password'] = '';
         $db['default']['database'] = 'db_academic';
         $db['default']['dbdriver'] = 'mysqli';// support with MYSQl,POSTGRE SQL, ORACLE,SQL SERVER
         $db['default']['dbprefix'] = '';
@@ -145,7 +139,7 @@ switch ($ServerName) {
 
         break;
     case 'demo.pcam.podomorouniversity.ac.id':
-        $db['default']['hostname'] = '10.1.30.102';
+        $db['default']['hostname'] = '10.1.30.59';
         $db['default']['username'] = 'db_itpu';
         $db['default']['password'] = 'Uap)(*&^%';
         $db['default']['database'] = 'db_academic';
@@ -161,7 +155,7 @@ switch ($ServerName) {
         $db['default']['autoinit'] = TRUE;
         $db['default']['stricton'] = FALSE;
 
-        $db['statistik']['hostname'] = '10.1.30.102';
+        $db['statistik']['hostname'] = '10.1.30.59';
         $db['statistik']['username'] = 'db_itpu';
         $db['statistik']['password'] = 'Uap)(*&^%';
         $db['statistik']['database'] = 'db_statistik';

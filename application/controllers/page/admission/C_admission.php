@@ -1071,7 +1071,7 @@ class C_admission extends Admission_Controler {
         // print_r($requestData);
         // die();
         $No = $requestData['start'] + 1;
-        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+        $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData,$reqTahun);
 
         $sql = 'select ccc.* from (
                 select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
@@ -1087,9 +1087,9 @@ class C_admission extends Admission_Controler {
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
                 ,xx.Name as NameSales,
-                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,""  ) as No_Ref
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
                 from db_admission.register as a
-                join db_admission.school as b
+                LEFT join db_admission.school as b
                 on a.SchoolID = b.ID
                 LEFT JOIN db_admission.register_verification as z
                 on a.ID = z.RegisterID
@@ -1181,7 +1181,7 @@ class C_admission extends Admission_Controler {
       // print_r($requestData);
       // die();
       $No = $requestData['start'] + 1;
-      $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData);
+      $totalData = $this->m_admission->getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun);
 
       $sql = 'select ccc.* from (
               select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
@@ -1196,7 +1196,8 @@ class C_admission extends Admission_Controler {
                       "Belum Lunas"
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-              ,xx.Name as NameSales,px.No_Ref
+              ,xx.Name as NameSales,
+              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
@@ -1312,7 +1313,7 @@ class C_admission extends Admission_Controler {
           $arr_insert3 = array(); // for auth_parents
           $arr_insert4 = array();
           $arr_insert_library = array();
-
+          $data_arr = array();
           for ($i=0; $i < count($arrInputID); $i++) {
             $data = $this->m_master->caribasedprimary('db_admission.register_formulir','ID',$arrInputID[$i]);
 
@@ -1537,7 +1538,6 @@ class C_admission extends Admission_Controler {
               $this->db->insert('db_admission.doc_mhs', $dataSave);
             }
 
-
             $temp = array(
                         'ProdiID' => $ProdiID,
                         'ProgramID' => $ProgramID,
@@ -1639,6 +1639,14 @@ class C_admission extends Admission_Controler {
                 'GeneratedBy' => $this->session->userdata('NIP'),
             );
             $this->db->insert('db_admission.to_be_mhs', $dataSave);
+
+            // store arr AD
+            $data_arr[] = array(
+              'Name' => $Name,
+              'NIM' => $NPM,
+              'Password' => $pasword_old,
+              'description' => $Q_Prodi[0]['Name'] ,
+            );
 
             //move payment
               $Semester = $input['Semester'];
@@ -1746,6 +1754,18 @@ class C_admission extends Admission_Controler {
           if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
           // if(true) {
             $this->m_admission->insert_to_Library($arr_insert_library);
+
+            // insert to AD
+            $data = array(
+                'auth' => 's3Cr3T-G4N',
+                'Type' => 'Student',
+                'data_arr' => $data_arr,
+            );
+
+            $url = URLAD.'__api/Create';
+            $token = $this->jwt->encode($data,"UAP)(*");
+            $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
+            
           }
 
           // send notif

@@ -1911,18 +1911,18 @@ class C_global extends CI_Controller {
     }
 
 
-     public function getlistrequestdoc(){
+    public function getlistrequestdoc(){
 
         $page = $this->load->view('page/rektorat/listrek_requestdoc','',true);
         $this->menu_request($page);
 
-     }
+    }
 
-
-     
-
-    
-
+    public function error_page($url)
+    {
+        $data['include'] = $this->load->view('template/include','',true);
+        $this->load->view('template/404page',$data);
+    }
 
 
 }
