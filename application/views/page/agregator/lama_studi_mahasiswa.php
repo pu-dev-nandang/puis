@@ -360,7 +360,7 @@
 
     $(document).on('click','.btnRemoveMAP',function () {
 
-        if(confirm('Hapus data?')){
+        if(confirm('Anda Yakin Hapus data?')){
             var ID = $(this).attr('data-id');
             var data = {
                 action : 'removePAM',
