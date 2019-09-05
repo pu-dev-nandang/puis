@@ -21,7 +21,7 @@
                 <select id="formLembagaMitraID" class="form-control"></select>
             </div>
             <div class="form-group">
-                <label>Tingakat</label>
+                <label>Tingkat</label>
                 <select class="form-control" id="formTingkat">
                     <option value="Internasional">Internasional</option>
                     <option value="Nasional">Nasional</option>
@@ -201,8 +201,19 @@
                     $('#listLembaga').append('<tr>' +
                         '<td>'+no+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
-                        '<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
-                        '<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
+                        //'<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
+                         '<td style="text-align: left;"><div class="btn-group btnAction"> ' +
+                        '    <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' +
+                        '        <i class="fa fa-pencil"></i> <span class="caret"></span> '+
+                        '    </button> '+
+                        '    <ul class="dropdown-menu"> '+
+                        '        <li><a class="btnEditLV" data-no="'+v.ID+'"  data-lembaga="'+v.Lembaga+'" data-desc="'+v.Description+'"> Edit</a></li> '+
+                        '        <li role="separator" class="divider"></li> '+
+                        '        <li><a class="btnDeleteLV" data-id="'+v.ID+'">Remove</a></li> '+
+                        '    </ul> '+
+                        '</div> </td>'+
+
+                        //'<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
                         '</tr>');
 
                     $('#formLembagaMitraID').append('<option value="'+v.ID+'">'+v.Lembaga+'</option>');
@@ -218,14 +229,49 @@
 
     $(document).on('click','.btnEditLV',function () {
 
-        var no = $(this).attr('data-no');
-        var dataForm = $('#btnEditLV_'+no).val();
-        var dataForm = JSON.parse(dataForm);
+        var ID = $(this).attr('data-no');
+        var Lembaga = $(this).attr('data-lembaga');
+        var Description = $(this).attr('data-desc');
 
-        $('#formID').val(dataForm.ID);
-        $('#formLembaga').val(dataForm.Lembaga);
-        $('#formDescription').val(dataForm.Description);
+        $('#formID').val(ID);
+        $('#formLembaga').val(Lembaga);
+        $('#formDescription').val(Description);
 
+    });
+
+
+
+    $(document).on('click','.btnDeleteLV',function () {
+        
+        if(confirm('Yakin Hapus data?')) {
+    
+            $('.btnDeleteLV').prop('disabled',true);
+    
+            var no = $(this).attr('data-id');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+    
+            var data = {
+                action: 'removeKerjasama',
+                ID : no
+            };
+    
+            var token = jwt_encode(data,'UAP)(*');
+    
+            $.post(url,{token:token},function (result) {
+    
+                $('#formID').val('');
+                $('#formLembaga').val('');
+                $('#formDescription').val('');
+
+                toastr.success('Data saved','Success');
+                loadDataLembagaMitra();
+
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+    
+           });
+        }
     });
 
     function UploadFile(ID,FileNameOld) {
@@ -348,6 +394,21 @@
             "ordering" : false,
             "language": {
                 "searchPlaceholder": "Lembaga, Sertifikat, Lingkup, Tingkat"
+            },
+            "sDom": "<'row'<'dataTables_header clearfix'<'col-md-3'l><'col-md-9'Tf>r>>t<'row'<'dataTables_footer clearfix'<'col-md-6'i><'col-md-6'p>>>", // T is new
+            "oTableTools": {
+                "aButtons": [
+                    {
+                        "sExtends" : "xls",
+                        "sButtonText" : '<i class="fa fa-file-excel-o" aria-hidden="true"></i> Excel',
+                    },
+                    {
+                        "sExtends":    "print",
+                        "sButtonText" : '<i class="fa fa-print" aria-hidden="true"></i> Print',
+                    }
+
+                ],
+                "sSwfPath": "../assets/template/plugins/datatables/tabletools/swf/copy_csv_xls_pdf.swf"
             },
             "ajax":{
                 url : url, // json datasource

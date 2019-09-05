@@ -45,6 +45,13 @@
 
     $(document).ready(function () {
 
+        window.act = "<?= $accessUser; ?>";
+        if(parseInt(act)<=0){
+            $('.form-data-edit').remove();
+        } else {
+
+        }
+
         loadDataKBKL();
         selectprogrampendidikan();
         selectyearstudy();

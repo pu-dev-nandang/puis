@@ -1330,10 +1330,14 @@ $route['agregator/hki-paten-sederhana'] = 'page/agregator/c_agregator/hki_paten_
 $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_karya_ilmiah';
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
-
-
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 //$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
+
+//Agregator Excel
+$route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';
+$route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
+$route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
+
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
