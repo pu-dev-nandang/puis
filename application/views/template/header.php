@@ -171,8 +171,8 @@
                         <?php } ?>
 
                         <?php if(in_array(9,$rule_service)){ ?>
-                            <li class="<?php if($this->uri->segment(1)=='budgeting'){echo 'active';} ?>" id = "PageServiceBudgeting">
-                                <a href="<?php echo base_url('agregator/akreditasi-eksternal'); ?>"><i class="fa fa-flag" aria-hidden="true"></i> Agregator</a>
+                            <li class="<?php if($this->uri->segment(1)=='agregator'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('agregator/akreditasi-eksternal'); ?>"><i class="fa fa-flag" aria-hidden="true"></i> Agregator (APT)</a>
                             </li>
                         <?php } ?>
 

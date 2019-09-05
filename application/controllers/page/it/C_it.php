@@ -62,6 +62,15 @@ class C_it extends It_Controler {
 
     }
 
+    public function agregator_menu(){
+
+        $department = parent::__getDepartement();
+        $data = '';
+        $page = $this->load->view('page/'.$department.'/agregator/agregator_menu',$data,true);
+        $this->temp($page);
+
+    }
+
     public function version_menu(){
       $department = parent::__getDepartement();
 

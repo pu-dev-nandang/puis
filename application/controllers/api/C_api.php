@@ -8305,6 +8305,68 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+
+
+            else if($data_arr['action']=='loadScheduleFPLeccturer'){
+                $NIP = $data_arr['NIP'];
+                $SemesterID = $data_arr['SemesterID'];
+                $Type = $data_arr['Type'];
+
+                $data = $this->db->query('SELECT fps.*, cl.Room FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                            LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpsl.FPSID)
+                                                            LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                            WHERE fpsl.NIP = "'.$NIP.'" AND fps.SemesterID = "'.$SemesterID.'" 
+                                                            AND fps.Type = "'.$Type.'" ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        // Get Examiner
+                        $data[$i]['Examiner'] = $this->db->query('SELECT fpsl.*, em.Name FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                                              LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                                              WHERE fpsl.FPSID = "'.$data[$i]['ID'].'" 
+                                                                              ORDER BY fpsl.Type DESC ')->result_array();
+
+                        // Get Student
+                        $data[$i]['Students'] = $this->db->query('SELECT fpss.*, ats.Name, fp.Status AS StatusFinalProject FROM db_academic.final_project_schedule_student fpss 
+                                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                                            LEFT JOIN db_academic.final_project fp ON(fp.NPM = fpss.NPM)
+                                                                            WHERE fpss.FPSID = "'.$data[$i]['ID'].'" 
+                                                                            ORDER BY fpss.NPM ASC ')->result_array();
+
+
+                    }
+                }
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='readStudentFromLCFP'){
+                $ID = $data_arr['ID'];
+                $data = $this->db->query('SELECT fpss.*, fp.Status AS StatusFinalProject, ats.Name FROM db_academic.final_project_schedule_student fpss 
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = fpss.NPM)
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+                                                        WHERE fpss.FPSID = "'.$ID.'" ')->result_array();
+
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='updateStudentFromLCFP'){
+
+                $this->db->set(array(
+                    'Notes' => $data_arr['Notes'],
+                    'Status' => $data_arr['Status']
+                ));
+                $this->db->where('ID',$data_arr['ID']);
+                $this->db->update('db_academic.final_project_schedule_student');
+                $this->db->reset_query();
+
+                $this->db->set('Status', $data_arr['Status']);
+                $this->db->where('NPM',$data_arr['NPM']);
+                $this->db->update('db_academic.final_project');
+
+                return print_r(1);
+
+
+            }
         }
     }
 

@@ -1161,6 +1161,98 @@ class C_api3 extends CI_Controller {
             )));
 
         }
+        else if($data_arr['action']=='readAgregatorAdmin'){
+            $data = $this->db->query('SELECT aa.*, em.Name FROM db_agregator.agregator_admin aa 
+                                              LEFT JOIN db_employees.employees em ON (aa.NIP = em.NIP)')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeAgregatorAdmin'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.agregator_admin');
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='addAgregatorAdmin'){
+            $NIP = $data_arr['NIP'];
+
+            // Cek nip
+            $data = $this->db->get_where('db_agregator.agregator_admin',array(
+                'NIP' => $NIP
+            ))->result_array();
+
+            if(count($data)>0){
+                $result = 0;
+            } else {
+
+                $dataIns = array(
+                    'NIP' => $NIP
+                );
+                $this->db->insert('db_agregator.agregator_admin',$dataIns);
+
+                $result = 1;
+            }
+            return print_r($result);
+        }
+        else if($data_arr['action']=='readAgregatorHeaderMenu'){
+            $data = $this->db->query('SELECT * FROM db_agregator.agregator_menu_header ORDER BY Type, Name ASC')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeAgregatorHeaderMenu'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', ID);
+            $this->db->delete('db_agregator.agregator_menu_header');
+            $this->db->reset_query();
+
+            $this->db->where('MHID', $ID);
+            $this->db->delete('db_agregator.agregator_menu');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateAgregatorHeaderMenu'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.agregator_menu_header',$dataForm);
+            } else {
+                $this->db->insert('db_agregator.agregator_menu_header',$dataForm);
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='readAgregatorMenu'){
+            $data = $this->db->query('SELECT am.*, amh.Name AS H_Name, amh.Type AS H_Type FROM db_agregator.agregator_menu am 
+                                                  LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
+                                                  ORDER BY am.MHID, am.ID ASC ')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removedAgregatorMenu'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.agregator_menu');
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='updateAgregatorMenu'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.agregator_menu',$dataForm);
+            } else {
+                $this->db->insert('db_agregator.agregator_menu',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
 
     }
 

@@ -211,6 +211,21 @@
                 </ul>
             </li>
 
+            <li class="<?= ($this->uri->segment(2)=='agregator') ? 'current open' : ''?>">
+                <a href="javascript:void(0);">
+                    <i class="icon-edit"></i>
+                    Agregator
+                    <i class="arrow <?= ($this->uri->segment(2)=='agregator') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
+                <ul class="sub-menu">
+                    <li class="<?= ($this->uri->segment(3)=='agregator-menu') ? "current open" : ""?>">
+                        <a href="<?= base_url('it/agregator/agregator-menu') ?>">
+                            <i class="icon-angle-right"></i>
+                            Menu Agregator
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
         </ul>
 
 
