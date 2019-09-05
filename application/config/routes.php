@@ -184,6 +184,8 @@ $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
 $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
+$route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
+
 
 
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -1338,6 +1340,8 @@ $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_ek
 $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 
+
+$route['agregator-aps/uploadFile'] = 'page/agregator/c_agregator_aps/uploadFile';
 
 $route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
