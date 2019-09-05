@@ -1764,7 +1764,7 @@ class C_admission extends Admission_Controler {
 
             $url = URLAD.'__api/Create';
             $token = $this->jwt->encode($data,"UAP)(*");
-            $this->m_master->apiservertoserver($url,$token);
+            $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
             
           }
 
