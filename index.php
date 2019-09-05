@@ -55,6 +55,7 @@
  */
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
+	define("URLAD","http://10.1.30.2:8076/", true);
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':
 		    define("url_registration","http://admission.podomorouniversity.ac.id/", true);
