@@ -8945,6 +8945,28 @@ class C_api extends CI_Controller {
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
                 $this->db->reset_query();
 
+                // send to AD if input Access_Card_Number
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                    if (array_key_exists('Access_Card_Number', $dataUpdtAuth)) {
+                        if ($dataUpdtAuth['Access_Card_Number'] != '' && $dataUpdtAuth['Access_Card_Number'] != null) {
+                            // update to AD
+                            $data_arr = [
+                                'pager' => $dataUpdtAuth['Access_Card_Number'] ,
+                            ];
+                            $data = array(
+                                'auth' => 's3Cr3T-G4N',
+                                'Type' => 'Student',
+                                'UserID' => $NPM,
+                                'data_arr' => $data_arr,
+                            );
+
+                            $url = URLAD.'__api/Edit';
+                            $token = $this->jwt->encode($data,"UAP)(*");
+                            $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
+                        }
+                    }
+                }    
+
                 return print_r(1);
 
             }
