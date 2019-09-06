@@ -147,8 +147,8 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
-//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
 $route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
 $route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 $route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';
@@ -1322,9 +1322,12 @@ $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregato
 
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 
-$route['agregator-aps/uploadFile'] = 'page/agregator/c_agregator_aps/uploadFile';
 
-$route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
+
+$route['agregator-aps/setting'] = 'page/agregator/c_agregator_aps/setting';
+$route['agregator-aps/kerjasama-tridharma'] = 'page/agregator/c_agregator_aps/kerjasama_tridharma';
+
+$route['api3/__getListMenuAgregator/(:any)'] = 'api/c_api3/getListMenuAgregator/$1';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
 
 $route['api3/__crudLembagaSurview'] = 'api/c_api3/crudLembagaSurview';

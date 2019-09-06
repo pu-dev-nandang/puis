@@ -50,7 +50,7 @@ if($access=='1'){ ?>
 <script>
     $(document).ready(function () {
         loadSelectOptionEmployeesSingle('#formMember','');
-        loadSelectOptionMenuAgregator('#formMenu','');
+        loadSelectOptionMenuAgregator('#formMenu','','APT');
 
         $('#formMember,#formMenu').select2({allowClear: true});
 

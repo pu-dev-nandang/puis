@@ -47,9 +47,14 @@ class C_api3 extends CI_Controller {
         return $status;
     }
 
-    public function getListMenuAgregator(){
+    public function getListMenuAgregator($Type){
 
-        $data = $this->db->order_by('ID','ASC')->get('db_agregator.agregator_menu')->result_array();
+//        $data = $this->db->order_by('ID','ASC')->get('db_agregator.agregator_menu')->result_array();
+
+        $data = $this->db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+                                              LEFT JOIN db_agregator.agregator_menu_header amh 
+                                              ON (amh.ID = am.MHID)
+                                              WHERE amh.Type = "'.$Type.'" ')->result_array();
 
         return print_r(json_encode($data));
 

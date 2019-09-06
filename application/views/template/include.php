@@ -1220,9 +1220,9 @@
     //     });
     // }
 
-    function loadSelectOptionMenuAgregator(element,selected) {
+    function loadSelectOptionMenuAgregator(element,selected,type) {
 
-        var url = base_url_js+'api3/__getListMenuAgregator';
+        var url = base_url_js+'api3/__getListMenuAgregator/'+type;
         $.getJSON(url,function (jsonResult) {
 
             if(jsonResult.length>0){
