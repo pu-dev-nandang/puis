@@ -630,12 +630,83 @@
                     if(fileType!=''){
                         uploadPhoto(fileName);
                     }
+                    $('#NotificationModal').modal('hide');
+                    var dtmodal = result.arr_callback;
+                    // show modal User & Password serta email nya untuk di print
+                    var html  = '<div class = "row">'+
+                                    '<div class = "col-md-12">'+
+                                        '<table class = "table">'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    'Username PC'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    ':'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class = "UsernamePC" dt = "'+dtmodal.UsernamePC+'">'+dtmodal.UsernamePC+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+ 
+                                            '<tr>'+
+                                                '<td>'+
+                                                    'Username Aplikasi PCAM'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    ':'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class = "UsernamePCam" dt = "'+dtmodal.UsernamePCam+'">'+dtmodal.UsernamePCam+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    'Password'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    ':'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class = "PasswordFill" dt = "'+dtmodal.Password+'">'+dtmodal.Password+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                            '<tr>'+
+                                                '<td>'+
+                                                    'Email PU'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    ':'+
+                                                '</td>'+
+                                                '<td>'+
+                                                    '<div class = "EmailPUFill" dt = "'+dtmodal.EmailPU+'">'+dtmodal.EmailPU+
+                                                    '</div>'+
+                                                '</td>'+
+                                            '</tr>'+
+                                        '</table>'+
+                                    '</div>'+
+                                '</div>';                           
+                    var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
+                        '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
+                    
+                    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Akses'+'</h4>');
+                    $('#GlobalModalLarge .modal-body').html(html);
+                    $('#GlobalModalLarge .modal-footer').html(footer);
+                    $('#GlobalModalLarge').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });            
+
                     toastr.success('Employees Saved','Success');
 
-                    setTimeout(function () {
-                        $('#NotificationModal').modal('hide');
-                        window.location.href = '';
-                    },1000);
+                    // setTimeout(function () {
+                    //     $('#NotificationModal').modal('hide');
+                    //     window.location.href = '';
+                    // },1000);
+
+                    $('input').val('');
+
                 }
 
             });
@@ -644,6 +715,26 @@
 
     }
 
+
+    $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+        var UsernamePC = $('.UsernamePC').attr('dt'); 
+        var UsernamePCam = $('.UsernamePCam').attr('dt');
+        var PasswordFill = $('.PasswordFill').attr('dt');
+        var EmailPUFill = $('.EmailPUFill').attr('dt');
+
+        var url = base_url_js+'save2pdf/print_akses_karyawan';
+        data = {
+          UsernamePC : UsernamePC,
+          UsernamePCam : UsernamePCam,
+          PasswordFill : PasswordFill,
+          EmailPUFill : EmailPUFill,
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+
+    })
 
     $(document).on('change','.uploadPhotoEmp',function () {
         // uploadPhoto();

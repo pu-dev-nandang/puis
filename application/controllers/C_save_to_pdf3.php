@@ -3159,4 +3159,44 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->Output($filename,'I');
     }
 
+    public function print_akses_karyawan()
+    {
+        $token = $this->input->post('token');
+        $Input = $this->getInputToken($token);
+        $UsernamePC = $Input['UsernamePC'];
+        $UsernamePCam = $Input['UsernamePCam'];
+        $PasswordFill = $Input['PasswordFill'];
+        $EmailPUFill = $Input['EmailPUFill'];
+        $filename = 'Data_'.$UsernamePCam.'.pdf';
+
+        $fpdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $fpdf->AddPage();
+        $fpdf->SetMargins(10,0,10,0);
+        // Logo
+        $fpdf->Image('./images/logo_tr.png',10,10,50);
+        $x = 10;
+        $y = 30;
+        $FontIsian = 10;
+        $fpdf->SetFont('Arial','B',$FontIsian);
+        $h = 10;
+        $fpdf->SetXY($x,$y);
+        $fpdf->Cell(50,$h, 'Username PC ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(50,$h, $UsernamePC, 0, 1, 'L', 0);
+
+        $fpdf->Cell(50,$h, 'Username PCam ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(50,$h, $UsernamePCam, 0, 1, 'L', 0);
+
+        $fpdf->Cell(50,$h, 'Password ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(50,$h, $PasswordFill, 0, 1, 'L', 0);
+
+        $fpdf->Cell(50,$h, 'Email PU ', 0, 0, 'L', 0);
+        $fpdf->Cell(10,$h, ':', 0, 0, 'L', 0);
+        $fpdf->Cell(50,$h, $EmailPUFill, 0, 1, 'L', 0);
+
+        $fpdf->Output($filename,'I');
+    }
+
 }
