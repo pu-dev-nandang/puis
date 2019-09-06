@@ -125,7 +125,7 @@
             '            <div class="form-group">' +
             '                <textarea class="form-control" id="formDescription" placeholder="Description..."></textarea>' +
             '            </div>' +
-            '            <div>' +
+            '            <div style="text-align:right;">' +
             '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
             '            </div>' +
             '        </div>' +

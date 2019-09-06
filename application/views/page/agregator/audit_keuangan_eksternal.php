@@ -148,7 +148,7 @@
 
                     if(jsonResult==0 || jsonResult=='0') { 
                         toastr.error('Maaf nama Lembaga sudah Ada!','Error');
-                        //$('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        $('#btnSaveLembaga').html('Save').prop('disabled',false);
 
                     } else {
 

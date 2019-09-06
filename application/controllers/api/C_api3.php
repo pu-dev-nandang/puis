@@ -185,67 +185,57 @@ class C_api3 extends CI_Controller {
             $data = $this->db->get('db_agregator.lembaga_audit')->result_array();
             return print_r(json_encode($data));
         }
-        else if($data_arr['action']=='updateLembagaSurview'){
-
-            $squery = 'SELECT * FROM db_agregator.lembaga_surview WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
-            $dataTable =$this->db->query($squery, array())->result_array();
+        else if($data_arr['action']=='updateLembagaSurview') {
 
             $dataForm = array(
                 'Lembaga' => $data_arr['Lembaga'],
                 'Description' => $data_arr['Description']
             );
 
-            if(count($dataTable)>0){
+            if($data_arr['ID']!=''){
+                // Update
+                $this->db->where('ID',$data_arr['ID']);
+                $this->db->update('db_agregator.lembaga_surview',$dataForm);
+            } else {
 
-                if($data_arr['ID']!=''){
-                        // Update
-                    $this->db->where('ID',$data_arr['ID']);
-                    $this->db->update('db_agregator.lembaga_surview',$dataForm);
+                $squery = 'SELECT * FROM db_agregator.lembaga_surview WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                    return print_r(0);
                 } 
                 else {
                     // Insert
-                    //$this->db->insert('db_agregator.lembaga_surview',$dataForm);
-                }
-                return print_r(0);
-            } 
-            else {
-
-                if($data_arr['ID']!=''){
-                        // Update
-                    $this->db->where('ID',$data_arr['ID']);
-                    $this->db->update('db_agregator.lembaga_surview',$dataForm);
-                } else {
-                    // Insert
                     $this->db->insert('db_agregator.lembaga_surview',$dataForm);
-                }
-                return print_r(1);
+                    return print_r(1);   
+                } 
             }
-
+               
         }
         else if($data_arr['action']=='updateLembagaAudit') {
 
-            $squery = 'SELECT * FROM db_agregator.lembaga_audit WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
-            $dataTable =$this->db->query($squery, array())->result_array();
+            $dataForm = array(
+                'Lembaga' => $data_arr['Lembaga'],
+                'Description' => $data_arr['Description']
+            );
 
-            if(count($dataTable)>0){
-                return print_r(0);
-            } 
-            else {
-
-                $dataForm = array(
-                    'Lembaga' => $data_arr['Lembaga'],
-                    'Description' => $data_arr['Description']
-                );
-
-                if($data_arr['ID']!=''){
+            if($data_arr['ID']!=''){
                     // Update
-                    $this->db->where('ID',$data_arr['ID']);
-                    $this->db->update('db_agregator.lembaga_audit',$dataForm);
-                } else {
-                    // Insert
+                $this->db->where('ID',$data_arr['ID']);
+                $this->db->update('db_agregator.lembaga_audit',$dataForm);
+            } else {
+
+                $squery = 'SELECT * FROM db_agregator.lembaga_audit WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                        return print_r(0);
+                } 
+                else {
+                // Insert
                     $this->db->insert('db_agregator.lembaga_audit',$dataForm);
+                    return print_r(1);
                 }
-              return print_r(1);
             }
         }
     }
@@ -507,8 +497,6 @@ class C_api3 extends CI_Controller {
 
         }
 
-        
-
         else if($data_arr['action']=='viewListAKE'){
 
             $requestData= $_REQUEST;
@@ -582,17 +570,25 @@ class C_api3 extends CI_Controller {
                 'Description' => $data_arr['Description']
             );
 
-            if($data_arr['ID']!=''){
+            if($data_arr['ID']!='') {
                 // Update
                 $this->db->where('ID',$data_arr['ID']);
                 $this->db->update('db_agregator.lembaga_mitra_kerjasama',$dataForm);
-            } else {
-                // Insert
-                $this->db->insert('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+            } 
+            else {
+                $squery = 'SELECT * FROM db_agregator.lembaga_mitra_kerjasama WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                    return print_r(0);
+                } 
+                else { 
+                    // Insert
+                    $this->db->insert('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+                    return print_r(1); 
+                }
             }
-
-            return print_r(1);
-
+                
         }
         else if($data_arr['action']=='readLembagaMitraKerjasama'){
             $data = $this->db->get('db_agregator.lembaga_mitra_kerjasama')->result_array();
@@ -669,9 +665,9 @@ class C_api3 extends CI_Controller {
                                                                         <i class="fa fa-pencil"></i> <span class="caret"></span>
                                                                       </button>
                                                                       <ul class="dropdown-menu">
-                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'"><i class="fa fa fa-edit"></i> Edit</a></li>
                                                                         <li role="separator" class="divider"></li>
-                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-file="'.$row['File'].'" data-tb="db_agregator.university_collaboration">Remove</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-file="'.$row['File'].'" data-tb="db_agregator.university_collaboration"><i class="fa fa fa-trash"></i> Remove</a></li>
                                                                       </ul>
                                                                     </div>
                                                                         <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
