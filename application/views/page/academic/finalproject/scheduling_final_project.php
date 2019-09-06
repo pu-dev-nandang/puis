@@ -29,8 +29,8 @@
                             <option value="1">Seminar Proposal</option>
                             <option value="2">Seminar Hasil</option>
                             <option disabled>-------</option>
-                            <option value="3">Remidial Seminar Proposal</option>
-                            <option value="4">Remidial Seminar Hasil</option>
+                            <option value="3">Make-up Seminar Proposal</option>
+                            <option value="4">Make-up Seminar Hasil</option>
                         </select>
                         <div id="viewType"></div>
                     </div>
