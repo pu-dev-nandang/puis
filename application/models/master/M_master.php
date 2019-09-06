@@ -2679,8 +2679,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     "token=".$Input);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $pr = curl_exec($ch);
-        curl_close ($ch);
+        // print_r($pr);die();
         $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
         return $rs;
     }
 
@@ -3286,5 +3287,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
 
         return $arr;
+    }
+
+    public function is_url_exist($url){
+        $file = $url;
+        $file_headers = @get_headers($file);
+        if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
+            $exists = false;
+        }
+        else {
+            $exists = true;
+        }
+
+        return $exists;
     }
 }
