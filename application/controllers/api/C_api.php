@@ -8086,8 +8086,11 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='viewDocumentSkripsi'){
 
                 $NPM = $data_arr['NPM'];
-                $data = $this->db->get_where('db_academic.final_project_files',
-                    array('NPM' => $NPM))->result_array();
+                $data = $this->db->query('SELECT fpf.*, fp.Status AS StatusFinalProject 
+                                                                FROM db_academic.final_project_files fpf 
+                                                                LEFT JOIN db_academic.final_project fp 
+                                                                ON (fp.NPM = fpf.NPM) 
+                                                                WHERE fpf.NPM = "'.$NPM.'"')->result_array();
 
                 return print_r(json_encode($data));
 
