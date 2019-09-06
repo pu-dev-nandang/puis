@@ -852,6 +852,12 @@ class C_dashboard extends Globalclass {
 
     }
 
+    public function ShowLoggingNotification()
+    {
+        $content = $this->load->view('dashboard/LoggingNotification','',true);
+        $this->temp($content);
+    }
+
 
 
 }

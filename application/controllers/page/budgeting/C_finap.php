@@ -28,6 +28,11 @@ class C_finap extends Budgeting_Controler {
 
     public function create_ap()
     {
+        $this->data['sget'] = '';
+        if ( isset($_GET['token']) ) {
+            $this->data['sget'] = $_GET['token'];
+        }
+       
         $page = $this->load->view('global/budgeting/finap/create_ap',$this->data,true);
         $this->menu_horizontal($page);
     }
@@ -35,10 +40,10 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal,pay.PostingDatePaid ';
         $joinaction = ' right join (
                                  select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
-                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin
+                                 ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin,c.PostingDate as PostingDatePaid
                                  from db_payment.payment as a join
                                  ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
                                    UNION 
@@ -47,10 +52,10 @@ class C_finap extends Budgeting_Controler {
                                    UNION 
                                    select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.cash_advance_realisasi where ID_cash_advance = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus from db_payment.cash_advance  as a
                                    left join db_payment.cash_advance_realisasi as b on a.ID = b.ID_cash_advance
-                                   UNION 
-                                   select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
-                                   as a
-                                   left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
+                                   #UNION 
+                                   #select a.ID_payment,a.Perihal,(select count(*) as total from db_payment.petty_cash_realisasi where ID_petty_cash = a.ID  ) as RealisasiTotal,b.Status as RealisasiStatus  from db_payment.petty_cash 
+                                   #as a
+                                   #left join db_payment.petty_cash_realisasi as b on a.ID = b.ID_petty_cash
                                  )
                  as b on a.ID = b.ID_payment
                  join db_budgeting.ap as c on a.ID = c.ID_payment
@@ -81,6 +86,12 @@ class C_finap extends Budgeting_Controler {
              if (array_key_exists('Month', $dataToken)) {
                  if ($dataToken['Month'] != 'all') {
                      $WhereFiltering .= ' and MONTH(CreateATPayFin) = '.(int)$dataToken['Month'];
+                 }
+             }
+
+             if (array_key_exists('TypePaymentSelect', $dataToken)) {
+                 if ($dataToken['TypePaymentSelect'] != '%') {
+                     $WhereFiltering .= ' and TypePay = "'.$dataToken['TypePaymentSelect'].'"';
                  }
              }
          }
@@ -228,6 +239,10 @@ class C_finap extends Budgeting_Controler {
                      'RealisasiTotal' => $row['RealisasiTotal'],
                      'RealisasiStatus' => $row['RealisasiStatus'],
                      'ReminderTotal' => $row['ReminderTotal'],
+                     'PayCreatedBy' => $row['PayCreatedBy'],
+                     'PayNameCreatedBy' => $row['PayNameCreatedBy'],
+                     'PostingDatePaid' => $row['PostingDatePaid'],
+                     'NamaSupplier' => $row['NamaSupplier'],
                  );
 
              $nestedData[] = $arr_temp;
@@ -290,6 +305,13 @@ class C_finap extends Budgeting_Controler {
 
     public function send_reminder_realisasi()
     {
+
+        /*
+            Reminder jika menggunakan po/spk maka notifikasi ke all purchasing
+            jika tanpa po/spk maka reminder pertama ke user request dan yang ke 2 dst ke all division
+
+        */
+
         $Input = $this->getInputToken();
         $ID_payment = $Input['ID_payment'];
         $G_pay = $this->m_master->caribasedprimary('db_payment.payment','ID',$ID_payment);
@@ -348,7 +370,7 @@ class C_finap extends Budgeting_Controler {
 
             }
             else
-            {
+            { // Non PO / SPK
                 $urlType = '';
                 switch ($G_pay[0]['Type']) {
                     case 'Bank Advance':
@@ -368,28 +390,57 @@ class C_finap extends Budgeting_Controler {
                         break;
                 }
 
-                $data = array(
-                    'auth' => 's3Cr3T-G4N',
-                    'Logging' => array(
-                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
-                                    'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
-                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
-                                    'CreatedBy' => $this->session->userdata('NIP'),
-                                  ),
-                    'To' => array(
-                              'Div' => array($DeptID),
-                            ),
-                    'Email' => 'No', 
-                );
+                // send to requested
+                $CreatedBy = $G_pay[0]['CreatedBy'];
+                // check total reminder 
+                $G_get_reminder = $this->m_master->caribasedprimary('db_payment.reminder_pay_realisasi','ID_payment',$ID_payment);
+                if (count($G_get_reminder) == 0) { // send to request
+                   $data = array(
+                       'auth' => 's3Cr3T-G4N',
+                       'Logging' => array(
+                                       'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                       'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                       'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                       'CreatedBy' => $this->session->userdata('NIP'),
+                                     ),
+                       'To' => array(
+                                 'NIP' => array($CreatedBy),
+                               ),
+                       'Email' => 'No', 
+                   );
 
-                $url = url_pas.'rest2/__send_notif_browser';
-                $token = $this->jwt->encode($data,"UAP)(*");
-                $this->m_master->apiservertoserver($url,$token);
+                   $url = url_pas.'rest2/__send_notif_browser';
+                   $token = $this->jwt->encode($data,"UAP)(*");
+                   $this->m_master->apiservertoserver($url,$token);
 
-                // send email
-                $G_emp = $this->m_master->getEmployeeByDepartmentByPosition($DeptID);
-                for ($i=0; $i < count($G_emp); $i++) { 
-                    $this->m_master->send_email_budgeting_All($G_emp[$i]['NIP'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+                   $this->m_master->send_email_budgeting_All($CreatedBy,$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
+                }
+                else // to division
+                {
+                    $data = array(
+                        'auth' => 's3Cr3T-G4N',
+                        'Logging' => array(
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                        'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                        'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                        'CreatedBy' => $this->session->userdata('NIP'),
+                                      ),
+                        'To' => array(
+                                  'Div' => array($DeptID),
+                                ),
+                        'Email' => 'No', 
+                    );
+
+                    $url = url_pas.'rest2/__send_notif_browser';
+                    $token = $this->jwt->encode($data,"UAP)(*");
+                    $this->m_master->apiservertoserver($url,$token);
+
+                    // send email
+                    $G_emp = $this->m_master->getEmployeeByDepartmentByPosition($DeptID);
+                    for ($i=0; $i < count($G_emp); $i++) { 
+                        $this->m_master->send_email_budgeting_All($G_emp[$i]['NIP'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+                    }
                 }
 
                 $bool = true;
@@ -418,25 +469,54 @@ class C_finap extends Budgeting_Controler {
                     break;
             }
 
-            $data = array(
-                'auth' => 's3Cr3T-G4N',
-                'Logging' => array(
-                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
-                                'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
-                                'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
-                                'CreatedBy' => $NIP,
-                              ),
-                'To' => array(
-                          'NIP' => array($G_emp[0]['NIP'],$G_emp[0]['AdminID']),
-                        ),
-                'Email' => 'No', 
-            );
+            // send to requested
+            $CreatedBy = $G_pay[0]['CreatedBy'];
+            // check total reminder 
+            $G_get_reminder = $this->m_master->caribasedprimary('db_payment.reminder_pay_realisasi','ID_payment',$ID_payment);
+            if (count($G_get_reminder) == 0) { // send to request
+               $data = array(
+                   'auth' => 's3Cr3T-G4N',
+                   'Logging' => array(
+                                   'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                   'CreatedBy' => $this->session->userdata('NIP'),
+                                 ),
+                   'To' => array(
+                             'NIP' => array($CreatedBy),
+                           ),
+                   'Email' => 'No', 
+               );
 
-            $url = url_pas.'rest2/__send_notif_browser';
-            $token = $this->jwt->encode($data,"UAP)(*");
-            $this->m_master->apiservertoserver($url,$token);
-            $this->m_master->send_email_budgeting_All($G_emp[0]['NIP'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
-            $this->m_master->send_email_budgeting_All($G_emp[0]['AdminID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+               $url = url_pas.'rest2/__send_notif_browser';
+               $token = $this->jwt->encode($data,"UAP)(*");
+               $this->m_master->apiservertoserver($url,$token);
+
+               $this->m_master->send_email_budgeting_All($CreatedBy,$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
+            }
+            else
+            {
+               $data = array(
+                   'auth' => 's3Cr3T-G4N',
+                   'Logging' => array(
+                                   'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                   'CreatedBy' => $NIP,
+                                 ),
+                   'To' => array(
+                             'NIP' => array($G_emp[0]['NIP'],$G_emp[0]['AdminID']),
+                           ),
+                   'Email' => 'No', 
+               );
+
+               $url = url_pas.'rest2/__send_notif_browser';
+               $token = $this->jwt->encode($data,"UAP)(*");
+               $this->m_master->apiservertoserver($url,$token);
+               $this->m_master->send_email_budgeting_All($G_emp[0]['NIP'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+               $this->m_master->send_email_budgeting_All($G_emp[0]['AdminID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']); 
+            }
             $bool = true;
         }
         elseif ($CodeDept == 'AC') {
@@ -459,26 +539,56 @@ class C_finap extends Budgeting_Controler {
                     # code...
                     break;
             }
-            
-            $data = array(
-                'auth' => 's3Cr3T-G4N',
-                'Logging' => array(
-                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
-                                'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
-                                'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
-                                'CreatedBy' => $NIP,
-                              ),
-                'To' => array(
-                          'NIP' => array($G_emp[0]['KaprodiID'],$G_emp[0]['AdminID']),
-                        ),
-                'Email' => 'No', 
-            );
 
-            $url = url_pas.'rest2/__send_notif_browser';
-            $token = $this->jwt->encode($data,"UAP)(*");
-            $this->m_master->apiservertoserver($url,$token);
-            $this->m_master->send_email_budgeting_All($G_emp[0]['KaprodiID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
-            $this->m_master->send_email_budgeting_All($G_emp[0]['AdminID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+            // send to requested
+            $CreatedBy = $G_pay[0]['CreatedBy'];
+            // check total reminder 
+            $G_get_reminder = $this->m_master->caribasedprimary('db_payment.reminder_pay_realisasi','ID_payment',$ID_payment);
+            if (count($G_get_reminder) == 0) { // send to request
+               $data = array(
+                   'auth' => 's3Cr3T-G4N',
+                   'Logging' => array(
+                                   'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                   'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                   'CreatedBy' => $this->session->userdata('NIP'),
+                                 ),
+                   'To' => array(
+                             'NIP' => array($CreatedBy),
+                           ),
+                   'Email' => 'No', 
+               );
+
+               $url = url_pas.'rest2/__send_notif_browser';
+               $token = $this->jwt->encode($data,"UAP)(*");
+               $this->m_master->apiservertoserver($url,$token);
+
+               $this->m_master->send_email_budgeting_All($CreatedBy,$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+
+            }
+            else
+            {
+                $data = array(
+                    'auth' => 's3Cr3T-G4N',
+                    'Logging' => array(
+                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Reminder Realisasi '.$G_pay[0]['Type'],
+                                    'Description' => 'Reminder Realisasi '.$G_pay[0]['Type'],
+                                    'URLDirect' => 'budgeting_menu/pembayaran/'.$urlType.'/'.$CodeUrl,
+                                    'CreatedBy' => $NIP,
+                                  ),
+                    'To' => array(
+                              'NIP' => array($G_emp[0]['KaprodiID'],$G_emp[0]['AdminID']),
+                            ),
+                    'Email' => 'No', 
+                );
+
+                $url = url_pas.'rest2/__send_notif_browser';
+                $token = $this->jwt->encode($data,"UAP)(*");
+                $this->m_master->apiservertoserver($url,$token);
+                $this->m_master->send_email_budgeting_All($G_emp[0]['KaprodiID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+                $this->m_master->send_email_budgeting_All($G_emp[0]['AdminID'],$Departement,$data['Logging']['URLDirect'],$data['Logging']['Description']);
+            }
+
             $bool = true;
         }
 
@@ -493,9 +603,7 @@ class C_finap extends Budgeting_Controler {
         }
 
         $G_re = $this->m_master->caribasedprimary('db_payment.reminder_pay_realisasi','ID_payment',$ID_payment);
-
         echo json_encode(array('total' => count($G_re) ));
-
     }
 
 }

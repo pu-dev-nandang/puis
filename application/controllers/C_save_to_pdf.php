@@ -3330,7 +3330,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,3);
         $pdf->Cell(115,7,'',0,0,'L');
-        $pdf->Cell(27,7,'Nomor Ijazah National / ',0,0,'L');
+        $pdf->Cell(27,7,'Nomor Ijazah Nasional / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell(25,7,'National Certificate Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
@@ -3638,12 +3638,12 @@ class C_save_to_pdf extends CI_Controller {
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
-        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
 
         $Rektorat = $dataStudent['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
         $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
 
         // Foto
         $pdf->SetFont('dinpromedium','',$font_medium);
@@ -3920,13 +3920,13 @@ class C_save_to_pdf extends CI_Controller {
         // Dekan --
         $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
         $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
-        $Dekan = $titleA.''.$Student['Dekan'].''.$titleB;
+        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
         // Rektor
         $Rektorat = $dataIjazah['Rektorat'][0];
         $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
         $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
         $komaRektor = ($titleBRektor!='') ? ',' : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].''.$titleBRektor;
+        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
         // ----
         $pdf->SetFont('dinpromedium','',$fn_b);
         $yy = 9.2; // novie
@@ -5639,7 +5639,7 @@ Phone: (021) 29200456';
                 $y += $h;
              }
 
-             $Max = 15;
+             $Max = 5;
              $h=4.4;
              for ($i=0; $i <$Max - count($pr_detail) ; $i++) {
                  $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);
@@ -5675,9 +5675,9 @@ Phone: (021) 29200456';
              $JsonStatus = (array) json_decode($pr_create[0]['JsonStatus'],true);
              $JsonStatus = $this->m_global->FilteringDoubleApproval($JsonStatus);
 
-             $maxWrec = 130;
+             $maxWrec = 210;
              $Wrec = $maxWrec - ( (count($JsonStatus)) * 5 );
-             $fpdf->Rect($x,$y,$Wrec,$rect_h);
+             $fpdf->Rect($x,$y,$Wrec,15);
              $fpdf->SetXY(($x+2),($y+2) );
              $fpdf->SetFont('Arial','b',$FontIsianHeader);
              $fpdf->Cell(0, 0, 'Notes : ', 0, 0, 'L', 0);
@@ -5687,9 +5687,10 @@ Phone: (021) 29200456';
              $fpdf->MultiCell(($Wrec - 10), 3, $pr_create[0]['Notes'], 0, 1, 'L', 0);
 
              // signature
-             $x = $Wrec + 20;
+             $y = $fpdf->getY()+10;
+             // $x = $Wrec + 20;
              $w_requested = 20;
-             $w_approved = 30;
+             $w_approved = 35;
              $h_signature = 15;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','',$FontIsian);
@@ -5707,12 +5708,27 @@ Phone: (021) 29200456';
              $fpdf->SetXY($x,$y);
              $fpdf->SetFillColor(255, 255, 255);
              // $fpdf->Cell($w_requested,$h_signature,'',$border,0,'C',true);
+             $Sx = $x;
              for ($i=0; $i < count($JsonStatus); $i++) {
                 if ($JsonStatus[$i]['Visible'] == 'Yes') {
-                 $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                      $Approver = $JsonStatus[$i]['NIP'];
+                      $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$Approver);
+                      $Signatures = $G_CreatedBy[0]['Signatures'];
+                      // print_r($Signatures);
+                     if (file_exists('./uploads/signature/'.$Signatures)) {
+                        $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                        $fpdf->Image('./uploads/signature/'.$Signatures,$Sx,$fpdf->GetY(),$w_approved,$h_signature);
+                     }
+                     else
+                     {
+                        $fpdf->Cell($w_approved,$h_signature,'',$border,0,'C',true);
+                     }
+
+                     $Sx += $w_approved;
+                 
                 }
              }
-
+             // die();
              $CreatedBy = $pr_create[0]['CreatedBy'];
              $G_CreatedBy = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
              $NameRequester = $G_CreatedBy[0]['Name'];
@@ -5744,17 +5760,16 @@ Phone: (021) 29200456';
 
 
              // watermark
-                if ($pr_create[0]['Status'] ==  2) {
-                    $fpdf->SetFont('Arial','B',50);
-                    $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Approve',35);
-                }
-                elseif ($pr_create[0]['Status'] ==  3) {
-                    $fpdf->SetFont('Arial','B',50);
-                    $fpdf->SetTextColor(255,192,203);
-                    $fpdf->RotatedText(35,190,'Reject',35);
-                }
-
+                // if ($pr_create[0]['Status'] ==  2) {
+                //     $fpdf->SetFont('Arial','B',50);
+                //     $fpdf->SetTextColor(255,192,203);
+                //     $fpdf->RotatedText(35,190,'Approve',35);
+                // }
+                // elseif ($pr_create[0]['Status'] ==  3) {
+                //     $fpdf->SetFont('Arial','B',50);
+                //     $fpdf->SetTextColor(255,192,203);
+                //     $fpdf->RotatedText(35,190,'Reject',35);
+                // }
 
 
              // show image in the next page
@@ -6059,7 +6074,7 @@ Phone: (021) 29200456';
             $y = $pdf->GetY()+20;
 
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-            $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+6,40);
+            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40); 
 
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');

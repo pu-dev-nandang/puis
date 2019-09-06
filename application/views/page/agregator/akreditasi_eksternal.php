@@ -1,4 +1,5 @@
 
+
 <style>
     #tableViewLemabagaSurview tr th, #tableViewLemabagaSurview tr td {
         text-align: center;
@@ -11,22 +12,19 @@
 </style>
 
 
-
-
-
 <div class="well">
     <div class="row">
 
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-default" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Surview</button>
+                <button class="btn btn-success btn-round" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Survey</button>
             </div>
 
             <div>
                 <input class="hide" id="formEAID">
                 <div class="form-group">
-                    <label>Lembaga</label>
+                    <label>Nama Lembaga</label>
                     <input class="hide" id="formAE_ID" />
                     <select class="form-control" id="formAE_LembagaID"></select>
                 </div>
@@ -54,19 +52,21 @@
                     <textarea class="form-control" id="formAE_Description" rows="3"></textarea>
                 </div>
                 <div class="form-group" style="text-align: right;">
-                    <button class="btn btn-primary" id="saveFormEA">Save</button>
+                    <button class="btn btn-primary btn-round" id="saveFormEA"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
                 </div>
             </div>
         </div>
+        <br/>
         <div class="col-md-9">
+             <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
             <div style="min-height: 30px;" id="viewData"></div>
         </div>
 
     </div>
 </div>
 
-<script>
 
+<script>
     $(document).ready(function () {
 
         window.act = "<?= $accessUser; ?>";
@@ -87,37 +87,56 @@
                     }
                 });
         }
+     
+            loadDataTable();
+        });
 
-        loadDataTable();
-    });
+    $("#btndownloaadExcel").click(function(){
+        //var selectCurriculum = $("#selectCurriculum").val();
+        //if (selectCurriculum == "" || selectCurriculum == null) {toastr.error('Please select Curriculum', 'Failed!!');return};
+
+        //var Year = selectCurriculum.split(".");
+       // Year = Year[1];
+       // var prodi = $('#selectProdi').val();
+        var akred = "0";
+
+        var url = base_url_js+'agregator/excel_akreditasi_eksternal';
+        data = {
+          akred : akred
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
     
     $('#btnLembagaSurview').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Lembaga Surview</h4>');
+            '<h4 class="modal-title">Lembaga Survei </h4>');
 
         var body = '<div class="row">' +
             '    <div class="col-md-5">' +
             '        <div class="well">' +
             '            <div class="form-group">' +
             '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="formLembaga" placeholder="Input lembaga..">' +
+            '                <input class="form-control" id="formLembaga" placeholder="Nama Lembaga...">' +
             '            </div>' +
             '            <div class="form-group">' +
-            '                <textarea class="form-control" id="formDescription" placeholder="Input description..."></textarea>' +
+            '                <textarea class="form-control" id="formDescription" placeholder="Description..."></textarea>' +
             '            </div>' +
-            '            <div>' +
-            '                <button class="btn btn-success" id="btnSaveLembaga">Save</button>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
             '            </div>' +
             '        </div>' +
             '    </div>' +
             '    ' +
             '    <div class="col-md-7">' +
-            '        <table class="table table-striped" id="tableViewLemabagaSurview">' +
+            '        <table class="table table-bordered table-striped" id="tableViewLemabagaSurview">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #20485A;color: #FFFFFF;">' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th>Lembaga</th>' +
+            '                <th>Nama Lembaga</th>' +
             '                <th style="width: 2%;"><i class="fa fa-cog"></i></th>' +
             '            </tr>' +
             '            </thead>' +
@@ -130,7 +149,7 @@
 
         loadDataLembagaSurview();
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -159,35 +178,34 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    $('#formID').val('');
-                    $('#formLembaga').val('');
-                    $('#formDescription').val('');
-
-                    toastr.success('Data saved','Success');
-
-                    loadDataLembagaSurview();
-
-                    setTimeout(function () {
-
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Maaf nama Lembaga sudah Ada!','Error');
                         $('#btnSaveLembaga').html('Save').prop('disabled',false);
 
-                    },500);
+                    } else {
 
+                        $('#formID').val('');
+                        $('#formLembaga').val('');
+                        $('#formDescription').val('');
+                        toastr.success('Data saved','Success');
+                        loadDataLembagaSurview();
+
+                        setTimeout(function () {
+                            $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        },500);
+                    }
                 });
 
             } else {
                 toastr.warning('All form is required','Warning');
             }
 
-
-
-
         });
         
     });
 
 
-    function loadDataLembagaSurview() {
+    function loadDataLembagaSurview() {  //tabel master survei
 
         var url = base_url_js+'api3/__crudLembagaSurview';
         var token = jwt_encode({action : 'readLembagaSurview'},'UAP)(*');
@@ -202,7 +220,16 @@
                     $('#listLembaga').append('<tr>' +
                         '<td>'+no+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
-                        '<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
+                        '<td style="text-align: left;"><div class="btn-group btnAction"> '+
+                        '        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+
+                        '            <i class="fa fa-pencil"></i> <span class="caret"></span> '+ 
+                        '        </button>  '+
+                        '        <ul class="dropdown-menu"> '+
+                        '            <li><a class="btnEditLV_" data-no="'+v.ID+'" data-lembaga="'+v.Lembaga+'"  data-desc="'+v.Description+'"><i class="fa fa fa-edit"></i> Edit</a></li> '+
+                        '            <li role="separator" class="divider"></li> '+
+                        '            <li><a class="btnDeleteLV" data-no="'+v.ID+'"><i class="fa fa fa-trash"></i> Delete</a></li> '+
+                        '        </ul> '+
+                        '</div> </td>' +
                         '<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
                         '</tr>');
 
@@ -217,16 +244,90 @@
 
     }
 
-    $(document).on('click','.btnEditLV',function () {
 
-        var no = $(this).attr('data-no');
-        var dataForm = $('#btnEditLV_'+no).val();
-        var dataForm = JSON.parse(dataForm);
 
-        $('#formID').val(dataForm.ID);
-        $('#formLembaga').val(dataForm.Lembaga);
-        $('#formDescription').val(dataForm.Description);
+    $(document).on('click','.btnEditLV_',function () {
+       // alert('aa');
 
+        var ID = $(this).attr('data-no');
+        var Lembaga = $(this).attr('data-lembaga');
+        var Description = $(this).attr('data-desc');
+        //var dataForm = $('#btnEditLV_'+no).val();
+        //var dataForm = JSON.parse(dataForm);
+       
+        $('#formID').val(ID);
+        $('#formLembaga').val(Lembaga);
+        $('#formDescription').val(Description);
+
+    });
+
+    $(document).on('click','.btnDeleteLV',function () {
+        
+        if(confirm('Yakin Hapus data?')) {
+    
+            $('.btnDeleteLV').prop('disabled',true);
+    
+            var no = $(this).attr('data-no');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+    
+            var data = {
+                action: 'removeDataMasterSurvey',
+                ID : no
+            };
+    
+            var token = jwt_encode(data,'UAP)(*');
+    
+            $.post(url,{token:token},function (result) {
+
+                $('#formID').val('');
+                $('#formLembaga').val('');
+                $('#formDescription').val('');
+
+                toastr.success('Data saved','Success');
+                loadDataLembagaSurview();
+
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+    
+           });
+        }
+    });
+
+    $(document).on('click','.btnRemove',function () {
+        
+        if(confirm('Yakin Hapus data?')) {
+    
+            $('.btnDeleteLV').prop('disabled',true);
+    
+            var no = $(this).attr('data-id');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+    
+            var data = {
+                action: 'removeAkreditasi_eks',
+                ID : no
+            };
+    
+            var token = jwt_encode(data,'UAP)(*');
+    
+            $.post(url,{token:token},function (result) {
+    
+                toastr.success('Data removed','Success');
+                loadDataTable();
+
+                $('#formAE_ID,#formAE_DueDate').val('');
+                $('#formAE_LembagaID').val('');
+                $('#formAE_Type').val('');
+                $('#formAE_Scope').val('');
+                $('#formAE_Level').val('');
+                $('#formAE_Description').val('');
+
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+    
+           });
+        }
     });
 
 
@@ -300,9 +401,9 @@
     // Get Table
     function loadDataTable() {
 
-        $('#viewData').html('<table class="table table-striped" id="tableData">' +
+        $('#viewData').html('<table class="table table-bordered table-striped" id="tableData">' +
             '                    <thead>' +
-            '                    <tr>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%">No</th>' +
             '                        <th style="width: 15%">Lembaga</th>' +
             '                        <th style="width: 5%">Jenis Sertifikat</th>' +

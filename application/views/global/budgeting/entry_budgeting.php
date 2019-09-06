@@ -84,6 +84,9 @@
         <li class="<?php if($request=='ListBudgetDepartement'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "ListBudgetDepartement">List Budget</a>
         </li>
+        <li class="<?php if($request=='budget_revisi'){echo "active";} ?>">
+            <a href="javascript:void(0)" class="pageAnchor" page = "budget_revisi">Budget Revisi</a>
+        </li>
         <li class="<?php if($request=='report_anggaran_per_years'){echo "active";} ?>">
             <a href="javascript:void(0)" class="pageAnchor" page = "report_anggaran_per_years">Report Anggaran</a>
         </li>
@@ -155,5 +158,28 @@
             },1000);
             
         }); // exit spost
+    }
+
+    function load_budget_remaining__(Year,Departement)
+    {
+        var def = jQuery.Deferred();
+        var url = base_url_js+"budgeting/detail_budgeting_remaining";
+        var data = {
+                    Year : Year,
+                    Departement : Departement,
+                };
+        var token = jwt_encode(data,'UAP)(*');
+        $.post(url,{token:token},function (resultJson) {
+            
+        }).done(function(resultJson) {
+            var response2 = jQuery.parseJSON(resultJson);
+            def.resolve(response2);
+        }).fail(function() {
+          toastr.info('No Result Data'); 
+          def.reject();
+        }).always(function() {
+                        
+        });
+        return def.promise();
     }
 </script>

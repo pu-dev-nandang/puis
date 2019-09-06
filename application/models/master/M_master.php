@@ -2679,9 +2679,31 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     "token=".$Input);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $pr = curl_exec($ch);
-        curl_close ($ch);
+        // print_r($pr);die();
         $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
         return $rs;
+    }
+
+    public function apiservertoserver_NotWaitResponse($url,$token = '')
+    {
+        $Input = $token;
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10); 
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+        $data = curl_exec($ch);
+        curl_close ($ch);
+        return $data;
     }
 
     public function UserQNA($IDDivision = '')
@@ -3237,11 +3259,46 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getEmployeeByDepartmentByPosition($IDDivision)
     {
+        // $sql = "select * from db_employees.employees
+        //         where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
+        //         and SPLIT_STR(PositionMain, '.', 2) <= 12 
+        //         ";
         $sql = "select * from db_employees.employees
                 where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
-                and SPLIT_STR(PositionMain, '.', 2) <= 12 
+                and IsHolding = 'No'
                 ";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
         return $query;
+    }
+
+    public function get_data_AD($UserID)
+    {
+        $arr = array();
+        $server = "ldap://10.1.30.2";
+        $ds=ldap_connect($server);
+        $dn = "CN=users,DC=pu,DC=local";
+        $userBind = 'alhadi.rahman'.'@pu.local';
+        $filter="(|(sAMAccountName=$UserID))";
+        $pwdBind = 'IT@podomoro6737ht';
+         if ($bind = ldap_bind($ds, $userBind , $pwdBind)) {
+             $sr = ldap_search($ds, $dn, $filter);
+             $ent= ldap_get_entries($ds,$sr);
+             $arr = $ent;
+        }
+
+        return $arr;
+    }
+
+    public function is_url_exist($url){
+        $file = $url;
+        $file_headers = @get_headers($file);
+        if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
+            $exists = false;
+        }
+        else {
+            $exists = true;
+        }
+
+        return $exists;
     }
 }

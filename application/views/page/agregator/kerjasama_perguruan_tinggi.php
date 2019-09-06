@@ -12,7 +12,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-default" id="btnLembagaMitra"><i class="fa fa-cog margin-right"></i> Lembaga Mitra Kerjasama</button>
+                <button class="btn btn-success btn-round" id="btnLembagaMitra"><i class="fa fa-cog margin-right"></i> Lembaga Mitra Kerjasama</button>
             </div>
 
             <div class="form-group">
@@ -21,7 +21,7 @@
                 <select id="formLembagaMitraID" class="form-control"></select>
             </div>
             <div class="form-group">
-                <label>Tingakat</label>
+                <label>Tingkat</label>
                 <select class="form-control" id="formTingkat">
                     <option value="Internasional">Internasional</option>
                     <option value="Nasional">Nasional</option>
@@ -47,7 +47,7 @@
                 <div class="col-xs-8" id="viewFile"></div>
                 <div class="col-xs-4">
                     <div style="text-align: right;">
-                        <button class="btn btn-primary" id="btnSave">Save</button>
+                        <button class="btn btn-primary btn-round" id="btnSave"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
                     </div>
                 </div>
             </div>
@@ -106,19 +106,19 @@
             '            <div class="form-group">' +
             '                <textarea class="form-control" id="formDescription" placeholder="Input description..."></textarea>' +
             '            </div>' +
-            '            <div>' +
-            '                <button class="btn btn-success" id="btnSaveLembaga">Save</button>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
             '            </div>' +
             '        </div>' +
             '    </div>' +
             '    ' +
             '    <div class="col-md-7">' +
-            '        <table class="table table-striped" id="tableViewLemabagaSurview">' +
+            '        <table class="table table-striped table-bordered" id="tableViewLemabagaSurview">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #20485A;color: #FFFFFF;">' +
             '                <th style="width: 1%;">No</th>' +
             '                <th>Lembaga</th>' +
-            '                <th style="width: 2%;"><i class="fa fa-cog"></i></th>' +
+            '                <th style="width: 2%;text-align: center;"><i class="fa fa-cog"></i></th>' +
             '            </tr>' +
             '            </thead>' +
             '           <tbody id="listLembaga"></tbody>' +
@@ -130,7 +130,7 @@
 
         loadDataLembagaMitra();
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i>  Close</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -146,7 +146,6 @@
                 formDescription!='' && formDescription!=null){
 
                 loading_buttonSm('#btnSaveLembaga');
-
                 var data = {
                     action : 'updateLembagaMitraKerjasama' ,
                     ID : (formID!='' && formID!=null) ? formID : '',
@@ -159,28 +158,28 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    $('#formID').val('');
-                    $('#formLembaga').val('');
-                    $('#formDescription').val('');
-
-                    toastr.success('Data saved','Success');
-
-                    loadDataLembagaMitra();
-
-                    setTimeout(function () {
-
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Maaf nama Lembaga sudah Ada!','Error');
                         $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                    } 
+                    else {
 
-                    },500);
+                        $('#formID').val('');
+                        $('#formLembaga').val('');
+                        $('#formDescription').val('');
+                        toastr.success('Data saved','Success');
+                        loadDataLembagaMitra();
+                        setTimeout(function () {
+                            $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        },500);
+
+                    }
 
                 });
 
             } else {
                 toastr.warning('All form is required','Warning');
             }
-
-
-
 
         });
 
@@ -201,8 +200,19 @@
                     $('#listLembaga').append('<tr>' +
                         '<td>'+no+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
-                        '<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
-                        '<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
+                        //'<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
+                         '<td style="text-align: left;"><div class="btn-group btnAction"> ' +
+                        '    <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' +
+                        '        <i class="fa fa-pencil"></i> <span class="caret"></span> '+
+                        '    </button> '+
+                        '    <ul class="dropdown-menu"> '+
+                        '        <li><a class="btnEditLV" data-no="'+v.ID+'"  data-lembaga="'+v.Lembaga+'" data-desc="'+v.Description+'"> <i class="fa fa fa-edit"></i> Edit</a></li> '+
+                        '        <li role="separator" class="divider"></li> '+
+                        '        <li><a class="btnDeleteLV" data-id="'+v.ID+'"><i class="fa fa fa-trash"></i> Remove</a></li> '+
+                        '    </ul> '+
+                        '</div> </td>'+
+
+                        //'<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
                         '</tr>');
 
                     $('#formLembagaMitraID').append('<option value="'+v.ID+'">'+v.Lembaga+'</option>');
@@ -218,14 +228,49 @@
 
     $(document).on('click','.btnEditLV',function () {
 
-        var no = $(this).attr('data-no');
-        var dataForm = $('#btnEditLV_'+no).val();
-        var dataForm = JSON.parse(dataForm);
+        var ID = $(this).attr('data-no');
+        var Lembaga = $(this).attr('data-lembaga');
+        var Description = $(this).attr('data-desc');
 
-        $('#formID').val(dataForm.ID);
-        $('#formLembaga').val(dataForm.Lembaga);
-        $('#formDescription').val(dataForm.Description);
+        $('#formID').val(ID);
+        $('#formLembaga').val(Lembaga);
+        $('#formDescription').val(Description);
 
+    });
+
+
+
+    $(document).on('click','.btnDeleteLV',function () {
+        
+        if(confirm('Yakin Hapus data?')) {
+    
+            $('.btnDeleteLV').prop('disabled',true);
+    
+            var no = $(this).attr('data-id');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+    
+            var data = {
+                action: 'removeKerjasama',
+                ID : no
+            };
+    
+            var token = jwt_encode(data,'UAP)(*');
+    
+            $.post(url,{token:token},function (result) {
+    
+                $('#formID').val('');
+                $('#formLembaga').val('');
+                $('#formDescription').val('');
+
+                toastr.success('Data saved','Success');
+                loadDataLembagaMitra();
+
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+    
+           });
+        }
     });
 
     function UploadFile(ID,FileNameOld) {
@@ -323,9 +368,9 @@
 
     function loadDataTable() {
 
-        $('#viewData').html('<table class="table table-striped" id="tableData">' +
+        $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
             '                    <thead>' +
-            '                    <tr>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%">No</th>' +
             '                        <th style="width: 25%">Lembaga Mitra Kerjasama</th>' +
             '                        <th style="width: 7%;">Tingkat</th>' +

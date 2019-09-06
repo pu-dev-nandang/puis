@@ -129,7 +129,7 @@
                             <label>Email PU</label>
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="formEmailPU">
+                                    <input type="text" class="form-control" id="formEmailPU" placeholder="Auto by System" disabled>
                                     <span class="input-group-addon">@podomorouniversity.ac.id</span>
                                 </div>
                             </div>
@@ -301,6 +301,12 @@
                                 <option>* Not Set</option>
                                 <option disabled>------</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" class="form-control" id="CardNumber">
                         </div>
                     </div>
                 </div>
@@ -515,7 +521,7 @@
 
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formProgrammeStudy = $('#formProgrammeStudy').val();
-
+        var Access_Card_Number = $('#CardNumber').val();
         if(formNIP!=null && formNIP!=''
             && formName!='' && formName!=null
             && formYearBirth!='' && formYearBirth!=null
@@ -565,7 +571,6 @@
                 ? formEmailPU+'@podomorouniversity.ac.id'
                 : '';
 
-
             var formLevelEducationID = $('#formLevelEducationID').val();
             var formLecturerAcademicPositionID = $('#formLecturerAcademicPositionID').val();
 
@@ -608,7 +613,8 @@
                     StatusEmployeeID : formStatusEmployee,
                     StatusLecturerID : formStatusLecturer,
                     StatusForlap : formStatusForlap,
-                    Status : '-1'
+                    Status : '-1',
+                    Access_Card_Number : Access_Card_Number,
                 }
             };
 
@@ -616,21 +622,21 @@
             var url = base_url_js+'api/__crudEmployees';
             $.post(url,{token:token},function (result) {
 
-                if(result==0 || result=='0'){
-                    toastr.error('NIK / NIP is exist','Error');
+                if(result.status==0 || result.status=='0'){
+                    // toastr.error('NIK / NIP is exist','Error');
+                    toastr.error(result.msg,'Error');
+                    $('#NotificationModal').modal('hide');
                 } else {
                     if(fileType!=''){
                         uploadPhoto(fileName);
                     }
                     toastr.success('Employees Saved','Success');
 
+                    setTimeout(function () {
+                        $('#NotificationModal').modal('hide');
+                        window.location.href = '';
+                    },1000);
                 }
-
-                setTimeout(function () {
-                    $('#NotificationModal').modal('hide');
-                    window.location.href = '';
-                },1000);
-
 
             });
         }

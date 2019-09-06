@@ -237,6 +237,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 'ID_bank' => $Input['ID_bank'],
                 'Invoice' => $Input['Invoice'],
                 'TypeInvoice' => $Input['TypeInvoice'],
+                'TypeBayar' => $Input['TypeBayar'],
             );
 
             $this->db->insert('db_payment.spb',$dataSave2);
@@ -249,7 +250,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     $data = array(
                         'auth' => 's3Cr3T-G4N',
                         'Logging' => array(
-                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code,
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created SPB : '.$Code,
                                         'Description' => 'Please approve SPB '.$Code,
                                         'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
                                         'CreatedBy' => $this->session->userdata('NIP'),
@@ -384,6 +385,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                 $dataSave2['ID_bank'] = $Input['ID_bank'];
                 $dataSave2['Invoice'] = $Input['Invoice'];
                 $dataSave2['TypeInvoice'] = $Input['TypeInvoice'];
+                $dataSave2['TypeBayar'] = $Input['TypeBayar'];
                 $this->db->where('ID_payment',$ID_payment);
                 $this->db->update('db_payment.spb',$dataSave2);
 
@@ -396,7 +398,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                         $data = array(
                             'auth' => 's3Cr3T-G4N',
                             'Logging' => array(
-                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval SPB : '.$Code.' after edited',
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created SPB : '.$Code.' after edited',
                                             'Description' => 'Please approve SPB '.$Code.' after edited',
                                             'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
                                             'CreatedBy' => $this->session->userdata('NIP'),
@@ -1059,6 +1061,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                          'ID_bank' => $dataInput['ID_bank'],
                          'Invoice' => $dataInput['Invoice'],
                          'TypeInvoice' => $dataInput['TypeInvoice'],
+                         'TypeBayar' => $dataInput['TypeBayar'],
                      );
                      $this->db->insert('db_payment.spb',$dataSave);
                      $ID_spb = $this->db->insert_id();
@@ -1268,6 +1271,7 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                      'ID_bank' => $dataInput['ID_bank'],
                      'Invoice' => $dataInput['Invoice'],
                      'TypeInvoice' => $dataInput['TypeInvoice'],
+                     'TypeBayar' => $dataInput['TypeBayar'],
                  );
 
                  // delete old file and upload new file if user do upload

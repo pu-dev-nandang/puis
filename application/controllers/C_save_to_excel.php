@@ -4866,4 +4866,393 @@ class C_save_to_excel extends CI_Controller
         header('Content-Disposition: attachment; filename=catalog.xlsx'); // jalan ketika tidak menggunakan ajax
         $objWriter->save('php://output'); // jalan ketika tidak menggunakan ajax
     }
+
+
+    // Agregator System Excel  ///
+
+    public function akreditasi_eksternal(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        //$data = $this->m_save_to_excel->_getCumulativeRecap($data_arr);
+        $data = $this->db->query('SELECT a.LembagaID, a.Type, a.Scope, a.Level, a.DueDate, a.Description, b.Lembaga 
+                                FROM db_agregator.external_accreditation AS a
+                                INNER JOIN db_agregator.lembaga_surview AS b ON (a.LembagaID = b.ID)')->result_array();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        //$pr = 'REKAP IPS IPK '.$data_arr['Year'];
+        $pr = 'DATA AKREDITASI EKSTERNAL';
+
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '33cccc')
+            )
+        );
+
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:G1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama Lembaga"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Jenis Sertifikat");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Lingkup");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Tingkat");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Masa Berlaku");
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Keterangan");
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
+    
+        $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
+
+        if(count($data)>0){
+             $i=0;
+            foreach ($data AS $item){
+                // Buat header tabel nya pada baris ke 3
+                $no = $i + 1;
+                $newDate = date("d-m-Y", strtotime($item['DueDate']));
+
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $no);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['Lembaga']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['Type']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['Scope']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $item['Level']);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $newDate);
+                $excel->setActiveSheetIndex(0)->setCellValue('G'.$numrow, $item['Description']);
+                //$excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $item['IPK']);
+
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $numrow += 1;
+            };
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
+
+    public function akreditasi_international(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $data = $this->db->query('SELECT iap.*, ls.Lembaga, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.international_accreditation_prodi iap
+                                        LEFT JOIN db_agregator.lembaga_surview ls ON (ls.ID = iap.LembagaID)
+                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = iap.ProdiID)')->result_array();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $pr = 'DATA AKREDITASI INTERNASIONAL';
+
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '33cccc')
+            )
+        );
+
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:F1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama Lembaga"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Program Studi");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Status/ Peringkat");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Masa Berlaku");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Keterangan");
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+        //$excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
+    
+        $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
+
+        if(count($data)>0){
+             $i=0;
+            foreach ($data AS $item){
+                // Buat header tabel nya pada baris ke 3
+                $no = $i + 1;
+                $newDate = date("d-m-Y", strtotime($item['DueDate']));
+
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $no);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['Lembaga']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['ProdiName']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['Status']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $newDate);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['Description']);
+                //$excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $item['IPK']);
+
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                //$excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $numrow += 1;
+            };
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
+
+
+    public function excel_audit_keuangan_eksternal(){
+        $token = $this->input->post('token');
+        $data_arr = $this->getInputToken($token);
+
+        $data = $this->db->query('SELECT fae.*, lu.Lembaga FROM db_agregator.financial_external_audit fae
+                                  LEFT JOIN db_agregator.lembaga_audit lu ON (lu.ID = fae.LembagaAuditID')->result_array();
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $pr = 'DATA AUDIT KEUANGAN EKSTERNAL';
+
+        // Settingan awal fil excel
+        $excel->getProperties()->setCreator('IT PU')
+            ->setLastModifiedBy('IT PU')
+            ->setTitle($pr)
+            ->setSubject($pr)
+            ->setDescription($pr)
+            ->setKeywords($pr);
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => '33cccc')
+            )
+        );
+
+
+        $style_col_fill = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', $pr); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
+        $excel->getActiveSheet()->mergeCells('A1:F1'); // Set Merge Cell pada kolom A1 sampai O1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(TRUE); // Set bold kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(15); // Set font size 15 untuk kolom A1
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
+
+
+        // Buat header tabel nya pada baris ke 3
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama Lembaga"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Program Studi");
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Status/ Peringkat");
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Masa Berlaku");
+        $excel->setActiveSheetIndex(0)->setCellValue('F3', "Keterangan");
+
+        // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+        $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
+        //$excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
+    
+        $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
+
+        if(count($data)>0){
+             $i=0;
+            foreach ($data AS $item){
+                // Buat header tabel nya pada baris ke 3
+                $no = $i + 1;
+                $newDate = date("d-m-Y", strtotime($item['DueDate']));
+
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $no);
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['Lembaga']);
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$numrow, $item['ProdiName']);
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$numrow, $item['Status']);
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$numrow, $newDate);
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$numrow, $item['Description']);
+                //$excel->setActiveSheetIndex(0)->setCellValue('H'.$numrow, $item['IPK']);
+
+                // Apply style header yang telah kita buat tadi ke masing-masing kolom header
+                $excel->getActiveSheet()->getStyle('A'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('B'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('C'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('D'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('E'.$numrow)->applyFromArray($style_col_fill);
+                $excel->getActiveSheet()->getStyle('F'.$numrow)->applyFromArray($style_col_fill);
+                //$excel->getActiveSheet()->getStyle('G'.$numrow)->applyFromArray($style_col_fill);
+                $numrow += 1;
+            };
+        }
+
+        foreach(range('A','Z') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+
+        // Proses file excel
+        $filename = str_replace(' ','_',$pr).".xlsx";
+        //$FILEpath = "./dokument/".$filename;
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
+
+
+
+
 }

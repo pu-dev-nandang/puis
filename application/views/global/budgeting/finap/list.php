@@ -30,6 +30,19 @@
             </div>  
           </div>
         </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="form-group">
+              <label>Type</label>
+              <select class="form-control TypePaymentSelect">
+                   <option value = "%" selected>All</option>
+                   <option value = "Spb">SPB</option>
+                   <option value = "Cash Advance">Cash Advance</option>
+                   <option value = "Bank Advance">Bank Advance</option>
+               </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 </div>
@@ -93,7 +106,7 @@ $(document).off('click', '#Month').on('click', '#Month',function(e) {
   LoadDataForTable();
 })
 
-$(document).off('change', '#RealisasiStatus').on('change', '#RealisasiStatus',function(e) {
+$(document).off('change', '#RealisasiStatus,.TypePaymentSelect').on('change', '#RealisasiStatus,.TypePaymentSelect',function(e) {
   LoadDataForTable();
 })
 
@@ -107,7 +120,8 @@ function LoadDataForTable()
                   '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Payment</th>'+
 	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Department</th>'+
 	                '<th  rowspan = "2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
-	                '<th  colspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
+                  '<th  colspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Realisasi</th>'+
+                  '<th  rowspan ="2" style = "text-align: center;background: #20485A;color: #FFFFFF;">Vendor & Paid Date</th>'+
               '</tr>'+
               '<tr>'+
                 '<td style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</td>'+
@@ -129,10 +143,12 @@ function Get_data_payment(){
    var Years = $('#Years option:selected').val();
    var Month = $('#Month option:selected').val();
    var RealisasiStatus = $('#RealisasiStatus option:selected').val();
+   var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
    	var data = {
          Years : Years,
          Month : Month,
          RealisasiStatus : RealisasiStatus,
+         TypePaymentSelect : TypePaymentSelect,
    	};
    	var token = jwt_encode(data,"UAP)(*");
 
@@ -169,7 +185,10 @@ function Get_data_payment(){
 	    	       var StatusPayFin = ListPR[1].StatusPayFin;
 	    	       var RealisasiStatus = ListPR[1].RealisasiStatus;
                var RealisasiTotal = ListPR[1].RealisasiTotal;
-	    	       var ReminderTotal = ListPR[1].ReminderTotal;
+               var ReminderTotal = ListPR[1].ReminderTotal;
+               var NamaSupplier = (ListPR[1].NamaSupplier != null && ListPR[1].NamaSupplier != '') ? ListPR[1].NamaSupplier : '-';
+	    	       var PostingDatePaid = NamaSupplier+'<br>'+ListPR[1].PostingDatePaid;
+               
 	    	       var CodeSPB = ListPR[1].CodeSPB;
 	    	       var TypePay = ListPR[1].TypePay;
 	    	       var Perihal = ListPR[1].Perihal;
@@ -190,7 +209,8 @@ function Get_data_payment(){
 	    	      if (Code_po_create != '') {
 	    	      	 Payment += '<br>PR Code : '+PRHTML;
 	    	      }
-	    	      Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+              // Payment += '<br>Created : '+data[parseInt(data.length) - 2];
+	    	      Payment += '<br>Created : '+ListPR[1].PayNameCreatedBy;
 	    	       
 	    	       $( row ).find('td:eq(1)').html(Payment);
     		    	
@@ -220,8 +240,10 @@ function Get_data_payment(){
     		    		htmlrealisasi += '<br><div style = "color:red;">Realiasi Approval not yet</div>';
     		    	}
     		    	$( row ).find('td:eq(4)').html(htmlrealisasi);
-    		    	$( row ).find('td:eq(4)').attr('align','center');
-
+              $( row ).find('td:eq(4)').attr('align','center');
+    		    	$( row ).find('td:eq(6)').attr('align','center');
+              $(row).find('td:eq(6)').html(PostingDatePaid);
+              // $(row).find('td:eq(7)').html(NamaSupplier);
               $( row ).find('td:eq(5)').html(htmlreminder);
 	    },
    	    "initComplete": function(settings, json) {

@@ -123,6 +123,7 @@
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Supplier</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Invoice</th>'+
 					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Left</th>'+
+					 				'<th style = "text-align: center;background: #20485A;color: #FFFFFF;">Paid</th>'+
 					 			'</tr>'+
 					 		'<thead>'+
 					 		'<tbody id="dataRow"></tbody>'+
@@ -197,6 +198,7 @@
 
 	       	    	$( row ).find('td:eq(4)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoicePO)+'</div>');
 	       	    	$( row ).find('td:eq(5)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoiceLeftPO)+'</div>');
+	       	    	$( row ).find('td:eq(6)').html('<div align = "left">'+formatRupiah(dtinvoice.InvoicePayPO)+'</div>');
 	       	    	if (dtinvoice.StatusPOI == 1) {
 	       	    		$( row ).attr('style','background-color:#8ED6EA;')
 	       	    	}
@@ -206,6 +208,12 @@
        	        def.resolve(json);
        	    }
        	});
+
+       	table.on( 'search.dt', function () {
+       	     $('#content_input').empty();
+       	     // $('.C_radio:first').prop('checked',true);
+       	     // $('.C_radio:first:checked').trigger('change');
+       	} );
        return def.promise();
 	}
 
@@ -495,6 +503,21 @@
 		return h;
 	}
 
+	function OPTypeBayar(TypeBayar=null,Dis='')
+	{
+		// console.log(TypeBayar);
+		var temp = ['Transfer','Giro'];
+		var h = '';
+		h = '<select class = " form-control dtTypeBayar" style = "width : 80%" '+Dis+'>';
+			for (var i = 0; i < temp.length; i++) {
+				var selected = (TypeBayar == temp[i]) ? 'selected' : '';
+				h += '<option value = "'+temp[i]+'" '+selected+' >'+temp[i]+'</option>';
+			}
+		h += '</select>';
+
+		return h;	
+	}
+
 	function makeDomSPBAdd(action,ID_spb_created,number,se_content)
 	{
 		var Code = $('.C_radio_pr:checked').attr('code');
@@ -593,8 +616,8 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
-		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "">'+
+								'<div class="input-group input-append date datetimepicker2" style= "width:50%;">'+
+		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "<?php echo date('Y-m-d') ?>">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+
 							'</td>	'+			
@@ -620,7 +643,12 @@
 									'Mohon dibayarkan / ditransfer kepada'+
 								'</td>'+
 								'<td>'+
-									'<b>'+Supplier+'</b>'+
+									'<div class = "col-xs-5">'+
+										'<b>'+Supplier+'</b>'+
+									'</div>'+
+									'<div class = "col-xs-5 col-md-offset-1">'+
+										OPTypeBayar()+
+									'</div>'+	
 								'</td>'+
 							'</tr>'+
 							'<tr style="height: 50px;">'+
@@ -772,9 +800,9 @@
 		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
 		var dtspb = dt_arr.dtspb;
 		// console.log(dtspb);
-		var Invoice = 0;
-		var TypePay = "Transfer";
-		var ID_bank = 7;
+		var Invoice = parseInt(InvoiceleftPO);
+		var TypePay = "Cash";
+		var ID_bank = 0;
 		var NoRekening = "";
 		var Nama_Penerima = "";
 		var Date_Needed = "";
@@ -881,7 +909,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								OPTypePay(TypePay,Dis)+	
+								OPTypePay(TypePay,'disabled')+	
 							'</td>'+		
 						'</tr>'+
 						'<tr>'+
@@ -966,11 +994,14 @@
 
 			// show page realisasi
 			var DataPaymentSelected = dt_arr;
-			if (DataPaymentSelected.dtspb[0].Status == 2) {
+			// console.log(DataPaymentSelected);
+			if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 				var DivPageRealisasi = se_content.find('.BAAdd');
 				makePagerealisasi(DataPaymentSelected,DivPageRealisasi); 
 			}
 		}
+
+		$('.TypePay').trigger('change');
 
 	}
 
@@ -1089,7 +1120,7 @@
 		DivPageRealisasi.find('.datetimepicker').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
 		});
-
+		// console.log(Realisasi);
 		if (Realisasi.length > 0) {
 			makeSignaturesRealiasi(DivPageRealisasi,JsonStatus);
 			makeActionRealisasi(DivPageRealisasi,Realisasi);
@@ -1108,7 +1139,7 @@
 		var btn_approve = '';
 		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
 		var btn_reject = '';
-		var btn_print = '';
+		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -1324,7 +1355,7 @@
 		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
 		var dtspb = dt_arr.dtspb;
 		// console.log(dtspb);
-		var Invoice = 0;
+		var Invoice = parseInt(InvoiceleftPO);
 		var TypePay = "Cash";
 		var ID_bank = 0;
 		var NoRekening = "";
@@ -1441,6 +1472,17 @@
 						'</tr>'+
 						'<tr>'+
 							'<td class="TD1">'+
+								'Nama Penerima'+
+							'</td>'+
+							'<td class="TD2">'+
+								':'+
+							'</td>'+
+							'<td>'+
+								'<input type = "text" class = "form-control Nama_Penerima" placeholder="Nama Penerima" value = "'+Nama_Penerima+'" '+Dis+'>'+
+							'</td>'+		
+						'</tr>'+
+						'<tr>'+
+							'<td class="TD1">'+
 								'Dibutuhkan pada tanggal:'+
 							'</td>'+
 							'<td class="TD2">'+
@@ -1489,7 +1531,8 @@
 
 			// show page realisasi
 			var DataPaymentSelected = dt_arr;
-			if (DataPaymentSelected.dtspb[0].Status == 2) {
+			// console.log(DataPaymentSelected);
+			if (DataPaymentSelected.dtspb[0].Status == 2 && DataPaymentSelected.dtspb[0].FinanceAP.length > 0) {
 				var DivPageRealisasi = se_content.find('.CAAdd');
 				makePagerealisasica(DataPaymentSelected,DivPageRealisasi); 
 			}
@@ -1521,6 +1564,7 @@
 		var StatusRealiasi = '';
 		var btn_hide_submit = '';
 		var btnRealisasi = '<button class="btn btn-success submitRealisasiCA '+btn_hide_submit+'" '+Dis+'> Submit</button>';
+		var PettyCashHtml = 'Auto Generate by System';
 		if (Realisasi.length > 0) { // exist
 			Dis = 'disabled';
 			StatusRealiasi = Realisasi[0].Status;
@@ -1543,6 +1587,9 @@
 			NoTandaTerima = Realisasi[0].NoTandaTerima;
 			Date_Realisasi = Realisasi[0].Date_Realisasi;
 			JsonStatus = jQuery.parseJSON(Realisasi[0]['JsonStatus']);
+
+			var CodePettyCash = Realisasi[0]['CodePettyCash'];
+			PettyCashHtml = '<a href = "javascript:void(0)" class ="ViewPettyCash" code = "'+CodePettyCash+'" ID_Realisasi = "'+ID_Realisasi+'">'+CodePettyCash+'</a>';
 		}
 
 		html += '<div class = "row realisasi_page" ID_Realisasi = "'+ID_Realisasi+'">'+
@@ -1593,6 +1640,17 @@
 				                		'</div>'+
 									'</td>	'+			
 								'</tr>'+
+								'<tr>'+
+									'<td class="TD1">'+
+										'Petty Cash'+
+									'</td>'+
+									'<td class="TD2">'+
+										':'+
+									'</td>'+
+									'<td>'+
+										PettyCashHtml+
+									'</td>	'+			
+								'</tr>'+
 							'</tbody>'+
 						'</table>'+
 						'<div id="r_signatures_realisasi"></div>'+
@@ -1629,7 +1687,7 @@
 		var btn_approve = '';
 		// var btn_reject = '<button class="btn btn-inverse" id="Reject_realisasi" action="reject">Reject</button>';
 		var btn_reject = '';
-		var btn_print = '';
+		var btn_print = '<button class="btn btn-default print_page_realisasi"> <i class="fa fa-print" aria-hidden="true"></i> Print</button>';
 		var Status = dtspb[0]['Status'];
 		switch(Status) {
 		  case 0:
@@ -1769,7 +1827,7 @@
 									'<div class="form-group">'+
 										'<label class = "col-sm-2">No Document</label>'+	
 											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...."></div>'+
-										'<label class = "col-sm-1">Upload Document</label>'+
+										'<label class = "col-sm-1">Upload</label>'+
 											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf"></div>'+
 									'</div>'+
 					'</div>'+				
@@ -1777,7 +1835,7 @@
 									'<div class="form-group">'+
 										'<label class = "col-sm-2">No Tanda Terima</label>'	+
 											'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoTandaTerimaGRPO" placeholder = "Input No Tanda Terima...."></div>'+
-										'<label class = "col-sm-1">Upload Tanda Terima</label>'+
+										'<label class = "col-sm-1">Upload</label>'+
 											'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseTTGRPO" id="BrowseTTGRPO" accept="image/*,application/pdf"></div>'+
 									'</div>'+
 					'</div>'+
@@ -1976,124 +2034,134 @@
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var Departement = IDDepartementPUBudget;
-		var ID_payment = ev.attr('id_payment');
-		var ID_budget_left = 0;
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var Departement = IDDepartementPUBudget;
+			var ID_payment = ev.attr('id_payment');
+			var ID_budget_left = 0;
+			var form_data = new FormData();
 
-		if ( ev.find('.BrowseInvoice').length ) {
-			var UploadFile = ev.find('.BrowseInvoice')[0].files;
-			form_data.append("UploadInvoice[]", UploadFile[0]);
+			if ( ev.find('.BrowseInvoice').length ) {
+				var UploadFile = ev.find('.BrowseInvoice')[0].files;
+				form_data.append("UploadInvoice[]", UploadFile[0]);
+			}
+
+			if ( ev.find('.BrowseTT').length ) {
+				var UploadFile = ev.find('.BrowseTT')[0].files;
+				form_data.append("UploadTandaTerima[]", UploadFile[0]);
+			}
+
+			var NoInvoice = ev.find('.NoInvoice').val();
+			var NoTandaTerima = ev.find('.NoTT').val();
+			var Datee = ev.find('.TglSPB').val();
+			var Perihal = ev.find('.Perihal').val();
+			var No_Rekening = ev.find('.NoRekening').val();
+			var ID_bank = ev.find('.dtbank option:selected').val();
+			var Invoice = ev.find('.Money_Pembayaran').val();
+			Invoice = findAndReplace(Invoice, ".","");
+			var TypeInvoice = ev.find('.TypePembayaran').attr('type');
+			var TypeBayar = ev.find('.dtTypeBayar option:selected').val();
+
+			var data = {
+				Code_po_create : Code_po_create,
+				Departement : Departement,
+				ID_budget_left : ID_budget_left,
+				NoInvoice : NoInvoice,
+				NoTandaTerima :NoTandaTerima,
+				Datee :Datee,
+				Perihal : Perihal,
+				No_Rekening : No_Rekening,
+				ID_bank : ID_bank,
+				Invoice : Invoice,
+				TypeInvoice  : TypeInvoice,
+				TypeBayar : TypeBayar,
+				ID_payment : ID_payment,
+				action : action,
+			};
+			// console.log(data);return;
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+
+			var data_verify = {
+				Code_po_create : Code_po_create,
+				InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+				InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+			};
+
+			var token2 = jwt_encode(data_verify,"UAP)(*");
+			form_data.append('token2',token2);
+
+			var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
+			form_data.append('token3',token3);
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var url = base_url_js + "budgeting/submitspb"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		if (data.Change == 1) {
+			  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+			  			setTimeout(function () {
+			  				Get_data_po().then(function(data){
+			  					$('.C_radio_pr:first').prop('checked',true);
+			  					$('.C_radio_pr:first').trigger('change');
+			  					loadingEnd(500);
+			  				})
+			  			},1000);
+			  			// load first load data
+			  			
+			  		}
+			  		else
+			  		{
+			  			loadingEnd(500);
+			  			toastr.error("Connection Error, Please try again", 'Error!!');
+			  		}
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			Get_data_po().then(function(data){
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  				loadingEnd(500);
+			  			})
+			  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+			  		},1500);
+			  	}
+			  	
+			  	$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    nmbtn = 'Submit';
+			    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+			  }
+			})
+		}
+		else
+		{
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
 
-		if ( ev.find('.BrowseTT').length ) {
-			var UploadFile = ev.find('.BrowseTT')[0].files;
-			form_data.append("UploadTandaTerima[]", UploadFile[0]);
-		}
-
-		var NoInvoice = ev.find('.NoInvoice').val();
-		var NoTandaTerima = ev.find('.NoTT').val();
-		var Datee = ev.find('.TglSPB').val();
-		var Perihal = ev.find('.Perihal').val();
-		var No_Rekening = ev.find('.NoRekening').val();
-		var ID_bank = ev.find('.dtbank option:selected').val();
-		var Invoice = ev.find('.Money_Pembayaran').val();
-		Invoice = findAndReplace(Invoice, ".","");
-		var TypeInvoice = ev.find('.TypePembayaran').attr('type');
-
-		var data = {
-			Code_po_create : Code_po_create,
-			Departement : Departement,
-			ID_budget_left : ID_budget_left,
-			NoInvoice : NoInvoice,
-			NoTandaTerima :NoTandaTerima,
-			Datee :Datee,
-			Perihal : Perihal,
-			No_Rekening : No_Rekening,
-			ID_bank : ID_bank,
-			Invoice : Invoice,
-			TypeInvoice  : TypeInvoice,
-			ID_payment : ID_payment,
-			action : action,
-		};
-
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-
-		var data_verify = {
-			Code_po_create : Code_po_create,
-			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
-			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
-		};
-
-		var token2 = jwt_encode(data_verify,"UAP)(*");
-		form_data.append('token2',token2);
-
-		var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
-		form_data.append('token3',token3);
-
-		// pass po_detail agar dapat approval
-		var po_detail = ClassDt.po_data.po_detail;
-		var temp = [];
-		for (var i = 0; i < po_detail.length; i++) {
-			var arr = po_detail[i];
-			var token_ = jwt_encode(arr,"UAP)(*");
-			temp.push(token_);
-		}
-
-		var token4 = jwt_encode(temp,"UAP)(*");
-		form_data.append('token4',token4);
-
-		var url = base_url_js + "budgeting/submitspb"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		if (data.Change == 1) {
-		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
-		  			setTimeout(function () {
-		  				Get_data_po().then(function(data){
-		  					$('.C_radio_pr:first').prop('checked',true);
-		  					$('.C_radio_pr:first').trigger('change');
-		  					loadingEnd(500);
-		  				})
-		  			},1000);
-		  			// load first load data
-		  			
-		  		}
-		  		else
-		  		{
-		  			loadingEnd(500);
-		  			toastr.error("Connection Error, Please try again", 'Error!!');
-		  		}
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			Get_data_po().then(function(data){
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  				loadingEnd(500);
-		  			})
-		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
-		  		},1500);
-		  	}
-		  	
-		  	$('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    nmbtn = 'Submit';
-		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
-		  }
-		})
 	}
 
 	function validation(arr)
@@ -2352,7 +2420,7 @@
 								':'+
 							'</td>'+
 							'<td>'+
-								'<div class="input-group input-append date datetimepicker" style= "width:50%;">'+
+								'<div class="input-group input-append date datetimepicker2" style= "width:50%;">'+
 		                            '<input data-format="yyyy-MM-dd" class="form-control TglSPB" type=" text" readonly="" value = "'+dtspb[0].Detail[0]['Datee']+'">'+
 		                            '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
 		                		'</div>'+
@@ -2379,7 +2447,12 @@
 									'Mohon dibayarkan / ditransfer kepada'+
 								'</td>'+
 								'<td>'+
-									'<b>'+Supplier+'</b>'+
+									'<div class = "col-xs-5">'+
+										'<b>'+Supplier+'</b>'+
+									'</div>'+
+									'<div class = "col-xs-5 col-md-offset-1">'+
+										OPTypeBayar(dtspb[0].Detail[0]['TypeBayar'],'disabled')+
+									'</div>'+	
 								'</td>'+
 							'</tr>'+
 							'<tr style="height: 50px;">'+
@@ -2768,7 +2841,7 @@
 												'<div class="col-sm-4">'+'<input type = "text" class = "form-control NoDocument" placeholder = "Input No Document...." value="'+dtgood_receipt_spb[i]['NoDocument']+'" disabled><br>'+
 												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileDocument+'" target="_blank" class = "Fileexist">File Document</a>'+
 												'</div>'+
-											'<label class = "col-sm-1">Upload Document</label>'+
+											'<label class = "col-sm-1">Upload</label>'+
 												'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseDocument" id="BrowseDocument" accept="image/*,application/pdf" disabled>'+
 												'</div>'+
 										'</div>'+
@@ -2780,7 +2853,7 @@
 												'<a href = "'+base_url_js+'fileGetAny/budgeting-grpo-'+FileTandaTerima+'" target="_blank" class = "Fileexist">File Tanda Terima'+
 												'</a>'+
 												'</div>'+
-											'<label class = "col-sm-1">Upload Tanda Terima</label>'+
+											'<label class = "col-sm-1">Upload</label>'+
 												'<div class="col-sm-4">'+'<input type="file" data-style="fileinput" class="BrowseTTGRPO" id="BrowseTTGRPO" accept="image/*,application/pdf" disabled>'+
 												'</div>'+
 										'</div>'+
@@ -3044,125 +3117,133 @@
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var Departement = IDDepartementPUBudget;
-		var ID_payment = ev.attr('ID_payment');
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var Departement = IDDepartementPUBudget;
+			var ID_payment = ev.attr('ID_payment');
+			var form_data = new FormData();
 
-		if ( ev2.find('.BrowseDocument').length ) {
-			var UploadFile = ev2.find('.BrowseDocument')[0].files;
-			form_data.append("FileDocument[]", UploadFile[0]);
-		}
-		
-		if ( ev2.find('.BrowseTTGRPO').length ) {
-			var UploadFile = ev2.find('.BrowseTTGRPO')[0].files;
-			form_data.append("FileTandaTerima[]", UploadFile[0]);
-		}
-
-		var NoDocument = ev2.find('.NoDocument').val();
-		var NoTandaTerima = ev2.find('.NoTandaTerimaGRPO').val();
-		var ID_budget_left = 0;
-
-		var arr_item = [];
-		ev2.find('.Item').each(function(){
-			var ID_po_detail = $(this).find('option:selected').val();
-			var ev2 = $(this).closest('.GroupingItem');
-			var QtyDiterima = ev2.find('.QtyDiterima').val();
-			var temp = {
-				ID_po_detail : ID_po_detail,
-				QtyDiterima : QtyDiterima,
+			if ( ev2.find('.BrowseDocument').length ) {
+				var UploadFile = ev2.find('.BrowseDocument')[0].files;
+				form_data.append("FileDocument[]", UploadFile[0]);
 			}
-			arr_item.push(temp);
-		})
+			
+			if ( ev2.find('.BrowseTTGRPO').length ) {
+				var UploadFile = ev2.find('.BrowseTTGRPO')[0].files;
+				form_data.append("FileTandaTerima[]", UploadFile[0]);
+			}
 
-		var ID_good_receipt_spb = ev2.find('.btn-delete-grpo').attr('id_good_receipt_spb');
-		if (ID_good_receipt_spb == '' || ID_good_receipt_spb == undefined || ID_good_receipt_spb == null ) {
-			var action2 = 'add';
-			ID_good_receipt_spb = '';
+			var NoDocument = ev2.find('.NoDocument').val();
+			var NoTandaTerima = ev2.find('.NoTandaTerimaGRPO').val();
+			var ID_budget_left = 0;
+
+			var arr_item = [];
+			ev2.find('.Item').each(function(){
+				var ID_po_detail = $(this).find('option:selected').val();
+				var ev2 = $(this).closest('.GroupingItem');
+				var QtyDiterima = ev2.find('.QtyDiterima').val();
+				var temp = {
+					ID_po_detail : ID_po_detail,
+					QtyDiterima : QtyDiterima,
+				}
+				arr_item.push(temp);
+			})
+
+			var ID_good_receipt_spb = ev2.find('.btn-delete-grpo').attr('id_good_receipt_spb');
+			if (ID_good_receipt_spb == '' || ID_good_receipt_spb == undefined || ID_good_receipt_spb == null ) {
+				var action2 = 'add';
+				ID_good_receipt_spb = '';
+			}
+			else
+			{
+				var action2 = 'edit';
+			}
+
+			var data = {
+				Code_po_create : Code_po_create,
+				Departement : Departement,
+				ID_budget_left : ID_budget_left,
+				NoDocument : NoDocument,
+				NoTandaTerima :NoTandaTerima,
+				ID_payment : ID_payment,
+				action : action,
+				action2 : action2,
+				arr_item : arr_item,
+				TglGRPO : ev2.find('.TglGRPO').val(),
+				po_data : ClassDt.po_data,
+				ID_good_receipt_spb : ID_good_receipt_spb,
+			};
+			// console.log(data);
+			// return false;
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+
+			var data_verify = {
+				Code_po_create : Code_po_create,
+				InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+				InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+			};
+
+			var token2 = jwt_encode(data_verify,"UAP)(*");
+			form_data.append('token2',token2);
+
+			// var url = base_url_js + "budgeting/submit"
+			var url = base_url_js + "budgeting/submitgrpo"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		if (data.Change == 1) {
+			  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+			  			setTimeout(function () {
+			  				Get_data_po().then(function(data){
+			  					$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  					$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  					loadingEnd(500);
+			  				})
+			  			},1000);
+			  			// load first load data
+			  			
+			  		}
+			  		else
+			  		{
+			  			toastr.error("Connection Error, Please try again", 'Error!!');
+			  			loadingEnd(500);
+			  		}
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			Get_data_po().then(function(data){
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  				loadingEnd(500);
+			  			})
+			  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+			  		},1500);
+			  	}
+			    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			    
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    nmbtn = 'Submit';
+			    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+			  }
+			})
 		}
 		else
 		{
-			var action2 = 'edit';
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
-
-		var data = {
-			Code_po_create : Code_po_create,
-			Departement : Departement,
-			ID_budget_left : ID_budget_left,
-			NoDocument : NoDocument,
-			NoTandaTerima :NoTandaTerima,
-			ID_payment : ID_payment,
-			action : action,
-			action2 : action2,
-			arr_item : arr_item,
-			TglGRPO : ev2.find('.TglGRPO').val(),
-			po_data : ClassDt.po_data,
-			ID_good_receipt_spb : ID_good_receipt_spb,
-		};
-		// console.log(data);
-		// return false;
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-
-		var data_verify = {
-			Code_po_create : Code_po_create,
-			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
-			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
-		};
-
-		var token2 = jwt_encode(data_verify,"UAP)(*");
-		form_data.append('token2',token2);
-
-		// var url = base_url_js + "budgeting/submit"
-		var url = base_url_js + "budgeting/submitgrpo"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		if (data.Change == 1) {
-		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
-		  			setTimeout(function () {
-		  				Get_data_po().then(function(data){
-		  					$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  					$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  					loadingEnd(500);
-		  				})
-		  			},1000);
-		  			// load first load data
-		  			
-		  		}
-		  		else
-		  		{
-		  			toastr.error("Connection Error, Please try again", 'Error!!');
-		  			loadingEnd(500);
-		  		}
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			Get_data_po().then(function(data){
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  				loadingEnd(500);
-		  			})
-		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
-		  		},1500);
-		  	}
-		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		    
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    nmbtn = 'Submit';
-		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
-		  }
-		})
+		
 	}
 
 	$(document).off('click', '.btnEditInputGRPO').on('click', '.btnEditInputGRPO',function(e) {
@@ -3282,114 +3363,123 @@
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var Departement = IDDepartementPUBudget;
-		var ID_payment = ev.attr('id_payment');
-		var ID_budget_left = 0;
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var Departement = IDDepartementPUBudget;
+			var ID_payment = ev.attr('id_payment');
+			var ID_budget_left = 0;
+			var form_data = new FormData();
 
-		var Biaya = ev.find('.Money_Pembayaran').val();
-		Biaya = findAndReplace(Biaya, ".","");
-		var TypePay = ev.find('.TypePay').val();
-		var Perihal = ev.find('.Perihal').text();
-		var No_Rekening = ev.find('.NoRekening').val();
-		var ID_bank = ev.find('.dtbank option:selected').val();
-		if (TypePay == 'Cash') {
-			ID_bank = 0;
+			var Biaya = ev.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			var TypePay = ev.find('.TypePay').val();
+			var Perihal = ev.find('.Perihal').text();
+			var No_Rekening = ev.find('.NoRekening').val();
+			var ID_bank = ev.find('.dtbank option:selected').val();
+			if (TypePay == 'Cash') {
+				ID_bank = 0;
+			}
+			var Nama_Penerima = ev.find('.Nama_Penerima').val();
+			var Date_Needed = ev.find('.TglBA').val();
+
+			var data = {
+				Code_po_create : Code_po_create,
+				Departement : Departement,
+				ID_budget_left : ID_budget_left,
+				Biaya : Biaya,
+				TypePay : TypePay,
+				Perihal : Perihal,
+				No_Rekening : No_Rekening,
+				ID_bank : ID_bank,
+				Nama_Penerima : Nama_Penerima,
+				Date_Needed : Date_Needed,
+				ID_payment : ID_payment,
+				action : action,
+			};
+
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+
+			var data_verify = {
+				Code_po_create : Code_po_create,
+				InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+				InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+			};
+
+			var token2 = jwt_encode(data_verify,"UAP)(*");
+			form_data.append('token2',token2);
+
+			var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
+			form_data.append('token3',token3);
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var url = base_url_js + "budgeting/submitba"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		if (data.Change == 1) {
+			  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+			  			setTimeout(function () {
+			  				Get_data_po().then(function(data){
+			  					$('.C_radio_pr:first').prop('checked',true);
+			  					$('.C_radio_pr:first').trigger('change');
+			  					loadingEnd(500);
+			  				})
+			  			},1000);
+			  			// load first load data
+			  			
+			  		}
+			  		else
+			  		{
+			  			// toastr.error("Connection Error, Please try again", 'Error!!');
+			  			toastr.error(data.msg, 'Error!!');
+			  			loadingEnd(500);
+			  		}
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			Get_data_po().then(function(data){
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  				loadingEnd(500);
+			  			})
+			  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+			  		},1500);
+			  	}
+			    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    nmbtn = 'Submit';
+			    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+			  }
+			})
 		}
-		var Nama_Penerima = ev.find('.Nama_Penerima').val();
-		var Date_Needed = ev.find('.TglBA').val();
-
-		var data = {
-			Code_po_create : Code_po_create,
-			Departement : Departement,
-			ID_budget_left : ID_budget_left,
-			Biaya : Biaya,
-			TypePay : TypePay,
-			Perihal : Perihal,
-			No_Rekening : No_Rekening,
-			ID_bank : ID_bank,
-			Nama_Penerima : Nama_Penerima,
-			Date_Needed : Date_Needed,
-			ID_payment : ID_payment,
-			action : action,
-		};
-
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-
-		var data_verify = {
-			Code_po_create : Code_po_create,
-			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
-			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
-		};
-
-		var token2 = jwt_encode(data_verify,"UAP)(*");
-		form_data.append('token2',token2);
-
-		var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
-		form_data.append('token3',token3);
-
-		// pass po_detail agar dapat approval
-		var po_detail = ClassDt.po_data.po_detail;
-		var temp = [];
-		for (var i = 0; i < po_detail.length; i++) {
-			var arr = po_detail[i];
-			var token_ = jwt_encode(arr,"UAP)(*");
-			temp.push(token_);
+		else
+		{
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
-
-		var token4 = jwt_encode(temp,"UAP)(*");
-		form_data.append('token4',token4);
-
-		var url = base_url_js + "budgeting/submitba"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		if (data.Change == 1) {
-		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
-		  			setTimeout(function () {
-		  				Get_data_po().then(function(data){
-		  					$('.C_radio_pr:first').prop('checked',true);
-		  					$('.C_radio_pr:first').trigger('change');
-		  					loadingEnd(500);
-		  				})
-		  			},1000);
-		  			// load first load data
-		  			
-		  		}
-		  		else
-		  		{
-		  			loadingEnd(500);
-		  			toastr.error("Connection Error, Please try again", 'Error!!');
-		  		}
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			Get_data_po().then(function(data){
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  				loadingEnd(500);
-		  			})
-		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
-		  		},1500);
-		  	}
-		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    nmbtn = 'Submit';
-		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
-		  }
-		})
+		
 	}
 
 
@@ -3414,10 +3504,10 @@
 			var ev2 = $(this).closest('.pageFormInput');
 			ev2.find('input').not('.TglBA').prop('disabled',false);
 			ev2.find('button').prop('disabled',false);
-			ev2.find('select').prop('disabled',false);
-			ev2.find('.dtbank[tabindex!="-1"]').select2({
-			    //allowClear: true
-			});
+			// ev2.find('select').prop('disabled',false);
+			// ev2.find('.dtbank[tabindex!="-1"]').select2({
+			//     //allowClear: true`
+			// });
 			$(this).remove();
 			ev2.find('.TypePay').trigger('change');
 		}
@@ -3491,114 +3581,122 @@
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var Departement = IDDepartementPUBudget;
-		var ID_payment = ev.attr('id_payment');
-		var ID_budget_left = 0;
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var Departement = IDDepartementPUBudget;
+			var ID_payment = ev.attr('id_payment');
+			var ID_budget_left = 0;
+			var form_data = new FormData();
 
-		var Biaya = ev.find('.Money_Pembayaran').val();
-		Biaya = findAndReplace(Biaya, ".","");
-		var TypePay = ev.find('.TypePay').val();
-		var Perihal = ev.find('.Perihal').text();
-		var No_Rekening = '';
-		var ID_bank = ev.find('.dtbank option:selected').val();
-		if (TypePay == 'Cash') {
-			ID_bank = 0;
+			var Biaya = ev.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			var TypePay = ev.find('.TypePay').val();
+			var Perihal = ev.find('.Perihal').text();
+			var No_Rekening = '';
+			var ID_bank = ev.find('.dtbank option:selected').val();
+			if (TypePay == 'Cash') {
+				ID_bank = 0;
+			}
+			var Nama_Penerima = ev.find('.Nama_Penerima').val();
+			var Date_Needed = ev.find('.TglCA').val();
+
+			var data = {
+				Code_po_create : Code_po_create,
+				Departement : Departement,
+				ID_budget_left : ID_budget_left,
+				Biaya : Biaya,
+				TypePay : TypePay,
+				Perihal : Perihal,
+				No_Rekening : No_Rekening,
+				ID_bank : ID_bank,
+				Nama_Penerima : Nama_Penerima,
+				Date_Needed : Date_Needed,
+				ID_payment : ID_payment,
+				action : action,
+			};
+
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+
+			var data_verify = {
+				Code_po_create : Code_po_create,
+				InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
+				InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
+			};
+
+			var token2 = jwt_encode(data_verify,"UAP)(*");
+			form_data.append('token2',token2);
+
+			var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
+			form_data.append('token3',token3);
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var url = base_url_js + "budgeting/submitca";
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		if (data.Change == 1) {
+			  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
+			  			setTimeout(function () {
+			  				Get_data_po().then(function(data){
+			  					$('.C_radio_pr:first').prop('checked',true);
+			  					$('.C_radio_pr:first').trigger('change');
+			  					loadingEnd(500);
+			  				})
+			  			},1000);
+			  			// load first load data
+			  		}
+			  		else
+			  		{
+			  			// toastr.error("Connection Error, Please try again", 'Error!!');
+			  			toastr.error(data.msg, 'Error!!');
+			  			loadingEnd(500);
+			  		}
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			Get_data_po().then(function(data){
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  				loadingEnd(500);
+			  			})
+			  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
+			  		},1500);
+			  	}
+			    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    nmbtn = 'Submit';
+			    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
+			  }
+			})
 		}
-		var Nama_Penerima = sessionName;
-		var Date_Needed = ev.find('.TglCA').val();
-
-		var data = {
-			Code_po_create : Code_po_create,
-			Departement : Departement,
-			ID_budget_left : ID_budget_left,
-			Biaya : Biaya,
-			TypePay : TypePay,
-			Perihal : Perihal,
-			No_Rekening : No_Rekening,
-			ID_bank : ID_bank,
-			Nama_Penerima : Nama_Penerima,
-			Date_Needed : Date_Needed,
-			ID_payment : ID_payment,
-			action : action,
-		};
-
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-
-		var data_verify = {
-			Code_po_create : Code_po_create,
-			InvoicePO : $('.C_radio_pr:checked').attr('invoicepo'),
-			InvoiceLeftPO : $('.C_radio_pr:checked').attr('invoiceleftpo'),
-		};
-
-		var token2 = jwt_encode(data_verify,"UAP)(*");
-		form_data.append('token2',token2);
-
-		var token3 = jwt_encode(ClassDt.po_data,"UAP)(*");
-		form_data.append('token3',token3);
-
-		// pass po_detail agar dapat approval
-		var po_detail = ClassDt.po_data.po_detail;
-		var temp = [];
-		for (var i = 0; i < po_detail.length; i++) {
-			var arr = po_detail[i];
-			var token_ = jwt_encode(arr,"UAP)(*");
-			temp.push(token_);
+		else
+		{
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
-
-		var token4 = jwt_encode(temp,"UAP)(*");
-		form_data.append('token4',token4);
-
-		var url = base_url_js + "budgeting/submitca"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		if (data.Change == 1) {
-		  			toastr.info('Terjadi perubahan data, halaman akan direfresh');
-		  			setTimeout(function () {
-		  				Get_data_po().then(function(data){
-		  					$('.C_radio_pr:first').prop('checked',true);
-		  					$('.C_radio_pr:first').trigger('change');
-		  					loadingEnd(500);
-		  				})
-		  			},1000);
-		  			// load first load data
-		  			
-		  		}
-		  		else
-		  		{
-		  			loadingEnd(500);
-		  			toastr.error("Connection Error, Please try again", 'Error!!');
-		  		}
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			Get_data_po().then(function(data){
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  				loadingEnd(500);
-		  			})
-		  			//window.location.href = base_url_js+'budgeting_menu/pembayaran/spb';
-		  		},1500);
-		  	}
-		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    nmbtn = 'Submit';
-		    ev.find(elementbtn).prop('disabled',false).html(nmbtn);
-		  }
-		})
+		
 	}
 
 	$(document).off('click', '.btnEditInputCA').on('click', '.btnEditInputCA',function(e) {
@@ -3738,7 +3836,19 @@
 			}
 			else
 			{
-				toastr.info('Tidak bisa tambah payment, Karena payment sebelumnya belum selesai');
+				// console.log(dtspb);
+				if (dtspb[0].Status == 2) {
+					// get number last
+					var number = $('.FormPage:last').attr('number');
+					number = parseInt(number) + 1;
+					template_html = __template_html('add','',number);
+					$('#content_input').append(template_html);
+				}
+				else
+				{
+					toastr.info('Tidak bisa tambah payment, Karena payment sebelumnya belum selesai');
+				}
+				
 			}
 			// console.log(data);
 		})
@@ -3855,76 +3965,104 @@
 	function submitBA_realisasi(elementbtn,ev,action)
 	{
 		loadingStart();
+
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var ID_Realisasi = ev.attr('ID_Realisasi');
-		var row = ev.closest('.FormPage');
-		var ID_payment = row.attr('ID_payment');
-		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
-		var DataPaymentSelected = dt_arr;
-		var dtspb = DataPaymentSelected.dtspb;
-		var Detail = dtspb[0].Detail;
-		var ID_payment_type = Detail[0].ID; // ID Cash Advance
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var ID_Realisasi = ev.attr('ID_Realisasi');
+			var row = ev.closest('.FormPage');
+			var ID_payment = row.attr('ID_payment');
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+			var DataPaymentSelected = dt_arr;
+			var dtspb = DataPaymentSelected.dtspb;
+			var Detail = dtspb[0].Detail;
+			var ID_payment_type = Detail[0].ID; // ID Cash Advance
+			var form_data = new FormData();
 
-		if ( ev.find('.BrowseInvoice').length ) {
-			var UploadFile = ev.find('.BrowseInvoice')[0].files;
-			form_data.append("UploadInvoice[]", UploadFile[0]);
+			if ( ev.find('.BrowseInvoice').length ) {
+				var UploadFile = ev.find('.BrowseInvoice')[0].files;
+				form_data.append("UploadInvoice[]", UploadFile[0]);
+			}
+
+			if ( ev.find('.BrowseTT').length ) {
+				var UploadFile = ev.find('.BrowseTT')[0].files;
+				form_data.append("UploadTandaTerima[]", UploadFile[0]);
+			}
+
+			
+			var NoInvoice = ev.find('.NoInvoice').val();
+			var NoTandaTerima = ev.find('.NoTT').val();
+			var Date_Realisasi = ev.find('.TglRealisasiBA').val();
+
+			var data = {
+				ID_Realisasi : ID_Realisasi,
+				NoInvoice : NoInvoice,
+				NoTandaTerima : NoTandaTerima,
+				Date_Realisasi : Date_Realisasi,
+				ID_payment_type : ID_payment_type,
+				ID_payment : ID_payment,
+				action : action,
+			};
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var Departement = IDDepartementPUBudget;
+			form_data.append('Departement',Departement);
+			var ev1= ev.closest('.FormPage');
+			var Biaya = ev1.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			form_data.append('Biaya',Biaya);
+
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+			var url = base_url_js + "budgeting/submitba_realisasi_by_po"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		loadingEnd(500);
+			  		toastr.error("Connection Error, Please try again", 'Error!!');
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			Get_data_po().then(function(data){
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  				loadingEnd(500);
+			  			})
+			  		},1500);
+			  	}
+			    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    loadingEnd(500);
+			  }
+			})
 		}
-
-		if ( ev.find('.BrowseTT').length ) {
-			var UploadFile = ev.find('.BrowseTT')[0].files;
-			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		else
+		{
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
-
 		
-		var NoInvoice = ev.find('.NoInvoice').val();
-		var NoTandaTerima = ev.find('.NoTT').val();
-		var Date_Realisasi = ev.find('.TglRealisasiBA').val();
-
-		var data = {
-			ID_Realisasi : ID_Realisasi,
-			NoInvoice : NoInvoice,
-			NoTandaTerima : NoTandaTerima,
-			Date_Realisasi : Date_Realisasi,
-			ID_payment_type : ID_payment_type,
-			ID_payment : ID_payment,
-			action : action,
-		};
-
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-		var url = base_url_js + "budgeting/submitba_realisasi_by_po"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		loadingEnd(500);
-		  		toastr.error("Connection Error, Please try again", 'Error!!');
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			Get_data_po().then(function(data){
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  				$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  				loadingEnd(500);
-		  			})
-		  		},1500);
-		  	}
-		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    loadingEnd(500);
-		  }
-		})
 	}
 
 	$(document).off('click', '.submitRealisasiCA').on('click', '.submitRealisasiCA',function(e) {
@@ -3995,73 +4133,101 @@
 	{
 		loadingStart();
 		var Code_po_create = $('.C_radio_pr:checked').attr('code');
-		var ID_Realisasi = ev.attr('ID_Realisasi');
-		var row = ev.closest('.FormPage');
-		var ID_payment = row.attr('ID_payment');
-		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
-		var DataPaymentSelected = dt_arr;
-		var dtspb = DataPaymentSelected.dtspb;
-		var Detail = dtspb[0].Detail;
-		var ID_payment_type = Detail[0].ID; // ID Cash Advance
-		var form_data = new FormData();
+		if (Code_po_create != '' && Code_po_create != null && Code_po_create != undefined ) {
+			var ID_Realisasi = ev.attr('ID_Realisasi');
+			var row = ev.closest('.FormPage');
+			var ID_payment = row.attr('ID_payment');
+			var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+			var DataPaymentSelected = dt_arr;
+			var dtspb = DataPaymentSelected.dtspb;
+			var Detail = dtspb[0].Detail;
+			var ID_payment_type = Detail[0].ID; // ID Cash Advance
+			var form_data = new FormData();
 
-		if ( ev.find('.BrowseInvoice').length ) {
-			var UploadFile = ev.find('.BrowseInvoice')[0].files;
-			form_data.append("UploadInvoice[]", UploadFile[0]);
+			if ( ev.find('.BrowseInvoice').length ) {
+				var UploadFile = ev.find('.BrowseInvoice')[0].files;
+				form_data.append("UploadInvoice[]", UploadFile[0]);
+			}
+
+			if ( ev.find('.BrowseTT').length ) {
+				var UploadFile = ev.find('.BrowseTT')[0].files;
+				form_data.append("UploadTandaTerima[]", UploadFile[0]);
+			}
+
+			
+			var NoInvoice = ev.find('.NoInvoice').val();
+			var NoTandaTerima = ev.find('.NoTT').val();
+			var Date_Realisasi = ev.find('.TglRealisasiCA').val();
+
+			var data = {
+				ID_Realisasi : ID_Realisasi,
+				NoInvoice : NoInvoice,
+				NoTandaTerima : NoTandaTerima,
+				Date_Realisasi : Date_Realisasi,
+				ID_payment_type : ID_payment_type,
+				ID_payment : ID_payment,
+				action : action,
+			};
+
+			var token = jwt_encode(data,"UAP)(*");
+			form_data.append('token',token);
+
+			// pass po_detail agar dapat approval
+			var po_detail = ClassDt.po_data.po_detail;
+			var temp = [];
+			for (var i = 0; i < po_detail.length; i++) {
+				var arr = po_detail[i];
+				var token_ = jwt_encode(arr,"UAP)(*");
+				temp.push(token_);
+			}
+
+			var token4 = jwt_encode(temp,"UAP)(*");
+			form_data.append('token4',token4);
+
+			var Departement = IDDepartementPUBudget;
+			form_data.append('Departement',Departement);
+			var ev1= ev.closest('.FormPage');
+			var Biaya = ev1.find('.Money_Pembayaran').val();
+			Biaya = findAndReplace(Biaya, ".","");
+			form_data.append('Biaya',Biaya);
+
+			var url = base_url_js + "budgeting/submitca_realisasi_by_po"
+			$.ajax({
+			  type:"POST",
+			  url:url,
+			  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+			  contentType: false,       // The content type used when sending data to the server.
+			  cache: false,             // To unable request pages to be cached
+			  processData:false,
+			  dataType: "json",
+			  success:function(data)
+			  {
+			  	if (data.Status == 0) {
+			  		loadingEnd(500);
+			  		toastr.error("Connection Error, Please try again", 'Error!!');
+			  	}
+			  	else{
+			  		toastr.success('Saved');
+			  		setTimeout(function () {
+			  			$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
+			  			$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
+			  			loadingEnd(500);
+			  		},1500);
+			  	}
+			    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
+			  },
+			  error: function (data) {
+			    toastr.error("Connection Error, Please try again", 'Error!!');
+			    loadingEnd(500);
+			  }
+			})
 		}
-
-		if ( ev.find('.BrowseTT').length ) {
-			var UploadFile = ev.find('.BrowseTT')[0].files;
-			form_data.append("UploadTandaTerima[]", UploadFile[0]);
+		else
+		{
+			toastr.info('Please Choose PO / SPK');
+			loadingEnd(500);
 		}
-
 		
-		var NoInvoice = ev.find('.NoInvoice').val();
-		var NoTandaTerima = ev.find('.NoTT').val();
-		var Date_Realisasi = ev.find('.TglRealisasiCA').val();
-
-		var data = {
-			ID_Realisasi : ID_Realisasi,
-			NoInvoice : NoInvoice,
-			NoTandaTerima : NoTandaTerima,
-			Date_Realisasi : Date_Realisasi,
-			ID_payment_type : ID_payment_type,
-			ID_payment : ID_payment,
-			action : action,
-		};
-
-		var token = jwt_encode(data,"UAP)(*");
-		form_data.append('token',token);
-		var url = base_url_js + "budgeting/submitca_realisasi_by_po"
-		$.ajax({
-		  type:"POST",
-		  url:url,
-		  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-		  contentType: false,       // The content type used when sending data to the server.
-		  cache: false,             // To unable request pages to be cached
-		  processData:false,
-		  dataType: "json",
-		  success:function(data)
-		  {
-		  	if (data.Status == 0) {
-		  		loadingEnd(500);
-		  		toastr.error("Connection Error, Please try again", 'Error!!');
-		  	}
-		  	else{
-		  		toastr.success('Saved');
-		  		setTimeout(function () {
-		  			$('.C_radio_pr[code="'+Code_po_create+'"]').prop('checked',true);
-		  			$('.C_radio_pr[code="'+Code_po_create+'"]').trigger('change');
-		  			loadingEnd(500);
-		  		},1500);
-		  	}
-		    $('html, body').animate({ scrollTop: $(".panel-primary:first").offset().top }, 'slow');
-		  },
-		  error: function (data) {
-		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    loadingEnd(500);
-		  }
-		})
 	}
 
 	$(document).off('click', '.btnEditInputRealisasiCA').on('click', '.btnEditInputRealisasiCA',function(e) {
@@ -4099,4 +4265,49 @@
 			toastr.info('Realisasi telah approve tidak bisa edit');
 		}	
 	})
+
+	$(document).off('click', '.print_page_realisasi').on('click', '.print_page_realisasi',function(e) {
+		var ev = $(this).closest('.FormPage');
+		var ID_payment = ev.attr('id_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+
+		var url = base_url_js+'save2pdf/print/pre_pembayaran_realisasi_po';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		}
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+	})
+
+	$(document).off('click', '.ViewPettyCash').on('click', '.ViewPettyCash',function(e) {
+		var CodePettyCash = $(this).attr('code');
+		var ID_Realisasi = $(this).attr('ID_Realisasi');
+		var ev = $(this).closest('.FormPage');
+		var ID_payment = ev.attr('id_payment');
+		var dt_arr = __getRsViewGRPO_SPB(ID_payment);
+		var po_data = ClassDt.po_data;
+		var Dataselected = ClassDt.Dataselected;
+		var url = base_url_js+'save2pdf/print/realisasi_petty_cash';
+		var data = {
+		  ID_payment : ID_payment,
+		  dt_arr : dt_arr,
+		  po_data : po_data,
+		  Dataselected : Dataselected,
+		  CodePettyCash : CodePettyCash,
+		}
+		// console.log(data);return;
+		var token = jwt_encode(data,"UAP)(*");
+		FormSubmitAuto(url, 'POST', [
+		    { name: 'token', value: token },
+		]);
+
+	})
+	
 </script>
