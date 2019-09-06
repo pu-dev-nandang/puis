@@ -5668,38 +5668,39 @@ class C_api extends CI_Controller {
                 $rs = array('msg' => '','status' => 1);
                 $formUpdate = (array) $data_arr['formUpdate'];
                 $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                    $urlAD = URLAD.'__api/Edit';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                    if ($is_url_exist) {
+                       if (array_key_exists('Access_Card_Number', $formUpdate)) {
+                            $pager = $formUpdate['Access_Card_Number'];
+                            if ($pager != '' && $pager != null) {
+                                $data_arr1 = [
+                                    'pager' => $pager,
+                                ];
+                                $UserID = explode('@', $formUpdate['EmailPU']);
+                                $UserID = $UserID[0];
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Type' => 'Employee',
+                                    'UserID' => $UserID,
+                                    'data_arr' => $data_arr1,
+                                );
 
-                $urlAD = URLAD.'__api/Edit';
-                $is_url_exist = $this->m_master->is_url_exist($urlAD);
-                if ($is_url_exist) {
-                   if (array_key_exists('Access_Card_Number', $formUpdate)) {
-                        $pager = $formUpdate['Access_Card_Number'];
-                        if ($pager != '' && $pager != null) {
-                            $data_arr1 = [
-                                'pager' => $pager,
-                            ];
-                            $UserID = explode('@', $formUpdate['EmailPU']);
-                            $UserID = $UserID[0];
-                            $data = array(
-                                'auth' => 's3Cr3T-G4N',
-                                'Type' => 'Employee',
-                                'UserID' => $UserID,
-                                'data_arr' => $data_arr1,
-                            );
-
-                            $url = URLAD.'__api/Edit';
-                            $token = $this->jwt->encode($data,"UAP)(*");
-                            $this->m_master->apiservertoserver($url,$token);
-                        }
-                   }
-                }
-                else
-                {
-                    $rs['msg'] = 'Windows active directory server not connected';
-                    $rs['status'] = 0;
-                    echo json_encode($rs);
-                    die(); // stop script
-                }
+                                $url = URLAD.'__api/Edit';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
+                            }
+                       }
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Windows active directory server not connected';
+                        $rs['status'] = 0;
+                        echo json_encode($rs);
+                        die(); // stop script
+                    }
+                }    
 
                 // Cek apakah delete photo atau tidak
                 if($data_arr['DeletePhoto']==1 || $data_arr['DeletePhoto']=='1'){
