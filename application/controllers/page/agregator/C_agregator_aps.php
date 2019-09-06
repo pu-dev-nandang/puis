@@ -74,7 +74,7 @@ class C_agregator_aps extends Globalclass {
         $data['listMenu'] = $dataMenu;
 
 
-        $content = $this->load->view('page/agregator/menu_agregator',$data,true);
+        $content = $this->load->view('page/agregator_aps/menu_agregator_aps',$data,true);
         $this->temp($content);
     }
 
@@ -85,18 +85,18 @@ class C_agregator_aps extends Globalclass {
         ))->result_array();
 
         $data['access'] = (count($dataSetting)>0) ? '1' : '0';
-        $page = $this->load->view('page/agregator/setting',$data,true);
+        $page = $this->load->view('page/agregator_aps/setting',$data,true);
         $this->menu_agregator($page);
 
 
     }
 
-    public function akreditasi_eksternal()
+    public function kerjasama_tridharma()
     {
-        $viewPage = 'akreditasi_eksternal';
+        $viewPage = 'kerjasama_tridharma';
         $accessUser = $this->agregatorPrevilege($viewPage);
         $data['accessUser'] = $accessUser;
-        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $page = $this->load->view('page/agregator_aps/'.$viewPage,$data,true);
         $this->menu_agregator($page);
     }
 

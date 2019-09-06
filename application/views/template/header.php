@@ -177,6 +177,12 @@
                             </li>
                         <?php } ?>
 
+                        <?php if(in_array(10,$rule_service)){ ?>
+                            <li class="<?php if($this->uri->segment(1)=='agregator-aps'){echo 'active';} ?>">
+                                <a href="<?php echo base_url('agregator-aps/kerjasama-tridharma'); ?>"><i class="fa fa-flag" aria-hidden="true"></i> Agregator (APS)</a>
+                            </li>
+                        <?php } ?>
+
                     </ul>
                 </li>
             <?php } ?>

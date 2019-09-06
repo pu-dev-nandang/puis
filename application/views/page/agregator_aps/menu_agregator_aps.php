@@ -1,18 +1,3 @@
-<style>
-.btn-circle {
-    width: 30px;
-    height: 30px;
-    padding: 6px 0px;
-    border-radius: 15px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.42857;
-}
- 
-.btn-round{
-    border-radius: 8px;
-}
-</style> 
 
 
 <style>
@@ -40,33 +25,36 @@
     <div class="col-md-2" id="menuLeft">
 
         <div>
-            <a href="<?= base_url('agregator/setting'); ?>" class="btn btn-primary btn-block btn-round"><i class="fa fa-cog"></i> Setting</a>
+            <select class="form-control" id="filterProdi"></select>
             <hr/>
         </div>
 
         <div class="panel-group" id="accordion">
 
 
-            <?php foreach ($listMenu AS $item){ ?>
+            <?php foreach ($listMenu AS $item){
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse_<?= $item['ID']; ?>">
-                        <h4 class="panel-title">
-                            <?= $item['Name']; ?>
-                        </h4>
-                    </a>
-                </div>
-                <div id="collapse_<?= $item['ID']; ?>" class="panel-collapse collapse">
-                    <div class="list-group">
-                        <?php foreach ($item['Menu'] AS $itm2){ ?>
-                            <a href="<?= base_url($itm2['URL']); ?>" class="list-group-item"><?= $itm2['Name']; ?></a>
-                        <?php } ?>
+                if(count($item['Menu'])>0){
+                ?>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse_<?= $item['ID']; ?>">
+                            <h4 class="panel-title">
+                                <?= $item['Name']; ?>
+                            </h4>
+                        </a>
+                    </div>
+                    <div id="collapse_<?= $item['ID']; ?>" class="panel-collapse collapse">
+                        <div class="list-group">
+                            <?php foreach ($item['Menu'] AS $itm2){ ?>
+                                <a href="<?= base_url($itm2['URL']); ?>" class="list-group-item"><?= $itm2['Name']; ?></a>
+                            <?php } ?>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <?php } ?>
+            <?php } } ?>
 
         </div>
     </div>
@@ -93,25 +81,8 @@
         elm.parent().parent().addClass('in');
 
 
+        loadSelectOptionBaseProdi('#filterProdi','');
 
-
-        //var elm2 = $('#"'+base_url_js+'agregator/<?//= $this->uri->segment(2); ?>//"]');
-
-
-        //console.log(elm.attr('id'));
-        //
-        //var IDMenu =  $('#data_');
-        //
-        //
-        //var MyMenu = JSON.parse('<?//= $MyMenu; ?>//');
-        //
-        //console.log(IDMenu);
-        //console.log(MyMenu);
-        //
-        //var v = ($.inArray(IDMenu,MyMenu)!=-1) ? '1' : '0';
-        //$('#dataView').val(v);
-
-        //         elm.attr('id', 'classAct');
 
 
     });

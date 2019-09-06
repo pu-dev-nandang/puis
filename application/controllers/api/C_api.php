@@ -8196,8 +8196,11 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='viewDocumentSkripsi'){
 
                 $NPM = $data_arr['NPM'];
-                $data = $this->db->get_where('db_academic.final_project_files',
-                    array('NPM' => $NPM))->result_array();
+                $data = $this->db->query('SELECT fpf.*, fp.Status AS StatusFinalProject 
+                                                                FROM db_academic.final_project_files fpf 
+                                                                LEFT JOIN db_academic.final_project fp 
+                                                                ON (fp.NPM = fpf.NPM) 
+                                                                WHERE fpf.NPM = "'.$NPM.'"')->result_array();
 
                 return print_r(json_encode($data));
 
@@ -8226,31 +8229,85 @@ class C_api extends CI_Controller {
 
                 $NPM = $data_arr['NPM'];
 
-                $result = [];
+                // Get data Final Project
 
-                for($i=1;$i<=2;$i++){
-                    $Type = $i;
-                    $data = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fp.Status, fp.TitleInd, fp.TitleEng, 
-                                                    em1.Name AS M1_Name, em1.TitleAhead AS M1_TitleAhead, em1.TitleBehind AS M1_TitleBehind,
-                                                    em2.Name AS M2_Name, em2.TitleAhead AS M2_TitleAhead, em2.TitleBehind AS M2_TitleBehind
+                $dataFinalProject = $this->db->query('SELECT fp.*, em1.Name AS M1_Name, em1.TitleAhead AS M1_TitleAhead, em1.TitleBehind AS M1_TitleBehind, 
+                                                             em2.Name AS M2_Name, em2.TitleAhead AS M2_TitleAhead, em2.TitleBehind AS M2_TitleBehind
+                                                             FROM db_academic.final_project fp
+                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+                                                            LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                            WHERE fp.NPM="'.$NPM.'"')->result_array();
+
+                // Jadwal Sidang Proposal Pertama
+                $sidang1 = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fpss.Status
                                                     FROM db_academic.final_project_schedule fps
                                                     LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
                                                     LEFT JOIN db_academic.final_project_schedule_student fpss ON (fpss.FPSID = fps.ID)
-                                                    LEFT JOIN db_academic.final_project fp ON (fp.NPM = fpss.NPM)
-                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
-                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
-                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
-                                                    WHERE fps.Type = "'.$Type.'" AND fpss.NPM = "'.$NPM.'" ')->result_array();
+                                                    WHERE fps.Type = "1" AND fpss.NPM = "'.$NPM.'" ')->result_array();
 
-                    if(count($data)>0){
-                        $data[0]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
+                if(count($sidang1)>0){
+                    $sidang1[0]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
-                                                              WHERE fpsl.FPSID = "'.$data[0]['ID'].'"')->result_array();
+                                                              WHERE fpsl.FPSID = "'.$sidang1[0]['ID'].'"')->result_array();
+                }
+
+                // Jadwal sidang 1 remidial
+                $sidang1_remidi = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fpss.Status
+                                                    FROM db_academic.final_project_schedule fps
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                    LEFT JOIN db_academic.final_project_schedule_student fpss ON (fpss.FPSID = fps.ID)
+                                                    WHERE fps.Type = "3" AND fpss.NPM = "'.$NPM.'" ')->result_array();
+
+                if(count($sidang1_remidi)>0){
+                    for($i=0;$i<count($sidang1_remidi);$i++){
+                        $sidang1_remidi[$i]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                              WHERE fpsl.FPSID = "'.$sidang1_remidi[$i]['ID'].'"')->result_array();
                     }
 
-                    $arr = (count($data)>0) ? $data[0] : [];
-                    array_push($result,$arr);
                 }
+
+
+
+                // Jadwal Sidang Hasil
+                $sidang2 = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fpss.Status
+                                                    FROM db_academic.final_project_schedule fps
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                    LEFT JOIN db_academic.final_project_schedule_student fpss ON (fpss.FPSID = fps.ID)
+                                                    WHERE fps.Type = "2" AND fpss.NPM = "'.$NPM.'" ')->result_array();
+
+                if(count($sidang2)>0){
+                    $sidang2[0]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                              WHERE fpsl.FPSID = "'.$sidang2[0]['ID'].'"')->result_array();
+                }
+
+                // Jadwal sidang 2 remidial
+                $sidang2_remidi = $this->db->query('SELECT fps.*, cl.Room, fpss.Notes, fpss.Status
+                                                    FROM db_academic.final_project_schedule fps
+                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                    LEFT JOIN db_academic.final_project_schedule_student fpss ON (fpss.FPSID = fps.ID)
+                                                    WHERE fps.Type = "4" AND fpss.NPM = "'.$NPM.'" ')->result_array();
+
+                if(count($sidang2_remidi)>0){
+                    for($i=0;$i<count($sidang2_remidi);$i++){
+                        $sidang2_remidi[$i]['Examiner'] = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                              WHERE fpsl.FPSID = "'.$sidang2_remidi[$i]['ID'].'"')->result_array();
+                    }
+
+                }
+
+                $result = array(
+                    'dataTA' => $dataFinalProject,
+                    'Sidang1' => $sidang1,
+                    'Sidang1_Remidi' => $sidang1_remidi,
+                    'Sidang2' => $sidang2,
+                    'Sidang2_Remidi' => $sidang2_remidi
+                );
+
+
 
 
 
