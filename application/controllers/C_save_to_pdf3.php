@@ -976,9 +976,10 @@ class C_save_to_pdf3 extends CI_Controller {
         $FontIsianHeader = 10;
         $FontIsian = 10;
         $h = 10;
-        $fpdf->SetFont('Arial','B',12);
+        $fpdf->SetFont('Arial','B',7);
         $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
         $y += 15;
+        $fpdf->SetFont('Arial','B',12);
         $fpdf->SetXY($x,$y);
         $fpdf->Cell(0,0, 'YAYASAN PENDIDIKAN AGUNG PODOMORO / YPAP', 0, 1, 'L', 0);
         $y += 15;
