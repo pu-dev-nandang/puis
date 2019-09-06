@@ -743,7 +743,7 @@ $route['save2pdf/print/payment_user'] =  'C_save_to_pdf3/payment_user';
 $route['save2pdf/print/pre_pembayaran_realisasi_po'] =  'C_save_to_pdf3/pre_pembayaran_realisasi_po';
 $route['save2pdf/print/payment_user_realisasi'] =  'C_save_to_pdf3/payment_user_realisasi';
 $route['save2pdf/print/realisasi_petty_cash'] =  'C_save_to_pdf3/realisasi_petty_cash';
-
+$route['save2pdf/print_akses_karyawan'] =  'C_save_to_pdf3/print_akses_karyawan';
 // ---- Save to EXCEL
 $route['save2excel/test'] =  'c_save_to_excel/test2';
 $route['save2excel/monitoring_score'] =  'c_save_to_excel/monitoring_score';

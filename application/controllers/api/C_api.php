@@ -5561,6 +5561,12 @@ class C_api extends CI_Controller {
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
                     $description = $G_div[0]['Description'];
+                    $arr_callback = array(
+                        'UsernamePCam' => $formInsert['NIP'],
+                        'UsernamePC' => '',
+                        'Password' => $Password,
+                        'EmailPU' => $formInsert['EmailPU'],
+                    );
                     if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
                     // if(true) {
                         // check url exist
@@ -5588,6 +5594,15 @@ class C_api extends CI_Controller {
                             // get email from AD
                             $arr_email = $callback['email'];
                             $formInsert['EmailPU'] = $arr_email[0];
+                            $UserID = explode('@', $formInsert['EmailPU']);
+                            $UserID = $UserID[0];
+                            $arr_callback = array(
+                                'UsernamePCam' => $formInsert['NIP'],
+                                'UsernamePC' => $UserID,
+                                'Password' => $Password,
+                                'EmailPU' => $formInsert['EmailPU'],
+                            );
+
                             // insert card number
                             if (array_key_exists('Access_Card_Number', $formInsert)) {
                                 $pager = $formInsert['Access_Card_Number'];
@@ -5595,8 +5610,6 @@ class C_api extends CI_Controller {
                                     $data_arr = [
                                         'pager' => $pager,
                                     ];
-                                    $UserID = explode('@', $formInsert['EmailPU']);
-                                    $UserID = $UserID[0];
                                     $data = array(
                                         'auth' => 's3Cr3T-G4N',
                                         'Type' => 'Employee',
@@ -5621,7 +5634,7 @@ class C_api extends CI_Controller {
 
                     }     
                     // end AD
-
+                    $rs['arr_callback'] = $arr_callback; // for callback
                     $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
                     $this->db->insert('db_employees.employees',$formInsert);
 
