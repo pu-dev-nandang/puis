@@ -89,7 +89,10 @@ class C_save_to_pdf3 extends CI_Controller {
         // Header
         $fpdf->SetXY($x,$y);
         $fpdf->SetFont('Arial','BU',12);
-        $fpdf->Cell(0,0, 'Purchase Order', 0, 1, 'C', 0);
+        $fpdf->SetX(90);
+        $fpdf->Cell(70,0, 'Purchase Order', 0, 0, 'L', 0);
+        $fpdf->SetFont('Arial','BI',6);
+        $fpdf->Cell(0,0, 'FM-UAP/PUR/02.03 Rev.1', 0, 1, 'L', 0);
         $fpdf->SetFont('Arial','B',$FontIsianHeader);
         $fpdf->Cell(0, 10, $Code, 0, 1, 'C', 0);
 
@@ -121,31 +124,69 @@ class C_save_to_pdf3 extends CI_Controller {
         // table
         // header
         $border = 1;
-        $w_no = 8;
-        $w_desc = 20;
-        $w_spec = 20;
-        $w_date_needed = 20;
-        $w_qty = 8;
-        $w_pricest = 25;
-        $w_pph = 15;
-        $w_disc = 15;
-        $w_anotcost = 25;
-        $w_totalammount = 35;
-        $h=4.4;
+        $w_no = 7;
+        $w_desc = 35;
+        $w_spec = 40;
+        $w_date_needed = 15;
+        $w_qty = 7;
+        $w_pricest = 20;
+        $w_pph = 8;
+        $w_disc = 14;
+        $w_anotcost = 18;
+        $w_totalammount = 27;
+        $h=8;
         $y = $fpdf->GetY();
         $fpdf->SetXY($x,$y);
         $fpdf->SetFillColor(255, 255, 255);
-         $fpdf->Cell($w_no,$h,'No.',$border,0,'C',true);
-         $fpdf->Cell($w_desc,$h,'Nama Barang',$border,0,'C',true);
-         $fpdf->Cell($w_spec,$h,'Specification',$border,0,'C',true);
-         $fpdf->Cell($w_date_needed,$h,'Date Needed',$border,0,'C',true);
-         $fpdf->Cell($w_qty,$h,'Qty',$border,0,'C',true);
-         $fpdf->Cell($w_pricest,$h,'Harga',$border,0,'C',true);
-         $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
-         $fpdf->Cell($w_disc,$h,'Discount',$border,0,'C',true);
-         $fpdf->Cell($w_anotcost,$h,'Another Cost',$border,0,'C',true);
-         $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
+         // $y_ = $fpdf->GetY();
+         // $fpdf->MultiCell($w_no,$h,'No.',$border,'C',true);
+         // $x = $x+$w_no;
+         // $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_desc,$h,'Nama Barang',$border,'C',true);
+         // $x = $x+$w_desc;
+         // $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_spec,$h,'Specification',$border,'C',true);
+         // $x = $x+$w_spec;
+         // $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_date_needed,4,'Date Needed',$border,'C',true);
+         // $x = $x+$w_date_needed;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_qty,$h,'Qty',$border,'C',true);
+         // $x = $x+$w_qty;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_pricest,$h,'Harga',$border,'C',true);
+         // $x = $x+$w_pricest;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_pph,$h,'PPN',$border,'C',true);
+         // $x = $x+$w_pph;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_disc,$h,'Discount',$border,'C',true);
+         // $x = $x+$w_disc;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_anotcost,$h,'Another Cost',$border,'C',true);
+         // $x = $x+$w_anotcost;
+         //          $fpdf->SetXY($x,$y_);
+         // $fpdf->MultiCell($w_totalammount,$h,'Total Amount',$border,'C',true);
 
+        $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_pph,$w_disc,$w_anotcost,$w_totalammount));
+        $fpdf->SetLineHeight(5);
+        $fpdf->SetAligns(array('C','C','C','C','C','C','C','C','C','C'));
+
+        $fpdf->Row(array(
+           'No',
+           'Nama Barang',
+           'Specification',
+           'Date Needed',
+           'Qty',
+           'Harga',
+           'PPN',
+           'Discount',
+           'Another Cost',
+           'Total Amount',
+
+        ));
+
+         $h=4.4;
         // isi table
          $no = 1;
          $fpdf->SetFont('Arial','',$FontIsian);
@@ -154,29 +195,30 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->SetLineHeight(5);
          $fpdf->SetAligns(array('C','L','L','C','L','C','C','C','C','C'));
          $total = 0;
+         // $fpdf->SetFont('Arial','U',7);
          for ($i=0; $i < count($po_detail); $i++) { 
              $Spesification = '';
              $DetailCatalog = json_decode($po_detail[$i]['DetailCatalog'],true);
              foreach ($DetailCatalog as $key => $value) {
-                $Spesification .= $key.' : '.$value."\n";
+                $Spesification .= $key.' : '.$value.", ";
              }
 
-             if ($po_detail[$i]['Spec_add'] != '' && $po_detail[$i]['Spec_add'] != null) {
-                 $Spesification .= "\n";
-                 $Spesification .= $po_detail[$i]['Spec_add'];
-             }
+             // if ($po_detail[$i]['Spec_add'] != '' && $po_detail[$i]['Spec_add'] != null) {
+             //     $Spesification .= ",";
+             //     $Spesification .= $po_detail[$i]['Spec_add'];
+             // }
 
              $fpdf->Row(array(
                 $no,
-                $po_detail[$i]['Item']."\n".$po_detail[$i]['Desc'],
+                $po_detail[$i]['Item'],
                 $Spesification,
                 $po_detail[$i]['DateNeeded'],
                 $po_detail[$i]['QtyPR'],
-                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),
+                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],0,',','.'),
                 (int)$po_detail[$i]['PPN_PO'].'%',
                 (int)$po_detail[$i]['Discount_PO'].'%',
-                'Rp '.number_format($po_detail[$i]['AnotherCost'],2,',','.'),
-                'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),
+                'Rp '.number_format($po_detail[$i]['AnotherCost'],0,',','.'),
+                'Rp '.number_format($po_detail[$i]['Subtotal'],0,',','.'),
 
              ));
              $total += $po_detail[$i]['Subtotal'];
@@ -188,6 +230,7 @@ class C_save_to_pdf3 extends CI_Controller {
          $y = $fpdf->GetY();
          $x__ = $w_no+$w_desc+$w_spec+$w_date_needed+$w_qty+$w_pricest+$w_pph;
          $total2= 'Rp '.number_format($total,2,',','.');
+         $x = 10;
          $fpdf->SetXY($x,$y);
          $fpdf->Cell($x__,$h,'Total',$border,0,'L',true);
          $fpdf->Cell($w_disc+$w_anotcost+$w_totalammount,$h,$total2,$border,1,'C',true);
@@ -424,7 +467,7 @@ class C_save_to_pdf3 extends CI_Controller {
             $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
             $fpdf->Cell($w_col_tugas,$h,'PENANGGUNG JAWAB',$border,0,'L',true);
             $fpdf->Cell($w_col_titik2,$h,':',$border,0,'C',true);
-            $fpdf->Cell($w_col_value,$h,'LILY B. PUTRI & WIBOWO NGASERIN',$border,1,'L',true);
+            $fpdf->Cell($w_col_value,$h,'SIA LILY BRAMAPUTRI & WIBOWO NGASERIN',$border,1,'L',true);
 
             $fpdf->SetX($x); 
             $fpdf->Cell($w_no,$h,'',$border,0,'C',true);
@@ -555,7 +598,7 @@ class C_save_to_pdf3 extends CI_Controller {
                 $fpdf->SetFont('Arial','',$FontIsian);
                 $fpdf->Cell($w1,$h,'Item',1,0,'L',true);
                 $fpdf->Cell($w2,$h,'Qty',1,0,'L',true);
-                $fpdf->Cell($w3,$h,'UnitCost',1,0,'L',true);
+                $fpdf->Cell($w3,$h,'Unit Cost',1,0,'L',true);
                 $fpdf->Cell($w4,$h,'PPN(%)',1,0,'L',true);
                 $fpdf->Cell($w5,$h,'Total',1,1,'L',true);
 
@@ -565,9 +608,9 @@ class C_save_to_pdf3 extends CI_Controller {
                     $fpdf->Cell($w_no,$h,'',$border,0,'L',true);
                     $fpdf->Cell($w1,$h,$po_detail[$i]['Item'],1,0,'L',true);
                     $fpdf->Cell($w2,$h,$po_detail[$i]['QtyPR'],1,0,'L',true);
-                    $fpdf->Cell($w3,$h,'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),1,0,'L',true);
+                    $fpdf->Cell($w3,$h,'Rp '.number_format($po_detail[$i]['UnitCost_PO'],0,',','.'),1,0,'L',true);
                     $fpdf->Cell($w4,$h,(int)$po_detail[$i]['PPN_PO'],1,0,'L',true);
-                    $fpdf->Cell($w5,$h,'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),1,1,'L',true);
+                    $fpdf->Cell($w5,$h,'Rp '.number_format($po_detail[$i]['Subtotal'],0,',','.'),1,1,'L',true);
                     $total += $po_detail[$i]['Subtotal'];
                 }
 
@@ -577,7 +620,7 @@ class C_save_to_pdf3 extends CI_Controller {
             $fpdf->Cell($w_no,10,'',$border,0,'L',true);
             $fpdf->Cell($w_col_tugas, 10, 'HARGA TOTAL', 0, 0, 'L', 0);
             $fpdf->Cell($w_col_titik2,10,':',$border,0,'C',true);
-            $fpdf->Cell($w_col_value,10,'Rp '.number_format($total,2,',','.'),$border,1,'L',true);
+            $fpdf->Cell($w_col_value,10,'Rp '.number_format($total,0 ,',','.'),$border,1,'L',true);
 
             $fpdf->SetX($x); 
             $fpdf->SetFont('Arial','B',$FontIsian);
@@ -596,9 +639,9 @@ class C_save_to_pdf3 extends CI_Controller {
             $__mengerjakan($U_mengerjakan,$__w,$w_col_value,$border,$fpdf,$FontIsian,5);
             
             // NO PR
-            $fpdf->SetFont('Arial','',$FontIsian);
-            $fpdf->Cell(37.5, 20, 'No.PR        :        '.$po_detail[0]['PRCode'], 0, 1, 'L', 0);
-
+            //$fpdf->SetFont('Arial','',$FontIsian);
+            //$fpdf->Cell(37.5, 20, 'No.PR        :        '.$po_detail[0]['PRCode'], 0, 1, 'L', 0);
+            $fpdf->SetY($fpdf->GetY() + 20 );
             $fpdf->SetFont('Arial','B',$FontIsian);
             $fpdf->Cell(135, 5, 'PIHAK I', 0, 0, 'L', 0);
             $fpdf->Cell(37.5, 5, 'PIHAK II', 0, 1, 'L', 0);
@@ -606,7 +649,7 @@ class C_save_to_pdf3 extends CI_Controller {
             $fpdf->Cell(37.5, 5, strtoupper($po_create[0]['NamaSupplier']), 0, 1, 'L', 0);
             $fpdf->SetFont('Arial','BU',$FontIsian);
             $fpdf->ln(20);
-            $fpdf->Cell(135, 0, 'LILY B. PUTRI & WIBOWO NGASERIN', 0, 0, 'L', 0);
+            $fpdf->Cell(135, 0, 'SIA LILY BRAMAPUTRI & WIBOWO NGASERIN', 0, 0, 'L', 0);
             $fpdf->Cell(37.5, 0, strtoupper($po_create[0]['PICName']), 0, 1, 'L', 0);
             $fpdf->SetFont('Arial','B',$FontIsian);
             $fpdf->Cell(135, 5, 'WAKIL BENDAHARA & KETUA YAYASAN', 0, 0, 'L', 0);
@@ -933,9 +976,10 @@ class C_save_to_pdf3 extends CI_Controller {
         $FontIsianHeader = 10;
         $FontIsian = 10;
         $h = 10;
-        $fpdf->SetFont('Arial','B',12);
+        $fpdf->SetFont('Arial','B',7);
         $fpdf->Text(150, 15, 'FM-UAP/KEU-01.  06');
         $y += 15;
+        $fpdf->SetFont('Arial','B',12);
         $fpdf->SetXY($x,$y);
         $fpdf->Cell(0,0, 'YAYASAN PENDIDIKAN AGUNG PODOMORO / YPAP', 0, 1, 'L', 0);
         $y += 15;
