@@ -5537,6 +5537,7 @@ class C_api extends CI_Controller {
             }
 
             else if($data_arr['action']=='addEmployees'){
+                $rs = array('msg' => '','status' => 1);
                 $formInsert = (array) $data_arr['formInsert'];
 
                 // Cek apakah NIP sudah digunakan atau belum
@@ -5545,7 +5546,9 @@ class C_api extends CI_Controller {
                     array('NIP' => $NIP))->result_array();
 
                 if(count($dataN)>0) {
-                    return print_r(0);
+                    $rs['msg'] = 'NIK / NIP is exist';
+                    $rs['status'] = 0;
+                    // return print_r(0);
                 } else {
                     // check fill admin Prodi
                     $ProdiArr = (array) $data_arr['arr_Prodi'];
@@ -5558,6 +5561,65 @@ class C_api extends CI_Controller {
                     $Name = $formInsert['Name'];
                     $G_div = $this->m_master->caribasedprimary('db_employees.division','ID',$Division);
                     $description = $G_div[0]['Description'];
+                    if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                    // if(true) {
+                        // check url exist
+                        $urlAD = URLAD.'__api/Create';
+                        $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                        if ($is_url_exist) {
+                            // insert to make AD
+                            $data_arr = [
+                                [
+                                    'Name' => $Name,
+                                    'Password' => $Password,
+                                    'description' => $description,
+                                ],
+                            ];
+                            $data = array(
+                                'auth' => 's3Cr3T-G4N',
+                                'Type' => 'Employee',
+                                'data_arr' => $data_arr,
+                            );
+
+                            $url = $urlAD;
+                            $token = $this->jwt->encode($data,"UAP)(*");
+                            $callback = $this->m_master->apiservertoserver($url,$token);
+                            // print_r($callback);die();
+                            // get email from AD
+                            $arr_email = $callback['email'];
+                            $formInsert['EmailPU'] = $arr_email[0];
+                            // insert card number
+                            if (array_key_exists('Access_Card_Number', $formInsert)) {
+                                $pager = $formInsert['Access_Card_Number'];
+                                if ($pager != '' && $pager != null) {
+                                    $data_arr = [
+                                        'pager' => $pager,
+                                    ];
+                                    $UserID = explode('@', $formInsert['EmailPU']);
+                                    $UserID = $UserID[0];
+                                    $data = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Type' => 'Employee',
+                                        'UserID' => $UserID,
+                                        'data_arr' => $data_arr,
+                                    );
+
+                                    $url = URLAD.'__api/Edit';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver($url,$token);
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            $rs['msg'] = 'Windows active directory server not connected';
+                            $rs['status'] = 0;
+                            echo json_encode($rs);
+                            die(); // stop script
+                        }
+
+                    }     
                     // end AD
 
                     $formInsert['Password_Old'] = md5($formInsert['Password_Old']);
@@ -5596,32 +5658,50 @@ class C_api extends CI_Controller {
                     );
                     $this->db->insert('db_reservation.previleges_guser', $dataSave);
 
-                   if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
-                        // insert to make AD
-                        $data_arr = [
-                            [
-                                'Name' => $Name,
-                                'Password' => $Password,
-                                'description' => $description,
-                            ],
-                        ];
-                        $data = array(
-                            'auth' => 's3Cr3T-G4N',
-                            'Type' => 'Employee',
-                            'data_arr' => $data_arr,
-                        );
-
-                        $url = URLAD.'__api/Create';
-                        $token = $this->jwt->encode($data,"UAP)(*");
-                        $this->m_master->apiservertoserver($url,$token);
-                   }     
-                    // end
-
-                    return print_r(1);
+                    // return print_r(1);
                 }
+
+                echo json_encode($rs);
             }
 
             else if($data_arr['action']=='UpdateEmployees'){
+                $rs = array('msg' => '','status' => 1);
+                $formUpdate = (array) $data_arr['formUpdate'];
+                $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                // if(true) {
+                    $urlAD = URLAD.'__api/Edit';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                    if ($is_url_exist) {
+                       if (array_key_exists('Access_Card_Number', $formUpdate)) {
+                            $pager = $formUpdate['Access_Card_Number'];
+                            if ($pager != '' && $pager != null) {
+                                $data_arr1 = [
+                                    'pager' => $pager,
+                                ];
+                                $UserID = explode('@', $formUpdate['EmailPU']);
+                                $UserID = $UserID[0];
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Type' => 'Employee',
+                                    'UserID' => $UserID,
+                                    'data_arr' => $data_arr1,
+                                );
+
+                                $url = URLAD.'__api/Edit';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver($url,$token);
+                            }
+                       }
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Windows active directory server not connected';
+                        $rs['status'] = 0;
+                        echo json_encode($rs);
+                        die(); // stop script
+                    }
+                }    
 
                 // Cek apakah delete photo atau tidak
                 if($data_arr['DeletePhoto']==1 || $data_arr['DeletePhoto']=='1'){
@@ -5632,8 +5712,8 @@ class C_api extends CI_Controller {
 
                 }
 
-                $formUpdate = (array) $data_arr['formUpdate'];
-                $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
+                // $formUpdate = (array) $data_arr['formUpdate'];
+                // $formUpdate['Password_Old'] = md5($formUpdate['Password_Old']);
 
                 $this->db->where('NIP', $data_arr['NIP']);
                 $this->db->update('db_employees.employees',$formUpdate);
@@ -5681,7 +5761,8 @@ class C_api extends CI_Controller {
                     }
                 }
 
-                return print_r(1);
+                echo json_encode($rs);
+                // return print_r(1);
 
             }
 
@@ -8990,46 +9071,59 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
             else if($data_arr['action'] == 'updateBiodataStudent'){
+                $rs = array('msg' => '','status' => 1);
+                $dataUpdtAuth = (array) $data_arr['dataAuth'];
+                $NPM = $data_arr['NPM'];
+                // send to AD if input Access_Card_Number
+                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+                // if(true) {    
+                    // check url exist
+                    $urlAD = URLAD.'__api/Create';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                    if ($is_url_exist) {
+                        if (array_key_exists('Access_Card_Number', $dataUpdtAuth)) {
+                            if ($dataUpdtAuth['Access_Card_Number'] != '' && $dataUpdtAuth['Access_Card_Number'] != null) {
+                                // update to AD
+                                $data_arr1 = [
+                                    'pager' => $dataUpdtAuth['Access_Card_Number'] ,
+                                ];
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Type' => 'Student',
+                                    'UserID' => $NPM,
+                                    'data_arr' => $data_arr1,
+                                );
+
+                                $url = URLAD.'__api/Edit';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $rs['msg'] = 'Windows active directory server not connected';
+                        $rs['status'] = 0;
+                        echo json_encode($rs);
+                        die(); // stop script
+                    }
+                    
+                }
 
                 $DB_Student = $data_arr['DB_Student'];
-                $NPM = $data_arr['NPM'];
 
                 $dataUpdate = $data_arr['dataForm'];
                 $this->db->where('NPM', $NPM);
                 $this->db->update($DB_Student.'.students',$dataUpdate);
                 $this->db->reset_query();
 
-
-                $dataUpdtAuth = (array) $data_arr['dataAuth'];
                 $dataUpdtAuth['LastUpdate']=date('Y-m-d H:i:s');
                 $dataUpdtAuth['UpdatedBy'] = $this->session->userdata('NIP');
                 $this->db->where('NPM', $NPM);
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
-                $this->db->reset_query();
+                $this->db->reset_query();    
 
-                // send to AD if input Access_Card_Number
-                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
-                    if (array_key_exists('Access_Card_Number', $dataUpdtAuth)) {
-                        if ($dataUpdtAuth['Access_Card_Number'] != '' && $dataUpdtAuth['Access_Card_Number'] != null) {
-                            // update to AD
-                            $data_arr = [
-                                'pager' => $dataUpdtAuth['Access_Card_Number'] ,
-                            ];
-                            $data = array(
-                                'auth' => 's3Cr3T-G4N',
-                                'Type' => 'Student',
-                                'UserID' => $NPM,
-                                'data_arr' => $data_arr,
-                            );
-
-                            $url = URLAD.'__api/Edit';
-                            $token = $this->jwt->encode($data,"UAP)(*");
-                            $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
-                        }
-                    }
-                }    
-
-                return print_r(1);
+                echo json_encode($rs);
 
             }
 

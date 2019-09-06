@@ -1291,6 +1291,17 @@ class C_admission extends Admission_Controler {
     {
       // die();
 
+      // check koneksi AD
+      if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
+        $urlAD = URLAD.'__api/Create';
+        $is_url_exist = $this->m_master->is_url_exist($urlAD);
+        if (!$is_url_exist) {
+          $msg = 'Windows active directory server not connected';
+          echo json_encode($msg);
+          die(); // stop script
+        }
+      }  
+
       $input = $this->getInputToken();
       $msg = '';
       //check existing db

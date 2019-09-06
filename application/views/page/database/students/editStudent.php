@@ -408,11 +408,18 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStudent';
             $.post(url,{token:token},function (result) {
-                toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    $('#btnSaveBiodata').html('Save');
-                    $('.formBiodata,#btnSaveBiodata').prop('disabled',false);
-                },500);
+                if(result.status==0 || result.status=='0'){
+                    toastr.error(result.msg,'Error');
+                    $('#btnSaveBiodata').prop('disabled',false).html('Save');
+                }
+                else
+                {
+                    toastr.success('Data saved','Success');
+                    setTimeout(function () {
+                        $('#btnSaveBiodata').html('Save');
+                        $('.formBiodata,#btnSaveBiodata').prop('disabled',false);
+                    },500);
+                }
             });
 
         }
