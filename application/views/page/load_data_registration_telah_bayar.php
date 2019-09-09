@@ -52,7 +52,7 @@
 					'<tr>'+
 						'<td>'+no+'</td>'+
 						'<td>'+data_json[i]['Name']+'</td>'+
-						'<td>'+data_json[i]['Email']+'</td>'+
+						'<td>'+data_json[i]['Email']+'</br>'+data_json[i]['Phone']+'</td>'+
 						'<td>'+formatRupiah(data_json[i]['PriceFormulir'])+'</td>'+
 						// '<td>'+data_json[i]['VA_number']+'</td>'+
 						// '<td>'+data_json[i]['BilingID']+'</td>'+
@@ -61,7 +61,7 @@
 						'<td>'+data_json[i]['FormulirCode']+' / '+data_json[i]['No_Ref']+'</td>'+
 						'<td>'+data_json[i]['RegisterAT']+'</td>'+
 						'<td>'+data_json[i]['VerificationAT']+'</td>'+
-					'</tr>'	
+					'</tr>'
 					);
 				no++;
 			}
@@ -83,5 +83,5 @@
 		    //'backdrop' : 'static',
 		    'show' : true
 		});
-	}	
+	}
 </script>
