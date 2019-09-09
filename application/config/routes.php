@@ -1343,6 +1343,7 @@ $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditas
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+$route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
 
 
 

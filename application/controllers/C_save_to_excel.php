@@ -5510,12 +5510,149 @@ class C_save_to_excel extends CI_Controller
 
     }
 
+    public function excel_seleksi_mahasiswa_baru_by_prodi()
+    {
+        $this->load->model('master/m_master');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        $body = $Input['body'];
+        $footer = $Input['footer'];
+        $body = json_decode(json_encode($body),true);
+        $footer = json_decode(json_encode($footer),true);
 
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $Filename = 'excel-seleksi-mahasiswa-Prodi.xlsx';
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Tabel 2.a Seleksi Mahasiswa Baru");
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "Tahun Akademik");
+        $excel->getActiveSheet()->mergeCells('A3:A4');
+        $excel->getActiveSheet()->getStyle('A3:A4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Daya Tampung");
+        $excel->getActiveSheet()->mergeCells('B3:B4');
+        $excel->getActiveSheet()->getStyle('B3:B4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Jumlah Calon Mahasiswa");
+        $excel->getActiveSheet()->mergeCells('C3:D3');
+        $excel->getActiveSheet()->getStyle('C3:D3')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('E3', "Jumlah Mahasiswa Baru");
+        $excel->getActiveSheet()->mergeCells('E3:F3');
+        $excel->getActiveSheet()->getStyle('E3:F3')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Jumlah Mahasiswa Aktif");
+        $excel->getActiveSheet()->mergeCells('G3:H3');
+        $excel->getActiveSheet()->getStyle('G3:H3')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('C4', "Pendaftar");
+        $excel->getActiveSheet()->getStyle('C4')->applyFromArray($style_col);
+        $excel->setActiveSheetIndex(0)->setCellValue('D4', "Lulus Seleksi");
+        $excel->getActiveSheet()->getStyle('D4')->applyFromArray($style_col);
+        $excel->setActiveSheetIndex(0)->setCellValue('E4', "Reguler");
+        $excel->getActiveSheet()->getStyle('E4')->applyFromArray($style_col);
+        $excel->setActiveSheetIndex(0)->setCellValue('F4', "Transfer");
+        $excel->getActiveSheet()->getStyle('F4')->applyFromArray($style_col);
+        $excel->setActiveSheetIndex(0)->setCellValue('G4', "Reguler");
+        $excel->getActiveSheet()->getStyle('G4')->applyFromArray($style_col);;
+        $excel->setActiveSheetIndex(0)->setCellValue('H4', "Transfer");
+        $excel->getActiveSheet()->getStyle('H4')->applyFromArray($style_col);
+
+        $r = 5;
+        for ($i=0; $i < count($body); $i++) { 
+            $excel->setActiveSheetIndex(0)->setCellValue('A'.$r, $body[$i]['Year'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('B'.$r, $body[$i]['Capacity'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('C'.$r, $body[$i]['Registrant'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('D'.$r, $body[$i]['PassSelection'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('E'.$r, $body[$i]['Regular'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('F'.$r, $body[$i]['Transfer'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('G'.$r, $body[$i]['Regular2'] );   
+            $excel->setActiveSheetIndex(0)->setCellValue('H'.$r, $body[$i]['Transfer2'] );
+
+            $excel->getActiveSheet()->getStyle('A'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('B'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('C'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('D'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('E'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('F'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('G'.$r)->applyFromArray($style_row);
+            $excel->getActiveSheet()->getStyle('H'.$r)->applyFromArray($style_row);
+
+            $r++;
+        }
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A'.$r, "Jumlah");
+        $excel->getActiveSheet()->mergeCells('A'.$r.':B'.$r);
+        $excel->getActiveSheet()->getStyle('A'.$r.':B'.$r)->applyFromArray($style_row);
+
+        $col = 2;
+        for ($i=0; $i < count($footer); $i++) { 
+            $huruf = $this->m_master->HurufColExcelNumber($col);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $footer[$i]);
+            $excel->getActiveSheet()->getStyle($huruf.$r, $footer[$i])->applyFromArray($style_row);    
+            $col++;
+        }
+
+
+        // foreach(range('A','H') as $columnID) {
+        //     $excel->getActiveSheet()->getColumnDimension($columnID)
+        //         ->setAutoSize(true);
+        // }
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(16);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('E')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(14);
+        $excel->getActiveSheet()->getColumnDimension('H')->setWidth(14);
+
+        // Set judul file excel nya
+        // $excel->getActiveSheet()->setTitle('');
+        $excel->setActiveSheetIndex(0);
+
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$Filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+    }
     
-
-    
-
-
-
 
 }

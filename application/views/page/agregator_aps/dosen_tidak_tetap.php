@@ -1,4 +1,7 @@
-<h3>This is the page : kerjasama_tridharma.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<div id="content_data">
+    
+</div>
 <script>
 
     $(document).ready(function () {

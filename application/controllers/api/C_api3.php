@@ -769,6 +769,71 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='readDataMHSBaruByProdi'){
+
+            // get tahun akademik smpe sekarang
+            $rs = array();
+            $arr_tahun_akademik = array();
+            $stYear = 2014;
+            $endYear = date('Y');
+            for ($i=$stYear; $i <= $endYear; $i++) { 
+                $arr_tahun_akademik[] = $i;
+            }
+
+            // get prodi
+            $filterProdi = $data_arr['filterProdi'];
+            $filterProdiName = $data_arr['filterProdiName'];
+            $exFPName = explode('-', $filterProdiName);
+            $filterProdiName = trim($exFPName[1]);
+            $arrExp = explode('.', $filterProdi);
+
+            for ($i=0; $i < count($arr_tahun_akademik); $i++) { 
+                $Year = $arr_tahun_akademik[$i];
+                $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                    WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+                $query=$this->db->query($sql, array($arrExp[0]))->result_array();
+                if (count($query) == 0) {
+                    $temp = [
+                        'Capacity' => 0,
+                        'EntredAt' => null,
+                        'EntredBy' => null,
+                        'ID' => null,
+                        'PassSelection' => 0,
+                        'ProdiCode' => $arrExp[1],
+                        'ProdiID' => $arrExp[0],
+                        'ProdiName' => $filterProdiName,
+                        'Registrant' => 0,
+                        'Regular' => 0,
+                        'Regular2' => 0,
+                        'TotalStudemt' => 0,
+                        'Transfer' => 0,
+                        'Transfer2' => 0,
+                        'Type' => null,
+                        'UpdatedBy' => null,
+                        'Year' => $Year,
+                        'updatedAt' => null,
+                    ];
+                }
+                else
+                {
+                    $temp = $query[0];
+                    // update all null menjadi 0
+                    foreach ($temp as $key => $value) {
+                        if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                            if ($value == null && $value == '') {
+                                $temp[$key] = 0;
+                            }
+                        }
+                    }
+                }
+
+                $rs[] = $temp;
+            }
+
+            return print_r(json_encode($rs));
+
+        }
         else if($data_arr['action']=='readDataMHSBaruAsing'){
 
             $Year = $data_arr['Year'];
