@@ -14,7 +14,7 @@
                             </select>
                 	    </div>
                 	</div>
-                </div>	
+                </div>
                 <div class="row" style="margin-top: 30px;">
                 	<div class="col-md-12">
                 		<div class="widget box">
@@ -28,7 +28,7 @@
                 			</div>
                 			<div class="widget-content">
                 				<div id="dataBelumBayar">
-                				    
+
                 				</div>
                 			</div>
                 			<div id = "tblResultCSV" class = "col-md-12 hide">
@@ -44,6 +44,7 @@
                 							<th>Price Formulir</th>
                 							<th>File Upload</th>
                 							<th>Sekolah</th>
+                              <th>Phone</th>
                 							<th>Register At</th>
                 							<th>Upload At</th>
                 							<th>Total Searching</th>
@@ -76,11 +77,11 @@
                             </div>
                             <hr/>
                             <div id="page">
-                                
+
                             </div>
                         </div>
                     </div>
-                </div>           
+                </div>
             </div>
         </div>
     </div>
@@ -106,7 +107,7 @@
 
 	function loadTahun()
 	  {
-	  	var academic_year_admission = "<?php echo $academic_year_admission ?>";  
+	  	var academic_year_admission = "<?php echo $academic_year_admission ?>";
 	      var thisYear = (new Date()).getFullYear();
           var startTahun = parseInt(thisYear);
           var selisih = (2018 < parseInt(thisYear)) ? parseInt(1) + (parseInt(thisYear) - parseInt(2018)) : 1;
@@ -137,18 +138,18 @@
 
 		 $("#kolomPrice option").filter(function() {
 		   //may want to use $.trim in here
-		   return $(this).val() == 4; 
+		   return $(this).val() == 4;
 		 }).prop("selected", true);
 
 		 $("#kolomDebit option").filter(function() {
 		   //may want to use $.trim in here
-		   return $(this).val() == 5; 
+		   return $(this).val() == 5;
 		 }).prop("selected", true);
 
 
 		 $("#kolomKredit option").filter(function() {
 		   //may want to use $.trim in here
-		   return $(this).val() == 5; 
+		   return $(this).val() == 5;
 		 }).prop("selected", true);
 
 		$('.angkaSelect').select2({
@@ -235,9 +236,9 @@
 				{
 					toastr.info('Formulir Number Online atau Formulir Number Global tidak ada, Silahkan kontak pihak Admisi');
 				}
-			  
+
 			}).fail(function() {
-			  toastr.info('No Action...'); 
+			  toastr.info('No Action...');
 			  // toastr.error('The Database connection error, please try again', 'Failed!!');
 			}).always(function() {
 				$(".savePay[RegID='"+RegID+"']").prop('disabled',false).html('Submit');
@@ -251,7 +252,7 @@
 	  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
 	  		toastr.error('The File APIs are not fully supported in this browser.', 'Failed!!');
 	        return;
-	      }   
+	      }
 
 	      input = document.getElementById('rekKoran');
 	      if (!input) {
@@ -270,7 +271,7 @@
           	fr.readAsText(file);
           	//fr.readAsDataURL(file);
 	      }
-	     
+
 	});
 
 	function receivedText()
@@ -331,8 +332,8 @@
 	    	else
 	    	{
 	    		toastr.error("Format tidak sesuai", 'Failed!!');
-	    	}	
-	    }	// exit if				
+	    	}
+	    }	// exit if
 	}
 
   function validation(arr)
@@ -363,7 +364,7 @@
   }
 
 	function processData2(datacsv) {
-	    var dataSaveTBL = []; 
+	    var dataSaveTBL = [];
 	    //console.log(dataGet);
 	    for (var i = 0; i < dataGet.length; i++) {
 	    	var PriceFormulirDB = dataGet[i]['PriceFormulir'];
@@ -415,7 +416,7 @@
 							'">'+dataResult[i]['count']+
 						  '</td>';
 			}
-			
+
 			$(".datatable2 tbody").append( '<tr>'+
 					  '<td class="checkbox-column">'+
 					  	'<input type="checkbox" class="uniform" value ="'+dataResult[i]['ID']+";"+dataResult[i]['FileUpload']+";"+dataResult[i]['Email']+";"+dataResult[i]['count']+";"+dataResult[i]['PriceFormulir']+'">'+
@@ -425,12 +426,13 @@
 					  '<td>'+dataResult[i]['PriceFormulir']+'</td>'+
 					  varFileUpload+
 					  '<td>'+dataResult[i]['SchoolName']+'</td>'+
+            '<td>'+dataResult[i]['Phone']+'</td>'+
 					  '<td>'+dataResult[i]['RegisterAT']+'</td>'+
 					  '<td>'+dataResult[i]['uploadAT']+'</td>'+
 					  total_searching+
 				  '</tr>'
 
-			);	
+			);
 		}
 
 		setTimeout(function () {
@@ -439,12 +441,12 @@
 		     $(".datatable2").removeClass('hide');
 		     $("#tblResultCSV").removeClass('hide');
 		     //LoaddataTable('.datatable2');
-		},500);			
+		},500);
 	}
 
 	$(document).on('click','#dataResultCheckAll', function () {
 		$('input.uniform').not(this).prop('checked', this.checked);
-		  /*$(".uniform", $(".datatable2").fnGetNodes()).each(function () { 
+		  /*$(".uniform", $(".datatable2").fnGetNodes()).each(function () {
 		  	$(this).prop("checked", true);
 		  	//$('input.uniform').not(this).prop('checked', this.checked);
 		  });*/
@@ -498,7 +500,7 @@
 		 		    '');
 		 		$('#NotificationModal').modal('show');
 		 	}
-	 		 
+
 		 }
 		 $('#btn-confirm').prop('disabled',false).html('Confirm');
 	});
