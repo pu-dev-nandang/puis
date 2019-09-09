@@ -135,8 +135,9 @@
 		    return html;    	 				
 		},
 	};
-
-	var PaymentType = ['Spb','Bank Advance','Cash Advance'];	
+	//Disable Cash Advance di Pembayaran Purchasing
+	//var PaymentType = ['Spb','Bank Advance','Cash Advance'];	
+	var PaymentType = ['Spb','Bank Advance'];	
 	$(document).ready(function() {
 		$('#page_po_list').html(ClassDt.htmlPage_po_list);
 		Get_data_po().then(function(data){

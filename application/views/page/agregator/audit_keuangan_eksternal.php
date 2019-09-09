@@ -14,7 +14,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-default" id="btnLembagaAudit"><i class="fa fa-cog margin-right"></i> Lembaga Audit</button>
+                <button class="btn btn-success btn-round" id="btnLembagaAudit"><i class="fa fa-cog margin-right"></i> Lembaga Audit</button>
             </div>
 
             <div>
@@ -36,13 +36,14 @@
                     <textarea class="form-control" rows="3" id="form_Description"></textarea>
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-primary" id="btnSaveForm">Save</button>
+                    <button class="btn btn-primary btn-round" id="btnSaveForm"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
                 </div>
             </div>
-
         </div>
+        <br/>
         <div class="col-md-9">
-            <div id="viewData"></div>
+            <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b> Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
+            <div id="viewData" class="table-responsive"></div>
         </div>
 
     </div>
@@ -62,6 +63,20 @@
         loadDataTable();
     });
 
+
+    $("#btndownloaadExcel").click(function(){
+       
+        var akred = "0";
+        var url = base_url_js+'agregator/excel-audit-keuangan-eksternal';  
+        data = {
+          akred : akred
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
+
     $('#btnLembagaAudit').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -72,24 +87,25 @@
             '        <div class="well">' +
             '            <div class="form-group">' +
             '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="formLembaga" placeholder="Input lembaga..">' +
+            '                <input class="form-control" id="formLembaga" placeholder="Input Lembaga...">' +
             '            </div>' +
             '            <div class="form-group">' +
-            '                <textarea class="form-control" id="formDescription" placeholder="Input description..."></textarea>' +
+            '                <textarea class="form-control" id="formDescription" placeholder="Input Description..."></textarea>' +
             '            </div>' +
-            '            <div>' +
-            '                <button class="btn btn-success" id="btnSaveLembaga">Save</button>' +
+            '            <div class="form-group" style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round text-right" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
             '            </div>' +
             '        </div>' +
+            '   </br/>'+
             '    </div>' +
             '    ' +
             '    <div class="col-md-7">' +
-            '        <table class="table table-striped" id="tableViewLemabagaSurview">' +
+            '        <table class="table table-striped table-bordered" id="tableViewLemabagaSurview">' +
             '            <thead>' +
-            '            <tr>' +
+            '            <tr style="background: #20485A;color: #FFFFFF;">' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th>Lembaga</th>' +
-            '                <th style="width: 2%;"><i class="fa fa-cog"></i></th>' +
+            '                <th>Nama Lembaga</th>' +
+            '                <th style="width: 2%;text-align: center"><i class="fa fa-cog"></i></th>' +
             '            </tr>' +
             '            </thead>' +
             '           <tbody id="listLembaga"></tbody>' +
@@ -101,7 +117,7 @@
 
         loadDataLembagaAudit();
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -130,19 +146,22 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    $('#formID').val('');
-                    $('#formLembaga').val('');
-                    $('#formDescription').val('');
-
-                    toastr.success('Data saved','Success');
-
-                    loadDataLembagaAudit();
-
-                    setTimeout(function () {
-
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Maaf nama Lembaga sudah Ada!','Error');
                         $('#btnSaveLembaga').html('Save').prop('disabled',false);
 
-                    },500);
+                    } else {
+
+                        $('#formID').val('');
+                        $('#formLembaga').val('');
+                        $('#formDescription').val('');
+
+                        toastr.success('Data saved','Success');
+                        loadDataLembagaAudit();
+                        setTimeout(function () {
+                            $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        },500);
+                    }
 
                 });
 
@@ -171,8 +190,16 @@
                     $('#listLembaga').append('<tr>' +
                         '<td>'+no+'</td>' +
                         '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
-                        '<td><button class="btn btn-default btn-sm btnEditLV" data-no="'+no+'"><i class="fa fa-edit"></i></button>' +
-                        '<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
+                        '<td style="text-align: left;"><div class="btn-group btnAction"> ' +
+                        '    <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> ' +
+                        '        <i class="fa fa-pencil"></i> <span class="caret"></span> '+
+                        '    </button> '+
+                        '    <ul class="dropdown-menu"> '+
+                        '        <li><a class="btnEditLV" data-no="'+v.ID+'"  data-lembaga="'+v.Lembaga+'" data-desc="'+v.Description+'"><i class="fa fa fa-edit"></i> Edit</a></li> '+
+                        '        <li role="separator" class="divider"></li> '+
+                        '        <li><a class="btnDeleteLV" data-id="'+v.ID+'"><i class="fa fa fa-trash"></i> Remove</a></li> '+
+                        '    </ul> '+
+                        '</div> </td>'+
                         '</tr>');
 
                     $('#form_LembagaAuditID').append('<option value="'+v.ID+'">'+v.Lembaga+'</option>');
@@ -188,15 +215,51 @@
 
     $(document).on('click','.btnEditLV',function () {
 
-        var no = $(this).attr('data-no');
-        var dataForm = $('#btnEditLV_'+no).val();
-        var dataForm = JSON.parse(dataForm);
+        var ID = $(this).attr('data-no');
+        var Lembaga = $(this).attr('data-lembaga');
+        var Description = $(this).attr('data-desc');
 
-        $('#formID').val(dataForm.ID);
-        $('#formLembaga').val(dataForm.Lembaga);
-        $('#formDescription').val(dataForm.Description);
+        $('#formID').val(ID);
+        $('#formLembaga').val(Lembaga);
+        $('#formDescription').val(Description);
 
     });
+
+    $(document).on('click','.btnDeleteLV',function () {
+        
+        if(confirm('Yakin Hapus data?')) {
+    
+            $('.btnDeleteLV').prop('disabled',true);
+    
+            var no = $(this).attr('data-id');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+    
+            var data = {
+                action: 'removeMasterAudit',
+                ID : no
+            };
+    
+            var token = jwt_encode(data,'UAP)(*');
+    
+            $.post(url,{token:token},function (result) {
+    
+                toastr.success('Data removed','Success');
+                loadDataTable();
+
+                $('#form_ID').val('');
+                $('#form_LembagaAuditID').val('');
+                $('#form_Year').val('');
+                $('#form_Opinion').val('');
+                $('#form_Description').val('');
+                loadDataLembagaAudit();
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+    
+           });
+        }
+    });
+
 
     // ================ =====================
     $('#btnSaveForm').click(function () {
@@ -232,8 +295,6 @@
 
                 toastr.success('Data saved','Success');
 
-                // var formAE_DueDate = $('#formAE_DueDate').datepicker("getDate");
-
                 loadDataTable();
 
                 $('#form_ID').val('');
@@ -256,9 +317,9 @@
 
     function loadDataTable() {
 
-        $('#viewData').html('<table class="table table-striped" id="tableData">' +
+        $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
             '                    <thead>' +
-            '                    <tr>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%">No</th>' +
             '                        <th style="width: 15%">Lembaga</th>' +
             '                        <th style="width: 5%">Year</th>' +

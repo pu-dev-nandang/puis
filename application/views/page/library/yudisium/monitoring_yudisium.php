@@ -58,8 +58,8 @@
                 '                <th>Course</th>' +
                 '                <th style="width: 10%;">Score</th>' +
                 '                <th style="width: 10%;">Ijazah SMA / SKHUN</th>' +
-                '                <th style="width: 10%;">Library Clearent</th>' +
-                '                <th style="width: 10%;">Finance Clearent</th>' +
+                '                <th style="width: 10%;">Library Clearance</th>' +
+                '                <th style="width: 10%;">Finance Clearance</th>' +
                 '                <th style="width: 10%;">Kaprodi</th>' +
                 '            </tr>' +
                 '            </thead>' +

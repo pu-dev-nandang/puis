@@ -49,11 +49,12 @@
             </div>
 
             <div class="form-group" style="text-align: right;">
-                <button class="btn btn-primary" id="btnSave">Save</button>
+                <button class="btn btn-primary btn-round" id="btnSave">Save</button>
             </div>
 
         </div>
         <div class="col-md-9">
+            <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
 
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
@@ -63,19 +64,20 @@
                 </div>
             </div>
 
+          <div class="table-responsive">
             <table class="table table-striped table-bordered" id="tableData">
                 <thead>
-                <tr>
-                    <th rowspan="2" style="width: 1%;">No</th>
-                    <th rowspan="2">Prodi</th>
-                    <th rowspan="2" style="width: 7%;">Daya Tampung</th>
+                <tr style="background: #20485A;color: #FFFFFF;">
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;width: 1%;">No</th>
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;">Prodi</th>
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;width: 7%;">Daya Tampung</th>
                     <th colspan="2">Jumlah Calon Mahasiswa</th>
                     <th colspan="2">Jumlah Mahasiswa Baru</th>
                     <th colspan="2">Jumlah Mahasiswa</th>
                     <th rowspan="2" style="width: 5%;"><i class="fa fa-cog"></i></th>
 
                 </tr>
-                <tr>
+                <tr style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 7%;">Pendaftar</th>
                     <th style="width: 7%;">Lulus Seleksi</th>
                     <th style="width: 7%;">Reguler</th>
@@ -86,6 +88,7 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
+          </div>
         </div>
     </div>
 </div>
@@ -94,7 +97,6 @@
 
     $(document).ready(function () {
 
-
         window.act = "<?= $accessUser; ?>";
         if(parseInt(act)<=0){
             $('.form-data-edit').remove();
@@ -102,10 +104,7 @@
             loadSelectOptionBaseProdi('#formProdiID','');
         }
 
-
-
         filteryear();
-
         var firstLoad = setInterval(function () {
             var filterYear = $('#filterYear').val();
             if(filterYear!='' && filterYear!=null){
@@ -119,6 +118,21 @@
         },7000);
 
     });
+
+    $("#btndownloaadExcel").click(function(){
+
+        var filterYear = $('#filterYear').val();
+        var data = {
+            Year : filterYear
+        };
+    
+        var url = base_url_js+'agregator/excel-seleksi-mahasiswa-baru';
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
+    
 
     $('#filterYear').change(function () {
         loadDataTable();
@@ -193,13 +207,10 @@
             $.post(url,{token:token},function (jsonResult) {
 
                 toastr.success('Data saved','Success');
-
                 filteryear();
                 setTimeout(function () {
                     loadDataTable();
                 },2000);
-
-
 
                 setTimeout(function () {
                     $('#formID').val('');
@@ -211,15 +222,10 @@
                     $('#formTransfer').val('');
                     $('#formRegular2').val('');
                     $('#formTransfer2').val('');
-
                     $('#btnSave').html('Save').prop('disabled',false);
-
                 },500);
-
             })
-
         }
-
 
     });
 
@@ -246,9 +252,9 @@
                         '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
-                        '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+v.ID+'">Edit</a></li>' +
+                        '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+v.ID+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
-                        '    <li><a href="javascript:void(0);" class="btnRemove" data-tb="db_agregator.student_selection" data-id="'+v.ID+'">Remove</a></li>' +
+                        '    <li><a href="javascript:void(0);" class="btnRemove" data-tb="db_agregator.student_selection" data-id="'+v.ID+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
                         '  </ul>' +
                         '</div><textarea id="dataEdit_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea>';
 
@@ -266,8 +272,6 @@
                         '</tr>');
                 });
             }
-
-
 
         })
 

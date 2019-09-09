@@ -28,6 +28,9 @@
                         <select id="formType" class="form-control">
                             <option value="1">Seminar Proposal</option>
                             <option value="2">Seminar Hasil</option>
+                            <option disabled>-------</option>
+                            <option value="3">Make-up Seminar Proposal</option>
+                            <option value="4">Make-up Seminar Hasil</option>
                         </select>
                         <div id="viewType"></div>
                     </div>
@@ -263,8 +266,14 @@
         if(formType==1){
             loadSelectOptionStudentYudisium('#formStudent','','1');
             $('#formStudent').select2({allowClear: true});
-        } else {
+        } else if(formType==2) {
             loadSelectOptionStudentYudisium('#formStudent','','3');
+            $('#formStudent').select2({allowClear: true});
+        } else if(formType==3) {
+            loadSelectOptionStudentYudisium('#formStudent','','-3');
+            $('#formStudent').select2({allowClear: true});
+        } else if(formType==4) {
+            loadSelectOptionStudentYudisium('#formStudent','','-5');
             $('#formStudent').select2({allowClear: true});
         }
     }

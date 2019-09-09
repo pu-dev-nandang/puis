@@ -47,9 +47,14 @@ class C_api3 extends CI_Controller {
         return $status;
     }
 
-    public function getListMenuAgregator(){
+    public function getListMenuAgregator($Type){
 
-        $data = $this->db->order_by('ID','ASC')->get('db_agregator.agregator_menu')->result_array();
+//        $data = $this->db->order_by('ID','ASC')->get('db_agregator.agregator_menu')->result_array();
+
+        $data = $this->db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+                                              LEFT JOIN db_agregator.agregator_menu_header amh 
+                                              ON (amh.ID = am.MHID)
+                                              WHERE amh.Type = "'.$Type.'" ')->result_array();
 
         return print_r(json_encode($data));
 
@@ -185,7 +190,7 @@ class C_api3 extends CI_Controller {
             $data = $this->db->get('db_agregator.lembaga_audit')->result_array();
             return print_r(json_encode($data));
         }
-        else if($data_arr['action']=='updateLembagaSurview'){
+        else if($data_arr['action']=='updateLembagaSurview') {
 
             $dataForm = array(
                 'Lembaga' => $data_arr['Lembaga'],
@@ -197,31 +202,47 @@ class C_api3 extends CI_Controller {
                 $this->db->where('ID',$data_arr['ID']);
                 $this->db->update('db_agregator.lembaga_surview',$dataForm);
             } else {
-                // Insert
-                $this->db->insert('db_agregator.lembaga_surview',$dataForm);
+
+                $squery = 'SELECT * FROM db_agregator.lembaga_surview WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                    return print_r(0);
+                } 
+                else {
+                    // Insert
+                    $this->db->insert('db_agregator.lembaga_surview',$dataForm);
+                    return print_r(1);   
+                } 
             }
-
-            return print_r(1);
-
+               
         }
-        else if($data_arr['action']=='updateLembagaAudit'){
+        else if($data_arr['action']=='updateLembagaAudit') {
+
             $dataForm = array(
                 'Lembaga' => $data_arr['Lembaga'],
                 'Description' => $data_arr['Description']
             );
 
             if($data_arr['ID']!=''){
-                // Update
+                    // Update
                 $this->db->where('ID',$data_arr['ID']);
                 $this->db->update('db_agregator.lembaga_audit',$dataForm);
             } else {
+
+                $squery = 'SELECT * FROM db_agregator.lembaga_audit WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                        return print_r(0);
+                } 
+                else {
                 // Insert
-                $this->db->insert('db_agregator.lembaga_audit',$dataForm);
+                    $this->db->insert('db_agregator.lembaga_audit',$dataForm);
+                    return print_r(1);
+                }
             }
-
-            return print_r(1);
         }
-
     }
 
     public function crudExternalAccreditation(){
@@ -281,9 +302,9 @@ class C_api3 extends CI_Controller {
                                                                         <i class="fa fa-pencil"></i> <span class="caret"></span>
                                                                       </button>
                                                                       <ul class="dropdown-menu">
-                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'"> <i class="fa fa fa-edit"></i> Edit</a></li>
                                                                         <li role="separator" class="divider"></li>
-                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.external_accreditation">Remove</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'"> <i class="fa fa fa-trash"></i> Delete</a></li>
                                                                       </ul>
                                                                     </div>
                                                                         <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
@@ -292,8 +313,8 @@ class C_api3 extends CI_Controller {
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Type'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Scope'].'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Level'].'</div>';
-                $nestedData[] = '<div style="text-align:right;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['Level'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
 
@@ -371,18 +392,18 @@ class C_api3 extends CI_Controller {
                                                                         <i class="fa fa-pencil"></i> <span class="caret"></span>
                                                                       </button>
                                                                       <ul class="dropdown-menu">
-                                                                        <li><a href="javascript:void(0);" class="btnEdit" data-no="'.$no.'">Edit</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnEdit" data-no="'.$no.'"><i class="fa fa fa-edit"></i>Edit</a></li>
                                                                         <li role="separator" class="divider"></li>
-                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.international_accreditation_prodi">Remove</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.international_accreditation_prodi"><i class="fa fa fa-trash"></i> Remove</a></li>
                                                                       </ul>
                                                                     </div>
                                                                         <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['ProdiName'].'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Status'].'</div>';
-                $nestedData[] = '<div style="text-align:right;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['ProdiName'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row['Status'].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Description'].'</div>';
 
@@ -430,7 +451,6 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='removeDataAgg'){
 
-
             $this->db->where('ID', $data_arr['ID']);
             $this->db->delete($data_arr['Table']);
 
@@ -441,8 +461,47 @@ class C_api3 extends CI_Controller {
             }
 
             return print_r(1);
+        }
+
+        else if($data_arr['action']=='removeDataMasterSurvey'){
+
+            $ID = $data_arr['ID'];
+
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.lembaga_surview');
+            return print_r(1);
 
         }
+
+        else if($data_arr['action']=='removeAkreditasi_eks'){
+
+            $ID = $data_arr['ID'];
+
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.external_accreditation');
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='removeMasterAudit'){
+
+            $ID = $data_arr['ID'];
+
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.lembaga_audit');
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='removeKerjasama'){
+
+            $ID = $data_arr['ID'];
+
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.lembaga_mitra_kerjasama');
+            return print_r(1);
+
+        }
+
         else if($data_arr['action']=='viewListAKE'){
 
             $requestData= $_REQUEST;
@@ -481,9 +540,9 @@ class C_api3 extends CI_Controller {
                                                                         <i class="fa fa-pencil"></i> <span class="caret"></span>
                                                                       </button>
                                                                       <ul class="dropdown-menu">
-                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'"><i class="fa fa fa-edit"></i> Edit</a></li>
                                                                         <li role="separator" class="divider"></li>
-                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.financial_external_audit">Remove</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-tb="db_agregator.financial_external_audit"><i class="fa fa fa-trash"></i> Remove</a></li>
                                                                       </ul>
                                                                     </div>
                                                                         <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
@@ -516,17 +575,25 @@ class C_api3 extends CI_Controller {
                 'Description' => $data_arr['Description']
             );
 
-            if($data_arr['ID']!=''){
+            if($data_arr['ID']!='') {
                 // Update
                 $this->db->where('ID',$data_arr['ID']);
                 $this->db->update('db_agregator.lembaga_mitra_kerjasama',$dataForm);
-            } else {
-                // Insert
-                $this->db->insert('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+            } 
+            else {
+                $squery = 'SELECT * FROM db_agregator.lembaga_mitra_kerjasama WHERE Lembaga = "'.$data_arr['Lembaga'].'" ';
+                $dataTable =$this->db->query($squery, array())->result_array();
+
+                if(count($dataTable)>0){
+                    return print_r(0);
+                } 
+                else { 
+                    // Insert
+                    $this->db->insert('db_agregator.lembaga_mitra_kerjasama',$dataForm);
+                    return print_r(1); 
+                }
             }
-
-            return print_r(1);
-
+                
         }
         else if($data_arr['action']=='readLembagaMitraKerjasama'){
             $data = $this->db->get('db_agregator.lembaga_mitra_kerjasama')->result_array();
@@ -603,19 +670,26 @@ class C_api3 extends CI_Controller {
                                                                         <i class="fa fa-pencil"></i> <span class="caret"></span>
                                                                       </button>
                                                                       <ul class="dropdown-menu">
-                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'">Edit</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'"><i class="fa fa fa-edit"></i> Edit</a></li>
                                                                         <li role="separator" class="divider"></li>
-                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-file="'.$row['File'].'" data-tb="db_agregator.university_collaboration">Remove</a></li>
+                                                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" data-file="'.$row['File'].'" data-tb="db_agregator.university_collaboration"><i class="fa fa fa-trash"></i> Remove</a></li>
                                                                       </ul>
                                                                     </div>
                                                                         <textarea class="hide" id="viewDetail_'.$no.'">'.json_encode($row).'</textarea>' : '-';
+
+                if($row['File'] == null) {
+                    $links = '<p target="_blank" disabled>No File</p>';
+                } else {
+                    $links = '<a target="_blank" href="'.base_url('uploads/agregator/'.$row['File']).'">Download Bukti</a>';
+                }
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Lembaga'].'</div>';
                 $nestedData[] = '<div style="text-align:center;">'.$row['Tingkat'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.$row['Benefit'].'</div>';
                 $nestedData[] = '<div style="text-align:left;">'.date('d M Y',strtotime($row['DueDate'])).'</div>';
-                $nestedData[] = '<div style="text-align:left;"><a target="_blank" href="'.base_url('uploads/agregator/'.$row['File']).'">Download Bukti</a></div>';
+                $nestedData[] = '<div style="text-align:center;">'.$links.'</div>';
+                //$nestedData[] = '<div style="text-align:left;"><a target="_blank" href="'.base_url('uploads/agregator/'.$row['File']).'">Download Bukti</a></div>';
                 $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
 
                 $data[] = $nestedData;
@@ -1266,7 +1340,6 @@ class C_api3 extends CI_Controller {
 
         }
 
-
         return print_r(json_encode($data));
 
     }
@@ -1496,6 +1569,7 @@ class C_api3 extends CI_Controller {
                         'EducationLevelID' => $edl[$a]['ID'],
                         'AccreditationID' => $data[$i]['ID']
                     ))->result_array();
+                    print_r($dataP);
 
                     $r = array(
                         'Level' => $edl[$a]['Name'],
@@ -1546,6 +1620,98 @@ class C_api3 extends CI_Controller {
                 'ID' => $ID,
                 'File' => $OldFile
             )));
+
+        }
+        else if($data_arr['action']=='readAgregatorAdmin'){
+            $data = $this->db->query('SELECT aa.*, em.Name FROM db_agregator.agregator_admin aa 
+                                              LEFT JOIN db_employees.employees em ON (aa.NIP = em.NIP)')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeAgregatorAdmin'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.agregator_admin');
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='addAgregatorAdmin'){
+            $NIP = $data_arr['NIP'];
+
+            // Cek nip
+            $data = $this->db->get_where('db_agregator.agregator_admin',array(
+                'NIP' => $NIP
+            ))->result_array();
+
+            if(count($data)>0){
+                $result = 0;
+            } else {
+
+                $dataIns = array(
+                    'NIP' => $NIP
+                );
+                $this->db->insert('db_agregator.agregator_admin',$dataIns);
+
+                $result = 1;
+            }
+            return print_r($result);
+        }
+        else if($data_arr['action']=='readAgregatorHeaderMenu'){
+            $data = $this->db->query('SELECT * FROM db_agregator.agregator_menu_header ORDER BY Type, Name ASC')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeAgregatorHeaderMenu'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', ID);
+            $this->db->delete('db_agregator.agregator_menu_header');
+            $this->db->reset_query();
+
+            $this->db->where('MHID', $ID);
+            $this->db->delete('db_agregator.agregator_menu');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='updateAgregatorHeaderMenu'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.agregator_menu_header',$dataForm);
+            } else {
+                $this->db->insert('db_agregator.agregator_menu_header',$dataForm);
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='readAgregatorMenu'){
+            $data = $this->db->query('SELECT am.*, amh.Name AS H_Name, amh.Type AS H_Type FROM db_agregator.agregator_menu am 
+                                                  LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
+                                                  ORDER BY am.MHID, am.ID ASC ')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removedAgregatorMenu'){
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.agregator_menu');
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='updateAgregatorMenu'){
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.agregator_menu',$dataForm);
+            } else {
+                $this->db->insert('db_agregator.agregator_menu',$dataForm);
+            }
+
+            return print_r(1);
 
         }
 

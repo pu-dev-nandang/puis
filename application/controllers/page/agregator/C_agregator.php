@@ -59,7 +59,10 @@ class C_agregator extends Globalclass {
 
     public function menu_agregator($page){
 
-        $dataMenu = $this->db->order_by('ID','ASC')->get('db_agregator.agregator_menu_header')->result_array();
+        $dataMenu = $this->db->order_by('ID','ASC')->get_where('db_agregator.agregator_menu_header',
+            array(
+                'Type' => 'APT'
+            ))->result_array();
         if(count($dataMenu)>0){
             $i = 0;
             foreach ($dataMenu AS $itm){

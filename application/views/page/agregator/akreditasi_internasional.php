@@ -32,11 +32,13 @@
                 <textarea class="form-control" id="formDescription" rows="3"></textarea>
             </div>
             <div class="form-group" style="text-align: right;">
-                <button class="btn btn-primary" id="saveForm">Save</button>
+                <button class="btn btn-primary btn-round" id="saveForm"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
             </div>
         </div>
+        <br/>
         <div class="col-md-9">
-            <div style="min-height: 30px;" id="viewData"></div>
+            <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
+            <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
         </div>
 
     </div>
@@ -68,6 +70,19 @@
 
         loadDataTable();
     });
+
+    $("#btndownloaadExcel").click(function(){
+       
+        var akred = "0";
+        var url = base_url_js+'agregator/excel-akreditasi-international';
+        data = {
+          akred : akred
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
 
     $('#saveForm').click(function () {
 
@@ -128,11 +143,11 @@
 
         $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
             '                    <thead>' +
-            '                    <tr>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%;">No</th>' +
             '                        <th style="width: 15%;">Lembaga</th>' +
             '                        <th style="width: 15%;">Program Studi</th>' +
-            '                        <th style="width: 10%;">Status</th>' +
+            '                        <th style="width: 10%;">Status/ Peringkat</th>' +
             '                        <th style="width: 15%;">Masa Berlaku</th>' +
             '                        <th style="width: 1%;"><i class="fa fa-cog"></i></th>' +
             '                        <th>Keterangan</th>' +

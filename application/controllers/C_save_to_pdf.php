@@ -5639,7 +5639,7 @@ Phone: (021) 29200456';
                 $y += $h;
              }
 
-             $Max = 15;
+             $Max = 5;
              $h=4.4;
              for ($i=0; $i <$Max - count($pr_detail) ; $i++) {
                  $fpdf->Cell($w_no,$h,'' ,$border,0,'C',true);

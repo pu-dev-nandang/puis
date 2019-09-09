@@ -148,8 +148,8 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
-//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
 $route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
 $route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 $route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';
@@ -183,6 +183,8 @@ $route['it/version'] = 'page/it/c_it/version_data';
 $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
 $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
+
+$route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
 
 
 
@@ -1330,12 +1332,23 @@ $route['agregator/hki-paten-sederhana'] = 'page/agregator/c_agregator/hki_paten_
 $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_karya_ilmiah';
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
-
-
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 //$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
 
-$route['api3/__getListMenuAgregator'] = 'api/c_api3/getListMenuAgregator';
+//Agregator Excel
+$route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';
+$route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
+$route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
+$route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
+$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+
+
+
+
+$route['agregator-aps/setting'] = 'page/agregator/c_agregator_aps/setting';
+$route['agregator-aps/kerjasama-tridharma'] = 'page/agregator/c_agregator_aps/kerjasama_tridharma';
+
+$route['api3/__getListMenuAgregator/(:any)'] = 'api/c_api3/getListMenuAgregator/$1';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
 
 $route['api3/__crudLembagaSurview'] = 'api/c_api3/crudLembagaSurview';

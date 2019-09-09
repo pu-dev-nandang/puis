@@ -20,7 +20,7 @@
         <div class="col-md-12">
             <p style="color:#3968c6;"><b> Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa Sosial </b></p>
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-success" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
             </div>
             <div id="viewTable"></div>
         </div>
@@ -139,6 +139,11 @@
 
 <script>
     $(document).ready(function () {
+        window.act = "<?= $accessUser; ?>";
+        if(parseInt(act)<=0){
+            $('.form-data-add').remove();
+        } else {
+        }
         loadAkreditasiProdi();
     });
 
