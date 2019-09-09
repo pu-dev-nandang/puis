@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-xs-12">
+          <div class="col-xs-6">
             <div class="form-group">
               <label>Type</label>
               <select class="form-control TypePaymentSelect">
@@ -39,6 +39,14 @@
                    <option value = "Spb">SPB</option>
                    <option value = "Cash Advance">Cash Advance</option>
                    <option value = "Bank Advance">Bank Advance</option>
+               </select>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="form-group">
+              <label>Event / Template</label>
+              <select class="form-control SelectTemplate">
+                   <option value = "%" selected>--No Selected--</option>
                </select>
             </div>
           </div>
@@ -56,6 +64,29 @@
 <script type="text/javascript">
   // get Departmentpu
 var IDDepartementPUBudget = "<?php echo $this->session->userdata('IDDepartementPUBudget') ?>";
+
+function __LoadTemplate()
+{
+  var def = jQuery.Deferred();
+  var url = base_url_js+'rest2/__LoadTemplate';
+  var data = {
+      auth : 's3Cr3T-G4N',
+      Active : 1,
+  };
+  var token = jwt_encode(data,"UAP)(*");
+  $.post(url,{ token:token },function (resultJson) {
+    
+  }).done(function(resultJson) {
+    def.resolve(resultJson);
+  }).fail(function() {
+    toastr.info('No Result Data');
+    def.reject();  
+  }).always(function() {
+                  
+  }); 
+  return def.promise();
+}  
+
 $(document).ready(function() {
 	LoadFirstLoad();
 	loadingEnd(500);
@@ -69,6 +100,15 @@ function LoadFirstLoad()
   else
   {
     load_table_activated_period_years();
+    // LoadTemplate
+    __LoadTemplate().then(function(dataTemplate){
+      var h = '';
+          for (var i = 0; i < dataTemplate.length; i++) {
+              h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+          }
+      $('.SelectTemplate').append(h);
+
+    })
   }
 	
 	// LoadDataForTable();
@@ -106,7 +146,7 @@ $(document).off('click', '#Month').on('click', '#Month',function(e) {
   LoadDataForTable();
 })
 
-$(document).off('change', '#RealisasiStatus,.TypePaymentSelect').on('change', '#RealisasiStatus,.TypePaymentSelect',function(e) {
+$(document).off('change', '#RealisasiStatus,.TypePaymentSelect,.SelectTemplate').on('change', '#RealisasiStatus,.TypePaymentSelect,.SelectTemplate',function(e) {
   LoadDataForTable();
 })
 
@@ -144,11 +184,13 @@ function Get_data_payment(){
    var Month = $('#Month option:selected').val();
    var RealisasiStatus = $('#RealisasiStatus option:selected').val();
    var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
+   var SelectTemplate = $('.SelectTemplate option:selected').val();
    	var data = {
          Years : Years,
          Month : Month,
          RealisasiStatus : RealisasiStatus,
          TypePaymentSelect : TypePaymentSelect,
+         SelectTemplate : SelectTemplate,
    	};
    	var token = jwt_encode(data,"UAP)(*");
 
