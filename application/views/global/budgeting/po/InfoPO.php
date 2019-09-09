@@ -705,8 +705,8 @@
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 200px;">Date Needed</th>'+
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 100px;">Qty</th>'+
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Harga</th>'+
+			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Discount(%)</th>'+
     		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">PPN(%)</th>'+
-    		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Discount(%)</th>'+
     		                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 150px;">Another Cost</th>'+
 			                            '<th style = "text-align: center;background: #67a9a2;color: #FFFFFF;width : 250px;">Sub Total</th>'+
 									'</tr></thead>'+
@@ -726,6 +726,17 @@
 									'</table>'+
 								//'</div>'+
 						   '</div></div>';
+		var Notes2 = (po_create[0].Notes2 != null && po_create[0].Notes2 != '') ? po_create[0].Notes2 :  '';			   
+		htmlInputPO += '<div class= "row">'+
+							'<div class="col-md-4">'+
+								'<div class="form-group">'+
+									'<label>Note Another Cost</label>'+
+										'<textarea id="Notes" class="form-control" rows="2" disabled="">'+
+											Notes2+
+										'</textarea>'+
+								'</div>'+
+							'</div>'+
+						'</div>';					   
 
 		_ajax_terbilang(Subtotal).then(function(data){
 			var html = htmlBtnAdd + htmlInputPO;			   
@@ -800,8 +811,8 @@
 						'<td>'+'<div align="center">'+po_detail[i]['DateNeeded']+'</div></td>'+
 						'<td class = "tdqty" value = "'+po_detail[i]['QtyPR']+'">'+'<div align="center">'+po_detail[i]['QtyPR']+'</div></td>'+
 						'<td class = "tdUnitCost" value = "'+po_detail[i]['UnitCost_PO']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['UnitCost_PO'])+'</div></td>'+
-						'<td class = "tdPPN" value = "'+po_detail[i]['PPN_PO']+'">'+'<div align="center">'+po_detail[i]['PPN_PO']+'</div></td>'+
 						'<td class = "tdDiscount" value = "'+po_detail[i]['Discount_PO']+'">'+'<div align="center">'+po_detail[i]['Discount_PO']+'</div></td>'+
+						'<td class = "tdPPN" value = "'+po_detail[i]['PPN_PO']+'">'+'<div align="center">'+po_detail[i]['PPN_PO']+'</div></td>'+
 						'<td class = "tdAnotherCost" value = "'+po_detail[i]['AnotherCost']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['AnotherCost'])+'</div></td>'+
 						'<td class = "tdSubtotal" value = "'+po_detail[i]['Subtotal']+'" max = "'+po_detail[i]['Subtotal_PR']+'">'+'<div align="center">'+formatRupiah(po_detail[i]['Subtotal'])+'</div></td>'+
 					'</tr>';
@@ -905,6 +916,7 @@
 		var ID_pay_type = $('#table_input_po tfoot').find('.tdNotes').attr('id_pay_type');
 		var htmlPayType = __OPpay_type(ID_pay_type);
 		$('#table_input_po tfoot').find('.tdNotes').html(htmlPayType);
+		$('#Notes').prop('disabled',false);
 	}
 
 	$(document).off('keyup', '.Discount,.PPN').on('keyup', '.Discount,.PPN',function(e) {
@@ -1035,6 +1047,7 @@
 			// var Notes =  $('#table_input_po tfoot').find('.Notes').val();
 			var Notes =  $('#table_input_po tfoot').find('.pay_type option:selected').text();
 			var ID_pay_type =  $('#table_input_po tfoot').find('.pay_type option:selected').val();
+			var NotesAnotherCost = $('#Notes').val();
 			var url = base_url_js+"po_spk/submit_create";
 			var data = {
 			    po_data : po_data,
@@ -1042,6 +1055,7 @@
 			    // AnotherCost : AnotherCost,
 			    Notes : Notes,
 			    ID_pay_type : ID_pay_type,
+			    NotesAnotherCost : NotesAnotherCost,
 			};
 
 			var token = jwt_encode(data,"UAP)(*");

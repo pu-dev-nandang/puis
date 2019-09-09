@@ -138,35 +138,6 @@ class C_save_to_pdf3 extends CI_Controller {
         $y = $fpdf->GetY();
         $fpdf->SetXY($x,$y);
         $fpdf->SetFillColor(255, 255, 255);
-         // $y_ = $fpdf->GetY();
-         // $fpdf->MultiCell($w_no,$h,'No.',$border,'C',true);
-         // $x = $x+$w_no;
-         // $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_desc,$h,'Nama Barang',$border,'C',true);
-         // $x = $x+$w_desc;
-         // $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_spec,$h,'Specification',$border,'C',true);
-         // $x = $x+$w_spec;
-         // $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_date_needed,4,'Date Needed',$border,'C',true);
-         // $x = $x+$w_date_needed;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_qty,$h,'Qty',$border,'C',true);
-         // $x = $x+$w_qty;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_pricest,$h,'Harga',$border,'C',true);
-         // $x = $x+$w_pricest;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_pph,$h,'PPN',$border,'C',true);
-         // $x = $x+$w_pph;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_disc,$h,'Discount',$border,'C',true);
-         // $x = $x+$w_disc;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_anotcost,$h,'Another Cost',$border,'C',true);
-         // $x = $x+$w_anotcost;
-         //          $fpdf->SetXY($x,$y_);
-         // $fpdf->MultiCell($w_totalammount,$h,'Total Amount',$border,'C',true);
 
         $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_pph,$w_disc,$w_anotcost,$w_totalammount));
         $fpdf->SetLineHeight(5);
@@ -179,12 +150,13 @@ class C_save_to_pdf3 extends CI_Controller {
            'Date Needed',
            'Qty',
            'Harga',
-           'PPN',
            'Discount',
+           'PPN',
            'Another Cost',
            'Total Amount',
 
         ));
+
 
          $h=4.4;
         // isi table
@@ -214,17 +186,17 @@ class C_save_to_pdf3 extends CI_Controller {
                 $Spesification,
                 $po_detail[$i]['DateNeeded'],
                 $po_detail[$i]['QtyPR'],
-                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],0,',','.'),
-                (int)$po_detail[$i]['PPN_PO'].'%',
+
+                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),
                 (int)$po_detail[$i]['Discount_PO'].'%',
-                'Rp '.number_format($po_detail[$i]['AnotherCost'],0,',','.'),
-                'Rp '.number_format($po_detail[$i]['Subtotal'],0,',','.'),
+                (int)$po_detail[$i]['PPN_PO'].'%',
+                'Rp '.number_format($po_detail[$i]['AnotherCost'],2,',','.'),
+                'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),
 
              ));
              $total += $po_detail[$i]['Subtotal'];
              $no++;
          }
-
 
          // footer table
          $y = $fpdf->GetY();
@@ -236,6 +208,15 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->Cell($w_disc+$w_anotcost+$w_totalammount,$h,$total2,$border,1,'C',true);
          $fpdf->SetFont('Arial','B',$FontIsian);
          $fpdf->Cell($x__+$w_disc+$w_anotcost+$w_totalammount,$h,$po_create[0]['Notes'],$border,1,'L',true);
+
+         if ($po_create[0]['Notes2'] != '' && $po_create[0]['Notes2'] != null) {
+             // Note Another Cost
+             $y = $fpdf->GetY()+3;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->Cell(25, 5, 'Note Another Cost : ', 0, 1, 'L', 0);
+             $fpdf->MultiCell(80, 5, $po_create[0]['Notes2'], 0, 1, 'L', 0);
+         }
 
          // show terbilang
          $y = $fpdf->GetY()+5;

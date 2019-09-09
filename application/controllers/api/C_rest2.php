@@ -4417,12 +4417,20 @@ class C_rest2 extends CI_Controller {
        $dataToken = $this->getInputToken2();
        $auth = $this->m_master->AuthAPI($dataToken);
         if ($auth) {
+            $where = ' where b.Active = 1 and ( b.StartDate <= CURDATE() and b.EndDate >= CURDATE() )';
+            if (array_key_exists('Active', $dataToken)) {
+                $where = ' where b.Active = '.$dataToken['Active'];
+            }
+            $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+            $Year = $get[0]['Year'];
+            $where .= ($where != '') ? ' and b.Year = '.$Year : ' where b.Year = '.$Year ;
+
             $sql = 'select b.ID,a.Name,b.ID_m_template,b.StartDate,b.EndDate,b.JsonStatus as JsonStatusDefault,b.CreatedBy,c.Name as NameCreatedBy,b.CreatedAt,b.LastUpdatedBy,d.Name as LastUpdatedName,b.LastUpdatedAt
                 from db_budgeting.m_template as a 
                 join db_budgeting.t_template as b on a.ID = b.ID_m_template
                 join db_employees.employees as c on b.CreatedBy = c.NIP
                 left join db_employees.employees as d on b.LastUpdatedBy = d.NIP
-                where b.Active = 1 and ( b.StartDate <= CURDATE() and b.EndDate >= CURDATE() )
+                '.$where.'
                 order by b.ID desc
             ';
             $query=$this->db->query($sql, array())->result_array(); 

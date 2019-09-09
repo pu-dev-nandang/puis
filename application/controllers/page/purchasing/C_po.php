@@ -861,6 +861,7 @@ class C_po extends Transaksi_Controler {
         // $AnotherCost = $Input['AnotherCost'];
         $Notes = $Input['Notes'];
         $ID_pay_type = $Input['ID_pay_type'];
+        $NotesAnotherCost = $Input['NotesAnotherCost'];
 
         $CheckPerubahanData = $this->m_pr_po->CheckPerubahanData_PO_Created($po_data);
         if ($CheckPerubahanData) {
@@ -886,12 +887,14 @@ class C_po extends Transaksi_Controler {
             }
 
             $JsonStatus = $this->m_pr_po->GetRuleApproval_PO_JsonStatus($Amount);
+
             $dataSave = array(
                 // 'AnotherCost' => $AnotherCost,
                 'Notes' => $Notes,
                 'ID_pay_type' => $ID_pay_type,
                 'Status' => 1,
                 'JsonStatus' => json_encode($JsonStatus),
+                'Notes2' => $NotesAnotherCost,
             );
             $this->db->where('Code',$Code);
             $this->db->update('db_purchasing.po_create',$dataSave);
