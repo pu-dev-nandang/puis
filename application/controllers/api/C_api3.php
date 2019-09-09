@@ -1987,7 +1987,7 @@ class C_api3 extends CI_Controller {
 
 
                 // Score
-                $Score = ($dataScore[0]['Score']!=null && $dataScore[0]['Score']!='') ? $dataScore[0]['Score'] : '';
+                $Score = (count($dataScore)>0 && $dataScore[0]['Score']!=null && $dataScore[0]['Score']!='') ? $dataScore[0]['Score'] : '';
 
                 $DeptID = $this->session->userdata('IDdepartementNavigation');
 
