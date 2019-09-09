@@ -184,6 +184,8 @@ $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
 $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
+$route['it/user-activity'] = 'page/it/c_it/user_activity';
+
 $route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
 
 
@@ -1344,9 +1346,22 @@ $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleks
 
 
 
+$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+                  LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
+                  WHERE amh.Type = "APS" ');
+$result = $query->result_array();
 
-$route['agregator-aps/setting'] = 'page/agregator/c_agregator_aps/setting';
-$route['agregator-aps/kerjasama-tridharma'] = 'page/agregator/c_agregator_aps/kerjasama_tridharma';
+foreach( $result as $row )
+{
+    $my_file = $row['View'].'.php';
+    $filePath = APPPATH.'views/page/agregator_aps/'.$my_file;
+    if(!file_exists($filePath)){
+        $handle = fopen($filePath, 'w') or die('Cannot open file:  '.$filePath);
+        $data = '<h3>This is the page : '.$my_file.'</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span><script>function loadPage(){var e=$("#filterProdi").val();""!=e&&null!=e&&($("#viewProdiID").html(e),$("#viewProdiName").html($("#filterProdi option:selected").text()))}$(document).ready(function(){var e=setInterval(function(){var l=$("#filterProdi").val();""!=l&&null!=l&&(loadPage(),clearInterval(e))},1e3);setTimeout(function(){clearInterval(e)},5e3)}),$("#filterProdi").change(function(){var e=$("#filterProdi").val();""!=e&&null!=e&&loadPage()});</script>';
+        fwrite($handle, $data);
+    }
+    $route["".$row['URL']] = 'page/agregator/c_agregator_aps/loadpage_aps/'.$row['View'];
+}
 
 $route['api3/__getListMenuAgregator/(:any)'] = 'api/c_api3/getListMenuAgregator/$1';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
