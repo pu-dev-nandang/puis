@@ -59,7 +59,7 @@
         <br/>
         <div class="col-md-9">
              <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
-            <div style="min-height: 30px;" id="viewData"></div>
+            <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
         </div>
 
     </div>
@@ -92,14 +92,8 @@
         });
 
     $("#btndownloaadExcel").click(function(){
-        //var selectCurriculum = $("#selectCurriculum").val();
-        //if (selectCurriculum == "" || selectCurriculum == null) {toastr.error('Please select Curriculum', 'Failed!!');return};
-
-        //var Year = selectCurriculum.split(".");
-       // Year = Year[1];
-       // var prodi = $('#selectProdi').val();
+     
         var akred = "0";
-
         var url = base_url_js+'agregator/excel_akreditasi_eksternal';
         data = {
           akred : akred

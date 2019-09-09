@@ -52,12 +52,11 @@
                 </div>
             </div>
 
-
-
         </div>
         <div class="col-md-9">
-
-            <div id="viewData"></div>
+             <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> 
+             <br/>
+            <div id="viewData" class="table-responsive"></div>
 
         </div>
 
@@ -90,6 +89,20 @@
         loadDataTable();
 
     });
+
+
+    $("#btndownloaadExcel").click(function(){
+        var akred = "0";
+
+        var url = base_url_js+'agregator/excel-kerjasama-perguruantinggi';
+        data = {
+          akred : akred
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
 
     $('#btnLembagaMitra').click(function () {
 
@@ -355,13 +368,9 @@
 
             });
 
-
-
         } else {
             toastr.warning('All form required','Warning');
         }
-
-
 
     });
 
@@ -375,9 +384,9 @@
             '                        <th style="width: 25%">Lembaga Mitra Kerjasama</th>' +
             '                        <th style="width: 7%;">Tingkat</th>' +
             '                        <th>Bentuk Kegiatan / Manfaat</th>' +
-            '                        <th style="width: 15%">Bukti Kerjasama</th>' +
+            '                        <th style="width: 10%">Masa Berlaku</th>' +
+            '                        <th style="width: 8%">Bukti Kerjasama</th>' +
             '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
-            '                        <th style="width: 15%">Masa Berlaku</th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                </table>');
