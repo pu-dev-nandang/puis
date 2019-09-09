@@ -688,7 +688,7 @@
                                     '</div>'+
                                 '</div>';                           
                     var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                        '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>';
+                        '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Print</button>';
                     
                     $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Akses'+'</h4>');
                     $('#GlobalModalLarge .modal-body').html(html);
