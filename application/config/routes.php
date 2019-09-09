@@ -1401,6 +1401,8 @@ foreach( $result as $row )
 
 $route['api3/__getListMenuAgregator/(:any)'] = 'api/c_api3/getListMenuAgregator/$1';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
+$route['api3/__crudProgrameStudy'] = 'api/c_api3/crudProgrameStudy';
+$route['api3/__getAccreditation'] = 'api/c_api3/getAccreditation';
 
 $route['api3/__crudLembagaSurview'] = 'api/c_api3/crudLembagaSurview';
 $route['api3/__crudExternalAccreditation'] = 'api/c_api3/crudExternalAccreditation';

@@ -2354,4 +2354,46 @@ class C_api3 extends CI_Controller {
 
     }
 
+    public function crudProgrameStudy(){
+
+        $data_arr = $this->getInputToken2();
+
+        if($data_arr['action']=='viewAllDataProdi'){
+            $data = $this->db->query('SELECT ps.*,el.Description, a.Label AS Akreditation FROM db_academic.program_study ps 
+                                           LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID) 
+                                           LEFT JOIN db_academic.accreditation a ON (a.ID = ps.AccreditationID)
+                                           WHERE ps.Status = "1"')->result_array();
+
+            // Get jml mhs
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $DataMhs  = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students ats 
+                                                            WHERE ats.ProdiID = "'.$data[$i]['ID'].'" AND ats.StatusStudentID = "3" ')->result_array();
+                    $data[$i]['TotalMhs'] = $DataMhs[0]['Total'];
+                }
+            }
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateProgrammeStudy'){
+            $ID = $data_arr['ID'];
+            $dataForm = $data_arr['dataForm'];
+
+            $this->db->where('ID', $ID);
+            $this->db->update('db_academic.program_study',$dataForm);
+
+            return print_r(1);
+
+        }
+
+
+
+    }
+
+    public function getAccreditation(){
+        $data = $this->db->get('db_academic.accreditation')->result_array();
+
+        return print_r(json_encode($data));
+    }
+
 }
