@@ -256,6 +256,9 @@ class C_pr_po extends Budgeting_Controler {
             case 'add':
                unset($Input['ID']);
                unset($Input['action']);
+               $get = $this->m_master->caribasedprimary('db_budgeting.cfg_dateperiod','Activated',1);
+               $Year = $get[0]['Year'];
+               $Input['Year'] = $Year;
                $Input['JsonStatus'] = json_encode($Input['JsonStatus']);
                $Input['CreatedBy'] = $this->session->userdata('NIP');
                $Input['CreatedAt'] = date('Y-m-d H:i:s');
@@ -266,7 +269,6 @@ class C_pr_po extends Budgeting_Controler {
                 $G_data = $this->m_master->caribasedprimary('db_budgeting.t_template','ID',$ID);
                 if ($G_data[0]['Activated'] == 1) {
                     unset($Input['action']);
-                    
                     unset($Input['ID']);
                     $Input['JsonStatus'] = json_encode($Input['JsonStatus']);
                     $Input['LastUpdatedBy'] = $this->session->userdata('NIP');

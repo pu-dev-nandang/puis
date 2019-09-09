@@ -141,8 +141,8 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->Cell($w_date_needed,$h,'Date Needed',$border,0,'C',true);
          $fpdf->Cell($w_qty,$h,'Qty',$border,0,'C',true);
          $fpdf->Cell($w_pricest,$h,'Harga',$border,0,'C',true);
-         $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
          $fpdf->Cell($w_disc,$h,'Discount',$border,0,'C',true);
+         $fpdf->Cell($w_pph,$h,'PPN',$border,0,'C',true);
          $fpdf->Cell($w_anotcost,$h,'Another Cost',$border,0,'C',true);
          $fpdf->Cell($w_totalammount,$h,'Total Amount',$border,1,'C',true);
 
@@ -173,8 +173,8 @@ class C_save_to_pdf3 extends CI_Controller {
                 $po_detail[$i]['DateNeeded'],
                 $po_detail[$i]['QtyPR'],
                 'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),
-                (int)$po_detail[$i]['PPN_PO'].'%',
                 (int)$po_detail[$i]['Discount_PO'].'%',
+                (int)$po_detail[$i]['PPN_PO'].'%',
                 'Rp '.number_format($po_detail[$i]['AnotherCost'],2,',','.'),
                 'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),
 
@@ -182,7 +182,6 @@ class C_save_to_pdf3 extends CI_Controller {
              $total += $po_detail[$i]['Subtotal'];
              $no++;
          }
-
 
          // footer table
          $y = $fpdf->GetY();
@@ -193,6 +192,15 @@ class C_save_to_pdf3 extends CI_Controller {
          $fpdf->Cell($w_disc+$w_anotcost+$w_totalammount,$h,$total2,$border,1,'C',true);
          $fpdf->SetFont('Arial','B',$FontIsian);
          $fpdf->Cell($x__+$w_disc+$w_anotcost+$w_totalammount,$h,$po_create[0]['Notes'],$border,1,'L',true);
+
+         if ($po_create[0]['Notes2'] != '' && $po_create[0]['Notes2'] != null) {
+             // Note Another Cost
+             $y = $fpdf->GetY()+3;
+             $fpdf->SetXY($x,$y);
+             $fpdf->SetFont('Arial','',$FontIsian);
+             $fpdf->Cell(25, 5, 'Note Another Cost : ', 0, 1, 'L', 0);
+             $fpdf->MultiCell(80, 5, $po_create[0]['Notes2'], 0, 1, 'L', 0);
+         }
 
          // show terbilang
          $y = $fpdf->GetY()+5;

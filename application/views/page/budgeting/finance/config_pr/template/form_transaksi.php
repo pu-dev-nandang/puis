@@ -116,6 +116,10 @@
         }
         $('#TableApprovalTransaksi tbody').html(html);          
         MakeAutoNumbering();
+
+        $('.datetimepicker').datetimepicker({
+         format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
+        });
         <?php endif ?> 
     }
 
