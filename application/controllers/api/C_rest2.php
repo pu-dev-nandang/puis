@@ -2051,9 +2051,9 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB,spb.CreatedAt as CreatedAtSPB ';
+               $fieldaction = ', spb.ID_payment,spb.Status as StatusSPB,spb.Departement as DepartementSPB,spb.JsonStatus as JsonStatus3,spb.Code as CodeSPB,spb.CreatedBy as SPBCreatedBy,e_spb.Name as SPBNameCreatedBy,if(spb.Status = 0,"Draft",if(spb.Status = 1,"Issued & Approval Process",if(spb.Status =  2,"Approval Done",if(spb.Status = -1,"Reject","Cancel") ) )) as StatusNameSPB,t_spb_de.NameDepartement as NameDepartementSPB,spb.CreatedAt as CreatedAtSPB,spb.ID_template_pay ';
                // $joinaction = ' right join db_purchasing.spb_created as spb on spb.Code_po_create = a.Code
-               $joinaction = ' right join (select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb")
+               $joinaction = ' right join (select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,a.ID_template as ID_template_pay,b.* from db_payment.payment as a join db_payment.spb as b on a.ID = b.ID_payment where a.Type = "Spb")
                                 as spb on spb.Code_po_create = a.Code
                                left join db_employees.employees as e_spb on e_spb.NIP = spb.CreatedBy
                                join (
@@ -2085,6 +2085,12 @@ class C_rest2 extends CI_Controller {
                         $WhereFiltering .= ' and MONTH(CreatedAtSPB) = '.(int)$dataToken['Month'];
                     }
                 }
+                // print_r($dataToken);die();
+                if (array_key_exists('SelectTemplate', $dataToken)) {
+                     if ($dataToken['SelectTemplate'] != '%' && $dataToken['SelectTemplate'] != '') {
+                        $WhereFiltering .= ' and (ID_template_PR = '.$dataToken['SelectTemplate'].' or ID_template_pay = '.$dataToken['SelectTemplate'].' )';
+                     }
+                 }
                  
                 $requestData = $_REQUEST;
                 $StatusQuery = '';
@@ -2092,7 +2098,7 @@ class C_rest2 extends CI_Controller {
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.ID_template as ID_template_PR,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2118,7 +2124,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.ID_template as ID_template_PR,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2135,6 +2141,7 @@ class C_rest2 extends CI_Controller {
                       or SPBNameCreatedBy LIKE "'.$requestData['search']['value'].'%" or SPBCreatedBy LIKE "'.$requestData['search']['value'].'%" 
                       or PRCode LIKE "'.$requestData['search']['value'].'%" or CodeSPB LIKE "'.$requestData['search']['value'].'%" 
                     ) '.$StatusQuery.$WhereFiltering.$whereaction ;
+                    // print_r($sql);die();
                 $sql.= ' ORDER BY ID_payment Desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $query = $this->db->query($sql)->result_array();
 
