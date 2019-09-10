@@ -762,9 +762,57 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readDataMHSBaru'){
 
             $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+            $data = array();
+            // $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+            //                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+            //                                         WHERE ss.Year = "'.$Year.'" ')->result_array();
+
+            // get all prodi
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+            for ($i=0; $i <count($G_prodi) ; $i++) { 
+                $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
-                                                    WHERE ss.Year = "'.$Year.'" ')->result_array();
+                                                    WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+                $query=$this->db->query($sql, array($G_prodi[$i]['ID']))->result_array();
+
+                if (count($query) == 0) {
+                    $temp = [
+                        'Capacity' => null,
+                        'EntredAt' => null,
+                        'EntredBy' => null,
+                        'ID' => null,
+                        'PassSelection' => null,
+                        'ProdiCode' => $G_prodi[$i]['Code'],
+                        'ProdiID' => $G_prodi[$i]['ID'],
+                        'ProdiName' => $G_prodi[$i]['Name'],
+                        'Registrant' => null,
+                        'Regular' => null,
+                        'Regular2' => null,
+                        'TotalStudemt' => null,
+                        'Transfer' => null,
+                        'Transfer2' => null,
+                        'Type' => null,
+                        'UpdatedBy' => null,
+                        'Year' => $Year,
+                        'updatedAt' => null,
+                    ];
+                }
+                else
+                {
+                    $temp = $query[0];
+                    // update all null menjadi 0
+                    // foreach ($temp as $key => $value) {
+                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                    //         if ($value == null && $value == '') {
+                    //             $temp[$key] = 0;
+                    //         }
+                    //     }
+                    // }
+                }
+
+                $data[] = $temp;
+            
+            }    
 
             return print_r(json_encode($data));
 
@@ -795,20 +843,20 @@ class C_api3 extends CI_Controller {
                 $query=$this->db->query($sql, array($arrExp[0]))->result_array();
                 if (count($query) == 0) {
                     $temp = [
-                        'Capacity' => 0,
+                        'Capacity' => null,
                         'EntredAt' => null,
                         'EntredBy' => null,
                         'ID' => null,
-                        'PassSelection' => 0,
+                        'PassSelection' => null,
                         'ProdiCode' => $arrExp[1],
                         'ProdiID' => $arrExp[0],
                         'ProdiName' => $filterProdiName,
-                        'Registrant' => 0,
-                        'Regular' => 0,
-                        'Regular2' => 0,
-                        'TotalStudemt' => 0,
-                        'Transfer' => 0,
-                        'Transfer2' => 0,
+                        'Registrant' => null,
+                        'Regular' => null,
+                        'Regular2' => null,
+                        'TotalStudemt' => null,
+                        'Transfer' => null,
+                        'Transfer2' => null,
                         'Type' => null,
                         'UpdatedBy' => null,
                         'Year' => $Year,
@@ -819,13 +867,13 @@ class C_api3 extends CI_Controller {
                 {
                     $temp = $query[0];
                     // update all null menjadi 0
-                    foreach ($temp as $key => $value) {
-                        if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
-                            if ($value == null && $value == '') {
-                                $temp[$key] = 0;
-                            }
-                        }
-                    }
+                    // foreach ($temp as $key => $value) {
+                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                    //         if ($value == null && $value == '') {
+                    //             $temp[$key] = 0;
+                    //         }
+                    //     }
+                    // }
                 }
 
                 $rs[] = $temp;
