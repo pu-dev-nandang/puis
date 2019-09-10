@@ -1347,6 +1347,9 @@ $route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asi
 
 $route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
 $route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akreditasi_program_studi';
+$route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tidak_tetap';
+$route['agregator/excel-rasio-dosen-mahasiswa'] = 'c_save_to_excel2/excel_rasio_dosen_mahasiswa';
+$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
 
 
 

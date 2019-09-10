@@ -23,7 +23,7 @@
                     </div>
                 </div>
             </div>
-
+            <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
             <table class="table" id="tableData">
                 <thead>
                 <tr>
@@ -41,6 +41,7 @@
 </div>
 
 <script>
+    var passToExcel = [];
     $(document).ready(function () {
         loadLecturerCertificate();
     });
@@ -50,7 +51,7 @@
     });
 
     function loadLecturerCertificate() {
-
+        passToExcel = [];
         var filterStatusForlap = $('#filterStatusForlap').val();
         var status = (filterStatusForlap!='' && filterStatusForlap!=null)
         ? filterStatusForlap : 'all';
@@ -86,9 +87,26 @@
                     '<th>'+ds_c+'</th>' +
                     //'<th>'+ds_x+'</th>' +
                     '</tr>')
+
+
+                passToExcel = jsonResult;
             }
 
         });
 
     }
+
+    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
+        if (passToExcel.length > 0) {
+            var url = base_url_js+'agregator/excel-rasio-dosen-mahasiswa';
+            data = {
+              passToExcel : passToExcel,
+            }
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+        }
+
+    })
 </script>

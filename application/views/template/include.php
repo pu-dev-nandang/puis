@@ -1981,6 +1981,10 @@
         return (v!='' && v!=null) ? v : '';
     }
 
+    function checkValueInt(v) {
+        return (v!='' && v!=null) ? v : 0;
+    }
+
     window.getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = decodeURIComponent(window.location.search.substring(1)),
             sURLVariables = sPageURL.split('&'),
