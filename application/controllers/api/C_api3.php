@@ -769,6 +769,71 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='readDataMHSBaruByProdi'){
+
+            // get tahun akademik smpe sekarang
+            $rs = array();
+            $arr_tahun_akademik = array();
+            $stYear = 2014;
+            $endYear = date('Y');
+            for ($i=$stYear; $i <= $endYear; $i++) { 
+                $arr_tahun_akademik[] = $i;
+            }
+
+            // get prodi
+            $filterProdi = $data_arr['filterProdi'];
+            $filterProdiName = $data_arr['filterProdiName'];
+            $exFPName = explode('-', $filterProdiName);
+            $filterProdiName = trim($exFPName[1]);
+            $arrExp = explode('.', $filterProdi);
+
+            for ($i=0; $i < count($arr_tahun_akademik); $i++) { 
+                $Year = $arr_tahun_akademik[$i];
+                $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                    WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+                $query=$this->db->query($sql, array($arrExp[0]))->result_array();
+                if (count($query) == 0) {
+                    $temp = [
+                        'Capacity' => 0,
+                        'EntredAt' => null,
+                        'EntredBy' => null,
+                        'ID' => null,
+                        'PassSelection' => 0,
+                        'ProdiCode' => $arrExp[1],
+                        'ProdiID' => $arrExp[0],
+                        'ProdiName' => $filterProdiName,
+                        'Registrant' => 0,
+                        'Regular' => 0,
+                        'Regular2' => 0,
+                        'TotalStudemt' => 0,
+                        'Transfer' => 0,
+                        'Transfer2' => 0,
+                        'Type' => null,
+                        'UpdatedBy' => null,
+                        'Year' => $Year,
+                        'updatedAt' => null,
+                    ];
+                }
+                else
+                {
+                    $temp = $query[0];
+                    // update all null menjadi 0
+                    foreach ($temp as $key => $value) {
+                        if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                            if ($value == null && $value == '') {
+                                $temp[$key] = 0;
+                            }
+                        }
+                    }
+                }
+
+                $rs[] = $temp;
+            }
+
+            return print_r(json_encode($rs));
+
+        }
         else if($data_arr['action']=='readDataMHSBaruAsing'){
 
             $Year = $data_arr['Year'];
@@ -1555,36 +1620,68 @@ class C_api3 extends CI_Controller {
     
 
     public function getAkreditasiProdi(){
-        $data = $this->db->get('db_academic.accreditation')->result_array();
+        // get TypeHeader
+        $rs = array();
+        $header = array();
+        $fill = array();
+        $sql = 'select Type from db_academic.education_level Group by Type';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $sql2 = 'select * from db_academic.education_level where Type = ? order by Name asc ';
+            $query2=$this->db->query($sql2, array($query[$i]['Type'] ))->result_array();
+            $query[$i]['Detail'] = $query2;
+        }
 
-        if(count($data)>0){
+        $header = $query;
 
-            // Data Education level
-            $edl = $this->db->get('db_academic.education_level')->result_array();
-            for($i=0;$i<count($data);$i++){
+        // fill count
+        $G_accreditation = $this->m_master->showData_array('db_academic.accreditation');
+        for ($i=0; $i < count($G_accreditation); $i++) { 
+            $AccreditationID = $G_accreditation[$i]['ID'];
+            $AccreditationName = $G_accreditation[$i]['Label'];
+            $temp2 = array(
+                'AccreditationID' => $AccreditationID,
+                'AccreditationName' => $AccreditationName,
+                'TypeProgramStudy' => array(),
+            );
+            $temp3 = array();
+            for ($j=0; $j < count($query); $j++) { 
+                $TypeProgramStudy = $query[$j]['Type'];
+                $temp3 = array(
+                    'Name' => $TypeProgramStudy,
+                    'Data' => array(),
+                );
 
-                for($a=0;$a<count($edl);$a++){
+                $Detail = $query[$j]['Detail'];
+                for ($k=0; $k < count($Detail); $k++) { 
+                    $EducationLevelID = $Detail[$k]['ID'];
+                    $EducationLevelName = $Detail[$k]['Name'];
+                    $EducationLevelDesc = $Detail[$k]['Description'];
+                    $EducationLevelDescEng = $Detail[$k]['DescriptionEng'];
+                    // find sql 
+                    $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
 
-                    $dataP = $this->db->get_where('db_academic.program_study',array(
-                        'EducationLevelID' => $edl[$a]['ID'],
-                        'AccreditationID' => $data[$i]['ID']
-                    ))->result_array();
-                    print_r($dataP);
-
-                    $r = array(
-                        'Level' => $edl[$a]['Name'],
-                        'Prodi' => count($dataP)
+                    $temp3['Data'][] = array(
+                        'EducationLevelID' => $EducationLevelID,
+                        'EducationLevelName' => $EducationLevelName,
+                        'EducationLevelDesc' => $EducationLevelDesc,
+                        'EducationLevelDescEng' => $EducationLevelDescEng,
+                        'Count' => $query3[0]['Total'],
                     );
-
-                    $data[$i]['Details'][$a] = $r;
-
                 }
+
+                $temp2['TypeProgramStudy'][] = $temp3;
 
             }
 
+            $fill[] = $temp2;
         }
 
-        return print_r(json_encode($data));
+        $rs['fill'] = $fill;
+        $rs['header'] = $header;
+
+        return print_r(json_encode($rs));
 
     }
 
