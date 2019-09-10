@@ -1706,6 +1706,25 @@
 
     }
 
+    function loadSelectOptionAccreditation(element,selected) {
+        var url = base_url_js+'api3/__getAccreditation';
+
+        $.getJSON(url,function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (selected!='' && selected!=null && selected!=='undefined' && v.ID == selected)
+                        ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Label+'</option>');
+                });
+            };
+
+
+
+        });
+
+    }
+
     function loadYearOfBirth(element,selected){
         $(element).empty();
         var thisYear = (new Date()).getFullYear();

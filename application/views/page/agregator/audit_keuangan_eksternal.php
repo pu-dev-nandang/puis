@@ -40,9 +40,9 @@
                 </div>
             </div>
         </div>
-        <br/>
+        
         <div class="col-md-9">
-            <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b> Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
+            <div style="text-align: right;"> <button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> <p></p>
             <div id="viewData" class="table-responsive"></div>
         </div>
 

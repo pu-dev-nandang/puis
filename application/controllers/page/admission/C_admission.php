@@ -1074,7 +1074,7 @@ class C_admission extends Admission_Controler {
         $totalData = $this->m_admission->getCountAllDataPersonal_Candidate($requestData,$reqTahun);
 
         $sql = 'select ccc.* from (
-                select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
+                select a.ID as RegisterID,a.Name,a.SchoolID,a.Phone,b.SchoolName,a.Email,a.RegisterAT,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
                 xq.DiscountType,
                 if(f.Rangking > 0 ,f.Rangking,"-") as Rangking,
                 if(
@@ -1132,7 +1132,7 @@ class C_admission extends Admission_Controler {
             // $nestedData[] = $row['NamePrody'];
             $Code = ($row['No_Ref'] != "") ? $row['FormulirCode'].' / '.$row['No_Ref'] : $row['FormulirCode'];
             $nestedData[] = $No;
-            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['SchoolName'];
+            $nestedData[] = $row['Name'].'<br>'.$row['Email'].'<br>'.$row['Phone'].'<br>'.$row['SchoolName'];
             $nestedData[] = $row['NamePrody'].'<br>'.$Code.'<br>'.$row['VA_number'];
             $nestedData[] = $row['NameSales'];
             $nestedData[] = $row['Rangking'];
@@ -1158,6 +1158,7 @@ class C_admission extends Admission_Controler {
              }
             $nestedData[] = $cicilan;
             $nestedData[] = $row['chklunas'];
+            $nestedData[] = $row['RegisterAT'];
             $nestedData[] = '<div style="text-align: center;"><button class="btn btn-sm btn-primary btnLoginPortalRegister " data-xx="'.$row['Email'].'" data-xx2="'.$row['FormulirCode'].'"  ><i class="fa fa-sign-in right-margin"></i> Login Portal</button></div>';
             $data[] = $nestedData;
             $No++;
@@ -1300,7 +1301,7 @@ class C_admission extends Admission_Controler {
           echo json_encode($msg);
           die(); // stop script
         }
-      }  
+      }
 
       $input = $this->getInputToken();
       $msg = '';
@@ -1776,7 +1777,7 @@ class C_admission extends Admission_Controler {
             $url = URLAD.'__api/Create';
             $token = $this->jwt->encode($data,"UAP)(*");
             $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
-            
+
           }
 
           // send notif

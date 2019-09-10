@@ -114,7 +114,7 @@
                            '<tr style="background: #333;color: #fff;">'+
                                // '<th><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
                                '<th>No</th>'+
-                               '<th>Nama,Email & Sekolah</th>'+
+                               '<th>Nama,Email,Phone & Sekolah</th>'+
                                '<th>Prody,Formulir & VA</th>'+
                                '<th>Sales</th>'+
                                '<th>Rangking</th>'+
@@ -123,6 +123,7 @@
                                '<th width = "13%">Tagihan</th>'+
                                '<th>Detail Payment</th>'+
                                '<th>Status</th>'+
+                               '<th>RegisterAt</th>'+
                                '<th>Login</th>'+
                            '</tr>'+
                            '</thead>'+

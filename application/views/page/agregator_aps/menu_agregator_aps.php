@@ -27,6 +27,8 @@
         <div>
             <select class="form-control" id="filterProdi"></select>
             <hr/>
+            <button onclick="linktoPage()" class="btn btn-block btn-primary">Program Studi</button>
+            <hr/>
         </div>
 
         <div class="panel-group" id="accordion">
@@ -122,5 +124,9 @@
 
 
     });
+
+    function linktoPage() {
+        window.location.href = "<?= base_url('agregator-aps/programme-study'); ?>";
+    }
 
 </script>

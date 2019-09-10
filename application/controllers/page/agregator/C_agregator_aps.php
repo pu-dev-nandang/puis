@@ -86,9 +86,12 @@ class C_agregator_aps extends Globalclass {
         $this->menu_agregator($page);
     }
 
-
-
-
-
+    public function programme_study(){
+        $viewPage = 'programme_study';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator_aps/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
 
 }

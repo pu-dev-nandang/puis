@@ -31,7 +31,8 @@ switch ($ServerName) {
 
         $db['default']['hostname'] = 'localhost';
         $db['default']['username'] = 'root';
-        $db['default']['password'] = '';
+        // $db['default']['password'] = ($_SERVER['SERVER_PORT']=='8080') ? '' : 'Uap)(*&^%';
+        $db['default']['password'] = ($_SERVER['SERVER_PORT']=='8080') ? '' : '';
 
 
 //        $db['default']['hostname'] = '10.1.30.18';
