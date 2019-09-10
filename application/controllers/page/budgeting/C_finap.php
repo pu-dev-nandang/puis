@@ -40,9 +40,9 @@ class C_finap extends Budgeting_Controler {
     public function list_server_side()
     {
          //check action
-        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal,pay.PostingDatePaid ';
+        $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.StatusPayFin,pay.CreateBYPayFin,e_PayFin.Name as PayFinNameCreatedBy,pay.ID_payment_fin,pay.RealisasiTotal,pay.RealisasiStatus,pay.CreateATPayFin,(select count(*) as total from db_payment.reminder_pay_realisasi where ID_payment = pay.ID_payment ) as ReminderTotal,pay.PostingDatePaid,pay.ID_template_pay ';
         $joinaction = ' right join (
-                                 select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.*,c.Status as StatusPayFin 
+                                 select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,a.ID_template as ID_template_pay,b.*,c.Status as StatusPayFin 
                                  ,c.CreatedBy as CreateBYPayFin,c.ID as ID_payment_fin,c.CreatedAt as CreateATPayFin,c.PostingDate as PostingDatePaid
                                  from db_payment.payment as a join
                                  ( select ID_payment,Perihal,1 as RealisasiTotal,2 as RealisasiStatus  from db_payment.spb
@@ -120,6 +120,12 @@ class C_finap extends Budgeting_Controler {
              }
              
          }
+
+         if (array_key_exists('SelectTemplate', $dataToken)) {
+             if ($dataToken['SelectTemplate'] != '%' && $dataToken['SelectTemplate'] != '') {
+                $WhereFiltering .= ' and (ID_template_PR = '.$dataToken['SelectTemplate'].' or ID_template_pay = '.$dataToken['SelectTemplate'].' )';
+             }
+         }
           
          $requestData = $_REQUEST;
          $StatusQuery = '';
@@ -127,7 +133,7 @@ class C_finap extends Budgeting_Controler {
                      select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                          c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                          a.JsonStatus,
-                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
+                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.ID_template as ID_template_PR,h.Year,h.Departement,a.Status'.$fieldaction.'
                      from db_purchasing.po_create as a
                      left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                      left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -154,7 +160,7 @@ class C_finap extends Budgeting_Controler {
                      select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                          c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                          a.JsonStatus,
-                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Year,h.Departement,a.Status'.$fieldaction.'
+                         if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.ID_template as ID_template_PR,h.Year,h.Departement,a.Status'.$fieldaction.'
                      from db_purchasing.po_create as a
                      left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                      left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier

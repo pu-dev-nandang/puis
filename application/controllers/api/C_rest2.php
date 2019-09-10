@@ -2510,9 +2510,9 @@ class C_rest2 extends CI_Controller {
             if ($auth) {
                 $this->load->model('budgeting/m_pr_po');
                 //check action
-               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.DateNeededAP ';
+               $fieldaction = ', pay.ID_payment,pay.Status as StatusPay,pay.Departement as DepartementPay,pay.JsonStatus as JsonStatus3,pay.Code as CodeSPB,pay.CreatedBy as PayCreatedBy,e_spb.Name as PayNameCreatedBy,if(pay.Status = 0,"Draft",if(pay.Status = 1,"Issued & Approval Process",if(pay.Status =  2,"Approval Done",if(pay.Status = -1,"Reject","Cancel") ) )) as StatusNamepay,t_spb_de.NameDepartement as NameDepartementPay,pay.Perihal,pay.Type as TypePay,pay.CreatedAt as PayCreateAt,pay.DateNeededAP,pay.ID_template_pay  ';
                $joinaction = ' right join (
-                                        select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,b.* from db_payment.payment as a join
+                                        select a.ID as ID_payment_,a.Type,a.Code,a.Code_po_create,a.Departement,a.UploadIOM,a.NoIOM,a.JsonStatus,a.Notes,a.Status,a.Print_Approve,a.CreatedBy,a.CreatedAt,a.LastUpdatedBy,a.LastUpdatedAt,a.ID_template as ID_template_pay,b.* from db_payment.payment as a join
                                         ( select ID_payment,Perihal,"-" as DateNeededAP from db_payment.spb
                                           UNION 
                                           select ID_payment,Perihal,Date_Needed  from db_payment.bank_advance
@@ -2542,6 +2542,12 @@ class C_rest2 extends CI_Controller {
                         $WhereFiltering .=  ' and TypePay = "'.$dataToken['TypePaymentSelect'].'"';
                     }
                 }
+
+                if (array_key_exists('SelectTemplate', $dataToken)) {
+                    if ($dataToken['SelectTemplate'] != '%' && $dataToken['SelectTemplate'] != '') {
+                       $WhereFiltering .= ' and (ID_template_PR = '.$dataToken['SelectTemplate'].' or ID_template_pay = '.$dataToken['SelectTemplate'].' )';
+                    }
+                }
                  
                 $requestData = $_REQUEST;
                 // $StatusQuery = ' and Status = 2';
@@ -2550,7 +2556,7 @@ class C_rest2 extends CI_Controller {
                             select if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.ID_template as ID_template_PR,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier
@@ -2577,7 +2583,7 @@ class C_rest2 extends CI_Controller {
                             select a.ID as ID_po_create,if(a.TypeCreate = 1,"PO","SPK") as TypeCode,a.Code,a.ID_pre_po_supplier,b.CodeSupplier,
                                 c.NamaSupplier,c.PICName as PICSupplier,c.Alamat as AlamatSupplier,
                                 a.JsonStatus,
-                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.Departement,a.Status'.$fieldaction.'
+                                if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = -1,"Reject","Cancel") ) )) as StatusName,a.CreatedBy,d.Name as NameCreateBy,a.CreatedAt,a.PostingDate,g.PRCode,h.JsonStatus as JsonStatus2,h.ID_template as ID_template_PR,h.Departement,a.Status'.$fieldaction.'
                             from db_purchasing.po_create as a
                             left join db_purchasing.pre_po_supplier as b on a.ID_pre_po_supplier = b.ID
                             left join db_purchasing.m_supplier as c on b.CodeSupplier = c.CodeSupplier

@@ -184,6 +184,8 @@ $route['it/loadpageversion'] = 'page/it/c_it/loadpageversiondetail';
 $route['it/academic/redundancy-krs-online'] = 'page/it/c_it/redundancy_krs_online';
 $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 
+$route['it/user-activity'] = 'page/it/c_it/user_activity';
+
 $route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
 
 
@@ -1343,16 +1345,69 @@ $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_ker
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
 
+$route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
+$route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akreditasi_program_studi';
 
 
 
+$route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
 
+$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+                  LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
+                  WHERE amh.Type = "APS" ');
+$result = $query->result_array();
 
-$route['agregator-aps/setting'] = 'page/agregator/c_agregator_aps/setting';
-$route['agregator-aps/kerjasama-tridharma'] = 'page/agregator/c_agregator_aps/kerjasama_tridharma';
+$ServerName = $_SERVER['SERVER_NAME'];
+foreach( $result as $row )
+{
+    $my_file = $row['View'].'.php';
+    $filePath = APPPATH.'views/page/agregator_aps/'.$my_file;
+    if($ServerName=='localhost'){
+        if(!file_exists($filePath)){
+            $handle = fopen($filePath, 'w') or die('Cannot open file:  '.$filePath);
+            $sc = "<script>
+                $(document).ready(function () {
+                    var firstLoad = setInterval(function () {
+                        var filterProdi = $('#filterProdi').val();
+                        if(filterProdi!='' && filterProdi!=null){
+                            loadPage();
+                            clearInterval(firstLoad);
+                        }
+                    },1000);
+                    setTimeout(function () {
+                        clearInterval(firstLoad);
+                    },5000);
+            
+                });
+                $('#filterProdi').change(function () {
+                    var filterProdi = $('#filterProdi').val();
+                    if(filterProdi!='' && filterProdi!=null){
+                        loadPage();
+                    }
+                });
+                function loadPage() {
+                    var filterProdi = $('#filterProdi').val();
+                    if(filterProdi!='' && filterProdi!=null){
+                        $('#viewProdiID').html(filterProdi);
+                        $('#viewProdiName').html($('#filterProdi option:selected').text());
+                    }
+                }
+            </script>";
+            $data = '<h3>This is the page : '.$my_file.'</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+                    
+                    
+                    '.$sc;
+            fwrite($handle, $data);
+        }
+    }
+
+    $route["".$row['URL']] = 'page/agregator/c_agregator_aps/loadpage_aps/'.$row['View'];
+}
 
 $route['api3/__getListMenuAgregator/(:any)'] = 'api/c_api3/getListMenuAgregator/$1';
 $route['api3/__crudTeamAgregagor'] = 'api/c_api3/crudTeamAgregagor';
+$route['api3/__crudProgrameStudy'] = 'api/c_api3/crudProgrameStudy';
+$route['api3/__getAccreditation'] = 'api/c_api3/getAccreditation';
 
 $route['api3/__crudLembagaSurview'] = 'api/c_api3/crudLembagaSurview';
 $route['api3/__crudExternalAccreditation'] = 'api/c_api3/crudExternalAccreditation';
@@ -1391,6 +1446,11 @@ $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
 $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
+
+
+// Agregator Adhi
+$route['api4/__crudAgregatorTB3'] = 'api/c_api4/crudAgregatorTB3';
+
 
 
 // budgeting & PR

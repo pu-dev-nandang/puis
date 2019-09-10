@@ -213,7 +213,7 @@
 
             <li class="<?= ($this->uri->segment(2)=='agregator') ? 'current open' : ''?>">
                 <a href="javascript:void(0);">
-                    <i class="icon-edit"></i>
+                    <i class="fa fa-flag"></i>
                     Agregator
                     <i class="arrow <?= ($this->uri->segment(2)=='agregator') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
                 <ul class="sub-menu">
@@ -224,6 +224,13 @@
                         </a>
                     </li>
                 </ul>
+            </li>
+
+            <li class="<?php if($this->uri->segment(2)=='user-activity'){echo"current";}?>">
+                <a href="<?php echo base_url('it/user-activity');?>">
+                    <i class="fa fa-angellist"></i>
+                    User Activity
+                </a>
             </li>
 
         </ul>

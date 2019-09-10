@@ -20,10 +20,10 @@
 	}	
 </style>
 <div class="row">
-	<div class="col-xs-8 col-md-offset-2" style="min-width: 600px;overflow: auto;">
-		<div class="thumbnail">
+	<div class="col-xs-12" style="min-width: 600px;overflow: auto;">
+		<!-- <div class="thumbnail"> -->
 			<div id = "page_payment_list"></div>
-		</div>	
+		<!-- </div>	 -->
 	</div>
 </div>
 <div id="page_content" style="min-width: 800px;overflow: auto;">
@@ -34,11 +34,11 @@
 	var ClassDt = {
 		htmlPage_payment_list : function(){
 			var html = '';
-			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;">'+
+			html = '<div class = "row" style = "margin-right : 0px;margin-left:0px;margin-top:10px;">'+
              '<div class="col-md-6 col-md-offset-3">'+
                 '<div class="thumbnail">'+
                     '<div class="row">'+
-                      '<div class="col-md-12">'+
+                      '<div class="col-md-6">'+
                         '<div class="form-group">'+
                           '<label>Type</label>'+
                           '<select class = "form-control TypePaymentSelect">'+
@@ -46,6 +46,14 @@
                             '<option value = "Spb">SPB</option>'+
                             '<option value = "Cash Advance">Cash Advance</option>'+
                             '<option value = "Bank Advance">Bank Advance</option>'+
+                          '</select>'+  
+                        '</div>'+  
+                      '</div>'+
+                      '<div class="col-md-6">'+
+                        '<div class="form-group">'+
+                          '<label>Event / Template</label>'+
+                          '<select class = "form-control SelectTemplate">'+
+                            '<option value = "%" selected>--No Selected--</option>'+
                           '</select>'+  
                         '</div>'+  
                       '</div>'+
@@ -92,6 +100,16 @@
 		else
 		{
 			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+      // LoadTemplate
+      __LoadTemplate().then(function(dataTemplate){
+        var h = '';
+            for (var i = 0; i < dataTemplate.length; i++) {
+                h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+            }
+        $('.SelectTemplate').append(h);
+
+      })
+
 			Get_data_payment().then(function(data){
         $('#page_content').empty();
 				$('.C_radio:first').prop('checked',true);
@@ -101,13 +119,37 @@
 		}
 	});
 
+  function __LoadTemplate()
+  {
+    var def = jQuery.Deferred();
+    var url = base_url_js+'rest2/__LoadTemplate';
+    var data = {
+        auth : 's3Cr3T-G4N',
+        Active : 1,
+    };
+    var token = jwt_encode(data,"UAP)(*");
+    $.post(url,{ token:token },function (resultJson) {
+      
+    }).done(function(resultJson) {
+      def.resolve(resultJson);
+    }).fail(function() {
+      toastr.info('No Result Data');
+      def.reject();  
+    }).always(function() {
+                    
+    }); 
+    return def.promise();
+  }
+
 	function Get_data_payment(){
        var def = jQuery.Deferred();
        var UriSegment = "<?php echo $sget ?>";
        var TypePaymentSelect = $('.TypePaymentSelect option:selected').val();
+       var SelectTemplate = $('.SelectTemplate option:selected').val();
        var data = {
    		   auth : 's3Cr3T-G4N',
          TypePaymentSelect : TypePaymentSelect,
+         SelectTemplate : SelectTemplate,
        };
        var token = jwt_encode(data,"UAP)(*");
        if (UriSegment != '' && UriSegment != null) {
@@ -1013,6 +1055,15 @@
 					$('#page_content').empty();
 					if (rs.Status == 1) {
 						$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+            // LoadTemplate
+            __LoadTemplate().then(function(dataTemplate){
+              var h = '';
+                  for (var i = 0; i < dataTemplate.length; i++) {
+                      h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+                  }
+              $('.SelectTemplate').append(h);
+
+            })
 						Get_data_payment().then(function(data){
 							$('.C_radio:first').prop('checked',true);
 							$('.C_radio:first').trigger('change');
@@ -1025,6 +1076,15 @@
 						if (rs.Change == 1) {
 							toastr.info('The Data already have updated by another person,Please check !!!');
 							$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+              // LoadTemplate
+              __LoadTemplate().then(function(dataTemplate){
+                var h = '';
+                    for (var i = 0; i < dataTemplate.length; i++) {
+                        h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+                    }
+                $('.SelectTemplate').append(h);
+
+              })
 							Get_data_payment().then(function(data){
 								$('.C_radio:first').prop('checked',true);
 								$('.C_radio:first').trigger('change');
@@ -1086,6 +1146,16 @@
 				  	var rs = data;
 				  	if (rs.Status == 1) {
 				  		$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+              // LoadTemplate
+              __LoadTemplate().then(function(dataTemplate){
+                var h = '';
+                    for (var i = 0; i < dataTemplate.length; i++) {
+                        h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+                    }
+                $('.SelectTemplate').append(h);
+
+              })
+
 				  		Get_data_payment().then(function(data){
 				  			$('.C_radio:first').prop('checked',true);
 				  			$('.C_radio:first').trigger('change');
@@ -1098,6 +1168,15 @@
 				  		if (rs.Change == 1) {
 				  			toastr.info('The Data already have updated by another person,Please check !!!');
 				  			$('#page_payment_list').html(ClassDt.htmlPage_payment_list);
+                // LoadTemplate
+                __LoadTemplate().then(function(dataTemplate){
+                  var h = '';
+                      for (var i = 0; i < dataTemplate.length; i++) {
+                          h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+                      }
+                  $('.SelectTemplate').append(h);
+
+                })
 				  			Get_data_payment().then(function(data){
 				  				$('.C_radio:first').prop('checked',true);
 				  				$('.C_radio:first').trigger('change');
@@ -1307,7 +1386,7 @@
 		return h;
 	}
 
-  $(document).off('change', '.TypePaymentSelect').on('change', '.TypePaymentSelect',function(e) {
+  $(document).off('change', '.TypePaymentSelect,.SelectTemplate').on('change', '.TypePaymentSelect,.SelectTemplate',function(e) {
     Get_data_payment().then(function(data){
       $('#page_content').empty();
       $('.C_radio:first').prop('checked',true);

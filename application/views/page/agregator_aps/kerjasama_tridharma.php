@@ -1,5 +1,4 @@
-<h1><small>kerjasama_tridharma</small> - Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span></h1>
-
+<h3>This is the page : kerjasama_tridharma.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <script>
 
     $(document).ready(function () {

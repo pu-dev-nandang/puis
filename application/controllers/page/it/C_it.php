@@ -96,6 +96,17 @@ class C_it extends It_Controler {
         $this->load->view('page/'.$department.'/version/'.$data_arr['page'], $data_arr);
     }
 
+    public function user_activity(){
+        $department = parent::__getDepartement();
+        $data['NIP']= $this->session->userdata('NIP');
+        $content = $this->load->view('page/'.$department.'/user-activity/user_activity',$data,true);
+        $this->temp($content);
+    }
+
+    public function seleksi_mahasiswa_asing(){
+
+    }
+
 
 
 

@@ -59,7 +59,7 @@
 					'<tr>'+
 						'<td>'+no+'</td>'+
 						'<td>'+data_json[i]['Name']+'</td>'+
-						'<td>'+data_json[i]['Email']+'</td>'+
+						'<td>'+data_json[i]['Email']+'</br>'+data_json[i]['Phone']+'</td>'+
 						'<td>'+formatRupiah(data_json[i]['PriceFormulir'])+'</td>'+
 						// '<td>'+data_json[i]['VA_number']+'</td>'+
 						// '<td>'+data_json[i]['BilingID']+'</td>'+
@@ -72,7 +72,7 @@
 						<?php if ($this->session->userdata('finance_auth_Policy_SYS') == 0): ?>
 							//'<td>'+btn_edit+'</td>'+
 						<?php endif ?>
-					'</tr>'	
+					'</tr>'
 					);
 				no++;
 			}
@@ -94,5 +94,5 @@
 		    //'backdrop' : 'static',
 		    'show' : true
 		});
-	}	
+	}
 </script>
