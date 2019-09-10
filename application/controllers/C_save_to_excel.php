@@ -5653,6 +5653,167 @@ class C_save_to_excel extends CI_Controller
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
     }
+
+    public function excel_akreditasi_program_studi()
+    {
+        $this->load->model('master/m_master');
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        $header = $Input['header'];
+        $fill = $Input['fill'];
+        $header = json_decode(json_encode($header),true);
+        $fill = json_decode(json_encode($fill),true);
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $Filename = 'excel_akreditasi_program_studi.xlsx';
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', "1.b. Akreditasi Program Studi");
+
+        // cari merge untuk Jumlah Program Studi
+        $totalCol = 1; // tambah total
+        for ( $i = 0; $i < count($header); $i++) {
+             $Detail = $header[$i]['Detail'];
+             $tot = count($Detail);
+             $totalCol += $tot;
+        }
+
+        // make header
+        $r = 3;
+        $rUntil = $r + 3 -1;
+        $st = 0;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "No");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+        
+        $st++;
+
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Status & Peringkat Akreditasi");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $stUntil = $st + $totalCol - 1;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $huruf_ = $this->m_master->HurufColExcelNumber($stUntil);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Jumlah Program Studi");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf_.$r);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf_.$r)->applyFromArray($style_col);
+
+        $r++;
+        $st= 2;
+        for ($i=0; $i < count($header); $i++) { 
+            $Type = $header[$i]['Type']; 
+            $ll = count($header[$i]['Detail']); 
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $stUntil = $st + $ll - 1;
+            $huruf_ = $this->m_master->HurufColExcelNumber($stUntil);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Type);
+            $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf_.$r);
+            $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf_.$r)->applyFromArray($style_col);
+            $st = $stUntil + 1;
+        }
+
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, 'Total');
+        $rUntil = $r+1;
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st= 2;
+        $r++;
+        for ($i=0; $i < count($header); $i++) { 
+            $Detail = $header[$i]['Detail'];
+            for ($j=0; $j < count($Detail); $j++) { 
+                $huruf = $this->m_master->HurufColExcelNumber($st);
+                $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Detail[$j]['Name'] );
+                $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);    
+                $st++;    
+            }
+        }
+
+        $r++;
+        for ($i=0; $i < count($fill); $i++) {
+            $st = 0; 
+            $No = $i+1;
+            $AccreditationName = $fill[$i]['AccreditationName'];
+            $Total = 0;
+             $huruf = $this->m_master->HurufColExcelNumber($st);
+             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $No );
+             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+             $st++;
+
+             $huruf = $this->m_master->HurufColExcelNumber($st);
+             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $AccreditationName );
+             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+             $TypeProgramStudy = $fill[$i]['TypeProgramStudy']; 
+             for ($j=0; $j < count($TypeProgramStudy); $j++) { 
+                $Data = $TypeProgramStudy[$j]['Data'];
+                for ($k=0; $k < count($Data); $k++) { 
+                    $st++;
+                    $huruf = $this->m_master->HurufColExcelNumber($st);
+                    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Data[$k]['Count'] );
+                    $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+                    $Total += $Data[$k]['Count'];
+                }
+
+             }
+
+             $st++;
+             $huruf = $this->m_master->HurufColExcelNumber($st);
+             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Total );
+             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+           $r++;    
+        }
+
+
+        $excel->setActiveSheetIndex(0);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$Filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
     
 
 }

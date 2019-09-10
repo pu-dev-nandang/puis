@@ -18,38 +18,10 @@
     <div class="row">
 
         <div class="col-md-12">
-
-            <table class="table" id="tableData">
-                <thead>
-                <tr>
-                    <th style="width: 1%" rowspan="3">No</th>
-                    <th rowspan="3">Status & Peringkat Akreditasi</th>
-                    <th colspan="12">Jumlah Program Studi</th>
-                    <th style="width: 5%;" rowspan="3">Jumlah</th>
-                </tr>
-                <tr>
-                    <th colspan="3" style="border-right: 1px solid #ccc;">Akademik</th>
-                    <th colspan="3" style="border-right: 1px solid #ccc;">Profesi</th>
-                    <th colspan="6">Vokasi</th>
-                </tr>
-                <tr>
-                    <th style="width: 5%;">S-3</th>
-                    <th style="width: 5%;">S-2</th>
-                    <th style="width: 5%;border-right: 1px solid #ccc;">S-1</th>
-                    <th style="width: 5%;">Sp-2</th>
-                    <th style="width: 5%;">Sp-1</th>
-                    <th style="width: 5%;border-right: 1px solid #ccc;">Profesi</th>
-                    <th style="width: 5%;">S-3T</th>
-                    <th style="width: 5%;">S-2T</th>
-                    <th style="width: 5%;">D-4</th>
-                    <th style="width: 5%;">D-3</th>
-                    <th style="width: 5%;">D-2</th>
-                    <th style="width: 5%;">D-1</th>
-                </tr>
-                </thead>
-                <tbody id="listData"></tbody>
-            </table>
-
+            <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
+            <div id = "content_data">
+                
+            </div>
         </div>
 
     </div>
@@ -57,62 +29,117 @@
 </div>
 
 <script>
-
+    var passToExcel = [];
     $(document).ready(function () {
         loadAkreditasiProdi();
     });
 
+    function __MakeHtmlTable(header)
+    {
+        var html = '';
+        var totalCol = 1; // tambah total
+        for (var i = 0; i < header.length; i++) {
+            var Detail = header[i].Detail;
+            var tot = Detail.length;
+            totalCol += tot;
+        }
+
+        html += '<table class = "table" id="tableData"> '+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th rowspan = "3"  style="vertical-align : middle;text-align:center;" >No</th>'+
+                            '<th rowspan = "3"  style="vertical-align : middle;text-align:center;" >Status & Peringkat Akreditasi</th>'+
+                            '<th colspan="'+totalCol+'" style="vertical-align : middle;text-align:center;" >Jumlah Program Studi</th>'+
+                        '</tr>'+
+                        '<tr>';    
+
+        
+        for (var i = 0; i < header.length; i++) {
+           var Type = header[i].Type;
+           var ll = header[i].Detail.length;
+           html += '<th colspan = "'+ll+'" style="border-right: 1px solid #ccc;">'+Type+'</th>';
+        }
+        html += '<th rowspan="2" style="border-right: 1px solid #ccc;">'+'Total'+'</th>';
+        html += '</tr>'+
+                    '<tr>';
+
+
+        for (var i = 0; i < header.length; i++) {
+           var Detail = header[i].Detail;
+           for (var j = 0; j < Detail.length; j++) {
+               html += '<th style="border-right: 1px solid #ccc;">'+Detail[j].Name+'</th>';
+           }
+           
+        }
+
+        html += '</tr>';  
+
+        html +=  '</thead>'+
+                '<tbody id="listData"></tbody>'+
+            '</table> ';
+
+        return html;                      
+    }
+
     function loadAkreditasiProdi() {
 
+        passToExcel = [];
         var url = base_url_js+'api3/__getAkreditasiProdi';
         $.getJSON(url,function (jsonResult) {
+            // make table
+            var header = jsonResult.header;
+            var MakeHtmlTable = __MakeHtmlTable(header);
+            $('#content_data').html(MakeHtmlTable);
+            // isian table
+            var htmlIsiTable = '';
+            var fill = jsonResult.fill;
+            for (var i = 0; i < fill.length; i++) {
+                var No = parseInt(i) + 1;
+                var AccreditationName = fill[i].AccreditationName;
+                var Total = 0;
+                htmlIsiTable += '<tr>'+
+                                    '<td>'+No+'</td>'+
+                                    '<td>'+AccreditationName+'</td>';
+                var TypeProgramStudy = fill[i].TypeProgramStudy;
+                for (var j = 0; j < TypeProgramStudy.length; j++) {
+                   var Data =  TypeProgramStudy[j].Data
+                   for (var k = 0; k < Data.length; k++) {
+                       htmlIsiTable += '<td>'+Data[k].Count+'</td>';
+                       Total += parseInt(Data[k].Count);
+                   }
+                }
 
-            if(jsonResult.length>0){
+                htmlIsiTable += '<td>'+Total+'</td>';
 
-                var arr_jml = [];
-
-                $.each(jsonResult,function (i,v) {
-
-                    var td = '';
-                    var total = 0;
-                    $.each(v.Details,function (i2,v2) {
-
-                        var c = (parseInt(v2.Prodi)>0) ? 'td-av' : '';
-                        total = total + parseInt(v2.Prodi);
-                        td = td+'<td  style="border-right: 1px solid #ccc;" class="'+c+' cl_'+i2+'" data-val="'+v2.Prodi+'">'+v2.Prodi+'</td>';
-
-
-                    });
-
-                   $('#listData').append('<tr>' +
-                       '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                       '<td style="text-align: left;">'+v.Label+'</td>' +
-                       td+'<td class="higligh">'+total+'</td>' +
-                       '</tr>');
-                });
-
-
-                $('#listData').append('<tr class="higligh">' +
-                    '<th colspan="2">Jumlah</th>' +
-                    '<th>'+hitungRow('.cl_0')+'</th>' +
-                    '<th>'+hitungRow('.cl_1')+'</th>' +
-                    '<th>'+hitungRow('.cl_2')+'</th>' +
-                    '<th>'+hitungRow('.cl_3')+'</th>' +
-                    '<th>'+hitungRow('.cl_4')+'</th>' +
-                    '<th>'+hitungRow('.cl_5')+'</th>' +
-                    '<th>'+hitungRow('.cl_6')+'</th>' +
-                    '<th>'+hitungRow('.cl_7')+'</th>' +
-                    '<th>'+hitungRow('.cl_8')+'</th>' +
-                    '<th>'+hitungRow('.cl_9')+'</th>' +
-                    '<th>'+hitungRow('.cl_10')+'</th>' +
-                    '<th>'+hitungRow('.cl_11')+'</th>' +
-                    '<th>'+hitungRow('.cl_12')+'</th>' +
-                    '</tr>');
+                htmlIsiTable += '</tr>';
             }
 
+            $('#listData').append(htmlIsiTable);
+
+            passToExcel =jsonResult;
         });
 
     }
+
+    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
+        if (passToExcel["header"] != undefined) {
+            var header = passToExcel['header'];
+            var fill = passToExcel['fill'];
+            if (fill.length > 0) {
+                // console.log(passToExcel);
+                var url = base_url_js+'agregator/excel-akreditasi-program-studi';
+                data = {
+                  header : header,
+                  fill : fill,
+                }
+                var token = jwt_encode(data,"UAP)(*");
+                FormSubmitAuto(url, 'POST', [
+                    { name: 'token', value: token },
+                ]);
+            }
+        }
+        
+    })
 
     function hitungRow(cl) {
 

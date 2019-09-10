@@ -1344,6 +1344,7 @@ $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_aud
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
+$route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akreditasi_program_studi';
 
 
 
@@ -1402,6 +1403,11 @@ $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
 $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
+
+
+// Agregator Adhi
+$route['api4/__crudAgregatorTB3'] = 'api/c_api4/crudAgregatorTB3';
+
 
 
 // budgeting & PR
