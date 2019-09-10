@@ -54,7 +54,7 @@
 
         </div>
         <div class="col-md-9">
-            <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> <br/>
+            <div style="text-align: right; border:0px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download : </b><button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> <br/>
 
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">

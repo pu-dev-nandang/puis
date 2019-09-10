@@ -1372,8 +1372,64 @@ class C_api3 extends CI_Controller {
             return print_r(1);
         }
 
-
     }
+
+
+    public function getsum_mahasiswa_asing() {
+
+        $year = date('Y');
+        $arr_year = array();
+            for ($i=0; $i < 4; $i++) { 
+                $arr_year[] = $year - $i;
+        }
+        //print_r($arr_year); exit();
+
+        $Status = $this->input->get('s');
+
+        $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
+            'Status' => 1
+        ))->result_array();
+         $dataMhs = $this->db->query('SELECT a.*, b.Name
+                    FROM db_agregator.student_selection_foreign AS a
+                    LEFT JOIN db_academic.program_study AS b ON (a.ProdiID = b.ID)
+                    WHERE b.Status = 1 ')->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                for ($j=0; $j < count($arr_year); $j++) { 
+
+                    $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_agregator.student_selection_foreign
+                                          WHERE Year = '.$arr_year[$j].' AND ProdiID = "'.$data[$i]['ID'].'" ')->result_array();
+                    //print_r($dataMhs); exit();
+
+                    if (count($dataMhs) > 0) { 
+                        $data[$i]['Tahunmasuk_'.$arr_year[$j]] = $arr_year[$j];
+                        $data[$i]['NameProdi'] = $data[$i]['Name'];
+                        $data[$i]['TotalStudent_'.$arr_year[$j]] = $dataMhs[0]['Total'];
+                    } 
+
+
+                //========================
+                //$and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+                // Total Mahasiswa
+                //$dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
+               //                           WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+               // $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
+
+                 // Total Lectrure
+                //$dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                //                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+                //$data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+                }
+            }
+        }
+
+        return print_r(json_encode($data));
+    
+   }
+
 
     public function getKecukupanDosen(){
 
@@ -1531,6 +1587,7 @@ class C_api3 extends CI_Controller {
 
         return print_r(json_encode($data));
     }
+
 
     public function getRasioDosenMahasiswa() {
 

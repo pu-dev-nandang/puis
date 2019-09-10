@@ -1343,8 +1343,11 @@ $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditas
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+$route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
+
 $route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
 $route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akreditasi_program_studi';
+
 
 
 $route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
@@ -1427,6 +1430,8 @@ $route['api3/__getHkiProduk'] = 'api/c_api3/getLuaranHkiproduk';
 $route['api3/__getHkiPaten'] = 'api/c_api3/getLuaranHkipaten';
 $route['api3/__getSitasiKarya'] = 'api/c_api3/getsitasikarya';
 $route['api3/__getRekognisiDosen'] = 'api/c_api3/getrekognisidosen';
+$route['api3/__getsum-mhs-asing'] = 'api/c_api3/getsum_mahasiswa_asing';
+
 
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 

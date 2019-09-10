@@ -16,8 +16,17 @@
             </div>
 
             <div class="form-group">
-                <label>Lembaga Mitra Kerjasama</label>
+                <label>Tipe Kerjasama</label>
                 <input class="hide" id="formID" />
+                <select class="form-control" id="formTingkat">
+                    <option value="1">Kerjasama Pendidikan</option>
+                    <option value="2">Kerjasama Penelitian</option>
+                    <option value="3">Kerjasama Pengabdian Kepada Masyarakat </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Lembaga Mitra Kerjasama</label>
                 <select id="formLembagaMitraID" class="form-control"></select>
             </div>
             <div class="form-group">
@@ -54,8 +63,8 @@
 
         </div>
         <div class="col-md-9">
-             <div style="text-align: right; border:1px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div> 
-             <br/>
+            <div style="text-align: right; "><button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> 
+             
             <div id="viewData" class="table-responsive"></div>
 
         </div>
