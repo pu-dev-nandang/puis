@@ -7,6 +7,7 @@ class M_api extends CI_Model {
     {
         parent::__construct();
         $this->load->model('m_rest');
+        $this->load->model('master/m_master');
     }
 
     public function getClassOf(){
@@ -4177,6 +4178,52 @@ class M_api extends CI_Model {
     public function cmp($a, $b)
     {
         return strcmp($a['Semester'], $b['Semester']);
+    }
+
+    public function __get_mahasiswa_asing()
+    {
+        $rs = array();
+        // get all prodi
+        $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+
+        // get year
+        $year = date('Y'); // 2019
+        // $arr_year = array();
+        //     for ($i=0; $i < 4; $i++) { 
+        //         $arr_year[] = $year - $i;
+        // }
+
+        $Years3 = $year - 3;
+        for ($i=$Years3; $i <= $year ; $i++) { 
+            $arr_year[] = $i;
+        }
+
+        for ($i=0; $i < count($G_prodi); $i++) { 
+           $ProdiID = $G_prodi[$i]['ID'];
+           $temp = array(
+               'ProdiID' => $ProdiID,
+               'Name' => $G_prodi[$i]['Name'],
+               'Detail' => array(),
+           );
+           for ($j=0; $j < count($arr_year); $j++) { 
+               $Year =  $arr_year[$j];
+               $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_agregator.student_selection_foreign
+                                     WHERE Year = '.$Year.' AND ProdiID = "'.$ProdiID.'" ')->result_array();
+
+               $detail = array(
+                'Year' => $Year,
+                'Count' => $dataMhs[0]['Total'],
+               );
+
+               $temp['Detail'][] = $detail;
+           }
+
+           $rs[] = $temp;
+
+        }
+
+        return $rs;
+
     }
 
 }

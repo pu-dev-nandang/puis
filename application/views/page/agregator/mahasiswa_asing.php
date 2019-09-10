@@ -24,12 +24,12 @@
                 <input type="number" class="form-control" id="formTotalStudent">
             </div>
             <div class="form-group" style="text-align: right;">
-                <button class="btn btn-primary" id="btnSave">Save</button>
+                <button class="btn btn-primary btn-round" id="btnSave">Save</button>
             </div>
 
         </div>
         <div class="col-md-9">
-
+            <div style="text-align: right;"><button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel</button></div> <p></p>
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <div class="well">
@@ -38,33 +38,32 @@
                 </div>
             </div>
 
-            <table class="table table-striped table-bordered" id="tableData">
-                <thead>
-                <tr>
-                    <th style="width: 1%;">No</th>
-                    <th style="width: 10%;">Year</th>
-                    <th>Prodi</th>
-                    <th style="width: 7%;">Total Student</th>
-                    <th style="width: 10%;"><i class="fa fa-cog"></i></th>
-                </tr>
-                </thead>
-                <tbody id="listStd"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="tableData">
+                    <thead>
+                    <tr>
+                        <th style="width: 1%;">No</th>
+                        <th style="width: 10%;">Year</th>
+                        <th>Prodi</th>
+                        <th style="width: 7%;">Total Student</th>
+                        <th style="width: 10%;"><i class="fa fa-cog"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody id="listStd"></tbody>
+                </table>
+            </div>
 
         </div>
-
-
     </div>
 
-
 <script>
-
     $(document).ready(function () {
 
         loadSelectOptionBaseProdi('#formProdiID','');
 
         filteryear();
         selectyearstudy();
+        loadsum_mhsasing();
 
         var firstLoad = setInterval(function () {
 
@@ -82,11 +81,35 @@
 
     });
 
-    $('#filterYear').change(function () {
+    $("#btndownloaadExcel").click(function(){
+        var akred = "0";
 
+        var url = base_url_js+'agregator/excel-mahasiswa-asing';
+        data = {
+          akred : akred
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
+
+    $('#filterYear').change(function () {
         loadDataTable();
 
     });
+
+     function loadsum_mhsasing() {
+
+        var url = base_url_js+'api3/__getsum-mhs-asing';
+
+        $.getJSON(url,function (jsonResult) {
+
+            console.log(jsonResult);
+            
+        });
+
+     }
 
     function selectyearstudy() {
 
