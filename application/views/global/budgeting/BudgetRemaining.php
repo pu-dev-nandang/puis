@@ -19,11 +19,6 @@
 					</div>	
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<p style="color: red;font-size: 20px">(.000)</p>	
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

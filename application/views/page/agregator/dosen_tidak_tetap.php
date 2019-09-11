@@ -9,7 +9,7 @@
 <div class="well">
     <div class="row">
         <div class="col-md-12">
-
+            <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
             <table class="table" id="dataTable">
                 <thead>
                 <tr>
@@ -34,12 +34,13 @@
 </div>
 
 <script>
-
+    var passToExcel = [];
     $(document).ready(function () {
         loadData();
     });
 
     function loadData() {
+        passToExcel = [];
         var url = base_url_js+'api3/__getJabatanAkademikDosenTidakTetap';
         $.getJSON(url,function (jsonResult) {
 
@@ -63,8 +64,24 @@
 
                 });
 
+                passToExcel = jsonResult
             }
 
         });
     }
+
+
+    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
+        if (passToExcel.length > 0) {
+            var url = base_url_js+'agregator/excel-dosen-tidak-tetap';
+            data = {
+              passToExcel : passToExcel,
+            }
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+        }
+
+    })
 </script>

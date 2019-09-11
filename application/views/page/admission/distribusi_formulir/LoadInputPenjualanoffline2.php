@@ -305,6 +305,7 @@
             $('#selectFormulirCode').select2({
                 allowClear: true
             });
+            $('#selectFormulirCode').prop('disabled',true);
             <?php endif ?>
 
         }).done(function () {

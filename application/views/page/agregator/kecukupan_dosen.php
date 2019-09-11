@@ -14,8 +14,11 @@
     <div class="row">
 
         <div class="col-md-12">
-            <div style="text-align: right;"> <button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> <p></p>
-            <table class="table table-bordered table-striped" id="dataTable">
+
+            <div style="text-align: right;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+            <table class="table dataTable2Excel" id="dataTable" data-name="kecukupan_dosen">
                 <thead>
                 <tr style="background: #20485A;color: #FFFFFF;">
                     <th rowspan="2" style="vertical-align : middle;text-align:center;width: 1%;">No</th>
@@ -107,5 +110,7 @@
 
         });
     }
+
+
     
 </script>

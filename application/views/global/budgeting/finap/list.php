@@ -138,11 +138,11 @@ function load_table_activated_period_years()
    }); 
 }
 
-$(document).off('click', '#Years').on('click', '#Years',function(e) {
+$(document).off('change', '#Years').on('change', '#Years',function(e) {
   LoadDataForTable();
 })
 
-$(document).off('click', '#Month').on('click', '#Month',function(e) {
+$(document).off('change', '#Month').on('change', '#Month',function(e) {
   LoadDataForTable();
 })
 

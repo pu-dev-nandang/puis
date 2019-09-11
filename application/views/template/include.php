@@ -339,6 +339,9 @@
 
 <script type="text/javascript" src="<?php echo base_url();?>assets/custom/jquery.maskMoney.js"></script>
 
+<!-- Jquery Excel -->
+<script type="text/javascript" src="<?php echo base_url();?>assets/jquerytable2excel/jquery.table2excel.js"></script>
+
 <!-- Custom -->
 <script type="text/javascript">
     window.base_url_js = "<?php echo base_url(); ?>";
@@ -1981,6 +1984,10 @@
         return (v!='' && v!=null) ? v : '';
     }
 
+    function checkValueInt(v) {
+        return (v!='' && v!=null) ? v : 0;
+    }
+
     window.getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = decodeURIComponent(window.location.search.substring(1)),
             sURLVariables = sPageURL.split('&'),
@@ -2031,6 +2038,16 @@
 
         Element.select2({
           // allowClear: true
+        });
+    }
+
+    function saveTable2Excel(element) {
+        var elm = $('.'+element);
+        var name = elm.attr('data-name');
+        elm.table2excel({
+            exclude : "table",
+            filename : name,
+            fileext : ".xlsx"
         });
     }
 

@@ -12,7 +12,8 @@
             <div class="form-group">
                 <label>Tahun Akademik</label>
                 <input class="hide" id="formID">
-                <input type="number" class="form-control" id="formYear" />
+                <!-- <input type="number" class="form-control" id="formYear" /> -->
+                <select class="form-control" id="formYear"></select>
             </div>
             <div class="form-group">
                 <label>Prodi</label>
@@ -54,8 +55,6 @@
 
         </div>
         <div class="col-md-9">
-            <div style="text-align: right; border:0px solid #bdc3c7;border-radius:2px 30px 30px;"> <b>Download : </b><button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> <br/>
-
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <div class="well">
@@ -64,7 +63,8 @@
                 </div>
             </div>
 
-          <div class="table-responsive">
+          <!-- <div class="table-responsive"> -->
+            <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
             <table class="table table-striped table-bordered" id="tableData">
                 <thead>
                 <tr style="background: #20485A;color: #FFFFFF;">
@@ -88,13 +88,13 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-          </div>
+          <!-- </div> -->
         </div>
     </div>
 </div>
 
 <script>
-
+    var passToExcel = [];
     $(document).ready(function () {
 
         window.act = "<?= $accessUser; ?>";
@@ -147,10 +147,12 @@
 
         $.post(url,{token:token},function (jsonResult) {
             $('#filterYear').empty();
+            $('#formYear').empty();
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
 
                     $('#filterYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
+                    $('#formYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
                 })
             }
 
@@ -160,7 +162,7 @@
     $('#btnSave').click(function () {
 
         var formID = $('#formID').val();
-        var formYear = $('#formYear').val();
+        var formYear = $('#formYear option:selected').val();
         var formProdiID = $('#formProdiID').val();
         var formCapacity = $('#formCapacity').val();
         var formRegistrant = $('#formRegistrant').val();
@@ -230,7 +232,7 @@
     });
 
     function loadDataTable() {
-
+        passToExcel = [];
         var filterYear = $('#filterYear').val();
 
         var data = {
@@ -271,6 +273,8 @@
                         '<td>'+btnAction+'</td>' +
                         '</tr>');
                 });
+
+                passToExcel = jsonResult;
             }
 
         })
@@ -284,7 +288,12 @@
         var d = JSON.parse(dataEdit);
 
         $('#formID').val(d.ID);
-        $('#formYear').val(d.Year);
+        // $('#formYear').val(d.Year);
+        $("#formYear option").filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == d.Year; 
+         }).prop("selected", true);
+        
         $('#formProdiID').val(d.ProdiID+'.'+d.ProdiCode);
         $('#formCapacity').val(d.Capacity);
         $('#formRegistrant').val(d.Registrant);
@@ -295,6 +304,20 @@
         $('#formTransfer2').val(d.Transfer2);
 
     });
+
+    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
+        if (passToExcel.length > 0) {
+            var url = base_url_js+'agregator/excel-seleksi-mahasiswa-baru';
+            data = {
+              passToExcel : passToExcel,
+            }
+            var token = jwt_encode(data,"UAP)(*");
+            FormSubmitAuto(url, 'POST', [
+                { name: 'token', value: token },
+            ]);
+        }
+
+    })
 
 
 </script>
