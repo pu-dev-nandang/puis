@@ -2,7 +2,7 @@
     <div class="col-md-6 col-md-offset-3">
       <div class="thumbnail">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group">
               <label>Year</label>
               <select class="select2-select-00 full-width-fix" id="Years">
@@ -10,11 +10,19 @@
                </select>
             </div>  
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group">
               <label>Month</label>
               <select class="select2-select-00 full-width-fix" id="Month">
                    <!-- <option></option> -->
+               </select>
+            </div>  
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Event / Template</label>
+              <select class="form-control SelectTemplate">
+                   <option value = "%" selected>--No Selected--</option>
                </select>
             </div>  
           </div>
@@ -44,8 +52,38 @@ $(document).ready(function() {
 function LoadFirstLoad()
 {
   load_table_activated_period_years();
+  __LoadTemplate().then(function(dataTemplate){
+      var h = '';
+          for (var i = 0; i < dataTemplate.length; i++) {
+              h += '<option value = "'+dataTemplate[i].ID+'" '+''+' >'+dataTemplate[i].Name+'</option>';
+          }
+      $('.SelectTemplate').append(h);
+
+    })
 	// LoadDataForTable();
 }
+
+function __LoadTemplate()
+{
+  var def = jQuery.Deferred();
+  var url = base_url_js+'rest2/__LoadTemplate';
+  var data = {
+      auth : 's3Cr3T-G4N',
+      Active : 1,
+  };
+  var token = jwt_encode(data,"UAP)(*");
+  $.post(url,{ token:token },function (resultJson) {
+    
+  }).done(function(resultJson) {
+    def.resolve(resultJson);
+  }).fail(function() {
+    toastr.info('No Result Data');
+    def.reject();  
+  }).always(function() {
+                  
+  }); 
+  return def.promise();
+}  
 
 function load_table_activated_period_years()
 {
@@ -72,11 +110,11 @@ function load_table_activated_period_years()
    }); 
 }
 
-$(document).off('click', '#Years').on('click', '#Years',function(e) {
+$(document).off('change', '#Years,.SelectTemplate').on('change', '#Years,.SelectTemplate',function(e) {
   LoadDataForTable();
 })
 
-$(document).off('click', '#Month').on('click', '#Month',function(e) {
+$(document).off('change', '#Month').on('change', '#Month',function(e) {
   LoadDataForTable();
 })
 
@@ -108,6 +146,7 @@ function LoadDataForTable()
 	$("#DivTable").html(table_html);
   var Years = $('#Years option:selected').val();
   var Month = $('#Month option:selected').val();
+  var SelectTemplate = $('.SelectTemplate option:selected').val();
 	var data = {
     	IDDepartementPUBudget : IDDepartementPUBudget,
     	sessionNIP : sessionNIP,
@@ -115,7 +154,9 @@ function LoadDataForTable()
 	    length : G_ApproverLength,
       Years : Years,
       Month : Month,
+      SelectTemplate : SelectTemplate,
 	};
+  // console.log(data);return;
 	var token = jwt_encode(data,"UAP)(*");
 
 	var arr_add = [];
