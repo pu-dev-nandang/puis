@@ -1335,7 +1335,6 @@ $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_kar
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
-//$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
 
 //Agregator Excel
 $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';
@@ -1343,6 +1342,15 @@ $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditas
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+$route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
+$route['agregator/excel-kecukupan-dosen'] = 'c_save_to_excel/excel_kecukupan_dosen';
+
+$route['agregator/excel-seleksi-mahasiswa-Prodi'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru_by_prodi';
+$route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akreditasi_program_studi';
+$route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tidak_tetap';
+$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
+$route['agregator/excel-aps-program-study'] = 'c_save_to_excel2/excel_aps_program_study';
+
 
 
 $route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
@@ -1424,7 +1432,8 @@ $route['api3/__getTeknoProduk'] = 'api/c_api3/getLuaranTekno_produk';
 $route['api3/__getHkiProduk'] = 'api/c_api3/getLuaranHkiproduk';
 $route['api3/__getHkiPaten'] = 'api/c_api3/getLuaranHkipaten';
 $route['api3/__getSitasiKarya'] = 'api/c_api3/getsitasikarya';
-$route['api3/__getRekognisiDosen'] = 'api/c_api3/getrekognisidosen';
+$route['api3/__getsum-mhs-asing'] = 'api/c_api3/getsum_mahasiswa_asing';
+
 
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
 
@@ -1439,6 +1448,11 @@ $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
 $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
+
+
+// Agregator Adhi
+$route['api4/__crudAgregatorTB3'] = 'api/c_api4/crudAgregatorTB3';
+
 
 
 // budgeting & PR

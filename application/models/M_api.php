@@ -7,6 +7,7 @@ class M_api extends CI_Model {
     {
         parent::__construct();
         $this->load->model('m_rest');
+        $this->load->model('master/m_master');
     }
 
     public function getClassOf(){
@@ -2344,7 +2345,8 @@ class M_api extends CI_Model {
         $Years = '';
 
         // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;
-        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = ".$StatusJual." and StatusJual = ".$StatusJual." ".$Years;
+        // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = ".$StatusJual." and StatusJual = ".$StatusJual." ".$Years;
+        $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." ".$Years;
         $query=$this->db->query($sql, array())->result_array();
         return $query;
     }
@@ -4177,6 +4179,86 @@ class M_api extends CI_Model {
     public function cmp($a, $b)
     {
         return strcmp($a['Semester'], $b['Semester']);
+    }
+
+    public function __get_mahasiswa_asing()
+    {
+        $rs = array();
+        // get all prodi
+        $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+
+        // get year
+        $year = date('Y'); // 2019
+        // $arr_year = array();
+        //     for ($i=0; $i < 4; $i++) { 
+        //         $arr_year[] = $year - $i;
+        // }
+
+        $Years3 = $year - 3;
+        for ($i=$Years3; $i <= $year ; $i++) { 
+            $arr_year[] = $i;
+        }
+
+        for ($i=0; $i < count($G_prodi); $i++) { 
+           $ProdiID = $G_prodi[$i]['ID'];
+           $temp = array(
+               'ProdiID' => $ProdiID,
+               'Name' => $G_prodi[$i]['Name'],
+               'Detail' => array(),
+           );
+           for ($j=0; $j < count($arr_year); $j++) { 
+               $Year =  $arr_year[$j];
+               $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_agregator.student_selection_foreign
+                                     WHERE Year = '.$Year.' AND ProdiID = "'.$ProdiID.'" ')->result_array();
+
+               $detail = array(
+                'Year' => $Year,
+                'Count' => $dataMhs[0]['Total'],
+               );
+
+               $temp['Detail'][] = $detail;
+           }
+
+           $rs[] = $temp;
+
+        }
+
+        return $rs;
+    }
+
+
+    public function __get_kecukupan_dosen() { 
+
+         // Get Program Studi
+        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study',array('Status' => 1))->result_array();
+
+        if(count($data)>0){
+            $dataLAP = $this->db->order_by('ID','DESC')->get_where('db_employees.level_education',array(
+                'ID >' => 8
+            ))->result_array();
+            for($i=0;$i<count($data);$i++){
+
+                for($j=0;$j<count($dataLAP);$j++){
+
+                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
+                    AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" ')->result_array();
+
+                    $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
+                    $data[$i]['dataLecturers'][$j] = $r;
+                }
+
+
+                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
+                    AND em.Profession <> "" ')->result_array();
+                $r = array('Level' => '', 'Details' => $dataL);
+                $data[$i]['dataLecturers'][2] = $r;
+
+            }
+
+        }
+
+        return $data;
+        ///return print_r(json_encode($data));
     }
 
 }

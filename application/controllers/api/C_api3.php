@@ -762,11 +762,124 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readDataMHSBaru'){
 
             $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+            $data = array();
+            // $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+            //                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+            //                                         WHERE ss.Year = "'.$Year.'" ')->result_array();
+
+            // get all prodi
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+            for ($i=0; $i <count($G_prodi) ; $i++) { 
+                $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
-                                                    WHERE ss.Year = "'.$Year.'" ')->result_array();
+                                                    WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+                $query=$this->db->query($sql, array($G_prodi[$i]['ID']))->result_array();
+
+                if (count($query) == 0) {
+                    $temp = [
+                        'Capacity' => null,
+                        'EntredAt' => null,
+                        'EntredBy' => null,
+                        'ID' => null,
+                        'PassSelection' => null,
+                        'ProdiCode' => $G_prodi[$i]['Code'],
+                        'ProdiID' => $G_prodi[$i]['ID'],
+                        'ProdiName' => $G_prodi[$i]['Name'],
+                        'Registrant' => null,
+                        'Regular' => null,
+                        'Regular2' => null,
+                        'TotalStudemt' => null,
+                        'Transfer' => null,
+                        'Transfer2' => null,
+                        'Type' => null,
+                        'UpdatedBy' => null,
+                        'Year' => $Year,
+                        'updatedAt' => null,
+                    ];
+                }
+                else
+                {
+                    $temp = $query[0];
+                    // update all null menjadi 0
+                    // foreach ($temp as $key => $value) {
+                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                    //         if ($value == null && $value == '') {
+                    //             $temp[$key] = 0;
+                    //         }
+                    //     }
+                    // }
+                }
+
+                $data[] = $temp;
+            
+            }    
 
             return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='readDataMHSBaruByProdi'){
+
+            // get tahun akademik smpe sekarang
+            $rs = array();
+            $arr_tahun_akademik = array();
+            $stYear = 2014;
+            $endYear = date('Y');
+            for ($i=$stYear; $i <= $endYear; $i++) { 
+                $arr_tahun_akademik[] = $i;
+            }
+
+            // get prodi
+            $filterProdi = $data_arr['filterProdi'];
+            $filterProdiName = $data_arr['filterProdiName'];
+            $exFPName = explode('-', $filterProdiName);
+            $filterProdiName = trim($exFPName[1]);
+            $arrExp = explode('.', $filterProdi);
+
+            for ($i=0; $i < count($arr_tahun_akademik); $i++) { 
+                $Year = $arr_tahun_akademik[$i];
+                $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                    WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+                $query=$this->db->query($sql, array($arrExp[0]))->result_array();
+                if (count($query) == 0) {
+                    $temp = [
+                        'Capacity' => null,
+                        'EntredAt' => null,
+                        'EntredBy' => null,
+                        'ID' => null,
+                        'PassSelection' => null,
+                        'ProdiCode' => $arrExp[1],
+                        'ProdiID' => $arrExp[0],
+                        'ProdiName' => $filterProdiName,
+                        'Registrant' => null,
+                        'Regular' => null,
+                        'Regular2' => null,
+                        'TotalStudemt' => null,
+                        'Transfer' => null,
+                        'Transfer2' => null,
+                        'Type' => null,
+                        'UpdatedBy' => null,
+                        'Year' => $Year,
+                        'updatedAt' => null,
+                    ];
+                }
+                else
+                {
+                    $temp = $query[0];
+                    // update all null menjadi 0
+                    // foreach ($temp as $key => $value) {
+                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
+                    //         if ($value == null && $value == '') {
+                    //             $temp[$key] = 0;
+                    //         }
+                    //     }
+                    // }
+                }
+
+                $rs[] = $temp;
+            }
+
+            return print_r(json_encode($rs));
 
         }
         else if($data_arr['action']=='readDataMHSBaruAsing'){
@@ -795,10 +908,31 @@ class C_api3 extends CI_Controller {
         // Rekognisi Dosen
         if($data_arr['action']=='save_rekognisi_dosen') { 
 
+            $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
 
-            $dataForm['EntredBy'] = $this->session->userdata('NIP');
-            $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID',$ID);
+                $this->db->update('db_agregator.rekognisi_dosen',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='readDataRekognisiDosen'){
+            $data = $this->db->query('SELECT rd.*, em.Name FROM db_agregator.rekognisi_dosen rd 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = rd.NIP)
+                                                ORDER BY em.Name ASC ')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeDataRekognisiDosen') {
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.rekognisi_dosen');
             return print_r(1);
         }
 
@@ -1307,8 +1441,64 @@ class C_api3 extends CI_Controller {
             return print_r(1);
         }
 
-
     }
+
+
+    public function getsum_mahasiswa_asing() {
+
+        $year = date('Y');
+        $arr_year = array();
+            for ($i=0; $i < 4; $i++) { 
+                $arr_year[] = $year - $i;
+        }
+        //print_r($arr_year); exit();
+
+        $Status = $this->input->get('s');
+
+        $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
+            'Status' => 1
+        ))->result_array();
+         $dataMhs = $this->db->query('SELECT a.*, b.Name
+                    FROM db_agregator.student_selection_foreign AS a
+                    LEFT JOIN db_academic.program_study AS b ON (a.ProdiID = b.ID)
+                    WHERE b.Status = 1 ')->result_array();
+
+        if(count($data)>0){
+            for($i=0;$i<count($data);$i++){
+
+                for ($j=0; $j < count($arr_year); $j++) { 
+
+                    $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_agregator.student_selection_foreign
+                                          WHERE Year = '.$arr_year[$j].' AND ProdiID = "'.$data[$i]['ID'].'" ')->result_array();
+                    //print_r($dataMhs); exit();
+
+                    if (count($dataMhs) > 0) { 
+                        $data[$i]['Tahunmasuk_'.$arr_year[$j]] = $arr_year[$j];
+                        $data[$i]['NameProdi'] = $data[$i]['Name'];
+                        $data[$i]['TotalStudent_'.$arr_year[$j]] = $dataMhs[0]['Total'];
+                    } 
+
+
+                //========================
+                //$and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+                // Total Mahasiswa
+                //$dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
+               //                           WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+               // $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
+
+                 // Total Lectrure
+                //$dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
+                //                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+                //$data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+                }
+            }
+        }
+
+        return print_r(json_encode($data));
+    
+   }
+
 
     public function getKecukupanDosen(){
 
@@ -1467,6 +1657,7 @@ class C_api3 extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+
     public function getRasioDosenMahasiswa() {
 
         $Status = $this->input->get('s');
@@ -1476,13 +1667,18 @@ class C_api3 extends CI_Controller {
         ))->result_array();
 
         if(count($data)>0){
+
+            // Get Semester aktif
+            $dataSmtAct = $this->m_api->_getSemesterActive();
+
             for($i=0;$i<count($data);$i++){
 
-                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+//                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+                $and2 = ' AND (StatusLecturerID = "3" || StatusLecturerID = "4" || StatusLecturerID = "5" || StatusLecturerID = "6")';
 
                 // Total Mahasiswa
                 $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
-                                          WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+                                          WHERE StatusStudentID = "3" AND ProdiID = "'.$data[$i]['ID'].'"  ')->result_array();
 
                 $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
 
@@ -1491,6 +1687,16 @@ class C_api3 extends CI_Controller {
                                           WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
 
                 $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+
+                $dataTA = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.std_study_planning ssp 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                                    WHERE ssp.SemesterID = "'.$dataSmtAct['ID'].'"
+                                                    AND ats.ProdiID = "'.$data[$i]['ID'].'"
+                                                     AND mk.Yudisium = "1"')->result_array();
+
+                $data[$i]['TotalMahasiwaTA'] = $dataTA[0]['Total'];
 
                 //$dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
                 //                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
@@ -1544,47 +1750,71 @@ class C_api3 extends CI_Controller {
 
     }
 
-    public function getrekognisidosen(){
-
-        $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT ID_Dosen, Bidang_keahlian, Rekognisi, Tahun FROM db_agregator.rekognisi_dosen ORDER BY ID DESC')->result_array();
-        return print_r(json_encode($data));
-
-    }
-
     
 
     public function getAkreditasiProdi(){
-        $data = $this->db->get('db_academic.accreditation')->result_array();
+        // get TypeHeader
+        $rs = array();
+        $header = array();
+        $fill = array();
+        $sql = 'select Type from db_academic.education_level Group by Type';
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            $sql2 = 'select * from db_academic.education_level where Type = ? order by Name asc ';
+            $query2=$this->db->query($sql2, array($query[$i]['Type'] ))->result_array();
+            $query[$i]['Detail'] = $query2;
+        }
 
-        if(count($data)>0){
+        $header = $query;
 
-            // Data Education level
-            $edl = $this->db->get('db_academic.education_level')->result_array();
-            for($i=0;$i<count($data);$i++){
+        // fill count
+        $G_accreditation = $this->m_master->showData_array('db_academic.accreditation');
+        for ($i=0; $i < count($G_accreditation); $i++) { 
+            $AccreditationID = $G_accreditation[$i]['ID'];
+            $AccreditationName = $G_accreditation[$i]['Label'];
+            $temp2 = array(
+                'AccreditationID' => $AccreditationID,
+                'AccreditationName' => $AccreditationName,
+                'TypeProgramStudy' => array(),
+            );
+            $temp3 = array();
+            for ($j=0; $j < count($query); $j++) { 
+                $TypeProgramStudy = $query[$j]['Type'];
+                $temp3 = array(
+                    'Name' => $TypeProgramStudy,
+                    'Data' => array(),
+                );
 
-                for($a=0;$a<count($edl);$a++){
+                $Detail = $query[$j]['Detail'];
+                for ($k=0; $k < count($Detail); $k++) { 
+                    $EducationLevelID = $Detail[$k]['ID'];
+                    $EducationLevelName = $Detail[$k]['Name'];
+                    $EducationLevelDesc = $Detail[$k]['Description'];
+                    $EducationLevelDescEng = $Detail[$k]['DescriptionEng'];
+                    // find sql 
+                    $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
 
-                    $dataP = $this->db->get_where('db_academic.program_study',array(
-                        'EducationLevelID' => $edl[$a]['ID'],
-                        'AccreditationID' => $data[$i]['ID']
-                    ))->result_array();
-                    print_r($dataP);
-
-                    $r = array(
-                        'Level' => $edl[$a]['Name'],
-                        'Prodi' => count($dataP)
+                    $temp3['Data'][] = array(
+                        'EducationLevelID' => $EducationLevelID,
+                        'EducationLevelName' => $EducationLevelName,
+                        'EducationLevelDesc' => $EducationLevelDesc,
+                        'EducationLevelDescEng' => $EducationLevelDescEng,
+                        'Count' => $query3[0]['Total'],
                     );
-
-                    $data[$i]['Details'][$a] = $r;
-
                 }
+
+                $temp2['TypeProgramStudy'][] = $temp3;
 
             }
 
+            $fill[] = $temp2;
         }
 
-        return print_r(json_encode($data));
+        $rs['fill'] = $fill;
+        $rs['header'] = $header;
+
+        return print_r(json_encode($rs));
 
     }
 

@@ -1,1 +1,40 @@
-<h3>This is the page : kerjasama_tridharma.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span><script>function loadPage(){var e=$("#filterProdi").val();""!=e&&null!=e&&($("#viewProdiID").html(e),$("#viewProdiName").html($("#filterProdi option:selected").text()))}$(document).ready(function(){var e=setInterval(function(){var l=$("#filterProdi").val();""!=l&&null!=l&&(loadPage(),clearInterval(e))},1e3);setTimeout(function(){clearInterval(e)},5e3)}),$("#filterProdi").change(function(){var e=$("#filterProdi").val();""!=e&&null!=e&&loadPage()});</script>
+<h3>This is the page : kerjasama_tridharma.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<script>
+
+    $(document).ready(function () {
+
+        var firstLoad = setInterval(function () {
+            var filterProdi = $('#filterProdi').val();
+
+            if(filterProdi!='' && filterProdi!=null){
+                loadPage();
+                clearInterval(firstLoad);
+            }
+
+        },1000);
+
+        setTimeout(function () {
+            clearInterval(firstLoad);
+        },5000);
+
+    });
+
+    $('#filterProdi').change(function () {
+        var filterProdi = $('#filterProdi').val();
+
+        if(filterProdi!='' && filterProdi!=null){
+            loadPage();
+        }
+
+    });
+
+    function loadPage() {
+        var filterProdi = $('#filterProdi').val();
+
+        if(filterProdi!='' && filterProdi!=null){
+            $('#viewProdiID').html(filterProdi);
+            $('#viewProdiName').html($('#filterProdi option:selected').text());
+        }
+    }
+
+</script>
