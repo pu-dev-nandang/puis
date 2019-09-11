@@ -1667,13 +1667,18 @@ class C_api3 extends CI_Controller {
         ))->result_array();
 
         if(count($data)>0){
+
+            // Get Semester aktif
+            $dataSmtAct = $this->m_api->_getSemesterActive();
+
             for($i=0;$i<count($data);$i++){
 
-                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+//                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
+                $and2 = ' AND (StatusLecturerID = "3" || StatusLecturerID = "4" || StatusLecturerID = "5" || StatusLecturerID = "6")';
 
                 // Total Mahasiswa
                 $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
-                                          WHERE Status = "1" AND ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
+                                          WHERE StatusStudentID = "3" AND ProdiID = "'.$data[$i]['ID'].'"  ')->result_array();
 
                 $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
 
@@ -1682,6 +1687,16 @@ class C_api3 extends CI_Controller {
                                           WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
 
                 $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+
+
+                $dataTA = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.std_study_planning ssp 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                                    LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                                    WHERE ssp.SemesterID = "'.$dataSmtAct['ID'].'"
+                                                    AND ats.ProdiID = "'.$data[$i]['ID'].'"
+                                                     AND mk.Yudisium = "1"')->result_array();
+
+                $data[$i]['TotalMahasiwaTA'] = $dataTA[0]['Total'];
 
                 //$dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
                 //                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
