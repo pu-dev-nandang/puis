@@ -1350,6 +1350,7 @@ $route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akre
 $route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tidak_tetap';
 $route['agregator/excel-rasio-dosen-mahasiswa'] = 'c_save_to_excel2/excel_rasio_dosen_mahasiswa';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
+$route['agregator/excel-aps-program-study'] = 'c_save_to_excel2/excel_aps_program_study';
 
 
 

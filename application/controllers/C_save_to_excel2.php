@@ -22,6 +22,14 @@ class C_save_to_excel2 extends CI_Controller
         return $data_arr;
     }
 
+    private function getInputToken2()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        return $data_arr;
+    }
+
     public function excel_dosen_tidak_tetap()
     {
         $token = $this->input->post('token');
@@ -513,6 +521,133 @@ class C_save_to_excel2 extends CI_Controller
 
         $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
         $write->save('php://output');
+    }
+
+    public function excel_aps_program_study()
+    {
+
+        $data_arr = $this->getInputToken2();
+
+//        print_r($data_arr);exit;
+
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $Filename = 'excel_aps_program_study.xlsx';
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Tabel Daftar Program Studi di Unit Pengelola Program Studi (UPPS)");
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+        $excel->getActiveSheet()->mergeCells('A3:A4');
+        $excel->getActiveSheet()->getStyle('A3:A4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Jenis Program");
+        $excel->getActiveSheet()->mergeCells('B3:B4');
+        $excel->getActiveSheet()->getStyle('B3:B4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('C3', "Nama Program Studi");
+        $excel->getActiveSheet()->mergeCells('C3:C4');
+        $excel->getActiveSheet()->getStyle('C3:C4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('D3', "Akreditasi Program Studi");
+        $excel->getActiveSheet()->mergeCells('D3:F3');
+        $excel->getActiveSheet()->getStyle('D3:F3')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('D4', "Status/ Peringkat");
+        $excel->getActiveSheet()->getStyle('D4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('E4', "No. dan Tgl. SK");
+        $excel->getActiveSheet()->getStyle('E4')->applyFromArray($style_col);
+
+        $excel->setActiveSheetIndex(0)->setCellValue('F4', "Tgl. Kadaluarsa");
+        $excel->getActiveSheet()->getStyle('F4')->applyFromArray($style_col);
+
+
+        $excel->setActiveSheetIndex(0)->setCellValue('G3', "Jumlah Mahasiswa");
+        $excel->getActiveSheet()->mergeCells('G3:G4');
+        $excel->getActiveSheet()->getStyle('G3:G4')->applyFromArray($style_col);
+
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(35);
+        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+        $excel->getActiveSheet()->getColumnDimension('E')->setWidth(45);
+        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
+
+        $r = 5;
+        if(count($data_arr)>0){
+
+
+
+            foreach ($data_arr AS $item){
+                $item = (array) $item;
+                $excel->setActiveSheetIndex(0)->setCellValue('A'.$r, $item['No'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('B'.$r, $item['JenisProgram'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('C'.$r, $item['Prodi'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('D'.$r, $item['Status'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('E'.$r, $item['SK'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('F'.$r, $item['TglSK'] );
+                $excel->setActiveSheetIndex(0)->setCellValue('G'.$r, $item['Mhs'] );
+
+                $excel->getActiveSheet()->getStyle('A'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('B'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('C'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('D'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('E'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('F'.$r)->applyFromArray($style_row);
+                $excel->getActiveSheet()->getStyle('G'.$r)->applyFromArray($style_row);
+
+                $r = $r + 1;
+
+
+            }
+
+        }
+
+
+
+        $excel->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$Filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+
     }
 
 }

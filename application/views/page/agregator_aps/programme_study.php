@@ -9,7 +9,7 @@
     <div class="col-md-12">
 
         <div style="text-align: right;margin-top: 20px;">
-            <button class="btn btn-lg btn-success"><i class="fa fa-download margin-right"></i> Excel</button>
+            <button class="btn btn-lg btn-success" id="download2Exacel"><i class="fa fa-download margin-right"></i> Excel</button>
         </div>
         <table class="table table-striped" id="tableData">
             <thead>
@@ -37,6 +37,7 @@
 <script>
     
     $(document).ready(function () {
+        window.toExcel = [];
         loadDataProgrammeStudy();
     });
     
@@ -47,6 +48,7 @@
 
             $('#listData').empty();
             $('#dataProdi').val(JSON.stringify(jsonResult));
+            toExcel = [];
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
 
@@ -68,6 +70,17 @@
                         '<td>'+v.TotalMhs+'</td>' +
                         '<td>'+btnEdit+'</td>' +
                         '</tr>');
+
+                    var arr = {
+                        No : (i+1),
+                        JenisProgram : v.Description,
+                        Prodi : v.Name,
+                        Status : Akreditation,
+                        SK : v.NoSKBANPT,
+                        TglSK : skDate,
+                        Mhs : v.TotalMhs
+                    };
+                    toExcel.push(arr);
                 });
             }
 
@@ -172,6 +185,17 @@
 
 
         });
+
+    });
+
+    $('#download2Exacel').click(function () {
+
+        var url = base_url_js+'agregator/excel-aps-program-study';
+        var data = toExcel;
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
 
     });
     
