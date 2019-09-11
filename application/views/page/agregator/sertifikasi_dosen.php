@@ -12,6 +12,10 @@
     <div class="row">
         <div class="col-md-12">
 
+            <div style="text-align: right;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <div class="form-group">
@@ -27,13 +31,13 @@
             </div>
 
 
-            <table class="table" id="tableData">
+            <table class="table table-bordered table-striped dataTable2Excel" id="tableData" data-name="setifikasi_dosen">
                 <thead>
-                <tr>
+                <tr  style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 1%;">No</th>
-                    <th>Prodi</th>
+                    <th>Unit Pengelola (Fakultas/Departemen/Jurusan)</th>
                     <th style="width: 15%;">Jumlah Dosen</th>
-                    <th style="width: 15%;">Jumlah Dosen Bersertifikat</th>
+                    <th style="width: 15%;">Jumlah Dosen Bersertifikat **)</th>
                 </tr>
                 </thead>
                 <tbody id="listData"></tbody>
