@@ -908,11 +908,26 @@ class C_api3 extends CI_Controller {
         // Rekognisi Dosen
         if($data_arr['action']=='save_rekognisi_dosen') { 
 
+            $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
 
-            $dataForm['EntredBy'] = $this->session->userdata('NIP');
-            $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID',$ID);
+                $this->db->update('db_agregator.rekognisi_dosen',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
+            }
+
             return print_r(1);
+        }
+        else if($data_arr['action']=='readDataRekognisiDosen'){
+            $data = $this->db->query('SELECT rd.*, em.Name FROM db_agregator.rekognisi_dosen rd 
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = rd.NIP)
+                                                ORDER BY em.Name ASC ')->result_array();
+            return print_r(json_encode($data));
         }
 
 
@@ -1710,14 +1725,6 @@ class C_api3 extends CI_Controller {
 
         $Status = $this->input->get('s');
         $data = $this->db->query('SELECT Nama_penulis, Judul_artikel, Banyak_artikel, Tahun FROM db_agregator.sitasi_karya ORDER BY ID DESC')->result_array();
-        return print_r(json_encode($data));
-
-    }
-
-    public function getrekognisidosen(){
-
-        $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT ID_Dosen, Bidang_keahlian, Rekognisi, Tahun FROM db_agregator.rekognisi_dosen ORDER BY ID DESC')->result_array();
         return print_r(json_encode($data));
 
     }

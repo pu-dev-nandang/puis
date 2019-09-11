@@ -1335,7 +1335,6 @@ $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_kar
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
-//$route['agregator/__getprogrampendik'] = 'page/agregator/c_agregator/getdataprogrampendik';
 
 //Agregator Excel
 $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';
@@ -1434,7 +1433,6 @@ $route['api3/__getTeknoProduk'] = 'api/c_api3/getLuaranTekno_produk';
 $route['api3/__getHkiProduk'] = 'api/c_api3/getLuaranHkiproduk';
 $route['api3/__getHkiPaten'] = 'api/c_api3/getLuaranHkipaten';
 $route['api3/__getSitasiKarya'] = 'api/c_api3/getsitasikarya';
-$route['api3/__getRekognisiDosen'] = 'api/c_api3/getrekognisidosen';
 $route['api3/__getsum-mhs-asing'] = 'api/c_api3/getsum_mahasiswa_asing';
 
 
