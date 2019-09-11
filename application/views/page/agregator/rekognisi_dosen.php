@@ -166,10 +166,6 @@
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregatorTB3';
 
-
-        // var url = base_url_js+'api3/__getRekognisiDosen';
-
-
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0) {
@@ -182,9 +178,9 @@
                         '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
-                        '    <li><a href="javascript:void(0);">Edit</a></li>' +
-                        '    <li role="separator" class="divider"></li>' +
-                        '    <li><a href="javascript:void(0);">Remove</a></li>' +
+                        // '    <li><a href="javascript:void(0);" class="btnActEdit" data-id="'+v.ID+'" data-no="'+i+'">Edit</a></li>' +
+                        // '    <li role="separator" class="divider"></li>' +
+                        '    <li><a href="javascript:void(0);" class="btnActRemove" data-id="'+v.ID+'" data-no="'+i+'">Remove</a></li>' +
                         '  </ul>' +
                         '</div>';
 
@@ -222,6 +218,25 @@
         setTimeout(function () {
             saveTable2Excel('dataTable2Excel');
         },1000);
+    });
+
+    $(document).on('click','.btnActRemove',function () {
+       if(confirm('Are you sure?')){
+           var ID = $(this).attr('data-id');
+
+           var data = {
+               action : 'removeDataRekognisiDosen',
+               ID : ID
+           };
+
+           var token = jwt_encode(data,'UAP)(*');
+           var url = base_url_js+'api3/__crudAgregatorTB3';
+           $.post(url,{token:token},function (result) {
+               toastr.success('Data removed','Success');
+               loadRekognisiDosen();
+           });
+
+       }
     });
 
 

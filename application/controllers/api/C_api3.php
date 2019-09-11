@@ -929,6 +929,12 @@ class C_api3 extends CI_Controller {
                                                 ORDER BY em.Name ASC ')->result_array();
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']=='removeDataRekognisiDosen') {
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_agregator.rekognisi_dosen');
+            return print_r(1);
+        }
 
 
     }
