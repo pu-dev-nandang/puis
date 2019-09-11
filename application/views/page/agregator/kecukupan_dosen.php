@@ -14,7 +14,10 @@
     <div class="row">
 
         <div class="col-md-12">
-            <table class="table" id="dataTable">
+            <div style="text-align: right;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+            <table class="table dataTable2Excel" id="dataTable" data-name="kecukupan_dosen">
                 <thead>
                 <tr>
                     <th rowspan="2" style="width: 1%;">No</th>
@@ -83,8 +86,8 @@
 
                 $('#listTable').append('<tr>' +
                     '<th colspan="2" class="tdJml">Jumlah</th>' +
-                    '<th class="tdJml">'+m+'</th>' +
                     '<th class="tdJml">'+d+'</th>' +
+                    '<th class="tdJml">'+m+'</th>' +
                     '<th class="tdJml">'+p+'</th>' +
                     '<th class="tdJml">'+j+'</th>' +
                     '</tr>');
@@ -92,5 +95,7 @@
 
         });
     }
+
+
     
 </script>

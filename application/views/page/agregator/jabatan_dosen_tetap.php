@@ -9,8 +9,10 @@
 <div class="well">
     <div class="row">
         <div class="col-md-12">
-
-            <table class="table" id="dataTable">
+            <div style="text-align: right;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+            <table class="table dataTable2Excel" id="dataTable" data-name="Jabatan_dosen_tetap">
                 <thead>
                 <tr>
                     <th style="width: 1%;" rowspan="2">No</th>
