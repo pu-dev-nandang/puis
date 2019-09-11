@@ -14,18 +14,19 @@
     <div class="row">
 
         <div class="col-md-12">
+
             <div style="text-align: right;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <table class="table dataTable2Excel" id="dataTable" data-name="kecukupan_dosen">
                 <thead>
-                <tr>
-                    <th rowspan="2" style="width: 1%;">No</th>
-                    <th rowspan="2">Program Studi</th>
+                <tr style="background: #20485A;color: #FFFFFF;">
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;width: 1%;">No</th>
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;">Program Studi</th>
                     <th colspan="3">Pendidikan Tertinggi</th>
-                    <th rowspan="2" style="width: 10%;">Jumlah</th>
+                    <th rowspan="2" style="vertical-align : middle;text-align:center;width: 10%;">Jumlah</th>
                 </tr>
-                <tr>
+                <tr style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 10%;">Doktor</th>
                     <th style="width: 10%;">Magister</th>
                     <th style="width: 10%;">Profesi</th>
@@ -44,6 +45,19 @@
         loadKecukupanDosen();
     });
 
+    $("#btndownloaadExcel").click(function(){
+     
+        var akred = "0";
+        var url = base_url_js+'agregator/excel-kecukupan-dosen';
+        data = {
+          akred : 0
+        }
+        var token = jwt_encode(data,"UAP)(*");
+        FormSubmitAuto(url, 'POST', [
+            { name: 'token', value: token },
+        ]);
+    })
+
     function loadKecukupanDosen() {
         var url = base_url_js+'api3/__getKecukupanDosen';
 
@@ -60,6 +74,7 @@
                         var det = v.Details.length;
                         totalLec = totalLec + det;
                         edu = edu+'<td>'+det+'</td>';
+                        //console.log(edu);
 
                         if(i==2){
                             p = p+det
