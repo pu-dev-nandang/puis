@@ -14,7 +14,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-success btn-round" id="btnLembagaAudit"><i class="fa fa-cog margin-right"></i> Lembaga Audit</button>
+                <button class="btn btn-success" id="btnLembagaAudit"><i class="fa fa-cog margin-right"></i> Lembaga Audit</button>
             </div>
 
             <div>
@@ -36,13 +36,13 @@
                     <textarea class="form-control" rows="3" id="form_Description"></textarea>
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-primary btn-round" id="btnSaveForm"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
+                    <button class="btn btn-primary" id="btnSaveForm"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
                 </div>
             </div>
         </div>
         
         <div class="col-md-9">
-            <div style="text-align: right;"> <button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> <p></p>
+            <div style="text-align: right;"> <button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div id="viewData" class="table-responsive"></div>
         </div>
 

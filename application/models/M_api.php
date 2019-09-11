@@ -4223,7 +4223,41 @@ class M_api extends CI_Model {
         }
 
         return $rs;
+    }
 
+
+    public function __get_kecukupan_dosen() { 
+
+         // Get Program Studi
+        $data = $this->db->select('ID,Code,Name')->get_where('db_academic.program_study',array('Status' => 1))->result_array();
+
+        if(count($data)>0){
+            $dataLAP = $this->db->order_by('ID','DESC')->get_where('db_employees.level_education',array(
+                'ID >' => 8
+            ))->result_array();
+            for($i=0;$i<count($data);$i++){
+
+                for($j=0;$j<count($dataLAP);$j++){
+
+                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
+                    AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" ')->result_array();
+
+                    $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
+                    $data[$i]['dataLecturers'][$j] = $r;
+                }
+
+
+                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em WHERE em.ProdiID = "'.$data[$i]['ID'].'"
+                    AND em.Profession <> "" ')->result_array();
+                $r = array('Level' => '', 'Details' => $dataL);
+                $data[$i]['dataLecturers'][2] = $r;
+
+            }
+
+        }
+
+        return $data;
+        ///return print_r(json_encode($data));
     }
 
 }
