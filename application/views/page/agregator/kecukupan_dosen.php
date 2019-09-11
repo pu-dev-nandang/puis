@@ -20,13 +20,13 @@
             </div>
             <table class="table dataTable2Excel" id="dataTable" data-name="kecukupan_dosen">
                 <thead>
-                <tr style="background: #20485A;color: #FFFFFF;">
+                <tr>
                     <th rowspan="2" style="vertical-align : middle;text-align:center;width: 1%;">No</th>
                     <th rowspan="2" style="vertical-align : middle;text-align:center;">Program Studi</th>
                     <th colspan="3">Pendidikan Tertinggi</th>
                     <th rowspan="2" style="vertical-align : middle;text-align:center;width: 10%;">Jumlah</th>
                 </tr>
-                <tr style="background: #20485A;color: #FFFFFF;">
+                <tr>
                     <th style="width: 10%;">Doktor</th>
                     <th style="width: 10%;">Magister</th>
                     <th style="width: 10%;">Profesi</th>
