@@ -341,6 +341,7 @@
 
 <!-- Jquery Excel -->
 <script type="text/javascript" src="<?php echo base_url();?>assets/jquerytable2excel/jquery.table2excel.js"></script>
+<!--<script type="text/javascript" src="--><?php //echo base_url();?><!--assets/jquerytable2excel/table2excel.js"></script>-->
 
 <!-- Custom -->
 <script type="text/javascript">
@@ -2044,10 +2045,12 @@
     function saveTable2Excel(element) {
         var elm = $('.'+element);
         var name = elm.attr('data-name');
+        var preserveColors = (elm.hasClass('table2excel_with_colors') ? true : false);
         elm.table2excel({
-            exclude : "table",
+            exclude: ".noExl",
             filename : name,
-            fileext : ".xlsx"
+            fileext : ".xlsx",
+            preserveColors : preserveColors
         });
     }
 

@@ -181,8 +181,8 @@
             '    </div>' +
             '</div>');
 
-        loadSelectOptionEmployeesSingle('#formMentor1',m1);
-        loadSelectOptionEmployeesSingle('#formMentor2',m2);
+        loadSelectOptionLecturersSingle('#formMentor1',m1);
+        loadSelectOptionLecturersSingle('#formMentor2',m2);
         $('#formMentor1,#formMentor2').select2({allowClear: true});
 
 
