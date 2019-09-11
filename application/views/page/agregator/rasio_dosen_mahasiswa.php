@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-12">
 
-            <div class="row">
+            <div class="row hide">
                 <div class="col-md-6 col-md-offset-3">
                     <div class="form-group">
                         <label>Filter Status</label>
@@ -23,8 +23,10 @@
                     </div>
                 </div>
             </div>
-            <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
-            <table class="table" id="tableData">
+            <div style="text-align: right;margin-bottom: 20px;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+            <table class="table dataTable2Excel" data-name="Rasio_Dosen_terhadap_Mahasiswa" id="tableData">
                 <thead>
                 <tr>
                     <th style="width: 1%;">No</th>
@@ -36,6 +38,11 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
+
+            <p style="color: orangered;">
+                <br/>*) Mahasiswa yang terhitung adalah mahasiswa yang aktif (Tidak termasuk mahasiswa cuti / mangkir)
+                <br/>*) Dosen yang terhitung adalah dosen yang aktif (Sesuai status Lecturer HRD)
+            </p>
         </div>
     </div>
 </div>
@@ -53,10 +60,10 @@
     function loadLecturerCertificate() {
         passToExcel = [];
         var filterStatusForlap = $('#filterStatusForlap').val();
-        var status = (filterStatusForlap!='' && filterStatusForlap!=null)
-        ? filterStatusForlap : 'all';
+        // var status = (filterStatusForlap!='' && filterStatusForlap!=null)
+        // ? filterStatusForlap : 'all';
 
-        var url = base_url_js+'api3/__getRasioDosenMahasiswa?s='+status;
+        var url = base_url_js+'api3/__getRasioDosenMahasiswa';
         $.getJSON(url,function (jsonResult) {
 
             $('#listData').empty();
@@ -65,7 +72,7 @@
 
                 var ds = 0;
                 var ds_c = 0;
-                var x = 0;
+                var ds_x = 0;
 
                 $.each(jsonResult,function (i,v) {
                     $('#listData').append('<tr>' +
@@ -73,20 +80,20 @@
                         '<td style="text-align: left;">'+v.Name+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+v.TotalLecturer+'</td>' +
                         '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwa+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">0</td>' +
+                        '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwaTA+'</td>' +
                         '</tr>');
 
                     ds = ds + parseInt(v.TotalLecturer);
                     ds_c = ds_c + parseInt(v.TotalMahasiwa);
-                    //ds_x = ds_x + parseInt(x);
+                    ds_x = ds_x + parseInt(v.TotalMahasiwaTA);
                 });
 
                 $('#listData').append('<tr>' +
                     '<th colspan="2">Jumlah</th>' +
                     '<th>'+ds+'</th>' +
                     '<th>'+ds_c+'</th>' +
-                    //'<th>'+ds_x+'</th>' +
-                    '</tr>')
+                    '<th>'+ds_x+'</th>' +
+                    '</tr>');
 
 
                 passToExcel = jsonResult;
@@ -96,17 +103,4 @@
 
     }
 
-    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
-        if (passToExcel.length > 0) {
-            var url = base_url_js+'agregator/excel-rasio-dosen-mahasiswa';
-            data = {
-              passToExcel : passToExcel,
-            }
-            var token = jwt_encode(data,"UAP)(*");
-            FormSubmitAuto(url, 'POST', [
-                { name: 'token', value: token },
-            ]);
-        }
-
-    })
 </script>
