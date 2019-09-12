@@ -1317,11 +1317,101 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='viewIPK'){
+            // error_reporting(0);
+            $rs = array('header' => array(),'body' => array() );
+            $header = array('No','Program Pendidikan','');
+            /*
+                array 3 awal yang di insert adalah Jumlah Lulusan pada
+                array 3 setelah itu yang di insert adalah Rata-rata IPK Lulusan pada
+        
+            */
+            // dapatkan 3 tahun belakang
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
+            }
 
-            $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT * FROM db_academic.auth_students ast 
-                                                          WHERE ast.StatusStudentID = "1" 
-                                                          AND ast.Year = "'.$Year.'" ')->result_array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
+            }
+            $rs['header'] = $header;
+
+            $ProgramPendidikan = array(
+                "Doktor/ Doktor Terapan/ Subspesialis",
+                "Magister/ Magister Terapan/ Spesialis",
+                "Profesi 1 Tahun",
+                "Profesi 2 Tahun",
+                "Sarjana/ Diploma Empat/ Sarjana Terapan", // indeks 4 search ke database
+                "Diploma Tiga",
+                "Diploma Dua",
+                "Diploma Satu",
+            );
+
+            $body = array();
+            for ($i=0; $i < count($ProgramPendidikan); $i++) { 
+                // define temp default
+                $temp = array();
+                $temp[] = $ProgramPendidikan[$i];
+                if ($i == 4) {
+                   for ($j=2; $j < count($header); $j++) { 
+                       if ($j == 2) {
+                           $sql = 'select count(*) as total from db_academic.program_study where Status = 1 and EducationLevelID in(3,9)';
+                           $query=$this->db->query($sql, array())->result_array();
+                           $temp[] = $query[0]['total']; // Jumlah PS
+                           continue;
+                       }
+                       else
+                       {
+                            if ($j <= 5) { // pembeda Jumlah Lulusan pada dan Rata-rata IPK Lulusan pada
+                               $get_tayear = $header[$j]; // ex : 2014
+                               $sql = 'select count(*) as total from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                               $query=$this->db->query($sql, array(1))->result_array();
+                               $temp[] = $query[0]['total']; // Jumlah PS
+                            }
+                            else // pembeda Jumlah Lulusan pada dan Rata-rata IPK Lulusan pada
+                            {
+                                // cari NPM dulu yg lulusan
+                                $get_tayear = $header[$j];
+                                $sql = 'select NPM,Year from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = 1';
+                                $query=$this->db->query($sql, array())->result_array();
+                                $GradeValueCredit = 0;
+                                $Credit = 0;
+                                $IPK = 0;
+                                for ($k=0; $k < count($query); $k++) {
+                                    $ta = 'ta_'.$query[$k]['Year'];
+                                    $NPM = $query[$k]['NPM']; 
+                                    $sql1 = 'select * from '.$ta.'.study_planning where NPM = ?';
+                                    // print_r($sql1);
+                                    $query1=$this->db->query($sql1, array($NPM))->result_array();
+                                    for ($l=0; $l < count($query1); $l++) { 
+                                        $GradeValue = $query1[$l]['GradeValue'];
+                                        $CreditSub = $query1[$l]['Credit'];
+                                        $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+                                        $Credit = $Credit + $CreditSub;
+                                    }
+                                }
+
+                                $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                                $temp[] = $IPK;
+                            }
+                            
+                       }
+                   }
+                }
+                else
+                {
+                    for ($j=2; $j < count($header); $j++) { 
+                        $temp[] = 0;
+                    }
+                }
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;
+
+            return print_r(json_encode($rs));
+
         }
         else if($data_arr['action']=='getprogrampendik'){
             $data = $this->db->query('SELECT ID, NamaProgramPendidikan FROM db_agregator.program_pendidikan')->result_array();
