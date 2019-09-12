@@ -280,8 +280,9 @@
                         <select class="form-control" id="formStatusForlap">
                             <option>* Not Set</option>
                             <option disabled>------</option>
-                            <option value="0">Contract</option>
-                            <option value="1">Permanent</option>
+                            <option value="0">NUP (Contract)</option>
+                            <option value="1">NIDN (Permanent)</option>
+                            <option value="2">NIDK (Special)</option>
                         </select>
 
 
