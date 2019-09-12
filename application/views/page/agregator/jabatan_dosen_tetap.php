@@ -12,16 +12,16 @@
             <div style="text-align: right;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
-            <table class="table dataTable2Excel" id="dataTable" data-name="Jabatan_dosen_tetap">
+            <table class="table table-bordered table-striped dataTable2Excel" id="dataTable" data-name="Jabatan_dosen_tetap">
                 <thead>
-                <tr>
+                <tr style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 1%;" rowspan="2">No</th>
                     <th rowspan="2">Pendidikan</th>
                     <th colspan="4">Jabatan Akademik</th>
                     <th style="width: 10%;" rowspan="2">Tenaga Pengajar</th>
                     <th style="width: 10%;" rowspan="2">Jumlah</th>
                 </tr>
-                <tr>
+                <tr style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 10%;">Asisten Ahli</th>
                     <th style="width: 10%;">Lektor</th>
                     <th style="width: 10%;">Lektor Kepala</th>
@@ -47,14 +47,38 @@
 
             $('#listData').empty();
             if(jsonResult.length>0){
+                var AA = 0;
+                var L = 0;
+                var LK = 0;
+                var GB = 0;
+                var TP = 0;
+                var J = 0;
 
                 $.each(jsonResult,function (i,v) {
 
                     var td = '';
                     var total = 0;
                     $.each(v.details,function (i2, v2) {
-                       td = td+'<td>'+v2.dataEmployees.length+'</td>';
+                        var det = v2.dataEmployees.length; 
+                        td = td+'<td>'+v2.dataEmployees.length+'</td>';
                         total = total + parseInt(v2.dataEmployees.length);
+                        
+                        if(i2==0){
+                            TP = TP+det; //tenaga pengajar
+                        }
+                        else if(i2==1){ // Asisten Ahli
+                            AA = AA+det;
+                        }
+                        else if(i2==2){ // lektor
+                            L = L + det;
+                        }
+                        else if(i2==3){ // lektor kepala
+                            LK = LK+det;
+                        }
+                        else if(i2==4){ // Guru besar
+                            GB = GB+det;
+                        }
+
                     });
 
                     $('#listData').append('<tr>' +
@@ -65,6 +89,19 @@
                         '</tr>');
 
                 });
+
+                $('#listData').append('<tr>' +
+                    '<th colspan="2" class="tdJml">Jumlah</th>' +
+                    '<th class="tdJml">'+TP+'</th>' +
+                    '<th class="tdJml">'+AA+'</th>' +
+                     '<th class="tdJml">'+L+'</th>' +
+                    '<th class="tdJml">'+J+'</th>' +
+                    '<th class="tdJml">'+GB+'</th>' +
+                    '<th class="tdJml">'+LK+'</th>' +
+                    
+                   
+                    
+                                       '</tr>');
 
             }
 
