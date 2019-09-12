@@ -540,7 +540,7 @@ class M_admission extends CI_Model {
           on a.ID = b.RegisterID
           join db_admission.register_verified as c
           on c.RegVerificationID = b.ID
-          join db_admission.school as z
+          left join db_admission.school as z
           on z.ID = a.SchoolID
           where a.StatusReg = 0
           ) as a right JOIN db_admission.formulir_number_online_m as b
