@@ -884,12 +884,64 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='readDataMHSBaruAsing'){
 
-            $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf
-                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
-                                                    WHERE ssf.Year = "'.$Year.'" ')->result_array();
+            // $Year = $data_arr['Year'];
+            // $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf
+            //                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
+            //                                         WHERE ssf.Year = "'.$Year.'" ')->result_array();
 
-            return print_r(json_encode($data));
+
+            $rs = array('header' => array(),'body' => array(),  );
+            // show all ta
+            $sql = "show databases like '".'ta_'."%'";
+            $query=$this->db->query($sql, array())->result_array();
+            $temp = ['No','Program Studi'];
+            for ($i=0; $i < count($query); $i++) { 
+                $arr = $query[$i];
+                $db_ = '';
+
+                foreach ($arr as $key => $value) {
+                    $db_ = $value;
+                }
+
+                if ($db_ != '') {
+                    $ta_year = explode('_', $db_);
+                    $ta_year = $ta_year[1];
+                    $temp[] = $ta_year;
+                }
+            }
+
+            $rs['header'] = $temp;
+
+            // body
+            // find prodi
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+            $body = array();
+            for ($j=0; $j < count($G_prodi); $j++) {
+                $temp = []; 
+                // find count
+                $ProdiID = $G_prodi[$j]['ID'];
+                $ProdiName = $G_prodi[$j]['Name'];
+                $temp[] = $ProdiName;
+                for ($i=0; $i < count($query); $i++) { 
+                    $arr = $query[$i];
+                    $db_ = '';
+
+                    foreach ($arr as $key => $value) {
+                        $db_ = $value;
+                    }
+
+                    $sql1 = 'select count(*) as total from '.$db_.'.students where NationalityID !=  "001" and ProdiID = ? ';
+                    $query1=$this->db->query($sql1, array($ProdiID))->result_array();
+                    $count = $query1[0]['total'];
+                    $temp[] = $count;
+                }
+
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;    
+
+            return print_r(json_encode($rs));
 
         }
 
