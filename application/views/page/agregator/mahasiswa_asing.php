@@ -116,7 +116,7 @@
             $('#listStd').empty();
 
             var arr_body_table = jsonResult.body;
-            console.log(arr_body_table);
+            // console.log(arr_body_table);
             if(arr_body_table.length>0){
                 for (var i = 0; i < arr_body_table.length; i++) {
                     var No = parseInt(i) + 1;

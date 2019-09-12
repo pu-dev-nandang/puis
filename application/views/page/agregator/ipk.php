@@ -1,15 +1,11 @@
-
-
 <div class="well">
-
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <select class="form-control" id="filterYear"> </select>
-        </div>
-    </div>
-    <br/>
     <div class="row">
         <div class="col-md-12">
+            <div style="text-align: right;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
+            </div>
+            <br/>
              <div id="viewTable"></div>
         </div>
     </div>
@@ -18,77 +14,83 @@
 <script>
     $(document).ready(function () {
         loadIPK();
-        selectyearstudy();
     });
     
     function loadIPK() {
 
-        var thisYear = (new Date()).getFullYear();
-        var startTahun = parseInt(thisYear) - parseInt(3);
-        var selisih =  parseInt(thisYear) - parseInt(startTahun);
+        var data = {
+            action : 'viewIPK',
+        };
 
-        var arr_years =[];
-        for (var i = 0; i < 3; i++) {
-            var y = parseInt(thisYear) - parseInt(i);
-            arr_years.push(y); 
-        }
-
-        var thYear = '';
-        for (var i = 0; i < arr_years.length; i++) {
-            thYear += '<th>'+arr_years[i]+'</th>';
-        }
-        
-         $('#viewTable').html(' <table class="table" id="dataTablesPAM">' +
-            '                <thead>' +
-            '                <tr>    ' +
-            '                    <th colspan="2" style="border-right: 1px solid #ccc;"></th> ' +
-             '                   <th style="border-right: 1px solid #ccc; text-align: center"> Jumlah PS </th> ' +
-            '                    <th colspan="3" style="border-right: 1px solid #ccc; text-align: center">Jumlah Lulusan pada</th> ' +
-            '                    <th colspan="3" style="border-right: 1px solid #ccc; text-align: center">Rata-rata IPK Lulusan pada</th>  ' +
-            '                    <th style="border-right: 1px solid #ccc;"></th>  ' +
-            '                </tr>  ' +
-            '                <tr>' +
-            '                    <th style="width: 1%;">No</th>' +
-            '                    <th>Program Pendidikan </th>' +
-            '                    <th></th>' +
-                                thYear+ 
-                                thYear+
-            //'                    <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
-            '                </tr>' +
-            '                </thead>' +
-            '                <tbody id="listData"></tbody>' +
-            '            </table>');
-
-        var filterYear = $('#filterYear').val();
-
-        if(filterYear!='' && filterYear!=null){
-
-            var data = {
-                action : 'viewIPK',
-                Year : filterYear
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api3/__crudAgregatorTB5';
-
-            $.post(url,{token:token},function (jsonResult) {
-
-
-
-            });
-        }    
-    }
-
-    function selectyearstudy() {
-
+        var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregatorTB5';
-        var token = jwt_encode({action : 'yearstudy'},'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
-            $('#filterYear').append('<option disabled selected></option>');
-                for(var i=0;i<jsonResult.length;i++){
-                   $('#filterYear').append('<option id="'+jsonResult[i].Year+'"> '+jsonResult[i].Year+' </option>');
+            var HtmlTable ='<table class ="table dataTable2Excel" data-name="TblviewIPK">'+
+                                '<thead>'+
+                                    '<tr>'+
+                                        '<th colspan="2" style="border-right: 1px solid #ccc;"></th>'+
+                                        '<th style="border-right: 1px solid #ccc; text-align: center"> Jumlah PS </th>'+
+                                        '<th colspan="3" style="border-right: 1px solid #ccc; text-align: center">Jumlah Lulusan pada</th>'+
+                                        '<th colspan="3" style="border-right: 1px solid #ccc; text-align: center">Rata-rata IPK Lulusan pada</th>'+
+                                        '<th style="border-right: 1px solid #ccc;"></th>'+
+                                    '</tr>'+
+                                    '<tr>';    
+
+           var header = jsonResult.header;
+           var arr_total = [];  
+           for (var i = 0; i < header.length; i++) {
+                HtmlTable += '<td>'+header[i]+'</td>';
+                if (i >= 2 && i <= 5) { // define total Jumlah PS dan Jumlah Lulusan pada
+                    arr_total.push(0);
                 }
-            });
-      }
+            }
+
+            HtmlTable+= '</tr></thead><tbody id = "listData"></tbody>';
+            HtmlTable+= '</table>';
+            $('#viewTable').html(HtmlTable);
+            var body = jsonResult.body;
+            var htmlBody = '';
+            for (var i = 0; i < body.length; i++) {
+                htmlBody += '<tr>';
+                var No = parseInt(i) + 1;
+                var arr_body = body[i];
+                // console.log(arr_body);
+                htmlBody += '<td>'+No+'</td>';
+                for (var j = 0; j < arr_body.length; j++) {
+                    if(j < 5){
+                        htmlBody += '<td>'+arr_body[j]+'</td>';
+                        if (j >= 1) { // isi total Jumlah PS dan Jumlah Lulusan pada
+                            arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j]);
+                        }
+                    }
+                    else
+                    {
+                        IPK = getCustomtoFixed(arr_body[j],2);
+                        htmlBody += '<td>'+IPK+'</td>';
+                    }
+                }
+
+                htmlBody += '</tr>';
+            }
+
+            $('#listData').append(htmlBody);  
+
+            // console.log(arr_total);
+            var tbl = $('#listData').closest('table');
+            var isian = '';
+            for (var i = 0; i < arr_total.length; i++) {
+                isian += '<td>'+arr_total[i]+'</td>';
+            }
+            tbl.append(
+                '<tfoot>'+
+                    '<tr>'+
+                        '<td colspan = "2">Jumlah</td>'+
+                        isian+
+                    '</tr>'+
+                '</tfoot>'        
+                );
+
+        });    
+    }
 </script>
