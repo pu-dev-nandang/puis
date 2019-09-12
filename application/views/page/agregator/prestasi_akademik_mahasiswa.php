@@ -40,6 +40,9 @@
         </div>
         <div class="col-md-9">
 
+            <div style="text-align: right;margin-bottom: 30px;">
+                <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
             <div id="viewTable"></div>
 
 
@@ -50,6 +53,9 @@
 </div>
 
 <script>
+
+    var oTable;
+    var oSettings;
 
     $(document).ready(function () {
 
@@ -122,16 +128,21 @@
     
     function loadDataPAM() {
 
-        $('#viewTable').html(' <table class="table" id="dataTablesPAM">' +
+        $('#viewTable').html(' <table class="table dataTable2Excel" data-name="Prestasi-Akademik-Mahasiswa" id="dataTablesPAM">' +
             '                <thead>' +
             '                <tr>' +
-            '                    <th style="width: 1%;">No</th>' +
-            '                    <th>Kegiatan</th>' +
-            '                    <th style="width: 15%;">Waktu</th>' +
-            '                    <th style="width: 15%;">Tingkat</th>' +
-            '                    <th style="width: 20%;">Prestasi</th>' +
-            '                    <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
+            '                    <th rowspan="2" style="width: 1%;">No</th>' +
+            '                    <th rowspan="2">Kegiatan</th>' +
+            '                    <th rowspan="2" style="width: 15%;">Waktu</th>' +
+            '                    <th colspan="3" style="width: 15%;">Tingkat</th>' +
+            '                    <th rowspan="2" style="width: 20%;">Prestasi</th>' +
+            '                    <th class="noExl" rowspan="2" style="width: 10%;"><i class="fa fa-cog"></i></th>' +
             '                </tr>' +
+            '                <tr>' +
+            '                   <th>Provinsi / Wilayah</th>' +
+            '                   <th>Nasional</th>' +
+            '                   <th>Internasional</th>' +
+            '               </tr>' +
             '                </thead>' +
             '                <tbody id="listData"></tbody>' +
             '            </table>');
@@ -162,19 +173,27 @@
                         '</div>' +
                         '<textarea id="viewData_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea>';
 
+                    var Provinsi = (v.Tingkat=='Provinsi') ? 'v' : '';
+                    var Nasional = (v.Tingkat=='Nasional') ? 'v' : '';
+                    var Internasional = (v.Tingkat=='Internasional') ? 'v' : '';
+
                     $('#listData').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+v.Kegiatan+'</td>' +
-                        '<td>'+moment(v.WaktuPenyelenggaraan).format('DD MMM YYYY')+'</td>' +
-                        '<td>'+v.Tingkat+'</td>' +
+                        '<td>'+moment(v.WaktuPenyelenggaraan).format('DD-MM-YYYY')+'</td>' +
+                        '<td>'+Provinsi+'</td>' +
+                        '<td>'+Nasional+'</td>' +
+                        '<td>'+Internasional+'</td>' +
                         '<td>'+v.Prestasi+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+btn+'</td>' +
+                        '<td class="noExl" style="border-left: 1px solid #ccc;">'+btn+'</td>' +
                         '</tr>');
 
                 });
             }
 
-            $('#dataTablesPAM').dataTable();
+
+            oTable = $('#dataTablesPAM').DataTable();
+            oSettings = oTable.settings();
 
 
         });
@@ -219,5 +238,17 @@
         }
 
 
+    });
+
+    $('#saveToExcel').click(function () {
+
+        $('select[name="dataTablesPAM_length"]').val(-1);
+
+        oSettings[0]._iDisplayLength = oSettings[0].fnRecordsTotal();
+        oTable.draw();
+
+        setTimeout(function () {
+            saveTable2Excel('dataTable2Excel');
+        },1000);
     });
 </script>

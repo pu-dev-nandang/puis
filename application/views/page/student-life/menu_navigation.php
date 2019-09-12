@@ -10,6 +10,12 @@
                     Diploma Supplement
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(2)=='student-achievement'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/student-achievement');?>">
+                    <i class="fa fa-trophy"></i>
+                    Student Achievement
+                </a>
+            </li>
         </ul>
 
 
