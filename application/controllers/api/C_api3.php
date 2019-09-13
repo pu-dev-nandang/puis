@@ -987,8 +987,7 @@ class C_api3 extends CI_Controller {
             $this->db->delete('db_agregator.rekognisi_dosen');
             return print_r(1);
         }
-         else if($data_arr['action']=='readProduktivitasPenelitian'){
-
+        else if($data_arr['action']=='readProduktivitasPenelitian'){
 
             $rs = array('header' => array(),'body' => array() );
             $Year = date('Y');
@@ -1020,7 +1019,40 @@ class C_api3 extends CI_Controller {
             $rs['header'] = $header;
             $rs['body'] = $body;
             return print_r(json_encode($rs));
+        }
 
+    else if($data_arr['action']=='readProduktivitasPkmDosen'){
+
+            $rs = array('header' => array(),'body' => array() );
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            $arr_year = array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $arr_year[] = $i;
+            }
+            $header = $arr_year;
+            // print_r($arr_year);
+            $body = array();
+            //$G_research = $this->m_master->showData_array('db_agregator.sumber_dana');
+            $G_research = $this->db->query('SELECT * FROM db_agregator.sumber_dana WHERE Status = "1" ')->result_array();
+            for ($i=0; $i < count($G_research); $i++) { 
+                $temp = array();
+                $temp[] = $G_research[$i]['SumberDana'];
+                $ID_sumberdana = $G_research[$i]['ID'];
+                for ($j=0; $j < count($arr_year); $j++) { 
+                    $Year_ = $arr_year[$j];
+                     $sql = 'select count(*) as total from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
+                     $count = $query[0]['total'];
+                     $temp[] = $count;
+                }
+
+                $body[] = $temp;
+               
+            }
+            $rs['header'] = $header;
+            $rs['body'] = $body;
+            return print_r(json_encode($rs));
         }
 
 

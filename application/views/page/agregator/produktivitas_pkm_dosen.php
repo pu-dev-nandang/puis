@@ -69,7 +69,7 @@
 
     function loadDataTable() {
         var data = {
-            action : 'readProduktivitasPenelitian',
+            action : 'readProduktivitasPkmDosen',
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregatorTB3';
@@ -81,7 +81,6 @@
             // make table
             var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPenelitian">'+
                                 '<thead>'+
-
                                     '<tr style="background: #20485A;color: #FFFFFF;">'+
                                          '<td>No</td>'+
                                          '<td>Sumber Pembiayaan</td>';   
