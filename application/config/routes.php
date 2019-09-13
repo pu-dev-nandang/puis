@@ -1336,6 +1336,7 @@ $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_do
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 $route['agregator/produktivitas-penelitian-dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
+$route['agregator/produktivitas-pkm-dosen'] = 'page/agregator/c_agregator/produktivitas_pkm_dosen';
 
 
 //Agregator Excel
