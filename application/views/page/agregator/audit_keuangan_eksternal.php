@@ -43,7 +43,7 @@
         
         <div class="col-md-9">
             <div style="text-align: right;"> <button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
-            <div id="viewData" class="table-responsive"></div>
+            <div id="viewData"></div>
         </div>
 
     </div>
@@ -322,7 +322,7 @@
             '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%">No</th>' +
             '                        <th style="width: 15%">Lembaga</th>' +
-            '                        <th style="width: 5%">Year</th>' +
+            '                        <th style="width: 5%">Tahun</th>' +
             '                        <th style="width: 20%">Opini</th>' +
             '                        <th style="width: 5%"><i class="fa fa-cog"></i></th>' +
             '                        <th>Keterangan</th>' +
@@ -340,7 +340,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "Lembaga, Sertifikat, Lingkup, Tingkat"
+                "searchPlaceholder": "Lembaga, Tahun, Keterangan"
             },
             "ajax":{
                 url : url, // json datasource

@@ -1,17 +1,17 @@
 <style>
-.btn-circle {
-    width: 30px;
-    height: 30px;
-    padding: 6px 0px;
-    border-radius: 15px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.42857;
-}
+/*.btn-circle {*/
+    /*width: 30px;*/
+    /*height: 30px;*/
+    /*padding: 6px 0px;*/
+    /*border-radius: 15px;*/
+    /*text-align: center;*/
+    /*font-size: 12px;*/
+    /*line-height: 1.42857;*/
+/*}*/
  
-.btn-round{
-    border-radius: 8px;
-}
+/*.btn-round{*/
+    /*border-radius: 8px;*/
+/*}*/
 </style> 
 
 

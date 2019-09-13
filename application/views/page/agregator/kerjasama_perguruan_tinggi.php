@@ -56,16 +56,16 @@
                 <div class="col-xs-8" id="viewFile"></div>
                 <div class="col-xs-4">
                     <div style="text-align: right;">
-                        <button class="btn btn-primary btn-round" id="btnSave"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
+                        <button class="btn btn-primary" id="btnSave"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>
                     </div>
                 </div>
             </div>
 
         </div>
         <div class="col-md-9">
-            <div style="text-align: right; "><button class="btn btn-success btn-round" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> Excel </button></div> 
+            <div style="text-align: right;margin-bottom: 20px; "><button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div>
              
-            <div id="viewData" class="table-responsive"></div>
+            <div id="viewData"></div>
 
         </div>
 
@@ -410,7 +410,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "Lembaga, Sertifikat, Lingkup, Tingkat"
+                "searchPlaceholder": "Lembaga, Tingkat, Benefit"
             },
             "ajax":{
                 url : url, // json datasource
