@@ -200,7 +200,30 @@
                             <input class="form-control" id="formMentorEmail" readonly>
                         </td>
                     </tr>
-
+                    <tr style="background: #fba94314">
+                        <th>Graduation Date </th>
+                        <th>:</th>
+                        <td>
+                            <div>
+                                <span class="btn btn-warning setGraduationDateToNull">Set To Null</span>
+                            </div>
+                            <br/>
+                            <input class="form-control hide" id="formDateOfGraduationValue" readonly>
+                            <input class="form-control formBiodata" data-desc="bio" id="formDateOfGraduation">
+                        </td>
+                    </tr>
+                    <tr style="background: #fba94314">
+                        <th>Yudisium Date </th>
+                        <th>:</th>
+                        <td>
+                            <div>
+                                <span class="btn btn-warning setYudisiumDateToNull">Set To Null</span>
+                            </div>
+                            <br/>
+                            <input class="form-control hide" id="formDateOfYudisiumValue" readonly>
+                            <input class="form-control formBiodata" data-desc="bio" id="formDateOfYudisium">
+                        </td>
+                    </tr>
                 </table>
 
 
@@ -348,15 +371,26 @@
 
 
 </div>
-
+<?php 
+    // echo date('Y', strtotime('2017-09-10'));
+    
+ ?>
 <script>
-
     $(document).ready(function () {
         loadDataStd();
     });
 
-    $('#btnSaveBiodata').click(function () {
+    $(document).off('click', '.setGraduationDateToNull').on('click', '.setGraduationDateToNull',function(e) {
+        $('#formDateOfGraduationValue').val('');
+        $('#formDateOfGraduation').val('');
+    })
 
+    $(document).off('click', '.setYudisiumDateToNull').on('click', '.setYudisiumDateToNull',function(e) {
+        $('#formDateOfYudisiumValue').val('');
+        $('#formDateOfYudisium').val('');
+    })
+
+    $('#btnSaveBiodata').click(function () {
         var DB_Student = "<?php echo $DB_Student; ?>";
 
         var formNPM = $('#formNPM').val();
@@ -380,6 +414,15 @@
             var formKtp = $('#formKtp').val();
             var formAcc = $('#formAcc').val();
 
+            var formDateOfGraduationValue = $('#formDateOfGraduationValue').val();
+            if (formDateOfGraduationValue.trim() == '' )  {
+                formDateOfGraduationValue = null;
+            }
+            var formDateOfYudisiumValue = $('#formDateOfYudisiumValue').val();
+            if (formDateOfYudisiumValue.trim() == '' )  {
+                formDateOfYudisiumValue = null;
+            }
+
             var data = {
                 action : 'updateBiodataStudent',
                 DB_Student : DB_Student,
@@ -402,6 +445,8 @@
                     KTPNumber : formKtp,
                     EmailPU : formEmailPU,
                     Access_Card_Number : formAcc,
+                    GraduationDate : formDateOfGraduationValue,
+                    YudisiumDate : formDateOfYudisiumValue,
                 }
             };
 
@@ -502,6 +547,58 @@
                         }
                     });
                 $('#formDateOfBirth').datepicker('setDate',new Date(d.DateOfBirth));
+
+                $( "#formDateOfGraduation" )
+                    .datepicker({
+                        showOtherMonths:true,
+                        autoSize: true,
+                        dateFormat: 'dd MM yy',
+                        onSelect : function () {
+                            var data_date = $(this).val().split(' ');
+                            var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
+                            var Desc = $(this).attr('data-desc');
+
+                            var elm = '#formDateOfGraduationValue';
+                            if(Desc=='Issue') {
+                                elm = '#formSTDateIssuedValue';
+                            } else if(Desc=='TempTS'){
+                                elm = '#formTemp_TsDateValue';
+                            }
+
+                            $(elm).val(CustomMoment);
+                        }
+                    });
+
+                if (d.GraduationDate != '' && d.GraduationDate != null) {
+                    $('#formDateOfGraduation').datepicker('setDate',new Date(d.GraduationDate));
+                } 
+
+                $( "#formDateOfYudisium" )
+                    .datepicker({
+                        showOtherMonths:true,
+                        autoSize: true,
+                        dateFormat: 'dd MM yy',
+                        onSelect : function () {
+                            var data_date = $(this).val().split(' ');
+                            var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
+                            var Desc = $(this).attr('data-desc');
+
+                            var elm = '#formDateOfYudisiumValue';
+                            if(Desc=='Issue') {
+                                elm = '#formSTDateIssuedValue';
+                            } else if(Desc=='TempTS'){
+                                elm = '#formTemp_TsDateValue';
+                            }
+
+                            $(elm).val(CustomMoment);
+                        }
+                    });
+
+                if (d.YudisiumDate != '' && d.YudisiumDate != null) {
+                    $('#formDateOfYudisium').datepicker('setDate',new Date(d.YudisiumDate));
+                }    
+                
+
 
                 $('#viewImage').attr('data-src',base_url_js+'uploads/students/'+DB_Student+'/'+d.Photo);
                 $('#viewImage').imgFitter({
