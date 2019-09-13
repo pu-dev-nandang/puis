@@ -1186,6 +1186,70 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
         }
 
+        else if($data_arr['action']=='readYearSDNewSumberDana'){
+            $data = $this->db->query('SELECT Year FROM db_agregator.perolehan_dana_2 pd  
+                                                      GROUP BY Year ORDER BY Year DESC')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readNewSumberDana'){
+
+            $dataTS = $this->db->get_where('db_agregator.perolehan_dana_2',
+                array('Year' => $data_arr['Year']))->result_array();
+
+
+            $y1 = (int) $data_arr['Year'] - 1;
+            $dataTS1 = $this->db->get_where('db_agregator.perolehan_dana_2',
+                array('Year' => $y1))->result_array();
+
+
+            $y2 = (int) $data_arr['Year'] - 2;
+            $dataTS2 = $this->db->get_where('db_agregator.perolehan_dana_2',
+                array('Year' => $y2))->result_array();
+
+            $result = array(
+                'TS' => $dataTS,
+                'TS1' => $dataTS1,
+                'TS2' => $dataTS2,
+            );
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='updateNewSumberDana'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+            $Year = $dataForm['Year'];
+
+            $result = 0;
+            if($ID!=''){
+                // Update
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.perolehan_dana_2',$dataForm);
+                $result = 1;
+            } else {
+                // Cek apakah tahun sudah pernah di input atau blm;
+                $dataY = $this->db->get_where('db_agregator.perolehan_dana_2',array(
+                    'Year' => $Year
+                ))->result_array();
+
+                if(count($dataY)<=0){
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                    $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID', $ID);
+                    $this->db->insert('db_agregator.perolehan_dana_2',$dataForm);
+                    $result = 1;
+                }
+
+            }
+
+            return print_r($result);
+
+        }
+
     }
 
     public function crudAgregatorTB5(){
