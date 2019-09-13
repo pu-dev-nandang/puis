@@ -82,7 +82,7 @@
                         }
                         else
                         {
-                            RataMasaStudy = getCustomtoFixed(arr_body[j],2);
+                            RataMasaStudy = getCustomtoFixed(arr_body[j],1);
                             htmlBody += '<td style = "text-align: center">'+RataMasaStudy+'</td>';
                         }
                     }
