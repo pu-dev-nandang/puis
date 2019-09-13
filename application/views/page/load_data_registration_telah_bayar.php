@@ -13,7 +13,7 @@
     		<th>Sekolah</th>
     		<th>Formulir Code</th>
     		<th>Register At</th>
-    		<th>Verifikasi Bayar</th>
+    		<th>Tanggal Bayar</th>
     		</tr>
     	</thead>
     	<tbody>
