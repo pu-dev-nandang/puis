@@ -1471,7 +1471,7 @@ class C_api3 extends CI_Controller {
             }
 
             $rs['body'] = $body;
-
+            
             return print_r(json_encode($rs));
 
         }
@@ -1643,6 +1643,91 @@ class C_api3 extends CI_Controller {
             $dataForm['EntredBy'] = $this->session->userdata('NIP');
             $this->db->insert('db_agregator.sitasi_karya',$dataForm);
             return print_r(1);
+        }
+        else if ($data_arr['action'] == 'viewRasioKelulusanTepatWaktuDanRasioKeberhasilanStudi') {
+            $rs = array('header' => [],'body' => [] );
+            // dapatkan 5 tahun terakhir
+            $header = ['Tahun Masuk'];
+            $Year = date('Y');
+            $Year3 = $Year - 4;
+            for ($i=$Year3; $i <= $Year; $i++) { 
+                $header[] = (int)$i;
+            }
+
+            /*
+                Data Masuk mahasiswa ada dari tahun 2019
+                2019 kebawah data tahun masuk sama dengan tahun angkatan
+                Filter s1 dan d4
+            */
+
+            $body = [];
+            for ($i=1; $i < count($header); $i++) { 
+                $temp = array();
+                $temp[] = $header[$i];
+                $Year = $header[$i];
+                $akhirTs = date('Y');
+                for ($j=1; $j < count($header); $j++) { // year mulai dari array indeks 1
+                    $ta_year = $header[$j];
+                    if ($Year >= 2019) {
+                        // ambil tahun masuk dari table db_admission.to_be_mhs
+                       
+                        $sql = 'select count(*) as total from db_academic.auth_students as a
+                                join db_admission.to_be_mhs as b on a.NPM = b.NPM
+                                join db_academic.program_study as c on a.ProdiID = c.ID
+                                where Year(b.DateTime) = ? and a.Year = ? and a.StatusStudentID = 3
+                                and c.EducationLevelID in(3,9)
+                          ';
+                        $query=$this->db->query($sql, array($Year,$ta_year))->result_array();
+                        $temp[] = $query[0]['total'];
+                    }
+                    else
+                    {
+                        // by year auth_students
+                        if ($Year == $ta_year) {
+                            $sql = 'select count(*) as total from db_academic.auth_students as a
+                                    join db_academic.program_study as c on a.ProdiID = c.ID    
+                                    where a.Year = ?  and a.StatusStudentID = 3 and c.EducationLevelID in(3,9)
+                              ';
+                            $query=$this->db->query($sql, array($Year))->result_array();
+                            $temp[] = $query[0]['total'];
+                        }
+                        else
+                        {
+                            $temp[] = 0;
+                        }
+                        
+                    }
+                }
+
+                // untuk jumlah lulusan
+                if ($Year >= 2019) {
+                    $sql = 'select count(*) as total from db_academic.auth_students as a
+                            join db_admission.to_be_mhs as b on a.NPM = b.NPM
+                            join db_academic.program_study as c on a.ProdiID = c.ID    
+                            where Year(b.DateTime) = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
+                            and c.EducationLevelID in(3,9)
+                      ';
+                    $query=$this->db->query($sql, array($Year))->result_array();
+                    $temp[] = $query[0]['total'];
+                }
+                else
+                {
+                    $sql = 'select count(*) as total from db_academic.auth_students as a
+                           join db_academic.program_study as c on a.ProdiID = c.ID         
+                            where Year = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
+                            and c.EducationLevelID in(3,9)
+                      ';
+                    $query=$this->db->query($sql, array($Year))->result_array();
+                    $temp[] = $query[0]['total'];
+                }
+
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;
+            $rs['header'] = $header;
+
+            return print_r(json_encode($rs));
         }
 
     }
