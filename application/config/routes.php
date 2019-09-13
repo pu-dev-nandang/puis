@@ -1335,7 +1335,7 @@ $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_kar
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
-$route['agregator/produktivitas_penelitian_dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
+$route['agregator/produktivitas-penelitian-dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
 
 
 //Agregator Excel
