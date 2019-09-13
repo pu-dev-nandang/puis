@@ -14,7 +14,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-4 form-data-edit">
         <div class="well" style="min-height: 100px;">
             <table class="table" id="tablePerolehanDana">
                 <thead>
@@ -271,8 +271,17 @@
 <script>
 
     $(document).ready(function () {
-        $('.formMoney').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
-        $('.formMoney').maskMoney('mask', '9894');
+
+        window.act = "<?= $accessUser; ?>";
+        if(parseInt(act)<=0){
+            $('.form-data-edit').remove();
+        } else {
+            $('.formMoney').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+            $('.formMoney').maskMoney('mask', '9894');
+        }
+
+
+
 
         loadSelectOptionYearSD();
 
