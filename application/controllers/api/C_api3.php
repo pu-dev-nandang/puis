@@ -999,7 +999,8 @@ class C_api3 extends CI_Controller {
             $header = $arr_year;
             // print_r($arr_year);
             $body = array();
-            $G_research = $this->m_master->showData_array('db_research.sumber_dana');
+            //$G_research = $this->m_master->showData_array('db_research.sumber_dana');
+            $G_research = $this->db->query('SELECT * FROM db_agregator.sumber_dana WHERE Status = "1" ')->result_array();
             for ($i=0; $i < count($G_research); $i++) { 
                 $temp = array();
                 $temp[] = $G_research[$i]['SumberDana'];
