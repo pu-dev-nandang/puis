@@ -8,28 +8,48 @@
         <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>NIK / NIP</label>
-                            <input class="form-control" id="formNIP">
+                            <input class="form-control" id="formNIP" />
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label>NUP</label>
+                            <input class="form-control" id="formNUP" />
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>NIDN</label>
-                            <input class="form-control" id="formNIDN">
+                            <input class="form-control" id="formNIDN" />
                         </div>
                     </div>
+
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label>NIDK</label>
+                            <input class="form-control" id="formNIDK" />
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-8">
+                    <div class="col-xs-5">
                         <div class="form-group">
                             <label>No KTP</label>
                             <input class="form-control" id="formKTP" />
                         </div>
                     </div>
                     <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" class="form-control" id="CardNumber">
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>Religion</label>
                             <select class="form-control" id="formReligion"></select>
@@ -288,12 +308,23 @@
                             <label>Programme Study</label>
                             <select class="form-control" id="formProgrammeStudy"></select>
                         </div>
+                        <div class="form-group">
+                            <label>Profession</label>
+                            <input class="form-control" id="formProfession">
+                        </div>
                     </div>
                     <div class="col-xs-4">
                         <div class="form-group">
                             <label>Level of Education</label>
                             <select class="form-control" id="formLevelEducationID"></select>
                         </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="formSerdos" value="1">
+                                Certified Dosen (Serdos)
+                            </label>
+                        </div>
+                        <input type="text" id="formSerdosNumber" class="form-control" disabled placeholder="Serdos Number">
                     </div>
                     <div class="col-xs-4">
                         <div class="form-group">
@@ -304,12 +335,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Card Number</label>
-                            <input type="text" class="form-control" id="CardNumber">
-                        </div>
-                    </div>
+
                 </div>
 
                 <div class="row">
@@ -402,6 +428,16 @@
         loadSelectOptionLecturerAcademicPosition('#formLecturerAcademicPositionID','');
     });
 
+    // SerDOS
+    $('#formSerdos').change(function () {
+        if($('#formSerdos').is(':checked')){
+            $('#formSerdosNumber').prop('disabled',false);
+        } else {
+            $('#formSerdosNumber').prop('disabled',true);
+            $('#formSerdosNumber').val('');
+        }
+    });
+
     function FuncEvform_MainDivision()
     {
             var Opform_MainDivision = function(NIP,Type = 'AdminID'){
@@ -482,7 +518,9 @@
     function saveEmployees() {
 
         var formNIP = $('#formNIP').val();
+        var formNUP = $('#formNUP').val();
         var formNIDN = $('#formNIDN').val();
+        var formNIDK = $('#formNIDK').val();
         var formKTP = $('#formKTP').val();
         var formReligion = $('#formReligion').val();
         var formName = $('#formName').val();
@@ -523,6 +561,14 @@
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formProgrammeStudy = $('#formProgrammeStudy').val();
         var Access_Card_Number = $('#CardNumber').val();
+
+        var formSerdos = ($('#formSerdos').is(":checked")) ? '1' : '0';
+        var formSerdosNumber = $('#formSerdosNumber').val();
+        var SerdosForm = true;
+        if(formSerdos=='1' && formSerdosNumber==''){
+            SerdosForm = false
+        }
+
         if(formNIP!=null && formNIP!=''
             && formName!='' && formName!=null
             && formYearBirth!='' && formYearBirth!=null
@@ -530,6 +576,7 @@
             && formDateBirth!='' && formDateBirth!=null
             && form_MainDivision!='' && form_MainDivision!=null
             && form_MainPosition!='' && form_MainPosition!=null
+            && SerdosForm == true
         ){
             loading_button('#btnSubmitEmployees');
             $('#btnCloseEmployees').prop('disabled',true);
@@ -578,6 +625,8 @@
             var formStatusLecturer = $('#formStatusLecturer').val();
             var formStatusForlap = $('#formStatusForlap').val();
 
+            var formProfession = $('#formProfession').val();
+
 
             var data = {
                 arr_Prodi : arr_Prodi,
@@ -593,7 +642,9 @@
                     // ProvinceID : formProgrammeStudy,
 
                     NIP : formNIP,
+                    NUP : formNUP,
                     NIDN : formNIDN,
+                    NIDK : formNIDK,
                     KTP : formKTP,
                     Name : formName,
                     TitleAhead : formTitleAhead,
@@ -614,8 +665,11 @@
                     StatusEmployeeID : formStatusEmployee,
                     StatusLecturerID : formStatusLecturer,
                     StatusForlap : formStatusForlap,
+                    Profession: formProfession,
                     Status : '-1',
                     Access_Card_Number : Access_Card_Number,
+                    Serdos : formSerdos,
+                    SerdosNumber : formSerdosNumber
                 }
             };
 
@@ -711,6 +765,20 @@
                 }
 
             });
+        } else {
+            var msg = '';
+            if(formName==''){
+                msg = 'Name is required';
+            } else if (formYearBirth=='' || formMontBirth=='' || formDateBirth==''){
+                msg = 'Birthday is required';
+            } else if(form_MainDivision==''){
+                msg = 'Main Division is required';
+            } else if (form_MainPosition==''){
+                msg = 'Main Position is required';
+            } else if(SerdosForm==false){
+                msg = 'Serdos Number are required'
+            }
+            toastr.error(msg,'Error');
         }
 
 

@@ -12,26 +12,7 @@
     <div class="row">
         <div class="col-md-12">
 
-            <div style="text-align: right;">
-                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <div class="form-group">
-                        <label>Filter Status Forlap</label>
-                        <select class="form-control" id="filterStatusForlap">
-                            <option value="all">Semua</option>
-                            <option disabled>-----</option>
-                            <option value="1">Permanent</option>
-                            <option value="0">Contract</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-
-            <table class="table table-bordered table-striped dataTable2Excel" id="tableData" data-name="setifikasi_dosen">
+            <table class="table" id="tableData">
                 <thead>
                 <tr  style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 1%;">No</th>
@@ -42,6 +23,9 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
+
+            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK)</p>
+            <p style="color: orangered;">*) Dosen yang Bersertifikat adalah dosen yang sudah tersertifikasi dosen (SERDOS)</p>
         </div>
     </div>
 </div>
@@ -51,17 +35,11 @@
         loadLecturerCertificate();
     });
 
-    $('#filterStatusForlap').change(function () {
-        loadLecturerCertificate();
-    });
 
     function loadLecturerCertificate() {
 
-        var filterStatusForlap = $('#filterStatusForlap').val();
-        var status = (filterStatusForlap!='' && filterStatusForlap!=null)
-        ? filterStatusForlap : 'all';
 
-        var url = base_url_js+'api3/__getLecturerCertificate?s='+status;
+        var url = base_url_js+'api3/__getLecturerCertificate';
         $.getJSON(url,function (jsonResult) {
 
             $('#listData').empty();

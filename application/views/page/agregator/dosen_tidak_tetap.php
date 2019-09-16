@@ -28,7 +28,7 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-
+            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NUP)</p>
         </div>
     </div>
 </div>

@@ -34,6 +34,8 @@
                 </thead>
                 <tbody id="listTable"></tbody>
             </table>
+
+            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK)</p>
         </div>
 
     </div>
