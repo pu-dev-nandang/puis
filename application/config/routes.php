@@ -535,8 +535,9 @@ $route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_act
 $route['crm/contact'] = 'page/admission/marketing/c_crm/contact';
 $route['crm/uploadDocumentPS'] = 'page/admission/marketing/c_crm/uploadDocumentPS';
 
-
-
+// daya tampung / capacity
+$route['admission/config/set_tahun_ajaran/(:any)'] = 'page/admission/c_master/capacity_tahun_ajaran/$1';
+$route['admission/config/save_capacity_tahun_ajaran'] = 'page/admission/c_master/save_capacity_tahun_ajaran';
 
 
 // ---Finance----

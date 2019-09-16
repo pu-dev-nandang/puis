@@ -3301,4 +3301,45 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         return $exists;
     }
+
+    public function __fillTA_Capacity($ID_crm_period)
+    {
+        // Cek apakah data ada
+        $G_dt = $this->caribasedprimary('db_admission.ta_setting','ID_crm_period',$ID_crm_period);
+        if (count($G_dt) == 0) {
+              // save default daya tampung
+              $G_prodi = $this->caribasedprimary('db_academic.program_study','Status',1);
+              for ($i=0; $i < count($G_prodi); $i++) { 
+                    $ProdiID = $G_prodi[$i]['ID'];
+                    $dataSave = array(
+                         'ID_crm_period' => $ID_crm_period,
+                         'ProdiID' => $ProdiID,
+                         'Capacity' => 0,   
+                    );
+
+                    $this->db->insert('db_admission.ta_setting',$dataSave);
+              }
+
+        }
+    }
+
+    public function __data_capacity($arr_search)
+    {
+        $whereFiltering = '';
+
+        $sql = 'select a.Year,a.Name,b.ID as ID_ta_setting,b.ID_crm_period,b.ProdiID,b.Capacity,c.Name as ProdiNameInd,c.NameEng as ProdiNameEng 
+                from db_admission.crm_period as a 
+                join db_admission.ta_setting as b on a.ID = b.ID_crm_period
+                join db_academic.program_study as c on b.ProdiID = c.ID
+                ';
+        foreach ($arr_search as $key => $value) {
+            $whereORAND = ($whereFiltering == '') ? ' where' : ' and';
+            $whereFiltering .= $whereORAND.' '.$key.' = "'.$value.'"';
+        }
+
+        $sql .= $whereFiltering;
+        $query =$this->db->query($sql, array())->result_array();
+        // print_r($query);die();
+        return $query;
+    }
 }

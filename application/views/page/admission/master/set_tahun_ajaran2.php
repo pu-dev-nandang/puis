@@ -122,7 +122,8 @@
             if(jsonResult.length>0){
                 tr = '';
                 $.each(jsonResult,function (i,v) {
-
+                    var TokenCapacity = jwt_encode(v.ID,'UAP)(*');
+                    var CurrentURL = "<?php echo current_url(); ?>";
                     var sts = (v.Status=='1' || v.Status==1)
                         ? '<span class="label label-success">Publish</span>'
                         : '<span class="label label-danger">Unpublish</span>';
@@ -131,9 +132,12 @@
                         : '<button class="btn btn-default btn-sm btnPublish" data-year="'+v.Year+'" data-id="'+v.ID+'">Publish</button> ' +
                         '<button class="btn btn-sm btn-danger btn-sm btnRemove" data-year="'+v.Year+'" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button>' ;
 
+                    var Ahref = '<a href = "'+CurrentURL+'/'+TokenCapacity+'" ><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></a>';    
+                        
                     tr = tr+'<tr>' +
                         '<td>'+(i+1)+'</td>' +
-                        '<td><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></td>' +
+                        // '<td><b>'+v.Year+'</b><div style="float: right;">'+sts+'</div></td>' +
+                        '<td>'+Ahref+'</td>' +
                         '<td>'+v.Name+'</td>' +
                         '<td style="text-align: right;">'+btn+'</td>' +
                         '</tr>';
