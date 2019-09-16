@@ -14,28 +14,48 @@
         <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>NIK / NIP</label>
                             <input class="form-control" disabled id="formNIP" value="<?php echo $arrEmp['NIP']; ?>">
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label>NUP</label>
+                            <input class="form-control" id="formNUP" value="<?php echo $arrEmp['NUP']; ?>">
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>NIDN</label>
                             <input class="form-control" id="formNIDN" value="<?php echo $arrEmp['NIDN']; ?>">
                         </div>
                     </div>
+
+                    <div class="col-xs-3">
+                        <div class="form-group">
+                            <label>NIDK</label>
+                            <input class="form-control" id="formNIDK" value="<?php echo $arrEmp['NIDK']; ?>">
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="row">
-                    <div class="col-xs-8">
+                    <div class="col-xs-5">
                         <div class="form-group">
                             <label>No KTP</label>
                             <input class="form-control" id="formKTP" value="<?php echo $arrEmp['KTP']; ?>" />
                         </div>
                     </div>
                     <div class="col-xs-4">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" class="form-control" id="CardNumber" value="<?= $arrEmp['Access_Card_Number']; ?>">
+                        </div>
+                    </div>
+                    <div class="col-xs-3">
                         <div class="form-group">
                             <label>Religion</label>
                             <select class="form-control" id="formReligion"></select>
@@ -97,7 +117,7 @@
                                     </div>
                                     <div class="col-xs-4">
                                         <div class="form-group">
-                                            <label>Mont</label>
+                                            <label>Month</label>
                                             <select class="form-control" id="formMontBirth"></select>
                                         </div>
                                     </div>
@@ -261,7 +281,7 @@
                 <div class="row">
                     <div class="col-xs-4">
                         <div class="form-group">
-                            <label>Status Employees</label>
+                            <label>Status Employee</label>
                             <select class="form-control" id="formStatusEmployee"></select>
                         </div>
                     </div>
@@ -295,21 +315,25 @@
                             <label>Programme Study</label>
                             <select class="form-control" id="formProgrammeStudy"></select>
                         </div>
+                        <div class="form-group">
+                            <label>Profession</label>
+                            <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
+                        </div>
                     </div>
                     <div class="col-xs-4">
                         <div class="form-group">
                             <label>Level of Education</label>
                             <select class="form-control" id="formLevelEducationID"></select>
                         </div>
+
                         <div class="form-group">
-                            <label>Profesi</label>
-                            <input class="form-control" id="formProfession" value="<?= $arrEmp['Profession']; ?>">
-                        </div>
-                    </div>
-                    <div class="col-xs-4">
-                        <div class="form-group">
-                            <label>Card Number</label>
-                            <input type="text" class="form-control" id="CardNumber" value="<?= $arrEmp['Access_Card_Number']; ?>">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="formSerdos" <?= ($arrEmp['Serdos']=='1') ? 'checked' : ''; ?> value="1">
+                                    Certified Dosen (Serdos)
+                                </label>
+                            </div>
+                            <input type="text" id="formSerdosNumber" class="form-control" <?= ($arrEmp['Serdos']=='1') ? '' : 'disabled'; ?> value="<?= $arrEmp['SerdosNumber']; ?>" placeholder="Serdos Number">
                         </div>
                     </div>
                     <div class="col-xs-4">
@@ -324,7 +348,7 @@
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" id="formCertified" <?= ($arrEmp['Certified']=='1') ? 'checked' : ''; ?> value="1">
-                                    Bersertifikat
+                                    Certified
                                 </label>
                             </div>
                             <button class="btn btn-sm btn-default" id="btnCertificate"><i class="fa fa-folder margin-right"></i> Certificate</button>
@@ -515,6 +539,16 @@
         <?php } ?>
 
 
+    });
+    
+    // SerDOS
+    $('#formSerdos').change(function () {
+        if($('#formSerdos').is(':checked')){
+            $('#formSerdosNumber').prop('disabled',false);
+        } else {
+            $('#formSerdosNumber').prop('disabled',true);
+            $('#formSerdosNumber').val('');
+        }
     });
 
     function FuncEvform_MainDivision()
@@ -709,7 +743,9 @@
 
     function updateEmployees() {
         var formNIP = $('#formNIP').val();
+        var formNUP = $('#formNUP').val();
         var formNIDN = $('#formNIDN').val();
+        var formNIDK = $('#formNIDK').val();
         var formKTP = $('#formKTP').val();
         var formReligion = $('#formReligion').val();
         var formName = $('#formName').val();
@@ -750,6 +786,14 @@
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formProgrammeStudy = $('#formProgrammeStudy').val();
         var Access_Card_Number = $('#CardNumber').val();
+
+        var formSerdos = ($('#formSerdos').is(":checked")) ? '1' : '0';
+        var formSerdosNumber = $('#formSerdosNumber').val();
+        var SerdosForm = true;
+        if(formSerdos=='1' && formSerdosNumber==''){
+            SerdosForm = false
+        }
+
         if(formNIP!=null && formNIP!=''
             && formName!='' && formName!=null
             && formYearBirth!='' && formYearBirth!=null
@@ -757,7 +801,9 @@
             && formDateBirth!='' && formDateBirth!=null
             && form_MainDivision!='' && form_MainDivision!=null
             && form_MainPosition!='' && form_MainPosition!=null
+            && SerdosForm==true
         ) {
+
             loading_button('#btnUpdate');
             $('.form-control').prop('disabled', true);
 
@@ -835,7 +881,9 @@
                     // CityID : formProgrammeStudy,
                     // ProvinceID : formProgrammeStudy,
 
+                    NUP: formNUP,
                     NIDN: formNIDN,
+                    NIDK: formNIDK,
                     KTP: formKTP,
                     Name: formName,
                     TitleAhead: formTitleAhead,
@@ -859,6 +907,9 @@
                     Profession: formProfession,
                     StatusForlap : formStatusForlap,
                     Access_Card_Number : Access_Card_Number,
+                    Serdos : formSerdos,
+                    SerdosNumber : formSerdosNumber
+
                 }
             };
 
@@ -902,6 +953,8 @@
                 msg = 'Main Division is required';
             } else if (form_MainPosition==''){
                 msg = 'Main Position is required';
+            } else if(SerdosForm==false){
+                msg = 'Serdos Number are required'
             }
             toastr.error(msg,'Error');
         }
@@ -1005,7 +1058,7 @@
             '                </select>' +
             '            </div>' +
             '            <div class="form-group">' +
-            '                <label>Publish Yaer</label>' +
+            '                <label>Publish Year</label>' +
             '                <input class="form-control" id="formPublicationYear" style="color: #333;" readonly>' +
             '            </div>' +
             '            <div class="form-group">' +

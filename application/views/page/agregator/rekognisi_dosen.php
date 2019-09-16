@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <p style="color:#3968c6;"><b> Rekognisi Dosen</b></p>
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus margin-right"></i> Rekognisi Dosen</button>
+                <button class="btn btn-primary form-data-add" id="addRekognisiDosenMDL"><i class="fa fa-plus margin-right"></i> Rekognisi Dosen</button>
             </div>
             <div style="text-align: right;">
 <!--                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>-->
@@ -27,7 +27,7 @@
     var oTable;
     var oSettings;
 
-     $('#btnLembagaMitra').click(function () {
+     $('#addRekognisiDosenMDL').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Tambah Data Rekognisi Dosen</h4>');
@@ -61,7 +61,7 @@
 
         $('#GlobalModal .modal-body').html(body);
 
-         loadSelectOptionLecturersSingle('#nip','');
+         loadSelectOptionLecturersSingle_NIDN('#nip','');
          $('#nip').select2({allowClear: true});
 
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +

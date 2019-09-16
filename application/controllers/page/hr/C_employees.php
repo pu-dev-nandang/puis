@@ -153,6 +153,9 @@ class C_employees extends HR_Controler {
         // Cek apakah NIP dapat di hapus secara permanen atau tidak
         $data['btnDelPermanent'] = $this->m_hr->checkPermanentDelete($NIP);
 
+//        print_r($arrEmp);
+//        exit;
+
         $page = $this->load->view('page/'.$department.'/employees/editEmployees',$data,true);
         $this->tab_menu($page);
     }

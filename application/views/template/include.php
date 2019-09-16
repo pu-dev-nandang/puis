@@ -884,6 +884,19 @@
         });
     }
 
+    function loadSelectOptionLecturersSingle_NIDN(element,selected) {
+
+        var url = base_url_js+'api/__getDosenSelectOption';
+        $.get(url,function (data) {
+            var option = $(''+element);
+            for(var i=0; i<data.length; i++){
+                var NIDN = (data[i].NIDN!='' && data[i].NIDN!=null && data[i].NIDN!=0) ? data[i].NIDN : '-';
+                option.append('<option value="'+data[i].NIP+'">'+NIDN+' | '+data[i].Name+'</option>')
+                    .val(selected).trigger('change');
+            }
+        });
+    }
+
     function loadSelectOptionConf(element,jenis,selected) {
 
         var table = jenis;
