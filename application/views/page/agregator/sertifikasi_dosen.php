@@ -14,11 +14,11 @@
 
             <table class="table" id="tableData">
                 <thead>
-                <tr>
+                <tr  style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 1%;">No</th>
-                    <th>Prodi</th>
+                    <th>Unit Pengelola (Fakultas/Departemen/Jurusan)</th>
                     <th style="width: 15%;">Jumlah Dosen</th>
-                    <th style="width: 15%;">Jumlah Dosen Bersertifikat</th>
+                    <th style="width: 15%;">Jumlah Dosen Bersertifikat **)</th>
                 </tr>
                 </thead>
                 <tbody id="listData"></tbody>

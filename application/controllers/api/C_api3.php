@@ -884,12 +884,64 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='readDataMHSBaruAsing'){
 
-            $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf
-                                                    LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
-                                                    WHERE ssf.Year = "'.$Year.'" ')->result_array();
+            // $Year = $data_arr['Year'];
+            // $data = $this->db->query('SELECT ssf.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection_foreign ssf
+            //                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ssf.ProdiID)
+            //                                         WHERE ssf.Year = "'.$Year.'" ')->result_array();
 
-            return print_r(json_encode($data));
+
+            $rs = array('header' => array(),'body' => array(),  );
+            // show all ta
+            $sql = "show databases like '".'ta_'."%'";
+            $query=$this->db->query($sql, array())->result_array();
+            $temp = ['No','Program Studi'];
+            for ($i=0; $i < count($query); $i++) { 
+                $arr = $query[$i];
+                $db_ = '';
+
+                foreach ($arr as $key => $value) {
+                    $db_ = $value;
+                }
+
+                if ($db_ != '') {
+                    $ta_year = explode('_', $db_);
+                    $ta_year = $ta_year[1];
+                    $temp[] = $ta_year;
+                }
+            }
+
+            $rs['header'] = $temp;
+
+            // body
+            // find prodi
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+            $body = array();
+            for ($j=0; $j < count($G_prodi); $j++) {
+                $temp = []; 
+                // find count
+                $ProdiID = $G_prodi[$j]['ID'];
+                $ProdiName = $G_prodi[$j]['Name'];
+                $temp[] = $ProdiName;
+                for ($i=0; $i < count($query); $i++) { 
+                    $arr = $query[$i];
+                    $db_ = '';
+
+                    foreach ($arr as $key => $value) {
+                        $db_ = $value;
+                    }
+
+                    $sql1 = 'select count(*) as total from '.$db_.'.students where NationalityID !=  "001" and ProdiID = ? ';
+                    $query1=$this->db->query($sql1, array($ProdiID))->result_array();
+                    $count = $query1[0]['total'];
+                    $temp[] = $count;
+                }
+
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;    
+
+            return print_r(json_encode($rs));
 
         }
 
@@ -934,6 +986,74 @@ class C_api3 extends CI_Controller {
             $this->db->where('ID', $ID);
             $this->db->delete('db_agregator.rekognisi_dosen');
             return print_r(1);
+        }
+        else if($data_arr['action']=='readProduktivitasPenelitian'){
+
+            $rs = array('header' => array(),'body' => array() );
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            $arr_year = array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $arr_year[] = $i;
+            }
+            $header = $arr_year;
+            // print_r($arr_year);
+            $body = array();
+            //$G_research = $this->m_master->showData_array('db_research.sumber_dana');
+            $G_research = $this->db->query('SELECT * FROM db_agregator.sumber_dana WHERE Status = "1" ')->result_array();
+            for ($i=0; $i < count($G_research); $i++) { 
+                $temp = array();
+                $temp[] = $G_research[$i]['SumberDana'];
+                $ID_sumberdana = $G_research[$i]['ID'];
+                for ($j=0; $j < count($arr_year); $j++) { 
+                    $Year_ = $arr_year[$j];
+                     $sql = 'select count(*) as total from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
+                     $count = $query[0]['total'];
+                     $temp[] = $count;
+                     // $temp['SumberDana'] = $G_research[$i]['SumberDana'];
+                }
+
+                $body[] = $temp;
+               
+            }
+            $rs['header'] = $header;
+            $rs['body'] = $body;
+            return print_r(json_encode($rs));
+        }
+
+    else if($data_arr['action']=='readProduktivitasPkmDosen'){
+
+            $rs = array('header' => array(),'body' => array() );
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            $arr_year = array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $arr_year[] = $i;
+            }
+            $header = $arr_year;
+            // print_r($arr_year);
+            $body = array();
+            //$G_research = $this->m_master->showData_array('db_agregator.sumber_dana');
+            $G_research = $this->db->query('SELECT * FROM db_agregator.sumber_dana WHERE Status = "1" ')->result_array();
+            for ($i=0; $i < count($G_research); $i++) { 
+                $temp = array();
+                $temp[] = $G_research[$i]['SumberDana'];
+                $ID_sumberdana = $G_research[$i]['ID'];
+                for ($j=0; $j < count($arr_year); $j++) { 
+                    $Year_ = $arr_year[$j];
+                     $sql = 'select count(*) as total from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
+                     $count = $query[0]['total'];
+                     $temp[] = $count;
+                }
+
+                $body[] = $temp;
+               
+            }
+            $rs['header'] = $header;
+            $rs['body'] = $body;
+            return print_r(json_encode($rs));
         }
 
 
@@ -1268,50 +1388,77 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='viewLamaStudy'){
 
-            $year = date('Y');
-            $arr_year = array();
-            for ($i=0; $i < 3; $i++) { 
-                $arr_year[] = $year - $i;
+            $rs = array('header' => array(),'body' => array() );
+            $header = array('No','Program Pendidikan');
+            // dapatkan 3 tahun belakang
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
             }
 
-            $data = $this->db->query('SELECT j.ID, k.ID AS EducationLevelID, k.Description 
-                            FROM db_academic.program_study AS j
-                            INNER JOIN db_academic.education_level AS k ON (j.EducationLevelID = k.ID)
-                            GROUP BY k.ID')->result_array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
+            }
+            $rs['header'] = $header;
 
-            for ($i=0; $i < count($data); $i++) { 
-                for ($j=0; $j < count($arr_year); $j++) { 
-                    $id_prody = $data[$i]['ID'];
+            $ProgramPendidikan = array(
+                "Doktor/ Doktor Terapan/ Subspesialis",
+                "Magister/ Magister Terapan/ Spesialis",
+                "Profesi 1 Tahun",
+                "Profesi 2 Tahun",
+                "Sarjana/ Diploma Empat/ Sarjana Terapan", // indeks 4 search ke database
+                "Diploma Tiga",
+                "Diploma Dua",
+                "Diploma Satu",
+            );
 
-                    $sql = 'SELECT a.ProdiID, a.Year, a.StatusStudentID, a.GraduationYear,b.Description, xx.EducationLevelID
-                        FROM db_academic.auth_students AS a
-                        LEFT JOIN db_academic.status_student AS b ON (a.StatusStudentID = b.CodeStatus)
-                        LEFT JOIN (SELECT j.ID, k.ID AS EducationLevelID, k.Description FROM db_academic.program_study AS j
-                        INNER JOIN db_academic.education_level AS k ON (j.EducationLevelID = k.ID)) AS xx ON (a.ProdiID = xx.ID)
-                        WHERE a.StatusStudentID = "1" AND xx.EducationLevelID = "'.$data[$i]['EducationLevelID'].'" AND a.GraduationYear = "'.$arr_year[$j].'" ';
-                   //$sql = 'select * from db_agregator.lama_studi_mahasiswa where ID_programpendik = '.$data[$i]['ID_programpendik'].' and Year = '.$arr_year[$j];
+            $body = array();
 
-                   $query=$this->db->query($sql, array())->result_array();
+            for ($i=0; $i < count($ProgramPendidikan); $i++) { 
+                // define temp default
+                $temp = array();
+                $temp[] = $ProgramPendidikan[$i];
+                if ($i == 4) {
+                    for ($j=2; $j < count($header); $j++) {
+                        $get_tayear = $header[$j]; 
+                        if ($j <= 4) { // Jumlah Lulusan pada by Year
+                            $sql = 'select count(*) as total from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                            $query=$this->db->query($sql, array(1))->result_array();
+                            $temp[] = $query[0]['total']; // Jumlah PS
+                        }
+                        else // Rata-rata Masa Studi Lulusan pada
+                        {
+                            $arr_temp = [];
+                            $sql = 'select NPM,Year,GraduationYear from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                            $query=$this->db->query($sql, array(1))->result_array();
+                            if (count($query) > 0 ) {
+                                for ($k=0; $k < count($query); $k++) { 
+                                   $Co = $query[$k]['GraduationYear'] - $query[$k]['Year'];
+                                   $arr_temp[] = $Co;
+                                }
 
-                   if (count($query) > 0) {
-
-                      $query[$i]['GraduationYear_'.$arr_year[$j]] = $arr_year[$j];
-                      /// $data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = $query[0]['Jumlah_masa_studi'];
-                   }
-                   else {
-                     $data[$i]['GraduationYear_'.$arr_year[$j]] = 0;
-                    //$data[$i]['Jumlah_masa_studi_'.$arr_year[$j]] = 0;
-                   }
-
-                   $query[$i]['TotalYear_'.$arr_year[$j]] = count($query);
-                    //$data[$i]['Total'] = count($query);
-                   //$data[$i]['GraduationYear'] = $arr_year[$j];
-                   //$data[$i]['Total'] = count($query);
+                                $rata_rata = array_sum($arr_temp)/count($arr_temp);
+                                $temp[] = $rata_rata;
+                            }
+                            else
+                            {
+                                $temp[] = 0;
+                            }
+                            
+                        }
+                    }
                 }
-            }
-
-            return print_r(json_encode($data));
-
+                else
+                {
+                    for ($j=2; $j < count($header); $j++) { 
+                        $temp[] = 0;
+                    }
+                }
+                $body[] = $temp;
+            }    
+            $rs['body'] = $body;
+            return print_r(json_encode($rs));
         }
 
         else if($data_arr['action']=='getloopdatastudy'){
@@ -1329,11 +1476,101 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='viewIPK'){
+            // error_reporting(0);
+            $rs = array('header' => array(),'body' => array() );
+            $header = array('No','Program Pendidikan','');
+            /*
+                array 3 awal yang di insert adalah Jumlah Lulusan pada
+                array 3 setelah itu yang di insert adalah Rata-rata IPK Lulusan pada
+        
+            */
+            // dapatkan 3 tahun belakang
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
+            }
 
-            $Year = $data_arr['Year'];
-            $data = $this->db->query('SELECT * FROM db_academic.auth_students ast 
-                                                          WHERE ast.StatusStudentID = "1" 
-                                                          AND ast.Year = "'.$Year.'" ')->result_array();
+            for ($i=$Year; $i >= $Year3; $i--) { 
+                $header[] = (int)$i;
+            }
+            $rs['header'] = $header;
+
+            $ProgramPendidikan = array(
+                "Doktor/ Doktor Terapan/ Subspesialis",
+                "Magister/ Magister Terapan/ Spesialis",
+                "Profesi 1 Tahun",
+                "Profesi 2 Tahun",
+                "Sarjana/ Diploma Empat/ Sarjana Terapan", // indeks 4 search ke database
+                "Diploma Tiga",
+                "Diploma Dua",
+                "Diploma Satu",
+            );
+
+            $body = array();
+            for ($i=0; $i < count($ProgramPendidikan); $i++) { 
+                // define temp default
+                $temp = array();
+                $temp[] = $ProgramPendidikan[$i];
+                if ($i == 4) {
+                   for ($j=2; $j < count($header); $j++) { 
+                       if ($j == 2) {
+                           $sql = 'select count(*) as total from db_academic.program_study where Status = 1 and EducationLevelID in(3,9)';
+                           $query=$this->db->query($sql, array())->result_array();
+                           $temp[] = $query[0]['total']; // Jumlah PS
+                           continue;
+                       }
+                       else
+                       {
+                            if ($j <= 5) { // pembeda Jumlah Lulusan pada dan Rata-rata IPK Lulusan pada
+                               $get_tayear = $header[$j]; // ex : 2014
+                               $sql = 'select count(*) as total from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                               $query=$this->db->query($sql, array(1))->result_array();
+                               $temp[] = $query[0]['total']; // Jumlah PS
+                            }
+                            else // pembeda Jumlah Lulusan pada dan Rata-rata IPK Lulusan pada
+                            {
+                                // cari NPM dulu yg lulusan
+                                $get_tayear = $header[$j];
+                                $sql = 'select NPM,Year from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = 1';
+                                $query=$this->db->query($sql, array())->result_array();
+                                $GradeValueCredit = 0;
+                                $Credit = 0;
+                                $IPK = 0;
+                                for ($k=0; $k < count($query); $k++) {
+                                    $ta = 'ta_'.$query[$k]['Year'];
+                                    $NPM = $query[$k]['NPM']; 
+                                    $sql1 = 'select * from '.$ta.'.study_planning where NPM = ?';
+                                    // print_r($sql1);
+                                    $query1=$this->db->query($sql1, array($NPM))->result_array();
+                                    for ($l=0; $l < count($query1); $l++) { 
+                                        $GradeValue = $query1[$l]['GradeValue'];
+                                        $CreditSub = $query1[$l]['Credit'];
+                                        $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+                                        $Credit = $Credit + $CreditSub;
+                                    }
+                                }
+
+                                $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                                $temp[] = $IPK;
+                            }
+                            
+                       }
+                   }
+                }
+                else
+                {
+                    for ($j=2; $j < count($header); $j++) { 
+                        $temp[] = 0;
+                    }
+                }
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;
+            
+            return print_r(json_encode($rs));
+
         }
         else if($data_arr['action']=='getprogrampendik'){
             $data = $this->db->query('SELECT ID, NamaProgramPendidikan FROM db_agregator.program_pendidikan')->result_array();
@@ -1503,6 +1740,91 @@ class C_api3 extends CI_Controller {
             $dataForm['EntredBy'] = $this->session->userdata('NIP');
             $this->db->insert('db_agregator.sitasi_karya',$dataForm);
             return print_r(1);
+        }
+        else if ($data_arr['action'] == 'viewRasioKelulusanTepatWaktuDanRasioKeberhasilanStudi') {
+            $rs = array('header' => [],'body' => [] );
+            // dapatkan 5 tahun terakhir
+            $header = ['Tahun Masuk'];
+            $Year = date('Y');
+            $Year3 = $Year - 4;
+            for ($i=$Year3; $i <= $Year; $i++) { 
+                $header[] = (int)$i;
+            }
+
+            /*
+                Data Masuk mahasiswa ada dari tahun 2019
+                2019 kebawah data tahun masuk sama dengan tahun angkatan
+                Filter s1 dan d4
+            */
+
+            $body = [];
+            for ($i=1; $i < count($header); $i++) { 
+                $temp = array();
+                $temp[] = $header[$i];
+                $Year = $header[$i];
+                $akhirTs = date('Y');
+                for ($j=1; $j < count($header); $j++) { // year mulai dari array indeks 1
+                    $ta_year = $header[$j];
+                    if ($Year >= 2019) {
+                        // ambil tahun masuk dari table db_admission.to_be_mhs
+                       
+                        $sql = 'select count(*) as total from db_academic.auth_students as a
+                                join db_admission.to_be_mhs as b on a.NPM = b.NPM
+                                join db_academic.program_study as c on a.ProdiID = c.ID
+                                where Year(b.DateTime) = ? and a.Year = ? and a.StatusStudentID = 3
+                                and c.EducationLevelID in(3,9)
+                          ';
+                        $query=$this->db->query($sql, array($Year,$ta_year))->result_array();
+                        $temp[] = $query[0]['total'];
+                    }
+                    else
+                    {
+                        // by year auth_students
+                        if ($Year == $ta_year) {
+                            $sql = 'select count(*) as total from db_academic.auth_students as a
+                                    join db_academic.program_study as c on a.ProdiID = c.ID    
+                                    where a.Year = ?  and a.StatusStudentID = 3 and c.EducationLevelID in(3,9)
+                              ';
+                            $query=$this->db->query($sql, array($Year))->result_array();
+                            $temp[] = $query[0]['total'];
+                        }
+                        else
+                        {
+                            $temp[] = 0;
+                        }
+                        
+                    }
+                }
+
+                // untuk jumlah lulusan
+                if ($Year >= 2019) {
+                    $sql = 'select count(*) as total from db_academic.auth_students as a
+                            join db_admission.to_be_mhs as b on a.NPM = b.NPM
+                            join db_academic.program_study as c on a.ProdiID = c.ID    
+                            where Year(b.DateTime) = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
+                            and c.EducationLevelID in(3,9)
+                      ';
+                    $query=$this->db->query($sql, array($Year))->result_array();
+                    $temp[] = $query[0]['total'];
+                }
+                else
+                {
+                    $sql = 'select count(*) as total from db_academic.auth_students as a
+                           join db_academic.program_study as c on a.ProdiID = c.ID         
+                            where Year = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
+                            and c.EducationLevelID in(3,9)
+                      ';
+                    $query=$this->db->query($sql, array($Year))->result_array();
+                    $temp[] = $query[0]['total'];
+                }
+
+                $body[] = $temp;
+            }
+
+            $rs['body'] = $body;
+            $rs['header'] = $header;
+
+            return print_r(json_encode($rs));
         }
 
     }

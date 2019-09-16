@@ -503,12 +503,16 @@ class C_pr_po extends Budgeting_Controler {
                 $WhereFiltering .= ' and MONTH(a.CreatedAt) = '.(int)$_POST['Month'];
             }
         }
-
+        if (array_key_exists('SelectTemplate', $_POST)) {
+            if ($_POST['SelectTemplate'] != '%' && $_POST['SelectTemplate'] != '') {
+               $WhereFiltering .= ' and (ID_template = '.$_POST['SelectTemplate'].' )';
+            }
+        }
         $sqltotalData = 'select count(*) as total from 
                 (
                     select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                    as StatusName, a.JsonStatus,a.PostingDate 
+                                    as StatusName, a.JsonStatus,a.PostingDate,a.ID_template as ID_template_PR
                                     from db_budgeting.pr_create as a 
                     join (
                     select * from (
@@ -532,7 +536,7 @@ class C_pr_po extends Budgeting_Controler {
                 (
                     select a.ID as PRID, a.PRCode,a.Year,a.Departement,b.NameDepartement,a.CreatedBy,a.CreatedAt,
                                     if(a.Status = 0,"Draft",if(a.Status = 1,"Issued & Approval Process",if(a.Status =  2,"Approval Done",if(a.Status = 3,"Reject","Cancel") ) ))
-                                    as StatusName, a.JsonStatus,a.PostingDate 
+                                    as StatusName, a.JsonStatus,a.PostingDate,a.ID_template as ID_template_PR
                                     from db_budgeting.pr_create as a 
                     join (
                     select * from (

@@ -9137,8 +9137,12 @@ class C_api extends CI_Controller {
 
                 $DB_Student = $data_arr['DB_Student'];
                 $NPM = $data_arr['NPM'];
+                /*
+                    Note : 
+                    Graduation Year ambil yang dari auth_students
+                */
                 $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc, au.KTPNumber, au.Access_Card_Number,
+                                      ss.Description AS StatusStudentDesc, au.KTPNumber, au.Access_Card_Number,au.GraduationDate,au.YudisiumDate,
                                       em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$DB_Student.'.students s
                                       LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
@@ -9193,12 +9197,28 @@ class C_api extends CI_Controller {
                 $DB_Student = $data_arr['DB_Student'];
 
                 $dataUpdate = $data_arr['dataForm'];
+                $GraduationYear = null;
+                $GraduationDate = $dataUpdtAuth['GraduationDate'];
+                if ($GraduationDate != '' && $GraduationDate != null) {
+                    $GraduationYear = date('Y', strtotime($GraduationDate));
+                    $dataUpdate->StatusStudentID = 1;
+                    $dataUpdtAuth['StatusStudentID'] = 1;
+                }
+                else
+                {
+                    $dataUpdate->StatusStudentID = 3;
+                    $dataUpdtAuth['StatusStudentID'] = 3;
+                }
+                $dataUpdate->GraduationYear = $GraduationYear;
+                
                 $this->db->where('NPM', $NPM);
                 $this->db->update($DB_Student.'.students',$dataUpdate);
                 $this->db->reset_query();
 
                 $dataUpdtAuth['LastUpdate']=date('Y-m-d H:i:s');
                 $dataUpdtAuth['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataUpdtAuth['GraduationYear'] = $GraduationYear;
+
                 $this->db->where('NPM', $NPM);
                 $this->db->update('db_academic.auth_students',$dataUpdtAuth);
                 $this->db->reset_query();    

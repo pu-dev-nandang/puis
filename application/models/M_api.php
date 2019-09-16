@@ -2184,7 +2184,7 @@ class M_api extends CI_Model {
                             `ProgramID` int(11) DEFAULT NULL,
                             `LevelStudyID` int(11) DEFAULT NULL,
                             `ReligionID` int(11) DEFAULT NULL,
-                            `NationalityID` int(11) DEFAULT NULL,
+                            `NationalityID` varchar(5) DEFAULT NULL,
                             `ProvinceID` int(11) DEFAULT NULL,
                             `CityID` int(11) DEFAULT NULL,
                             `HighSchoolID` int(11) DEFAULT NULL,

@@ -129,17 +129,17 @@ class C_save_to_pdf3 extends CI_Controller {
         $w_spec = 40;
         $w_date_needed = 15;
         $w_qty = 7;
-        $w_pricest = 20;
+        $w_pricest = 22;
+        $w_disc = 13;
         $w_pph = 8;
-        $w_disc = 14;
         $w_anotcost = 18;
-        $w_totalammount = 27;
+        $w_totalammount = 26;
         $h=8;
         $y = $fpdf->GetY();
         $fpdf->SetXY($x,$y);
         $fpdf->SetFillColor(255, 255, 255);
 
-        $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_pph,$w_disc,$w_anotcost,$w_totalammount));
+        $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_disc,$w_pph,$w_anotcost,$w_totalammount));
         $fpdf->SetLineHeight(5);
         $fpdf->SetAligns(array('C','C','C','C','C','C','C','C','C','C'));
 
@@ -163,9 +163,9 @@ class C_save_to_pdf3 extends CI_Controller {
          $no = 1;
          $fpdf->SetFont('Arial','',$FontIsian);
          $total = 0;
-         $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_pph,$w_disc,$w_anotcost,$w_totalammount));
+         $fpdf->SetWidths(array($w_no,$w_desc,$w_spec,$w_date_needed,$w_qty,$w_pricest,$w_disc,$w_pph,$w_anotcost,$w_totalammount));
          $fpdf->SetLineHeight(5);
-         $fpdf->SetAligns(array('C','L','L','C','L','C','C','C','C','C'));
+         $fpdf->SetAligns(array('C','L','L','C','C','C','C','C','C','C'));
          $total = 0;
          // $fpdf->SetFont('Arial','U',7);
          for ($i=0; $i < count($po_detail); $i++) { 
@@ -187,11 +187,11 @@ class C_save_to_pdf3 extends CI_Controller {
                 $po_detail[$i]['DateNeeded'],
                 $po_detail[$i]['QtyPR'],
 
-                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],2,',','.'),
+                'Rp '.number_format($po_detail[$i]['UnitCost_PO'],0,',','.'),
                 (int)$po_detail[$i]['Discount_PO'].'%',
                 (int)$po_detail[$i]['PPN_PO'].'%',
-                'Rp '.number_format($po_detail[$i]['AnotherCost'],2,',','.'),
-                'Rp '.number_format($po_detail[$i]['Subtotal'],2,',','.'),
+                'Rp '.number_format($po_detail[$i]['AnotherCost'],0,',','.'),
+                'Rp '.number_format($po_detail[$i]['Subtotal'],0,',','.'),
 
              ));
              $total += $po_detail[$i]['Subtotal'];
@@ -201,7 +201,7 @@ class C_save_to_pdf3 extends CI_Controller {
          // footer table
          $y = $fpdf->GetY();
          $x__ = $w_no+$w_desc+$w_spec+$w_date_needed+$w_qty+$w_pricest+$w_pph;
-         $total2= 'Rp '.number_format($total,2,',','.');
+         $total2= 'Rp '.number_format($total,0,',','.');
          $x = 10;
          $fpdf->SetXY($x,$y);
          $fpdf->Cell($x__,$h,'Total',$border,0,'L',true);
@@ -214,7 +214,7 @@ class C_save_to_pdf3 extends CI_Controller {
              $y = $fpdf->GetY()+3;
              $fpdf->SetXY($x,$y);
              $fpdf->SetFont('Arial','',$FontIsian);
-             $fpdf->Cell(25, 5, 'Note Another Cost : ', 0, 1, 'L', 0);
+             $fpdf->Cell(25, 5, 'Note Another Cost : ', 0, 0, 'L', 0);
              $fpdf->MultiCell(80, 5, $po_create[0]['Notes2'], 0, 1, 'L', 0);
          }
 
