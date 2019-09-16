@@ -258,12 +258,12 @@
         </div>
         <div class="row">
             <div class="col-md-12" style="text-align: right;margin-bottom: 20px;">
+                <button class="btn btn-default" id="btnEditSumberDana"><i class="fa fa-edit"></i> Edit</button>
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
 
-            <div class="col-md-12" id="viewDataTable">
-
-            </div>
+            <div class="col-md-12" id="viewDataTable"></div>
+            <textarea id="viewData" class="hide"></textarea>
         </div>
     </div>
 </div>
@@ -279,9 +279,6 @@
             $('.formMoney').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
             $('.formMoney').maskMoney('mask', '9894');
         }
-
-
-
 
         loadSelectOptionYearSD();
 
@@ -590,6 +587,8 @@
 
             $.post(url,{token:token},function (jsonResult) {
 
+                $('#viewData').val(JSON.stringify(jsonResult));
+
                 var d_TS = (jsonResult.TS.length>0) ? jsonResult.TS[0] : 0;
                 var d_TS1 = (jsonResult.TS1.length>0) ? jsonResult.TS1[0] : 0;
                 var d_TS2 = (jsonResult.TS2.length>0) ? jsonResult.TS2[0] : 0;
@@ -762,5 +761,31 @@
 
 
     }
+
+    $('#btnEditSumberDana').click(function () {
+
+        var viewData = $('#viewData').val();
+        var jsonResult = JSON.parse(viewData);
+        var d_TS = (jsonResult.TS.length>0) ? jsonResult.TS[0] : 0;
+
+        if(jsonResult.TS.length>0){
+            $('#ID').val(d_TS.ID);
+            $('#Year').val(d_TS.Year);
+
+            var keyNames_TS = (d_TS!=0) ? Object.keys(d_TS) : [];
+
+            if(keyNames_TS.length>0) {
+                for (var i = 0; i < keyNames_TS.length; i++) {
+
+                    if(i>=2 && i<=18){
+                        var vts = (d_TS!=0) ? parseFloat(d_TS[keyNames_TS[i]]) : d_TS;
+                        $('#'+keyNames_TS[i]).val(vts);
+                    }
+
+                }
+            }
+        }
+
+    });
 
 </script>
