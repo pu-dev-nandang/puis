@@ -11,10 +11,10 @@
         
         <div class="col-md-12">
             <div style="text-align: right;">
-                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> <p></p>
                 <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
             </div>
-            <div id = "content_dt">
+            <div id= "content_dt">
                 
             </div>
         </div>
@@ -81,19 +81,22 @@
             // make table
             var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPenelitian">'+
                                 '<thead>'+
-
                                     '<tr style="background: #20485A;color: #FFFFFF;">'+
-                                         '<td>No</td>'+
-                                         '<td>Sumber Pembiayaan</td>';   
+                                         '<td style="vertical-align : middle;text-align:center;width: 1%;" rowspan="2">No</td>'+
+                                         '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 15%;">Sumber Pembiayaan</td>'+
+                                         '<td colspan="3" style="vertical-align : middle;text-align:center;">Jumlah Judul</td>'+
+                                         '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 10%;">Jumlah</td> </tr><tr style="background: #20485A;color: #FFFFFF;">';
+
             for (var i = 0; i < arr_header_table.length; i++) {
-                htmlTable += '<td>'+arr_header_table[i]+'</td>';
+                htmlTable += '<td style="vertical-align : middle;text-align:center;width: 5%;">'+arr_header_table[i]+'</td>';
                 arr_total.push(0);
             }
-            htmlTable += '<td>'+'Jumlah'+'</td>';
-            htmlTable += '</tr>'+
-                        '</thead>'+
+           
+            //htmlTable += '<td>'+'Jumlah'+'</td>';
+            htmlTable += '</tr></thead>'+
                         '<tbody id="listStd"></tbody>'+
-                        '</table>';
+                        '</table>';   
+            
             $('#content_dt').html(htmlTable);            
             $('#listStd').empty();
 
@@ -133,7 +136,7 @@
                 tbl.append(
                     '<tfoot>'+
                         '<tr>'+
-                            '<td colspan = "2">Jumlah</td>'+
+                            '<td colspan = "2" style="vertical-align : middle;text-align:center;">Jumlah</td>'+
                             isian+
                         '</tr>'+
                     '</tfoot>'        
