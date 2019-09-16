@@ -11,8 +11,10 @@
 
     <div class="row">
         <div class="col-md-12">
-
-            <table class="table" id="tableData">
+            <div style="text-align: right;margin-bottom: 20px;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+            <table class="table table-striped dataTable2Excel" id="tableData" data-name="setifikasi_dosen">
                 <thead>
                 <tr  style="background: #20485A;color: #FFFFFF;">
                     <th style="width: 1%;">No</th>
