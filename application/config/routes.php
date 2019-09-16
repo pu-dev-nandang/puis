@@ -1839,3 +1839,6 @@ $route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
 // don't show Digital Signature
 $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
 
+// Cooperation
+$route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi';
+
