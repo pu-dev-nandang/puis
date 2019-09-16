@@ -19,6 +19,29 @@
 		        						<input type="text" name="Lembaga_mitra_kerjasama" class="form-control input">
 		        					</div>
 		        					<div class="form-group">
+		        						<div class="row">
+		        							<div class="col-xs-12">
+		        								<table class="table">
+		        									<tr>
+		        										<td style="border-top: none;">MOU</td>
+		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOU"></td>
+		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input"></td>
+		        									</tr>
+		        									<tr>
+		        										<td style="border-top: none;">MOU</td>
+		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOU"></td>
+		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input"></td>
+		        									</tr>
+		        									<tr>
+		        										<td style="border-top: none;">MOU</td>
+		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOU"></td>
+		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input"></td>
+		        									</tr>
+		        								</table>
+		        							</div>
+		        						</div>
+		        					</div>
+		        					<div class="form-group">
 		        						<label>Tingkat</label>
 		        						<select class="form-control input" name ="Tingkat">
 		        							<option disabled selected value="!">--Pilih--</option>
@@ -27,7 +50,7 @@
 		        							<option value="Lokal">Wilayah/ Lokal</option>
 		        						</select>
 		        					</div>
-
+									
 		        				</div>
 		        			</div>
 		        		</div>
