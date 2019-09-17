@@ -14,7 +14,6 @@
 		        					<div style="padding: 15px;">
 		        						<h3 style="color: red;">Form Input</h3>
 		        					</div>
-		        					<hr/>
 		        					<div class="form-group">
 		        						<label>Lembaga  Mitra Kerja Sama</label>
 		        						<input type="text" name="Lembaga" class="form-control input">
@@ -138,12 +137,98 @@
 		        	</div>
 		        	<div class="col-md-8">
 		        		<div class="thumbnail">
-		        			<div class="row">
+		        			<div class="row" style="margin-left: 0px;margin-right: 0px;">
 		        				<div class="col-md-12">
 		        					<div style="padding: 15px;">
 		        						<h3 style="color: red;">Data</h3>
 		        					</div>
-		        					<hr/>
+		        					<div class="row">
+		        						<div class="col-md-10">
+		        							<div class="well" style="background: lightyellow;">
+		        								<div style="color: red;"><b>Filtering</b></div>
+			        							<div class="row" style="margin-top: 10px;">
+			        								<div class="col-md-3">
+			        									<div class="thumbnail">
+			        										<div class="form-group">
+			        											<label>Kategori</label>
+			        											<select class="form-control SearchKategori" name ="Kategori">
+			        												<option selected value="%">--All--</option>
+			        												<option value="PKM">PKM</option>
+			        												<option value="Penelitian">Penelitian</option>
+			        												<option value="Pendidikan">Pendidikan</option>
+			        												<option value="Tridarma">Tridarma</option>
+			        											</select>
+			        										</div>
+			        									</div>
+			        								</div>
+			        								<div class="col-md-3">
+			        									<div class="thumbnail">
+				        									<div class="form-group">
+				        										<label>Perjanjian</label>
+				        										<table class="">
+																	<tr>
+																		<td style="border-top: none;">MOU</td>
+																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOU"></td>
+																	</tr>
+																	<tr>
+																		<td style="border-top: none;">MOA</td>
+																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOA"></td>
+																	</tr>
+																	<tr>
+																		<td style="border-top: none;">IA</td>
+																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="IA"></td>
+																	</tr>
+				        										</table>
+				        									</div>
+			        									</div>
+			        								</div>
+			        								<div class="col-md-3">
+			        									<div class="thumbnail">
+			        										<div class="form-group">
+			        											<label>Tingkat</label>
+			        											<select class="form-control SearchTingkat" name ="Kategori">
+			        												<option selected value="%">--All--</option>
+			        												<option value="Internasional">Internasional</option>
+			        												<option value="Nasional">Nasional</option>
+			        												<option value="Lokal">Wilayah/ Lokal</option>
+			        											</select>
+			        										</div>
+			        									</div>
+			        								</div>
+			        							</div>
+		        							</div>
+		        						</div>
+		        						<div class="col-md-2" align="right">
+		        							Export Excel
+		        						</div>
+		        					</div>
+		        					<div class="row" style="margin-top: 5px;">
+		        						<div class="table-responsive">
+		        						<div class="col-md-12">
+											<table class="table table-bordered" id="TblKerjaSama">
+												<thead>
+													<tr>
+														<th>No</th>
+														<!-- <th>Lembaga</th> -->
+														<!-- <th>Kategori</th> -->
+														<th>Tingkat</th>
+														<th>Judul Kegiatan</th>
+														<!-- <th>Bentuk Kegiatan</th> -->
+														<!-- <th>Manfaat Kegiatan</th> -->
+														<th>Bukti</th>
+														<th>Date</th>
+														<th>Perjanjian</th>
+														<th>Department</th>
+														<th><i class="fa fa-cog"></i></th>
+													</tr>
+												</thead>
+												<tbody>
+													
+												</tbody>
+											</table>
+		        						</div>
+		        						</div>
+		        					</div>
 		        				</div>
 		        			</div>
 		        		</div>
@@ -162,6 +247,7 @@
 	function LoadFirstLoad()
 	{
 		loadingStart();
+		LoadDataForTable();
 		// set data default
 		SetDataDefault();
 		loadingEnd(1000);
@@ -173,6 +259,15 @@
         	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
         });
         $('.input:first').focus();
+        $('input:not([type="checkbox"])').val('');
+        // $('select[class="input"] option').filter(function() {
+        //    //may want to use $.trim in here
+        //    return $(this).val() == '!'; 
+        //  }).prop("selected", true);
+
+        $('.input[type="checkbox"]').prop('checked',false);
+        $('textarea').val('');
+
 	}
 
 	$(document).off('click', '#addDepartment').on('click', '#addDepartment',function(e) {
@@ -273,12 +368,13 @@
 		}); // exit each function
 
 		// write html Department Selected
-		HtmlPageDepartmentSelected(checkboxArr);
+		var selector = $('.ListDepartmentSelected');
+		HtmlPageDepartmentSelected(checkboxArr,selector);
 		$('#GlobalModalLarge').modal('hide');
 
 	})
 
-	function HtmlPageDepartmentSelected(arr)
+	function HtmlPageDepartmentSelected(arr,selector,classdt='input_li')
 	{
 		var html = '<div class = "row">';
 		var MaxRow = 11;
@@ -297,7 +393,7 @@
 
 		var r = 0;
 		for (var x = 0; x < split; x++) {
-			var lihtml = '<ul class ="input_li" style ="margin-left:-30px;">';
+			var lihtml = '<ul class ="'+classdt+'" style ="margin-left:-30px;">';
 			for (var z = 0; z < MaxRow; z++) {
 				// console.log(r);
 				if (r == Total) {
@@ -312,7 +408,7 @@
 
 		html += '</div>';
 
-		$('.ListDepartmentSelected').html(html);	
+		selector.html(html);	
 
 	}
 
@@ -520,6 +616,8 @@
 		  		toastr.error("Connection Error, Please try again", 'Error!!');
 			}
 		  	else{
+		  		LoadDataForTable();
+		  		SetDataDefault();
 		  		toastr.success('Data Saved');
 			}
 
@@ -531,4 +629,101 @@
 		 }
 		})
 	}
+
+	function LoadDataForTable()
+	{
+		var SearchPerjanjian = [];
+		$('.SearchPerjanjian:checked').each(function(){
+			var v = $(this).val();
+			SearchPerjanjian.push(v);
+		})
+
+		var SearchKategori = $('.SearchKategori option:selected').val();
+		var SearchTingkat = $('.SearchTingkat option:selected').val();
+		var data = {
+		    auth : 's3Cr3T-G4N',
+		    SearchPerjanjian : SearchPerjanjian,
+		    SearchKategori : SearchKategori,
+		    SearchTingkat : SearchTingkat,
+		};
+		var token = jwt_encode(data,"UAP)(*");
+		$('#TblKerjaSama tbody').empty();
+
+		var table = $('#TblKerjaSama').DataTable({
+			"fixedHeader": true,
+		    "processing": true,
+		    "destroy": true,
+		    "serverSide": true,
+	      "lengthMenu": [[5], [5]],
+		    "iDisplayLength" : 5,
+		    "ordering" : false,
+	      "language": {
+	          "searchPlaceholder": "Search",
+	      },
+		    "ajax":{
+		        url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi", // json datasource
+		        ordering : false,
+		        type: "post",  // method  , by default get
+		        data : {token : token},
+		        error: function(){  // error handling
+		            $(".employee-grid-error").html("");
+		            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+		            $("#employee-grid_processing").css("display","none");
+		        }
+		    },
+	   	    'createdRow': function( row, data, dataIndex ) {
+	   	    	// console.log(data);
+	   	    	var Bukti = data[3];
+	   	    	var a = Bukti.split('--');
+	   	    	var html = '';
+	   	    	var File = jQuery.parseJSON(a[1]);
+	   	    	html = a[0]+'<br>File :'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">File</a>';
+	   	    	$( row ).find('td:eq(3)').html(html);
+
+	   	    	var Perjanjian = data[5];
+	   	    	html = '';
+	   	    	var cc = Perjanjian.split(',');
+	   	    	for (var i = 0; i < cc.length; i++) {
+	   	    		var zc = cc[i];
+	   	    		a = zc.split('--');
+	   	    		File = jQuery.parseJSON(a[1]);
+	   	    		html += '<li>'+a[0]+'<br>File :'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">File</a></li>';
+	   	    	}
+	   	    	
+	   	    	$( row ).find('td:eq(5)').html(html);
+
+	   	    	var Departement = data[6];
+	   	    	html = '';
+	   	    	cc = Departement.split(',');
+	   	    	var arr = [];
+	   	    	for (var i = 0; i < cc.length; i++) {
+	   	    		var zc = cc[i];
+	   	    		a = zc.split('--');
+	   	    		var temp = {
+	   	    			Code : a[0],
+	   	    			Name : a[1],
+	   	    		}
+	   	    		arr.push(temp);
+	   	    	}
+	   	    	var selector = $( row ).find('td:eq(6)');
+	   	    	HtmlPageDepartmentSelected(arr,selector,'listtbl');
+
+	   	    	html = '<div class="btn-group">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>  </ul></div>';
+	   	    	$( row ).find('td:eq(7)').html(html);
+
+	   	    },
+	        dom: 'l<"toolbar">frtip',
+	   	    "initComplete": function(settings, json) {
+
+	   	    }
+		});
+	}
+
+	$(document).off('change', '.SearchTingkat,.SearchKategori').on('change', '.SearchTingkat,.SearchKategori',function(e) {
+		LoadDataForTable();
+	})
+
+	$(document).off('click', '.SearchPerjanjian').on('click', '.SearchPerjanjian',function(e) {
+		LoadDataForTable();
+	})
 </script>
