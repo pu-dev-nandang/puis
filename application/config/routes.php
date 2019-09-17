@@ -1841,4 +1841,6 @@ $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
 
 // Cooperation
 $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit';
+
 

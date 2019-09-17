@@ -2054,4 +2054,21 @@
         });
     }
 
+    function load_data_department_ajax()
+    {
+        var def = jQuery.Deferred();
+        var url = base_url_js+"api/__getAllDepartementPU";
+        $.post(url,function (data_json) {
+            
+        }).done(function(data_json) {
+            def.resolve(data_json);
+        }).fail(function() {
+          toastr.info('No Result Data'); 
+          def.reject();
+        }).always(function() {
+                        
+        });
+        return def.promise();
+    }
+
 </script>

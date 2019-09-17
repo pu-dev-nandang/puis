@@ -15,7 +15,21 @@ class C_cooperation extends Cooperation_Controler {
     {
       $content = $this->load->view('page/'.$this->data['department'].'/kerjasama-perguruan-tinggi/index',$this->data,true);
       $this->temp($content);
-      
+    }
+
+    public function kerja_sama_perguruan_tinggi_submit()
+    {
+        $Input = $this->getInputToken();
+        $mode = $Input['mode'];
+        switch ($mode) {
+            case 'add':
+                
+                break;
+            
+            default:
+                # code...
+                break;
+        }
     }
 
 }
