@@ -1899,21 +1899,21 @@ class C_api3 extends CI_Controller {
 
                 for($j=0;$j<count($dataLAP);$j++){
 
-                    $dataDetails = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                    $dataDetails = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em 
                                                                             WHERE em.ProdiID = "'.$data[$i]['ID'].'"
                                                                             AND em.LevelEducationID = "'.$dataLAP[$j]['ID'].'" 
                                                                             AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
 
-                    $r = array('Level' => $dataLAP[$j]['Level'], 'Details' => $dataDetails);
+                    $r = array('Level' => $dataLAP[$j]['Description'], 'Details' => $dataDetails);
                     $data[$i]['dataLecturers'][$j] = $r;
                 }
 
 
-                $dataL = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em 
+                $dataL = $this->db->query('SELECT em.NIP,  em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em 
                                                                     WHERE em.ProdiID = "'.$data[$i]['ID'].'"
                                                                     AND em.Profession <> "" 
                                                                     AND ( em.StatusForlap = "1" OR em.StatusForlap = "2" ) ')->result_array();
-                $r = array('Level' => '', 'Details' => $dataL);
+                $r = array('Level' => 'Profesi', 'Details' => $dataL);
                 $data[$i]['dataLecturers'][2] = $r;
 
             }
@@ -1937,7 +1937,7 @@ class C_api3 extends CI_Controller {
             for($i=0;$i<count($data);$i++){
 
                 for($p=0;$p<count($dataPosition);$p++){
-                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
                                                                     WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
                                                                      AND (em.StatusForlap = "1" || em.StatusForlap = "2") ')->result_array();
@@ -1951,7 +1951,7 @@ class C_api3 extends CI_Controller {
                 }
 
 
-                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                $dataEmp = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
                                                                     WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position)
                                                                      AND (em.StatusForlap = "1" || em.StatusForlap = "2") ')->result_array();
@@ -1985,7 +1985,7 @@ class C_api3 extends CI_Controller {
             for($i=0;$i<count($data);$i++){
 
                 for($p=0;$p<count($dataPosition);$p++){
-                    $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                    $dataEmp = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
                                                                     WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID = "'.$dataPosition[$p]['ID'].'"
                                                                      AND em.StatusForlap = "0" ')->result_array();
@@ -1998,7 +1998,7 @@ class C_api3 extends CI_Controller {
                     $data[$i]['details'][$p] = $r;
                 }
 
-                $dataEmp = $this->db->query('SELECT em.NIP, em.Name FROM db_employees.employees em
+                $dataEmp = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
                                                                     WHERE em.LevelEducationID = "'.$data[$i]['ID'].'"
                                                                     AND em.LecturerAcademicPositionID NOT IN (SELECT ID FROM db_employees.lecturer_academic_position)
                                                                      AND em.StatusForlap = "0" ')->result_array();
@@ -2028,14 +2028,18 @@ class C_api3 extends CI_Controller {
             for($i=0;$i<count($data);$i++){
 
                 // Total Employees
-                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
-                                          WHERE ProdiID = "'.$data[$i]['ID'].'"  ')->result_array();
+                $dataEmp = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
+                                          WHERE em.ProdiID = "'.$data[$i]['ID'].'" 
+                                          AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
 
-                $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+                $data[$i]['TotalLecturer'] = $dataEmp;
 
-                $dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
-                                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Serdos="1"  ')->result_array();
-                $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
+                $dataEmpCerti = $this->db->query('SELECT em.NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_employees.employees em
+                                          WHERE em.ProdiID = "'.$data[$i]['ID'].'" AND em.Serdos="1" 
+                                          AND (em.StatusForlap = "1" || em.StatusForlap = "2")  ')->result_array();
+
+
+                $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti;
 
             }
         }
@@ -2046,7 +2050,7 @@ class C_api3 extends CI_Controller {
 
     public function getRasioDosenMahasiswa() {
 
-        $Status = $this->input->get('s');
+        $SemesterID = $this->input->get('smt');
 
         $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
             'Status' => 1
@@ -2054,12 +2058,9 @@ class C_api3 extends CI_Controller {
 
         if(count($data)>0){
 
-            // Get Semester aktif
-            $dataSmtAct = $this->m_api->_getSemesterActive();
 
             for($i=0;$i<count($data);$i++){
 
-//                $and2 = ($Status!='all') ? ' AND StatusForlap = "'.$Status.'" ' : '';
                 $and2 = ' AND (StatusLecturerID = "3" || StatusLecturerID = "4" || StatusLecturerID = "5" || StatusLecturerID = "6")';
 
                 // Total Mahasiswa
@@ -2078,15 +2079,11 @@ class C_api3 extends CI_Controller {
                 $dataTA = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.std_study_planning ssp 
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
-                                                    WHERE ssp.SemesterID = "'.$dataSmtAct['ID'].'"
+                                                    WHERE ssp.SemesterID = "'.$SemesterID.'"
                                                     AND ats.ProdiID = "'.$data[$i]['ID'].'"
                                                      AND mk.Yudisium = "1"')->result_array();
 
                 $data[$i]['TotalMahasiwaTA'] = $dataTA[0]['Total'];
-
-                //$dataEmpCerti = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
-                //                          WHERE ProdiID = "'.$data[$i]['ID'].'" AND Certified="1"  '.$and2)->result_array();
-               // $data[$i]['TotalLecturerCertifies'] = $dataEmpCerti[0]['Total'];
 
             }
         }

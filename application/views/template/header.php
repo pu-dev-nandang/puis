@@ -266,6 +266,17 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!-- Global Modal Large -->
+<div class="modal fade" id="GlobalModalSmall" role="dialog">
+    <div class="modal-dialog" role="document" style="width:355px;">
+        <div class="modal-content animated jackInTheBox">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <!-- Modal Notification -->
 <div class="modal fade" id="NotificationModal" role="dialog" style="top: 100px;">
     <div class="modal-dialog" style="width: 400px;" role="document">
