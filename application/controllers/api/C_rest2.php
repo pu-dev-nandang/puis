@@ -4540,4 +4540,125 @@ class C_rest2 extends CI_Controller {
         echo json_encode($json_data);
     }
 
+    public function get_data_kerja_sama_perguruan_tinggi()
+    {
+        try {
+               $dataToken = $this->getInputToken2();
+               $auth = $this->m_master->AuthAPI($dataToken);
+               if ($auth) {
+                $WhereFiltering = '';
+                $requestData = $_REQUEST;
+                if (array_key_exists('SearchPerjanjian', $dataToken)) {
+                    $SearchPerjanjian = $dataToken['SearchPerjanjian'];
+                    // print_r($SearchPerjanjian);die();
+                    if (count($SearchPerjanjian) > 0) {
+                        $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                        $WhereFiltering .= $FwhereAnd.' ( b.Type ="'.$SearchPerjanjian[0].'" '; 
+                        for ($i=0; $i < count($SearchPerjanjian); $i++) { 
+                            $WhereFiltering .= ' or b.Type ="'.$SearchPerjanjian[$i].'" '; 
+                        }
+
+                        $WhereFiltering .= ')';
+                    }
+                }
+
+                if (array_key_exists('SearchKategori', $dataToken)) {
+                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                    if ($dataToken['SearchKategori'] != '' && $dataToken['SearchKategori'] != '%') {
+                        $WhereFiltering .= $FwhereAnd.' a.Kategori = "'.$dataToken['SearchKategori'].'" '; 
+                    }
+                    
+                }
+
+                if (array_key_exists('SearchTingkat', $dataToken)) {
+                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                    if ($dataToken['SearchTingkat'] != '' && $dataToken['SearchTingkat'] != '%') {
+                        $WhereFiltering .= $FwhereAnd.' a.Tingkat = "'.$dataToken['SearchTingkat'].'" '; 
+                    }
+                }
+
+                $sqltotalData = 'select count(*) as total from (
+
+                select count(*) as total from db_cooperation.kerjasama as a
+                                                join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                                join db_cooperation.k_department as c on a.ID = c.KerjasamaID
+                                                '.$WhereFiltering.'
+                            ';
+               $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+               $sqltotalData .= $WhereORAnd.' (           
+                      a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                 )';
+
+                $sqltotalData .= ' GROUP BY a.ID ) cc';                  
+                $querytotalData = $this->db->query($sqltotalData)->result_array();
+                $totalData = $querytotalData[0]['total'];
+
+                $sql = 'select b.KerjasamaID,a.Lembaga,a.Kategori,a.Tingkat,a.JudulKegiatan,a.BentukKegiatan,
+                        a.ManfaatKegiatan,a.BuktiName,a.BuktiUpload,a.StartDate,a.EndDate,
+                        (
+                        select GROUP_CONCAT( CONCAT(Type,"--",Upload,"--",ID) ) from db_cooperation.k_perjanjian where KerjasamaID = a.ID group by KerjasamaID
+                        ) as Perjanjian,
+                        (
+                        select GROUP_CONCAT( CONCAT(z.Departement,"--",x.Code) ) from db_cooperation.k_department as z
+                        join (
+                         select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                        UNION
+                                        select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                        UNION
+                                        select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                        ) as x on z.Departement = x.ID
+                        where KerjasamaID = a.ID group by KerjasamaID
+                        ) as DepartmentKS
+                        from db_cooperation.kerjasama as a
+                        join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                        join db_cooperation.k_department as c on a.ID = c.KerjasamaID
+                        '.$WhereFiltering;
+
+                    $sql .= $WhereORAnd.' (           
+                           a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                    )';
+                    $sql .= ' GROUP BY a.ID';    
+                    $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $query = $this->db->query($sql)->result_array();
+                    $No = $requestData['start'] + 1;
+                    $data = array();
+                    for($i=0;$i<count($query);$i++){
+                        $nestedData=array();
+                        $row = $query[$i];
+                        $nestedData[] = $No;
+                        $nestedData[] = $row['Lembaga'].'<br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
+                        // $nestedData[] = $row['Kategori'];
+                        // $nestedData[] = $row['Tingkat'];
+                        $nestedData[] = $row['JudulKegiatan'];
+                        // $nestedData[] = $row['BentukKegiatan'];
+                        // $nestedData[] = $row['ManfaatKegiatan'];
+                        $nestedData[] = nl2br($row['BuktiName']).'--'.$row['BuktiUpload'];
+                        $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End :'.$row['EndDate'];
+                        $nestedData[] = $row['Perjanjian'];
+                        $nestedData[] = $row['DepartmentKS'];
+                        $nestedData[] = $row['KerjasamaID'];
+                        $data[] = $nestedData;
+                        $No++;
+                    }
+
+                    $json_data = array(
+                        "draw"            => intval( $requestData['draw'] ),
+                        "recordsTotal"    => intval($totalData),
+                        "recordsFiltered" => intval($totalData ),
+                        "data"            => $data,
+                    );
+                    echo json_encode($json_data);    
+               }
+               else
+               {
+                   // handling orang iseng
+                   echo '{"status":"999","message":"Not Authorize"}';
+               }
+        }
+       catch(Exception $e) {
+            // handling orang iseng
+            echo '{"status":"999","message":"Not Authorize"}';
+       }
+    }
+
 }

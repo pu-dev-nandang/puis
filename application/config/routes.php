@@ -1035,6 +1035,8 @@ $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_b
 $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
+$route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1838,4 +1840,9 @@ $route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
 
 // don't show Digital Signature
 $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
+
+// Cooperation
+$route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit';
+
 
