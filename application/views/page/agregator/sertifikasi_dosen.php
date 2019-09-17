@@ -22,7 +22,7 @@
             </div>
             <table class="table table-striped dataTable2Excel" id="tableData" data-name="setifikasi_dosen">
                 <thead>
-                <tr  style="background: #20485A;color: #FFFFFF;">
+                <tr>
                     <th style="width: 1%;">No</th>
                     <th>Unit Pengelola (Fakultas/Departemen/Jurusan)</th>
                     <th style="width: 15%;">Jumlah Dosen</th>
