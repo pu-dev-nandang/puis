@@ -4,6 +4,9 @@
     #dataDanaTable tr th, #dataDanaTable tr td {
         text-align: center;
     }
+    #tablePD tr th, #tablePD tr td {
+        text-align: center;
+    }
 </style>
 
 <div class="well">
@@ -15,7 +18,7 @@
                 <label>Jenis Penggunaan</label>
                 <input id="formID" class="hide">
                 <select class="form-control" id="formJPID"></select>
-                <a style="float: right;" href="javascript:void(0);" id="btnCrud_JP"><i class="fa fa-edit margin-right"></i> Jenis Penggunaan</a>
+                <a style="float: right;" href="javascript:void(0);" class="" id="btnCrud_JP"><i class="fa fa-edit margin-right"></i> Jenis Penggunaan</a>
             </div>
             <div class="form-group">
                 <label>Year</label>
@@ -35,7 +38,39 @@
         </div>
         <div class="col-md-9">
 
-            <div id="viewData"></div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-4">
+                    <div class="well">
+                        <select class="form-control" id="filterYear"></select>
+                    </div>
+                </div>
+                <div class="col-md-4" style="text-align: right;margin-bottom: 20px;">
+                    <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered  dataTable2Excel table2excel_with_colors" data-name="Penggunaan-Dana"  id="tablePD">
+                        <thead>
+                        <tr>
+                            <th rowspan="2" style="width: 1%;">No</th>
+                            <th rowspan="2">Jenis Penggunaan</th>
+                            <th colspan="3">Dana (Rupiah)</th>
+                            <th rowspan="2" style="width: 20%;">Jumlah (Rupiah)</th>
+                        </tr>
+                        <tr>
+                            <th style="width: 20%;">TS-2 <span id="viewTS2"></span></th>
+                            <th style="width: 20%;">TS-1 <span id="viewTS1"></span></th>
+                            <th style="width: 20%;">TS <span id="viewTS"></span></th>
+                        </tr>
+                        </thead>
+                        <tbody id="loadListDana"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="viewData2"></div>
 
         </div>
 
@@ -48,16 +83,29 @@
 
     $(document).ready(function () {
 
+        loadSOPenggunaanDanaYear('filterYear');
+
         $('#formPrice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
         $('#formPrice').maskMoney('mask', '9894');
         loadJenisDana();
-        loadPenggunaanDana();
+
+        var firstLoad = setInterval(function (args) {
+            var filterYear = $('#filterYear').val();
+            if(filterYear!='' && filterYear!=null){
+                loadPenggunaanDana();
+                clearInterval(firstLoad);
+            }
+        },1000);
+
+        setTimeout(function () {
+            clearInterval(firstLoad);
+        },5000);
+
 
     });
 
     $('#btnSave').click(function () {
 
-        var formID = $('#formID').val();
         var formJPID = $('#formJPID').val();
         var formYear = $('#formYear').val();
         var formPrice = $('#formPrice').val();
@@ -69,7 +117,6 @@
 
             var data = {
                 action : 'updatePenggunaanDana',
-                ID : (formID!='' && formID!=null) ? formID : '',
                 dataForm : {
                     JPID : formJPID,
                     Year : formYear,
@@ -82,6 +129,7 @@
             
             $.post(url,{token:token},function (result) {
                 toastr.success('Data saved','Success');
+                // loadSOPenggunaanDanaYear('filterYear');
                 loadPenggunaanDana();
                 setTimeout(function () {
 
@@ -100,59 +148,163 @@
 
     });
 
-    function loadPenggunaanDana() {
+    $('#filterYear').change(function () {
+       var filterYear = $('#filterYear').val();
+       if(filterYear!='' && filterYear!=null){
+           loadPenggunaanDana();
+       }
+    });
 
+    function loadSOPenggunaanDanaYear(elm) {
         var data = {
-            action : 'viewPenggunaanDana'
+            action : 'viewPenggunaanDanaYear'
         };
 
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregatorTB4';
 
-        $('#viewData').html('<table class="table" id="dataDanaTable">' +
-            '                    <thead>' +
-            '                    <tr>' +
-            '                        <th style="width: 1%;">No</th>' +
-            '                        <th>Jenis Penggunaan</th>' +
-            '                        <th style="width: 10%;">Year</th>' +
-            '                        <th style="width: 25%;">Dana</th>' +
-            '                        <th style="width: 10%;"><i class="fa fa-cog"></i></th>' +
-            '                    </tr>' +
-            '                    </thead>' +
-            '                    <tbody id="loadListDana"></tbody>' +
-            '                </table>');
+        $('#'+elm).empty();
 
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){
-
                 $.each(jsonResult,function (i,v) {
-
-                    var btn = '<div class="btn-group">' +
-                        '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                        '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
-                        '  </button>' +
-                        '  <ul class="dropdown-menu">' +
-                        '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnEditPD">Edit</a></li>' +
-                        '    <li role="separator" class="divider"></li>' +
-                        '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnRemovePD">Remove</a></li>' +
-                        '  </ul>' +
-                        '</div>' +
-                        '<textarea id="viewData_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea>';
-
-                    $('#loadListDana').append('<tr>' +
-                        '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                        '<td style="text-align: left;">'+v.JP+'</td>' +
-                        '<td>'+v.Year+'</td>' +
-                        '<td>'+formatRupiah(v.Price)+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+btn+'</td>' +
-                        '</tr>');
-                })
+                    $('#'+elm).append('<option value="'+v.Year+'">Tahun '+v.Year+'</option>');
+                });
             }
 
         });
+    }
+
+    function loadPenggunaanDana() {
+
+        var filterYear = $('#filterYear').val();
+        if(filterYear!='' && filterYear!=null){
+
+            var Year = filterYear;
+            var Year1 = parseInt(filterYear) - 1;
+            var Year2 = parseInt(filterYear) - 2;
+
+            $('#viewTS2').html('( '+Year2+' )');
+            $('#viewTS1').html('( '+Year1+' )');
+            $('#viewTS').html('( '+filterYear+' )');
+
+            var data = {
+                action : 'viewPenggunaanDana',
+                Year : Year,
+                Year1 : Year1,
+                Year2 : Year2
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudAgregatorTB4';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#loadListDana').empty();
+
+                if(jsonResult.length>0){
+
+                    var no = 1;
+                    var jml_th3 = 0;
+                    var jml_th2 = 0;
+                    var jml_th1 = 0;
+                    var jml_jml = 0;
+                    $.each(jsonResult,function (i,v) {
+
+                        var jml = parseFloat(v.th3) + parseFloat(v.th2) + parseFloat(v.th1);
+
+                        $('#loadListDana').append('<tr>' +
+                            '<td>'+no+'</td>' +
+                            '<td style="text-align: left;">'+v.Jenis+'</td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
+                            '<td style="text-align: right;">'+formatRupiah(jml)+'</td>' +
+                            '</tr>');
+                        jml_th3 = jml_th3+ parseFloat(v.th3);
+                        jml_th2 = jml_th2+ parseFloat(v.th2);
+                        jml_th1 = jml_th1+ parseFloat(v.th1);
+                        jml_jml = jml_jml+ parseFloat(jml);
+
+                        no += 1;
+                        if(no==8){
+
+                            $('#loadListDana').append('<tr>' +
+                                '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                '</tr>');
+
+                            jml_th3 = 0;
+                            jml_th2 = 0;
+                            jml_th1 = 0;
+                            jml_jml = 0;
+
+                            no =1;
+                        } else if(i==8){
+                            $('#loadListDana').append('<tr>' +
+                                '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
+                                '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                '</tr>');
+                        }
+                    });
+
+                }
+
+                return false;
+
+                if(jsonResult.length>0){
+
+                    $.each(jsonResult,function (i,v) {
+
+                        var btn = '<div class="btn-group">' +
+                            '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                            '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
+                            '  </button>' +
+                            '  <ul class="dropdown-menu">' +
+                            '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnEditPD">Edit</a></li>' +
+                            '    <li role="separator" class="divider"></li>' +
+                            '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnRemovePD">Remove</a></li>' +
+                            '  </ul>' +
+                            '</div>' +
+                            '<textarea id="viewData_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea>';
+
+                        $('#loadListDana').append('<tr>' +
+                            '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                            '<td style="text-align: left;">'+v.JP+'</td>' +
+                            '<td>'+v.Year+'</td>' +
+                            '<td>'+formatRupiah(v.Price)+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+btn+'</td>' +
+                            '</tr>');
+                    })
+                }
+
+            });
+        }
+
+
 
     }
+
+    $(document).on('click','.editNominal',function () {
+        var year = $(this).attr('data-year');
+        var Dana = $(this).attr('data-v');
+        var JPID = $(this).attr('data-jpid');
+
+
+        $('#formJPID').val(JPID);
+        $('#formYear').val(year);
+        $('#formPrice').val(Dana);
+        $('#formPrice').focus();
+
+
+    });
 
     $(document).on('click','.btnEditPD',function () {
         var ID = $(this).attr('data-id');
@@ -251,6 +403,7 @@
 
                 $.post(url,{token:token},function (result) {
                     loadJenisDana();
+                    loadPenggunaanDana();
                     setTimeout(function () {
                         $('#btnJPSave').prop('disabled',false).html('Save');
                         $('#formJP_ID').val('');
