@@ -388,7 +388,7 @@
             var formJP_ID = $('#formJP_ID').val();
             var formJP_Jenis = $('#formJP_Jenis').val();
 
-            if(formJP_Jenis!='' && formJP_Jenis!=null){
+            if(formJP_Jenis!='' && formJP_Jenis!=null && formJP_ID!='' && formJP_ID!=null){
 
                 loading_buttonSm('#btnJPSave');
 
@@ -411,6 +411,8 @@
                     },500);
                 });
 
+            } else {
+                toastr.warning('Hanya dapat digunakan untuk edit','Warning');
             }
 
         });
