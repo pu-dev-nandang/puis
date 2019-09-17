@@ -1156,9 +1156,21 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='updatePenggunaanDana'){
 
-            $ID = $data_arr['ID'];
 
             $dataForm = (array) $data_arr['dataForm'];
+
+            $JPID = $dataForm['JPID'];
+            $Year = $dataForm['Year'];
+
+            $dataCk = $this->db->get_where('db_agregator.penggunaan_dana',array(
+                'JPID' => $JPID,
+                'Year' => $Year
+            ))->result_array();
+
+
+//            $ID = $data_arr['ID'];
+            $ID = (count($dataCk)>0) ? $dataCk[0]['ID'] : '';
+
 
             if($ID!=''){
                 // Update
@@ -1179,8 +1191,46 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='viewPenggunaanDana'){
-            $data = $this->db->query('SELECT pd.*, jp.Jenis AS JP FROM db_agregator.penggunaan_dana pd 
-                                                  LEFT JOIN db_agregator.jenis_penggunaan jp ON (pd.JPID = jp.ID) ')->result_array();
+
+            $Year = $data_arr['Year'];
+            $Year1 = $data_arr['Year1'];
+            $Year2 = $data_arr['Year2'];
+
+            // Load Jenis P
+            $dataJenis = $this->db->get('db_agregator.jenis_penggunaan')->result_array();
+
+            $result = [];
+
+            if(count($dataJenis)>0){
+
+
+                for($i=0;$i<count($dataJenis);$i++){
+                    $d = $dataJenis[$i];
+
+                    for($y=1;$y<=3;$y++){
+                        if($y==1){
+                            $YearEx = $Year;
+                        } else if($y==2){
+                            $YearEx = $Year1;
+                        } else {
+                            $YearEx = $Year2;
+                        }
+
+                        $dataPD = $this->db->query('SELECT pd.* FROM db_agregator.penggunaan_dana pd 
+                                                  WHERE pd.Year = "'.$YearEx.'" AND pd.JPID = "'.$d['ID'].'" ')->result_array();
+
+                        $dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['Price'] : 0;
+                    }
+
+                }
+
+            }
+
+            return print_r(json_encode($dataJenis));
+        }
+        else if($data_arr['action']=='viewPenggunaanDanaYear'){
+            $data = $this->db->query('SELECT pd.Year FROM db_agregator.penggunaan_dana pd 
+                                                  GROUP BY pd.Year ORDER BY pd.Year DESC ')->result_array();
 
             return print_r(json_encode($data));
         }
