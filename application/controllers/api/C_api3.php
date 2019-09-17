@@ -2065,20 +2065,21 @@ class C_api3 extends CI_Controller {
 
 
                 // Total Mahasiswa
-                $dataMhs = $this->db->query('SELECT NPM, Name FROM db_academic.auth_students
-                                          WHERE StatusStudentID = "3" AND ProdiID = "'.$data[$i]['ID'].'" 
-                                          AND Year <= "'.$Year.'" 
-                                          ORDER BY Year, NPM ASC ')->result_array();
+                $dataMhs = $this->db->query('SELECT ats.NPM, ats.Name, ss.Description FROM db_academic.auth_students ats
+                                          LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                          WHERE ats.StatusStudentID = "3" AND ats.ProdiID = "'.$data[$i]['ID'].'" 
+                                          AND ats.Year <= "'.$Year.'" 
+                                          ORDER BY ats.Year, ats.NPM ASC ')->result_array();
 
                 $data[$i]['dataMahasiwa'] = $dataMhs;
 
 
-                $dataTA = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.std_study_planning ssp 
+                $dataTA = $this->db->query('SELECT ats.NPM, ats.Name, ss.Description FROM db_academic.std_study_planning ssp 
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                                    LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
                                                     WHERE ssp.SemesterID = "'.$SemesterID.'"
                                                     AND ats.ProdiID = "'.$data[$i]['ID'].'"
-                                                    AND ats.StatusStudentID = "3"
                                                      AND ats.Year <= "'.$Year.'"
                                                      AND mk.Yudisium = "1"')->result_array();
 

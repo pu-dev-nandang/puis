@@ -237,10 +237,13 @@
         var tr = '';
         if(d.Details.length>0){
             $.each(d.Details,function (i,v) {
+
+                var Status = (v.Description!=null && v.Description!='') ? ucwords(v.Description) : '-';
                 tr = tr+'<tr>' +
                     '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                     '<td>'+v.NPM+'</td>' +
                     '<td style="text-align: left;">'+ucwords(v.Name)+'</td>' +
+                    '<td>'+Status+'</td>' +
                     '</tr>';
             });
         }
@@ -256,6 +259,7 @@
             '                <th style="width: 5%;">No</th>' +
             '                <th style="width: 25%;">NIM</th>' +
             '                <th>Name</th>' +
+            '                <th style="width: 20%;">Status</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +
