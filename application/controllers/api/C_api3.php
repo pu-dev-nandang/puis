@@ -2051,6 +2051,7 @@ class C_api3 extends CI_Controller {
     public function getRasioDosenMahasiswa() {
 
         $SemesterID = $this->input->get('smt');
+        $Year = $this->input->get('y');
 
         $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
             'Status' => 1
@@ -2061,29 +2062,73 @@ class C_api3 extends CI_Controller {
 
             for($i=0;$i<count($data);$i++){
 
-                $and2 = ' AND (StatusLecturerID = "3" || StatusLecturerID = "4" || StatusLecturerID = "5" || StatusLecturerID = "6")';
+
 
                 // Total Mahasiswa
-                $dataMhs = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.auth_students
-                                          WHERE StatusStudentID = "3" AND ProdiID = "'.$data[$i]['ID'].'"  ')->result_array();
+                $dataMhs = $this->db->query('SELECT NPM, Name FROM db_academic.auth_students
+                                          WHERE StatusStudentID = "3" AND ProdiID = "'.$data[$i]['ID'].'" 
+                                          AND Year <= "'.$Year.'" 
+                                          ORDER BY Year, NPM ASC ')->result_array();
 
-                $data[$i]['TotalMahasiwa'] = $dataMhs[0]['Total'];
-
-                 // Total Lectrure
-                $dataEmp = $this->db->query('SELECT COUNT(*) AS Total FROM db_employees.employees
-                                          WHERE ProdiID = "'.$data[$i]['ID'].'"  '.$and2)->result_array();
-
-                $data[$i]['TotalLecturer'] = $dataEmp[0]['Total'];
+                $data[$i]['dataMahasiwa'] = $dataMhs;
 
 
-                $dataTA = $this->db->query('SELECT COUNT(*) AS Total FROM db_academic.std_study_planning ssp 
+                $dataTA = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.std_study_planning ssp 
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
                                                     LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
                                                     WHERE ssp.SemesterID = "'.$SemesterID.'"
                                                     AND ats.ProdiID = "'.$data[$i]['ID'].'"
+                                                    AND ats.StatusStudentID = "3"
+                                                     AND ats.Year <= "'.$Year.'"
                                                      AND mk.Yudisium = "1"')->result_array();
 
-                $data[$i]['TotalMahasiwaTA'] = $dataTA[0]['Total'];
+                $data[$i]['dataMahasiwaTA'] = $dataTA;
+
+
+                //
+                if($SemesterID>=13){
+
+                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_academic.schedule_details_course sdc 
+                                                              LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID) 
+                                                              LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
+                                                               WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                GROUP BY sc.Coordinator ')->result_array();
+
+                    $data[$i]['Lecturer_Sch_Co'] = $dataSchedule;
+
+                    $listCoord = [];
+                    if(count($dataSchedule)>0){
+                        foreach ($dataSchedule AS $item){
+                            array_push($listCoord,$item['NIP']);
+                        }
+                    }
+
+                    $data[$i]['Lecturer_Sch_Co_arr'] = $listCoord;
+
+                    $dataScheduleTeam = $this->db->query('SELECT stt.NIP, em.NUP, em.NIDN, em.NIDK, em.Name  FROM db_academic.schedule_team_teaching stt 
+                                                                LEFT JOIN db_academic.schedule sc ON (sc.ID = stt.ScheduleID)
+                                                                LEFT JOIN db_academic.schedule_details_course sdc ON (sc.ID = sdc.ScheduleID) 
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                                WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                GROUP BY stt.NIP
+                                                                 ')->result_array();
+
+                    $data[$i]['Lecturer_Sch_Team'] = $dataScheduleTeam;
+
+                    if(count($dataScheduleTeam)>0){
+                        foreach ($dataScheduleTeam AS $item){
+                            if(!in_array($item['NIP'],$listCoord)){
+                                array_push($dataSchedule,$item);
+                            }
+                        }
+                    }
+
+                    $data[$i]['Lecturer_Sch_Fix'] = $dataSchedule;
+
+                } else {
+                    // Schedule Lama
+                    $data[$i]['Lecturer_Sch_Fix'] = [];
+                }
 
             }
         }
