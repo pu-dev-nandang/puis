@@ -4577,6 +4577,13 @@ class C_rest2 extends CI_Controller {
                     }
                 }
 
+                if (array_key_exists('StartDate', $dataToken) && array_key_exists('EndDate', $dataToken)) {
+                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                    if ($dataToken['StartDate'] != '') {
+                        $WhereFiltering .= $FwhereAnd.' a.StartDate >= "'.$dataToken['StartDate'].'" and a.EndDate <= "'.$dataToken['EndDate'].'" '; 
+                    }
+                }
+
                 $sqltotalData = 'select count(*) as total from (
 
                 select count(*) as total from db_cooperation.kerjasama as a
