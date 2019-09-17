@@ -15,16 +15,16 @@
             <div style="text-align: right;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
-            <table class="table table-bordered table-striped dataTable2Excel" id="dataTable" data-name="Jabatan_dosen_tetap">
+            <table class="table table-striped dataTable2Excel" id="dataTable" data-name="Jabatan_dosen_tetap">
                 <thead>
-                <tr style="background: #20485A;color: #FFFFFF;">
+                <tr>
                     <th style="width: 1%;" rowspan="2">No</th>
                     <th rowspan="2">Pendidikan</th>
                     <th colspan="4">Jabatan Akademik</th>
                     <th style="width: 10%;" rowspan="2">Tenaga Pengajar</th>
                     <th style="width: 10%;" rowspan="2">Jumlah</th>
                 </tr>
-                <tr style="background: #20485A;color: #FFFFFF;">
+                <tr>
                     <th style="width: 10%;">Asisten Ahli</th>
                     <th style="width: 10%;">Lektor</th>
                     <th style="width: 10%;">Lektor Kepala</th>
