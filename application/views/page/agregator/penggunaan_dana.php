@@ -18,7 +18,7 @@
                 <label>Jenis Penggunaan</label>
                 <input id="formID" class="hide">
                 <select class="form-control" id="formJPID"></select>
-                <a style="float: right;" href="javascript:void(0);" class="hide" id="btnCrud_JP"><i class="fa fa-edit margin-right"></i> Jenis Penggunaan</a>
+                <a style="float: right;" href="javascript:void(0);" class="" id="btnCrud_JP"><i class="fa fa-edit margin-right"></i> Jenis Penggunaan</a>
             </div>
             <div class="form-group">
                 <label>Year</label>
@@ -403,6 +403,7 @@
 
                 $.post(url,{token:token},function (result) {
                     loadJenisDana();
+                    loadPenggunaanDana();
                     setTimeout(function () {
                         $('#btnJPSave').prop('disabled',false).html('Save');
                         $('#formJP_ID').val('');
