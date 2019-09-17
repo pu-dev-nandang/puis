@@ -1006,7 +1006,9 @@ class C_rest2 extends CI_Controller {
 
         if($data_arr['action']=='readCRMPeriode'){
 
-            $data = $this->db->order_by('Year','DESC')->get('db_admission.crm_period')->result_array();
+            // $data = $this->db->order_by('Year','DESC')->get('db_admission.crm_period')->result_array();
+            $sql = 'select * from db_admission.crm_period order by Status Desc,Year Desc';
+            $data=$this->db->query($sql, array())->result_array();
 
             return print_r(json_encode($data));
 
@@ -1027,12 +1029,16 @@ class C_rest2 extends CI_Controller {
                     'Year' => $Year,
                     'Name' => $data_arr['Name']
                 ));
+
+                $insert_id = $this->db->insert_id();
+
                 $result = array(
                     'Status' => '1'
                 );
+
+                $this->m_master->__fillTA_Capacity($insert_id);
+
             }
-
-
 
             return print_r(json_encode($result));
         }

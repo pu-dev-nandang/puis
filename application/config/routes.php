@@ -535,8 +535,9 @@ $route['crm/marketing-activity'] = 'page/admission/marketing/c_crm/marketing_act
 $route['crm/contact'] = 'page/admission/marketing/c_crm/contact';
 $route['crm/uploadDocumentPS'] = 'page/admission/marketing/c_crm/uploadDocumentPS';
 
-
-
+// daya tampung / capacity
+$route['admission/config/set_tahun_ajaran/(:any)'] = 'page/admission/c_master/capacity_tahun_ajaran/$1';
+$route['admission/config/save_capacity_tahun_ajaran'] = 'page/admission/c_master/save_capacity_tahun_ajaran';
 
 
 // ---Finance----
@@ -1335,6 +1336,9 @@ $route['agregator/sitasi-karya-ilmiah'] = 'page/agregator/c_agregator/sitasi_kar
 $route['agregator/rasio-dosen-mahasiswa'] = 'page/agregator/c_agregator/rasio_dosen_mahasiswa';
 $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dosen';
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
+$route['agregator/produktivitas-penelitian-dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
+$route['agregator/produktivitas-pkm-dosen'] = 'page/agregator/c_agregator/produktivitas_pkm_dosen';
+
 
 //Agregator Excel
 $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';

@@ -1839,4 +1839,32 @@ class C_master extends Admission_Controler {
         }
     }
 
+    public function capacity_tahun_ajaran($tokenID_crm_period)
+    {   
+        $key = "UAP)(*";
+        $ID_crm_period =$this->jwt->decode($tokenID_crm_period,$key);
+        $this->m_master->__fillTA_Capacity($ID_crm_period);
+        // get Year
+        $G_dt = $this->m_master->caribasedprimary('db_admission.crm_period','ID',$ID_crm_period);
+        $this->data['NamePeriod'] = $G_dt[0]['Name'];
+        $this->data['ID_crm_period'] = $ID_crm_period;
+        // get data
+        $this->data['G_data'] = $this->m_master->__data_capacity(array('ID_crm_period' => $ID_crm_period));
+        $content = $this->load->view('page/'.$this->data['department'].'/master/tahun_ajaran_capacity',$this->data,true);
+        $this->temp($content);
+    }
+
+    public function save_capacity_tahun_ajaran()
+    {
+        $Input = $this->getInputToken();
+        $dt = json_decode(json_encode($Input),true);
+        for ($i=0; $i < count($dt); $i++) { 
+            $Capacity = $dt[$i]['Capacity'];
+            $ID = $dt[$i]['ID'];
+            $this->db->where('ID',$ID);
+            $this->db->update('db_admission.ta_setting',array('Capacity' => $Capacity));
+        }
+        echo json_encode(1);
+    }
+
 }

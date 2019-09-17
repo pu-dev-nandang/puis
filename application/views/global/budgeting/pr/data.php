@@ -306,6 +306,7 @@ $(document).ready(function() {
 					        	ApproverLength : G_ApproverLength,
 					        	Years : Years,
 					        	Month : Month,
+					        	SelectTemplate : SelectTemplate,
 					        	},
 					        error: function(){  // error handling
 					            $(".employee-grid-error").html("");
@@ -416,6 +417,7 @@ $(document).ready(function() {
 			        	ApproverLength : G_ApproverLength,
 			        	Years : Years,
 			        	Month : Month,
+			        	SelectTemplate : SelectTemplate,
 			        	},
 			        error: function(){  // error handling
 			            $(".employee-grid-error").html("");
