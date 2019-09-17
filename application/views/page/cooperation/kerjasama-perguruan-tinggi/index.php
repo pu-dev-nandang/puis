@@ -17,7 +17,7 @@
 		        					<hr/>
 		        					<div class="form-group">
 		        						<label>Lembaga  Mitra Kerja Sama</label>
-		        						<input type="text" name="Lembaga_mitra_kerjasama" class="form-control input">
+		        						<input type="text" name="Lembaga" class="form-control input">
 		        					</div>
 		        					<div class="form-group">
 		        						<table class="table">
@@ -321,7 +321,7 @@
 		var data_id = $(this).attr('data-id');
 		if (validation_input()) {
 			var el = '#btnSave';
-			// loading_button(el);
+			loading_button(el);
 			SubmitData(el,mode,data_id);
 		}
 	})
@@ -468,7 +468,6 @@
 		console.log(DepartmentSelected);
 
 		var Perjanjian = [];
-		var r = 0;
 		$('.input[name="Perjanjian"]').each(function(){
 			if(this.checked){
 				var v =$(this).val();
@@ -478,10 +477,8 @@
 
 				if ( S_file.length ) {
 					var UploadFile = S_file[0].files;
-					form_data.append("Upload_"+r, UploadFile[0]);
+					form_data.append("Upload_"+v+"[]", UploadFile[0]);
 				}
-
-				r++;
 			}
 		})
 
@@ -491,7 +488,7 @@
 		var S_file = $('.input[name="BuktiUpload"]');
 		if ( S_file.length ) {
 			var UploadFile = S_file[0].files;
-			form_data.append("BuktiUpload", UploadFile[0]);
+			form_data.append("BuktiUpload[]", UploadFile[0]);
 		}
 
 		var data = {
@@ -520,18 +517,18 @@
 		  success:function(data)
 		  {
 		  	if (data.Status == 0) {
-
+		  		toastr.error("Connection Error, Please try again", 'Error!!');
 			}
 		  	else{
-
+		  		toastr.success('Data Saved');
 			}
-		 }	
+
+			$(el).prop('disabled',false).html('Save');
+		 },	
 		 error: function (data) {
 		    toastr.error("Connection Error, Please try again", 'Error!!');
-		    ev.find(el).prop('disabled',false).html('Save');
+		    $(el).prop('disabled',false).html('Save');
 		 }
 		})
-
-
 	}
 </script>
