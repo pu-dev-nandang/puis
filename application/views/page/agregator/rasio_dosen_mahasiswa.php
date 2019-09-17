@@ -8,26 +8,26 @@
 
 <div class="well">
 
+    <div class="row">
+        <div class="col-md-2 col-md-offset-5">
+            <select class="form-control" id="filterSemester"></select>
+        </div>
+        <div class="col-md-5">
+            <div style="text-align: right;margin-bottom: 20px;">
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
 
-            <div class="row hide">
-                <div class="col-md-6 col-md-offset-3">
-                    <div class="form-group">
-                        <label>Filter Status</label>
-                        <select class="form-control" id="filterStatusForlap">
-                            <option value="1" disabled="" selected="">Aktif</option>
-                            <option value="0" disabled="">Non Aktif</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div style="text-align: right;margin-bottom: 20px;">
-                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
-            </div>
+
             <table class="table dataTable2Excel" data-name="Rasio_Dosen_terhadap_Mahasiswa" id="tableData">
                 <thead>
+                <tr>
+                    <th colspan="5">2019/2020 Ganjil</th>
+                </tr>
                 <tr>
                     <th style="width: 1%;">No</th>
                     <th>Prodi</th>
@@ -50,56 +50,80 @@
 <script>
     var passToExcel = [];
     $(document).ready(function () {
-        loadLecturerCertificate();
+        loSelectOptionSemester('#filterSemester','');
+
+        var firstLoad = setInterval(function () {
+            var filterSemester = $('#filterSemester').val();
+            if(filterSemester!='' && filterSemester!=null){
+                loadLecturerCertificate();
+                clearInterval(firstLoad);
+            }
+        },1000);
+
+        setTimeout(function () {
+            clearInterval(firstLoad);
+        },1000);
+
+
     });
 
-    $('#filterStatusForlap').change(function () {
-        loadLecturerCertificate();
+    $('#filterSemester').change(function () {
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
+            loadLecturerCertificate();
+        }
+
     });
 
     function loadLecturerCertificate() {
-        passToExcel = [];
-        var filterStatusForlap = $('#filterStatusForlap').val();
-        // var status = (filterStatusForlap!='' && filterStatusForlap!=null)
-        // ? filterStatusForlap : 'all';
 
-        var url = base_url_js+'api3/__getRasioDosenMahasiswa';
-        $.getJSON(url,function (jsonResult) {
+        var filterSemester = $('#filterSemester').val();
+        if(filterSemester!='' && filterSemester!=null){
 
-            $('#listData').empty();
+            // console.log(filterSemester);
+            var SemesterID = filterSemester.split('.')[0];
 
-            if(jsonResult.length>0){
+            passToExcel = [];
 
-                var ds = 0;
-                var ds_c = 0;
-                var ds_x = 0;
+            var url = base_url_js+'api3/__getRasioDosenMahasiswa?smt='+SemesterID;
+            $.getJSON(url,function (jsonResult) {
 
-                $.each(jsonResult,function (i,v) {
+                $('#listData').empty();
+
+                if(jsonResult.length>0){
+
+                    var ds = 0;
+                    var ds_c = 0;
+                    var ds_x = 0;
+
+                    $.each(jsonResult,function (i,v) {
+                        $('#listData').append('<tr>' +
+                            '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                            '<td style="text-align: left;">'+v.Name+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+v.TotalLecturer+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwa+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwaTA+'</td>' +
+                            '</tr>');
+
+                        ds = ds + parseInt(v.TotalLecturer);
+                        ds_c = ds_c + parseInt(v.TotalMahasiwa);
+                        ds_x = ds_x + parseInt(v.TotalMahasiwaTA);
+                    });
+
                     $('#listData').append('<tr>' +
-                        '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                        '<td style="text-align: left;">'+v.Name+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+v.TotalLecturer+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwa+'</td>' +
-                        '<td style="border-left: 1px solid #ccc;">'+v.TotalMahasiwaTA+'</td>' +
+                        '<th colspan="2">Jumlah</th>' +
+                        '<th>'+ds+'</th>' +
+                        '<th>'+ds_c+'</th>' +
+                        '<th>'+ds_x+'</th>' +
                         '</tr>');
 
-                    ds = ds + parseInt(v.TotalLecturer);
-                    ds_c = ds_c + parseInt(v.TotalMahasiwa);
-                    ds_x = ds_x + parseInt(v.TotalMahasiwaTA);
-                });
 
-                $('#listData').append('<tr>' +
-                    '<th colspan="2">Jumlah</th>' +
-                    '<th>'+ds+'</th>' +
-                    '<th>'+ds_c+'</th>' +
-                    '<th>'+ds_x+'</th>' +
-                    '</tr>');
+                    passToExcel = jsonResult;
+                }
 
+            });
 
-                passToExcel = jsonResult;
-            }
-
-        });
+        }
 
     }
 
