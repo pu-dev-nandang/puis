@@ -74,21 +74,21 @@
                         td = td+'<td>'+viewLect+'</td>';
 
                         total = total + parseInt(v2.dataEmployees.length);
-                
-                        if(i2==0){
-                            TP = TP+det; //tenaga pengajar
-                        }
-                        else if(i2==1){ // Asisten Ahli
+                        if(i2==0){ // Asisten Ahli
                             AA = AA+det;
                         }
-                        else if(i2==2){ // lektor
+
+                        else if(i2==1){ // lektor
                             L = L + det;
                         }
-                        else if(i2==3){ // lektor kepala
+                        else if(i2==2){ // lektor kepala
                             LK = LK+det;
                         }
-                        else if(i2==4){ // Guru besar
+                        else if(i2==3){ // Guru besar
                             GB = GB+det;
+                        }
+                        else if(i2==4){
+                            TP = TP+det; //tenaga pengajar
                         }
                         
                     });
