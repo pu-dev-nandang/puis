@@ -1007,10 +1007,10 @@ class C_api3 extends CI_Controller {
                 $ID_sumberdana = $G_research[$i]['ID'];
                 for ($j=0; $j < count($arr_year); $j++) { 
                     $Year_ = $arr_year[$j];
-                     $sql = 'select count(*) as total from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $sql = 'select Judul_litabmas from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
                      $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
-                     $count = $query[0]['total'];
-                     $temp[] = $count;
+                     // $count = $query[0]['total'];
+                     $temp[] = $query;
                      // $temp['SumberDana'] = $G_research[$i]['SumberDana'];
                 }
 

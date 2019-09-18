@@ -18,9 +18,10 @@
     <div class="row">
 
         <div class="col-md-12">
-            <p style="color:#3968c6;"><b> Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa Sosial </b></p>
+            
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable"></div>
         </div>
@@ -28,7 +29,10 @@
 </div>
 
 <script>
-    
+     var oTable;
+    var oSettings;
+
+
      $('#btnLembagaMitra').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -46,6 +50,10 @@
             '                <label>Tahun Perolehan </label> '+
             '                <input class="form-control" id="tahun_perolehan" ></input>' +
             '            </div>' +
+            '          <div class="form-group">' +
+            '                <label>Program Studi </label> '+
+            '                <select class="form-control" id="prodi"></select>' +
+            '            </div>' +
             '            <div class="form-group">' +
              '                <label>Keterangan </label> '+
             '                 <textarea class="form-control" id="keterangan"></textarea>' +
@@ -58,22 +66,28 @@
             '</div>';
 
         $('#GlobalModal .modal-body').html(body);
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button class="btn btn-success" style="text-align: right;" id="btnSaveLembaga">Save</button>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger" data-dismiss="modal"><i class="glyphicon glyphicon-remove"></i> Close</button> <button class="btn btn-success" style="text-align: right;" id="btnSaveLembaga"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button>');
 
          $( "#tahun_perolehan" )
             .datepicker({
                 changeYear: true,
                 viewMode: 'years', 
-                //minViewMode: 2,
                 autoclose: true,
                 dateFormat: 'yy',
-                // minDate: new Date(moment().year(),moment().month(),moment().date()),
                 onSelect : function () {
-                    // var data_date = $(this).val().split(' ');
-                    // var nextelement = $(this).attr('nextelement');
-                    // nextDatePick(data_date,nextelement);
+                   
                 }
         });
+
+        var url = base_url_js+'api3/__crudAllProgramStudy';
+        var token = jwt_encode({action : 'viewAllProdi'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#formYear').append('<option disabled selected></option>');
+                for(var i=0;i<jsonResult.length;i++){
+                   $('#prodi').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name+' </option>');
+                }
+            });
 
         $('#GlobalModal').modal({
             'show' : true,
@@ -90,6 +104,7 @@
 
         var judul = $('#judul').val();
         var tahun_perolehan = $('#tahun_perolehan').val();
+        var prodi_id = $('#prodi option:selected').attr('id');
         var keterangan = $('#keterangan').val();
         var nama_judul =  judul.toUpperCase();
 
@@ -99,10 +114,10 @@
 
             var data = {
                 action : 'save_tekno_produk',
-                //ID : (formID!='' && formID!=null) ? formID : '',
                 dataForm : {
                     Nama_judul : nama_judul,
                     Tahun_perolehan : tahun_perolehan,
+                    ProdiID : prodi_id,
                     Keterangan : keterangan
                 }
             };
@@ -135,6 +150,19 @@
     });    
 
 
+ $('#saveToExcel').click(function () {
+        alert('aaa');
+
+        $('select[name="dataTablesLuaran_length"]').val(-1);
+
+        oSettings[0]._iDisplayLength = oSettings[0].fnRecordsTotal();
+        oTable.draw();
+
+        setTimeout(function () {
+            saveTable2Excel('dataTable2Excel');
+        },1000);
+    });
+
 </script>
 
 <script>
@@ -145,13 +173,27 @@
         } else {
         }
         loadAkreditasiProdi();
+        //load_prodi();
     });
+
+    function load_prodi() {
+
+        var url = base_url_js+'api3/crudAllProgramStudy';
+        var token = jwt_encode({action : 'viewAllProdi'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#formYear').append('<option disabled selected></option>');
+                for(var i=0;i<jsonResult.length;i++){
+                   $('#prodi').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name+' </option>');
+                }
+            });
+      }
 
     function loadAkreditasiProdi() {
 
-         $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
+         $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran">' +
             '    <thead>  '+
-            '     <tr>   '+
+            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
             '        <th style="text-align: center; width: 5%;">No</th>  '+
             '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
             '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
@@ -159,7 +201,6 @@
             '    </tr>  '+
             '    </thead>  '+
             '       <tbody id="listData"></tbody>   '+
-            //'    <tfoot id="listDataFoot">  </tfoot>'+
             '    </tfoot> '+
             '    </table>');
 
@@ -170,7 +211,6 @@
 
                 for (var i = 0; i < jsonResult.length; i++) {
                     var v = jsonResult[i]; 
-                    //var tahun = moment(v.Tgl_terbit).format('YYYY');
 
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
@@ -185,7 +225,9 @@
 
             }
                 
-             $('#dataTablesLuaran').dataTable();
+             //$('#dataTablesLuaran').dataTable();
+             oTable = $('#dataTablesLuaran').DataTable();
+            oSettings = oTable.settings();
 
         });
 
