@@ -84,7 +84,7 @@
                                     '<tr style="background: #20485A;color: #FFFFFF;">'+
                                          '<td style="vertical-align : middle;text-align:center;width: 1%;" rowspan="2">No</td>'+
                                          '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 15%;">Sumber Pembiayaan</td>'+
-                                         '<td colspan="3" style="vertical-align : middle;text-align:center;">Jumlah Judul</td>'+
+                                         '<td colspan="3" style="vertical-align : middle;text-align:center;">Jumlah Judul Penelitian</td>'+
                                          '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 10%;">Jumlah</td> </tr><tr style="background: #20485A;color: #FFFFFF;">';
 
             for (var i = 0; i < arr_header_table.length; i++) {
@@ -112,8 +112,6 @@
                     for(var key in arr) {
 
                         var viewDataTb = (key==0) ? arr[key] : arr[key].length;
-
-                        
                         var tokenPen = jwt_encode(arr[key],'UAP)(*');
 
                         var isi = (viewDataTb!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pen="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
@@ -162,7 +160,7 @@
     $(document).on('click','.showDetailLect',function () {
        var  tokenLect = $(this).attr('data-pen');
        var d = jwt_decode(tokenLect,'UAP)(*');
-       console.log(d);
+       //console.log(d);
        //return false;
 
         var tr = '';
