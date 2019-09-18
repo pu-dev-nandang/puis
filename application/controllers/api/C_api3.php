@@ -1042,14 +1042,16 @@ class C_api3 extends CI_Controller {
                 $ID_sumberdana = $G_research[$i]['ID'];
                 for ($j=0; $j < count($arr_year); $j++) { 
                     $Year_ = $arr_year[$j];
-                     $sql = 'select count(*) as total from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     //$sql = 'select count(*) as total from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $sql = 'select Judul_PKM from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
                      $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
-                     $count = $query[0]['total'];
-                     $temp[] = $count;
+                     //$count = $query[0]['total'];
+                     //$temp[] = $count;
+                     $temp[] = $query;
+                     //print_r($query); die();
                 }
 
                 $body[] = $temp;
-               
             }
             $rs['header'] = $header;
             $rs['body'] = $body;
