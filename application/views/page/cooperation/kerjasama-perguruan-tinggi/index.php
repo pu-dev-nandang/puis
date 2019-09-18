@@ -143,7 +143,7 @@
 		        						<h3 style="color: red;">Data</h3>
 		        					</div>
 		        					<div class="row">
-		        						<div class="col-md-10">
+		        						<div class="col-md-12">
 		        							<div class="well" style="background: lightyellow;">
 		        								<div style="color: red;"><b>Filtering</b></div>
 			        							<div class="row" style="margin-top: 10px;">
@@ -159,6 +159,15 @@
 			        												<option value="Tridarma">Tridarma</option>
 			        											</select>
 			        										</div>
+															<div class="form-group">
+																<label>Tingkat</label>
+																<select class="form-control SearchTingkat" name ="Kategori">
+																	<option selected value="%">--All--</option>
+																	<option value="Internasional">Internasional</option>
+																	<option value="Nasional">Nasional</option>
+																	<option value="Lokal">Wilayah/ Lokal</option>
+																</select>
+															</div>
 			        									</div>
 			        								</div>
 			        								<div class="col-md-3">
@@ -182,25 +191,43 @@
 				        									</div>
 			        									</div>
 			        								</div>
-			        								<div class="col-md-3">
+			        								<div class="col-md-6">
 			        									<div class="thumbnail">
-			        										<div class="form-group">
-			        											<label>Tingkat</label>
-			        											<select class="form-control SearchTingkat" name ="Kategori">
-			        												<option selected value="%">--All--</option>
-			        												<option value="Internasional">Internasional</option>
-			        												<option value="Nasional">Nasional</option>
-			        												<option value="Lokal">Wilayah/ Lokal</option>
-			        											</select>
+			        										<table class="table">
+			        											<tr>
+			        												<td>
+			        													<label class="checkbox-inline">
+			        														<input type="checkbox" class="dateOP" name="dateOP" id="dateOPRange" value="0">
+			        														Date range
+			        													</label>
+			        												</td>
+			        												<td>
+					        											<label>Start Date</label>
+																		<div class="input-group input-append date datetimepicker">
+												                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "StartDate">
+												                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+												                		</div>
+			        												</td>
+			        												<td>
+					        											<label>End Date</label>
+																		<div class="input-group input-append date datetimepicker">
+												                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "EndDate">
+												                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+												                		</div>
+			        												</td>
+			        											</tr>
+			        										</table>
+			        										<div align="right">
+			        											<button class="btn btn-primary SearchDateBtn" disabled><i class="fa fa-search"></i> Search</button>
 			        										</div>
 			        									</div>
 			        								</div>
 			        							</div>
 		        							</div>
 		        						</div>
-		        						<div class="col-md-2" align="right">
+		        						<!-- <div class="col-md-2" align="right">
 		        							Export Excel
-		        						</div>
+		        						</div> -->
 		        					</div>
 		        					<div class="row" style="margin-top: 5px;">
 		        						<div class="table-responsive">
@@ -638,6 +665,9 @@
 			SearchPerjanjian.push(v);
 		})
 
+		var StartDate = $('.SearchDate[name="StartDate"]').val();
+		var EndDate = $('.SearchDate[name="EndDate"]').val();
+
 		var SearchKategori = $('.SearchKategori option:selected').val();
 		var SearchTingkat = $('.SearchTingkat option:selected').val();
 		var data = {
@@ -645,6 +675,8 @@
 		    SearchPerjanjian : SearchPerjanjian,
 		    SearchKategori : SearchKategori,
 		    SearchTingkat : SearchTingkat,
+		    StartDate : StartDate,
+		    EndDate : EndDate,
 		};
 		var token = jwt_encode(data,"UAP)(*");
 		$('#TblKerjaSama tbody').empty();
@@ -726,4 +758,22 @@
 	$(document).off('click', '.SearchPerjanjian').on('click', '.SearchPerjanjian',function(e) {
 		LoadDataForTable();
 	})
+
+	$(document).off('click', '#dateOPRange').on('click', '#dateOPRange',function(e) {
+		if (this.checked) {
+			var datee = "<?php echo date('Y-m-d') ?>";
+			$('.SearchDate').val(datee);
+			$('.SearchDateBtn').prop('disabled',false);
+		}
+		else
+		{
+			$('.SearchDate').val('');
+			$('.SearchDateBtn').prop('disabled',true);
+		}
+	})
+
+	$(document).off('click', '.SearchDateBtn').on('click', '.SearchDateBtn',function(e) {
+		LoadDataForTable();
+	})
+
 </script>
