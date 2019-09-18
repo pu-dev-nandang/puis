@@ -11,7 +11,7 @@
         
         <div class="col-md-12">
             <div style="text-align: right;">
-                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> <p></p>
                 <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
             </div>
             <div id = "content_dt">
@@ -79,7 +79,7 @@
             var arr_header_table = jsonResult.header;
             var arr_total = [];
             // make table
-            var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPenelitian">'+
+            var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPKMdosen">'+
                                 '<thead>'+
                                  '<tr style="background: #20485A;color: #FFFFFF;">'+
                                    '<td style="vertical-align : middle;text-align:center;width: 1%;" rowspan="2">No</td>'+
