@@ -4624,7 +4624,11 @@ class C_rest2 extends CI_Controller {
                     $sql .= $WhereORAnd.' (           
                            a.Lembaga LIKE "'.$requestData['search']['value'].'%"
                     )';
-                    $sql .= ' GROUP BY a.ID';    
+                    $sql .= ' GROUP BY a.ID';
+                    $queryPass = $sql;
+                    // encode query pass
+                    $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
+
                     $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                     $query = $this->db->query($sql)->result_array();
                     $No = $requestData['start'] + 1;
@@ -4634,16 +4638,34 @@ class C_rest2 extends CI_Controller {
                         $row = $query[$i];
                         $nestedData[] = $No;
                         $nestedData[] = $row['Lembaga'].'<br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
-                        // $nestedData[] = $row['Kategori'];
-                        // $nestedData[] = $row['Tingkat'];
                         $nestedData[] = $row['JudulKegiatan'];
-                        // $nestedData[] = $row['BentukKegiatan'];
-                        // $nestedData[] = $row['ManfaatKegiatan'];
                         $nestedData[] = nl2br($row['BuktiName']).'--'.$row['BuktiUpload'];
                         $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End :'.$row['EndDate'];
                         $nestedData[] = $row['Perjanjian'];
                         $nestedData[] = $row['DepartmentKS'];
                         $nestedData[] = $row['KerjasamaID'];
+                        $nestedData[] = $queryPass;
+
+                        // token to Pass Data to form
+                        $tokenEdit = [
+                             'KerjasamaID' =>  $row['KerjasamaID'],
+                             'Lembaga' => $row['Lembaga'],
+                             'Kategori' => $row['Kategori'],
+                             'Tingkat' => $row['Tingkat'],
+                             'JudulKegiatan' => $row['JudulKegiatan'],
+                             'BuktiName' => $row['BuktiName'],
+                             'BuktiUpload' => $row['BuktiUpload'],
+                             'StartDate' => $row['StartDate'],
+                             'EndDate' => $row['EndDate'],
+                             'Perjanjian' => $row['Perjanjian'],
+                             'DepartmentKS' => $row['DepartmentKS'],
+                             'BentukKegiatan' => $row['BentukKegiatan'],
+                             'ManfaatKegiatan' => $row['ManfaatKegiatan'],
+                        ];
+                        // encode data
+                        $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
+                        $nestedData[] = $tokenEdit; 
+
                         $data[] = $nestedData;
                         $No++;
                     }
