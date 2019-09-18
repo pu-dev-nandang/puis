@@ -1,7 +1,6 @@
 <div class="row">
 	<div class="col-xs-12">
 		<div class="panel panel-primary">
-		<!-- <div class="panel panel-primary" style="min-width: 1600px;overflow: auto;"> -->
 		    <div class="panel-heading clearfix">
 		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Kerja Sama Perguruan Tinggi</h4>
 		    </div>
@@ -144,7 +143,7 @@
 		        					</div>
 		        					<div class="row">
 		        						<div class="col-md-12">
-		        							<div class="well" style="background: lightyellow;">
+		        							<div class="well">
 		        								<div style="color: red;"><b>Filtering</b></div>
 			        							<div class="row" style="margin-top: 10px;">
 			        								<div class="col-md-3">
@@ -218,7 +217,7 @@
 			        											</tr>
 			        										</table>
 			        										<div align="right">
-			        											<button class="btn btn-primary SearchDateBtn" disabled><i class="fa fa-search"></i> Search</button>
+			        											<button class="btn btn-primary SearchDateBtn"><i class="fa fa-search"></i> Search</button>
 			        										</div>
 			        									</div>
 			        								</div>
@@ -236,9 +235,9 @@
 												<thead>
 													<tr>
 														<th>No</th>
-														<!-- <th>Lembaga</th> -->
+														<th>Lembaga</th>
 														<!-- <th>Kategori</th> -->
-														<th>Tingkat</th>
+														<!-- <th>Tingkat</th> -->
 														<th>Judul Kegiatan</th>
 														<!-- <th>Bentuk Kegiatan</th> -->
 														<!-- <th>Manfaat Kegiatan</th> -->
@@ -267,6 +266,8 @@
 </div>
 <script type="text/javascript">
 	var S_Table_example_ = '';
+	var QueryPass = '';
+	$("#container").attr('class','fixed-header sidebar-closed');
 	$(document).ready(function() {
 		LoadFirstLoad();
 	})
@@ -294,7 +295,11 @@
 
         $('.input[type="checkbox"]').prop('checked',false);
         $('textarea').val('');
-
+        $('#btnSave').attr('mode','add');
+        $('#btnSave').attr('data-id','');
+        $('.divFile').remove();
+        $('.divFileUpload').remove();
+        $('.ListDepartmentSelected').html('<strong>--Empty Department Selected--</strong>');
 	}
 
 	$(document).off('click', '#addDepartment').on('click', '#addDepartment',function(e) {
@@ -442,14 +447,14 @@
 	$(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
 		var mode = $(this).attr('mode');
 		var data_id = $(this).attr('data-id');
-		if (validation_input()) {
+		if (validation_input(mode)) {
 			var el = '#btnSave';
 			loading_button(el);
 			SubmitData(el,mode,data_id);
 		}
 	})
 
-	function validation_input()
+	function validation_input(mode)
 	{
 		var bool = true;
 		// filter input
@@ -481,9 +486,11 @@
 				var tr = $(this).closest('tr');
 				var S_file = tr.find('td:eq(2)').find('input');
 				var NameUpload = S_file.attr('data');
-				if (!file_validation2(S_file,NameUpload) ) {
-				  bool = false;
-				  return false;
+				if (mode == 'add') {
+					if (!file_validation2(S_file,NameUpload) ) {
+					  bool = false;
+					  return false;
+					}
 				}
 				c++;
 			}
@@ -500,9 +507,11 @@
 			// bukti upload
 			var S_file = $('.input[name="BuktiUpload"]');
 			var NameUpload = 'BuktiUpload';
-			if (!file_validation2(S_file,NameUpload) ) {
-			  bool = false;
-			  return false;
+			if (mode == 'add') {
+				if (!file_validation2(S_file,NameUpload) ) {
+				  bool = false;
+				  return false;
+				}
 			}
 
 		}	
@@ -659,6 +668,7 @@
 
 	function LoadDataForTable()
 	{
+		QueryPass = '';
 		var SearchPerjanjian = [];
 		$('.SearchPerjanjian:checked').each(function(){
 			var v = $(this).val();
@@ -709,7 +719,7 @@
 	   	    	var a = Bukti.split('--');
 	   	    	var html = '';
 	   	    	var File = jQuery.parseJSON(a[1]);
-	   	    	html = a[0]+'<br>File :'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">File</a>';
+	   	    	html = a[0]+'<br>'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">File</a>';
 	   	    	$( row ).find('td:eq(3)').html(html);
 
 	   	    	var Perjanjian = data[5];
@@ -719,7 +729,7 @@
 	   	    		var zc = cc[i];
 	   	    		a = zc.split('--');
 	   	    		File = jQuery.parseJSON(a[1]);
-	   	    		html += '<li>'+a[0]+'<br>File :'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">File</a></li>';
+	   	    		html += '<li>'+a[0]+'<br>'+'<a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist" style="margin-left:19px;">File</a></li>';
 	   	    	}
 	   	    	
 	   	    	$( row ).find('td:eq(5)').html(html);
@@ -740,9 +750,14 @@
 	   	    	var selector = $( row ).find('td:eq(6)');
 	   	    	HtmlPageDepartmentSelected(arr,selector,'listtbl');
 
-	   	    	html = '<div class="btn-group">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>  </ul></div>';
+	   	    	var tokenEdit = data[9];
+
+	   	    	html = '<div class="btn-group">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[7]+'" tokenedit="'+tokenEdit+'"><i class="fa fa fa-edit"></i> Edit</a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>  </ul></div>';
 	   	    	$( row ).find('td:eq(7)').html(html);
 
+	   	    	if (QueryPass == '') {
+	   	    		QueryPass = data[8];
+	   	    	}
 	   	    },
 	        dom: 'l<"toolbar">frtip',
 	   	    "initComplete": function(settings, json) {
@@ -763,17 +778,137 @@
 		if (this.checked) {
 			var datee = "<?php echo date('Y-m-d') ?>";
 			$('.SearchDate').val(datee);
-			$('.SearchDateBtn').prop('disabled',false);
+			// $('.SearchDateBtn').prop('disabled',false);
 		}
 		else
 		{
 			$('.SearchDate').val('');
-			$('.SearchDateBtn').prop('disabled',true);
+			// $('.SearchDateBtn').prop('disabled',true);
 		}
 	})
 
 	$(document).off('click', '.SearchDateBtn').on('click', '.SearchDateBtn',function(e) {
 		LoadDataForTable();
 	})
+
+	$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
+		var ID = $(this).attr('data-id');
+		var tokenedit = $(this).attr('tokenedit');
+		// decode data
+		var dt = jwt_decode(tokenedit);
+		FormEditSelected(dt);
+	});
+
+	$(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
+		var ID = $(this).attr('data-id');
+		var url = base_url_js+'cooperation/Kerja_Sama_Perguruan_Tinggi/Submit';
+		var data = {
+		    ID : ID,
+		    mode : 'delete',
+		};
+		if (confirm('Are you sure ?')) {
+			var token = jwt_encode(data,"UAP)(*");
+			$.post(url,{ token:token },function (resultJson) {
+			  	if (data.Status == 0) {
+			  		toastr.error("Connection Error, Please try again", 'Error!!');
+				}
+			  	else{
+			  		LoadDataForTable();
+			  		SetDataDefault();
+			  		toastr.success('The data has been deleted');
+				}
+			}).fail(function() {
+			  toastr.info('No Result Data'); 
+			}).always(function() {
+			                
+			});	
+		}
+	});
+
+	 function FormEditSelected(dt)
+	 {
+	 	console.log(dt);
+	 	for (key in dt){
+	 		if (key != 'Perjanjian' && key != 'DepartmentKS' && key != 'BuktiUpload' && key != 'KerjasamaID') {
+	 			if (key == 'Kategori' || key == 'Tingkat') {
+	 				$('.input[name="'+key+'"] option').filter(function() {
+	 				   //may want to use $.trim in here
+	 				   return $(this).val() == dt[key]; 
+	 				}).prop("selected", true);
+	 			}
+	 			else
+	 			{
+	 				// console.log(dt[key]);
+	 				$('.input[name="'+key+'"]').val(dt[key]);
+	 			}
+	 		}
+	 		else
+	 		{
+	 			switch(key) {
+	 			  case 'DepartmentKS':
+	 			    var rsPass = [];
+	 			    var arr = dt[key].split(',');
+	 			    for (var i = 0; i < arr.length; i++) {
+	 			    	var d = arr[i];
+	 			    	var cc = d.split('--');
+	 			    	var temp = {
+	 			    		Code : cc[0],
+	 			    		Name : cc[1],
+	 			    	};
+
+	 			    	rsPass.push(temp);
+	 			    }
+	 			    var selector = $('.ListDepartmentSelected');
+	 			    HtmlPageDepartmentSelected(rsPass,selector);
+	 			    break;
+	 			  case 'Perjanjian':
+	 			  	var rsPass = [];
+	 			  	var Sper = $('.input[name="Perjanjian"]');
+	 			  	Sper.prop('checked',false);
+	 			  	$('.divFile').remove();
+	 			  	var arr = dt[key].split(',');
+	 			  	for (var i = 0; i < arr.length; i++) {
+	 			  		var d = arr[i];
+	 			  		var cc = d.split('--');
+	 			  		var v = cc[0];
+	 			  		var f = cc[1];
+	 			  		f = jQuery.parseJSON(f);
+	 			  		f = '<a href = "'+base_url_js+'fileGetAny/cooperation-'+f[0]+'" target="_blank" class = "Fileexist">File</a>';
+	 			  		var IDP = cc[2];
+	 			  		Sper.each(function(){
+	 			  			if (this.value == v) {
+	 			  				$(this).prop('checked',true);
+	 			  				var tr = $(this).closest('tr');
+	 			  				//console.log(tr);
+	 			  				if (tr.find('td:eq(2)').find('.divFile').length  ) {
+	 			  					tr.find('td:eq(2)').find('.divFile').remove();
+	 			  				}
+
+	 			  				tr.find('td:eq(2)').append('<div class="divFile">'+f+'</div>');
+	 			  			}
+	 			  		})
+	 			  	}
+	 			  break;
+	 			  case 'BuktiUpload':
+	 			  	var td = $('input[name="'+key+'"]').closest('td');
+	 			  	if (td.find('.divFileUpload').length  ) {	
+	 			  		td.find('.divFileUpload').remove();
+	 			  	}
+
+	 			  	var f = dt[key];
+	 			  	f = jQuery.parseJSON(f);
+	 			  	f = '<a href = "'+base_url_js+'fileGetAny/cooperation-'+f[0]+'" target="_blank" class = "Fileexist">File</a>';	
+	 			  	td.append('<div class="divFileUpload">'+f+'</div>');
+	 			  break;
+	 			  case 'KerjasamaID':
+	 			  	$('#btnSave').attr('mode','edit');
+	 			  	$('#btnSave').attr('data-id',dt[key]);
+	 			  break;
+	 			  default:
+	 			    // code block
+	 			}
+	 		}
+	 	}
+	 }
 
 </script>
