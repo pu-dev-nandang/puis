@@ -1,273 +1,261 @@
 <div class="row">
-	<div class="col-xs-12">
-		<div class="panel panel-primary">
-		    <div class="panel-heading clearfix">
-		        <h4 class="panel-title pull-left" style="padding-top: 7.5px;">Kerja Sama Perguruan Tinggi</h4>
-		    </div>
-		    <div class="panel-body">
-		        <div class="row">
-		        	<div class="col-md-4">
-		        		<div class="thumbnail">
-		        			<div class="row">
-		        				<div class="col-md-12">
-		        					<div style="padding: 15px;">
-		        						<h3 style="color: red;">Form Input</h3>
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Lembaga  Mitra Kerja Sama</label>
-		        						<input type="text" name="Lembaga" class="form-control input">
-		        					</div>
-		        					<div class="form-group">
-		        						<table class="table">
-		        							<tr>
-		        								<td>
-		        									<label>Department</label>
-		        									<button class="btn btn-primary btn-default" id = "addDepartment"><i class="icon-plus"></i> Add</button>
-		        								</td>
-		        								<td style="width: 90%" class="ListDepartmentSelected">
-		        									<strong>--Empty Department Selected--</strong> 
-		        								</td>
-		        							</tr>
-		        						</table>
-		        					</div>
-		        					<div class="form-group">
-		        						<div class="row">
-		        							<div class="col-xs-12">
-		        								<table class="table">
-		        									<tr>
-		        										<td style="border-top: none;">MOU</td>
-		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOU"></td>
-		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "MOU"></td>
-		        									</tr>
-		        									<tr>
-		        										<td style="border-top: none;">MOA</td>
-		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOA"></td>
-		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "MOA"></td>
-		        									</tr>
-		        									<tr>
-		        										<td style="border-top: none;">IA</td>
-		        										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="IA"></td>
-		        										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "IA"></td>
-		        									</tr>
-		        								</table>
-		        							</div>
-		        						</div>
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Kategori</label>
-		        						<select class="form-control input" name ="Kategori">
-		        							<option disabled selected value="!">--Pilih--</option>
-		        							<option value="PKM">PKM</option>
-		        							<option value="Penelitian">Penelitian</option>
-		        							<option value="Pendidikan">Pendidikan</option>
-		        							<option value="Tridarma">Tridarma</option>
-		        						</select>
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Tingkat</label>
-		        						<select class="form-control input" name ="Tingkat">
-		        							<option disabled selected value="!">--Pilih--</option>
-		        							<option value="Internasional">Internasional</option>
-		        							<option value="Nasional">Nasional</option>
-		        							<option value="Lokal">Wilayah/ Lokal</option>
-		        						</select>
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Judul Kegiatan</label>
-		        						<input type="text" name="JudulKegiatan" class="form-control input">
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Bentuk Kegiatan</label>
-		        						<input type="text" name="BentukKegiatan" class="form-control input">
-		        					</div>
-		        					<div class="form-group">
-		        						<label>Manfaat Kegiatan</label>
-		        						<input type="text" name="ManfaatKegiatan" class="form-control input">
-		        					</div>
-		        					<div class="form-group">
-		        						<div class="row">
-		        							<div class="col-xs-12">
-		        								<table class="table">
-		        									<tr>
-		        										<td>
-		        											<label>Bukti</label>
-		        											<textarea name="BuktiName" class="form-control input"></textarea>
-		        										</td>
-		        									</tr>
-		        									<tr>
-		        										<td style="border-bottom: 1px solid #ddd;border-top: none;">
-		        											<input type="file" data-style="fileinput" class="input" name="BuktiUpload">
-		        										</td>
-		        									</tr>
-		        								</table>
-		        							</div>
-		        						</div>
-		        					</div>
-		        					<div class="form-group">
-		        						<div class="row">
-		        							<div class="col-xs-12">
-		        								<table class="table">
-		        									<tr>
-		        										<td style="border-top: none;">
-		        											<label>Start Date</label>
-															<div class="input-group input-append date datetimepicker">
-									                            <input data-format="yyyy-MM-dd" class="form-control input" type=" text" readonly="" value = "" name = "StartDate">
-									                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
-									                		</div>
-		        										</td>
-		        										<td style="border-top: none;">
-		        											<label>End Date</label>
-															<div class="input-group input-append date datetimepicker">
-									                            <input data-format="yyyy-MM-dd" class="form-control input" type=" text" readonly="" value = "" name = "EndDate">
-									                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
-									                		</div>
-		        										</td>
-		        									</tr>
-		        								</table>
-		        							</div>
-		        						</div>
-		        					</div>
-									<div style="padding: 5px;">
-				                        <button class="btn btn-block btn-success" id="btnSave" mode = "add" data-id = "">Save</button>
-				                    </div>
-		        				</div>
-		        			</div>
-		        		</div>
-		        	</div>
-		        	<div class="col-md-8">
-		        		<div class="thumbnail">
-		        			<div class="row" style="margin-left: 0px;margin-right: 0px;">
-		        				<div class="col-md-12">
-		        					<div style="padding: 15px;">
-		        						<h3 style="color: red;">Data</h3>
-		        					</div>
-		        					<div class="row">
-		        						<div class="col-md-12">
-		        							<div class="well">
-		        								<div style="color: red;"><b>Filtering</b></div>
-			        							<div class="row" style="margin-top: 10px;">
-			        								<div class="col-md-3">
-			        									<div class="thumbnail">
-			        										<div class="form-group">
-			        											<label>Kategori</label>
-			        											<select class="form-control SearchKategori" name ="Kategori">
-			        												<option selected value="%">--All--</option>
-			        												<option value="PKM">PKM</option>
-			        												<option value="Penelitian">Penelitian</option>
-			        												<option value="Pendidikan">Pendidikan</option>
-			        												<option value="Tridarma">Tridarma</option>
-			        											</select>
-			        										</div>
-															<div class="form-group">
-																<label>Tingkat</label>
-																<select class="form-control SearchTingkat" name ="Kategori">
-																	<option selected value="%">--All--</option>
-																	<option value="Internasional">Internasional</option>
-																	<option value="Nasional">Nasional</option>
-																	<option value="Lokal">Wilayah/ Lokal</option>
-																</select>
-															</div>
-			        									</div>
-			        								</div>
-			        								<div class="col-md-3">
-			        									<div class="thumbnail">
-				        									<div class="form-group">
-				        										<label>Perjanjian</label>
-				        										<table class="">
-																	<tr>
-																		<td style="border-top: none;">MOU</td>
-																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOU"></td>
-																	</tr>
-																	<tr>
-																		<td style="border-top: none;">MOA</td>
-																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOA"></td>
-																	</tr>
-																	<tr>
-																		<td style="border-top: none;">IA</td>
-																		<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="IA"></td>
-																	</tr>
-				        										</table>
-				        									</div>
-			        									</div>
-			        								</div>
-			        								<div class="col-md-6">
-			        									<div class="thumbnail">
-			        										<table class="table">
-			        											<tr>
-			        												<td>
-			        													<label class="checkbox-inline">
-			        														<input type="checkbox" class="dateOP" name="dateOP" id="dateOPRange" value="0">
-			        														Date range
-			        													</label>
-			        												</td>
-			        												<td>
-					        											<label>Start Date</label>
-																		<div class="input-group input-append date datetimepicker">
-												                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "StartDate">
-												                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
-												                		</div>
-			        												</td>
-			        												<td>
-					        											<label>End Date</label>
-																		<div class="input-group input-append date datetimepicker">
-												                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "EndDate">
-												                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
-												                		</div>
-			        												</td>
-			        											</tr>
-			        										</table>
-			        										<div align="right">
-			        											<button class="btn btn-primary SearchDateBtn"><i class="fa fa-search"></i> Search</button>
-			        										</div>
-			        									</div>
-			        								</div>
-			        							</div>
-		        							</div>
-		        						</div>
-		        						<!-- <div class="col-md-2" align="right">
-		        							Export Excel
-		        						</div> -->
-		        					</div>
-		        					<div class="row" style="margin-top: 5px;">
-		        						<div class="table-responsive">
-		        						<div class="col-md-12">
-											<table class="table table-bordered" id="TblKerjaSama">
-												<thead>
-													<tr>
-														<th>No</th>
-														<th>Lembaga</th>
-														<!-- <th>Kategori</th> -->
-														<!-- <th>Tingkat</th> -->
-														<th>Judul Kegiatan</th>
-														<!-- <th>Bentuk Kegiatan</th> -->
-														<!-- <th>Manfaat Kegiatan</th> -->
-														<th>Bukti</th>
-														<th>Date</th>
-														<th>Perjanjian</th>
-														<th>Department</th>
-														<th><i class="fa fa-cog"></i></th>
-													</tr>
-												</thead>
-												<tbody>
-													
-												</tbody>
-											</table>
-		        						</div>
-		        						</div>
-		        					</div>
-		        				</div>
-		        			</div>
-		        		</div>
-		        	</div>
-		        </div>   
-		    </div>
+	<div class="col-md-4">
+		<div class="thumbnail">
+			<div class="row">
+				<div class="col-md-12">
+					<div style="padding: 15px;">
+						<h3 style="color: red;">Form Input</h3>
+					</div>
+					<div class="form-group">
+						<label>Lembaga  Mitra Kerja Sama</label>
+						<input type="text" name="Lembaga" class="form-control input">
+					</div>
+					<div class="form-group">
+						<table class="table">
+							<tr>
+								<td>
+									<label>Department</label>
+									<button class="btn btn-primary btn-default" id = "addDepartment"><i class="icon-plus"></i> Add</button>
+								</td>
+								<td style="width: 90%" class="ListDepartmentSelected">
+									<strong>--Empty Department Selected--</strong> 
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-xs-12">
+								<table class="table">
+									<tr>
+										<td style="border-top: none;">MOU</td>
+										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOU"></td>
+										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "MOU"></td>
+									</tr>
+									<tr>
+										<td style="border-top: none;">MOA</td>
+										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="MOA"></td>
+										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "MOA"></td>
+									</tr>
+									<tr>
+										<td style="border-top: none;">IA</td>
+										<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="input" value="IA"></td>
+										<td style="border-top: none;"><input type="file" data-style="fileinput" class="input" data = "IA"></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label>Kategori</label>
+						<select class="form-control input" name ="Kategori">
+							<option disabled selected value="!">--Pilih--</option>
+							<option value="PKM">PKM</option>
+							<option value="Penelitian">Penelitian</option>
+							<option value="Pendidikan">Pendidikan</option>
+							<option value="Tridarma">Tridarma</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Tingkat</label>
+						<select class="form-control input" name ="Tingkat">
+							<option disabled selected value="!">--Pilih--</option>
+							<option value="Internasional">Internasional</option>
+							<option value="Nasional">Nasional</option>
+							<option value="Lokal">Wilayah/ Lokal</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Judul Kegiatan</label>
+						<input type="text" name="JudulKegiatan" class="form-control input">
+					</div>
+					<div class="form-group">
+						<label>Bentuk Kegiatan</label>
+						<input type="text" name="BentukKegiatan" class="form-control input">
+					</div>
+					<div class="form-group">
+						<label>Manfaat Kegiatan</label>
+						<input type="text" name="ManfaatKegiatan" class="form-control input">
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-xs-12">
+								<table class="table">
+									<tr>
+										<td>
+											<label>Bukti</label>
+											<textarea name="BuktiName" class="form-control input"></textarea>
+										</td>
+									</tr>
+									<tr>
+										<td style="border-bottom: 1px solid #ddd;border-top: none;">
+											<input type="file" data-style="fileinput" class="input" name="BuktiUpload">
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="row">
+							<div class="col-xs-12">
+								<table class="table">
+									<tr>
+										<td style="border-top: none;">
+											<label>Start Date</label>
+											<div class="input-group input-append date datetimepicker">
+					                            <input data-format="yyyy-MM-dd" class="form-control input" type=" text" readonly="" value = "" name = "StartDate">
+					                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+					                		</div>
+										</td>
+										<td style="border-top: none;">
+											<label>End Date</label>
+											<div class="input-group input-append date datetimepicker">
+					                            <input data-format="yyyy-MM-dd" class="form-control input" type=" text" readonly="" value = "" name = "EndDate">
+					                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+					                		</div>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div style="padding: 5px;">
+                        <button class="btn btn-block btn-success" id="btnSave" mode = "add" data-id = "">Save</button>
+                    </div>
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
+	<div class="col-md-8">
+		<div class="thumbnail">
+			<div class="row" style="margin-left: 0px;margin-right: 0px;">
+				<div class="col-md-12">
+					<div style="padding: 15px;">
+						<h3 style="color: red;">Data</h3>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="well">
+								<div style="color: red;"><b>Filtering</b></div>
+    							<div class="row" style="margin-top: 10px;">
+    								<div class="col-md-3">
+    									<div class="thumbnail">
+    										<div class="form-group">
+    											<label>Kategori</label>
+    											<select class="form-control SearchKategori" name ="Kategori">
+    												<option selected value="%">--All--</option>
+    												<option value="PKM">PKM</option>
+    												<option value="Penelitian">Penelitian</option>
+    												<option value="Pendidikan">Pendidikan</option>
+    												<option value="Tridarma">Tridarma</option>
+    											</select>
+    										</div>
+											<div class="form-group">
+												<label>Tingkat</label>
+												<select class="form-control SearchTingkat" name ="Kategori">
+													<option selected value="%">--All--</option>
+													<option value="Internasional">Internasional</option>
+													<option value="Nasional">Nasional</option>
+													<option value="Lokal">Wilayah/ Lokal</option>
+												</select>
+											</div>
+    									</div>
+    								</div>
+    								<div class="col-md-3">
+    									<div class="thumbnail">
+        									<div class="form-group">
+        										<label>Perjanjian</label>
+        										<table class="">
+													<tr>
+														<td style="border-top: none;">MOU</td>
+														<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOU"></td>
+													</tr>
+													<tr>
+														<td style="border-top: none;">MOA</td>
+														<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="MOA"></td>
+													</tr>
+													<tr>
+														<td style="border-top: none;">IA</td>
+														<td style="border-top: none;"><input type="checkbox" name="Perjanjian" class="SearchPerjanjian" value="IA"></td>
+													</tr>
+        										</table>
+        									</div>
+    									</div>
+    								</div>
+    								<div class="col-md-6">
+    									<div class="thumbnail">
+    										<table class="table">
+    											<tr>
+    												<td>
+    													<label class="checkbox-inline">
+    														<input type="checkbox" class="dateOP" name="dateOP" id="dateOPRange" value="0">
+    														Date range
+    													</label>
+    												</td>
+    												<td>
+	        											<label>Start Date</label>
+														<div class="input-group input-append date datetimepicker">
+								                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "StartDate">
+								                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+								                		</div>
+    												</td>
+    												<td>
+	        											<label>End Date</label>
+														<div class="input-group input-append date datetimepicker">
+								                            <input data-format="yyyy-MM-dd" class="form-control SearchDate" type=" text" readonly="" value = "" name = "EndDate">
+								                            <span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>
+								                		</div>
+    												</td>
+    											</tr>
+    										</table>
+    										<div align="right">
+    											<button class="btn btn-primary SearchDateBtn"><i class="fa fa-search"></i> Search</button>
+    										</div>
+    									</div>
+    								</div>
+    							</div>
+							</div>
+						</div>
+						<!-- <div class="col-md-2" align="right">
+							Export Excel
+						</div> -->
+					</div>
+					<div class="row" style="margin-top: 5px;">
+						<div class="table-responsive">
+						<div class="col-md-12">
+							<table class="table table-bordered" id="TblKerjaSama">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th>Lembaga</th>
+										<!-- <th>Kategori</th> -->
+										<!-- <th>Tingkat</th> -->
+										<th>Judul Kegiatan</th>
+										<!-- <th>Bentuk Kegiatan</th> -->
+										<!-- <th>Manfaat Kegiatan</th> -->
+										<th>Bukti</th>
+										<th>Date</th>
+										<th>Perjanjian</th>
+										<th>Department</th>
+										<th><i class="fa fa-cog"></i></th>
+									</tr>
+								</thead>
+								<tbody>
+									
+								</tbody>
+							</table>
+						</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> 
 <script type="text/javascript">
 	var S_Table_example_ = '';
 	var QueryPass = '';
-	$("#container").attr('class','fixed-header sidebar-closed');
 	$(document).ready(function() {
 		LoadFirstLoad();
 	})

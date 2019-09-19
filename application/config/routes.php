@@ -1036,7 +1036,7 @@ $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataI
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
-
+$route['rest2/__get_data_kerja_sama_perguruan_tinggi_aggregator'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi_aggregator';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1843,6 +1843,8 @@ $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
 
 // Cooperation
 $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi';
-$route['cooperation/Kerja_Sama_Perguruan_Tinggi/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
+$route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
 
 
