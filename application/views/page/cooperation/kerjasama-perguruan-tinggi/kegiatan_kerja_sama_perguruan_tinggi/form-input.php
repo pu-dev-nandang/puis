@@ -244,7 +244,7 @@
 			var nm = $(this).attr('name');
 			var v = $(this).val();
 			var type = $(this).attr('type');
-			if (nm != 'BentukKegiatan' && nm != 'ManfaatKegiatan' && type != 'file') {
+			if (nm != 'BentukKegiatan' && nm != 'ManfaatKegiatan' && type != 'file' && nm != 'Desc') {
 				if (v =='' || v == '!' || v == undefined) {
 					toastr.error(nm+' required','!Error Input');
 					bool = false;
