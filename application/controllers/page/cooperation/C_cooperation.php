@@ -11,13 +11,27 @@ class C_cooperation extends Cooperation_Controler {
         $this->data['department'] = parent::__getDepartement();
     }
 
-    public function kerja_sama_perguruan_tinggi()
+    public function page_kerja_sama_perguruan_tinggi($page)
     {
-      $content = $this->load->view('page/'.$this->data['department'].'/kerjasama-perguruan-tinggi/index',$this->data,true);
+      $page['department'] = parent::__getDepartement();
+      $content = $this->load->view('page/'.$page['department'].'/kerjasama-perguruan-tinggi/page',$page,true);
       $this->temp($content);
     }
 
-    public function kerja_sama_perguruan_tinggi_submit()
+    public function kerja_sama_perguruan_tinggi()
+    {
+      // $page['content'] = $this->load->view('page/'.$this->data['department'].'/kerjasama-perguruan-tinggi/index',$this->data,true);
+      // $this->page_kerja_sama_perguruan_tinggi($page);
+      $this->kegiatan_kerja_sama_perguruan_tinggi();
+    }
+
+    public function kegiatan_kerja_sama_perguruan_tinggi()
+    {
+        $page['content'] = $this->load->view('page/'.$this->data['department'].'/kerjasama-perguruan-tinggi/kegiatan_kerja_sama_perguruan_tinggi',$this->data,true);
+        $this->page_kerja_sama_perguruan_tinggi($page);
+    }
+
+    public function kerja_sama_perguruan_tinggi_submit_master()
     {
         $rs = ['Status' => 0,'msg' => ''];
         $Input = $this->getInputToken();
@@ -59,7 +73,7 @@ class C_cooperation extends Cooperation_Controler {
                 
                 $this->db->insert_batch('db_cooperation.k_perjanjian', $k_perjanjian);
                 // insert department
-                $DepartmentSelected = json_decode(json_encode($Input['k_department']),true);
+                $DepartmentSelected = json_decode(json_encode($Input['ker_department']),true);
                 $k_department = [];
                 for ($i=0; $i < count($DepartmentSelected); $i++) { 
                     $k_department[] = array(
@@ -67,7 +81,7 @@ class C_cooperation extends Cooperation_Controler {
                         'Departement' => $DepartmentSelected[$i],
                     );
                 }
-                $this->db->insert_batch('db_cooperation.k_department', $k_department);
+                $this->db->insert_batch('db_cooperation.ker_department', $k_department);
                 $rs['Status'] = 1;
                 break;
             case 'edit':
@@ -184,10 +198,10 @@ class C_cooperation extends Cooperation_Controler {
                 // delete && insert
                     // delete
                     $this->db->where('KerjasamaID',$ID);
-                    $this->db->delete('db_cooperation.k_department');
+                    $this->db->delete('db_cooperation.ker_department');
 
                     // insert
-                    $DepartmentSelected = json_decode(json_encode($Input['k_department']),true);
+                    $DepartmentSelected = json_decode(json_encode($Input['ker_department']),true);
                     $k_department = [];
                     for ($i=0; $i < count($DepartmentSelected); $i++) { 
                         $k_department[] = array(
@@ -195,7 +209,7 @@ class C_cooperation extends Cooperation_Controler {
                             'Departement' => $DepartmentSelected[$i],
                         );
                     }
-                    $this->db->insert_batch('db_cooperation.k_department', $k_department);
+                    $this->db->insert_batch('db_cooperation.ker_department', $k_department);
                     $rs['Status'] = 1;
 
                 break;
@@ -229,7 +243,7 @@ class C_cooperation extends Cooperation_Controler {
                 }
 
                 $this->db->where('KerjasamaID',$ID);
-                $this->db->delete('db_cooperation.k_department');
+                $this->db->delete('db_cooperation.ker_department');
 
                 $rs['Status'] = 1;
             break;
@@ -239,8 +253,83 @@ class C_cooperation extends Cooperation_Controler {
         }
 
         echo json_encode($rs);
+    }
 
 
+    public function master_kerja_sama_perguruan_tinggi()
+    {
+        $page['content'] = $this->load->view('page/'.$this->data['department'].'/kerjasama-perguruan-tinggi/master_kerja_sama_perguruan_tinggi',$this->data,true);
+        $this->page_kerja_sama_perguruan_tinggi($page);
+    }
+
+    public function kerja_sama_perguruan_tinggi_submit_kegiatan()
+    {
+        $rs = ['Status' => 0,'msg' => ''];
+        $Input = $this->getInputToken();
+        $mode = $Input['mode'];
+        switch ($mode) {
+            case 'add':
+                // Save data kerjasama
+                $kegiatan = json_decode(json_encode($Input['kegiatan']),true);
+                // add upload bukti kerjasama
+                $this->db->insert('db_cooperation.kegiatan',$kegiatan);
+                $insert_id = $this->db->insert_id();
+                $ID = $insert_id;
+
+                // insert department
+                $DepartmentSelected = json_decode(json_encode($Input['keg_department']),true);
+                $keg_department = [];
+                for ($i=0; $i < count($DepartmentSelected); $i++) { 
+                    $keg_department[] = array(
+                        'KegiatanID' => $ID,
+                        'Departement' => $DepartmentSelected[$i],
+                    );
+                }
+                $this->db->insert_batch('db_cooperation.keg_department', $keg_department);
+                $rs['Status'] = 1;
+                break;
+            case 'edit':
+                $ID = $Input['ID'];
+                $kegiatan = json_decode(json_encode($Input['kegiatan']),true);
+                $this->db->where('ID',$ID);
+                $this->db->update('db_cooperation.kegiatan',$kegiatan);
+
+                // Department
+                // delete && insert
+                    // delete
+                    $this->db->where('KegiatanID',$ID);
+                    $this->db->delete('db_cooperation.keg_department');
+
+                    // insert
+                    $DepartmentSelected = json_decode(json_encode($Input['keg_department']),true);
+                    $keg_department = [];
+                    for ($i=0; $i < count($DepartmentSelected); $i++) { 
+                        $keg_department[] = array(
+                            'KegiatanID' => $ID,
+                            'Departement' => $DepartmentSelected[$i],
+                        );
+                    }
+                    $this->db->insert_batch('db_cooperation.keg_department', $keg_department);
+                    $rs['Status'] = 1;
+
+                break;
+            case 'delete':
+                $ID = $Input['ID'];
+                // kerjasama
+                $this->db->where('ID',$ID);
+                $this->db->delete('db_cooperation.kegiatan');
+
+                $this->db->where('KegiatanID',$ID);
+                $this->db->delete('db_cooperation.keg_department');
+
+                $rs['Status'] = 1;
+            break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($rs);
     }
 
 }

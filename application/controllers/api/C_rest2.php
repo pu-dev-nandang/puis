@@ -4547,136 +4547,331 @@ class C_rest2 extends CI_Controller {
                $auth = $this->m_master->AuthAPI($dataToken);
                if ($auth) {
                 $WhereFiltering = '';
+                $WhereFiltering2 = '';
                 $requestData = $_REQUEST;
-                if (array_key_exists('SearchPerjanjian', $dataToken)) {
-                    $SearchPerjanjian = $dataToken['SearchPerjanjian'];
-                    // print_r($SearchPerjanjian);die();
-                    if (count($SearchPerjanjian) > 0) {
-                        $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
-                        $WhereFiltering .= $FwhereAnd.' ( b.Type ="'.$SearchPerjanjian[0].'" '; 
-                        for ($i=0; $i < count($SearchPerjanjian); $i++) { 
-                            $WhereFiltering .= ' or b.Type ="'.$SearchPerjanjian[$i].'" '; 
-                        }
+                switch ($dataToken['mode']) {
+                    case 'DataKerjaSama':
+                         if (array_key_exists('SearchPerjanjian', $dataToken)) {
+                             $SearchPerjanjian = $dataToken['SearchPerjanjian'];
+                             // print_r($SearchPerjanjian);die();
+                             if (count($SearchPerjanjian) > 0) {
+                                 $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                                 $WhereFiltering .= $FwhereAnd.' ( b.Type ="'.$SearchPerjanjian[0].'" '; 
+                                 for ($i=0; $i < count($SearchPerjanjian); $i++) { 
+                                     $WhereFiltering .= ' or b.Type ="'.$SearchPerjanjian[$i].'" '; 
+                                 }
 
-                        $WhereFiltering .= ')';
-                    }
-                }
+                                 $WhereFiltering .= ')';
+                             }
+                         }
 
-                if (array_key_exists('SearchKategori', $dataToken)) {
-                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
-                    if ($dataToken['SearchKategori'] != '' && $dataToken['SearchKategori'] != '%') {
-                        $WhereFiltering .= $FwhereAnd.' a.Kategori = "'.$dataToken['SearchKategori'].'" '; 
-                    }
-                    
-                }
+                         if (array_key_exists('SearchKategori', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchKategori'] != '' && $dataToken['SearchKategori'] != '%') {
+                                 $WhereFiltering .= $FwhereAnd.' a.Kategori = "'.$dataToken['SearchKategori'].'" '; 
+                             }
+                             
+                         }
 
-                if (array_key_exists('SearchTingkat', $dataToken)) {
-                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
-                    if ($dataToken['SearchTingkat'] != '' && $dataToken['SearchTingkat'] != '%') {
-                        $WhereFiltering .= $FwhereAnd.' a.Tingkat = "'.$dataToken['SearchTingkat'].'" '; 
-                    }
-                }
+                         if (array_key_exists('SearchTingkat', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchTingkat'] != '' && $dataToken['SearchTingkat'] != '%') {
+                                 $WhereFiltering .= $FwhereAnd.' a.Tingkat = "'.$dataToken['SearchTingkat'].'" '; 
+                             }
+                         }
 
-                if (array_key_exists('StartDate', $dataToken) && array_key_exists('EndDate', $dataToken)) {
-                    $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
-                    if ($dataToken['StartDate'] != '') {
-                        $WhereFiltering .= $FwhereAnd.' a.StartDate >= "'.$dataToken['StartDate'].'" and a.EndDate <= "'.$dataToken['EndDate'].'" '; 
-                    }
-                }
+                         if (array_key_exists('StartDate', $dataToken) && array_key_exists('EndDate', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             if ($dataToken['StartDate'] != '') {
+                                 $WhereFiltering .= $FwhereAnd.' a.StartDate >= "'.$dataToken['StartDate'].'" and a.EndDate <= "'.$dataToken['EndDate'].'" '; 
+                             }
+                         }
 
-                $sqltotalData = 'select count(*) as total from (
+                         if (array_key_exists('Active', $dataToken)) {
+                             if ($dataToken['Active'] == 1) {
+                                 $dd = ' a.EndDate >= "'.date('Y-m-d').'" ';
+                             }
+                             else
+                             {
+                                $dd = ' a.EndDate < "'.date('Y-m-d').'" ';
+                             }
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             $WhereFiltering .= $FwhereAnd.$dd;
+                         }
 
-                select count(*) as total from db_cooperation.kerjasama as a
-                                                join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
-                                                join db_cooperation.k_department as c on a.ID = c.KerjasamaID
-                                                '.$WhereFiltering.'
+                         $sqltotalData = 'select count(*) as total from (
+
+                         select count(*) as total from db_cooperation.kerjasama as a
+                                                         join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                                         join db_cooperation.ker_department as c on a.ID = c.KerjasamaID
+                                                         '.$WhereFiltering.'
+                                     ';
+                        $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+                        $sqltotalData .= $WhereORAnd.' (           
+                               a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                          )';
+
+                         $sqltotalData .= ' GROUP BY a.ID ) cc';                  
+                         $querytotalData = $this->db->query($sqltotalData)->result_array();
+                         $totalData = $querytotalData[0]['total'];
+
+                         $sql = 'select b.KerjasamaID,a.Lembaga,a.Kategori,a.Tingkat,a.BuktiName,a.BuktiUpload,a.StartDate,a.EndDate,a.Desc,
+                                 (
+                                 select GROUP_CONCAT( CONCAT(Type,"--",Upload,"--",ID) ) from db_cooperation.k_perjanjian where KerjasamaID = a.ID group by KerjasamaID
+                                 ) as Perjanjian,
+                                 (
+                                 select GROUP_CONCAT( CONCAT(z.Departement,"--",x.Code) ) from db_cooperation.ker_department as z
+                                 join (
+                                  select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                                 UNION
+                                                 select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                 UNION
+                                                 select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                 ) as x on z.Departement = x.ID
+                                 where KerjasamaID = a.ID group by KerjasamaID
+                                 ) as DepartmentKS
+                                 from db_cooperation.kerjasama as a
+                                 join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                 join db_cooperation.ker_department as c on a.ID = c.KerjasamaID
+                                 '.$WhereFiltering;
+
+                             $sql .= $WhereORAnd.' (           
+                                    a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                             )';
+                             $sql .= ' GROUP BY a.ID';
+                             $queryPass = $sql;
+                             // encode query pass
+                             $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
+
+                             $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                             $query = $this->db->query($sql)->result_array();
+                             $No = $requestData['start'] + 1;
+                             $data = array();
+                             for($i=0;$i<count($query);$i++){
+                                 $nestedData=array();
+                                 $row = $query[$i];
+                                 $nestedData[] = $No;
+                                 $nestedData[] = $row['Lembaga'].'<br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
+                                 $nestedData[] = nl2br($row['BuktiName']).'--'.$row['BuktiUpload'];
+                                 $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End : '.$row['EndDate'];
+                                 $nestedData[] = $row['Perjanjian'];
+                                 $nestedData[] = $row['DepartmentKS'];
+                                 $nestedData[] = $row['KerjasamaID'];
+
+                                 // token to Pass Data to form
+                                 $tokenEdit = [
+                                      'KerjasamaID' =>  $row['KerjasamaID'],
+                                      'Lembaga' => $row['Lembaga'],
+                                      'Kategori' => $row['Kategori'],
+                                      'Tingkat' => $row['Tingkat'],
+                                      'BuktiName' => $row['BuktiName'],
+                                      'BuktiUpload' => $row['BuktiUpload'],
+                                      'StartDate' => $row['StartDate'],
+                                      'EndDate' => $row['EndDate'],
+                                      'Perjanjian' => $row['Perjanjian'],
+                                      'DepartmentKS' => $row['DepartmentKS'],
+                                      'Desc' => $row['Desc'],
+                                 ];
+                                 // encode data
+                                 $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
+                                 $nestedData[] = $tokenEdit; 
+
+                                 $data[] = $nestedData;
+                                 $No++;
+                             }
+
+                             $json_data = array(
+                                 "draw"            => intval( $requestData['draw'] ),
+                                 "recordsTotal"    => intval($totalData),
+                                 "recordsFiltered" => intval($totalData ),
+                                 "data"            => $data,
+                                 'queryPass'       => $queryPass,
+                             );
+                             echo json_encode($json_data);  
+                        break;
+                    case 'DataKegiatan':
+                         if (array_key_exists('SearchPerjanjian', $dataToken)) {
+                             $SearchPerjanjian = $dataToken['SearchPerjanjian'];
+                             // print_r($SearchPerjanjian);die();
+                             if (count($SearchPerjanjian) > 0) {
+                                 $FwhereAnd = ($WhereFiltering2 == '') ? ' where ' : ' And';
+                                 $WhereFiltering2 .= $FwhereAnd.' ( b.Type ="'.$SearchPerjanjian[0].'" '; 
+                                 for ($i=0; $i < count($SearchPerjanjian); $i++) { 
+                                     $WhereFiltering2 .= ' or b.Type ="'.$SearchPerjanjian[$i].'" '; 
+                                 }
+
+                                 $WhereFiltering2 .= ')';
+                             }
+                         }
+
+                         if (array_key_exists('SearchKategori', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering2 == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchKategori'] != '' && $dataToken['SearchKategori'] != '%') {
+                                 $WhereFiltering2 .= $FwhereAnd.' a.Kategori = "'.$dataToken['SearchKategori'].'" '; 
+                             }
+                             
+                         }
+
+                         if (array_key_exists('SearchTingkat', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering2 == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchTingkat'] != '' && $dataToken['SearchTingkat'] != '%') {
+                                 $WhereFiltering2 .= $FwhereAnd.' a.Tingkat = "'.$dataToken['SearchTingkat'].'" '; 
+                             }
+                         }
+
+                         if (array_key_exists('StartDate', $dataToken) && array_key_exists('EndDate', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             if ($dataToken['StartDate'] != '') {
+                                 $WhereFiltering .= $FwhereAnd.' z.StartDate >= "'.$dataToken['StartDate'].'" and z.EndDate <= "'.$dataToken['EndDate'].'" '; 
+                             }
+                         }
+
+                         if (array_key_exists('Active', $dataToken)) {
+                             if ($dataToken['Active'] == 1) {
+                                 $dd = ' a.EndDate >= "'.date('Y-m-d').'" ';
+                             }
+                             else
+                             {
+                                $dd = ' a.EndDate < "'.date('Y-m-d').'" ';
+                             }
+                             $FwhereAnd = ($WhereFiltering2 == '') ? ' where ' : ' And';
+                             $WhereFiltering2 .= $FwhereAnd.$dd;
+                         }
+
+                         if (array_key_exists('SearchLembaga', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering2 == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchLembaga'] != '' && $dataToken['SearchLembaga'] != '%') {
+                                 $WhereFiltering2 .= $FwhereAnd.' a.ID = "'.$dataToken['SearchLembaga'].'" '; 
+                             }
+                             
+                         }
+
+                         $sqltotalData = '
+                            select count(*) as total from(
+                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate from db_cooperation.kegiatan as z
+                                join (
+                                    select a.ID from db_cooperation.kerjasama as a
+                                     join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                     join db_cooperation.ker_department as c on a.ID = c.KerjasamaID
+                                    '.$WhereFiltering2.' GROUP BY a.ID
+                                ) as x
+                                on z.KerjasamaID = x.ID
+                            ) as z
                             ';
-               $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
-               $sqltotalData .= $WhereORAnd.' (           
-                      a.Lembaga LIKE "'.$requestData['search']['value'].'%"
-                 )';
 
-                $sqltotalData .= ' GROUP BY a.ID ) cc';                  
-                $querytotalData = $this->db->query($sqltotalData)->result_array();
-                $totalData = $querytotalData[0]['total'];
+                        $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+                        $sqltotalData .= $WhereORAnd.' (           
+                               z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%"
+                          )';
+                            
+                         $querytotalData = $this->db->query($sqltotalData)->result_array();
+                         $totalData = $querytotalData[0]['total'];
 
-                $sql = 'select b.KerjasamaID,a.Lembaga,a.Kategori,a.Tingkat,a.JudulKegiatan,a.BentukKegiatan,
-                        a.ManfaatKegiatan,a.BuktiName,a.BuktiUpload,a.StartDate,a.EndDate,
-                        (
-                        select GROUP_CONCAT( CONCAT(Type,"--",Upload,"--",ID) ) from db_cooperation.k_perjanjian where KerjasamaID = a.ID group by KerjasamaID
-                        ) as Perjanjian,
-                        (
-                        select GROUP_CONCAT( CONCAT(z.Departement,"--",x.Code) ) from db_cooperation.k_department as z
-                        join (
-                         select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
-                                        UNION
-                                        select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
-                                        UNION
-                                        select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
-                        ) as x on z.Departement = x.ID
-                        where KerjasamaID = a.ID group by KerjasamaID
-                        ) as DepartmentKS
-                        from db_cooperation.kerjasama as a
-                        join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
-                        join db_cooperation.k_department as c on a.ID = c.KerjasamaID
-                        '.$WhereFiltering;
+                         $sql = '
+                                    select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Desc,z.KerjasamaID,z.SemesterID,
+                                    x.Lembaga, x.Kategori,x.Tingkat,
+                                    (
+                                    select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.keg_department as zz
+                                    join (
+                                     select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                                    UNION
+                                                    select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                    UNION
+                                                    select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                    ) as x on zz.Departement = x.ID
+                                    where KegiatanID = z.ID group by KegiatanID
+                                    ) as DepartmentKS
+                                    from db_cooperation.kegiatan as z
+                                    join (
+                                        select b.KerjasamaID,a.Lembaga,a.Kategori,a.Tingkat,a.BuktiName,a.BuktiUpload,a.StartDate,a.EndDate,a.Desc,
+                                             (
+                                             select GROUP_CONCAT( CONCAT(Type,"--",Upload,"--",ID) ) from db_cooperation.k_perjanjian where KerjasamaID = a.ID group by KerjasamaID
+                                             ) as Perjanjian,
+                                             (
+                                             select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.ker_department as zz
+                                             join (
+                                              select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                                             UNION
+                                                             select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                             UNION
+                                                             select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                             ) as x on zz.Departement = x.ID
+                                             where KerjasamaID = a.ID group by KerjasamaID
+                                             ) as DepartmentKS
+                                             from db_cooperation.kerjasama as a
+                                             join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                             join db_cooperation.ker_department as c on a.ID = c.KerjasamaID
+                                             '.$WhereFiltering2.' GROUP BY a.ID
 
-                    $sql .= $WhereORAnd.' (           
-                           a.Lembaga LIKE "'.$requestData['search']['value'].'%"
-                    )';
-                    $sql .= ' GROUP BY a.ID';
-                    $queryPass = $sql;
-                    // encode query pass
-                    $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
+                                    ) as x
+                                    on x.KerjasamaID = z.KerjasamaID
+                                ';
+                         $queryPass = $sql;
+                         $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
 
-                    $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
-                    $query = $this->db->query($sql)->result_array();
-                    $No = $requestData['start'] + 1;
-                    $data = array();
-                    for($i=0;$i<count($query);$i++){
-                        $nestedData=array();
-                        $row = $query[$i];
-                        $nestedData[] = $No;
-                        $nestedData[] = $row['Lembaga'].'<br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
-                        $nestedData[] = $row['JudulKegiatan'];
-                        $nestedData[] = nl2br($row['BuktiName']).'--'.$row['BuktiUpload'];
-                        $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End :'.$row['EndDate'];
-                        $nestedData[] = $row['Perjanjian'];
-                        $nestedData[] = $row['DepartmentKS'];
-                        $nestedData[] = $row['KerjasamaID'];
-                        $nestedData[] = $queryPass;
+                         $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+                         $sql .= $WhereORAnd.' (           
+                                z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                                z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                                z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%"
+                           )';
 
-                        // token to Pass Data to form
-                        $tokenEdit = [
-                             'KerjasamaID' =>  $row['KerjasamaID'],
-                             'Lembaga' => $row['Lembaga'],
-                             'Kategori' => $row['Kategori'],
-                             'Tingkat' => $row['Tingkat'],
-                             'JudulKegiatan' => $row['JudulKegiatan'],
-                             'BuktiName' => $row['BuktiName'],
-                             'BuktiUpload' => $row['BuktiUpload'],
-                             'StartDate' => $row['StartDate'],
-                             'EndDate' => $row['EndDate'],
-                             'Perjanjian' => $row['Perjanjian'],
-                             'DepartmentKS' => $row['DepartmentKS'],
-                             'BentukKegiatan' => $row['BentukKegiatan'],
-                             'ManfaatKegiatan' => $row['ManfaatKegiatan'],
-                        ];
-                        // encode data
-                        $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
-                        $nestedData[] = $tokenEdit; 
+                             $sql.= ' ORDER BY z.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                             $query = $this->db->query($sql)->result_array();
+                             $No = $requestData['start'] + 1;
+                             $data = array();
+                             for($i=0;$i<count($query);$i++){
+                                 $nestedData=array();
+                                 $row = $query[$i];
+                                 $nestedData[] = $No;
+                                 $TokenLinkSearch = $this->jwt->encode($row['Lembaga'],"UAP)(*");
+                                 //$nestedData[] = '<a href="'.base_url().'cooperation/kerjasama-perguruan-tinggi/master/'.$TokenLinkSearch.'">'.$row['Lembaga'].'</a><br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
+                                 $nestedData[] = '<a href="javascript:void(0)">'.$row['Lembaga'].'</a><br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
+                                 $nestedData[] = $row['JudulKegiatan'];
+                                 $nestedData[] = $row['BentukKegiatan'];
+                                 $nestedData[] = $row['ManfaatKegiatan'];
+                                 $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End : '.$row['EndDate'];
+                                 $nestedData[] = $row['DepartmentKS'];
+                                 $nestedData[] = $row['KerjasamaID'];
+                                 $nestedData[] = $row['ID'];
+                                 // token to Pass Data to form
+                                 $tokenEdit = [
+                                      'KerjasamaID' =>  $row['KerjasamaID'],
+                                      'Lembaga' => $row['Lembaga'],
+                                      'JudulKegiatan' => $row['JudulKegiatan'],
+                                      'BentukKegiatan' => $row['BentukKegiatan'],
+                                      'ManfaatKegiatan' => $row['ManfaatKegiatan'],
+                                      'StartDate' => $row['StartDate'],
+                                      'EndDate' => $row['EndDate'],
+                                      'DepartmentKS' => $row['DepartmentKS'],
+                                      'Desc' => $row['Desc'],
+                                      'ID' => $row['ID'],
+                                      'SemesterID' => $row['SemesterID'],
+                                 ];
+                                 // encode data
+                                 $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
+                                 $nestedData[] = $tokenEdit; 
 
-                        $data[] = $nestedData;
-                        $No++;
-                    }
+                                 $data[] = $nestedData;
+                                 $No++;
+                             }
 
-                    $json_data = array(
-                        "draw"            => intval( $requestData['draw'] ),
-                        "recordsTotal"    => intval($totalData),
-                        "recordsFiltered" => intval($totalData ),
-                        "data"            => $data,
-                    );
-                    echo json_encode($json_data);    
+                             $json_data = array(
+                                 "draw"            => intval( $requestData['draw'] ),
+                                 "recordsTotal"    => intval($totalData),
+                                 "recordsFiltered" => intval($totalData ),
+                                 "data"            => $data,
+                                 'queryPass'       => $queryPass,
+                             );
+                             echo json_encode($json_data);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+                  
                }
                else
                {
@@ -4688,6 +4883,82 @@ class C_rest2 extends CI_Controller {
             // handling orang iseng
             echo '{"status":"999","message":"Not Authorize"}';
        }
+    }
+
+    public function get_data_kerja_sama_perguruan_tinggi_aggregator()
+    {
+        try {
+               $dataToken = $this->getInputToken2();
+               $auth = $this->m_master->AuthAPI($dataToken);
+               if ($auth) {
+                    $requestData = $_REQUEST;
+
+                    // data 3 tahun belakang
+                    $Year = date('Y');
+                    $Year3 = $Year - 2;
+
+                     $sqltotalData = 'select count(*) as total from db_cooperation.kerjasama as a
+                                      where Year(a.EndDate) >= '.$Year3.'
+                                    ';
+                     $sqltotalData .= ' and (  
+                                        a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                                        )';                
+                     $querytotalData = $this->db->query($sqltotalData)->result_array();
+                     $totalData = $querytotalData[0]['total'];
+
+
+                    $sql = 'select a.Lembaga,if(a.Tingkat = "Internasional",1,0) as Internasional,if(a.Tingkat = "Nasional",1,0) as Nasional,if(a.Tingkat = "Lokal",1,0) as Lokal,a.BentukKegiatan,a.BuktiName,a.BuktiUpload,a.EndDate 
+                        from db_cooperation.kerjasama as a
+                        where Year(a.EndDate) >= '.$Year3.'
+                    ';
+
+                    $queryPass = $sql;
+                    // encode query pass
+                    $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
+                    $sql .= ' and (  
+                                       a.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                                 )';   
+                    $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                    $query = $this->db->query($sql)->result_array();
+                    $No = $requestData['start'] + 1;
+                    $data = array();
+
+                    for($i=0;$i<count($query);$i++){
+                        $nestedData=array();
+                        $row = $query[$i];
+                        $nestedData[] = $No;
+                        $nestedData[] = $row['Lembaga'];
+                        $nestedData[] = $row['Internasional'];
+                        $nestedData[] = $row['Nasional'];
+                        $nestedData[] = $row['Lokal'];
+                        $nestedData[] = $row['BentukKegiatan'];
+                        $nestedData[] = $row['BuktiName'];
+                        $nestedData[] = $row['BuktiUpload'];
+                        $nestedData[] = $row['EndDate'];
+                        $nestedData[] = $queryPass;
+                        $data[] = $nestedData;
+                        $No++;
+                    }
+
+                    $json_data = array(
+                        "draw"            => intval( $requestData['draw'] ),
+                        "recordsTotal"    => intval($totalData),
+                        "recordsFiltered" => intval($totalData ),
+                        "data"            => $data,
+                    );
+                    echo json_encode($json_data);  
+
+               }           
+               else
+               {
+                   // handling orang iseng
+                   echo '{"status":"999","message":"Not Authorize"}';
+               }
+            }
+            catch(Exception $e) {
+                // handling orang iseng
+                echo '{"status":"999","message":"Not Authorize"}';
+            }
     }
 
 }
