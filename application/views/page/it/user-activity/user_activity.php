@@ -20,10 +20,10 @@
         $('#loadTable').html('<table class="table table-striped" id="tableDataLog">' +
             '            <thead>' +
             '            <tr>' +
-            '                <th>No</th>' +
-            '                <th>Name</th>' +
-            '                <th>Accessed At</th>' +
-            '                <th>Login As</th>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th style="width: 25%;">Name</th>' +
+            '                <th style="width: 15%;">Accessed At</th>' +
+            '                <th style="width: 25%;">Login As</th>' +
             '                <th>URL</th>' +
             '            </tr>' +
             '            </thead>' +
@@ -43,7 +43,7 @@
             "ajax":{
                 url :url, // json datasource
                 ordering : false,
-                type: "get",  // method  , by default get
+                type: "post",  // method  , by default get
                 error: function(){  // error handling
                     $(".employee-grid-error").html("");
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');

@@ -3174,7 +3174,7 @@ class C_api3 extends CI_Controller {
     public function getDataLogEmployees(){
 
         $requestData= $_REQUEST;
-
+        
         $u = $this->input->get('u');
 
         $dataWhere = ($u!='' && $u!=null && isset($u)) ? 'WHERE lem.NIP = "'.$u.'" ' : '';
