@@ -465,7 +465,7 @@
 
     function loading_page_simple(element,position) {
         var arrp = ['center','left','right'];
-        var p = (typeof position !== 'undefined' && position!='' && position!=null && inArray(position,arrp)!=-1)
+        var p = (typeof position !== 'undefined' && position!='' && position!=null && $.inArray(position,arrp)!=-1)
             ? 'text-align:'+position+';'
             : '';
         $(element).html('<div style="margin-top: 1px;'+p+'">' +

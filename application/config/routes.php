@@ -1445,6 +1445,7 @@ $route['api3/__getHkiProduk'] = 'api/c_api3/getLuaranHkiproduk';
 $route['api3/__getHkiPaten'] = 'api/c_api3/getLuaranHkipaten';
 $route['api3/__getSitasiKarya'] = 'api/c_api3/getsitasikarya';
 $route['api3/__getsum-mhs-asing'] = 'api/c_api3/getsum_mahasiswa_asing';
+$route['api3/__getDataLogEmployees'] = 'api/c_api3/getDataLogEmployees';
 
 
 $route['api3/__crudAgregator'] = 'api/c_api3/crudAgregator';
