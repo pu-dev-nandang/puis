@@ -3029,6 +3029,7 @@ class C_api3 extends CI_Controller {
         if($data_arr['action']=='insertLog'){
 
             $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
             $this->db->insert('db_employees.log_employees',$dataForm);
             return print_r(1);
 
