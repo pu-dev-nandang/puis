@@ -3171,4 +3171,84 @@ class C_api3 extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getDataLogEmployees(){
+
+        $requestData= $_REQUEST;
+
+        $u = $this->input->get('u');
+
+        $dataWhere = ($u!='' && $u!=null && isset($u)) ? 'WHERE lem.NIP = "'.$u.'" ' : '';
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+
+            $fillSrc = 'lem.URL LIKE "%'.$search.'%" OR
+                                 em.Name LIKE "%'.$search.'%" OR
+                                 em.NIP LIKE "%'.$search.'%" OR
+                                 em2.Name LIKE "%'.$search.'%" OR
+                                 em2.NIP LIKE "%'.$search.'%" OR
+                                 ats.Name LIKE "%'.$search.'%" OR
+                                 ats.NPM LIKE "%'.$search.'%"';
+
+            $dataSearch = ($u!='' && $u!=null && isset($u))
+                ?  ' AND ( '.$fillSrc.' )'
+                : ' WHERE '.$fillSrc;
+        }
+
+        $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn, 
+                            (CASE WHEN lem.NIP = lem.UserID THEN 0 ELSE lem.UserID END ) AS LoginAs, 
+                            (CASE WHEN em2.Name = em.Name THEN 0 ELSE em2.Name END) AS LoginAsLec, 
+                            ats.Name AS LoginAsStd,lem.URL
+                            FROM db_employees.log_employees lem 
+                            LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP) 
+                            LEFT JOIN db_employees.employees em2 ON (em2.NIP = lem.UserID)
+                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM =  lem.UserID)
+                            '.$dataWhere.''.$dataSearch.' ORDER BY lem.ID DESC';
+
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+
+            $nestedData = array();
+            $row = $query[$i];
+
+            $LoginAs = '-';
+            if($row['LoginAs']!=0 || $row['LoginAs']!='0'){
+
+                $LoginAs = ($row['LoginAsLec']!=0 || $row['LoginAsLec']!='0')
+                    ? 'Lec : '.$row['LoginAsLec']
+                    : 'Std : '.$row['LoginAsStd'];
+
+            }
+
+
+            $nestedData[] = '<div>'.$no.'</div>';
+            $nestedData[] = '<div>'.$row['Name'].'</div>';
+            $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
+            $nestedData[] = '<div>'.$LoginAs.'</div>';
+            $nestedData[] = '<div>'.$row['URL'].'</div>';
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+    }
+
 }
