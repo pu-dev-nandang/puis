@@ -4867,6 +4867,95 @@ class C_rest2 extends CI_Controller {
                              );
                              echo json_encode($json_data);
                         break;
+                    case 'DataKerjaSamaAggregator':
+                        $Year = date('Y');
+                        $Year3 = $Year - 2;
+                        $sqltotalData = 'select count(*) as total from db_cooperation.kegiatan as z
+                                        join db_cooperation.kerjasama as x on z.KerjasamaID = x.ID
+                            ';
+                        $WhereFiltering =  'where Year(x.EndDate) >= '.$Year3;
+                        $sqltotalData .= $WhereFiltering;   
+                        $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+                        $sqltotalData .= $WhereORAnd.' (           
+                               z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               x.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                          )';
+                        $querytotalData = $this->db->query($sqltotalData)->result_array();
+                        $totalData = $querytotalData[0]['total'];
+
+                        $sql = 'select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,x.StartDate,x.EndDate,x.Lembaga,z.KerjasamaID,
+                                if(x.Tingkat = "Nasional",1,0) as Nasional,if(x.Tingkat = "Internasional",1,0) as Internasional,
+                                if(x.Tingkat= "Lokal",1,0) as Lokal,x.BuktiName,x.BuktiUpload,z.SemesterID,y.Name as SemesterName,x.Kategori
+                                from db_cooperation.kegiatan as z
+                                join (
+                                    select b.KerjasamaID,a.Lembaga,a.Kategori,a.Tingkat,a.BuktiName,a.BuktiUpload,a.StartDate,a.EndDate,a.Desc,
+                                         (
+                                         select GROUP_CONCAT( CONCAT(Type,"--",Upload,"--",ID) ) from db_cooperation.k_perjanjian where KerjasamaID = a.ID group by KerjasamaID
+                                         ) as Perjanjian,
+                                         (
+                                         select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.ker_department as zz
+                                         join (
+                                          select CONCAT("AC.",ID) as ID,  CONCAT("Study ",NameEng) as NameDepartement,Code as Code from db_academic.program_study where Status = 1
+                                                         UNION
+                                                         select CONCAT("NA.",ID) as ID, Division as NameDepartement,Abbreviation as Code from db_employees.division where StatusDiv = 1
+                                                         UNION
+                                                         select CONCAT("FT.",ID) as ID, CONCAT("Faculty ",NameEng) as NameDepartement,Abbr as Code from db_academic.faculty where StBudgeting = 1
+                                         ) as x on zz.Departement = x.ID
+                                         where KerjasamaID = a.ID group by KerjasamaID
+                                         ) as DepartmentKS
+                                         from db_cooperation.kerjasama as a
+                                         join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
+                                         join db_cooperation.ker_department as c on a.ID = c.KerjasamaID
+                                         GROUP BY a.ID
+
+                                ) as x
+                                on x.KerjasamaID = z.KerjasamaID
+                                join db_academic.semester as y on z.SemesterID = y.ID
+                        ';
+                        $sql .= $WhereFiltering;   
+                        $queryPass = $sql;
+                        $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
+                        $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
+                        $sql .= $WhereORAnd.' (           
+                               z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%" or
+                               x.Lembaga LIKE "'.$requestData['search']['value'].'%"
+                          )';
+                      $sql.= ' ORDER BY z.StartDate asc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                      $query = $this->db->query($sql)->result_array();
+                      $No = $requestData['start'] + 1;
+                      $data = array();
+                      for($i=0;$i<count($query);$i++){
+                          $nestedData=array();
+                          $row = $query[$i];
+                          $nestedData[] = $No;
+                          $nestedData[] = $row['Lembaga'];
+                          $nestedData[] = $row['Internasional'];
+                          $nestedData[] = $row['Nasional'];
+                          $nestedData[] = $row['Lokal'];
+                          $nestedData[] = $row['BentukKegiatan'];
+                          $nestedData[] = nl2br($row['BuktiName']);
+                          $nestedData[] = $row['BuktiUpload'];
+                          $nestedData[] = $this->m_master->getDateIndonesian($row['EndDate']);
+                          $nestedData[] = $row['SemesterName'];
+                          $nestedData[] = $row['KerjasamaID'];
+                          $nestedData[] = $row['ID'];
+                          $data[] = $nestedData;
+                          $No++;
+                      }
+
+                      $json_data = array(
+                          "draw"            => intval( $requestData['draw'] ),
+                          "recordsTotal"    => intval($totalData),
+                          "recordsFiltered" => intval($totalData ),
+                          "data"            => $data,
+                          'queryPass'       => $queryPass,
+                      );
+                      echo json_encode($json_data);
+                        break;
                     default:
                         # code...
                         break;
@@ -4883,82 +4972,6 @@ class C_rest2 extends CI_Controller {
             // handling orang iseng
             echo '{"status":"999","message":"Not Authorize"}';
        }
-    }
-
-    public function get_data_kerja_sama_perguruan_tinggi_aggregator()
-    {
-        try {
-               $dataToken = $this->getInputToken2();
-               $auth = $this->m_master->AuthAPI($dataToken);
-               if ($auth) {
-                    $requestData = $_REQUEST;
-
-                    // data 3 tahun belakang
-                    $Year = date('Y');
-                    $Year3 = $Year - 2;
-
-                     $sqltotalData = 'select count(*) as total from db_cooperation.kerjasama as a
-                                      where Year(a.EndDate) >= '.$Year3.'
-                                    ';
-                     $sqltotalData .= ' and (  
-                                        a.Lembaga LIKE "'.$requestData['search']['value'].'%"
-                                        )';                
-                     $querytotalData = $this->db->query($sqltotalData)->result_array();
-                     $totalData = $querytotalData[0]['total'];
-
-
-                    $sql = 'select a.Lembaga,if(a.Tingkat = "Internasional",1,0) as Internasional,if(a.Tingkat = "Nasional",1,0) as Nasional,if(a.Tingkat = "Lokal",1,0) as Lokal,a.BentukKegiatan,a.BuktiName,a.BuktiUpload,a.EndDate 
-                        from db_cooperation.kerjasama as a
-                        where Year(a.EndDate) >= '.$Year3.'
-                    ';
-
-                    $queryPass = $sql;
-                    // encode query pass
-                    $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
-                    $sql .= ' and (  
-                                       a.Lembaga LIKE "'.$requestData['search']['value'].'%"
-                                 )';   
-                    $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
-                    $query = $this->db->query($sql)->result_array();
-                    $No = $requestData['start'] + 1;
-                    $data = array();
-
-                    for($i=0;$i<count($query);$i++){
-                        $nestedData=array();
-                        $row = $query[$i];
-                        $nestedData[] = $No;
-                        $nestedData[] = $row['Lembaga'];
-                        $nestedData[] = $row['Internasional'];
-                        $nestedData[] = $row['Nasional'];
-                        $nestedData[] = $row['Lokal'];
-                        $nestedData[] = $row['BentukKegiatan'];
-                        $nestedData[] = $row['BuktiName'];
-                        $nestedData[] = $row['BuktiUpload'];
-                        $nestedData[] = $row['EndDate'];
-                        $nestedData[] = $queryPass;
-                        $data[] = $nestedData;
-                        $No++;
-                    }
-
-                    $json_data = array(
-                        "draw"            => intval( $requestData['draw'] ),
-                        "recordsTotal"    => intval($totalData),
-                        "recordsFiltered" => intval($totalData ),
-                        "data"            => $data,
-                    );
-                    echo json_encode($json_data);  
-
-               }           
-               else
-               {
-                   // handling orang iseng
-                   echo '{"status":"999","message":"Not Authorize"}';
-               }
-            }
-            catch(Exception $e) {
-                // handling orang iseng
-                echo '{"status":"999","message":"Not Authorize"}';
-            }
     }
 
 }
