@@ -1041,6 +1041,8 @@ $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataI
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
+$route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
+
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
@@ -1805,6 +1807,10 @@ $route['it/saveDivision'] = 'page/it/c_rule_service/saveDivision';
 $route['it/saveService'] = 'page/it/c_rule_service/saveService';
 $route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
 $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
+$route['it/admission/change-kode-formulir-online'] = 'page/it/c_it/change_kode_formulir_online';
+$route['it/admission/submit-change-kode-formulir-online'] = 'page/it/c_it/submit_change_kode_formulir_online';
+
+
 
 // end it
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
