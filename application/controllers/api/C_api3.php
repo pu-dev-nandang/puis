@@ -3174,7 +3174,7 @@ class C_api3 extends CI_Controller {
     public function getDataLogEmployees(){
 
         $requestData= $_REQUEST;
-        
+
         $u = $this->input->get('u');
 
         $dataWhere = ($u!='' && $u!=null && isset($u)) ? 'WHERE lem.NIP = "'.$u.'" ' : '';
@@ -3204,7 +3204,7 @@ class C_api3 extends CI_Controller {
                             LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP) 
                             LEFT JOIN db_employees.employees em2 ON (em2.NIP = lem.UserID)
                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM =  lem.UserID)
-                            '.$dataWhere.''.$dataSearch.' ORDER BY lem.ID DESC';
+                            '.$dataWhere.' '.$dataSearch.' ORDER BY lem.ID DESC';
 
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -3223,7 +3223,7 @@ class C_api3 extends CI_Controller {
             $LoginAs = '-';
             if($row['LoginAs']!=0 || $row['LoginAs']!='0'){
 
-                $LoginAs = ($row['LoginAsLec']!=0 || $row['LoginAsLec']!='0')
+                $LoginAs = ($row['LoginAsLec']!=0 && $row['LoginAsLec']!='0' && $row['LoginAsLec']!=null)
                     ? 'Lec : '.$row['LoginAsLec']
                     : 'Std : '.$row['LoginAsStd'];
 
