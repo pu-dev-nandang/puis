@@ -4974,4 +4974,16 @@ class C_rest2 extends CI_Controller {
        }
     }
 
+    public function get_data_formulir_no_ref()
+    {
+    	$dataToken = $this->getInputToken2();
+    	$Status = $dataToken['Status'];
+    	$Year = $dataToken['Year'];
+    
+    	$sql = 'select * from db_admission.formulir_number_global  where Status = ? and Years = ?';
+    	$query=$this->db->query($sql, array($Status,$Year))->result_array();
+
+    	echo json_encode($query);
+    }
+
 }
