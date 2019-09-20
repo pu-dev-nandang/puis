@@ -687,6 +687,9 @@ $route['library/yudisium/final-project/details/(:num)'] =  'page/library/c_yudis
 $route['student-life/diploma-supplement'] =  'page/student-life/c_studentlife/diploma_supplement';
 $route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_studentlife/diploma_supplement';
 
+$route['student-life/student-achievement/list'] =  'page/student-life/c_studentlife/student_achievement';
+$route['student-life/student-achievement/update-data-achievement'] =  'page/student-life/c_studentlife/update_data_achievement';
+
 
 // --- LPMI ----
 $route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
@@ -778,6 +781,8 @@ $route['api/__getLecturer'] = 'api/c_api/getLecturer';
 $route['api/__getStudents'] = 'api/c_api/getStudents';
 $route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
 $route['api/__getLecturermengajar'] = 'api/c_api/getLecturermengajar';
+
+$route['api/__getStudentsServerSide'] = 'api/c_api/getStudentsServerSide';
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 

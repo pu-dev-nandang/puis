@@ -1352,15 +1352,52 @@ class C_api3 extends CI_Controller {
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
                 $this->db->where('ID', $ID);
-                $this->db->update('db_agregator.prestasi_mahasiswa',$dataForm);
+                $this->db->update('db_studentlife.student_achievement',$dataForm);
+
+                $this->db->reset_query();
+
+                $this->db->where('SAID', $ID);
+                $this->db->delete('db_studentlife.student_achievement_student');
 
             } else {
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
+                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+//                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
+                $this->db->insert('db_studentlife.student_achievement',$dataForm);
                 $ID = $this->db->insert_id();
             }
 
+            // Add Student
+            $dataListStudent = (array) $data_arr['dataListStudent'];
+
+            if(count($dataListStudent)>0){
+                for($i=0;$i<count($dataListStudent);$i++){
+                    $d = (array) $dataListStudent[$i];
+                    $arr = array(
+                        'SAID' => $ID,
+                        'NPM' => $d['NPM']
+                    );
+                    $this->db->insert('db_studentlife.student_achievement_student',$arr);
+                }
+            }
+
+
             return print_r(1);
+        } else if($data_arr['action']=='viewDataPAM'){
+
+            $data = $this->db->query('SELECT * FROM db_studentlife.student_achievement ORDER BY Year, StartDate DESC')->result_array();
+
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $ID = $data[$i]['ID'];
+                    $data[$i]['DataStudent'] = $this->db->query('SELECT sas.*, ats.Name FROM db_studentlife.student_achievement_student sas 
+                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sas.NPM)
+                                                            WHERE sas.SAID = "'.$ID.'" ')->result_array();
+                }
+            }
+
+            return print_r(json_encode($data));
+
         }
 
         else if($data_arr['action']=='updateLamaStudy'){
@@ -1399,6 +1436,13 @@ class C_api3 extends CI_Controller {
         }
 
         else if($data_arr['action']=='viewPAM'){
+
+            $data = $this->db->get_where('db_studentlife.student_achievement', array(
+                'Type' => $data_arr['Type']
+            ))->result_array();
+            return print_r(json_encode($data));
+
+            exit;
 
             $data = $this->db->get_where('db_agregator.prestasi_mahasiswa', array(
                 'Type' => $data_arr['Type']
@@ -1520,10 +1564,31 @@ class C_api3 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='getPAMByID'){
+            $ID = $data_arr['ID'];
+            $dataAch = $this->db->get_where('db_studentlife.student_achievement',array('ID' => $ID))->result_array();
+
+            $dataAchStd = $this->db->query('SELECT sas.NPM,ats.Name FROM db_studentlife.student_achievement_student sas 
+                                                        LEFT JOIN db_academic.auth_students ats ON (sas.NPM = ats.NPM)
+                                                        WHERE sas.SAID = "'.$ID.'" ORDER BY ats.Name')->result_array();
+
+            $arr = array(
+                'dataAch' => $dataAch,
+                'dataAchStd' => $dataAchStd
+            );
+
+            return print_r(json_encode($arr));
+        }
+
         else if($data_arr['action']=='removePAM'){
 
+
+            $this->db->where('SAID', $data_arr['ID']);
+            $this->db->delete('db_studentlife.student_achievement_student');
+            $this->db->reset_query();
+
             $this->db->where('ID', $data_arr['ID']);
-            $this->db->delete('db_agregator.prestasi_mahasiswa');
+            $this->db->delete('db_studentlife.student_achievement');
             return print_r(1);
 
         }

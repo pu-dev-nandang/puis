@@ -609,6 +609,19 @@ class C_api extends CI_Controller {
 
     }
 
+    public function getStudentsServerSide(){
+
+        $key = $this->input->post('key');
+
+        $data = $this->db->query('SELECT NPM, Name FROM db_academic.auth_students ats 
+                                                    WHERE ats.NPM LIKE "%'.$key.'%" 
+                                                    OR ats.Name LIKE "%'.$key.'%" 
+                                                    ORDER BY Name ASC LIMIT 5 ')->result_array();
+
+        return print_r(json_encode($data));
+
+    }
+
     public function getStudentsAdmission(){
         $requestData= $_REQUEST;
 
