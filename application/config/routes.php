@@ -1036,8 +1036,6 @@ $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataI
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
-$route['rest2/__get_data_kerja_sama_perguruan_tinggi_aggregator'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi_aggregator';
-
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
 $route['api/__test_data'] = 'api/c_api/test_data';
@@ -1356,6 +1354,7 @@ $route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akre
 $route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tidak_tetap';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-aps-program-study'] = 'c_save_to_excel2/excel_aps_program_study';
+$route['agregator/excel-kerjasama-perguruan-tinggi'] = 'c_save_to_excel2/excel_kerjasama_perguruan_tinggi';
 
 
 
@@ -1836,7 +1835,6 @@ $route['upload/remove-skripsi'] = 'api/c_upload/remove_skripsi';
 
 // Loging
 $route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
-
 
 // don't show Digital Signature
 $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';

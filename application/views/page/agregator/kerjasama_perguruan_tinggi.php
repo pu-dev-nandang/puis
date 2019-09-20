@@ -31,6 +31,7 @@
                                     <th rowspan="2">Bentuk Kegiatan / Manfaat</th>
                                     <th rowspan="2">Bukti Kerjasama</th>
                                     <th rowspan="2">Masa Berlaku (Tahun Berakhir, YYYY)</th>
+                                    <th rowspan="2">Semester</th>
                                 </tr>
                                 <tr>
                                     <th>Internasional</th>
@@ -63,6 +64,7 @@
     {
         var data = {
             auth : 's3Cr3T-G4N',
+            mode : 'DataKerjaSamaAggregator',
         };
         var token = jwt_encode(data,"UAP)(*");
         $('#TblKerjaSama tbody').empty();
@@ -79,7 +81,7 @@
               "searchPlaceholder": "Search",
           },
             "ajax":{
-                url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi_aggregator", // json datasource
+                url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi", // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
                 data : {token : token},
@@ -99,12 +101,28 @@
 
                 var File = jQuery.parseJSON(data[7]);
                 var html = data[6]+'</br><a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">Attachment</a>';
-                $( row ).find('td:eq(6)').html(html); 
+                $( row ).find('td:eq(6)').html(html);
+
+                 $( row ).find('td:eq(7)').html(data[8]);
+                 $( row ).find('td:eq(8)').html(data[9]);
             },
             dom: 'l<"toolbar">frtip',
             "initComplete": function(settings, json) {
-                // console.log(json);
+                passToExcel = json.queryPass;
             }
         });
     }
+
+    $("#btndownloaadExcel").click(function(){
+        if (passToExcel != '') {
+          var url = base_url_js+'agregator/excel-kerjasama-perguruan-tinggi';
+          data = {
+            passToExcel : passToExcel
+          }
+          var token = jwt_encode(data,"UAP)(*");
+          FormSubmitAuto(url, 'POST', [
+              { name: 'token', value: token },
+          ]);  
+        }
+    })
 </script>
