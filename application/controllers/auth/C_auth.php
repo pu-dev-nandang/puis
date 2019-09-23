@@ -534,6 +534,9 @@ class C_auth extends Globalclass {
 
     public function toStdPlanning($ta,$NIP){
 
+        print_r('Exited');
+        exit;
+
         $max_execution_time = 360;
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', $max_execution_time); //60 seconds = 1 minutes
