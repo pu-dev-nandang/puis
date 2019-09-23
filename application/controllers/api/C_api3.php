@@ -1007,7 +1007,10 @@ class C_api3 extends CI_Controller {
                 $ID_sumberdana = $G_research[$i]['ID'];
                 for ($j=0; $j < count($arr_year); $j++) { 
                     $Year_ = $arr_year[$j];
-                     $sql = 'select Judul_litabmas from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     //$sql = 'select Judul_litabmas from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $sql = 'SELECT a.Judul_litabmas, b.Name
+                            FROM db_research.litabmas AS a
+                            LEFT JOIN db_employees.employees AS b ON (b.NIP = a.NIP) where a.ID_sumberdana = ? and a.ID_thn_laks = ? ';
                      $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
                      // $count = $query[0]['total'];
                      $temp[] = $query;
@@ -1042,8 +1045,10 @@ class C_api3 extends CI_Controller {
                 $ID_sumberdana = $G_research[$i]['ID'];
                 for ($j=0; $j < count($arr_year); $j++) { 
                     $Year_ = $arr_year[$j];
-                     //$sql = 'select count(*) as total from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
-                     $sql = 'select Judul_PKM from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     //$sql = 'select Judul_PKM from db_research.pengabdian_masyarakat where ID_sumberdana = ? and ID_thn_laks = ? ';
+                    $sql = 'SELECT a.Judul_PKM, b.Name
+                            FROM db_research.pengabdian_masyarakat AS a
+                            LEFT JOIN db_employees.employees AS b ON (b.NIP = a.NIP) where a.ID_sumberdana = ? and a.ID_thn_laks = ? ';
                      $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
                      //$count = $query[0]['total'];
                      //$temp[] = $count;
