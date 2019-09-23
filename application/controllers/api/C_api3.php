@@ -3200,7 +3200,7 @@ class C_api3 extends CI_Controller {
 
         $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn, 
                             (CASE WHEN lem.NIP = lem.UserID THEN 0 ELSE lem.UserID END ) AS LoginAs, 
-                            (CASE WHEN em2.Name = em.Name THEN 0 ELSE em2.Name END) AS LoginAsLec, 
+                            (CASE WHEN em2.Name = em.Name THEN NULL ELSE em2.Name END) AS LoginAsLec, 
                             ats.Name AS LoginAsStd,lem.URL
                             FROM db_employees.log_employees lem 
                             LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP) 
@@ -3222,20 +3222,19 @@ class C_api3 extends CI_Controller {
             $nestedData = array();
             $row = $query[$i];
 
-            $LoginAs = '-';
-            if($row['LoginAs']!=0 || $row['LoginAs']!='0'){
 
-                $LoginAs = ($row['LoginAsLec']!=0 && $row['LoginAsLec']!='0' && $row['LoginAsLec']!=null)
-                    ? 'Lec : '.$row['LoginAsLec']
-                    : 'Std : '.$row['LoginAsStd'];
 
-            }
+            $LoginAsLecturer = ($row['LoginAsLec']!='' && $row['LoginAsLec']!=null)
+                ? $row['LoginAsLec'] : '';
+            $LoginAsStudent = ($row['LoginAsStd']!='' && $row['LoginAsStd']!=null)
+                ? ucwords(strtolower($row['LoginAsStd'])) : '';
 
 
             $nestedData[] = '<div>'.$no.'</div>';
             $nestedData[] = '<div>'.$row['Name'].'</div>';
             $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
-            $nestedData[] = '<div>'.$LoginAs.'</div>';
+            $nestedData[] = '<div>'.$LoginAsLecturer.'</div>';
+            $nestedData[] = '<div>'.$LoginAsStudent.'</div>';
             $nestedData[] = '<div>'.$row['URL'].'</div>';
 
             $data[] = $nestedData;
@@ -3247,7 +3246,8 @@ class C_api3 extends CI_Controller {
             "draw"            => intval( $requestData['draw'] ),
             "recordsTotal"    => intval(count($queryDefaultRow)),
             "recordsFiltered" => intval( count($queryDefaultRow) ),
-            "data"            => $data
+            "data"            => $data,
+            "dataQuery"            => $query
         );
         echo json_encode($json_data);
 
