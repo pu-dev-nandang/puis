@@ -2763,12 +2763,14 @@ class C_save_to_excel extends CI_Controller
 
     public function intake_Excel()
     {
+        // error_reporting(0);
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $input = (array) $this->jwt->decode($token,$key);
         $this->load->model('admission/m_admission');
         $Year = $input['Year'];
-        $getData = $this->m_admission->getIntakeByYear($Year);
+        $datechoose = $input['datechoose'];
+        $getData = $this->m_admission->getIntakeByYear($Year,$datechoose);
         $this->getExcelIntake_admission($getData,$Year);
     }
 
@@ -2777,6 +2779,7 @@ class C_save_to_excel extends CI_Controller
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
         $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+         // print_r($GetDateNow);die();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load('./uploads/admisi/rekap_intake.xlsx'); // Empty Sheet
