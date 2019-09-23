@@ -173,7 +173,7 @@
                tr = tr+'<tr>' +
                    '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                    '<td>'+v.Judul_litabmas+'</td>' +
-                   //'<td style="text-align: left;">'+v.Name+'</td>' +
+                   '<td>'+v.Name+'</td>' +
                    '</tr>';
             });
         }
@@ -188,7 +188,7 @@
             '            <tr>' +
             '                <th style="width: 5%;">No</th>' +
             '                <th style="width: 25%;">Nama Judul</th>' +
-            //'                <th>Name</th>' +
+            '                <th style="width: 25%;">Nama Dosen</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +
