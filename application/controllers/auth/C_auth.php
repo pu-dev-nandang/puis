@@ -540,9 +540,17 @@ class C_auth extends Globalclass {
 
         $db = 'ta_'.$ta;
 
-        $dataSP = $this->db->order_by('SemesterID ASC, NPM ASC')->get($db.'.study_planning')->result_array();
+        $dataSP = $this->db->order_by('SemesterID ASC, NPM ASC')->get_where($db.'.study_planning',array('SemesterID' => 15))->result_array();
 
         if(count($dataSP)>0){
+            $this->db->where(array(
+                'ClassOf' => $ta,
+                'SemesterID' => 15
+
+            ));
+            $this->db->delete('db_academic.std_study_planning');
+            $this->db->reset_query();
+
             foreach ($dataSP AS $item){
                 $arr = array(
                     'SPID' => $item['ID'],
@@ -557,7 +565,7 @@ class C_auth extends Globalclass {
                     'EntredBy' => $NIP
                 );
 
-//                $this->db->insert('db_academic.std_study_planning',$arr);
+                $this->db->insert('db_academic.std_study_planning',$arr);
             }
         }
 
