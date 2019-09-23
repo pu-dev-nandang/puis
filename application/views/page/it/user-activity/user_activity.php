@@ -23,7 +23,8 @@
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 25%;">Name</th>' +
             '                <th style="width: 15%;">Accessed At</th>' +
-            '                <th style="width: 25%;">Login As</th>' +
+            '                <th style="width: 25%;">Accessed Lecturer</th>' +
+            '                <th style="width: 25%;">Accessed Student</th>' +
             '                <th>URL</th>' +
             '            </tr>' +
             '            </thead>' +
