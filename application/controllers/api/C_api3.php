@@ -1337,10 +1337,9 @@ class C_api3 extends CI_Controller {
             }
 
             return print_r($result);
-
         }
-
     }
+
 
     public function crudAgregatorTB5(){
 
@@ -2231,7 +2230,10 @@ class C_api3 extends CI_Controller {
     public function getsitasikarya(){
 
         $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT Nama_penulis, Judul_artikel, Banyak_artikel, Tahun FROM db_agregator.sitasi_karya ORDER BY ID DESC')->result_array();
+        $data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
+                    FROM db_agregator.sitasi_karya AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
+                    ORDER BY a.ID DESC')->result_array();
         return print_r(json_encode($data));
 
     }
