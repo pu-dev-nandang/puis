@@ -81,16 +81,23 @@ function LoadTableData(filterProdi)
 
         var selector = $('#dataTablesRekognisiDosen tbody');
         var body = jsonResult.body;
-        for (var i = 0; i < body.length; i++) {
-              var t = '<tr>';
-              var arr = body[i];
-              for (var j = 0; j < arr.length; j++) {
-                    t+= '<td>'+arr[j]+'</td>'; 
-              }
+        if (body.length > 0) {
+            for (var i = 0; i < body.length; i++) {
+                  var t = '<tr>';
+                  var arr = body[i];
+                  for (var j = 0; j < arr.length; j++) {
+                        t+= '<td>'+arr[j]+'</td>'; 
+                  }
 
-              t += '</tr>';
-              selector.append(t);   
+                  t += '</tr>';
+                  selector.append(t);   
+            }
         }
+        else
+        {
+            selector.append('<tr><th colspan="9">No data found in the server</th></tr>');
+        }
+        
     });
 
 }
