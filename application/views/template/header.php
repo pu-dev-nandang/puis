@@ -81,6 +81,12 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(1)=='my-activities'){echo 'current';} ?>">
+                <a href="<?php echo base_url('my-activities'); ?>">
+                    <i class="icon-home"></i>
+                    <span>My Activities</span>
+                </a>
+            </li>
             <li class="hide">
                 <a href="javascript:void(0);" id="btn_announcement">
                     <i class="fa fa-bullhorn" aria-hidden="true"></i>

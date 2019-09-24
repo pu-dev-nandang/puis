@@ -56,6 +56,7 @@ $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 
 // === Dashboard ===
 $route['dashboard'] = 'dashboard/c_dashboard';
+$route['my-activities'] = 'dashboard/c_dashboard/myactivities';
 $route['profile/(:any)'] = 'dashboard/c_dashboard/profile/$1';
 $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
