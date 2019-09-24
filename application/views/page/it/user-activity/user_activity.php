@@ -21,11 +21,11 @@
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th style="width: 25%;">Name</th>' +
-            '                <th style="width: 15%;">Accessed At</th>' +
-            '                <th style="width: 25%;">Accessed Lecturer</th>' +
-            '                <th style="width: 25%;">Accessed Student</th>' +
-            '                <th>URL</th>' +
+            '                <th style="width: 20%;">Name</th>' +
+            '                <th style="width: 10%;">Accessed At</th>' +
+            '                <th style="width: 15%;">Accessed Lecturer</th>' +
+            '                <th style="width: 15%;">Accessed Student</th>' +
+            '                <th>Accessed</th>' +
             '            </tr>' +
             '            </thead>' +
             '        </table>');

@@ -3288,13 +3288,30 @@ class C_api3 extends CI_Controller {
             $LoginAsStudent = ($row['LoginAsStd']!='' && $row['LoginAsStd']!=null)
                 ? ucwords(strtolower($row['LoginAsStd'])) : '';
 
+            $urlExp = explode('/',$row['URL']);
+
+            $viewLink = '';
+            if(count($urlExp)>3){
+                for($i2=0;$i2<count($urlExp);$i2++){
+                    if($i2>3){
+                        $lg = strlen($urlExp[$i2]);
+                        $vl = ($lg<=55) ? $urlExp[$i2] : '';
+
+                        $de = ($i2!=3 && $i2!=count($urlExp)) ? '<i class="fa fa-angle-right"></i>' : '';
+                        $viewLink = $viewLink.' '.$de.' <b>'.$vl.'</b>';
+                    }
+
+                }
+            } else {
+                $viewLink = $urlExp[3];
+            }
 
             $nestedData[] = '<div>'.$no.'</div>';
             $nestedData[] = '<div>'.$row['Name'].'</div>';
             $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
             $nestedData[] = '<div>'.$LoginAsLecturer.'</div>';
             $nestedData[] = '<div>'.$LoginAsStudent.'</div>';
-            $nestedData[] = '<div>'.$row['URL'].'</div>';
+            $nestedData[] = '<div>'.$viewLink.'</div>';
 
             $data[] = $nestedData;
             $no++;
