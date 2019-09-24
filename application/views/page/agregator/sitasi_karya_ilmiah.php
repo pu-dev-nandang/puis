@@ -17,7 +17,6 @@
 <div class="well">
     <div class="row">
         <div class="col-md-12">
-            <p style="color:#3968c6;"><b> Sitasi Karya Ilmiah </b></p>
             <div style="text-align: right;margin-bottom: 20px;">
                 <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Sitasi Karya Ilmiah</button>
             </div>
@@ -36,10 +35,10 @@
         var body = '<div class="row">' +
             '    <div class="col-md-12">' +
             '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <label> Nama Penulis </label> '+
-            '                <input class="form-control" id="nama_penulis">' +
-            '            </div>' +
+            '        <div class="form-group">' +
+            '           <label>Nama Dosen Penulis</label>' + 
+            '              <select class="full-width-fix" size="5" id="nama_penulis" style="width: 100%;" size="5"><option></option></select>' +
+            '        </div>' +
             '            <div class="form-group">' +
             '                <label>Judul Artikel yang Disitasi </label> '+
             '                <input class="form-control" id="judul_artikel">' +
@@ -55,7 +54,6 @@
             '        </div>' +
             '    </div>' +
             '    ' +
-        
             '</div>';
 
         $('#GlobalModal .modal-body').html(body);
@@ -88,7 +86,9 @@
           }).attr("readonly", false);
         });
         // --------------------------------
-
+        loadSelectOptionLecturersSingle('#nama_penulis','');
+        $('#nama_penulis').select2({allowClear: true});
+        
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -106,7 +106,6 @@
         var banyak_artikel = $('#banyak_artikel').val();
         var tahun = $('#tahun').val();
         var nama_judul =  judul_artikel.toUpperCase();
-        var penulis =  nama_penulis.toUpperCase();
 
         if(nama_penulis!='' && nama_penulis!=null &&
             judul_artikel!='' && judul_artikel!=null &&
@@ -116,7 +115,7 @@
             var data = {
                 action : 'save_sitasi_karya',
                 dataForm : {
-                    Nama_penulis : penulis,
+                    NIP_penulis : nama_penulis,
                     Judul_artikel : nama_judul,
                     Banyak_artikel : banyak_artikel,
                     Tahun : tahun
@@ -192,7 +191,7 @@
 
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.Nama_penulis+'</td>' +
+                        '   <td style="text-align: left;">'+v.Name+'</td>' +
                         '   <td style="text-align: left;">'+v.Judul_artikel+'</td>' +
                         '   <td style="text-align: center;">'+v.Banyak_artikel+'</td>' +
                         '   <td style="text-align: center;">'+v.Tahun+'</td>' +
