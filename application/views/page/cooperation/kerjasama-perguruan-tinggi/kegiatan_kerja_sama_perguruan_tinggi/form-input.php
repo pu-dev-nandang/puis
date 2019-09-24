@@ -147,6 +147,7 @@
            '<thead>'+
               '<tr>'+
                  '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                 '<th>Code</th>'+
                  '<th>Departement</th>'+
               '</tr>'+
            '</thead>'+
@@ -184,6 +185,12 @@
 			         'targets': 1,
 			         'render': function (data, type, full, meta){
 			             return full.Abbr;
+			         }
+			      },
+			      {
+			         'targets': 2,
+			         'render': function (data, type, full, meta){
+			             return full.Name1;
 			         }
 			      },
 		      ],

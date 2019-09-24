@@ -1362,6 +1362,7 @@ $route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tida
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-aps-program-study'] = 'c_save_to_excel2/excel_aps_program_study';
 $route['agregator/excel-kerjasama-perguruan-tinggi'] = 'c_save_to_excel2/excel_kerjasama_perguruan_tinggi';
+$route['agregator_aps/excel-kerjasama-tridarma'] = 'c_save_to_excel2/aps_excel_kerjasama_tridarma';
 
 
 

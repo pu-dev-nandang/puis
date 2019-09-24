@@ -4870,22 +4870,31 @@ class C_rest2 extends CI_Controller {
                     case 'DataKerjaSamaAggregator':
                         $Year = date('Y');
                         $Year3 = $Year - 2;
-                        $sqltotalData = 'select count(*) as total from db_cooperation.kegiatan as z
+                        $sqltotalData = 'select count(*) as total from (
+                                    select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,x.Lembaga,x.EndDate,yy.Departement
+                                    from db_cooperation.kegiatan as z
                                         join db_cooperation.kerjasama as x on z.KerjasamaID = x.ID
+                                        join db_cooperation.keg_department as yy on z.ID = yy.KegiatanID
                             ';
                         $WhereFiltering =  'where Year(x.EndDate) >= '.$Year3;
-                        $sqltotalData .= $WhereFiltering;   
+                        if (array_key_exists('ProdiID', $dataToken)) {
+                            $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                            $WhereFiltering .= $WhereORAnd.' yy.Departement = "AC.'.$dataToken['ProdiID'].'" ';
+                            // $sqltotalData .= $WhereFiltering;  
+                        }
+                        $sqltotalData .= $WhereFiltering;  
                         $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
                         $sqltotalData .= $WhereORAnd.' (           
                                z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                x.Lembaga LIKE "'.$requestData['search']['value'].'%"
-                          )';
+                          ) group by z.ID ) xx';
+                          // print_r($sqltotalData);die();
                         $querytotalData = $this->db->query($sqltotalData)->result_array();
                         $totalData = $querytotalData[0]['total'];
 
-                        $sql = 'select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,x.StartDate,x.EndDate,x.Lembaga,z.KerjasamaID,
+                        $sql = 'select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,x.Lembaga,z.KerjasamaID,
                                 if(x.Tingkat = "Nasional",1,0) as Nasional,if(x.Tingkat = "Internasional",1,0) as Internasional,
                                 if(x.Tingkat= "Lokal",1,0) as Lokal,x.BuktiName,x.BuktiUpload,z.SemesterID,y.Name as SemesterName,x.Kategori
                                 from db_cooperation.kegiatan as z
@@ -4913,6 +4922,7 @@ class C_rest2 extends CI_Controller {
                                 ) as x
                                 on x.KerjasamaID = z.KerjasamaID
                                 join db_academic.semester as y on z.SemesterID = y.ID
+                                join db_cooperation.keg_department as yy on z.ID = yy.KegiatanID
                         ';
                         $sql .= $WhereFiltering;   
                         $queryPass = $sql;
@@ -4924,7 +4934,7 @@ class C_rest2 extends CI_Controller {
                                z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                x.Lembaga LIKE "'.$requestData['search']['value'].'%"
                           )';
-                      $sql.= ' ORDER BY z.StartDate asc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                      $sql.= ' group by z.ID ORDER BY z.StartDate asc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                       $query = $this->db->query($sql)->result_array();
                       $No = $requestData['start'] + 1;
                       $data = array();
@@ -4941,6 +4951,9 @@ class C_rest2 extends CI_Controller {
                           $nestedData[] = $row['BuktiUpload'];
                           $nestedData[] = $this->m_master->getDateIndonesian($row['EndDate']);
                           $nestedData[] = $row['SemesterName'];
+                          $nestedData[] = $row['JudulKegiatan'];
+                          $nestedData[] = $row['ManfaatKegiatan'];
+                          $nestedData[] = $this->m_master->getDateIndonesian($row['StartDate']);
                           $nestedData[] = $row['KerjasamaID'];
                           $nestedData[] = $row['ID'];
                           $data[] = $nestedData;
