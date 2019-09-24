@@ -967,15 +967,27 @@ class C_api3 extends CI_Controller {
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
 
-                // add bukti upload,bukti name dan tingkat
+                // add bukti upload,buktiname dan tingkat
+                $BuktiUpload = json_encode('');
                 if (array_key_exists('BuktiUpload', $_FILES)) {
-                    
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/Agregator/Aps/');
+                    $Upload = json_encode($Upload);
+                    $BuktiUpload = $Upload;
                 }
 
+                $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->where('ID',$ID);
                 $this->db->update('db_agregator.rekognisi_dosen',$dataForm);
             } else {
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                // add bukti upload,buktiname dan tingkat
+                $BuktiUpload = json_encode(array());
+                if (array_key_exists('BuktiUpload', $_FILES)) {
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/Agregator/Aps/');
+                    $Upload = json_encode($Upload);
+                    $BuktiUpload = $Upload;
+                }
+                $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
             }
 
@@ -989,6 +1001,18 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='removeDataRekognisiDosen') {
             $ID = $data_arr['ID'];
+
+            // remove file is exist
+            $G_data = $this->m_master->caribasedprimary('db_agregator.rekognisi_dosen','ID',$ID);
+            if ($G_data[0]['BuktiPendukungUpload'] != '' && $G_data[0]['BuktiPendukungUpload'] != null) {
+                $arr_file = (array) json_decode($G_data[0]['BuktiPendukungUpload'],true);
+                if (count($arr_file) > 0) {
+                    $filePath = 'Agregator\\Aps\\'.$arr_file[0]; // pasti ada file karena required
+                    $path = FCPATH.'uploads\\'.$filePath;
+                    unlink($path);
+                }
+            }
+
             $this->db->where('ID', $ID);
             $this->db->delete('db_agregator.rekognisi_dosen');
             return print_r(1);

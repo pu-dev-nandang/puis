@@ -43,5 +43,55 @@ function LoadTableData(filterProdi)
 {
     var P = filterProdi.split('.');
     var ProdiID = P[0];
+    var data = {
+        auth : 's3Cr3T-G4N',
+        mode : 'RekognisiDosenKaryaIlmiah',
+        ProdiID : ProdiID,
+    };
+    var token = jwt_encode(data,"UAP)(*");
+    var url = base_url_js+"rest3/__get_APS_CrudAgregatorTB3";
+    $.post(url,{token:token},function (jsonResult) {
+        var selector = $('#viewTable');
+         var header = jsonResult.header;
+         var html = '';
+         var html = '<table class = "table table-bordered dataTable2Excel" id = "dataTablesRekognisiDosen" data-name="TblRekognisiDosen">'+
+                        '<thead>'+
+                            '<tr>';
+         for (var i = 0; i < header.length; i++) {
+             html += '<th rowspan = "'+header[i].rowspan+'" colspan = "'+header[i].colspan+'">'+header[i].Name+'</th>';
+         }
+
+         html += '</tr>';
+         html += '<tr>';
+
+         for (var i = 0; i < header.length; i++) {
+             if (header[i].colspan > 1) {
+                var Sub = header[i].Sub;
+                for (var k = 0; k < Sub.length; k++) {
+                   html += '<th>'+Sub[k]+'</th>'; 
+                }
+             }
+         }
+
+         html += '</tr>';
+         html += '</thead>'+
+                 '<tbody></tbody></table>';
+
+        selector.html(html); 
+
+        var selector = $('#dataTablesRekognisiDosen tbody');
+        var body = jsonResult.body;
+        for (var i = 0; i < body.length; i++) {
+              var t = '<tr>';
+              var arr = body[i];
+              for (var j = 0; j < arr.length; j++) {
+                    t+= '<td>'+arr[j]+'</td>'; 
+              }
+
+              t += '</tr>';
+              selector.append(t);   
+        }
+    });
+
 }
 </script>

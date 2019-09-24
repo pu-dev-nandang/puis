@@ -1042,8 +1042,8 @@ $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
 $route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
+// rest3 
 $route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
-
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
