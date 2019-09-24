@@ -966,6 +966,12 @@ class C_api3 extends CI_Controller {
             if($ID!=''){
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                // add bukti upload,bukti name dan tingkat
+                if (array_key_exists('BuktiUpload', $_FILES)) {
+                    
+                }
+
                 $this->db->where('ID',$ID);
                 $this->db->update('db_agregator.rekognisi_dosen',$dataForm);
             } else {
