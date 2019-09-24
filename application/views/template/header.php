@@ -83,7 +83,7 @@
             </li>
             <li class="<?php if($this->uri->segment(1)=='my-activities'){echo 'current';} ?>">
                 <a href="<?php echo base_url('my-activities'); ?>">
-                    <i class="icon-home"></i>
+                    <i class="fa fa-line-chart"></i>
                     <span>My Activities</span>
                 </a>
             </li>
