@@ -179,11 +179,13 @@ class C_rest3 extends CI_Controller {
                 $header[] = ['Name' => 'Jumlah Sitasi','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
 
                 $body = [];
+                $ProdiID = $dataToken['ProdiID'];
                 $sql = 'select a.*,b.Name from db_agregator.rekognisi_dosen as a 
                         join db_employees.employees as b on a.NIP = b.NIP
+                        where b.ProdiID = ?
                         order by a.ID desc limit 1000
                         ';
-                $query=$this->db->query($sql, array())->result_array();
+                $query=$this->db->query($sql, array($ProdiID))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                     $No = $i + 1;
                     $NIP = $query[$i]['NIP'];
