@@ -4998,5 +4998,4 @@ class C_rest2 extends CI_Controller {
 
     	echo json_encode($query);
     }
-
 }
