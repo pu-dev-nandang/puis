@@ -3230,19 +3230,20 @@ class C_api3 extends CI_Controller {
             $urlExp = explode('/',$row['URL']);
 
             $viewLink = '';
-            if(count($urlExp)>3){
+            $im = 2;
+            if(count($urlExp)>$im){
                 for($i2=0;$i2<count($urlExp);$i2++){
-                    if($i2>3){
+                    if($i2>$im){
                         $lg = strlen($urlExp[$i2]);
                         $vl = ($lg<=55) ? $urlExp[$i2] : '';
 
-                        $de = ($i2!=3 && $i2!=count($urlExp)) ? '<i class="fa fa-angle-right"></i>' : '';
+                        $de = ($i2!=$im && $i2!=count($urlExp)) ? '<i class="fa fa-angle-right"></i>' : '';
                         $viewLink = $viewLink.' '.$de.' <b>'.$vl.'</b>';
                     }
 
                 }
             } else {
-                $viewLink = $urlExp[3];
+                $viewLink = $urlExp[$im];
             }
 
             $nestedData[] = '<div>'.$no.'</div>';
