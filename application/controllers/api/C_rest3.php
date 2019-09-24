@@ -167,7 +167,95 @@ class C_rest3 extends CI_Controller {
                 $rs['body'] = $body;
                 echo json_encode($rs);
                 break;
-            
+            case 'RekognisiDosenKaryaIlmiah':
+                $rs = ['header' => [],'body' => [] ];
+                $header = [];
+                $header[] = ['Name' => 'No','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Nama Dosen','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Rekognisi dan Bukti Pendukung','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Tingkat','rowspan' => 1,'Sub' => ['Wilayah','Nasional','Internasional'],'colspan' => 3 ];
+                $header[] = ['Name' => 'Tahun Rekognisi (YYYY)','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Judul Artikel yang Disitasi (Jurnal, Volume, Tahun, Nomor, Halaman)','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Jumlah Sitasi','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+
+                $body = [];
+                $sql = 'select a.*,b.Name from db_agregator.rekognisi_dosen as a 
+                        join db_employees.employees as b on a.NIP = b.NIP
+                        order by a.ID desc limit 1000
+                        ';
+                $query=$this->db->query($sql, array())->result_array();
+                for ($i=0; $i < count($query); $i++) { 
+                    $No = $i + 1;
+                    $NIP = $query[$i]['NIP'];
+                    $NameDosen = $query[$i]['Name'];
+                    $G_dt_artikel = $this->m_master->caribasedprimary('db_agregator.sitasi_karya','NIP_penulis',$NIP);
+                    $temp = [];
+                    for ($k=0; $k < count($header); $k++) { 
+                        switch ($k) {
+                            case 0: // No
+                               $temp[] = $No;
+                                break;
+                            case 1: // Name
+                               $temp[] = $NameDosen;
+                                break;
+                            case 2: // Rekognisi dan Bukti Pendukung
+                               $Rekognisi = $query[$i]['Rekognisi'];
+                               $BuktiName = $query[$i]['BuktiPendukungName'];
+                               $BuktiPendukungUpload = $query[$i]['BuktiPendukungUpload'];
+                               $arr_file = (array) json_decode($BuktiPendukungUpload,true);
+                               $wr = $Rekognisi;
+                               if ($BuktiName != '' && count($arr_file) > 0 ) {
+                                   $wr .= '<br/>'.$BuktiName.'<br/>'.'<a href="'.base_url().'fileGetAny/Agregator-Aps-'.$arr_file[0].'" target="_blank" class="Fileexist">Attachment</a>';
+                               }
+                               $temp[] = $wr;
+                                break;
+                            case 3: // Tingkat
+                                $Sub = ['Wilayah','Nasional','Internasional'];
+                                for ($l=0; $l < count($Sub); $l++) {
+                                    $wr = '';
+                                   if ($Sub[$l] == $query[$i]['Tingkat']) {
+                                       $wr = 'V'; 
+                                   }
+                                   $temp[] = $wr;
+                                }
+                               break;
+                            case 4: // Tahun
+                               $wr = $query[$i]['Tahun'];
+                               $temp[] = $wr;
+                               break;
+                            case 5: // Judul Artikel
+                               $wr = '';
+                               if (count($G_dt_artikel) > 0) {
+                                   $wr .= $G_dt_artikel[0]['Judul_artikel'];
+                                   for ($l=1; $l < count($G_dt_artikel); $l++) { 
+                                      $wr .= '<br/>'.$G_dt_artikel[$l]['Judul_artikel'];
+                                   }
+                               }
+                               $temp[] = $wr;
+                               break;
+                            case 6: // Jumlah sitasi
+                               $wr = '';
+                               if (count($G_dt_artikel) > 0) {
+                                   $wr .= $G_dt_artikel[0]['Banyak_artikel'];
+                                   for ($l=1; $l < count($G_dt_artikel); $l++) { 
+                                      $wr .= '<br/>'.$G_dt_artikel[$l]['Banyak_artikel'];
+                                   }
+                               }
+                               $temp[] = $wr;
+                               break;
+                            default:
+                                # code...
+                                break;
+                        }
+                    }
+
+                    $body[] = $temp;
+                }
+
+                $rs['header'] = $header;
+                $rs['body'] = $body;
+                echo json_encode($rs);    
+                break;
             default:
                 # code...
                 break;
