@@ -42,7 +42,13 @@
             var html = '<div class = "row" style = "margin-top : 10px;">'+
                             '<div class = "col-xs-12">'+
                                 '<div class = "well">'+
-                                    '<div class = "row">'+
+                                    '<div class="row">'+
+                                        '<div class="col-md-12" style="text-align: right">'+
+                                            '<b>Download File : </b>'+
+                                            '<button class="btn btn-success btn-circle" id="btndownloaadExcel"><i class="fa fa-file-excel-o"></i> </button>'+
+                                        '</div>'+
+                                    '</div>'+
+                                    '<div class = "row" style = "margin-top:10px;">'+
                                         '<div class = "col-xs-12">'+
                                             '<table class="table table-bordered" id = "TblKerjaSama" style="width: 100%">'+
                                         '<thead>'+
@@ -135,5 +141,19 @@
             }
         });
     }
+
+    $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
+
+        if (passToExcel != '') {
+          var url = base_url_js+'agregator_aps/excel-kerjasama-tridarma';
+          data = {
+            passToExcel : passToExcel
+          }
+          var token = jwt_encode(data,"UAP)(*");
+          FormSubmitAuto(url, 'POST', [
+              { name: 'token', value: token },
+          ]);  
+        }
+    })
 
 </script>
