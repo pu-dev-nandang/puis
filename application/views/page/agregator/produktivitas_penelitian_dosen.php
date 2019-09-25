@@ -1,7 +1,10 @@
 
 <style>
-    #tableData tr th, #tableData tr td {
+    .dataTable2Excel tr th, .dataTable2Excel tr td {
         text-align: center;
+    }
+    .dataTable2Excel tr td:nth-child(2) {
+        text-align: left;
     }
 </style>
 
@@ -101,7 +104,7 @@
             $('#listStd').empty();
 
             var arr_body_table = jsonResult.body;
-            // console.log(arr_body_table);
+            console.log(arr_body_table);
             if(arr_body_table.length>0){
                 for (var i = 0; i < arr_body_table.length; i++) {
                     var jumlahKanan = 0;
@@ -114,8 +117,8 @@
                         var viewDataTb = (key==0) ? arr[key] : arr[key].length;
                         var tokenPen = jwt_encode(arr[key],'UAP)(*');
 
-                        var isi = (viewDataTb!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pen="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
-                        htmlTableBody += '<td style="vertical-align : middle;text-align:center;">'+isi+'</td>';
+                        var isi = (viewDataTb!=0 && key!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pen="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
+                        htmlTableBody += '<td style="vertical-align : middle;">'+isi+'</td>';
                         //htmlTableBody += '<td>'+arr[key]+'</td>';
                     }
 

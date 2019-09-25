@@ -166,13 +166,13 @@
             if(jsonResult.length>0) {
 
                 for (var i = 0; i < jsonResult.length; i++) {
-                    var v = jsonResult[i]; 
+                    var v = jsonResult[i];
 
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.Nama_judul+'</td>' +
-                        '   <td style="text-align: center;">'+v.Tahun_perolehan+'</td>' +
-                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
+                        '   <td style="text-align: left;">'+v.Judul+'</td>' +
+                        '   <td style="text-align: center;">'+moment(v.tahun).format('YYYY')+'</td>' +
+                        '   <td style="text-align: left;">'+v.Ket+'</td>' +
                         '</tr>');
                     var total = parseInt(jsonResult.length);
                 }

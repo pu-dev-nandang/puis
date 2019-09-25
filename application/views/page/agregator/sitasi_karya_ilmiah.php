@@ -18,7 +18,8 @@
     <div class="row">
         <div class="col-md-12">
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Sitasi Karya Ilmiah</button>
+                <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Sitasi Karya Ilmiah</button>
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable"></div>
         </div>
@@ -148,8 +149,6 @@
             toastr.error('Soory, All form required','Error');
       }
     });    
-
-
 </script>
 
 <script>
@@ -166,7 +165,7 @@
 
     function loadAkreditasiProdi() {
 
-         $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
+         $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran" data-name="sitasi_karya_ilmiah">' +
             '    <thead>  '+
             '     <tr>   '+
             '        <th style="text-align: center; width: 5%;">No</th>  '+
@@ -185,6 +184,7 @@
         $.getJSON(url,function (jsonResult) {
 
             if(jsonResult.length>0) {
+                  var sumx = 0;
 
                 for (var i = 0; i < jsonResult.length; i++) {
                     var v = jsonResult[i]; 
@@ -197,10 +197,18 @@
                         '   <td style="text-align: center;">'+v.Tahun+'</td>' +
                         '</tr>');
                     var total = parseInt(jsonResult.length);
+                    var sumx = sumx + parseInt(v.Banyak_artikel);
+                    //sum += v.Banyak_artikel;
                 }
             }
                 
             $('#dataTablesLuaran').dataTable();
+
+            $('#listData').append('<tr>' +
+                    '<th colspan="3" style="text-align: center;">Jumlah</th>' +
+                    '<th style="text-align: center;">'+sumx+'</th>' +
+                    '</tr>')
+            //console.log(sum);
         });
 
     }
