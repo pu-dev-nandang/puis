@@ -1676,13 +1676,20 @@ class C_api3 extends CI_Controller {
             for ($i=0; $i < count($ProgramPendidikan); $i++) {
                 // define temp default
                 $temp = array();
-                $temp[] = $ProgramPendidikan[$i];
+                // $temp[] = $ProgramPendidikan[$i];
+                $temp[] = array('show' => $ProgramPendidikan[$i] ,'data' => '');
                 if ($i == 4) {
                    for ($j=2; $j < count($header); $j++) {
                        if ($j == 2) {
                            $sql = 'select count(*) as total from db_academic.program_study where Status = 1 and EducationLevelID in(3,9)';
                            $query=$this->db->query($sql, array())->result_array();
-                           $temp[] = $query[0]['total']; // Jumlah PS
+                           // get data detail
+                           $sql1 = 'select * from db_academic.program_study where Status = 1 and EducationLevelID in(3,9)';
+                           $query1=$this->db->query($sql1, array())->result_array();
+                           // encode token
+                           $token = $this->jwt->encode($query1,"UAP)(*");
+                           $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
+                           // $temp[] = $query[0]['total']; // Jumlah PS
                            continue;
                        }
                        else
@@ -1691,7 +1698,13 @@ class C_api3 extends CI_Controller {
                                $get_tayear = $header[$j]; // ex : 2014
                                $sql = 'select count(*) as total from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
                                $query=$this->db->query($sql, array(1))->result_array();
-                               $temp[] = $query[0]['total']; // Jumlah PS
+                               // get data detail
+                               $sql1 = 'select NPM,Name from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                               $query1=$this->db->query($sql1, array(1))->result_array();
+                               // encode token
+                               $token = $this->jwt->encode($query1,"UAP)(*");
+                               // $temp[] = $query[0]['total']; // Jumlah PS
+                               $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
                             }
                             else // pembeda Jumlah Lulusan pada dan Rata-rata IPK Lulusan pada
                             {
@@ -1717,7 +1730,8 @@ class C_api3 extends CI_Controller {
                                 }
 
                                 $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
-                                $temp[] = $IPK;
+                                // $temp[] = $IPK;
+                                $temp[] = array('show' => $IPK ,'data' => '');
                             }
 
                        }
@@ -1726,7 +1740,8 @@ class C_api3 extends CI_Controller {
                 else
                 {
                     for ($j=2; $j < count($header); $j++) {
-                        $temp[] = 0;
+                        // $temp[] = 0;
+                        $temp[] = array('show' => 0 ,'data' => '');
                     }
                 }
                 $body[] = $temp;
