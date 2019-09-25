@@ -3912,7 +3912,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment = "'.$DateFiltering2.'") as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering2.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3944,7 +3944,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment = "'.$DateFiltering.'") as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3954,6 +3954,7 @@ class M_admission extends CI_Model {
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.$Year.'"
                         ) ccc where ID_program_study = ? and C_bayar > 0';
+
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
               }
@@ -3975,7 +3976,7 @@ class M_admission extends CI_Model {
                           (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                           if(a.StatusReg = 1,
                           (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB('.$DateFiltering.', INTERVAL 7 DAY) ) as C_bayar
+                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB("'.$DateFiltering.'", INTERVAL 7 DAY) ) as C_bayar
                           from db_admission.register as a
                           join db_admission.school as b on a.SchoolID = b.ID
                           LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3985,6 +3986,7 @@ class M_admission extends CI_Model {
                           left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                            where a.SetTa = "'.$Year.'"
                           ) ccc where ID_program_study = ? and C_bayar > 0';
+
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
                 }
