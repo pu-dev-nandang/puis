@@ -64,7 +64,7 @@
 		$('#datetimepicker1').datetimepicker({
 			format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
      // startDate: date.addDays(0), // adding by policy booking minus 1
-		 startDate: date.addDays(<?php echo $dayPolicy ?>), // adding by policy booking minus 1
+		 // startDate: date.addDays(<?php echo $dayPolicy ?>), // adding by policy booking minus 1
 		});
 
 		$('#datetime_deadline1').prop('readonly',true);
