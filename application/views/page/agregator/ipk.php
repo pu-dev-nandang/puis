@@ -59,14 +59,28 @@
                 htmlBody += '<td>'+No+'</td>';
                 for (var j = 0; j < arr_body.length; j++) {
                     if(j < 5){
-                        htmlBody += '<td>'+arr_body[j]+'</td>';
+                        // htmlBody += '<td>'+arr_body[j]+'</td>';
+                        if (j == 0) {
+                            htmlBody += '<td>'+arr_body[j].show+'</td>';
+                        }
+                        else
+                        {
+                            if (j == 1) {
+                                htmlBody += '<td><a href = "javascript:void(0);" class = "datadetailPS" data = "'+arr_body[j].data+'">'+arr_body[j].show+'</a></td>';
+                            }
+                            else
+                            {
+                                htmlBody += '<td><a href = "javascript:void(0);" class = "datadetail" data = "'+arr_body[j].data+'">'+arr_body[j].show+'</a></td>';
+                            }
+                            
+                        }
                         if (j >= 1) { // isi total Jumlah PS dan Jumlah Lulusan pada
-                            arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j]);
+                            arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j].show);
                         }
                     }
                     else
                     {
-                        IPK = getCustomtoFixed(arr_body[j],2);
+                        IPK = getCustomtoFixed(arr_body[j].show,2);
                         htmlBody += '<td>'+IPK+'</td>';
                     }
                 }
@@ -93,4 +107,80 @@
 
         });    
     }
+
+    $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
+        var v = parseInt($(this).html());
+        if (v > 0) {
+            var dt = $(this).attr('data');
+            // console.log(dt);
+            dt = jwt_decode(dt);
+            var html =  '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<td>No</td>'+
+                                            '<td>NPM</td>'+
+                                            '<td>NAMA</td>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>';
+                    for (var i = 0; i < dt.length; i++) {
+                        html += '<tr>'+
+                                    '<td>'+ (parseInt(i)+1) + '</td>'+
+                                    '<td>'+ dt[i].NPM + '</td>'+
+                                    '<td>'+ dt[i].Name + '</td>'+
+                                '</tr>';    
+                    }
+
+                    html  += '</tbody></table></div></div>';                
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+    })
+
+    $(document).off('click', '.datadetailPS').on('click', '.datadetailPS',function(e) {
+        var v = parseInt($(this).html());
+        if (v > 0) {
+            var dt = $(this).attr('data');
+            // console.log(dt);
+            dt = jwt_decode(dt);
+            var html =  '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<td>No</td>'+
+                                            '<td>Program Study</td>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>';
+                    for (var i = 0; i < dt.length; i++) {
+                        html += '<tr>'+
+                                    '<td>'+ (parseInt(i)+1) + '</td>'+
+                                    '<td>'+ dt[i].Name + '</td>'+
+                                '</tr>';    
+                    }
+
+                    html  += '</tbody></table></div></div>';                
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+    })
 </script>
