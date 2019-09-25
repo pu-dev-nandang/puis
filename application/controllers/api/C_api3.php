@@ -2387,13 +2387,17 @@ class C_api3 extends CI_Controller {
     public function getLuaranHkipaten(){
 
         $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_paten_sederhana ORDER BY ID DESC')->result_array();
+        $data = $this->db->query('SELECT a.Judul, a.Tgl_terbit, a.Ket
+                FROM db_research.publikasi AS a
+                LEFT JOIN db_research.kategori_capaian_luaran AS b ON (b.ID_kat_capaian = a.ID_kat_capaian)
+                WHERE a.ID_kat_capaian = 3
+                ORDER BY a.ID_publikasi DESC')->result_array();
         return print_r(json_encode($data));
     }
 
     public function getsitasikarya(){
 
-        $Status = $this->input->get('s');
+        //$Status = $this->input->get('s');
         $data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
                     FROM db_agregator.sitasi_karya AS a
                     LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
