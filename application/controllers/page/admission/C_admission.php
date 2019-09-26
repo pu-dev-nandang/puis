@@ -1766,7 +1766,7 @@ class C_admission extends Admission_Controler {
           $this->db->insert_batch('db_academic.auth_parents', $arr_insert3);
           if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') {
           // if(true) {
-            //$this->m_admission->insert_to_Library($arr_insert_library);
+            $this->m_admission->insert_to_Library($arr_insert_library);
 
             // insert to AD
             $data = array(

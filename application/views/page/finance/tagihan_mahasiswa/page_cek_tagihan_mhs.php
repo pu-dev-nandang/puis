@@ -161,7 +161,7 @@
         loadSelectOptionBaseProdi('#selectProdi','');
         loadSelectOptionPaymentTypeAll('#selectPTID','');
         loadSelectOptionSemesterByload('#selectSemester',1);
-        getReloadTableSocket();
+        //getReloadTableSocket();
         // $("#btn-submit").addClass('hide');
         function loadSelectOptionSemesterByload(element,selected) {
 

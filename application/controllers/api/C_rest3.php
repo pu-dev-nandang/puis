@@ -258,10 +258,202 @@ class C_rest3 extends CI_Controller {
                 $rs['body'] = $body;
                 echo json_encode($rs);    
                 break;
+            case 'DataDosen':
+                $rs = [];
+                $ProdiID = $dataToken['ProdiID'];
+                $F_SemesterID = function($dataToken)
+                {
+                    if (array_key_exists('SemesterID', $dataToken)) {
+                        $SemesterID = $dataToken['SemesterID'];
+                    }
+                    else
+                    {
+                        $G_smt = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+                        $SemesterID = $G_smt[0]['ID'];
+                    }
+
+                    return $SemesterID;
+                };
+
+                $SemesterID = $F_SemesterID($dataToken);
+                // ts berdasarkan semester
+                $G_smt = $this->m_master->caribasedprimary('db_academic.semester','ID',$SemesterID);
+                $Year = $G_smt[0]['Year'];
+                $Year3 = $Year - 2;
+                $arr_year = [];
+                for ($i=$Year3; $i <= $Year; $i++) { 
+                   $arr_year[] = $i;
+                }
+
+                $sql = 'select a.*,b.Position as JabatanAkademik from db_employees.employees as a
+                    left join db_employees.lecturer_academic_position as b on a.LecturerAcademicPositionID = b.ID  
+                     where ( 
+                                SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
+                                SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
+                                SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
+                                SPLIT_STR(a.PositionOther3, ".", 2) = 7
+                            ) and StatusForlap != "0" and ProdiID = ?';
+                $query=$this->db->query($sql, array($ProdiID))->result_array();
+                for ($i=0; $i < count($query); $i++) { 
+                    $NIP = $query[$i]['NIP'];
+                    $PendidikanPascaSarjana = function($NIP)
+                    {
+                        $rs = '';
+                        $sql = 'select NameUniversity from db_employees.files  where TypeFiles in(3,4) and NIP = "'.$NIP.'" group by NIP';
+                        $query=$this->db->query($sql, array())->result_array();
+                        if (count($query) > 0) {
+                            $rs = $query[0]['NameUniversity'];
+                        }
+                        return $rs;
+                    };
+                    $LevelEducationName = function($ID){
+                        $rs = '';
+                        $G= $this->m_master->caribasedprimary('db_employees.level_education','ID',$ID);
+                        if (count($G) > 0) {
+                            $rs = $G[0]['Level'];
+                        }
+                        return $rs;
+                    };
+                    $BidKeahlian = function($NIP)
+                    {
+                        $rs = '';
+                        $sql = 'select Major from db_employees.files  where TypeFiles in(3,4) and NIP = "'.$NIP.'" group by NIP';
+                        $query=$this->db->query($sql, array())->result_array();
+                        if (count($query) > 0) {
+                            $rs = $query[0]['Major'];
+                        }
+                        return $rs;
+                    };
+
+                    $SertifikatPendidikProfesional = function($NIP){
+                        return '';
+                    };
+
+                    $MKPSAkreditasi = function($NIP,$ProdiID,$SemesterID){
+                        $rs = '';
+                        $sql = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng
+                                from db_academic.schedule_details_course as a 
+                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                where a.ProdiID = ? and b.Coordinator = ? and b.SemesterID = ?
+                                group by b.ID,a.MKID    
+                                 ';
+                        $query=$this->db->query($sql, array($ProdiID,$NIP,$SemesterID))->result_array();
+                        if (count($query) > 0) {
+                            $rs .= $query[0]['ClassGroup'].' - '.$query[0]['NameEng'];
+                            for ($i=1; $i < count($query); $i++) { 
+                                $rs .= ', '.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'];
+                            }
+                        }
+                        return $rs;
+                    };
+
+                    // get dt academic except prodi
+                    $dtAcademic = function($NIP,$ProdiID,$SemesterID){
+                        $rs = array('MK' => '','SKS' => '');
+                        $sql = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,d.TotalSKS
+                                from db_academic.schedule_details_course as a 
+                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                join db_academic.curriculum_details as d on a.CDID = d.ID
+                                where a.ProdiID != ? and b.Coordinator = ? and b.SemesterID = ?
+                                group by b.ID,a.MKID    
+                                 ';
+                        $query=$this->db->query($sql, array($ProdiID,$NIP,$SemesterID))->result_array();
+                        $MK = '';
+                        $SKS = '';
+                        if (count($query) > 0) {
+                            $MK .= $query[0]['ClassGroup'].' - '.$query[0]['NameEng'];
+                            $SKS .= $query[0]['TotalSKS'];
+                            for ($i=1; $i < count($query); $i++) { 
+                                $MK .= ', '.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'];
+                                $SKS .= ', '.$query[$i]['TotalSKS'];
+                            }
+
+                            $rs['MK'] = $MK;
+                            $rs['SKS'] = $SKS;
+                        }
+                        return $rs;
+                    };
+
+                    $dtAcademic_get = $dtAcademic($NIP,$ProdiID,$SemesterID);
+
+                    // get jumlah mahasiswa dengan tiga ts terakhir
+                    $JMLDibimbingBy_PS = array();
+                    $JMLDibimbingBy_LainPS = array();
+                    $SumBimbingan_tahun = 0;
+                    $SumProgram_tahun = 0;
+                    for ($k=0; $k < count($arr_year); $k++) { 
+                        $Y = $arr_year[$k];
+                        $sql_ = 'select a.NPM,b.Name from db_academic.mentor_academic as a
+                                join db_academic.auth_students as b on a.NPM = b.NPM
+                                where a.Status = ? and a.ProdiID = ? and a.Year = ? and a.NIP = ?
+                                    ';
+                        $query_=$this->db->query($sql_, array("1",$ProdiID,$Y,$NIP))->result_array();
+                        $tot = count($query_);
+                        $SumBimbingan_tahun += $tot;
+                        $temp = [
+                            'tot' => $tot,
+                            'Year' => $Y,
+                            'data' =>  $this->jwt->encode($query_,"UAP)(*"),
+                        ];
+                        $JMLDibimbingBy_PS[] = $temp;
+
+                        $sql_lain = 'select a.NPM,b.Name from db_academic.mentor_academic as a
+                                join db_academic.auth_students as b on a.NPM = b.NPM
+                                where a.Status = ? and a.ProdiID != ? and a.Year = ? and a.NIP = ?
+                                    ';
+                        $query_lain=$this->db->query($sql_lain, array("1",$ProdiID,$Y,$NIP))->result_array();
+
+                        $tot1 = count($query_lain);
+                        $c_tot_all = $tot + $tot1;
+                        $SumProgram_tahun += $c_tot_all;
+                        $temp = [
+                            'tot' => $tot1,
+                            'Year' => $Y,
+                            'data' =>  $this->jwt->encode($query_lain,"UAP)(*"),
+                        ];
+
+                        $JMLDibimbingBy_LainPS[] = $temp;
+                    }
+                    $C_year = count($arr_year);
+                    $C_year2 = $C_year * 2;
+                    $rata2BimBingan = $SumBimbingan_tahun / $C_year;
+                    $rata2BimBinganAll = $SumProgram_tahun / $C_year2;
+
+                    $temp = ['No'  =>  ($i+1),
+                             'NameDosen' => $query[$i]['Name'],
+                             'NIDN' => $query[$i]['NIDN'],
+                             'NIDK' => $query[$i]['NIDK'],
+                             'PendidikanPascaSarjana' => $PendidikanPascaSarjana($NIP),
+                             'PerusahaanIndustri' => '',
+                             'PendidikanTertinggi' => $LevelEducationName($query[$i]['LevelEducationID']),
+                             'BidKeahlian' => $BidKeahlian($NIP),
+                             'KesesuaianKompetensiIntiPS' => '',
+                             'JabatanAkademik' => $query[$i]['JabatanAkademik'],
+                             'SertifikatPendidikProfesional' => $SertifikatPendidikProfesional($NIP),
+                             'SertifikatPendidikProfesi' => '',
+                             'MKPSAkreditasi' => $MKPSAkreditasi($NIP,$ProdiID,$SemesterID),
+                             'KesesuaianBidKeahlian' => '',
+                             'MKPS_lain' => $dtAcademic_get['MK'],
+                             'BobotKredit_lain' => $dtAcademic_get['SKS'],
+                             'JMLDibimbingBy_PS' => $JMLDibimbingBy_PS,
+                             'JMLDibimbingBy_LainPS' => $JMLDibimbingBy_LainPS,
+                             'rata2BimBingan' => $rata2BimBingan,
+                             'rata2BimBinganAll' => $rata2BimBinganAll,
+                             // 'SumBimbingan_tahun' => $SumBimbingan_tahun,
+                             // 'SumProgram_tahun' => $SumProgram_tahun,
+                          ];
+                    $rs[] = $temp;      
+                }
+                echo json_encode($rs);    
+                break;
             default:
                 # code...
                 break;
         }
     }
+
+
 
 }
