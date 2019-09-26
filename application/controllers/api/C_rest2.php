@@ -4954,6 +4954,7 @@ class C_rest2 extends CI_Controller {
                           $nestedData[] = $row['JudulKegiatan'];
                           $nestedData[] = $row['ManfaatKegiatan'];
                           $nestedData[] = $this->m_master->getDateIndonesian($row['StartDate']);
+                          $nestedData[] = $row['Kategori'];
                           $nestedData[] = $row['KerjasamaID'];
                           $nestedData[] = $row['ID'];
                           $data[] = $nestedData;

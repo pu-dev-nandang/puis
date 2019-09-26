@@ -55,6 +55,7 @@
                                            ' <tr>'+
                                               '  <th rowspan="2">No</th>'+
                                              '   <th rowspan="2">Lembaga Mitra Kerjasama</th>'+
+                                             '   <th rowspan="2">Kategori</th>'+
                                                 '<th colspan="3">Tingkat</th>'+
                                              '   <th rowspan="2">Judul Kegiatan Kerjasama</th>'+
                                              '   <th rowspan="2">Manfaat bagi PS yang Diakreditasi</th>'+
@@ -119,21 +120,22 @@
                 var Internasional = (data[2] == 1) ? '<i class="fa fa-check" style="color: green;"></i>' : '<i class="fa fa-minus-circle" style="color: red;"></i>';
                 var Nasional = (data[3] == 1) ? '<i class="fa fa-check" style="color: green;"></i>' : '<i class="fa fa-minus-circle" style="color: red;"></i>';
                 var Lokal = (data[4] == 1) ? '<i class="fa fa-check" style="color: green;"></i>' : '<i class="fa fa-minus-circle" style="color: red;"></i>';
-                $( row ).find('td:eq(2)').html(Internasional);
-                $( row ).find('td:eq(2)').attr('style','text-align:center');
-                $( row ).find('td:eq(3)').html(Nasional);
+                $( row ).find('td:eq(3)').html(Internasional);
                 $( row ).find('td:eq(3)').attr('style','text-align:center');
-                $( row ).find('td:eq(4)').html(Lokal);
+                $( row ).find('td:eq(4)').html(Nasional);
                 $( row ).find('td:eq(4)').attr('style','text-align:center');
-                $( row ).find('td:eq(5)').html(data[10]);
-                $( row ).find('td:eq(6)').html(data[11]);
-                $( row ).find('td:eq(7)').html('Start : '+data[12]+'<br/>'+'End : '+data[8]);
+                $( row ).find('td:eq(5)').html(Lokal);
+                $( row ).find('td:eq(6)').attr('style','text-align:center');
+                $( row ).find('td:eq(6)').html(data[10]);
+                $( row ).find('td:eq(7)').html(data[11]);
+                $( row ).find('td:eq(8)').html('Start : '+data[12]+'<br/>'+'End : '+data[8]);
 
                 var File = jQuery.parseJSON(data[7]);
                 var html = data[6]+'</br><a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">Attachment</a>';
-                $( row ).find('td:eq(8)').html(html);
-                $( row ).find('td:eq(9)').html(data[8]);
-                 $( row ).find('td:eq(10)').html(data[9]);
+                $( row ).find('td:eq(9)').html(html);
+                $( row ).find('td:eq(10)').html(data[8]);
+                 $( row ).find('td:eq(11)').html(data[9]);
+                $( row ).find('td:eq(2)').html(data[13]);
             },
             dom: 'l<"toolbar">frtip',
             "initComplete": function(settings, json) {

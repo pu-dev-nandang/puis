@@ -2,6 +2,30 @@
     #dataTablesDataDosen thead th {
         vertical-align: middle;
     }
+
+    #dataTablesDataDosen thead>tr>th, #dataTablesDataDosen tbody>tr>th, #dataTablesDataDosen tfoot>tr>th, #dataTablesDataDosen thead>tr>td, #dataTablesDataDosen tbody>tr>td, #dataTablesDataDosen tfoot>tr>td {
+        padding: 3px;
+        line-height: 1.428571429;
+        vertical-align: top;
+    }
+
+    #dataTablesDataDosen tbody {
+        display:block;
+        height:520px;
+        width:2200px;
+        overflow:auto;
+    }
+    #dataTablesDataDosen thead,#dataTablesDataDosen tbody tr {
+        display:table;
+        width:2200px;
+        table-layout:fixed; /* even columns width , fix width of table too*/
+    }
+    #dataTablesDataDosen thead {
+        width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width 
+    }
+    #dataTablesDataDosen table {
+        width:2200px;
+    }
 </style>
 <h3>This is the page : data_dosen.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div class="well">
@@ -59,7 +83,7 @@ function LoadTableData(filterProdi)
     var url = base_url_js+"rest3/__get_APS_CrudAgregatorTB3";
     $.post(url,{token:token},function (jsonResult) {
         var selector = $('#viewTable');
-        var html = '<div class="table-responsive">';
+        var html = '<div style = "height:700px;overflow-y:auto;overflow-x:auto;">';
 
         // get data pertama untuk ts
         var JMLDibimbingBy_PS = jsonResult[0]['JMLDibimbingBy_PS'];
