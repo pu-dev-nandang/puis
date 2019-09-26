@@ -416,10 +416,14 @@
 
         var FileName = NPM+'.'+Type;
         var db = $(this).attr('data-db');
-        uploadPhoto(db,NPM,FileName);
+        // console.log(db)
+        // console.log(NPM)
+        // console.log(FileName)
+        var selector_this = $(this);
+        uploadPhoto(db,NPM,FileName,selector_this);
 
     });
-    function uploadPhoto(db,NPM,fileName) {
+    function uploadPhoto(db,NPM,fileName,selector_this) {
 
         if(fileName!='' && fileName!=null){
 
@@ -437,6 +441,9 @@
                 success : function(data) {
 
                     var jsonData = JSON.parse(data);
+                    var urlPath = base_url_js+'uploads/students/'+db+'/'+fileName;
+                    var ev = selector_this.closest('tr');
+                    var s_pr = ev.find('.PrintIDCard').attr('path',urlPath);
 
                 }
             });
