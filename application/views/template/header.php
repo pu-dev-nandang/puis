@@ -47,6 +47,10 @@
         color: #333333;
     }
 
+    .table-centre tr th, .table-centre tr td {
+        text-align: center;
+    }
+
 </style>
 
 <!-- Header -->

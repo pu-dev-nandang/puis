@@ -691,6 +691,8 @@ $route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_s
 $route['student-life/student-achievement/list'] =  'page/student-life/c_studentlife/student_achievement';
 $route['student-life/student-achievement/update-data-achievement'] =  'page/student-life/c_studentlife/update_data_achievement';
 
+$route['student-life/tracer-alumni/list'] =  'page/student-life/c_studentlife/list_alumni';
+
 
 // --- LPMI ----
 $route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
@@ -784,6 +786,7 @@ $route['api/__getStudentsAdmission'] = 'api/c_api/getStudentsAdmission';
 $route['api/__getLecturermengajar'] = 'api/c_api/getLecturermengajar';
 
 $route['api/__getStudentsServerSide'] = 'api/c_api/getStudentsServerSide';
+
 
 $route['api/__getAllMK'] = 'api/c_api/getAllMK';
 
@@ -1322,6 +1325,7 @@ $route['agregator/kerjasama-perguruan-tinggi'] = 'page/agregator/c_agregator/ker
 
 $route['agregator/seleksi-mahasiswa-baru'] = 'page/agregator/c_agregator/seleksi_mahasiswa_baru';
 $route['agregator/mahasiswa-asing'] = 'page/agregator/c_agregator/mahasiswa_asing';
+$route['agregator/bobot-kredit-mk'] = 'page/agregator/c_agregator/bobot_kredit_mk';
 
 $route['agregator/kecukupan-dosen'] = 'page/agregator/c_agregator/kecukupan_dosen';
 $route['agregator/jabatan-dosen-tetap'] = 'page/agregator/c_agregator/jabatan_dosen_tetap';
@@ -1465,6 +1469,8 @@ $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 
 
 $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
+
+$route['api3/__crudTracerAlumni'] = 'api/c_api3/crudTracerAlumni';
 
 
 // Agregator Adhi
