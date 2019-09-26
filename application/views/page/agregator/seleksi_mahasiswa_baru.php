@@ -21,7 +21,7 @@
             </div>
             <div class="form-group">
                 <label>Daya Tampung</label>
-                <input type="number" class="form-control" id="formCapacity">
+                <input type="number" class="form-control" id="formCapacity" disabled>
             </div>
             <div class="form-group">
                 <label>Pendaftar</label>
@@ -109,6 +109,7 @@
             var filterYear = $('#filterYear').val();
             if(filterYear!='' && filterYear!=null){
                 loadDataTable();
+                $('#formYear').trigger('change');
                 clearInterval(firstLoad);
             }
         },1000);
@@ -212,18 +213,19 @@
                 filteryear();
                 setTimeout(function () {
                     loadDataTable();
+                    $('#formYear').trigger('change');
                 },2000);
 
                 setTimeout(function () {
-                    $('#formID').val('');
-                    $('#formYear').val('');
-                    $('#formCapacity').val('');
-                    $('#formRegistrant').val('');
-                    $('#formPassSelection').val('');
-                    $('#formRegular').val('');
-                    $('#formTransfer').val('');
-                    $('#formRegular2').val('');
-                    $('#formTransfer2').val('');
+                    // $('#formID').val('');
+                    // $('#formYear').val('');
+                    // $('#formCapacity').val('');
+                    // $('#formRegistrant').val('');
+                    // $('#formPassSelection').val('');
+                    // $('#formRegular').val('');
+                    // $('#formTransfer').val('');
+                    // $('#formRegular2').val('');
+                    // $('#formTransfer2').val('');
                     $('#btnSave').html('Save').prop('disabled',false);
                 },500);
             })
@@ -295,14 +297,14 @@
          }).prop("selected", true);
         
         $('#formProdiID').val(d.ProdiID+'.'+d.ProdiCode);
-        $('#formCapacity').val(d.Capacity);
-        $('#formRegistrant').val(d.Registrant);
-        $('#formPassSelection').val(d.PassSelection);
-        $('#formRegular').val(d.Regular);
-        $('#formTransfer').val(d.Transfer);
-        $('#formRegular2').val(d.Regular2);
-        $('#formTransfer2').val(d.Transfer2);
-
+        // $('#formCapacity').val(d.Capacity);
+        // $('#formRegistrant').val(d.Registrant);
+        // $('#formPassSelection').val(d.PassSelection);
+        // $('#formRegular').val(d.Regular);
+        // $('#formTransfer').val(d.Transfer);
+        // $('#formRegular2').val(d.Regular2);
+        // $('#formTransfer2').val(d.Transfer2);
+        $('#formYear').trigger('change');
     });
 
     $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {
@@ -319,5 +321,62 @@
 
     })
 
+    
+    $(document).off('change', '#formYear').on('change', '#formYear',function(e) {
+        var v = $(this).val();
+        if (v >= 2019) {
+            $('#formRegistrant').prop('disabled',true);
+            $('#formPassSelection').prop('disabled',true);
+            $('#formRegular').prop('disabled',true);
+            $('#formRegular2').prop('disabled',true);
+        }
+        else
+        {
+            $('#formRegistrant').prop('disabled',false);
+            $('#formPassSelection').prop('disabled',false);
+            $('#formRegular').prop('disabled',false);
+            $('#formRegular2').prop('disabled',false);
+        }
+
+        var formProdiID = $('#formProdiID option:selected').val();
+        var P = formProdiID.split('.');
+        var ProdiID = P[0]; 
+        LoadDataToInput(v,ProdiID);
+
+    })
+
+    $(document).off('change', '#formProdiID').on('change', '#formProdiID',function(e) {
+        $('#formYear').trigger('change');
+    })
+
+    function LoadDataToInput(Year,ProdiID)
+    {
+         var data = {
+                    action : 'LoadDataToInputMHSBaru',
+                    Year : Year,
+                    ProdiID :ProdiID,
+          };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api3/__crudAgregatorTB2';
+
+        $.post(url,{token:token},function (jsonResult) {
+            var d = jsonResult[0];
+            $('#formID').val(d.ID);
+            // $('#formYear').val(d.Year);
+            $("#formYear option").filter(function() {
+               //may want to use $.trim in here
+               return $(this).val() == d.Year; 
+             }).prop("selected", true);
+            
+            $('#formProdiID').val(d.ProdiID+'.'+d.ProdiCode);
+            $('#formCapacity').val(d.Capacity);
+            $('#formRegistrant').val(d.Registrant);
+            $('#formPassSelection').val(d.PassSelection);
+            $('#formRegular').val(d.Regular);
+            $('#formTransfer').val(d.Transfer);
+            $('#formRegular2').val(d.Regular2);
+            $('#formTransfer2').val(d.Transfer2);
+        })
+    }
 
 </script>
