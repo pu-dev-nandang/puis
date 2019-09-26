@@ -73,7 +73,14 @@
             '<td>Type</td>' +
             '<td>:</td>' +
             '<td>' +
-            '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
+            '<div class="row">' +
+            '<div class="col-md-6"><select id="formTypeMK" class="form-control form-mk"></select></div> ' +
+            '<div class="col-md-6"><select id="formCourseType" class="form-control">' +
+            '<option value="1">Teori</option>' +
+            '<option value="2">Praktikum / Praktik</option>' +
+            '<option value="3">Praktik Lapangan</option>' +
+            '</select></div> ' +
+            '</div> ' +
             '</td>' +
             '</tr>' +
             '<tr>' +
@@ -141,7 +148,14 @@
                 '<td>Type</td>' +
                 '<td>:</td>' +
                 '<td>' +
-                '<select id="formTypeMK" class="form-control form-mk" style="max-width: 150px;"></select>' +
+                '<div class="row">' +
+                '<div class="col-md-6"><select id="formTypeMK" class="form-control form-mk"></select></div> ' +
+                '<div class="col-md-6"><select id="formCourseType" class="form-control form-mk">' +
+                '<option value="1">Teori</option>' +
+                '<option value="2">Praktikum / Praktik</option>' +
+                '<option value="3">Praktik Lapangan</option>' +
+                '</select></div> ' +
+                '</div> ' +
                 '</td>' +
                 '</tr>' +
                 '<tr>' +
@@ -156,6 +170,9 @@
                 '</tr>' +
                 '</table>' +
                 '</div>');
+
+            $('#formCourseType').val(valueMK.CourseType);
+
             loadSelectOptionBaseProdi('#FormBaseProdi',valueMK.BaseProdiID);
             $('.form-mk').prop('disabled',true).css('color','#333');
             $('#GlobalModal .modal-footer').html('<button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>' +
@@ -196,6 +213,7 @@
         var NameEng = $('#formNameEng').val();
 
         var formTypeMK = $('#formTypeMK').val();
+        var formCourseType = $('#formCourseType').val();
 
         process = formRequired('#formCode,#formName,#formNameEng,#formTypeMK');
 
@@ -217,6 +235,7 @@
                             NameEng : NameEng,
                             BaseProdiID : prodi[0].trim(),
                             TypeMK : formTypeMK,
+                            CourseType : formCourseType,
                             Yudisium : ($('#formYudisium').is(':checked')) ? '1' : '0',
                             UpdateBy : sessionNIP,
                             UpdateAt : dateTimeNow()

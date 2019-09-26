@@ -1215,6 +1215,26 @@
         });
     }
 
+    function loadSelectOptionExperiencePosistionLevel(element,selected) {
+        var token = jwt_encode({action : 'loadPositionLevel'},'UAP)(*');
+        var url = base_url_js+'api3/__crudTracerAlumni';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (selected!='' && selected!=null
+                        && selected !== 'undefined' && selected==v.ID) ? 'selected' : '';
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+
+                });
+            }
+
+        });
+
+    }
+
     // function loadSelectOptionStudentRegisterSeminarhasil(element,selected) {
     //     var url = base_url_js+'api/__crudFinalProject';
     //     var token = jwt_encode({action : 'getAllStdReg',Status:'3'},'UAP)(*');
@@ -1739,6 +1759,17 @@
 
 
         });
+
+    }
+
+    function loadSelectOptionMonth(element,selected) {
+
+        var m = moment();
+        for (var i = 0; i < 12; i++) {
+            var sc = (selected!='' && selected!=null
+                && selected!=='undefined' && selected==(i+1)) ? 'selected' : '';
+            $(element).append('<option value="'+(i+1)+'" '+sc+'>'+m.months(i).format('MMMM')+'</option>');
+        }
 
     }
 
