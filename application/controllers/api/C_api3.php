@@ -755,18 +755,40 @@ class C_api3 extends CI_Controller {
 
         }
         else if($data_arr['action']=='filterYear'){
-            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection GROUP BY Year ORDER BY Year ASC')->result_array();
-
+            // $data = $this->db->query('SELECT Year FROM db_agregator.student_selection GROUP BY Year ORDER BY Year ASC')->result_array();
+            $data = [];
+            $sql = "show databases like '".'ta_'."%'";
+            $query=$this->db->query($sql, array())->result_array();
+            for ($i=0; $i < count($query); $i++) {
+                $variable = $query[$i]; 
+                foreach ($variable as $key => $value) {
+                    $ex = explode('_', $value);
+                    $ta = $ex[1];
+                    $data[] = array('Year' => $ta);
+                }
+            }
+            
             return print_r(json_encode($data));
         }
-        else if($data_arr['action']=='readDataMHSBaru'){
-
+        else if($data_arr['action'] == 'LoadDataToInputMHSBaru'){
+            $this->load->model('admission/m_admission');
             $Year = $data_arr['Year'];
-            $data = array();
-            // $data = $this->db->query('SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
-            //                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
-            //                                         WHERE ss.Year = "'.$Year.'" ')->result_array();
+            $ProdiID = $data_arr['ProdiID'];
+            $G_proses = $this->m_admission->proses_agregator_seleksi_mhs_baru_by_prodi($Year,$ProdiID);
+            $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
+                                                WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+            $query=$this->db->query($sql, array($ProdiID))->result_array();
 
+            return print_r(json_encode($query));
+        }
+        else if($data_arr['action']=='readDataMHSBaru'){
+            $this->load->model('admission/m_admission');
+            $Year = $data_arr['Year'];
+            // insert data all ta ke db_agregator.student_selection
+            $G_proses = $this->m_admission->proses_agregator_seleksi_mhs_baru($Year);
+
+            $data = array();
             // get all prodi
             $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
             for ($i=0; $i <count($G_prodi) ; $i++) {
@@ -800,14 +822,6 @@ class C_api3 extends CI_Controller {
                 else
                 {
                     $temp = $query[0];
-                    // update all null menjadi 0
-                    // foreach ($temp as $key => $value) {
-                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
-                    //         if ($value == null && $value == '') {
-                    //             $temp[$key] = 0;
-                    //         }
-                    //     }
-                    // }
                 }
 
                 $data[] = $temp;
@@ -866,14 +880,6 @@ class C_api3 extends CI_Controller {
                 else
                 {
                     $temp = $query[0];
-                    // update all null menjadi 0
-                    // foreach ($temp as $key => $value) {
-                    //     if ($key != 'EntredAt' && $key != 'EntredBy' && $key != 'Type' && $key != 'UpdatedBy' && $key != 'updatedAt' ) {
-                    //         if ($value == null && $value == '') {
-                    //             $temp[$key] = 0;
-                    //         }
-                    //     }
-                    // }
                 }
 
                 $rs[] = $temp;
@@ -945,11 +951,21 @@ class C_api3 extends CI_Controller {
 
         }
 
-        else if($data_arr['action']=='filterYearMhsAsing'){
-            $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
-
-            return print_r(json_encode($data));
-        }
+        // else if($data_arr['action']=='filterYearMhsAsing'){
+        //     // $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
+        //     $data = [];
+        //     $sql = "show databases like '".'ta_'."%'";
+        //     $query=$this->db->query($sql, array())->result_array();
+        //     for ($i=0; $i < count($query); $i++) {
+        //         $variable = $query[$i]; 
+        //         foreach ($variable as $key => $value) {
+        //             $ex = explode('_', $value);
+        //             $ta = $ex[1];
+        //             $data[] = array('Year' => $ta);
+        //         }
+        //     }
+        //     return print_r(json_encode($data));
+        // }
     }
 
 

@@ -292,7 +292,7 @@ class C_rest3 extends CI_Controller {
                                 SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
                                 SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
                                 SPLIT_STR(a.PositionOther3, ".", 2) = 7
-                            ) and StatusForlap != "0" and ProdiID = ?';
+                            ) and StatusForlap != "0" and ProdiID = ? and a.StatusEmployeeID = 1';
                 $query=$this->db->query($sql, array($ProdiID))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                     $NIP = $query[$i]['NIP'];
