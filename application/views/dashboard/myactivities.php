@@ -30,8 +30,9 @@
             '            </thead>' +
             '        </table>');
 
-        // var url = base_url_js+'api3/__getDataLogEmployees?u=2017090';
-        var url = base_url_js+'api3/__getDataLogEmployees';
+        var url = base_url_js+'api3/__getDataLogEmployees?u='+sessionNIP;
+        // var url = base_url_js+'api3/__getDataLogEmployees?u=2016065';
+        // var url = base_url_js+'api3/__getDataLogEmployees';
 
         var dataTable = $('#tableDataLog').DataTable( {
             "processing": true,
@@ -52,7 +53,7 @@
                 }
             }
         } );
-        
+
     }
 
     $('#btnReloadTalbe').click(function () {

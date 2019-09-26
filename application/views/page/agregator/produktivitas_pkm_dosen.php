@@ -1,7 +1,10 @@
 
 <style>
-    #tableData tr th, #tableData tr td {
+    .dataTable2Excel tr th, .dataTable2Excel tr td {
         text-align: center;
+    }
+    .dataTable2Excel tr td:nth-child(2) {
+        text-align: left;
     }
 </style>
 
@@ -113,9 +116,9 @@
                         var viewDataTb = (key==0) ? arr[key] : arr[key].length;
                         var tokenPen = jwt_encode(arr[key],'UAP)(*');
 
-                        var isi = (viewDataTb!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pkm="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
+                        var isi = (viewDataTb!=0 && key!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pkm="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
                         //htmlTableBody += '<td>'+arr[key]+'</td>';
-                        htmlTableBody += '<td style="vertical-align : middle;text-align:center;">'+isi+'</td>';
+                        htmlTableBody += '<td style="vertical-align : middle;">'+isi+'</td>';
                     }
 
                     for (var m = 1; m < arr.length; m++) {

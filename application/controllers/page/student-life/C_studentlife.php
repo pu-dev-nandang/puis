@@ -29,9 +29,10 @@ class C_studentlife extends Student_Life {
     }
 
 
+    // ===== student_achievement ====
 
 
-    public function menu_student_achievementc($page){
+    private function menu_student_achievementc($page){
         $data['page'] = $page;
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/student-achievement/menu_student_achievement',$data,true);
@@ -55,6 +56,25 @@ class C_studentlife extends Student_Life {
         $page = $this->load->view('page/'.$data['department'].'/student-achievement/update_data_achievement',$data,true);
         $this->menu_student_achievementc($page);
     }
+
+    // ===== tracert_alumni ====
+
+    private function menu_stracert_alumni($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/tracer-alumni/menu_stracer_alumni',$data,true);
+        $this->temp($content);
+    }
+
+    public function list_alumni(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/tracer-alumni/list_alumni',$data,true);
+        $this->menu_student_achievementc($page);
+    }
+
+
+
+
 
 
 }

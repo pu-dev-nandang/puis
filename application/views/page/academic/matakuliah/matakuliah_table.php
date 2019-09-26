@@ -11,6 +11,7 @@
             <th  class="hide" style="width: 50px;">Type</th>
             <th  class="hide" style="width: 50px;">Yudusium Filter</th>
             <th style="width: 50px;">Type</th>
+            <th style="width: 50px;">Category</th>
         </tr>
         </thead>
         <tbody>
@@ -29,6 +30,14 @@
             } else if($item_mk['TypeMK']=='3'){
                 $TypeMKFilter = 'MKU';
             }
+
+            $CourseType = 'Teory';
+            if($item_mk['CourseType']=='2'){
+                $CourseType = 'Praktikum / Praktik';
+            }
+            else if ($item_mk['CourseType']=='3'){
+                $CourseType = 'Praktik Lampangan';
+            }
             ?>
             <tr>
                 <td class="td-center">
@@ -41,7 +50,7 @@
                 </td>
                 <td>
                     <div>
-                        <a href="javascript:void(0)" data-id="<?php echo $item_mk['mkID']; ?>" class="btn-mk-action" ><b><?php echo $item_mk['Name']; ?></b></a>
+                        <a href="javascript:void(0)" data-id="<?php echo $item_mk['ID']; ?>" class="btn-mk-action" ><b><?php echo $item_mk['Name']; ?></b></a>
                     </div>
                 </td>
                 <td>
@@ -55,6 +64,7 @@
                 <td class="hide"><?php echo $TypeMKFilter; ?></td>
                 <td class="hide"><?= ($item_mk['Yudisium']=='1') ? 'Yudisium Filter' : 'Not As Yudisium Filter'; ?></td>
                 <td><?php echo $TypeMK; ?></td>
+                <td><?= $CourseType; ?></td>
             </tr>
         <?php } ?>
         </tbody>
@@ -85,7 +95,7 @@
             initComplete: function () {
                 this.api().columns().every( function () {
                     var column = this;
-                    var select = $('<select class="form-control filter-prodi"><option selected disabled>--- Select Programme Study ---</option><option value="">All</option></select>')
+                    var select = $('<select class="form-control filter-prodi"><option selected disabled>--- Select Filter ---</option><option value="">All</option></select>')
                         .appendTo( $('.dataTables_header .col-md-9') )
                         .on( 'change', function () {
                             var val = $.fn.dataTable.util.escapeRegex(

@@ -153,6 +153,14 @@ class C_agregator extends Globalclass {
         $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
         $this->menu_agregator($page);
     }
+    public function bobot_kredit_mk()
+    {
+        $viewPage = 'bobot_kredit_mk';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
 
     public function kecukupan_dosen(){
 

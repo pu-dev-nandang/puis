@@ -194,6 +194,11 @@ class C_dashboard extends Globalclass {
 
     }
 
+    public function myactivities(){
+        $content = $this->load->view('dashboard/myactivities','',true);
+        $this->temp($content);
+    }
+
     public function change_departement(){
         $dpt = $this->input->post('departement');
         $IDDivision = $this->input->post('IDDivision');

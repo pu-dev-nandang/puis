@@ -47,6 +47,10 @@
         color: #333333;
     }
 
+    .table-centre tr th, .table-centre tr td {
+        text-align: center;
+    }
+
 </style>
 
 <!-- Header -->
@@ -79,6 +83,12 @@
                 <a href="<?php echo base_url('dashboard'); ?>">
                     <i class="icon-home"></i>
                     <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(1)=='my-activities'){echo 'current';} ?>">
+                <a href="<?php echo base_url('my-activities'); ?>">
+                    <i class="fa fa-line-chart"></i>
+                    <span>My Activities</span>
                 </a>
             </li>
             <li class="hide">
