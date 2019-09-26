@@ -296,16 +296,6 @@ class C_rest3 extends CI_Controller {
                 $query=$this->db->query($sql, array($ProdiID))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                     $NIP = $query[$i]['NIP'];
-                    $PendidikanPascaSarjana = function($NIP)
-                    {
-                        $rs = '';
-                        $sql = 'select NameUniversity from db_employees.files  where TypeFiles in(3,4) and NIP = "'.$NIP.'" group by NIP';
-                        $query=$this->db->query($sql, array())->result_array();
-                        if (count($query) > 0) {
-                            $rs = $query[0]['NameUniversity'];
-                        }
-                        return $rs;
-                    };
                     $LevelEducationName = function($ID){
                         $rs = '';
                         $G= $this->m_master->caribasedprimary('db_employees.level_education','ID',$ID);
@@ -314,17 +304,29 @@ class C_rest3 extends CI_Controller {
                         }
                         return $rs;
                     };
-                    $BidKeahlian = function($NIP)
+
+                    $LevelEdu = $LevelEducationName($query[$i]['LevelEducationID']);
+
+                    $PendidikanPascaSarjana = function($NIP,$LevelEdu)
                     {
-                        $rs = '';
-                        $sql = 'select Major from db_employees.files  where TypeFiles in(3,4) and NIP = "'.$NIP.'" group by NIP';
+                        $rs = array('PendidikanPascaSarjana' => '' ,'BidKeahlian' => '');
+                        $M_q = '(3,4)';
+                        if ($LevelEdu == 'S3') {
+                           $M_q = '(5,6)';
+                        }
+                        elseif ($LevelEdu == 'S1') {
+                           $M_q = '(1,2)';
+                        }
+                        $sql = 'select NameUniversity,Major from db_employees.files  where TypeFiles in'.$M_q.' and NIP = "'.$NIP.'"  order by ID desc limit 1';
+                        // print_r($sql);
                         $query=$this->db->query($sql, array())->result_array();
                         if (count($query) > 0) {
-                            $rs = $query[0]['Major'];
+                            $rs['PendidikanPascaSarjana'] = $query[0]['NameUniversity'];
+                            $rs['BidKeahlian'] = $query[0]['Major'];
                         }
                         return $rs;
                     };
-
+                    
                     $SertifikatPendidikProfesional = function($NIP){
                         return '';
                     };
@@ -421,14 +423,17 @@ class C_rest3 extends CI_Controller {
                     $rata2BimBingan = $SumBimbingan_tahun / $C_year;
                     $rata2BimBinganAll = $SumProgram_tahun / $C_year2;
 
+                    $G_master_academic = $PendidikanPascaSarjana($NIP,$LevelEdu);
+                   
                     $temp = ['No'  =>  ($i+1),
                              'NameDosen' => $query[$i]['Name'],
                              'NIDN' => $query[$i]['NIDN'],
                              'NIDK' => $query[$i]['NIDK'],
-                             'PendidikanPascaSarjana' => $PendidikanPascaSarjana($NIP),
+                             'PendidikanPascaSarjana' => $G_master_academic['PendidikanPascaSarjana'],
                              'PerusahaanIndustri' => '',
-                             'PendidikanTertinggi' => $LevelEducationName($query[$i]['LevelEducationID']),
-                             'BidKeahlian' => $BidKeahlian($NIP),
+                             // 'PendidikanTertinggi' => $LevelEducationName($query[$i]['LevelEducationID']),
+                             'PendidikanTertinggi' => $LevelEdu,
+                             'BidKeahlian' => $G_master_academic['BidKeahlian'],
                              'KesesuaianKompetensiIntiPS' => '',
                              'JabatanAkademik' => $query[$i]['JabatanAkademik'],
                              'SertifikatPendidikProfesional' => $SertifikatPendidikProfesional($NIP),

@@ -506,7 +506,7 @@ class C_save_to_excel2 extends CI_Controller
     	$Input = (array) $this->jwt->decode($token,$key);
     	$passToExcel = $Input['passToExcel'];
     	$passToExcel = $this->jwt->decode($passToExcel,$key);
-    	$sql = $passToExcel.' ORDER BY z.StartDate asc';
+    	$sql = $passToExcel.' group by z.ID ORDER BY z.StartDate asc';
     	$data = $this->db->query($sql)->result_array();
     	include APPPATH.'third_party/PHPExcel/PHPExcel.php';
     	ini_set('memory_limit', '-1');
@@ -559,6 +559,12 @@ class C_save_to_excel2 extends CI_Controller
     	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
     	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
 
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Kategori");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
     	$st++;
     	$huruf = $this->m_master->HurufColExcelNumber($st);
     	$stUntil = $st+2;
@@ -583,7 +589,8 @@ class C_save_to_excel2 extends CI_Controller
     	$huruf = $this->m_master->HurufColExcelNumber($st);
     	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Masa Berlaku (Tahun Berakhir, YYYY)");
     	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
-    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->getAlignment()->setWrapText(true);
 
     	$st++;
     	$huruf = $this->m_master->HurufColExcelNumber($st);
@@ -592,7 +599,7 @@ class C_save_to_excel2 extends CI_Controller
     	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
 
     	$r++;
-    	$st = 2;
+    	$st = 3;
     	$huruf = $this->m_master->HurufColExcelNumber($st);
     	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Internasional");
     	$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
@@ -625,34 +632,42 @@ class C_save_to_excel2 extends CI_Controller
     		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lembaga );
     		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
     		$Internasional = '';
     		if ($data[$i]['Internasional'] == 1) {
     			// print_r('Internasional == '.$data[$i]['Internasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-    			if ($data[$i]['Kategori'] == 'Tridarma') {
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
 
-    				$c_int++;
-    				// print_r('int => '.$c_int.'<br/>');
-    			}
+        			// 	$c_int++;
+        			// 	// print_r('int => '.$c_int.'<br/>');
+        			// }
+                    $c_int++;
     			$Internasional = 'V';
     		}
     		
     		$Nasional = '';
     		if ($data[$i]['Nasional'] == 1 ) {
     			// print_r('Nasional == '.$data[$i]['Nasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-    			if ($data[$i]['Kategori'] == 'Tridarma') {
-    				$c_nas++;
-    				// print_r('nas => '.$c_nas.'<br/>');
-    			}
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
+        			// 	$c_nas++;
+        			// 	// print_r('nas => '.$c_nas.'<br/>');
+        			// }
+                    $c_nas++;
     			$Nasional = 'V';
     		}
 
     		$Lokal = '';
     		if ($data[$i]['Lokal'] == 1) {
     			// print_r('Lokal == '.$data[$i]['Lokal'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-    			if ($data[$i]['Kategori'] == 'Tridarma') {
-    				$c_lokal++;
-    				// print_r('lokal => '.$c_lokal.'<br/>');
-    			}
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
+        			// 	$c_lokal++;
+        			// 	// print_r('lokal => '.$c_lokal.'<br/>');
+        			// }
+                    $c_lokal++;
     			$Lokal = 'V';
     		}
 
@@ -718,10 +733,16 @@ class C_save_to_excel2 extends CI_Controller
     	$huruf = $this->m_master->HurufColExcelNumber($st);
     	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $c_lokal );
 
-    	$excel->getActiveSheet()->getColumnDimension('A')->setWidth(8);
-    	foreach(range('B','J') as $columnID) {
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+    	$excel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+        foreach(range('D','F') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+    	foreach(range('G','J') as $columnID) {
     	    $excel->getActiveSheet()->getColumnDimension($columnID)
-    	        ->setAutoSize(true);
+                  ->setWidth(25);
     	}
 
     	$excel->setActiveSheetIndex(0);
@@ -795,6 +816,12 @@ class C_save_to_excel2 extends CI_Controller
 
         $st++;
         $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Kategori");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
         $stUntil = $st+2;
         $hurufUntil = $this->m_master->HurufColExcelNumber($stUntil);
         $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Tingkat *)");
@@ -838,7 +865,7 @@ class C_save_to_excel2 extends CI_Controller
         $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
 
         $r++;
-        $st = 2;
+        $st = 3;
         $huruf = $this->m_master->HurufColExcelNumber($st);
         $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Internasional");
         $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
@@ -866,6 +893,11 @@ class C_save_to_excel2 extends CI_Controller
             $st++;
             $huruf = $this->m_master->HurufColExcelNumber($st);
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lembaga );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
             $Internasional = '';
