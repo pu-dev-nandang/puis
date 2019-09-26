@@ -1,5 +1,5 @@
 <!-- <h1>lama_studi_mahasiswa</h1> -->
- 
+
 
 <style>
     /*#dataTablesPAM tr th, #dataTablesPAM tr td {
@@ -25,7 +25,7 @@
     </div>
 </div>
 <script>
-    
+
     $(document).ready(function () {
         loadDataPAM();
     });
@@ -39,7 +39,7 @@
 			'                    <th colspan="3" style="border-right: 1px solid #ccc;">Rata-rata Masa Studi Lulusan pada</th>  ' +
 			'                    <th style="border-right: 1px solid #ccc;"></th>  ' +
 			'                </tr>';
-            
+
 
 
         var data = {
@@ -51,9 +51,9 @@
         var url = base_url_js+'api3/__crudAgregatorTB5';
 
         $.post(url,{token:token},function (jsonResult) {
-        	// console.log(jsonResult); 
+        	// console.log(jsonResult);
             var header = jsonResult.header;
-            var arr_total = [];  
+            var arr_total = [];
             for (var i = 0; i < header.length; i++) {
                  HtmlTable += '<td style = "text-align: center">'+header[i]+'</td>';
                  if (i >= 2 && i <= 4) { // define total Jumlah PS dan Jumlah Lulusan pada
@@ -75,9 +75,15 @@
                     htmlBody += '<td>'+No+'</td>';
                     for (var j = 0; j < arr_body.length; j++) {
                         if(j < 4){
-                            htmlBody += '<td style = "text-align: center">'+arr_body[j]+'</td>';
+                            if (j == 0) {
+                                htmlBody += '<td style = "text-align: center">'+arr_body[j].show+'</td>';
+                            }
+                            else
+                            {
+                                htmlBody += '<td style = "text-align: center"><a href = "javascript:void(0);" class = "datadetail" data = "'+arr_body[j].data+'">'+arr_body[j].show+'</a></td>';
+                            }
                             if (j >= 1) { // isi total Jumlah PS dan Jumlah Lulusan pada
-                                arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j]);
+                                arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j].show);
                             }
                         }
                         else
@@ -103,11 +109,51 @@
                             '<td colspan = "2">Jumlah</td>'+
                             isian+
                         '</tr>'+
-                    '</tfoot>'        
-                    );  
+                    '</tfoot>'
+                    );
 
             }
 
         });
     }
+
+    $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
+        var v = parseInt($(this).html());
+        if (v > 0) {
+            var dt = $(this).attr('data');
+            // console.log(dt);
+            dt = jwt_decode(dt);
+            var html =  '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<td>No</td>'+
+                                            '<td>NPM</td>'+
+                                            '<td>NAMA</td>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>';
+                    for (var i = 0; i < dt.length; i++) {
+                        html += '<tr>'+
+                                    '<td>'+ (parseInt(i)+1) + '</td>'+
+                                    '<td>'+ dt[i].NPM + '</td>'+
+                                    '<td>'+ dt[i].Name + '</td>'+
+                                '</tr>';    
+                    }
+
+                    html  += '</tbody></table></div></div>';                
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+    })
+    
 </script>

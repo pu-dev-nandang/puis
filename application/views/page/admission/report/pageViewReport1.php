@@ -100,12 +100,15 @@
 			        			<div class="form-group">
 			        				<div class="row" style="margin-top: 10px">
 			        					<div class="col-xs-4">
-			        						<label>Angkatan</label>
+			        						<label>Angkatan & Date</label>
 			        					</div>
 			        					<div class="col-xs-4">
 			        						<select class="select2-select-00 full-width-fix" id="SelectYearDataMHS">
   		                                         <option></option>
   		                                    </select>
+			        					</div>
+			        					<div class="col-xs-4">
+  				          					<input type="text" name="datechoose" id= "datechoose" data-date-format="yyyy-mm-dd" placeholder="Date Start" class="form-control" readonly="true" value="<?php echo date('Y-m-d') ?>">
 			        					</div>
 			        				</div>
 			        				<div class="row" style="margin-top: 10px">
@@ -169,9 +172,11 @@
 			var url = base_url_js+'admission/intake_Excel';
 			var SelectYearDataMHS = $("#SelectYearDataMHS").val();
 			var Prodi = $("#Prodi").val();
+			var datechoose = $('#datechoose').val();
 			data = {
 			  Year : SelectYearDataMHS,
 			  Prodi : Prodi,
+			  datechoose : datechoose,
 			}
 			var token = jwt_encode(data,"UAP)(*");
 			FormSubmitAuto(url, 'POST', [
@@ -304,6 +309,11 @@
 	  		    dateFormat: 'yy-mm-dd',
 
 	  	  });
+
+  	      $("#datechoose").datepicker({
+  	  		    dateFormat: 'yy-mm-dd',
+
+  	  	  });
 		FuncLoadMajor();
 		FuncLoadMonth();
 		FuncLoadYears();

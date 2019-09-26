@@ -499,4 +499,515 @@ class C_save_to_excel2 extends CI_Controller
 
     }
 
+    public function excel_kerjasama_perguruan_tinggi()
+    {
+    	$token = $this->input->post('token');
+    	$key = "UAP)(*";
+    	$Input = (array) $this->jwt->decode($token,$key);
+    	$passToExcel = $Input['passToExcel'];
+    	$passToExcel = $this->jwt->decode($passToExcel,$key);
+    	$sql = $passToExcel.' group by z.ID ORDER BY z.StartDate asc';
+    	$data = $this->db->query($sql)->result_array();
+    	include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+    	ini_set('memory_limit', '-1');
+    	ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+    	// Panggil class PHPExcel nya
+    	$excel = new PHPExcel();
+    	$Filename = 'excel-kerjasama-perguruan-tinggi.xlsx';
+    	// Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+    	$style_col = array(
+    	    'font' => array('bold' => true), // Set font nya jadi bold
+    	    'alignment' => array(
+    	        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+    	        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+    	    ),
+    	    'borders' => array(
+    	        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+    	        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+    	        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+    	        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+    	    )
+    	);
+
+    	// Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+    	$style_row = array(
+    	    'alignment' => array(
+    	        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+    	    ),
+    	    'borders' => array(
+    	        'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+    	        'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+    	        'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+    	        'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+    	    )
+    	);
+
+    	$excel->setActiveSheetIndex(0)->setCellValue('A1', "Tabel 1.c Kerjasama Perguruan Tinggi");
+
+    	$r = 7;
+    	$rUntil = $r + 2 -1;
+    	$st = 0;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "No");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+    	
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Lembaga Mitra Kerjasama");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Kategori");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$stUntil = $st+2;
+    	$hurufUntil = $this->m_master->HurufColExcelNumber($stUntil);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Tingkat *)");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$hurufUntil.$r);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$hurufUntil.$r)->applyFromArray($style_col);
+
+    	$st = $stUntil+1;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Bentuk Kegiatan/ Manfaat");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Bukti Kerjasama");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Masa Berlaku (Tahun Berakhir, YYYY)");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->getAlignment()->setWrapText(true);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Semester");
+    	$excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+    	$excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+    	$r++;
+    	$st = 3;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Internasional");
+    	$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Nasional");
+    	$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Wilayah/ Lokal");
+    	$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+    	$c_int = 0;
+    	$c_nas = 0;
+    	$c_lokal = 0;
+    	$r++;
+    	// print_r($data);die();
+    	for ($i=0; $i < count($data); $i++) { 
+    		$No = $i+1;
+    		$st = 0;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $No );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$Lembaga = $data[$i]['Lembaga'];
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lembaga );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$Internasional = '';
+    		if ($data[$i]['Internasional'] == 1) {
+    			// print_r('Internasional == '.$data[$i]['Internasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
+
+        			// 	$c_int++;
+        			// 	// print_r('int => '.$c_int.'<br/>');
+        			// }
+                    $c_int++;
+    			$Internasional = 'V';
+    		}
+    		
+    		$Nasional = '';
+    		if ($data[$i]['Nasional'] == 1 ) {
+    			// print_r('Nasional == '.$data[$i]['Nasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
+        			// 	$c_nas++;
+        			// 	// print_r('nas => '.$c_nas.'<br/>');
+        			// }
+                    $c_nas++;
+    			$Nasional = 'V';
+    		}
+
+    		$Lokal = '';
+    		if ($data[$i]['Lokal'] == 1) {
+    			// print_r('Lokal == '.$data[$i]['Lokal'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+        			// if ($data[$i]['Kategori'] == 'Tridarma') {
+        			// 	$c_lokal++;
+        			// 	// print_r('lokal => '.$c_lokal.'<br/>');
+        			// }
+                    $c_lokal++;
+    			$Lokal = 'V';
+    		}
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Internasional );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Nasional );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lokal );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['BentukKegiatan'] );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['BuktiName'] );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $this->m_master->getDateIndonesian($data[$i]['EndDate']) );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$st++;
+    		$huruf = $this->m_master->HurufColExcelNumber($st);
+    		$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['SemesterName'] );
+    		$excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+    		$r++;
+    	}
+    	// die();
+    	$r = 2;
+    	$st = 0;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, 'Jumlah kerjasama tridharma tingkat internasional =' );
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $c_int );
+
+    	$r++;
+    	$st = 0;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, 'Jumlah kerjasama tridharma tingkat nasional =' );
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $c_nas );
+
+    	$r++;
+    	$st = 0;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, 'Jumlah kerjasama tridharma tingkat wilayah/lokal =' );
+    	$st++;
+    	$huruf = $this->m_master->HurufColExcelNumber($st);
+    	$excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $c_lokal );
+
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+    	$excel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+        foreach(range('D','F') as $columnID) {
+            $excel->getActiveSheet()->getColumnDimension($columnID)
+                ->setAutoSize(true);
+        }
+    	foreach(range('G','J') as $columnID) {
+    	    $excel->getActiveSheet()->getColumnDimension($columnID)
+                  ->setWidth(25);
+    	}
+
+    	$excel->setActiveSheetIndex(0);
+    	header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    	header('Content-Disposition: attachment; filename='.$Filename); // Set nama file excel nya
+    	header('Cache-Control: max-age=0');
+
+    	$write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+    	$write->save('php://output');
+    }
+
+    public function aps_excel_kerjasama_tridarma()
+    {
+        $token = $this->input->post('token');
+        $key = "UAP)(*";
+        $Input = (array) $this->jwt->decode($token,$key);
+        $passToExcel = $Input['passToExcel'];
+        $passToExcel = $this->jwt->decode($passToExcel,$key);
+        $sql = $passToExcel.' ORDER BY z.StartDate asc';
+        $data = $this->db->query($sql)->result_array();
+        include APPPATH.'third_party/PHPExcel/PHPExcel.php';
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 600); //600 seconds = 10 minutes
+
+        // Panggil class PHPExcel nya
+        $excel = new PHPExcel();
+        $Filename = 'excel-kerjasama-perguruan-tinggi.xlsx';
+        // Buat sebuah variabel untuk menampung pengaturan style dari header tabel
+        $style_col = array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
+        $style_row = array(
+            'alignment' => array(
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('style'  => PHPExcel_Style_Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('style'  => PHPExcel_Style_Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('style'  => PHPExcel_Style_Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $excel->setActiveSheetIndex(0)->setCellValue('A1', "Tabel 1 Kerjasama");
+
+        $r = 4;
+        $rUntil = $r + 2 -1;
+        $st = 0;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "No");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+        
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Lembaga Mitra Kerjasama");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Kategori");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $stUntil = $st+2;
+        $hurufUntil = $this->m_master->HurufColExcelNumber($stUntil);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Tingkat *)");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$hurufUntil.$r);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$hurufUntil.$r)->applyFromArray($style_col);
+
+        $st = $stUntil+1;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Judul Kegiatan Kerjasama");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Manfaat bagi PS yang diakreditasi");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Waktu dan Durasi");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Bukti Kerjasama");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Masa Berlaku (Tahun Berakhir, YYYY)");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Semester");
+        $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
+        $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
+
+        $r++;
+        $st = 3;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Internasional");
+        $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Nasional");
+        $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+        $st++;
+        $huruf = $this->m_master->HurufColExcelNumber($st);
+        $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "Wilayah/ Lokal");
+        $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+
+        $r++;
+        for ($i=0; $i < count($data); $i++) { 
+            $No = $i+1;
+            $row = $data[$i];
+            $st = 0;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $No );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $Lembaga = $data[$i]['Lembaga'];
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lembaga );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $Internasional = '';
+            if ($data[$i]['Internasional'] == 1) {
+                // print_r('Internasional == '.$data[$i]['Internasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+                if ($data[$i]['Kategori'] == 'Tridarma') {
+
+                    $c_int++;
+                    // print_r('int => '.$c_int.'<br/>');
+                }
+                $Internasional = 'V';
+            }
+            
+            $Nasional = '';
+            if ($data[$i]['Nasional'] == 1 ) {
+                // print_r('Nasional == '.$data[$i]['Nasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+                if ($data[$i]['Kategori'] == 'Tridarma') {
+                    $c_nas++;
+                    // print_r('nas => '.$c_nas.'<br/>');
+                }
+                $Nasional = 'V';
+            }
+
+            $Lokal = '';
+            if ($data[$i]['Lokal'] == 1) {
+                // print_r('Lokal == '.$data[$i]['Lokal'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
+                if ($data[$i]['Kategori'] == 'Tridarma') {
+                    $c_lokal++;
+                    // print_r('lokal => '.$c_lokal.'<br/>');
+                }
+                $Lokal = 'V';
+            }
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Internasional );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Nasional );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Lokal );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['JudulKegiatan'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['ManfaatKegiatan'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $Waktu = $this->m_master->getDateIndonesian($row['StartDate']).' - '.$this->m_master->getDateIndonesian($row['EndDate']);
+            $Durasi = $this->m_master->dateDiffDays ($row['StartDate'], $row['EndDate']);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Waktu." \n ".$Durasi.' days' );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->getAlignment()->setWrapText(true);
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['BuktiName'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $this->m_master->getDateIndonesian($data[$i]['EndDate']) );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $st++;
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['SemesterName'] );
+            $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
+
+            $r++;
+        }
+
+        $excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+        $excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
+        $excel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
+        $excel->getActiveSheet()->getColumnDimension('F')->setWidth(50);
+        $excel->getActiveSheet()->getColumnDimension('G')->setWidth(50);
+        $excel->getActiveSheet()->getColumnDimension('H')->setWidth(40);
+        $excel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
+        $excel->getActiveSheet()->getColumnDimension('J')->setWidth(35);
+        $excel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
+        // foreach(range('B','E') as $columnID) {
+        //     $excel->getActiveSheet()->getColumnDimension($columnID)
+        //         // ->setAutoSize(true);
+        //         ->setWidth(15);
+        // }
+
+        $excel->setActiveSheetIndex(0);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename='.$Filename); // Set nama file excel nya
+        header('Cache-Control: max-age=0');
+
+        $write = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+        $write->save('php://output');
+
+    }
+
 }

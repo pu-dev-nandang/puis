@@ -45,7 +45,7 @@
                     </div>
                     <div class="col-xs-4">
                         <div class="form-group">
-                            <label>Card Number</label>
+                            <label>Access Card Number</label>
                             <input type="text" class="form-control" id="CardNumber">
                         </div>
                     </div>
@@ -149,9 +149,10 @@
                             <label>Email PU</label>
                             <div class="form-group">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="formEmailPU" placeholder="Auto by System" disabled>
+                                    <input type="text" class="form-control" id="formEmailPU" disabled>
                                     <span class="input-group-addon">@podomorouniversity.ac.id</span>
                                 </div>
+                                <label> *Email PU Auto Generete by system</label>
                             </div>
                         </div>
                     </div>

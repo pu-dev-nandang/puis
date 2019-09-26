@@ -533,8 +533,8 @@ class M_admission extends CI_Model {
         $status = '';
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
-          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone
+        $sql = 'select a.ID,a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
+          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone,a.ID
           from db_admission.register as a
           join db_admission.register_verification as b
           on a.ID = b.RegisterID
@@ -3833,7 +3833,7 @@ class M_admission extends CI_Model {
 
     }
 
-    public function getIntakeByYear($Year)
+    public function getIntakeByYear($Year,$datechoose = null)
     {
       $this->load->model('master/m_master');
       $this->load->model('statistik/m_statistik');
@@ -3844,12 +3844,18 @@ class M_admission extends CI_Model {
         Find Faculty active by program study
       */
        $G_Faculty = $this->m_master->facultyActiveByProgramStudy();
-       $GetDateNow = date('Y-m-d');
+       $GetDateNow = ($datechoose == null ) ? date('Y-m-d') : $datechoose;
+       $DateFiltering = $GetDateNow;
        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
        // get date satu minggu sebelumnya
-       $MingguWr = $this->m_master->GetDateAfterOrBefore(date('Y-m-d'),'-7');
+       $MingguWr = $this->m_master->GetDateAfterOrBefore($DateFiltering,'-7');
+       $DateFiltering2 = $MingguWr;
        $MingguWr = $this->m_master->getIndoBulan($MingguWr);
 
+       // get date last year
+       $DateFiltering2  = explode('-', $DateFiltering);
+       $DateFiltering2 = ($DateFiltering2[0] - 1).'-'.($DateFiltering2[1]).'-'.($DateFiltering2[2]);
+       // print_r($DateFiltering2);die();
        for ($i=0; $i < count($G_Faculty); $i++) {
          $FacultyID = $G_Faculty[$i]['FacultyID'];
          $temp['Faculty'] = $G_Faculty[$i]['Name'];
@@ -3878,14 +3884,24 @@ class M_admission extends CI_Model {
          $arr_temp = array();
          for ($j=0; $j < count($G_program_study); $j++) {
            $temp['Prodi'][] = $G_program_study[$j]['Name'];
-           // cari intake tahun lalu dulu
+           // cari intake tahun lalu dulu berdasarkan tannggal yang dipilih
               $ProdiID = $G_program_study[$j]['ID'];
               // check table existing
                $ChkTblExist = $this->m_statistik->table_Exist('rekapintakeadm_'.($Year-1));
-               if ($ChkTblExist) {
-                 $query = $this->m_master->caribasedprimary('db_statistik.rekapintakeadm_'.($Year-1),'ProdiID',$ProdiID);
-                 $total = $query[0]['Total'];
-                 $c1 = $total;
+               // year 2018 ke bawah datanya tidak ada
+               if (($Year-1) <= 2018) {
+                if ($ChkTblExist) {
+                  $query = $this->m_master->caribasedprimary('db_statistik.rekapintakeadm_'.($Year-1),'ProdiID',$ProdiID);
+                  $total = 0;
+                  if (count($query) > 0) {
+                     $total = $query[0]['Total'];
+                  }
+                  $c1 = $total;
+                }
+                else
+                {
+                  $c1 = 0;
+                }
                }
                else
                {
@@ -3896,7 +3912,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering2.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3928,7 +3944,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3938,6 +3954,7 @@ class M_admission extends CI_Model {
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.$Year.'"
                         ) ccc where ID_program_study = ? and C_bayar > 0';
+
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
               }
@@ -3959,7 +3976,7 @@ class M_admission extends CI_Model {
                           (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                           if(a.StatusReg = 1,
                           (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB(NOW(), INTERVAL 7 DAY) ) as C_bayar
+                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB("'.$DateFiltering.'", INTERVAL 7 DAY) ) as C_bayar
                           from db_admission.register as a
                           join db_admission.school as b on a.SchoolID = b.ID
                           LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3969,6 +3986,7 @@ class M_admission extends CI_Model {
                           left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                            where a.SetTa = "'.$Year.'"
                           ) ccc where ID_program_study = ? and C_bayar > 0';
+
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
                 }

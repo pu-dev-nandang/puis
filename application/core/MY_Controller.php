@@ -861,3 +861,16 @@ abstract class Ga_Controler extends Globalclass{
     }
 
 }
+
+class Cooperation_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function temp($content)
+    {
+        parent::template($content);
+    }
+}

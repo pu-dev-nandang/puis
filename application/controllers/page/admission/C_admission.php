@@ -148,7 +148,8 @@ class C_admission extends Admission_Controler {
        $page = $this->uri->segment(5);
        $start = ($page - 1) * $config["per_page"];
        $this->data['datadb'] = $this->m_admission->selectDataDitribusiFormulirOnline($config["per_page"], $start,$tahun,$NomorFormulir,$status);
-      $content = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/tabel_formulir_online',$this->data,true);
+      // $content = $this->load->view('page/'.$this->data['department'].'/distribusi_formulir/tabel_formulir_online',$this->data,true);
+      $content = $this->load->view('page/'.'admission'.'/distribusi_formulir/tabel_formulir_online',$this->data,true);
 
        $output = array(
        'pagination_link'  => $this->pagination->create_links(),
