@@ -1995,7 +1995,7 @@ class C_api3 extends CI_Controller {
             for ($i=0; $i < count($G_prodi); $i++) {
                 $ProdiID = $G_prodi[$i]['ID'];
                 $MasaStudi = $G_prodi[$i]['MasaStudi'];
-                $IndexMS = $MasaStudi + 1; // array 1 adalah isian data lulus,existing etc
+                $IndexMS = $MasaStudi; // array 1 adalah isian data lulus,existing etc
                 // get all std ta by ProdiID tanpa status std
                 $sql = 'select count(*) as total from (
                         select ID from db_academic.auth_students 
@@ -2056,7 +2056,7 @@ class C_api3 extends CI_Controller {
 
                                     $temp[] = $queryYear[0]['total'];
                                     $_ex[] = $queryYear[0]['total']; // get existing
-                                    $TotalHor +=  $queryYear[0]['total']; 
+                                    $TotalHor =  0; 
                                 }
                             }
                             $_ex[] = 0; // get existing
@@ -2093,15 +2093,16 @@ class C_api3 extends CI_Controller {
                                     }
                                     else
                                     {
-                                         $lulus = ($_lu[($k - 1)] / $ExistingAwal) * 100;
+                                         $lulus = ($_lu[($k)] / $ExistingAwal) * 100;
                                          // > 50 = 4 && > 50 = 0
-                                         if ($lulus > 50) {
-                                             $temp[] = 4;
-                                         }
-                                         else
-                                         {
-                                            $temp[] = 0;
-                                         }
+                                         // if ($lulus > 50) {
+                                         //     $temp[] = 4;
+                                         // }
+                                         // else
+                                         // {
+                                         //    $temp[] = 0;
+                                         // }
+                                         $temp[] = $lulus;
                                     }
                                     
                                 }
@@ -2122,15 +2123,17 @@ class C_api3 extends CI_Controller {
                                     }
                                     else
                                     {
-                                         $lulus = ($_lu[($k - 1)] / $ExistingAwal) * 100;
+                                         $lulus = ($_lu[($k)] / $ExistingAwal) * 100;
                                          // >= 85 = 4 && > 85 = 0
-                                         if ($lulus > 85) {
-                                             $temp[] = 4;
-                                         }
-                                         else
-                                         {
-                                            $temp[] = 0;
-                                         }
+                                         // if ($lulus > 85) {
+                                         //     $temp[] = 4;
+                                         // }
+                                         // else
+                                         // {
+                                         //    $temp[] = 0;
+                                         // }
+
+                                         $temp[] = $lulus;
                                     }
                                     
                                 }
