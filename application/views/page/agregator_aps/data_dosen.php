@@ -36,6 +36,8 @@
             </div>
             <br/>
             <div id="viewTable"></div>
+            <p style="color: orangered;">*) Table data dosen mencakup laporan APS table 3.a1, 3.a2, 3.a4, 3a5</p>
+            <p style="color: orangered;">*) Data Dosen yang terhitung adalah dosen yang mempunyai status forlap</p>
         </div>
     </div>
 </div>                       
@@ -124,6 +126,7 @@ function LoadTableData(filterProdi)
                             '</tr>'+
                         '</thead>'+
                         '<tbody></tbody>'+
+                        ''
                     '</table></div>';
         selector.html(html);                               
 
