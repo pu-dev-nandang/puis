@@ -55,9 +55,14 @@
 								'<div style="text-align: right;">'+
 								    '<button onclick="saveTable2Excel(\'dataTable2Excel\')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>'+
 								'</div>'+
+								'<p style="color: orangered;">*) Ratio Tepat Waktu > 50 = 4, <= 50 = 0  </p>'+
+								'<p style="color: orangered;">*) Ratio Keberhasilan Studi >= 85 = 4, < 85 = 0  </p>'+
+								'<p style="color: orangered;" class = "PercentRatio"></p>'+
 								'<br/>'+
 								'<table class = "table table-bordered dataTable2Excel" data-name="TblLamaRasioKelulusan">';
+			var SumRata = 0;
 			for (var i = 0; i < jsonResult.length; i++) {
+				var MasaStudi = jsonResult[i].MasaStudi;
 				var ProdiName = jsonResult[i]['ProdiName'];
 				var TheadBuild = '';
 				var header = jsonResult[i]['header'];
@@ -71,7 +76,8 @@
 					var Sub = header[j].Sub;
 					if (Sub.length) {
 						for (var k = 0; k < Sub.length; k++) {
-							TheadBuild_sub += '<td>'+Sub[k]+'</td>';
+							var ss = (MasaStudi == k) ? 'style = "background-color: lightyellow;"' : '';
+							TheadBuild_sub += '<td '+ss+'>'+Sub[k]+'</td>';
 						}
 					}
 				}
@@ -81,8 +87,33 @@
 				for (var j = 0; j < data.length; j++) {
 					tbodyFill += '<tr>';
 					var dt = data[j];
+					var wrPersent = (j>1) ? '%' : '';
 					for (var k = 0; k < dt.length; k++) {
-						tbodyFill += '<td>'+dt[k]+'</td>';
+						var ss = (MasaStudi == (k-1) ) ? 'style = "background-color: lightyellow;"' : '';
+						if (k==0) {
+							tbodyFill += '<td>'+dt[k]+'</td>';
+						}
+						else
+						{
+							if ( (dt.length) - 1 == k && j == 1) {
+								tbodyFill += '<td>'+getCustomtoFixed(dt[k],0)+'</td>';
+							}
+							else if( (dt.length) - 1 == k && j != 1) {
+								tbodyFill += '<td>'+'-'+'</td>';
+							}
+							else
+							{
+								tbodyFill += '<td '+ss+'>'+getCustomtoFixed(dt[k],0)+wrPersent+'</td>';
+								
+							}
+
+							if (MasaStudi == (k-1) && j == 2 ) { // for sum untuk year
+								// console.log(getCustomtoFixed(dt[k],0));
+								SumRata += parseInt(getCustomtoFixed(dt[k],0));
+							}
+							
+						}
+						
 					}
 
 					tbodyFill += '</tr>';
@@ -107,68 +138,78 @@
 				'</div>';	
 			
 		$('#content_data').html(html);
+
+		var rt = SumRata / (jsonResult.length);
+		rt =  getCustomtoFixed(rt,1);
+		var Ta = $('#SelectTA option:selected').val();
+		$('.PercentRatio').html('*) Ratio '+Ta+' : '+rt+'%');
 	}
 
-	function MakeContentData2(jsonResult)
-	{
-		var html = '';
-			for (var i = 0; i < jsonResult.length; i++) {
-				var ProdiName = jsonResult[i]['ProdiName'];
-				var TheadBuild = '';
-				var header = jsonResult[i]['header'];
-				for (var j = 0; j < header.length; j++) {
-					TheadBuild += '<th rowspan = "'+header[j].Rowspan+'" colspan = "'+header[j].Colspan+'">'+header[j].Name+'</th>';							
-				}
+	// function MakeContentData2(jsonResult)
+	// {
+	// 	var html = '';
+	// 		for (var i = 0; i < jsonResult.length; i++) {
+	// 			var ProdiName = jsonResult[i]['ProdiName'];
+	// 			var TheadBuild = '';
+	// 			var header = jsonResult[i]['header'];
+	// 			for (var j = 0; j < header.length; j++) {
+	// 				TheadBuild += '<th rowspan = "'+header[j].Rowspan+'" colspan = "'+header[j].Colspan+'">'+header[j].Name+'</th>';							
+	// 			}
 
-				// loop sub
-				var TheadBuild_sub = '';
-				for (var j = 0; j < header.length; j++) {
-					var Sub = header[j].Sub;
-					if (Sub.length) {
-						for (var k = 0; k < Sub.length; k++) {
-							TheadBuild_sub += '<th>'+Sub[k]+'</th>';
-						}
-					}
-				}
+	// 			// loop sub
+	// 			var TheadBuild_sub = '';
+	// 			for (var j = 0; j < header.length; j++) {
+	// 				var Sub = header[j].Sub;
+	// 				if (Sub.length) {
+	// 					for (var k = 0; k < Sub.length; k++) {
+	// 						TheadBuild_sub += '<th>'+Sub[k]+'</th>';
+	// 					}
+	// 				}
+	// 			}
 
-				var data = jsonResult[i]['data'];
-				var tbodyFill = '';
-				for (var j = 0; j < data.length; j++) {
-					tbodyFill += '<tr>';
-					var dt = data[j];
-					for (var k = 0; k < dt.length; k++) {
-						tbodyFill += '<td>'+dt[k]+'</td>';
-					}
+	// 			var data = jsonResult[i]['data'];
+	// 			var tbodyFill = '';
+	// 			for (var j = 0; j < data.length; j++) {
+	// 				tbodyFill += '<tr>';
+	// 				var dt = data[j];
+	// 				for (var k = 0; k < dt.length; k++) {
+	// 					tbodyFill += '<td>'+dt[k]+'</td>';
+	// 				}
 
-					tbodyFill += '</tr>';
-				}
+	// 				tbodyFill += '</tr>';
+	// 			}
 
 
-				var StyleRow = (i == 0) ? '' : ' style = "margin-top:10px;" '
-				html += '<div class = "row" '+StyleRow+'>'+
-							'<div class = "col-md-12">'+
-								'<table class = "table table-bordered">'+
-									'<thead>'+
-										'<tr>'+
-											'<th colspan = "10" align = "center"><h2 style = "margin-top: 0px;border-left: 7px solid #2196F3;padding-left: 10px;    font-weight: bold;">'+ProdiName+'</h2></th>'+
-										'</tr>'+	
-										'<tr>'+
-											TheadBuild+
-										'</tr>'+
-										'<tr>'+
-											TheadBuild_sub+
-										'</tr>'+
-									'</thead>'+
-									'<tbody>'+
-										tbodyFill+
-									'</tbody>'+
-								'</table>'+
-							'</div>'+
-						'</div>';							
-			}
+	// 			var StyleRow = (i == 0) ? '' : ' style = "margin-top:10px;" '
+	// 			html += '<div class = "row" '+StyleRow+'>'+
+	// 						'<div class = "col-md-12">'+
+	// 							'<table class = "table table-bordered">'+
+	// 								'<thead>'+
+	// 									'<tr>'+
+	// 										'<th colspan = "10" align = "center"><h2 style = "margin-top: 0px;border-left: 7px solid #2196F3;padding-left: 10px;    font-weight: bold;">'+ProdiName+'</h2></th>'+
+	// 									'</tr>'+	
+	// 									'<tr>'+
+	// 										TheadBuild+
+	// 									'</tr>'+
+	// 									'<tr>'+
+	// 										TheadBuild_sub+
+	// 									'</tr>'+
+	// 								'</thead>'+
+	// 								'<tbody>'+
+	// 									tbodyFill+
+	// 								'</tbody>'+
+	// 							'</table>'+
+	// 						'</div>'+
+	// 					'</div>';							
+	// 		}
 			
-		$('#content_data').html(html);
-	}
+	// 	$('#content_data').html(html);
+	// }
+
+	
+	$(document).off('click', '#SelectTA').on('click', '#SelectTA',function(e) {
+		MakeTable1();
+	})
 
 	$(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
 	    var v = parseInt($(this).html());
