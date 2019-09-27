@@ -1965,129 +1965,196 @@ class C_api3 extends CI_Controller {
             return print_r(1);
         }
         else if ($data_arr['action'] == 'viewRasioKelulusanTepatWaktuDanRasioKeberhasilanStudi') {
-            $rs = array('header' => [],'body' => [] );
-            // dapatkan 5 tahun terakhir
-            $header = ['Tahun Masuk'];
-            $Year = date('Y');
-            $Year3 = $Year - 4;
-            for ($i=$Year3; $i <= $Year; $i++) {
-                $header[] = (int)$i;
+            $rs = array();
+            $TA = $data_arr['TA'];
+            // header table 7 tahun dari TA
+            $UntilYear = $TA + 7;
+            $te = [];
+            for ($i=$TA; $i <= $UntilYear; $i++) { 
+                $te[]= $i;
             }
+
+            $Lte = $i - 1; // last year 
+           
+            $header = [
+                   ['Name' => 'Data','Rowspan' => 2,'Colspan' => 1,'Sub' => [] ], 
+                   ['Name' => 'Jumlah Mahasiswa per Angkatan pada Tahun','Rowspan' => 1,'Colspan' => 8,'Sub' => $te ], 
+                   ['Name' => 'Total','Colspan' => 1,'Sub' => [] , 'Rowspan' => 2 ], 
+            ];
+
+            // show data per prodi in the table
+            $_data = ['Existing','Lulus','Ratio Tepat Waktu','Ratio Keberhasilan Studi'];
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+            $sql_prodi = 'select a.*,b.MasaStudi from db_academic.program_study as a join db_academic.education_level as b on a.EducationLevelID =  b.ID where a.Status = 1';
+            $G_prodi = $this->db->query($sql_prodi, array())->result_array();
 
             /*
-                Data Masuk mahasiswa ada di tahun 2019
-                2019 kebawah data tahun masuk sama dengan tahun angkatan
-                Filter s1 dan d4
+                    Ratio Tepat waktu yaitu 4 tahun
             */
+            $dt = [];
+            for ($i=0; $i < count($G_prodi); $i++) {
+                $ProdiID = $G_prodi[$i]['ID'];
+                $MasaStudi = $G_prodi[$i]['MasaStudi'];
+                $IndexMS = $MasaStudi + 1; // array 1 adalah isian data lulus,existing etc
+                // get all std ta by ProdiID tanpa status std
+                $sql = 'select count(*) as total from (
+                        select ID from db_academic.auth_students 
+                        where Year = '.$TA.' and ProdiID = '.$ProdiID.'
+                    )xx';
+                $query =$this->db->query($sql, array())->result_array();
+                $ExistingAwal = $query[0]['total'];
+                $_dt = array(
+                    'header' => $header,
+                    'ProdiID' => $ProdiID,
+                    'MasaStudi' => $MasaStudi,
+                    'ProdiName' => $G_prodi[$i]['Name'],
+                );
+                $_getdt = [];
+                $_ex = [];
+                $_lu = [];
+                for ($j=0; $j < count($_data); $j++) { 
+                    $temp = [];
+                    switch ($j) {
+                        case 0: // existing
+                            $temp[] = $_data[$j];
+                            $TotalHor = 0;
+                            // get 7 tahun ration
+                            for ($k=0; $k < count($te); $k++) { 
+                                if ($k == 0) {
+                                  $temp[] = $ExistingAwal; 
 
-            $body = [];
-            for ($i=1; $i < count($header); $i++) {
-                $temp = array();
-                $temp[] = array('show' => $header[$i] ,'data' => '');
-                $Year = $header[$i];
-                $akhirTs = date('Y');
-                for ($j=1; $j < count($header); $j++) { // year mulai dari array indeks 1
-                    $ta_year = $header[$j];
-                    if ($Year >= 2019) {
-                        // ambil tahun masuk dari table db_admission.to_be_mhs
+                                }
+                                else
+                                {
+                                    $ss = [];
+                                    $Yte = $te[$k]+1;
 
-                        $sql = 'select count(*) as total from db_academic.auth_students as a
-                                join db_admission.to_be_mhs as b on a.NPM = b.NPM
-                                join db_academic.program_study as c on a.ProdiID = c.ID
-                                where Year(b.DateTime) = ? and a.Year = ? and a.StatusStudentID = 3
-                                and c.EducationLevelID in(3,9)
-                          ';
-                        $query=$this->db->query($sql, array($Year,$ta_year))->result_array();
-                        // get data detail
-                        $sql1 = 'select a.NPM,a.Name from db_academic.auth_students as a
-                                join db_admission.to_be_mhs as b on a.NPM = b.NPM
-                                join db_academic.program_study as c on a.ProdiID = c.ID
-                                where Year(b.DateTime) = ? and a.Year = ? and a.StatusStudentID = 3
-                                and c.EducationLevelID in(3,9)';
-                        $query1=$this->db->query($sql1, array($Year,$ta_year))->result_array();
-                        // encode token
-                        $token = $this->jwt->encode($query1,"UAP)(*");
-                        $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
+                                    for ($z=$Yte; $z <= $Lte; $z++) { 
+                                        $ss[] =(string)$z;
+                                    }
 
-                        // $temp[] = $query[0]['total'];
-                    }
-                    else
-                    {
-                        // by year auth_students
-                        if ($Year == $ta_year) {
-                            $sql = 'select count(*) as total from db_academic.auth_students as a
-                                    join db_academic.program_study as c on a.ProdiID = c.ID
-                                    where a.Year = ?  and a.StatusStudentID = 3 and c.EducationLevelID in(3,9)
-                              ';
-                            $query=$this->db->query($sql, array($Year))->result_array();
-                            // get data detail
-                            $sql1 = 'select a.NPM,a.Name from db_academic.auth_students as a
-                                    join db_academic.program_study as c on a.ProdiID = c.ID
-                                    where a.Year = ?  and a.StatusStudentID = 3 and c.EducationLevelID in(3,9)';
-                            $query1=$this->db->query($sql1, array($Year))->result_array();
-                            // encode token
-                            $token = $this->jwt->encode($query1,"UAP)(*");
-                            $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
+                                    $q_add = '';
+                                    $sqlAdd = '';
+                                    if (count($ss) > 0 ) {
+                                        $q_add = implode(',', $ss);
+                                        $q_add = ' and GraduationYear in('.$q_add.')';
+                                        $sqlAdd = ' UNION 
+                                                    select ID from db_academic.auth_students
+                                                    where Year = '.$TA.$q_add.' and GraduationYear is not NULL and  GraduationYear != "" 
+                                                    and ProdiID = '.$ProdiID.'
+                                                  ';
+                                    }
 
-                            // $temp[] = $query[0]['total'];
-                        }
-                        else
-                        {
-                            $temp[] = array('show' => 0 ,'data' => '');
-                            // $temp[] = 0;
-                        }
+                                    $sqlYear = 'select count(*) as total from (
+                                                select ID from db_academic.auth_students
+                                                where Year = '.$TA.' and ( GraduationYear IS NULL  or GraduationYear = "" )
+                                                and ProdiID = '.$ProdiID.'
+                                                '.$sqlAdd.'
+                                            )xx ';
+                                          
+                                    $queryYear =$this->db->query($sqlYear, array())->result_array();
 
-                    }
+                                    $temp[] = $queryYear[0]['total'];
+                                    $_ex[] = $queryYear[0]['total']; // get existing
+                                    $TotalHor +=  $queryYear[0]['total']; 
+                                }
+                            }
+                            $_ex[] = 0; // get existing
+                            $temp[] = $TotalHor;
+                            break;
+                        case 1: // Lulus
+                            $temp[] = $_data[$j];
+                            $TotalHor = 0;
+                            // get 7 tahun ration
+                           for ($k=0; $k < count($te); $k++) { 
+                            $Yte = $te[$k];
+                            $sqlYear = 'select count(*) as total from 
+                                             (
+                                                 select ID from db_academic.auth_students
+                                                 where Year = '.$TA.'
+                                                 and ProdiID = '.$ProdiID.'
+                                                 and GraduationYear = '.$Yte.'
+                                             )xx
+                                        ';
+                            $queryYear =$this->db->query($sqlYear, array())->result_array();
+                            $temp[] = $queryYear[0]['total'];
+                            $_lu[] =  $queryYear[0]['total'];
+                            $TotalHor +=  $queryYear[0]['total']; 
+                           }
+                           $_lu[] = 0;
+                           $temp[] = $TotalHor;
+                            break;
+                        case 2: // Ratio Tepat Waktu
+                            $temp[] = $_data[$j];
+                            for ($k=0; $k < count($te); $k++) {
+                                if ($k == $IndexMS) {
+                                    if ($ExistingAwal == 0) {
+                                        $temp[] = 0;
+                                    }
+                                    else
+                                    {
+                                         $lulus = ($_lu[($k - 1)] / $ExistingAwal) * 100;
+                                         // > 50 = 4 && > 50 = 0
+                                         if ($lulus > 50) {
+                                             $temp[] = 4;
+                                         }
+                                         else
+                                         {
+                                            $temp[] = 0;
+                                         }
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    $temp[] = 0;
+                                } 
+                            }
+
+                            $temp[] = 0;
+                            break;
+                        case 3: // Ratio Keberhasilan Studi
+                            $temp[] = $_data[$j];
+                            for ($k=0; $k < count($te); $k++) {
+                                if ($k == $IndexMS) {
+                                    if ($ExistingAwal == 0) {
+                                        $temp[] = 0;
+                                    }
+                                    else
+                                    {
+                                         $lulus = ($_lu[($k - 1)] / $ExistingAwal) * 100;
+                                         // >= 85 = 4 && > 85 = 0
+                                         if ($lulus > 85) {
+                                             $temp[] = 4;
+                                         }
+                                         else
+                                         {
+                                            $temp[] = 0;
+                                         }
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    $temp[] = 0;
+                                } 
+                            }
+
+                            $temp[] = 0;
+                            break;
+                        default:
+                            # code...
+                            break;
+                    } // end switch
+
+                    $_getdt[] = $temp;
                 }
 
-                // untuk jumlah lulusan
-                if ($Year >= 2019) {
-                    $sql = 'select count(*) as total from db_academic.auth_students as a
-                            join db_admission.to_be_mhs as b on a.NPM = b.NPM
-                            join db_academic.program_study as c on a.ProdiID = c.ID
-                            where Year(b.DateTime) = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
-                            and c.EducationLevelID in(3,9)
-                      ';
-                    $query=$this->db->query($sql, array($Year))->result_array();
-                    // get data detail
-                    $sql1 = 'select a.NPM,a.Name from db_academic.auth_students as a
-                            join db_admission.to_be_mhs as b on a.NPM = b.NPM
-                            join db_academic.program_study as c on a.ProdiID = c.ID
-                            where Year(b.DateTime) = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
-                            and c.EducationLevelID in(3,9)';
-                    $query1=$this->db->query($sql1, array($Year))->result_array();
-                    // encode token
-                    $token = $this->jwt->encode($query1,"UAP)(*");
-                    $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
-
-                    // $temp[] = $query[0]['total'];
-                }
-                else
-                {
-                    $sql = 'select count(*) as total from db_academic.auth_students as a
-                           join db_academic.program_study as c on a.ProdiID = c.ID
-                            where Year = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
-                            and c.EducationLevelID in(3,9)
-                      ';
-                    $query=$this->db->query($sql, array($Year))->result_array();
-                    // get data detail
-                    $sql1 = 'select a.NPM,a.Name from db_academic.auth_students as a
-                           join db_academic.program_study as c on a.ProdiID = c.ID
-                            where Year = ? and a.GraduationYear = "'.$akhirTs.'" and a.StatusStudentID = 1
-                            and c.EducationLevelID in(3,9)';
-                    $query1=$this->db->query($sql1, array($Year))->result_array();
-                    // encode token
-                    $token = $this->jwt->encode($query1,"UAP)(*");
-                    $temp[] = array('show' => $query[0]['total'] ,'data' => $token);
-                    // $temp[] = $query[0]['total'];
-                }
-
-                $body[] = $temp;
+                $_dt['data'] = $_getdt; // add variable year
+                $dt[] = $_dt; // insert ke table untuk body
             }
 
-            $rs['body'] = $body;
-            $rs['header'] = $header;
-
+            $rs = $dt;
             return print_r(json_encode($rs));
         }
 
@@ -3503,6 +3570,22 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+    }
+
+    public function getAllTA_MHS()
+    {
+        $rs = [];
+        $sql = "show databases like '".'ta_'."%'";
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $variable = $query[$i]; 
+            foreach ($variable as $key => $value) {
+                $ex = explode('_', $value);
+                $ta = $ex[1];
+                $rs[] = $ta;
+            }
+        }
+        echo json_encode($rs);
     }
 
 }
