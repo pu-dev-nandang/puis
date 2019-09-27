@@ -1151,6 +1151,7 @@ $route['mobile/__getSemesterActive'] = 'api/c_mobile/getSemesterActive';
 
 $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 $route['api3/__crudqna'] = 'api/c_api3/crudqna';
+$route['api3/__getAllTA_MHS'] = 'api/c_api3/getAllTA_MHS';
 $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 
@@ -1866,5 +1867,7 @@ $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperati
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
 $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
+
+
 
 

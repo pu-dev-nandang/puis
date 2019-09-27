@@ -2115,4 +2115,27 @@
         return def.promise();
     }
 
+    function load_select_ta_mhs(selector = null)
+    {
+        var def = jQuery.Deferred();
+        var url = base_url_js+"api3/__getAllTA_MHS";
+        $.post(url,function (data_json) {
+
+        }).done(function(data_json) {
+             if (selector != null) {
+                selector.empty();
+                for (var i = 0; i < data_json.length; i++) {
+                    selector.append('<option value = "'+data_json[i]+'">'+data_json[i]+'</option>')
+                }
+             }
+            def.resolve(data_json);
+        }).fail(function() {
+          toastr.info('No Result Data'); 
+          def.reject();
+        }).always(function() {
+                        
+        });
+        return def.promise();
+    }
+
 </script>
