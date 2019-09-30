@@ -17,9 +17,14 @@
 <div class="well">
     <div class="row">
         <div class="col-md-12">
-            <p style="color:#3968c6;"><b> HKI (Paten, Paten Sederhana) </b></p>
+            
+
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <div>
+                    <select class="form-control" style="text-align: center;" id="filterAwal"></select>
+                </div>
+                 <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                
             </div>
             <div id="viewTable"></div>
         </div>
@@ -170,9 +175,9 @@
 
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.Judul+'</td>' +
-                        '   <td style="text-align: center;">'+moment(v.tahun).format('YYYY')+'</td>' +
-                        '   <td style="text-align: left;">'+v.Ket+'</td>' +
+                        '   <td style="text-align: left;">'+v.NamaJudul+'</td>' +
+                        '   <td style="text-align: center;">'+moment(v.Tahun).format('YYYY')+'</td>' +
+                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
                         '</tr>');
                     var total = parseInt(jsonResult.length);
                 }

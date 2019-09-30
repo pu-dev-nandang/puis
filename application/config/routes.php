@@ -1353,7 +1353,7 @@ $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dose
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 $route['agregator/produktivitas-penelitian-dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
 $route['agregator/produktivitas-pkm-dosen'] = 'page/agregator/c_agregator/produktivitas_pkm_dosen';
-
+$route['agregator/publikasi-ilmiah'] = 'page/agregator/c_agregator/publikasi_ilmiah';
 
 //Agregator Excel
 $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';

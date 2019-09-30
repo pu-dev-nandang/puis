@@ -72,13 +72,12 @@
 
     function loadDataTable() {
         var data = {
-            action : 'readProduktivitasPkmDosen',
+            action : 'readPublikasiIlmiah',
         };
         var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api3/__crudAgregatorTB3';
+        var url = base_url_js+'api3/__crudAgregatorTB5';
 
         $.post(url,{token:token},function (jsonResult) {
-            // arr_header_table
             var arr_header_table = jsonResult.header;
             var arr_total = [];
             // make table
@@ -86,8 +85,8 @@
                                 '<thead>'+
                                  '<tr style="background: #20485A;color: #FFFFFF;">'+
                                    '<td style="vertical-align : middle;text-align:center;width: 1%;" rowspan="2">No</td>'+
-                                   '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 15%;">Sumber Pembiayaan</td>'+
-                                   '<td colspan="3" style="vertical-align : middle;text-align:center;">Jumlah Judul PKM</td>'+
+                                   '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 15%;">Jenis Publikasi</td>'+
+                                   '<td colspan="3" style="vertical-align : middle;text-align:center;">Jumlah Judul</td>'+
                                    '<td rowspan="2" style="vertical-align : middle;text-align:center;width: 5%;">Jumlah</td> </tr><tr style="background: #20485A;color: #FFFFFF;">';
 
            
@@ -95,7 +94,7 @@
                 htmlTable += '<td style="vertical-align : middle;text-align:center;width: 5%;">'+arr_header_table[i]+'</td>';
                 arr_total.push(0);
             }
-            //htmlTable += '<td>'+'Jumlah'+'</td>';
+            
             htmlTable += '</tr>'+
                         '</thead>'+
                         '<tbody id="listStd"></tbody>'+
@@ -117,19 +116,16 @@
                         var tokenPen = jwt_encode(arr[key],'UAP)(*');
 
                         var isi = (viewDataTb!=0 && key!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pkm="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
-                        //htmlTableBody += '<td>'+arr[key]+'</td>';
                         htmlTableBody += '<td style="vertical-align : middle;">'+isi+'</td>';
                     }
 
                     for (var m = 1; m < arr.length; m++) {
-                        // console.log(m + ' ,,' +arr[m]);
-                       //arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m]);
-                       //jumlahKanan += parseInt(arr[m]);
-                        arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m].length);
+
+                       arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m].length);
                        jumlahKanan += parseInt(arr[m].length);
                     }
 
-                     htmlTableBody += '<td style="vertical-align : middle;text-align:center;">'+jumlahKanan+'</td>';
+                    htmlTableBody += '<td style="vertical-align : middle;text-align:center;">'+jumlahKanan+'</td>';
                     htmlTableBody += '</tr>';
 
                     $('#listStd').append(htmlTableBody);
@@ -172,12 +168,9 @@
         if(d.length>0){
             $.each(d,function (i,v) {
 
-                //var NID = (v.NIDN!='' && v.NIDN!=null && v.NIDN!=0 && v.NIDN!='0') ? v.NIDN : '-';
-                //NID = (v.NIDK!='' && v.NIDK!=null && v.NIDK!=0 && v.NIDK!='0') ? v.NIDK : NID;
-
                tr = tr+'<tr>' +
-                   '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                   '<td>'+v.Judul_PKM+'</td>' +
+                   '<td style="border-right: 1px solid #ccc;text-align:center;">'+(i+1)+'</td>' +
+                   '<td>'+v.Judul+'</td>' +
                    '<td>'+v.Name+'</td>' +
                    '</tr>';
             });
@@ -185,15 +178,15 @@
 
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Judul PKM Dosen</h4>');
+            '<h4 class="modal-title">Judul Publikasi Ilmiah</h4>');
         $('#GlobalModal .modal-body').html('<div class="row">' +
             '    <div class="col-md-12">' +
             '        <table class="table table-striped table-bordered" id="tableLect" style="margin-bottom: 0px;">' +
             '            <thead>' +
             '            <tr style="background: #20485A;color: #FFFFFF;">' +
-            '                <th style="width: 5%;">No</th>' +
-            '                <th style="width: 25%;">Nama Judul</th>' +
-             '                <th style="width: 20%;">Nama Dosen</th>' +
+            '                <th style="width: 5%; text-align:center;">No</th>' +
+            '                <th style="width: 25%; text-align:center;">Judul Publikasi Ilmiah</th>' +
+             '                <th style="width: 20%; text-align:center;">Nama Dosen</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +
