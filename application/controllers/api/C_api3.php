@@ -1269,7 +1269,43 @@ class C_api3 extends CI_Controller {
             )));
 
         }
-        else if($data_arr['action']=='viewPenggunaanDana'){
+         else if($data_arr['action']=='updatePenggunaanDana_aps'){
+
+
+                    $dataForm = (array) $data_arr['dataForm'];
+
+                    $JPID = $dataForm['JPID'];
+                    $Year = $dataForm['Year'];
+
+                    $dataCk = $this->db->get_where('db_agregator.penggunaan_dana_aps',array(
+                        'JPID' => $JPID,
+                        'Year' => $Year
+                    ))->result_array();
+
+
+        //            $ID = $data_arr['ID'];
+                    $ID = (count($dataCk)>0) ? $dataCk[0]['ID'] : '';
+
+
+                    if($ID!=''){
+                        // Update
+                        $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                        $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                        $this->db->where('ID', $ID);
+                        $this->db->update('db_agregator.penggunaan_dana_aps',$dataForm);
+
+                    } else {
+                        $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                        $this->db->insert('db_agregator.penggunaan_dana_aps',$dataForm);
+                        $ID = $this->db->insert_id();
+                    }
+
+                    return print_r(json_encode(array(
+                        'ID' => $ID
+                    )));
+
+                }
+         else if($data_arr['action']=='viewPenggunaanDana'){
 
             $Year = $data_arr['Year'];
             $Year1 = $data_arr['Year1'];
@@ -1307,8 +1343,55 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($dataJenis));
         }
+         else if($data_arr['action']=='viewPenggunaanDana_aps'){
+
+            $Year = $data_arr['Year'];
+            $Year1 = $data_arr['Year1'];
+            $Year2 = $data_arr['Year2'];
+            $Year3 = $data_arr['Year3'];
+            $Year4 = $data_arr['Year4'];
+            $Year5 = $data_arr['Year5'];
+
+            // Load Jenis P
+            $dataJenis = $this->db->get('db_agregator.jenis_penggunaan_aps')->result_array();
+
+            $result = [];
+
+            if(count($dataJenis)>0){
+
+
+                for($i=0;$i<count($dataJenis);$i++){
+                    $d = $dataJenis[$i];
+
+                    for($y=1;$y<=3;$y++){
+                        if($y==1){
+                            $YearEx = $Year;
+                        } else if($y==2){
+                            $YearEx = $Year1;
+                        } else {
+                            $YearEx = $Year2;
+                        }
+
+                        $dataPD = $this->db->query('SELECT pd.* FROM db_agregator.penggunaan_dana_aps pd
+                                                  WHERE pd.Year = "'.$YearEx.'" AND pd.JPID = "'.$d['ID'].'" ')->result_array();
+
+                        $dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['Price'] : 0;
+                    }
+
+                }
+
+            }
+
+            return print_r(json_encode($dataJenis));
+        }
         else if($data_arr['action']=='viewPenggunaanDanaYear'){
             $data = $this->db->query('SELECT pd.Year FROM db_agregator.penggunaan_dana pd
+                                                  GROUP BY pd.Year ORDER BY pd.Year DESC ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='viewPenggunaanDanaYear_aps'){
+            $data = $this->db->query('SELECT pd.Year FROM db_agregator.penggunaan_dana_aps pd
                                                   GROUP BY pd.Year ORDER BY pd.Year DESC ')->result_array();
 
             return print_r(json_encode($data));
@@ -1317,6 +1400,14 @@ class C_api3 extends CI_Controller {
 
             $this->db->where('ID', $data_arr['ID']);
             $this->db->delete('db_agregator.penggunaan_dana');
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='removePenggunaanDana_aps'){
+
+            $this->db->where('ID', $data_arr['ID']);
+            $this->db->delete('db_agregator.penggunaan_dana_aps');
 
             return print_r(1);
 
@@ -1342,9 +1433,35 @@ class C_api3 extends CI_Controller {
 
 
         }
+        else if($data_arr['action']=='updateJenisDana_aps'){
+
+            $ID = $data_arr['ID'];
+
+            $dataForm = array('Jenis' => $data_arr['Jenis']);
+
+            if($ID!=''){
+                // Update
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_agregator.jenis_penggunaan_aps',$dataForm);
+
+            } else {
+                $this->db->insert('db_agregator.jenis_penggunaan_aps',$dataForm);
+                $ID = $this->db->insert_id();
+            }
+
+            return print_r(1);
+
+
+        }
         else if($data_arr['action']=='viewJenisDana'){
 
             $data = $this->db->get('db_agregator.jenis_penggunaan')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='viewJenisDana_aps'){
+
+            $data = $this->db->get('db_agregator.jenis_penggunaan_aps')->result_array();
             return print_r(json_encode($data));
         }
 

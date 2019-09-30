@@ -15,7 +15,7 @@
                 <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable"></div>
-            <p style="color: orangered;">*) Table prestasi mahasiswa mencakup laporan APS table 8.b1, 8.b2,</p>
+            <p style="color: orangered;">*) Table prestasi mahasiswa mencakup laporan APS table 5 & 5a</p>
 
         </div>
 
