@@ -61,6 +61,7 @@
 								'<br/>'+
 								'<table class = "table table-bordered dataTable2Excel" data-name="TblLamaRasioKelulusan">';
 			var SumRata = 0;
+			var CountStdB0 = 0;
 			for (var i = 0; i < jsonResult.length; i++) {
 				var MasaStudi = jsonResult[i].MasaStudi;
 				var ProdiName = jsonResult[i]['ProdiName'];
@@ -95,6 +96,13 @@
 						}
 						else
 						{
+							// get total std per prodi untuk rata-rata rasio per tahun
+							if (k == 1 && j == 0) {
+								if (dt[k] > 0) {
+									CountStdB0++;
+								}
+							}
+
 							if ( (dt.length) - 1 == k && j == 1) {
 								tbodyFill += '<td>'+getCustomtoFixed(dt[k],0)+'</td>';
 							}
@@ -138,11 +146,14 @@
 				'</div>';	
 			
 		$('#content_data').html(html);
+		var rt = 0;
+		if (CountStdB0 > 0) {
+			rt = SumRata / CountStdB0;	
+		}
 
-		var rt = SumRata / (jsonResult.length);
 		rt =  getCustomtoFixed(rt,1);
 		var Ta = $('#SelectTA option:selected').val();
-		$('.PercentRatio').html('*) Ratio '+Ta+' : '+rt+'%');
+		$('.PercentRatio').html('*) Pesentase Ratio '+Ta+' : '+rt+'%');
 	}
 
 	// function MakeContentData2(jsonResult)
