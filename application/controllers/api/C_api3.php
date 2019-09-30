@@ -1983,7 +1983,8 @@ class C_api3 extends CI_Controller {
             ];
 
             // show data per prodi in the table
-            $_data = ['Existing','Lulus','Ratio Tepat Waktu','Ratio Keberhasilan Studi'];
+            // $_data = ['Existing','Lulus','Ratio Tepat Waktu','Ratio Keberhasilan Studi'];
+            $_data = ['Existing','Lulus','Persentase Ratio'];
             $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
             $sql_prodi = 'select a.*,b.MasaStudi from db_academic.program_study as a join db_academic.education_level as b on a.EducationLevelID =  b.ID where a.Status = 1';
             $G_prodi = $this->db->query($sql_prodi, array())->result_array();
@@ -2084,7 +2085,7 @@ class C_api3 extends CI_Controller {
                            $_lu[] = 0;
                            $temp[] = $TotalHor;
                             break;
-                        case 2: // Ratio Tepat Waktu
+                        case 2: //  Persentase Ratio
                             $temp[] = $_data[$j];
                             for ($k=0; $k < count($te); $k++) {
                                 if ($k == $IndexMS) {
@@ -2102,37 +2103,6 @@ class C_api3 extends CI_Controller {
                                          // {
                                          //    $temp[] = 0;
                                          // }
-                                         $temp[] = $lulus;
-                                    }
-                                    
-                                }
-                                else
-                                {
-                                    $temp[] = 0;
-                                } 
-                            }
-
-                            $temp[] = 0;
-                            break;
-                        case 3: // Ratio Keberhasilan Studi
-                            $temp[] = $_data[$j];
-                            for ($k=0; $k < count($te); $k++) {
-                                if ($k == $IndexMS) {
-                                    if ($ExistingAwal == 0) {
-                                        $temp[] = 0;
-                                    }
-                                    else
-                                    {
-                                         $lulus = ($_lu[($k)] / $ExistingAwal) * 100;
-                                         // >= 85 = 4 && > 85 = 0
-                                         // if ($lulus > 85) {
-                                         //     $temp[] = 4;
-                                         // }
-                                         // else
-                                         // {
-                                         //    $temp[] = 0;
-                                         // }
-
                                          $temp[] = $lulus;
                                     }
                                     
