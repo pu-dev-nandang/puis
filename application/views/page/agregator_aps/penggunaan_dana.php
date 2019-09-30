@@ -25,10 +25,17 @@
                     <input class="form-control" id="formYear" />
                 </div>
                 <div class="form-group">
-                    <label>Jumlah Dana</label>
+                    <label>Jumlah Dana UPPS</label>
                     <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">Rp</span>
-                        <input type="text" class="form-control" id="formPrice">
+                        <input type="text" class="form-control" id="formPriceUPPS">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Dana PS</label>
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">Rp</span>
+                        <input type="text" class="form-control" id="formPricePS">
                     </div>
                 </div>
                 <div class="form-group" style="text-align: right;">
@@ -51,7 +58,7 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-bordered  dataTable2Excel table2excel_with_colors" data-name="Penggunaan-Dana"  id="tablePD">
+                        <table class="table table-bordered  dataTable2Excel table2excel_with_colors" data-name="Penggunaan-Dana-aps"  id="tablePD">
                             <thead>
                             <tr>
                                 <th rowspan="2" style="width: 1%;">No</th>
@@ -83,8 +90,11 @@
     </div>
 
                 
-                    <script>
+        <script>
+
+
                 $(document).ready(function () {
+
                     var firstLoad = setInterval(function () {
                         var filterProdi = $('#filterProdi').val();
                         if(filterProdi!='' && filterProdi!=null){
@@ -92,17 +102,83 @@
                             clearInterval(firstLoad);
                         }
                     },1000);
+
+                    loadSOPenggunaanDanaYear('filterYear');
+
+                    $('#formPrice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
+                    $('#formPrice').maskMoney('mask', '9894');
+                    loadJenisDana();
+                    var firstLoad_year = setInterval(function (args) {
+                        var filterYear = $('#filterYear').val();
+                        if(filterYear!='' && filterYear!=null){
+                            loadPenggunaanDana();
+                            clearInterval(firstLoad_year);
+                        }
+                    },1000);
+                    
                     setTimeout(function () {
                         clearInterval(firstLoad);
                     },5000);
-            
+
                 });
+
+                $('#btnSave').click(function () {
+
+                    var formJPID = $('#formJPID').val();
+                    var formYear = $('#formYear').val();
+                    var formPrice = $('#formPrice').val();
+
+                    if(formYear !='' && formYear!=null &&
+                    formPrice !='' && formPrice!=null){
+
+                        loading_buttonSm('#btnSave');
+
+                        var data = {
+                            action : 'updatePenggunaanDana_aps',
+                            dataForm : {
+                                JPID : formJPID,
+                                Year : formYear,
+                                Price : clearDotMaskMoney(formPrice)
+                            }
+                        };
+
+                        var token = jwt_encode(data,'UAP)(*');
+                        var url = base_url_js+'api3/__crudAgregatorTB4';
+                        
+                        $.post(url,{token:token},function (result) {
+                            toastr.success('Data saved','Success');
+                            // loadSOPenggunaanDanaYear('filterYear');
+                            loadPenggunaanDana();
+                            setTimeout(function () {
+
+                                $('#formID').val('');
+                                $('#formYear').val('');
+                                $('#formPrice').val(0);
+
+                                $('#btnSave').prop('disabled',false).html('Save');
+                            },500);
+
+                        });
+
+                    } else {
+                        toastr.error('Year & Price is required','Error');
+                    }
+
+                });
+
                 $('#filterProdi').change(function () {
                     var filterProdi = $('#filterProdi').val();
                     if(filterProdi!='' && filterProdi!=null){
                         loadPage();
                     }
                 });
+                $('#filterYear').change(function () {
+                   var filterYear = $('#filterYear').val();
+                   if(filterYear!='' && filterYear!=null){
+                       loadPenggunaanDana();
+                   }
+                });
+
                 function loadPage() {
                     var filterProdi = $('#filterProdi').val();
                     if(filterProdi!='' && filterProdi!=null){
@@ -110,4 +186,272 @@
                         $('#viewProdiName').html($('#filterProdi option:selected').text());
                     }
                 }
+
+                $(document).on('click','.btnRemovePD',function () {
+
+                    if(confirm('Hapus data?')){
+
+                        var ID = $(this).attr('data-id');
+                        var data = {
+                            action : 'removePenggunaanDana_aps',
+                        ID : ID
+                        };
+
+                        var token = jwt_encode(data,'UAP)(*');
+                        var url = base_url_js+'api3/__crudAgregatorTB4';
+
+                        $.post(url,{token:token},function (result) {
+                            toastr.success('Data removed','Success');
+                            loadPenggunaanDana();
+                        });
+
+                    }
+
+                });
+
+                $('#btnCrud_JP').click(function () {
+
+                    var bodyModal = '<div class="well row">' +
+                        '    <div class="col-md-8">' +
+                        '        <input class="hide" id="formJP_ID">' +
+                        '        <input class="form-control" id="formJP_Jenis">' +
+                        '    </div>' +
+                        '    <div class="col-md-4">' +
+                        '        <button class="btn btn-block btn-success" id="btnJPSave">Save</button>' +
+                        '    </div>' +
+                        '</div>' +
+                        '<div class="row">' +
+                        '    <div class="col-md-12">' +
+                        '        <hr/>' +
+                        '        <table class="table table-striped">' +
+                        '            <thead>' +
+                        '            <tr>' +
+                        '                <th style="width: 1%;">No</th>' +
+                        '                <th>Jenis</th>' +
+                        '                <th style="width: 15%;"><i class="fa fa-cog"></i></th>' +
+                        '            </tr>' +
+                        '            </thead>' +
+                        '            <tbody id="listData"></tbody>' +
+                        '        </table>' +
+                        '    </div>' +
+                        '</div>';
+
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Jenis Pengeluaran</h4>');
+                    $('#GlobalModal .modal-body').html(bodyModal);
+                    loadJenisDana();
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+
+                    $('#btnJPSave').click(function () {
+
+                        var formJP_ID = $('#formJP_ID').val();
+                        var formJP_Jenis = $('#formJP_Jenis').val();
+
+                        if(formJP_Jenis!='' && formJP_Jenis!=null && formJP_ID!='' && formJP_ID!=null){
+
+                            loading_buttonSm('#btnJPSave');
+
+                            var data = {
+                                action : 'updateJenisDana_aps',
+                                ID : formJP_ID,
+                                Jenis : formJP_Jenis
+                            };
+
+                            var token = jwt_encode(data,'UAP)(*');
+                            var url = base_url_js+'api3/__crudAgregatorTB4';
+
+                            $.post(url,{token:token},function (result) {
+                                loadJenisDana();
+                                loadPenggunaanDana();
+                                setTimeout(function () {
+                                    $('#btnJPSave').prop('disabled',false).html('Save');
+                                    $('#formJP_ID').val('');
+                                    $('#formJP_Jenis').val('');
+                                },500);
+                            });
+
+                        } else {
+                            toastr.warning('Hanya dapat digunakan untuk edit','Warning');
+                        }
+
+                    });
+
+                });
+        function loadSOPenggunaanDanaYear(elm) {
+            var data = {
+                action : 'viewPenggunaanDanaYear_aps'
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudAgregatorTB4';
+
+            $('#'+elm).empty();
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                if(jsonResult.length>0){
+                    $.each(jsonResult,function (i,v) {
+                        $('#'+elm).append('<option value="'+v.Year+'">Tahun '+v.Year+'</option>');
+                    });
+                }
+
+            });
+        }
+        function loadPenggunaanDana() {
+
+            var filterYear = $('#filterYear').val();
+            if(filterYear!='' && filterYear!=null){
+
+                var Year = filterYear;
+                var Year1 = parseInt(filterYear) - 1;
+                var Year2 = parseInt(filterYear) - 2;
+
+                $('#viewTS2').html('( '+Year2+' )');
+                $('#viewTS1').html('( '+Year1+' )');
+                $('#viewTS').html('( '+filterYear+' )');
+
+                var data = {
+                    action : 'viewPenggunaanDana_aps',
+                    Year : Year,
+                    Year1 : Year1,
+                    Year2 : Year2
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudAgregatorTB4';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    $('#loadListDana').empty();
+
+                    if(jsonResult.length>0){
+
+                        var no = 1;
+                        var jml_th3 = 0;
+                        var jml_th2 = 0;
+                        var jml_th1 = 0;
+                        var jml_jml = 0;
+                        $.each(jsonResult,function (i,v) {
+
+                            var jml = parseFloat(v.th3) + parseFloat(v.th2) + parseFloat(v.th1);
+
+                            $('#loadListDana').append('<tr>' +
+                                '<td>'+no+'</td>' +
+                                '<td style="text-align: left;">'+v.Jenis+'</td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
+                                '<td style="text-align: right;">'+formatRupiah(jml)+'</td>' +
+                                '</tr>');
+                            jml_th3 = jml_th3+ parseFloat(v.th3);
+                            jml_th2 = jml_th2+ parseFloat(v.th2);
+                            jml_th1 = jml_th1+ parseFloat(v.th1);
+                            jml_jml = jml_jml+ parseFloat(jml);
+
+                            no += 1;
+                            if(no==8){
+
+                                $('#loadListDana').append('<tr>' +
+                                    '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                    '</tr>');
+
+                                jml_th3 = 0;
+                                jml_th2 = 0;
+                                jml_th1 = 0;
+                                jml_jml = 0;
+
+                                no =1;
+                            } else if(i==8){
+                                $('#loadListDana').append('<tr>' +
+                                    '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                    '</tr>');
+                            }
+                        });
+
+                    }
+
+                    return false;
+
+                    if(jsonResult.length>0){
+
+                        $.each(jsonResult,function (i,v) {
+
+                            var btn = '<div class="btn-group">' +
+                                '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                                '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
+                                '  </button>' +
+                                '  <ul class="dropdown-menu">' +
+                                '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnEditPD">Edit</a></li>' +
+                                '    <li role="separator" class="divider"></li>' +
+                                '    <li><a href="javascript:void(0);" data-id="'+v.ID+'" class="btnRemovePD">Remove</a></li>' +
+                                '  </ul>' +
+                                '</div>' +
+                                '<textarea id="viewData_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea>';
+
+                            $('#loadListDana').append('<tr>' +
+                                '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                                '<td style="text-align: left;">'+v.JP+'</td>' +
+                                '<td>'+v.Year+'</td>' +
+                                '<td>'+formatRupiah(v.Price)+'</td>' +
+                                '<td style="border-left: 1px solid #ccc;">'+btn+'</td>' +
+                                '</tr>');
+                        })
+                    }
+
+                });
+            }
+
+
+
+        }
+        function loadJenisDana() {
+
+            var data = {
+                action : 'viewJenisDana_aps'
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudAgregatorTB4';
+
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#listData,#formJPID').empty();
+                if(jsonResult.length>0){
+
+                    $.each(jsonResult,function (i,v) {
+                        $('#listData').append('<tr>' +
+                            '<td>'+(i+1)+'</td>' +
+                            '<td>'+v.Jenis+'</td>' +
+                            '<td><button class="btn btn-sm btn-default btnEditJD" data-id="'+v.ID+'" data-j="'+v.Jenis+'"><i class="fa fa-edit"></i></button></td>' +
+                            '</tr>');
+
+                        $('#formJPID').append('<option value="'+v.ID+'">'+v.Jenis+'</option>');
+                    });
+
+                }
+
+            });
+
+        }
+            $(document).on('click','.btnEditJD',function () {
+                var j = $(this).attr('data-j');
+                var ID = $(this).attr('data-id');
+
+                $('#formJP_ID').val(ID);
+                $('#formJP_Jenis').val(j);
+            })
+
+
             </script>
