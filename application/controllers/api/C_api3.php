@@ -1475,6 +1475,28 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='viewDataPAM_APS'){
+                    $ProdiID = $data_arr['ProdiID'];
+                    $data = $this->db->query('SELECT sa.* FROM db_studentlife.student_achievement as sa
+                        
+                        JOIN db_studentlife.student_achievement_student as sas on sas.SAID = sa.ID 
+                        JOIN db_academic.auth_students as aus on sas.NPM = aus.NPM
+
+                        WHERE aus.ProdiID = '.$ProdiID.'   
+                        ORDER BY sa.Year, sa.StartDate DESC')->result_array();
+
+                    if(count($data)>0){
+                        for($i=0;$i<count($data);$i++){
+                            $ID = $data[$i]['ID'];
+                            $data[$i]['DataStudent'] = $this->db->query('SELECT sas.*, ats.Name FROM db_studentlife.student_achievement_student sas
+                                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sas.NPM)
+                                                                    WHERE sas.SAID = "'.$ID.'" ')->result_array();
+                        }
+                    }
+
+                    return print_r(json_encode($data));
+
+                }
 
         else if($data_arr['action']=='updateLamaStudy'){
 
