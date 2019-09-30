@@ -1048,6 +1048,7 @@ $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_k
 $route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
 // rest3 
 $route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
+$route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolback_door_to_be_mhs_admission';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1821,7 +1822,7 @@ $route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
 $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
 $route['it/admission/change-kode-formulir-online'] = 'page/it/c_it/change_kode_formulir_online';
 $route['it/admission/submit-change-kode-formulir-online'] = 'page/it/c_it/submit_change_kode_formulir_online';
-
+$route['it/admission/roolback-to-be-mhs'] = 'page/it/c_it/roolback_to_be_mhs';
 
 
 // end it

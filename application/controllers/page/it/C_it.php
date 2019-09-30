@@ -192,4 +192,11 @@ class C_it extends It_Controler {
       }
     }
 
+    public function roolback_to_be_mhs()
+    {
+      $this->data['DBTA'] = $this->m_master->ShowDBLikes();
+      $content = $this->load->view('page/'.$this->data['department'].'/admission/roolback_to_be_mhs',$this->data,true);
+      $this->temp($content);
+    }
+
 }

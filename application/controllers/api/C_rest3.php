@@ -459,6 +459,133 @@ class C_rest3 extends CI_Controller {
         }
     }
 
+    public function get_roolback_door_to_be_mhs_admission()
+    {
+        $dataToken = $this->data['dataToken'];
+        $action = $dataToken['action'];
+        if ($action == 'read') {
+            $TA = $dataToken['ta'];
+            $DBTA = 'ta_'.$TA;
+            $sql = 'select a.NPM,a.Name,a.ProdiID,b.Name as NameProdi,c.FormulirCode,if(y.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
+            from '.$DBTA.'.students as a 
+            join db_academic.program_study as b on a.ProdiID = b.ID
+            join db_admission.to_be_mhs as c on a.NPM = c.NPM
+            join db_admission.register_verified as z on c.FormulirCode = z.FormulirCode
+            join db_admission.register_verification as x on z.RegVerificationID = x.ID
+            join db_admission.register as y on x.RegisterID = y.ID
+            where a.NPM NOT IN (
+                select NPM from '.$DBTA.'.study_planning
+                group by NPM
+                order by ID desc
+            )
+            ';
+            $query=$this->db->query($sql, array())->result_array();
 
+            echo json_encode($query);
+        }
+        elseif ($action == 'roolback') {
+            $this->load->model('admission/m_admission');
+            $rs = ['Status' => 1,'Dt' => [] ];
+            /*
+                1.Cek Koneksi DB Library
+                2.Cek Data telah diinput pada library atau belum
+                3.Cek Koneksi AD
+                4.Delete user AD first
+                5.Remove file di folder upload/document/{NPM}
+                6.Remove file photo di folder upload/students/{ta}/{NIP}{ekstension}
+                7.Remove data di db_finance.payment_students by ID payment
+                8.Remove data di db_finance.payment
+                9.Remove data di db_finance.m_tuition_fee
+                10.Remove data di db_academic.auth_students
+                11.Remove data di db_academic.auth_parents
+                12.Remove data di db_admission.doc_mhs
+                13.Remove data di db_admission.to_be_mhs
+                14.Remove data di {ta}.students by NIP
+            */
+
+            $DataSelected = $dataToken['DataSelected'];
+            $DataSelected = json_decode(json_encode($DataSelected),true);
+            for ($i=0; $i < count($DataSelected); $i++) {
+                $NPM = $DataSelected[$i]['NPM']; 
+                $Name = $DataSelected[$i]['Name'];
+                $MSG = ''; 
+                // library conn
+                $cekLib = $this->m_master->cekConectDb();
+                if (!$cekLib) {
+                    $MSG .= 'Library Koneksi : Koneksi Library bermasalah';
+                    $DataSelected[$i]['Status'] = $MSG;
+                    $rs['Status'] = 0;
+                    $rs['Dt'] = $DataSelected;
+                    break;
+                }
+                else
+                {
+                    $MSG .= 'Library Koneksi : Koneksi Library Success';
+                    $DataSelected[$i]['Status'] = $MSG;
+                    // Cek data telah diinput pada library
+                    $CekLibStd = $this->m_admission->cekDBLibraryExistSTD($NPM);
+                    if ($CekLibStd) {
+                        $MSG .= '<br/>Library Data : Ada';
+                    }
+                    else{
+                        $MSG .= '<br/>Library Data : Tidak Ada';
+                    }
+
+                    // cek koneksi AD
+                    $urlAD = URLAD.'__api/Create';
+                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                    if (!$is_url_exist) {
+                        $MSG .= '<br/>AD Koneksi : Windows active directory server not connected';
+                        $DataSelected[$i]['Status'] = $MSG;
+                        $rs['Status'] = 0;
+                        $rs['Dt'] = $DataSelected;
+                        break;
+                    }
+                    else {
+                        $server = "ldap://10.1.30.2";
+                        $ds=ldap_connect($server);
+                        $dn = 'OU=Ldap,DC=pu,DC=local';
+                        $userBind = 'alhadi.rahman'.'@pu.local';
+                        $filter="(|(sAMAccountName=$NPM))";
+                        $pwdBind = 'IT@podomoro6737ht';
+                         if ($bind = ldap_bind($ds, $userBind , $pwdBind)) {
+                             $sr = ldap_search($ds, $dn, $filter);
+                             $ent= ldap_get_entries($ds,$sr);
+                            //  $cn = $ent[0]['cn'][0];
+                             $cn = 'test ad1';
+                             if ($ent["count"] == 1) {
+                               // api delete
+                               // dsrm -noprompt CN="test ad",OU=Ldap,DC=pu,DC=local
+                                $script = 'dsrm -noprompt CN="'.$cn.'",OU=Ldap,DC=pu,DC=local';
+                                $data = array(
+                                    'auth' => 's3Cr3T-G4N',
+                                    'Type' => 'Student',
+                                    'script' => $script,
+                                );
+                                
+                                $url = URLAD.'__api/Delete';
+                                $token = $this->jwt->encode($data,"UAP)(*");
+                                $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
+                                $MSG .= '<br/>AD Proses Delete : Finish';   
+
+                             }
+                             else {
+                                $MSG .= '<br/>AD Data : Tidak Ada';
+                             }
+                         }
+
+                         // Remove file di folder upload/document/{NPM}
+                    }
+                }
+            }
+
+            echo json_encode($rs);
+            
+        }     
+        else {
+            
+        }
+        
+    }
 
 }

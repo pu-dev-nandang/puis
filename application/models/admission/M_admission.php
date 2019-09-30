@@ -3834,6 +3834,20 @@ class M_admission extends CI_Model {
 
     }
 
+    public function cekDBLibraryExistSTD($NPM)
+    {
+      $this->db_server22 = $this->load->database('server22', TRUE);
+      $sql = 'select count(*) as total from library.member where member_id = "'.$NPM.'" ';
+      $query=$this->db_server22->query($sql, array())->result_array();
+      if ($query[0]['total'] > 1) {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
     public function getIntakeByYear($Year,$datechoose = null)
     {
       $this->load->model('master/m_master');

@@ -3355,4 +3355,30 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $result;
 
     }
+
+    public function ShowDBLikes($like='ta_')
+    {
+        $data = [];
+            $sql = "show databases like '".$like."%'";
+            $query=$this->db->query($sql, array())->result_array();
+            for ($i=0; $i < count($query); $i++) {
+                $variable = $query[$i]; 
+                foreach ($variable as $key => $value) {
+                    $data[] = $value;
+                }
+            }
+        return $data;    
+    }
+
+    public function cekConectDb($vardb = 'server22')
+    {
+        $db_obj = $this->load->database($vardb, TRUE);
+        $connected = $db_obj->initialize();
+        if (!$connected) {
+            return false;
+        }
+        else{
+            return true;
+        } 
+    }
 }

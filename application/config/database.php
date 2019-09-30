@@ -1,31 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-
 $active_group = 'default';
 $active_record = TRUE;
 
 $ServerName = $_SERVER['SERVER_NAME'];
-$db['server22'] = array(
-    'dsn'   => '',
-    'hostname' => '10.1.30.63',
-    'username' => 'root',
-    'password' => '4dm1n5!S',
-    'database' => 'library',
-    'dbdriver' => 'mysqli',
-    'dbprefix' => '',
-    'pconnect' => FALSE,
-    'db_debug' => (ENVIRONMENT !== 'production'),
-    'cache_on' => FALSE,
-    'cachedir' => '',
-    'char_set' => 'utf8',
-    'dbcollat' => 'utf8_general_ci',
-    'swap_pre' => '',
-    'encrypt' => FALSE,
-    'compress' => FALSE,
-    'stricton' => FALSE,
-    'failover' => array(),
-    'save_queries' => TRUE
-);
+
 switch ($ServerName) {
     case 'localhost':
 
@@ -146,6 +125,27 @@ switch ($ServerName) {
         $db['statistik']['autoinit'] = TRUE;
         $db['statistik']['stricton'] = FALSE;
 
+        $db['server22'] = array(
+            'dsn'   => '',
+            'hostname' => '10.1.30.63',
+            'username' => 'root',
+            'password' => '4dm1n5!S',
+            'database' => 'library',
+            'dbdriver' => 'mysqli',
+            'dbprefix' => '',
+            'pconnect' => FALSE,
+            'db_debug' => (ENVIRONMENT !== 'production'),
+            'cache_on' => FALSE,
+            'cachedir' => '',
+            'char_set' => 'utf8',
+            'dbcollat' => 'utf8_general_ci',
+            'swap_pre' => '',
+            'encrypt' => FALSE,
+            'compress' => FALSE,
+            'stricton' => FALSE,
+            'failover' => array(),
+            'save_queries' => TRUE
+        );
         break;
     case 'demo.pcam.podomorouniversity.ac.id':
         $db['default']['hostname'] = '10.1.30.59';
@@ -179,6 +179,28 @@ switch ($ServerName) {
         $db['statistik']['swap_pre'] = '';
         $db['statistik']['autoinit'] = TRUE;
         $db['statistik']['stricton'] = FALSE;
+
+        $db['server22'] = array(
+            'dsn'   => '',
+            'hostname' => '10.1.30.59',
+            'username' => 'db_itpu',
+            'password' => 'Uap)(*&^%',
+            'database' => 'library',
+            'dbdriver' => 'mysqli',
+            'dbprefix' => '',
+            'pconnect' => FALSE,
+            'db_debug' => (ENVIRONMENT !== 'production'),
+            'cache_on' => FALSE,
+            'cachedir' => '',
+            'char_set' => 'utf8',
+            'dbcollat' => 'utf8_general_ci',
+            'swap_pre' => '',
+            'encrypt' => FALSE,
+            'compress' => FALSE,
+            'stricton' => FALSE,
+            'failover' => array(),
+            'save_queries' => TRUE
+        );
         break;    
     default:
         # code...
