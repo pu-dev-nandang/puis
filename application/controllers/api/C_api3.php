@@ -1025,7 +1025,7 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($rs));
         }
 
-    else if($data_arr['action']=='readProduktivitasPkmDosen'){
+        else if($data_arr['action']=='readProduktivitasPkmDosen'){
 
             $rs = array('header' => array(),'body' => array() );
             $Year = date('Y');
@@ -1062,8 +1062,6 @@ class C_api3 extends CI_Controller {
             $rs['body'] = $body;
             return print_r(json_encode($rs));
         }
-
-
     }
 
     public function crudAgregatorTB4(){
@@ -1723,8 +1721,6 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='get_years') {
 
-            //$data_arr = $this->getInputToken();
-
             if (count($data_arr) > 0) {
 
                 $filterAwaltahun = $data_arr['filterAwaltahun'];
@@ -1732,6 +1728,42 @@ class C_api3 extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+        }
+
+        else if($data_arr['action']=='readPublikasiIlmiah'){
+
+            $rs = array('header' => array(),'body' => array() );
+            $Year = date('Y');
+            $Year3 = $Year - 2;
+            $arr_year = array();
+            for ($i=$Year; $i >= $Year3; $i--) {
+                $arr_year[] = $i;
+            }
+            $header = $arr_year;
+            // print_r($arr_year);
+            $body = array();
+            $G_research = $this->db->query('SELECT * FROM db_research.jenis_forlap_publikasi')->result_array();
+            for ($i=0; $i < count($G_research); $i++) {
+                $temp = array();
+                $temp[] = $G_research[$i]['NamaForlap_publikasi'];
+                $ID_sumberdana = $G_research[$i]['ID'];
+                for ($j=0; $j < count($arr_year); $j++) {
+                    $Year_ = $arr_year[$j];
+                     //$sql = 'select Judul_litabmas from db_research.litabmas where ID_sumberdana = ? and ID_thn_laks = ? ';
+                     $sql = 'SELECT a.Judul, a.Tgl_terbit, b.Name
+                            FROM db_research.publikasi AS a
+                            LEFT JOIN db_employees.employees AS b ON (b.NIP = a.NIP) 
+                            WHERE a.ID_forlap_publikasi = ? and YEAR(a.Tgl_terbit) = ? ';
+                     $query=$this->db->query($sql, array($ID_sumberdana,$Year_))->result_array();
+                     $temp[] = $query;
+                }
+
+                $body[] = $temp;
+
+            }
+            $rs['header'] = $header;
+            $rs['body'] = $body;
+            return print_r(json_encode($rs));
         }
 
         //Waktu Tunggu lulusan
@@ -2342,11 +2374,14 @@ class C_api3 extends CI_Controller {
     public function getLuaranHkipaten(){
 
         $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT a.Judul, a.Tgl_terbit, a.Ket
-                FROM db_research.publikasi AS a
-                LEFT JOIN db_research.kategori_capaian_luaran AS b ON (b.ID_kat_capaian = a.ID_kat_capaian)
-                WHERE a.ID_kat_capaian = 3
-                ORDER BY a.ID_publikasi DESC')->result_array();
+        $data = $this->db->query('
+            SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            FROM db_research.publikasi 
+            WHERE ID_kat_capaian = 2
+            UNION
+            SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+            FROM db_research.pengabdian_masyarakat
+            WHERE ID_kat_capaian = 2')->result_array();
         return print_r(json_encode($data));
     }
 
