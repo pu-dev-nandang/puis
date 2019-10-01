@@ -1278,10 +1278,13 @@ class C_api3 extends CI_Controller {
 
                     $JPID = $dataForm['JPID'];
                     $Year = $dataForm['Year'];
-
+                    $PriceUPPS = $dataForm['PriceUPPS'];
+                    $PricePS = $dataForm['PricePS'];
                     $dataCk = $this->db->get_where('db_agregator.penggunaan_dana_aps',array(
                         'JPID' => $JPID,
-                        'Year' => $Year
+                        'Year' => $Year,
+                        'PriceUPPS' => $PriceUPPS,
+                        'PricePS' => $PricePS
                     ))->result_array();
 
 

@@ -1,4 +1,4 @@
-<h3>This is the page : kerjasama_tridharma.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center"><b>Kerjasama Tridarma</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div id="content_dt">
     
 </div>

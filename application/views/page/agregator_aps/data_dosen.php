@@ -1,3 +1,4 @@
+<h3 align="center"><b>Data Dosen</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <style type="text/css">
     #dataTablesDataDosen thead th {
         vertical-align: middle;

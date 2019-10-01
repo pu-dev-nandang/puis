@@ -1,4 +1,4 @@
-<h3>This is the page : prestasi_mahasiswa.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center">Prestasi Mahasiswa</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <style>
     #dataTablesPAM tr th, #dataTablesPAM tr td {
         text-align: center;

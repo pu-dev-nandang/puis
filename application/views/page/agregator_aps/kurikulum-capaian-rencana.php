@@ -1,4 +1,4 @@
-<h3>This is the page : kurikulum-capaian-rencana.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center"><b>Kurikulum, Capaian Pembelajaran, dan Rencana Pembelajaran</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
  <style>
      #dataTablesKurikulum tr th, #dataTablesKurikulum tr td {
          text-align: center;
@@ -14,7 +14,7 @@
                  <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
              </div>
              <div id="viewTable"></div>
-             <p style="color: orangered;">*) Table prestasi mahasiswa mencakup laporan APS table 5 & 5a</p>
+             <p style="color: orangered;">*) Table prestasi mahasiswa mencakup laporan APS table 5a</p>
 
          </div>
 
