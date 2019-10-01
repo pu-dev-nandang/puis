@@ -273,7 +273,7 @@
                             <td><?php echo $itemX['NameEng']; ?></td>
                             <td><?php echo $itemX['NameLevel']; ?></td>
                             <td><?php echo $itemX['NameFak']; ?></td>
-                            <td><?php echo $itemX['Accreditation']; ?></td>
+                            <td><?php echo $itemX['accreditation']; ?></td>
 
                             <td>
                                 <span id="SKBANPTDate<?php echo $itemX['ID']; ?>"><?php echo $itemX['SKBANPTDate']; ?></span>
