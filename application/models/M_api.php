@@ -2340,9 +2340,11 @@ class M_api extends CI_Model {
     {
         // GET SET TA
         $this->load->model('master/m_master');
-        // $Q_Years = $this->m_master->showData_array('db_admission.set_ta');
-        // $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
         $Years = '';
+        if ($StatusJual == 0) {
+            $Q_Years = $this->m_master->showData_array('db_admission.set_ta');
+            $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
+        }
 
         // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;
         // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = ".$StatusJual." and StatusJual = ".$StatusJual." ".$Years;

@@ -239,78 +239,74 @@
         var division = <?php echo $Division ?>;
         <?php endif ?>
         var selectTahun = '<?php echo $Ta ?>';
-        var url = base_url_js+'rest/__loadDataFormulirGlobal_available';
-        var data = {
-            selectTahun : selectTahun,
-            auth : 's3Cr3T-G4N',
-            division : division,
-        };
-        var token = jwt_encode(data,"UAP)(*");
-        $.post(url,{token:token},function (data_json) {
-            for (var i = 0; i < data_json.length; i++) {
-                var selected = (i==0) ? 'selected' : '';
-                $('#No_Ref').append('<option value="'+data_json[i].FormulirCodeGlobal+'" '+selected+'>'+data_json[i].FormulirCodeGlobal+'</option>');
-            }
+        <?php if ($action != 'edit'): ?>
+            var url = base_url_js+'rest/__loadDataFormulirGlobal_available';
+            var data = {
+                selectTahun : selectTahun,
+                auth : 's3Cr3T-G4N',
+                division : division,
+                action : 'add',
+            };
+            var token = jwt_encode(data,"UAP)(*");
+            $.post(url,{token:token},function (data_json) {
+                for (var i = 0; i < data_json.length; i++) {
+                        var selected = (i==0) ? 'selected' : '';
+                        $('#No_Ref').append('<option value="'+data_json[i].FormulirCodeGlobal+'" '+selected+'>'+data_json[i].FormulirCodeGlobal+'</option>');
+                    }
 
-            $('#No_Ref').select2({
-                // allowClear: true
+                $('#No_Ref').select2({
+                    // allowClear: true
+                });
+                  
+                loadingEnd(1000);
             });
+        <?php endif ?>
 
-            <?php if ($action == 'edit'): ?>
+        <?php if ($action == 'edit'): ?>
             var NoRefGlobal = "<?php echo $get2[0]['No_Ref'] ?>";
             $('#No_Ref').append('<option value="'+NoRefGlobal+'" '+'selected'+'>'+NoRefGlobal+'</option>');
-            $("#No_Ref option").filter(function() {
-                //may want to use $.trim in here
-                return $(this).val() == "<?php echo $get2[0]['No_Ref'] ?>";
-            }).prop("selected", true);
             $('#No_Ref').select2({
                 // allowClear: true
             });
             $('#No_Ref').prop('disabled',true);
-            <?php endif ?>
-
             loadingEnd(1000);
-        });
+        <?php endif ?>  
     }
 
     function loadFormulirCode()
     {
         $("#selectFormulirCode").empty();
+        <?php if ($action != 'edit'): ?>
         var url = base_url_js+'api/__getFormulirOfflineAvailable/0';
-        <?php if ($action == 'edit'): ?>
-        url = base_url_js+'api/__getFormulirOfflineAvailable/1';
-        <?php endif ?>
-        $.get(url,function (data_json) {
-            if(data_json.length > 0)
-            {
-                for(var i=0;i<data_json.length;i++){
-                    var selected = (i==0) ? 'selected' : '';
-                    $('#selectFormulirCode').append('<option value="'+data_json[i].FormulirCode+'" '+''+'>'+data_json[i].FormulirCode+'</option>');
+            $.get(url,function (data_json) {
+                if(data_json.length > 0)
+                {
+                    for(var i=0;i<data_json.length;i++){
+                        var selected = (i==0) ? 'selected' : '';
+                        $('#selectFormulirCode').append('<option value="'+data_json[i].FormulirCode+'" '+selected+'>'+data_json[i].FormulirCode+'</option>');
+                    }
                 }
-            }
-            else
-            {
-                toastr.error('Formulir Code Offline belum ada yang di print...<br>Silahkan di print dahulu.', 'Failed!!');
-            }
+                else
+                {
+                    toastr.error('Formulir Code Offline belum ada yang di print...<br>Silahkan di print dahulu.', 'Failed!!');
+                }
 
-            $('#selectFormulirCode').select2({
-                allowClear: true
+                $('#selectFormulirCode').select2({
+                    allowClear: true
+                });
+
+            }).done(function () {
+                // loadSelectSma1();
             });
+        <?php endif ?>
 
-            <?php if ($action == 'edit'): ?>
-            $("#selectFormulirCode option").filter(function() {
-                //may want to use $.trim in here
-                return $(this).val() == "<?php echo $get1[0]['FormulirCodeOffline'] ?>";
-            }).prop("selected", true);
+        <?php if ($action == 'edit'): ?>
+            $('#selectFormulirCode').append('<option value="<?php echo $get1[0]['FormulirCodeOffline'] ?>" '+''+'><?php echo $get1[0]['FormulirCodeOffline'] ?></option>');
             $('#selectFormulirCode').select2({
                 allowClear: true
             });
             $('#selectFormulirCode').prop('disabled',true);
-            <?php endif ?>
-
-        }).done(function () {
-            // loadSelectSma1();
-        });
+        <?php endif ?>
     }
 
     function loadProgramStudy()
