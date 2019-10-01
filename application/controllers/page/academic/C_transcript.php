@@ -35,11 +35,12 @@ class C_transcript extends Academic_Controler {
         $data['Graduation'] = $this->db->get('db_academic.graduation')->result_array();
         $data['Education'] = $this->db->get('db_academic.education_level')->result_array();
 
-        $data['ProgramStudy'] = $this->db->query('SELECT a.ID, a.Name, a.NameEng, a.NoSKBANPT, a.SKBANPTDate, b.Name AS NameLevel, c.Name AS NameFak
+        $data['ProgramStudy'] = $this->db->query('SELECT a.ID, a.Name, a.NameEng, a.NoSKBANPT, a.SKBANPTDate, b.Name AS NameLevel, c.Name AS NameFak,d.Label as Accreditation
             FROM db_academic.program_study AS a
             LEFT JOIN db_academic.education_level AS b ON (a.EducationLevelID = b.ID)
+            LEFT JOIN db_academic.Accreditation as d ON (a.accreditationID =  d.ID)
             LEFT JOIN db_academic.faculty AS c ON (a.FacultyID = c.FacultyID)
-            WHERE c.ID NOT IN (4)')->result_array();
+            where a.status =1 ')->result_array();
 
         //$data['ProgramStudy'] = $this->db->get('db_academic.program_study')->result_array();
         $data['department'] = parent::__getDepartement();
