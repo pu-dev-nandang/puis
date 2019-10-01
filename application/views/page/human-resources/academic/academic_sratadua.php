@@ -142,11 +142,11 @@
                     '     <table class="table table-striped table-bordered">                        '+
                     '         <thead>                                                               '+
                     '         <tr style="background: #1E90FF;color: #FFFFFF;">                      '+
-                    '             <th style="width: 5%;text-align: center;">Academic</th>           '+
+                    '             <th style="width: 4%;text-align: center;">Academic</th>           '+
                      '            <th style="width: 10%;text-align: center;">Name University</th>   '+
                     '             <th style="width: 8%;text-align: center;">Ijazah</th>             '+
                     '             <th style="width: 8%;text-align: center;">Transcript</th>         '+
-                    '             <th style="text-align: center;width: 5%;">Action</th>             '+
+                    '             <th style="text-align: center;width: 8%;">Action</th>             '+
                     '         </tr>                                                                 '+
                     '         </thead>                                                              '+
                     '         <tbody id="dataRow"></tbody>                                          '+
@@ -158,10 +158,12 @@
                 var orbs=0;
                 for (var i = 0; i < response.length; i++) {
                     var listdatas1 = response[i]['LinkFiles']; 
+                    var iddata1 = response[i]['ID']; 
 
                     for (var j = i+1; j < response.length; j++) {
                         if (response[i]['NIP'] == response[j]['NIP'] && response[i]['NameUniversity'] == response[j]['NameUniversity']) {
                             var listdatas2 = response[j]['LinkFiles'];
+                            var iddata2 = response[j]['ID']; 
                         }
                         else
                         {
@@ -176,7 +178,7 @@
                     '            <td> '+response[i]['NameUniversity']+' </td>                           '+                             
                     '            <td><center><button class="btn btn-sm btn-default btn-default-primary btn-round btnviewlistsrata" filesub="'+listdatas1+'"><i class="fa fa-eye margin-right"></i> Preview</button></center></td>                                                '+    
                     '            <td><center><button class="btn btn-sm btn-default btn-default-success btn-round btnviewlistsrata" filesub="'+listdatas2+'"><i class="fa fa-eye margin-right"></i> Preview</button> </center></td>                                              '+                                
-                    '            <td style="text-align: center;"><button id="btnedits1" class="btn btn-sm btn-primary btn-circle testEdit2" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button></td>      '+     
+                    '            <td style="text-align: center;"><button class="btn btn-sm btn-primary btn-circle testdetail" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs2 ="'+listdatas1+'" filetranscripts2 ="'+listdatas2+'"><i class="icon-list icon-large"></i></button> <button id="btnedits2" class="btn btn-sm btn-primary btn-circle testEdit2" data-toggle="tooltip" data-placement="top" title="Edit" nameuniv= "'+response[i]['NameUniversity']+'" fileijazahs1 ="'+listdatas1+'" filetranscripts1 ="'+listdatas2+'"><i class="fa fa-edit"></i></button>  <button class="btn btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+iddata1+'" listid2 ="'+iddata2+'"><i class="fa fa-trash"></i></button></td>      '+     
                     '         </tr> ');
                 }
                 
@@ -534,5 +536,267 @@ $(document).ready(function () {
     });
 </script>
 
- 
+<script>
+    $(document).on('click','.testdetail',function () {
+        var NIP = '<?php echo $NIP; ?>';
+        var acad = 'S2';
+        var fileijazahs2 = $(this).attr('fileijazahs2');
+        var filetranscripts2 = $(this).attr('filetranscripts2');
+        var nameuniv = $(this).attr('nameuniv');
 
+        if (fileijazahs2 != null) {
+            var filesx = '<iframe src="'+base_url_js+'uploads/files/'+fileijazahs2+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+fileijazahs2+'"><i class="fa fa-eye"></i> Preview </button></center>';
+            } else {
+            var filesx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">'
+        }
+        if (filetranscripts2 != null) {
+            var filestrans = '<iframe src="'+base_url_js+'uploads/files/'+filetranscripts2+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+filetranscripts2+'"><i class="fa fa-eye"></i> Preview </button></center>';
+        } else {
+            var filestrans = '<img src="<?php echo base_url('images/icon/no_image.png'); ?>" style="width:200px; height:100px">'
+        }
+
+        if(nameuniv == "null") {
+                $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">  '+
+                        '<div class="form-group">                                                   '+
+                        '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
+                        '      <h4>Detail Academic Transcript S1 </h4>                           '+
+                        '       <div class="row">                                                   '+
+                        '          <div class="col-xs-12">                                          '+
+                        '               <div class="form-group">                                    '+
+                        '                   <label>Name Univesity</label>                           '+
+                        '                  <input class="form-control" id="formNameUnivS1" >         '+
+                        '               </div>                                                      '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>No. Ijazah S1</label>                           '+
+                        '                    <input class="form-control" id="formNoIjazahS1">       '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+     
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Date & Year Ijazah</label>                      '+
+                        '                    <input class="form-control editdatepicker" id="formEditIjazahDate" autocomplete="off">Format : YYYY-MM-DD '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Major</label>                                   '+
+                        '                    <input class="form-control" id="formMajorS1">          '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Program Study </label>                          '+
+                        '                    <input class="form-control" id="formStudyS1">          '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                    '+
+                        '                    <label>Grade/ IPK</label>                               '+
+                        '                    <input class="form-control" id="gradeS1" maxlength="4"> '+
+                        '                </div>                                                      '+
+                        '            </div>                                                          '+
+                        '            <div class="col-xs-3">                                          '+
+                        '                <div class="form-group">                                    '+
+                        '                    <label>Total Credit</label>                             '+
+                        '                    <input class="form-control" id="totalCreditS1" maxlength="3"> '+
+                        '                </div>                                                         '+
+                        '            </div>                                                             '+
+                        '            <div class="col-xs-3">                                             '+
+                        '               <div class="form-group">                                        '+ 
+                        '                    <label>Total Semester</label>                              '+
+                        '                        <div class="input-group number-spinner">               '+
+                        '                        <span class="input-group-btn">                         '+
+                        '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
+                        '                        </span>                                                '+
+                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="0" pattern="[0-9.]+"> '+
+                        '                           <span class="input-group-btn"> '+
+                        '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button> '+
+                        '                           </span>                                             '+
+                        '                   </div>                                                      '+
+                        '               </div>                                                          '+
+                        '           </div>                                                              '+
+                        '           <div class="col-xs-6">                                              '+
+                        '           <div class="form-group">                                            '+
+                        '               <label>Ijazah</label>                                           '+
+                        '                   <div> '+filesx+'</div>                                      '+
+                        '               </div>                                                          '+
+                        '           </div>                                                              '+
+                        '           <div class="col-xs-6">                                              '+
+                        '           <div class="form-group">                                            '+
+                        '               <label>Transcript</label>                                       '+
+                        '                   <div> '+filestrans+'</div>                                   '+
+                        '                </div>  '+
+                        '            </div> '+
+                        '        </div>'+
+                        '        <div class="row"> '+
+                        '           <div class="col-md-12" style="text-align: right;"> '+
+                        '                <hr/> '+
+                        '    <div><input type="hidden" class="form-control" value="'+fileijazahs2+'" id="linkijazahs1"> </div>              '+
+                        '    <div><input type="hidden" class="form-control" value="'+filetranscripts2+'" id="linktranscripts1">    </div>       '+
+                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Cancel</button> '+
+                        '           </div> '+
+                        '       </div>'+
+                        '   </div>'+
+                        '</div>'+
+                    '</div>');
+                
+                    $('#NotificationModal').modal({
+                    'backdrop' : 'static',
+                    'show' : true
+                    }); 
+        } 
+        else {
+
+            var url = base_url_js+'api/__getdataedits1?n='+NIP+'&j='+fileijazahs2+'&t='+filetranscripts2+'&s='+acad+'&x='+nameuniv;                
+            var token = jwt_encode({
+            action:'read',
+            NIP:NIP},'UAP)(*');
+
+            $.post(url,{token:token},function (resultJson) {
+
+                var response = resultJson;
+                if(response.length>0){
+                    var no = 1;
+                    for (var i = 0; i < response.length; i++) {
+                        var nameuniv1 = response[i]['NameUniversity'];
+                        for (var j = i+1; j < response.length; j++) {
+                            var nameuniv2 = response[j]['NameUniversity'];
+                            
+                            if (nameuniv1 == nameuniv2) {
+                                if (response[j]['LinkFiles'] != null) {
+                                        //var Transcriptx = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button id="btnviewIjazahS1" class="btn btn-sm btn-primary" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                                        var Transcriptx = response[j]['LinkFiles'];
+                                    } else {
+                                        var Transcriptx = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">'
+                                }
+
+                            }
+
+                    $('#NotificationModal .modal-body').html('<br/><div class="col-xs-12 id="subsesi">      '+
+                        '<div class="form-group">                                                   '+
+                        '    <div class="thumbnail" style="padding: 10px;text-align: left;">        '+
+                        '      <h4>Detail Academic Transcript S2 </h4>                           '+
+                        '       <div class="row">                                                   '+
+                        '          <div class="col-xs-12">                                          '+
+                        '               <div class="form-group">                                    '+
+                        '                   <label>Name Univesity</label>                           '+
+                        '                  <input class="form-control" id="formNameUnivS2" value="'+response[i]['NameUniversity']+'" disabled>         '+
+                        '               </div>                                                      '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>No. Ijazah S1</label>                           '+
+                        '                    <input class="form-control" id="formNoIjazahS2" value="'+response[i]['NoIjazah']+'" disabled>       '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+     
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Date & Year Ijazah</label>                      '+
+                        '                    <input class="form-control editdatepicker" id="formEditIjazahDate" autocomplete="off" value="'+response[i]['DateIjazah']+'" disabled>Format : YYYY-MM-DD '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Major</label>                                   '+
+                        '                    <input class="form-control" id="formMajorS2" value="'+response[i]['Major']+'" disabled>          '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                   '+
+                        '                    <label>Program Study </label>                          '+
+                        '                    <input class="form-control" id="formStudyS2" value="'+response[i]['ProgramStudy']+'" disabled>          '+
+                        '                </div>                                                     '+
+                        '            </div>                                                         '+
+                        '            <div class="col-xs-6">                                         '+
+                        '                <div class="form-group">                                    '+
+                        '                    <label>Grade/ IPK</label>                               '+
+                        '                    <input class="form-control" id="gradeS2" maxlength="4" value="'+response[i]['Grade']+'" disabled> '+
+                        '                </div>                                                      '+
+                        '            </div>                                                          '+
+                        '            <div class="col-xs-3">                                          '+
+                        '                <div class="form-group">                                    '+
+                        '                    <label>Total Credit</label>                             '+
+                        '                    <input class="form-control" id="totalCreditS2" maxlength="3" value="'+response[i]['TotalCredit']+'" disabled> '+
+                        '                </div>                                                         '+
+                        '            </div>                                                             '+
+                        '            <div class="col-xs-3">                                             '+
+                        '               <div class="form-group">                                        '+ 
+                        '                    <label>Total Semester</label>                              '+
+                        '                        <div class="input-group number-spinner">               '+
+                        '                        <span class="input-group-btn">                         '+
+                        '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
+                        '                        </span>                                                '+
+                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" > '+
+                        '                           <span class="input-group-btn"> '+
+                        '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus" disabled></span></button> '+
+                        '                           </span>                                             '+
+                        '                   </div>                                                      '+
+                        '               </div>                                                          '+
+                        '           </div>                                                              '+
+                        '           <div class="col-xs-6">                                              '+
+                        '           <div class="form-group">                                            '+
+                        '               <label>Ijazah</label>                                           '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '               </div>                                                          '+
+                        '           </div>                                                              '+
+                        '           <div class="col-xs-6">                                              '+
+                        '           <div class="form-group">                                            '+
+                        '               <label>Transcript</label>                                       '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+Transcriptx+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+Transcriptx+'"><i class="fa fa-eye"></i> Preview </button></center></div>                 '+
+                        '                </div>                                                         '+
+                        '            </div>                                                             '+
+                        '        </div>                                                                 '+
+                        '        <div class="row">                                                      '+
+                        '           <div class="col-md-12" style="text-align: right;">                   '+
+                        '                <hr/>                                                           '+
+                        '    <div><input type="hidden" class="form-control" value="'+response[i]['LinkFiles']+'" id="linkijazahs1"> </div>                     '+
+                        '    <div><input type="hidden" class="form-control" value="'+Transcriptx+'" id="linktranscripts1">    </div>                            '+
+                        '    <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>            '+
+                        '           </div>                                                              '+
+                        '       </div>                                                                  '+
+                        '   </div>                                                                      '+
+                        '</div>                                                                         '+
+                    '</div>');
+                
+                    $('#NotificationModal').modal({
+                    'backdrop' : 'static',
+                    'show' : true
+                    }); 
+                    i = j;
+                    break;
+                        }    
+                    } //end for
+                } //end if
+            }); //end json
+             
+        } //END IF 
+    });
+
+</script>
+ 
+<script>
+     $(document).on('click','.btndelist',function () {
+        if (window.confirm('Are you sure to delete data?')) {
+            //loading_button('#btndelist');
+
+            var acaid1 = $(this).attr('listid1');
+            var acaid2 = $(this).attr('listid2');
+            var data = {
+                action : 'deleteacademic',
+                ID1 : acaid1,
+                ID2 : acaid2,
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__delistacaemploy";
+            $.post(url,{token:token},function (result) {
+                toastr.success('Success Delete Data!','Success'); 
+                setTimeout(function () {
+                    window.location.href = '';
+                },1000);
+            });
+        }
+    });
+</script>

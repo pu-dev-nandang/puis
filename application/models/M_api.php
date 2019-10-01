@@ -809,7 +809,7 @@ class M_api extends CI_Model {
 
      public function views_files1($NIP,$srata) {
 
-             $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
+             $sql = "SELECT ID, NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
                     FROM db_employees.files
                     WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
              $query=$this->db->query($sql, array());
@@ -850,14 +850,14 @@ class M_api extends CI_Model {
 
      public function delistacademicemployee($ID1, $ID2){
 
-        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $sql = "DELETE  WHERE ID IN ('".$ID1."', '".$ID2."') ";
         $query=$this->db->query($sql);
 
      }
 
      public function delistotherfiles($ID1){
 
-        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID = '".$ID1."' ";
+        $sql = "DELETE db_employees.files WHERE ID = '".$ID1."' ";
         $query=$this->db->query($sql);
 
      }

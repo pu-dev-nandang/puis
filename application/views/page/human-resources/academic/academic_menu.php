@@ -83,7 +83,7 @@ border-radius: 17px;
         <div class="tabbable tabbable-custom tabbable-full-width">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="javascript:void(0)" class="menuDetails" data-page="academic_details" data-toggle="tab"><i class="fa fa-user"></i> Personal Information </a></li>
-                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="list_academic" data-toggle="tab"><i class="fa fa-graduation-cap"></i> Detail Academic</a></li>
+                <!--<li class=""><a href="javascript:void(0)" class="menuDetails" data-page="list_academic" data-toggle="tab"><i class="fa fa-graduation-cap"></i> Detail Academic</a></li> -->
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratasatu" data-toggle="tab"><i class="fa fa-university"></i>  Academic S1</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratadua" data-toggle="tab"><i class="fa fa-university"></i> Academic S2</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratatiga" data-toggle="tab"><i class="fa fa-university"></i> Academic S3</a></li>
@@ -368,8 +368,8 @@ border-radius: 17px;
                     && oFile!='' && oFile!=null 
                     && xFile!='' && xFile!=null 
                     ){ 
-                    loading_button('#btnSubmitEmployees');
-                    $('#btnCloseEmployees').prop('disabled',true);
+                    loading_button('.btnSubmitEmployees1');
+                    $('.btnSubmitEmployees1').prop('disabled',true);
 
                     var data = {
                         action : 'addAcademicS1',
@@ -515,8 +515,8 @@ function uploadfile_transcripts(fileName_Transcript) {
                     && oFile!='' && oFile!=null 
                     && xFile!='' && xFile!=null 
                     ){ 
-                    loading_button('#btnSubmitEmployees');
-                    $('#btnCloseEmployees').prop('disabled',true);
+                    loading_button('.btnSubmitEmployees2');
+                    $('.btnSubmitEmployees2').prop('disabled',true);
 
                     var data = {
                         action : 'addAcademicS2',
@@ -738,7 +738,7 @@ function uploadfile_transcripts2(fileName_Transcript) {
                     && oFile!='' && oFile!=null 
                     && xFile!='' && xFile!=null 
                     ){ 
-                    loading_button('#btnSubmitEmployees');
+                    loading_button('#btnSubmitEmployees3');
                     $('#btnCloseEmployees').prop('disabled',true);
 
                     var data = {

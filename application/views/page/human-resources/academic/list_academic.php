@@ -69,18 +69,20 @@
                 if(keyA > keyB) return 1;
                 return 0;
             });
+
             if (response.length > 0) {
                 for (var i = 0; i < response.length; i++) {
                        
                     if (response[i]['TypeAcademic'] == 'S1' ) {
                         //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
                         var NameUniversity1 = response[i]['NameUniversity'];
+                        var Major1 = response[i]['Major'];
                         var Idlist1 = response[i]['ID'];
 
                             if (response[i]['LinkFiles'] != null) {
                                 var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
                             } else {
-                                var Ijazah = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
+                                var Ijazah = '<img src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="width:200px; height:100px;">';
                             }
 
                             if (response[i]['DateIjazah'] != null) {
@@ -93,9 +95,10 @@
                     for (var j = i+1; j < response.length; j++) {
     
                         var NameUniversity2 = response[j]['NameUniversity'];
+                        var Major2 = response[j]['Major'];
                         var Idlist2 = response[j]['ID'];
 
-                        if (NameUniversity1 == NameUniversity2) {
+                        if (NameUniversity1 == NameUniversity2 && Major1 == Major2) {
                                 //var Transcript = response[j]['LinkFiles'];
                                 if (response[j]['LinkFiles'] != null) {
                                     var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-round btn-primary btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
@@ -103,7 +106,7 @@
                                     var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                 }
 
-                                $("#loadtableNow").append('<div class="panel panel-default"> '+
+                            $("#loadtableNow").append('<div class="panel panel-default"> '+
                                 '<div class="panel-body" style="padding: 0px;"> '+
                                 '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="pull-right"><button class="btn btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"><i class="fa fa-trash"></i></button></div></h3>'+
                                 '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
@@ -173,6 +176,7 @@
                                     } else {
                                         var Transcript2 = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
                                     }
+
                         $("#loadtableS2").append( '<div class="panel panel-default"> '+
                             '<div class="panel-body" style="padding: 0px;"> '+
                                 '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="pull-right"><button class="btn btn-xs btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"> <i class="fa fa-trash"></i> </button></div></h3>'+
