@@ -486,13 +486,24 @@ class C_rest3 extends CI_Controller {
         elseif ($action == 'roolback') {
             $this->load->model('admission/m_admission');
             $rs = ['Status' => 1,'Dt' => [] ];
+            // $path = FCPATH.'upload\\document\\'.'11190042';
+            
+            // if (!file_exists('./uploads/document/'.'111900424')) {
+            //     print_r('Not Directory');
+            // }
+            // else {
+            //     print_r('Directory');
+            // }
+
+            // die();
+
             /*
                 1.Cek Koneksi DB Library
                 2.Cek Data telah diinput pada library atau belum
                 3.Cek Koneksi AD
                 4.Delete user AD first
                 5.Remove file di folder upload/document/{NPM}
-                6.Remove file photo di folder upload/students/{ta}/{NIP}{ekstension}
+                6.Remove file photo di folder upload/students/{ta}/{NPM}{ekstension}
                 7.Remove data di db_finance.payment_students by ID payment
                 8.Remove data di db_finance.payment
                 9.Remove data di db_finance.m_tuition_fee
@@ -500,10 +511,12 @@ class C_rest3 extends CI_Controller {
                 11.Remove data di db_academic.auth_parents
                 12.Remove data di db_admission.doc_mhs
                 13.Remove data di db_admission.to_be_mhs
-                14.Remove data di {ta}.students by NIP
+                14.Remove data di {ta}.students by NPM
             */
 
             $DataSelected = $dataToken['DataSelected'];
+            $ta =  $dataToken['ta'];
+            $taDB =  'ta_'.$ta;
             $DataSelected = json_decode(json_encode($DataSelected),true);
             for ($i=0; $i < count($DataSelected); $i++) {
                 $NPM = $DataSelected[$i]['NPM']; 
@@ -526,6 +539,15 @@ class C_rest3 extends CI_Controller {
                     $CekLibStd = $this->m_admission->cekDBLibraryExistSTD($NPM);
                     if ($CekLibStd) {
                         $MSG .= '<br/>Library Data : Ada';
+                        // delete data  pada library jika live
+                        $DelDtLib = $this->m_admission->DelDBLibraryExistSTD($NPM);
+                        if ($DelDtLib) {
+                            $MSG .= '<br/>Library Data : Data berhasil dihapus';
+                        }
+                        else {
+                            $MSG .= '<br/>Library Data : Data tidak dihapus';
+                        }
+
                     }
                     else{
                         $MSG .= '<br/>Library Data : Tidak Ada';
@@ -563,10 +585,12 @@ class C_rest3 extends CI_Controller {
                                     'script' => $script,
                                 );
                                 
-                                $url = URLAD.'__api/Delete';
-                                $token = $this->jwt->encode($data,"UAP)(*");
-                                $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
-                                $MSG .= '<br/>AD Proses Delete : Finish';   
+                                if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') { // AD jalannya hanya di live
+                                    $url = URLAD.'__api/Delete';
+                                    $token = $this->jwt->encode($data,"UAP)(*");
+                                    $this->m_master->apiservertoserver_NotWaitResponse($url,$token);
+                                    $MSG .= '<br/>AD Proses Delete : Finish';
+                                }
 
                              }
                              else {
@@ -575,10 +599,127 @@ class C_rest3 extends CI_Controller {
                          }
 
                          // Remove file di folder upload/document/{NPM}
+                         $path = FCPATH.'uploads\\document\\'.$NPM;
+                         if (file_exists('./uploads/document/'.$NPM)) {
+                            $this->m_master->deleteDir($path);
+                            $MSG .= '<br/>Remove Folder upload/document/'.$NPM.' : Selesai';
+                          } else {
+                            $MSG .= '<br/>Remove Folder upload/document/'.$NPM.' : Directory tidak ada';
+                          }
+
+                          // Remove file photo di folder upload/students/{ta}/{NIP}{ekstension}
+                          $G_dtMHS = $this->m_master->caribasedprimary($taDB.'.students','NPM',$NPM);
+                          if (count($G_dtMHS) > 0) {
+                            $Photo = $G_dtMHS[0]['Photo'];
+                            if (file_exists('./upload/students/'.$ta.'/'.$Photo)) {
+                                $path = FCPATH.'uploads\\students\\'.$ta.'\\'.$Photo;
+                                unlink($path);
+                                $MSG .= '<br/>File Photo  : Berhasil Dihapus';
+                            }
+                            else {
+                                $MSG .= '<br/>File Photo  : tidak ada';
+                            }
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student  : tidak ada';
+                          }
+
+                          // remove di db_finance
+                          $G_dtFin = $this->m_master->caribasedprimary('db_finance.payment','NPM',$NPM);
+                          $countCek = 0;
+                          for ($z=0; $z < count($G_dtFin); $z++) { 
+                              // delete di payment student first
+                              $this->db->where('ID_payment',$G_dtFin[$z]['ID']);
+                              $this->db->delete('db_finance.payment_students');
+
+                              // delete di payment
+                              $this->db->where('ID',$G_dtFin[$z]['ID']);
+                              $this->db->delete('db_finance.payment');
+                              if ($this->db->affected_rows() > 0 )
+                              {
+                                $countCek++;
+                              }
+                          }
+                          
+                          if ($countCek == count($G_dtFin)) {
+                            $MSG .= '<br/>Data Student -- Finance  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- Finance  : Gagal dihapus';
+                          }
+
+                          // delete di m_tuition fee
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete('db_finance.m_tuition_fee');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- m_tuition_fee  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- m_tuition_fee  : Gagal dihapus';
+                          }
+
+                          // Remove data di db_academic.auth_students
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete('db_academic.auth_students');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- auth_students  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- auth_students  : Gagal dihapus';
+                          }
+
+                          // Remove data di db_academic.auth_students
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete('db_academic.auth_parents');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- auth_parents  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- auth_parents  : Gagal dihapus';
+                          }
+
+                          // Remove data di db_admission.doc_mhs
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete('db_admission.doc_mhs');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- doc_mhs  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- doc_mhs  : Gagal dihapus';
+                          }
+
+                          // Remove data di db_admission.to_be_mhs
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete('db_admission.to_be_mhs');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- to_be_mhs  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- to_be_mhs  : Gagal dihapus';
+                          }
+
+                          // Remove data di {ta}.students by NPM
+                          $this->db->where('NPM',$NPM);
+                          $this->db->delete($taDB.'.students');
+                          if ($this->db->affected_rows() > 0 )
+                          {
+                            $MSG .= '<br/>Data Student -- {ta}.students  : Berhasil dihapus';
+                          }
+                          else {
+                            $MSG .= '<br/>Data Student -- {ta}.students  : Gagal dihapus';
+                          }
                     }
                 }
+
+                $DataSelected[$i]['Status'] = $MSG;
             }
 
+            $rs['Dt'] = $DataSelected;
             echo json_encode($rs);
             
         }     

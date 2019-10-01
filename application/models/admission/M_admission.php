@@ -3839,12 +3839,27 @@ class M_admission extends CI_Model {
       $this->db_server22 = $this->load->database('server22', TRUE);
       $sql = 'select count(*) as total from library.member where member_id = "'.$NPM.'" ';
       $query=$this->db_server22->query($sql, array())->result_array();
-      if ($query[0]['total'] > 1) {
+      if ($query[0]['total'] > 0) {
         return true;
       }
       else
       {
         return false;
+      }
+    }
+
+    public function DelDBLibraryExistSTD($NPM)
+    {
+      $this->db_server22 = $this->load->database('server22', TRUE);
+      $this->db_server22->where('member_id',$NPM);
+      $this->db_server22->delete('library.member'); 
+      if ($this->db_server22->affected_rows() > 0 )
+      {
+        return TRUE;
+      }
+      else
+      {
+        return FALSE;
       }
     }
 

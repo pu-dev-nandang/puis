@@ -204,23 +204,33 @@
     })
 
     $(document).off('click', '.btn-save').on('click', '.btn-save',function(e) {
-           if (DataSelected.length > 0) {
-                var url = base_url_js+'rest3/__get_roolback_door_to_be_mhs_admission';
-                var ta = $('#SelectTA option:selected').val();
-                var data = {
-                            action : 'roolback',
-                            auth : 's3Cr3T-G4N',
-                            ta : ta,
-                            DataSelected : DataSelected,
-                        };
-                var token = jwt_encode(data,'UAP)(*');
-                $.post(url,{token:token},function (resultJson) {
-
-                }).fail(function() {
-                    toastr.info('No Result Data'); 
-                }).always(function() {
-                                
-                });
-           } 
+            if (confirm('Are you sure ?')) {
+                    if (DataSelected.length > 0) {
+                        var url = base_url_js+'rest3/__get_roolback_door_to_be_mhs_admission';
+                        var ta = $('#SelectTA option:selected').val();
+                        var data = {
+                                    action : 'roolback',
+                                    auth : 's3Cr3T-G4N',
+                                    ta : ta,
+                                    DataSelected : DataSelected,
+                                };
+                        var token = jwt_encode(data,'UAP)(*');
+                        loading_button('.btn-save');
+                        $.post(url,{token:token},function (resultJson) {
+                            DataSelected = resultJson.Dt;
+                            MakeDataSelected();
+                            S_Table.$('input[type="checkbox"]').each(function(){
+			                    if(this.checked){
+                                    $(this).closest('tr').remove();
+	                            }
+		                    });
+                            $('.btn-save').prop('disabled',false).html('Roolback To Be Intake');
+                        }).fail(function() {
+                            toastr.info('No Result Data'); 
+                        }).always(function() {
+                                        
+                        });
+                    } 
+            }
     })
 </script>
