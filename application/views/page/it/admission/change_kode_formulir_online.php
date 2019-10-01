@@ -158,7 +158,7 @@
     				'<div class = "col-xs-12">'+
     					'<div class = "well">'+	
     						'<div class = "row">'+
-    							'<div class = "col-xs-4">'+
+    							'<div class = "col-xs-6">'+
     								'<div class = "thumbnail">'+
     									'<div style = "padding:15px;">'+
     										'<h2>Edit Number Formulir</h2>'+
@@ -166,7 +166,7 @@
     									'<div id="content-input-edit"></div>'+
     								'</div>'+
     						'</div>'+
-    						'<div class = "col-xs-4">'+
+    						'<div class = "col-xs-6">'+
     							'<div class = "thumbnail">'+
     								'<div style = "padding:15px;">'+
     									'<h2>Exchange Number Formulir</h2>'+
@@ -174,14 +174,14 @@
     								'<div id="content-input-exchange"></div>'+
     							'</div>'+
     						'</div>'+
-    						'<div class = "col-xs-4">'+
-    							'<div class = "thumbnail">'+
-    								'<div style = "padding:15px;">'+
-    									'<h2>Set TA</h2>'+
-    								'</div>'+	
-    								'<div id="content-input-set_ta"></div>'+
-    							'</div>'+
-    						'</div>'+
+    						// '<div class = "col-xs-4">'+
+    						// 	'<div class = "thumbnail">'+
+    						// 		'<div style = "padding:15px;">'+
+    						// 			'<h2>Set TA</h2>'+
+    						// 		'</div>'+	
+    						// 		'<div id="content-input-set_ta"></div>'+
+    						// 	'</div>'+
+    						// '</div>'+
     					'</div>'+
     				'</div>'+
     			'</div>';

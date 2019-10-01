@@ -1519,7 +1519,7 @@ class C_admission extends Admission_Controler {
                     for ($ee=0; $ee < count($explode); $ee++) {
                      if (file_exists($this->path_upload_regOnline.$Email.'/'.$explode[$ee])) {
                       copy($this->path_upload_regOnline.$Email.'/'.$explode[$ee], './uploads/document/'.$NPM.'/'.$explode[$ee]);
-                      unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
+                      // unlink($this->path_upload_regOnline.$Email.'/'.$explode[$ee]);
                      }
 
                     }
@@ -1528,7 +1528,7 @@ class C_admission extends Admission_Controler {
                   {
                     if (file_exists($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'])) {
                       copy($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment'], './uploads/document/'.$NPM.'/'.$getDoc[$z]['Attachment']);
-                      unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
+                      // unlink($this->path_upload_regOnline.$Email.'/'.$getDoc[$z]['Attachment']);
                     }
 
                   }

@@ -238,10 +238,16 @@
                     Admission Back Door
                     <i class="arrow <?= ($this->uri->segment(2)=='admission') ? 'icon-angle-down' : 'icon-angle-left'?>"></i></a>
                 <ul class="sub-menu">
-                    <li class="<?= ($this->uri->segment(3)=='redundancy-krs-online') ? "current open" : ""?>">
+                    <li class="<?= ($this->uri->segment(3)=='change-kode-formulir-online') ? "current open" : ""?>">
                         <a href="<?= base_url('it/admission/change-kode-formulir-online') ?>">
                             <i class="icon-angle-right"></i>
                             Formulir Online
+                        </a>
+                    </li>
+                    <li class="<?= ($this->uri->segment(3)=='roolback-to-be-mhs') ? "current open" : ""?>">
+                        <a href="<?= base_url('it/admission/roolback-to-be-mhs') ?>">
+                            <i class="icon-angle-right"></i>
+                            Roolback To Be MHS
                         </a>
                     </li>
                 </ul>
