@@ -81,6 +81,7 @@ border-radius: 17px;
     });
 
     function loadDataEmployees(status) {
+        console.log(status);
         var dataTable = $('#tableEmployees').DataTable( {
             "processing": true,
             "destroy": true,

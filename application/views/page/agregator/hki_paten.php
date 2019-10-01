@@ -17,15 +17,24 @@
 <div class="well">
     <div class="row">
         <div class="col-md-12">
-            
 
-            <div style="text-align: right;margin-bottom: 20px;">
-                <div>
-                    <select class="form-control" style="text-align: center;" id="filterAwal"></select>
-                </div>
-                 <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
-                
+            <div style="text-align: right;">
+                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
             </div>
+
+            <div class="col-md-3 col-md-offset-4">
+                <div class="thumbnail">
+                    <select class="form-control" id="filterTahun">
+                        <option value="" disabled="">--- Pilih Tahun ---</option>
+                        <option value="1">--- Pilih Tahun 1---</option>
+                        <option value="2">--- Pilih Tahun 2---</option>
+                    </select>
+                </div>
+                <hr/>
+            </div>
+    
+            
+         
             <div id="viewTable"></div>
         </div>
     </div>
@@ -146,10 +155,15 @@
             $('.form-data-add').remove();
         } else {
         }
-        loadAkreditasiProdi();
+        loadhkipaten();
     });
 
-    function loadAkreditasiProdi() {
+    $('#filterTahun').change(function () {
+        var status = $(this).val();
+        loadhkipaten(status);
+    });
+
+    function loadhkipaten(status) {
 
          $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
             '    <thead>  '+
@@ -165,7 +179,9 @@
             '    </tfoot> '+
             '    </table>');
 
-        var url = base_url_js+'api3/__getHkiPaten';
+        var url : base_url_js+"api3/__getHkiPaten?s="+status, // json datasource
+        //var url = base_url_js+'api3/__getHkiPaten';
+
         $.getJSON(url,function (jsonResult) {
 
             if(jsonResult.length>0) {

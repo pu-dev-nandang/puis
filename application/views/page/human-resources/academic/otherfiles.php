@@ -1,5 +1,4 @@
 
-
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
 
@@ -14,7 +13,6 @@
                                         <label class="control-label">Type File </label>
                                         <div>
                                             <select class="form-control" id="typefiles">
-
                                                 <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>
                                                     <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>
                                                      <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>  
@@ -167,8 +165,8 @@ $('#fileOther').change(function (event) {
                     '            <td>'+response[i]['NameFiles']+'</td>                               '+       
                     '            <td>'+datadoc+'</td>                                                '+    
                     '            <td><center>'+datadate+'</center></td>                              '+                                                       
-                    '             <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'+response[i]['ID']+'"><i class="fa fa-trash"></i> </button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
+                    '            <td>'+datadesc+'</td>                                              '+    
+                    '            <td style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'+response[i]['ID']+'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
                     '   </tr>');
                 } 
             }
