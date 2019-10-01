@@ -1,4 +1,4 @@
-<h3>This is the page : penggunaan_dana.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center">Penggunaan Dana</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     
     <style>
         #dataDanaTable tr th, #dataDanaTable tr td {

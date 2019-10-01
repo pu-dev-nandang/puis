@@ -1,4 +1,4 @@
-<h3>This is the page : mahasiswa_asing.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center">Mahasiswa Asing</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     
                     
                     <script>

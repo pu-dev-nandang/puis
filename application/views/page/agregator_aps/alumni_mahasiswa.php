@@ -1,4 +1,4 @@
-<h3>This is the page : alumni_mahasiswa.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center"><b>Alumni Mahasiswa</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     
                     
                     <script>

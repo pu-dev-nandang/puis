@@ -1,4 +1,4 @@
-<h3>This is the page : publikasi_ilmiah_dtps.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<h3 align="center"><b>Publikasi Ilmiah</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     
                     
                     <script>
