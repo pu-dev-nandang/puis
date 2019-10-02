@@ -72,9 +72,9 @@
                                 <th style="width: 10%;">TS-2 <span id="viewTS2"></span></th>
                                 <th style="width: 10%;">TS-1 <span id="viewTS1"></span></th>
                                 <th style="width: 10%;">TS <span id="viewTS"></span></th>
-                                <th style="width: 10%;">TS-2 <span id="viewTS2"></span></th>
-                                <th style="width: 10%;">TS-1 <span id="viewTS1"></span></th>
-                                <th style="width: 10%;">TS <span id="viewTS"></span></th>
+                                <th style="width: 10%;">TS-2 <span id="viewTS5"></span></th>
+                                <th style="width: 10%;">TS-1 <span id="viewTS4"></span></th>
+                                <th style="width: 10%;">TS <span id="viewTS3"></span></th>
                             </tr>
                             </thead>
                             <tbody id="loadListDana"></tbody>
@@ -111,7 +111,7 @@
                     var firstLoad_year = setInterval(function (args) {
                         var filterYear = $('#filterYear').val();
                         if(filterYear!='' && filterYear!=null){
-                            loadPenggunaanDana();
+                            loadPenggunaanDana(filterProdi);
                             clearInterval(firstLoad_year);
                         }
                     },1000);
@@ -124,12 +124,17 @@
 
                 $('#btnSave').click(function () {
 
+                    var filterProdi = $('#filterProdi').val();
+                    var P = filterProdi.split('.');
+                    var ProdiID = P[0];
                     var formJPID = $('#formJPID').val();
                     var formYear = $('#formYear').val();
-                    var formPrice = $('#formPrice').val();
+                    var formPriceUPPS = $('#formPriceUPPS').val();
+                    var formPricePS = $('#formPricePS').val();
 
                     if(formYear !='' && formYear!=null &&
-                    formPrice !='' && formPrice!=null){
+                    formPriceUPPS !='' && formPriceUPPS!=null&&
+                    formPricePS !='' && formPricePS!=null){
 
                         loading_buttonSm('#btnSave');
 
@@ -138,7 +143,9 @@
                             dataForm : {
                                 JPID : formJPID,
                                 Year : formYear,
-                                Price : clearDotMaskMoney(formPrice)
+                                ProdiID : ProdiID,
+                                PriceUPPS : clearDotMaskMoney(formPriceUPPS),
+                                PricePS : clearDotMaskMoney(formPricePS),
                             }
                         };
 
@@ -148,12 +155,13 @@
                         $.post(url,{token:token},function (result) {
                             toastr.success('Data saved','Success');
                             // loadSOPenggunaanDanaYear('filterYear');
-                            loadPenggunaanDana();
+                            loadPenggunaanDana(filterProdi);
                             setTimeout(function () {
 
                                 $('#formID').val('');
                                 $('#formYear').val('');
-                                $('#formPrice').val(0);
+                                $('#formPriceUPPS').val(0);
+                                $('#formPricePS').val(0);
 
                                 $('#btnSave').prop('disabled',false).html('Save');
                             },500);
@@ -167,15 +175,12 @@
                 });
 
                 $('#filterProdi').change(function () {
-                    var filterProdi = $('#filterProdi').val();
-                    if(filterProdi!='' && filterProdi!=null){
-                        loadPage();
-                    }
+                    loadPage()
                 });
                 $('#filterYear').change(function () {
                    var filterYear = $('#filterYear').val();
                    if(filterYear!='' && filterYear!=null){
-                       loadPenggunaanDana();
+                       loadPenggunaanDana(filterProdi);
                    }
                 });
 
@@ -184,6 +189,7 @@
                     if(filterProdi!='' && filterProdi!=null){
                         $('#viewProdiID').html(filterProdi);
                         $('#viewProdiName').html($('#filterProdi option:selected').text());
+                        loadPenggunaanDana(filterProdi);
                     }
                 }
 
@@ -202,7 +208,7 @@
 
                         $.post(url,{token:token},function (result) {
                             toastr.success('Data removed','Success');
-                            loadPenggunaanDana();
+                            loadPenggunaanDana(filterProdi);
                         });
 
                     }
@@ -266,7 +272,7 @@
 
                             $.post(url,{token:token},function (result) {
                                 loadJenisDana();
-                                loadPenggunaanDana();
+                                loadPenggunaanDana(filterProdi);
                                 setTimeout(function () {
                                     $('#btnJPSave').prop('disabled',false).html('Save');
                                     $('#formJP_ID').val('');
@@ -301,7 +307,7 @@
 
             });
         }
-        function loadPenggunaanDana() {
+        function loadPenggunaanDana(filterProdi) {
 
             var filterYear = $('#filterYear').val();
             if(filterYear!='' && filterYear!=null){
@@ -309,7 +315,15 @@
                 var Year = filterYear;
                 var Year1 = parseInt(filterYear) - 1;
                 var Year2 = parseInt(filterYear) - 2;
+                var Year3 = filterYear;
+                var Year4 = parseInt(filterYear) - 1;
+                var Year5 = parseInt(filterYear) - 2;
+                var P = filterProdi.split('.');
+                var ProdiID = P[0];
 
+                $('#viewTS5').html('( '+Year5+' )');
+                $('#viewTS4').html('( '+Year4+' )');
+                $('#viewTS3').html('( '+filterYear+' )');
                 $('#viewTS2').html('( '+Year2+' )');
                 $('#viewTS1').html('( '+Year1+' )');
                 $('#viewTS').html('( '+filterYear+' )');
@@ -318,7 +332,11 @@
                     action : 'viewPenggunaanDana_aps',
                     Year : Year,
                     Year1 : Year1,
-                    Year2 : Year2
+                    Year2 : Year2,
+                    Year3 : Year3,
+                    Year4 : Year4,
+                    Year5 : Year5,
+                    ProdiID : ProdiID,
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
@@ -334,51 +352,106 @@
                         var jml_th3 = 0;
                         var jml_th2 = 0;
                         var jml_th1 = 0;
-                        var jml_jml = 0;
+                        var jml_rataUPPS = 0;
+                        var jml_th6 = 0;
+                        var jml_th5 = 0;
+                        var jml_th4 = 0;
+                        var jml_rataPS = 0;
+
+
                         $.each(jsonResult,function (i,v) {
 
                             var jml = parseFloat(v.th3) + parseFloat(v.th2) + parseFloat(v.th1);
-
+                            var rataUPPS = jml/3;
+                            rataUPPS = getCustomtoFixed(rataUPPS,2);
+                            var jml = parseFloat(v.th4) + parseFloat(v.th5) + parseFloat(v.th6);
+                            var rataPS = jml/3;
+                            rataPS = getCustomtoFixed(rataPS,2);
                             $('#loadListDana').append('<tr>' +
                                 '<td>'+no+'</td>' +
                                 '<td style="text-align: left;">'+v.Jenis+'</td>' +
                                 '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
                                 '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
                                 '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
-                                '<td style="text-align: right;">'+formatRupiah(jml)+'</td>' +
+                                '<td style="text-align: right;">'+formatRupiah(rataUPPS)+'</td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year5+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th6)+'">'+formatRupiah(v.th6)+'</a></td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year4+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th5)+'">'+formatRupiah(v.th5)+'</a></td>' +
+                                '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year3+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th4)+'">'+formatRupiah(v.th4)+'</a></td>' +
+                                '<td style="text-align: right;">'+formatRupiah(rataPS)+'</td>' +
                                 '</tr>');
                             jml_th3 = jml_th3+ parseFloat(v.th3);
                             jml_th2 = jml_th2+ parseFloat(v.th2);
                             jml_th1 = jml_th1+ parseFloat(v.th1);
-                            jml_jml = jml_jml+ parseFloat(jml);
+                            jml_rataUPPS = jml_rataUPPS+ parseFloat(rataUPPS);
+                            jml_th6 = jml_th6+ parseFloat(v.th6);
+                            jml_th5 = jml_th5+ parseFloat(v.th5);
+                            jml_th4 = jml_th4+ parseFloat(v.th4);
+                            jml_rataPS = jml_rataPS+ parseFloat(rataPS);
 
                             no += 1;
-                            if(no==8){
+                            if(no==7){
 
                                 $('#loadListDana').append('<tr>' +
                                     '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
-                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataUPPS)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th6)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th5)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th4)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataPS)+'</td>' +
                                     '</tr>');
 
                                 jml_th3 = 0;
                                 jml_th2 = 0;
                                 jml_th1 = 0;
-                                jml_jml = 0;
+                                jml_rataUPPS = 0;
+                                jml_th6 = 0;
+                                jml_th5 = 0;
+                                jml_th4 = 0;
+                                jml_rataPS = 0;
 
-                                no =1;
-                            } else if(i==8){
+                                no =7;
+                            } else if(i==7){
                                 $('#loadListDana').append('<tr>' +
                                     '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
                                     '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
-                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_jml)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataUPPS)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th6)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th5)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th4)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataPS)+'</td>' +
+                                    '</tr>');
+
+                                jml_th3 = 0;
+                                jml_th2 = 0;
+                                jml_th1 = 0;
+                                jml_rataUPPS = 0;
+                                jml_th6 = 0;
+                                jml_th5 = 0;
+                                jml_th4 = 0;
+                                jml_rataPS = 0;
+
+                            } else if(i==10){
+                                $('#loadListDana').append('<tr>' +
+                                    '<td colspan="2" style="background: lightyellow;">Jumlah</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th3)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th2)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th1)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataUPPS)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th6)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th5)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_th4)+'</td>' +
+                                    '<td style="text-align: right;background: lightyellow;">'+formatRupiah(jml_rataPS)+'</td>' +
                                     '</tr>');
                             }
+
+
                         });
+                            
 
                     }
 
