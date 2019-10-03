@@ -3605,56 +3605,111 @@ class C_save_to_pdf extends CI_Controller {
         $min = 25;
         $borderttd = 0;
 
-        $pdf->SetFont('dinpromedium','',$font_medium);
-        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
+        if($Student['FacultyID']!=4 || $Student['FacultyID']!='4'){
+
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
 
 
-        $pdf->SetFont('dinlightitalic','',$font_medium_i);
-        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'Place and Date Issued',$borderttd,1,'L');
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Place and Date Issued',$borderttd,1,'L');
 
-        $pdf->SetFont('dinpromedium','',$font_medium);
-        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.$this->getDateIndonesian($Transcript['DateIssued']),$borderttd,1,'L');
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.$this->getDateIndonesian($Transcript['DateIssued']),$borderttd,1,'L');
 
-        $pdf->SetFont('dinlightitalic','',$font_medium_i);
-        $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).',  '.date('F j, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).',  '.date('F j, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
-        $pdf->Ln(5);
+            $pdf->Ln(5);
+
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'Wakil Rektor Akademik dan Kemahasiswaan',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Dekan',$borderttd,1,'L');
+
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'Vice Rector of Academic and Student Affairs',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
+
+            $pdf->Ln(17);
+
+            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
+            $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
+
+            $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+
+            $Rektorat = $dataStudent['Rektorat'][0];
+            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+            $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
+            $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+
+            // Foto
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,$Rektor,$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,$Dekan,$borderttd,1,'L');
+
+            $pdf->SetFont('dinpromedium','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
+
+            $pdf->Rect(85, $y+5, 40, 58);
+
+        } else {
+
+            $min = 5;
+            $borderttd = 0;
+
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Tempat dan Tanggal Diterbitkan',$borderttd,1,'L');
 
 
-        $pdf->SetFont('dinpromedium','',$font_medium);
-        $pdf->Cell($w_Div+$min,$h,'Rektor',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'Dekan',$borderttd,1,'L');
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Place and Date Issued',$borderttd,1,'L');
 
-        $pdf->SetFont('dinlightitalic','',$font_medium_i);
-        $pdf->Cell($w_Div+$min,$h,'Rector',$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'Dean',$borderttd,1,'L');
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).', '.$this->getDateIndonesian($Transcript['DateIssued']),$borderttd,1,'L');
 
-        $pdf->Ln(17);
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,ucwords(strtolower($Transcript['PlaceIssued'])).',  '.date('F j, Y',strtotime($Transcript['DateIssued'])),$borderttd,1,'L');
 
-        $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
-        $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
+            $pdf->Ln(5);
 
-        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Wakil Rektor Akademik dan Kemahasiswaan',$borderttd,1,'L');
 
-        $Rektorat = $dataStudent['Rektorat'][0];
-        $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
-        $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+            $pdf->SetFont('dinlightitalic','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'Vice Rector of Academic and Student Affairs',$borderttd,1,'L');
 
-        // Foto
-        $pdf->SetFont('dinpromedium','',$font_medium);
-        $pdf->Cell($w_Div+$min,$h,$Rektor,$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,$Dekan,$borderttd,1,'L');
+            $pdf->Ln(17);
 
-        $pdf->SetFont('dinpromedium','',$font_medium_i);
-        $pdf->Cell($w_Div+$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,0,'L');
-        $pdf->Cell($w_Div-$min,$h,'NIP : '.$Student['NIP'],$borderttd,1,'L');
+            $Rektorat = $dataStudent['Rektorat'][0];
+            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+            $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
+            $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
 
-        $pdf->Rect(77, $y+5, 40, 58);
+            // Foto
+            $pdf->SetFont('dinpromedium','',$font_medium);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,$Rektor,$borderttd,1,'L');
+
+            $pdf->SetFont('dinpromedium','',$font_medium_i);
+            $pdf->Cell($w_Div+$min,$h,'',$borderttd,0,'L');
+            $pdf->Cell($w_Div-$min,$h,'NIP : '.$Rektorat['NIP'],$borderttd,1,'L');
+
+            $pdf->Rect(61, $y+5, 40, 58);
+
+        }
+
+
 
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
@@ -3755,8 +3810,9 @@ class C_save_to_pdf extends CI_Controller {
   public function ijazah(){
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
+
         $dataIjazah = $this->m_save_to_pdf->getIjazah($data_arr['DBStudent'],$data_arr['NPM']);
-        //print_r($dataIjazah); exit;
+
         $pdf = new FPDF('L','mm','A4');
         $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
         // membuat halaman baru
@@ -3900,54 +3956,106 @@ class C_save_to_pdf extends CI_Controller {
         $y = $pdf->GetY()+7;
         $pdf->Ln(15);
         // 171.5
-        // Tanda tangan
-        $pdf->SetX($x+10);
-        $pdf->SetFont('dinpromedium','',$fn_b);
-        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.$this->getDateIndonesian($Ijazah['DateIssued']),$border,1,'L');
-        $pdf->SetX($x+10);
-        $pdf->SetFont('dinlightitalic','',$fn_i);
-        $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
-        $pdf->Ln(3);
-        $pdf->SetX($x+10);
-        $pdf->SetFont('dinpromedium','',$fn_b);
-        $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
-        $pdf->Cell(41,$h,'Dekan',$border,1,'L');
-        $pdf->SetFont('dinlightitalic','',$fn_i);
-        $pdf->SetX($x+10);
-        $pdf->Cell(138.5,$h,'Rector',$border,0,'L');
-        $pdf->Cell(41,$h,'Dean',$border,1,'L');
-        $pdf->Ln(13);
-        // Dekan --
-        $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
-        $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
-        $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
-        // Rektor
-        $Rektorat = $dataIjazah['Rektorat'][0];
-        $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
-        $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-        $komaRektor = ($titleBRektor!='') ? ',' : '';
-        $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
-        // ----
-        $pdf->SetFont('dinpromedium','',$fn_b);
-        $yy = 9.2; // novie
-        $xx = 57;
-        $ytext = $pdf->GetY()+$yy;
-        $xtext = $pdf->GetX()+$xx;
-        $pdf->Text($xtext,$ytext,$Rektor);
-        $ytext = $pdf->GetY()+$yy+4;
-        $xtext = $pdf->GetX()+$xx;
-        $pdf->SetFont('dinpromedium','',$fn_b-2);
-        $pdf->Text($xtext,$ytext,'NIP : '.$Rektorat['NIP']);
-        $pdf->SetFont('dinpromedium','',$fn_b);
-        $ytext = $pdf->GetY()+$yy;
-        $xtext = $pdf->GetX()+$xx+138;
-        $pdf->Text($xtext,$ytext,$Dekan);
-        $ytext = $pdf->GetY()+$yy+4;
-        $xtext = $pdf->GetX()+$xx+138;
-        $pdf->SetFont('dinpromedium','',$fn_b-2);
-        $pdf->Text($xtext,$ytext,'NIP : '.$Student['NIP']);
-        //foto
-        $pdf->Rect($x+95, $y, 40, 58);
+
+      // Rektor
+      $Rektorat = $dataIjazah['Rektorat'][0];
+      $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+      $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
+      $komaRektor = ($titleBRektor!='') ? ',' : '';
+      $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+
+        if($Student['FacultyID']!=4 || $Student['FacultyID']!='4'){
+
+            // Tanda tangan
+            $pdf->SetX($x+10);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.$this->getDateIndonesian($Ijazah['DateIssued']),$border,1,'L');
+            $pdf->SetX($x+10);
+            $pdf->SetFont('dinlightitalic','',$fn_i);
+            $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
+            $pdf->Ln(3);
+            $pdf->SetX($x+10);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $pdf->Cell(138.5,$h,'Rektor',$border,0,'L');
+            $pdf->Cell(41,$h,'Dekan',$border,1,'L');
+            $pdf->SetFont('dinlightitalic','',$fn_i);
+            $pdf->SetX($x+10);
+            $pdf->Cell(138.5,$h,'Rector',$border,0,'L');
+            $pdf->Cell(41,$h,'Dean',$border,1,'L');
+            $pdf->Ln(13);
+
+            // Dekan --
+            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
+            $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
+            $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+
+            // ----
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $yy = 9.2; // novie
+            $xx = 57;
+            $ytext = $pdf->GetY()+$yy;
+            $xtext = $pdf->GetX()+$xx;
+            $pdf->Text($xtext,$ytext,$Rektor);
+            $ytext = $pdf->GetY()+$yy+4;
+            $xtext = $pdf->GetX()+$xx;
+            $pdf->SetFont('dinpromedium','',$fn_b-2);
+            $pdf->Text($xtext,$ytext,'NIP : '.$Rektorat['NIP']);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $ytext = $pdf->GetY()+$yy;
+            $xtext = $pdf->GetX()+$xx+138;
+            $pdf->Text($xtext,$ytext,$Dekan);
+            $ytext = $pdf->GetY()+$yy+4;
+            $xtext = $pdf->GetX()+$xx+138;
+            $pdf->SetFont('dinpromedium','',$fn_b-2);
+            $pdf->Text($xtext,$ytext,'NIP : '.$Student['NIP']);
+            //foto
+            $pdf->Rect($x+95, $y, 40, 58);
+
+        } else {
+
+            // Tanda tangan
+            $pdf->SetX($x+120);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.$this->getDateIndonesian($Ijazah['DateIssued']),$border,1,'L');
+            $pdf->SetX($x+120);
+            $pdf->SetFont('dinlightitalic','',$fn_i);
+            $pdf->Cell(171.5,$h,$Ijazah['PlaceIssued'].', '.date('F j, Y',strtotime($Ijazah['DateIssued'])),$border,1,'L');
+
+            $pdf->Ln(3);
+            $pdf->SetX($x+120);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $pdf->Cell(138.5,$h,'Rektor',$border,1,'L');
+            $pdf->SetFont('dinlightitalic','',$fn_i);
+            $pdf->SetX($x+120);
+            $pdf->Cell(138.5,$h,'Rector',$border,1,'L');
+            $pdf->Ln(13);
+
+
+            $pdf->SetFont('dinpromedium','',$fn_b);
+            $yy = 9.2; // novie
+            $xx = 57 + 110;
+            $ytext = $pdf->GetY()+$yy;
+            $xtext = $pdf->GetX()+$xx;
+            $pdf->Text($xtext,$ytext,$Rektor);
+            $ytext = $pdf->GetY()+$yy+4;
+            $xtext = $pdf->GetX()+$xx;
+            $pdf->SetFont('dinpromedium','',$fn_b-2);
+            $pdf->Text($xtext,$ytext,'NIP : '.$Rektorat['NIP']);
+            $pdf->SetFont('dinpromedium','',$fn_b);
+
+
+
+            //foto
+            $pdf->Rect($x+45, $y, 40, 58);
+
+        }
+
+
+
+
+
+
+
         $nameF = str_replace(' ','_',strtoupper($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
