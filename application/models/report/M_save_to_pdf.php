@@ -438,7 +438,7 @@ class M_save_to_pdf extends CI_Model {
         $dataStd = $this->db->query('SELECT s.Name, s.NPM, s.PlaceOfBirth, s.DateOfBirth, aus.CertificateSerialNumber AS CSN, aus.CertificateNationalNumber AS CNN,
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, edl.Description AS GradeDesc,
                                             edl.DescriptionEng AS GradeDescEng, em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind,
-                                            fp.TitleInd, fp.TitleEng, f.Name AS FacultyName
+                                            fp.TitleInd, fp.TitleEng, f.Name AS FacultyName, f.ID AS FacultyID
                                             FROM '.$DBStudent.'.students s
                                             LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM)
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
@@ -498,7 +498,7 @@ class M_save_to_pdf extends CI_Model {
         // Get Rektor
         $dataRektor = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
                                                     LEFT JOIN db_employees.employees_status ems ON (ems.ID = em.StatusEmployeeID)
-                                                    WHERE em.PositionMain = "2.1" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
+                                                    WHERE em.PositionMain = "2.2" AND ems.IDStatus != -1 AND ems.IDStatus != -2 ')->result_array();
 
         // Wakil rektor akademik / Warek I
         $dataWaRek1 = $this->db->query('SELECT em.NIP, em.Name, em.TitleAhead, em.TitleBehind FROM db_employees.employees em
@@ -542,7 +542,7 @@ class M_save_to_pdf extends CI_Model {
                                             ps.Name AS Prodi, ps.NameEng AS ProdiEng, aus.KTPNumber,
                                             ps.Degree, ps.TitleDegree, ps.DegreeEng, ps.TitleDegreeEng, ps.NoSKBANPT,
                                             edl.Description AS GradeDesc, edl.DescriptionEng AS GradeDescEng,
-                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind
+                                            em.NIP, em.Name AS Dekan, em.TitleAhead, em.TitleBehind, f.Name AS FacultyName, f.ID AS FacultyID
                                             FROM '.$DBStudent.'.students s
                                             LEFT JOIN db_academic.auth_students aus ON (s.NPM = aus.NPM)
                                             LEFT JOIN db_academic.program_study ps ON (s.ProdiID = ps.ID)
