@@ -69,7 +69,7 @@ class C_studentlife extends Student_Life {
     public function list_alumni(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/tracer-alumni/list_alumni',$data,true);
-        $this->menu_student_achievementc($page);
+        $this->menu_stracert_alumni($page);
     }
 
 
