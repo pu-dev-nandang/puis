@@ -285,6 +285,16 @@ class C_rest3 extends CI_Controller {
                    $arr_year[] = $i;
                 }
 
+                $AndWhere = '';
+                if (array_key_exists('StatusForlap',$dataToken) ) {
+                    if ($dataToken['StatusForlap'] == '%') {
+                        $AndWhere = '';
+                    }
+                    else {
+                        $AndWhere = ' AND StatusForlap = "'.$dataToken['StatusForlap'].'" ';
+                    }
+                }
+
                 $sql = 'select a.*,b.Position as JabatanAkademik from db_employees.employees as a
                     left join db_employees.lecturer_academic_position as b on a.LecturerAcademicPositionID = b.ID  
                      where ( 
@@ -292,7 +302,7 @@ class C_rest3 extends CI_Controller {
                                 SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
                                 SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
                                 SPLIT_STR(a.PositionOther3, ".", 2) = 7
-                            ) and StatusForlap != "0" and ProdiID = ? and a.StatusEmployeeID = 1';
+                            ) and StatusForlap  is not null and ProdiID = ? and StatusForlap != "" '.$AndWhere;
                 $query=$this->db->query($sql, array($ProdiID))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                     $NIP = $query[$i]['NIP'];
