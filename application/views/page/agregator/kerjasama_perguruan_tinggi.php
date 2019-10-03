@@ -2,7 +2,7 @@
     #TblKerjaSama tr th, #TblKerjaSama tr td {
         text-align: center;
     }
-    
+
     #TblKerjaSama tr td {
         vertical-align : middle;
         text-align:center;
@@ -46,7 +46,7 @@
                 </div>
             </div>
         </div>
-
+        <p style="color: orangered;">*) Yang terhitung hanya kerja sama yang melakukan kegiatan</p>
     </div>
 
 </div>
@@ -124,7 +124,7 @@
           var token = jwt_encode(data,"UAP)(*");
           FormSubmitAuto(url, 'POST', [
               { name: 'token', value: token },
-          ]);  
+          ]);
         }
     })
 </script>

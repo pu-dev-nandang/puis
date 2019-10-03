@@ -36,6 +36,8 @@
 
         </div>
     </div>
+    <p style="color: orangered;">*) Sarjana : Guru Besar >= 15% , Score : 4 <br>
+       **) Vokasi : Lektor kepala >= 25%, Score : 4</p>
 </div>
 
 <script>
@@ -63,7 +65,7 @@
                     var total = 0;
                     $.each(v.details,function (i2, v2) {
 
-                      var det = v2.dataEmployees.length; 
+                      var det = v2.dataEmployees.length;
                         var toModal = {
                             Position : v2.Position,
                             Level : v.Description,
@@ -76,7 +78,7 @@
                        td = td+'<td>'+viewLect+'</td>';
 
                         total = total + parseInt(v2.dataEmployees.length);
-                        
+
                         if(i2==0){
                             TP = TP+det; //tenaga pengajar
                         }
@@ -112,9 +114,9 @@
                     '<th class="tdJml">'+J+'</th>' +
                     '<th class="tdJml">'+GB+'</th>' +
                     '<th class="tdJml">'+LK+'</th>' +
-                    
-                   
-                    
+
+
+
                                        '</tr>');
 
             }
