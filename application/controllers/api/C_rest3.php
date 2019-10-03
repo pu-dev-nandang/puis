@@ -739,4 +739,71 @@ class C_rest3 extends CI_Controller {
         
     }
 
+    public function APS_CrudAgregatorTB7()
+    {
+        $dataToken = $this->data['dataToken'];
+        $mode = $dataToken['mode'];
+        if ($mode == 'IPKLulusan') {
+            $rs = [];
+            $ProdiID = $dataToken['ProdiID'];
+            $G_smt = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $YearNow = $G_smt[0]['Year'];
+            $YearSt = $YearNow - 2;
+
+            $arr_year = [];
+
+            for ($i=$YearSt; $i <= $YearNow ; $i++) { 
+                $arr_year[] = $i;
+            }
+
+            for ($i=0; $i < count($arr_year); $i++) { 
+                $temp = [];
+                $temp[] = $arr_year[$i];
+                // get lulusan
+                $sql = 'select NPM,Name,Year from db_academic.auth_students where GraduationYear = '.$arr_year[$i].' AND ProdiID = '.$ProdiID;
+                $query=$this->db->query($sql, array())->result_array();
+                $token = $this->jwt->encode($query,"UAP)(*");
+
+                $temp[] = ['Count'=> count($query),'token' => $token ];
+
+                $temp2 = [];
+                for ($k=0; $k < count($query); $k++) { 
+                    $TADB = 'ta_'.$query[$k]['Year'];
+                    $NPM = $query[$k]['NPM'];
+                    $sql1 = 'select * from '.$TADB.'.study_planning where NPM = ?';
+                    $query1=$this->db->query($sql1, array($NPM))->result_array();
+                    $GradeValueCredit = 0;
+                    $Credit = 0;
+                    $IPK = 0;
+                    for ($l=0; $l < count($query1); $l++) {
+                        $GradeValue = $query1[$l]['GradeValue'];
+                        $CreditSub = $query1[$l]['Credit'];
+                        $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+                        $Credit = $Credit + $CreditSub;
+                    }
+
+                    $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                    $temp2[] = $IPK;
+                }
+
+                if (count($temp2) > 0) {
+                    $temp[] = min($temp2);
+                    $temp[] = array_sum($temp2)/count($temp2);
+                    $temp[] = max($temp2);
+                }
+                else {
+                    $temp[] = 0;
+                    $temp[] = 0;
+                    $temp[] = 0;
+                }
+                
+                $rs[] = $temp;
+            }
+
+            echo json_encode($rs);
+
+        }
+        
+    }
+
 }
