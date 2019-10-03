@@ -42,7 +42,7 @@
                 data-dpt="human-resources">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/hr.png'); ?>"></span>
-                    <span class="title">Human Resources</span>
+                    <span class="title">HR</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='general-affair'){echo 'current';} ?>"
@@ -50,7 +50,7 @@
                 data-dpt="general-affair">
                 <a href="javascript:void(0);">
                     <span class="image"><img src="<?php echo base_url('assets/icon/ga.png'); ?>"></span>
-                    <span class="title">General Affair</span>
+                    <span class="title">GA</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='cooperation'){echo 'current';} ?>"
@@ -133,7 +133,7 @@
                 division="5"
                 data-dpt="research">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/research.png'); ?>"></span>
                     <span class="title">Research</span>
                 </a>
             </li>
@@ -141,7 +141,7 @@
                 division="38"
                 data-dpt="abdimas">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/abdimas.png'); ?>"></span>
                     <span class="title">Abdimas</span>
                 </a>
             </li>
@@ -149,7 +149,7 @@
                 division="17"
                 data-dpt="marcom">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/marcom.png'); ?>"></span>
                     <span class="title">Marcom</span>
                 </a>
             </li>
@@ -157,7 +157,7 @@
                 division="19"
                 data-dpt="pu-x">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/pu-x.png'); ?>"></span>
                     <span class="title">PU-X</span>
                 </a>
             </li>
@@ -165,7 +165,7 @@
                 division="20"
                 data-dpt="pucel">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/pucel.png'); ?>"></span>
                     <span class="title">Pucel</span>
                 </a>
             </li>
@@ -173,23 +173,15 @@
                 division="1"
                 data-dpt="yayasan">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/yayasan.png'); ?>"></span>
                     <span class="title">Yayasan</span>
-                </a>
-            </li>
-            <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
-                division="36"
-                data-dpt="other-division">
-                <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
-                    <span class="title">Other</span>
                 </a>
             </li>
             <li class="departement <?php if($departement=='learning-development-center'){echo 'current';} ?>"
                 division="39"
                 data-dpt="learning-development-center">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/ldc.png'); ?>"></span>
                     <span class="title">Learning & Development Center</span>
                 </a>
             </li>
@@ -197,8 +189,17 @@
                 division="40"
                 data-dpt="pu-press">
                 <a href="javascript:void(0);">
-                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="image"><img src="<?php echo base_url('assets/icon/press.png'); ?>"></span>
                     <span class="title">PU Press</span>
+                </a>
+            </li>
+
+            <li class="departement <?php if($departement=='other-division'){echo 'current';} ?>"
+                division="36"
+                data-dpt="other-division">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="title">Other</span>
                 </a>
             </li>
         </ul>
