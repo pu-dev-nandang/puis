@@ -60,7 +60,6 @@ $route['my-activities'] = 'dashboard/c_dashboard/myactivities';
 $route['profile/(:any)'] = 'dashboard/c_dashboard/profile/$1';
 $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
-
 // === Academic ===
 $route['academic/curriculum_cross/(:any)/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1/$2';
 $route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
@@ -1157,6 +1156,26 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 
 // Penutup API 2 ===
+
+// ==== API Prodi yamin=== //
+
+$route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
+
+// ==== API Prodi yamin=== //
+
+// =======================//
+// ====== Prodi yamin ====\\
+// =======================//
+
+$route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
+// ---- Prodi CMS ----- //
+$route['prodi/beranda/overview'] =  'page/admin-prodi/beranda/c_home/overview';
+$route['prodi/beranda/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$route['prodi/beranda/calltoaction'] =  'page/admin-prodi/beranda/c_home/calltoaction';
+$route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
+// =======================//
+// ====== Prodi yamin ====\\
+// =======================//
 
 
 $route['__resetPasswordUser'] = 'c_login/resetPasswordUser';
