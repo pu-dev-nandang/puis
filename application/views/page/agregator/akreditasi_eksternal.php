@@ -56,13 +56,15 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-9">
             <div style="text-align: right;"> <button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
         </div>
-
-    </div>
+<p style="color: orangered;">
+  *) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau uni yang relevan <br>
+ **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
+  </div>
 </div>
 
 
@@ -87,12 +89,12 @@
                     }
                 });
         }
-     
+
             loadDataTable();
         });
 
     $("#btndownloaadExcel").click(function(){
-     
+
         var akred = "0";
         var url = base_url_js+'agregator/excel_akreditasi_eksternal';
         data = {
@@ -103,7 +105,7 @@
             { name: 'token', value: token },
         ]);
     })
-    
+
     $('#btnLembagaSurview').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -172,7 +174,7 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    if(jsonResult==0 || jsonResult=='0') { 
+                    if(jsonResult==0 || jsonResult=='0') {
                         toastr.error('Maaf nama Lembaga sudah Ada!','Error');
                         $('#btnSaveLembaga').html('Save').prop('disabled',false);
 
@@ -195,7 +197,7 @@
             }
 
         });
-        
+
     });
 
 
@@ -216,7 +218,7 @@
                         '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
                         '<td style="text-align: left;"><div class="btn-group btnAction"> '+
                         '        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+
-                        '            <i class="fa fa-pencil"></i> <span class="caret"></span> '+ 
+                        '            <i class="fa fa-pencil"></i> <span class="caret"></span> '+
                         '        </button>  '+
                         '        <ul class="dropdown-menu"> '+
                         '            <li><a class="btnEditLV_" data-no="'+v.ID+'" data-lembaga="'+v.Lembaga+'"  data-desc="'+v.Description+'"><i class="fa fa fa-edit"></i> Edit</a></li> '+
@@ -248,7 +250,7 @@
         var Description = $(this).attr('data-desc');
         //var dataForm = $('#btnEditLV_'+no).val();
         //var dataForm = JSON.parse(dataForm);
-       
+
         $('#formID').val(ID);
         $('#formLembaga').val(Lembaga);
         $('#formDescription').val(Description);
@@ -256,21 +258,21 @@
     });
 
     $(document).on('click','.btnDeleteLV',function () {
-        
+
         if(confirm('Yakin Hapus data?')) {
-    
+
             $('.btnDeleteLV').prop('disabled',true);
-    
+
             var no = $(this).attr('data-no');
             var url = base_url_js+'api3/__crudAgregatorTB1';
-    
+
             var data = {
                 action: 'removeDataMasterSurvey',
                 ID : no
             };
-    
+
             var token = jwt_encode(data,'UAP)(*');
-    
+
             $.post(url,{token:token},function (result) {
 
                 $('#formID').val('');
@@ -283,29 +285,29 @@
                 setTimeout(function () {
                     //loadDataTable();
                 },500);
-    
+
            });
         }
     });
 
     $(document).on('click','.btnRemove',function () {
-        
+
         if(confirm('Yakin Hapus data?')) {
-    
+
             $('.btnDeleteLV').prop('disabled',true);
-    
+
             var no = $(this).attr('data-id');
             var url = base_url_js+'api3/__crudAgregatorTB1';
-    
+
             var data = {
                 action: 'removeAkreditasi_eks',
                 ID : no
             };
-    
+
             var token = jwt_encode(data,'UAP)(*');
-    
+
             $.post(url,{token:token},function (result) {
-    
+
                 toastr.success('Data removed','Success');
                 loadDataTable();
 
@@ -319,7 +321,7 @@
                 setTimeout(function () {
                     //loadDataTable();
                 },500);
-    
+
            });
         }
     });

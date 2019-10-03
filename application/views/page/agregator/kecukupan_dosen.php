@@ -38,7 +38,8 @@
                 <tbody id="listTable"></tbody>
             </table>
 
-            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK)</p>
+            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK) dan all status <br>
+               **) Daftar dosen harus sesuai dengan data PD-DIKTI (pangkalan data pendidikan tinggi)</p>
         </div>
 
     </div>
@@ -53,7 +54,7 @@
     });
 
     $("#btndownloaadExcel").click(function(){
-     
+
         var akred = "0";
         var url = base_url_js+'agregator/excel-kecukupan-dosen';
         data = {
@@ -171,5 +172,5 @@
     });
 
 
-    
+
 </script>

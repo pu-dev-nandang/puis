@@ -22,6 +22,10 @@
             <br/>
             <div id="viewTable"></div>
         </div>
+        <p style="color: orangered;">
+            *) Tanggal Lulus - Tanggal SK penerimaan mahasiswa (hitungan dalam bulan)
+
+        </p>
     </div>
 </div>
 <script>
@@ -139,10 +143,10 @@
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
                                     '<td>'+ dt[i].NPM + '</td>'+
                                     '<td>'+ dt[i].Name + '</td>'+
-                                '</tr>';    
+                                '</tr>';
                     }
 
-                    html  += '</tbody></table></div></div>';                
+                    html  += '</tbody></table></div></div>';
 
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -155,5 +159,5 @@
             });
         }
     })
-    
+
 </script>

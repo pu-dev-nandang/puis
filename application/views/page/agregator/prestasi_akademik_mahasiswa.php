@@ -18,7 +18,9 @@
 
 
         </div>
-
+        <p style="color: orangered;">
+            *) Akademik : minimal 0.05 % dari total mahasiswa aktif. (Nilai terbesar adalah tingkat internasional)
+        </p>
     </div>
 
 </div>
@@ -60,7 +62,7 @@
 
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregatorTB5';
-        
+
         $.post(url,{token:token},function (jsonResult) {
 
             if(jsonResult.length>0){

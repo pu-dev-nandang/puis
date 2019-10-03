@@ -9,13 +9,16 @@
              <div id="viewTable"></div>
         </div>
     </div>
+    <p style="color: orangered;">
+        *) Rata-rata IPK harus >= 3.25 , Score : 4
+    </p>
 </div>
 
 <script>
     $(document).ready(function () {
         loadIPK();
     });
-    
+
     function loadIPK() {
 
         var data = {
@@ -35,10 +38,10 @@
                                         '<th colspan="3" style="border-right: 1px solid #ccc; text-align: center">Rata-rata IPK Lulusan pada</th>'+
                                         '<th style="border-right: 1px solid #ccc;"></th>'+
                                     '</tr>'+
-                                    '<tr>';    
+                                    '<tr>';
 
            var header = jsonResult.header;
-           var arr_total = [];  
+           var arr_total = [];
            for (var i = 0; i < header.length; i++) {
                 HtmlTable += '<td>'+header[i]+'</td>';
                 if (i >= 2 && i <= 5) { // define total Jumlah PS dan Jumlah Lulusan pada
@@ -72,7 +75,7 @@
                             {
                                 htmlBody += '<td><a href = "javascript:void(0);" class = "datadetail" data = "'+arr_body[j].data+'">'+arr_body[j].show+'</a></td>';
                             }
-                            
+
                         }
                         if (j >= 1) { // isi total Jumlah PS dan Jumlah Lulusan pada
                             arr_total[(j-1)] = parseInt(arr_total[(j-1)]) + parseInt(arr_body[j].show);
@@ -88,7 +91,7 @@
                 htmlBody += '</tr>';
             }
 
-            $('#listData').append(htmlBody);  
+            $('#listData').append(htmlBody);
 
             // console.log(arr_total);
             var tbl = $('#listData').closest('table');
@@ -102,10 +105,10 @@
                         '<td colspan = "2">Jumlah</td>'+
                         isian+
                     '</tr>'+
-                '</tfoot>'        
+                '</tfoot>'
                 );
 
-        });    
+        });
     }
 
     $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
@@ -130,10 +133,10 @@
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
                                     '<td>'+ dt[i].NPM + '</td>'+
                                     '<td>'+ dt[i].Name + '</td>'+
-                                '</tr>';    
+                                '</tr>';
                     }
 
-                    html  += '</tbody></table></div></div>';                
+                    html  += '</tbody></table></div></div>';
 
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -167,10 +170,10 @@
                         html += '<tr>'+
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
                                     '<td>'+ dt[i].Name + '</td>'+
-                                '</tr>';    
+                                '</tr>';
                     }
 
-                    html  += '</tbody></table></div></div>';                
+                    html  += '</tbody></table></div></div>';
 
 
             $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +

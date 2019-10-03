@@ -33,6 +33,7 @@
                 <tbody id="listData"></tbody>
             </table>
             <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NUP)</p>
+            <p style="color: orangered;">**) Total dosen tidak tetap seharusnya =< 10%, Score : 4</p>
         </div>
     </div>
 </div>
@@ -57,7 +58,7 @@
                 var TP = 0;
                 var J = 0;
                 $.each(jsonResult,function (i,v) {
-                   
+
                     var td = '';
                     var total = 0;
                     $.each(v.details,function (i2, v2) {
@@ -70,7 +71,7 @@
                         };
                         var tokenLect = jwt_encode(toModal,'UAP)(*');
                         var viewLect = (v2.dataEmployees.length>0) ? '<a href="javascript:void(0);" class="showDetailLect" data-lec="'+tokenLect+'">'+v2.dataEmployees.length+'</a>' : v2.dataEmployees.length;
-                        
+
                         td = td+'<td>'+viewLect+'</td>';
 
                         total = total + parseInt(v2.dataEmployees.length);
@@ -90,7 +91,7 @@
                         else if(i2==4){
                             TP = TP+det; //tenaga pengajar
                         }
-                        
+
                     });
 
                     $('#listData').append('<tr>' +
