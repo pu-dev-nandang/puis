@@ -1335,6 +1335,7 @@ $route['agregator/prestasi-akademik-mahasiswa'] = 'page/agregator/c_agregator/pr
 $route['agregator/prestasi-non-akademik-mahasiswa'] = 'page/agregator/c_agregator/prestasi_non_akademik_mahasiswa';
 $route['agregator/lama-studi-mahasiswa'] = 'page/agregator/c_agregator/lama_studi_mahasiswa';
 $route['agregator/rasio-kelulusan'] = 'page/agregator/c_agregator/rasio_kelulusan';
+$route['agregator/table-refrensi'] = 'page/agregator/c_agregator/table_refrensi';
 $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 $route['agregator/kepuasan_pengguna_lulusan'] = 'page/agregator/c_agregator/kepuasan_pengguna_lulusan';
@@ -1465,6 +1466,8 @@ $route['api3/__crudAllProgramStudy'] = 'api/c_api3/crudAllProgramStudy';
 $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
 
 $route['api3/__crudTracerAlumni'] = 'api/c_api3/crudTracerAlumni';
+
+$route['api3/__getLanguagelabels'] = 'api/c_api3/getLanguagelabels';
 
 
 // Agregator Adhi
