@@ -3342,4 +3342,59 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         // print_r($query);die();
         return $query;
     }
+
+    public function getDateIndonesian($date){
+    	date_default_timezone_set("Asia/Jakarta");
+    	setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
+    	
+        $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
+        $data = strftime($e." %B %Y",strtotime($date));
+
+        $result = str_replace('Pebruari', 'Februari', $data);
+
+        return $result;
+
+    }
+
+    public function ShowDBLikes($like='ta_')
+    {
+        $data = [];
+            $sql = "show databases like '".$like."%'";
+            $query=$this->db->query($sql, array())->result_array();
+            for ($i=0; $i < count($query); $i++) {
+                $variable = $query[$i]; 
+                foreach ($variable as $key => $value) {
+                    $data[] = $value;
+                }
+            }
+        return $data;    
+    }
+
+    public function cekConectDb($vardb = 'server22')
+    {
+        $db_obj = $this->load->database($vardb, TRUE);
+        $connected = $db_obj->initialize();
+        if (!$connected) {
+            return false;
+        }
+        else{
+            return true;
+        } 
+    }
+
+    public function deleteDir($dirPath) {
+        $dir = $dirPath;
+        
+        $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+        $files = new RecursiveIteratorIterator($it,
+                    RecursiveIteratorIterator::CHILD_FIRST);
+        foreach($files as $file) {
+            if ($file->isDir()){
+                rmdir($file->getRealPath());
+            } else {
+                unlink($file->getRealPath());
+            }
+        }
+        rmdir($dir);
+    }
 }

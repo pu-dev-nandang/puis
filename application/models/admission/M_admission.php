@@ -10,6 +10,7 @@ class M_admission extends CI_Model {
   public function __construct()
     {
         parent::__construct();
+        $this->load->model('master/m_master');
     }
 
     public function count_calon_mahasiswa()
@@ -533,8 +534,8 @@ class M_admission extends CI_Model {
         $status = '';
       }
 
-        $sql = 'select a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
-          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone
+        $sql = 'select a.ID,a.NameCandidate,a.Email,a.SchoolName,b.FormulirCode,a.StatusReg,b.Years,b.Status as StatusUsed,b.No_Ref,a.Phone from (
+          select a.Name as NameCandidate,a.Email,z.SchoolName,c.FormulirCode,a.StatusReg,a.Phone,a.ID
           from db_admission.register as a
           join db_admission.register_verification as b
           on a.ID = b.RegisterID
@@ -3833,7 +3834,36 @@ class M_admission extends CI_Model {
 
     }
 
-    public function getIntakeByYear($Year)
+    public function cekDBLibraryExistSTD($NPM)
+    {
+      $this->db_server22 = $this->load->database('server22', TRUE);
+      $sql = 'select count(*) as total from library.member where member_id = "'.$NPM.'" ';
+      $query=$this->db_server22->query($sql, array())->result_array();
+      if ($query[0]['total'] > 0) {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    public function DelDBLibraryExistSTD($NPM)
+    {
+      $this->db_server22 = $this->load->database('server22', TRUE);
+      $this->db_server22->where('member_id',$NPM);
+      $this->db_server22->delete('library.member'); 
+      if ($this->db_server22->affected_rows() > 0 )
+      {
+        return TRUE;
+      }
+      else
+      {
+        return FALSE;
+      }
+    }
+
+    public function getIntakeByYear($Year,$datechoose = null)
     {
       $this->load->model('master/m_master');
       $this->load->model('statistik/m_statistik');
@@ -3844,12 +3874,18 @@ class M_admission extends CI_Model {
         Find Faculty active by program study
       */
        $G_Faculty = $this->m_master->facultyActiveByProgramStudy();
-       $GetDateNow = date('Y-m-d');
+       $GetDateNow = ($datechoose == null ) ? date('Y-m-d') : $datechoose;
+       $DateFiltering = $GetDateNow;
        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
        // get date satu minggu sebelumnya
-       $MingguWr = $this->m_master->GetDateAfterOrBefore(date('Y-m-d'),'-7');
+       $MingguWr = $this->m_master->GetDateAfterOrBefore($DateFiltering,'-7');
+       $DateFiltering2 = $MingguWr;
        $MingguWr = $this->m_master->getIndoBulan($MingguWr);
 
+       // get date last year
+       $DateFiltering2  = explode('-', $DateFiltering);
+       $DateFiltering2 = ($DateFiltering2[0] - 1).'-'.($DateFiltering2[1]).'-'.($DateFiltering2[2]);
+       // print_r($DateFiltering2);die();
        for ($i=0; $i < count($G_Faculty); $i++) {
          $FacultyID = $G_Faculty[$i]['FacultyID'];
          $temp['Faculty'] = $G_Faculty[$i]['Name'];
@@ -3878,14 +3914,24 @@ class M_admission extends CI_Model {
          $arr_temp = array();
          for ($j=0; $j < count($G_program_study); $j++) {
            $temp['Prodi'][] = $G_program_study[$j]['Name'];
-           // cari intake tahun lalu dulu
+           // cari intake tahun lalu dulu berdasarkan tannggal yang dipilih
               $ProdiID = $G_program_study[$j]['ID'];
               // check table existing
                $ChkTblExist = $this->m_statistik->table_Exist('rekapintakeadm_'.($Year-1));
-               if ($ChkTblExist) {
-                 $query = $this->m_master->caribasedprimary('db_statistik.rekapintakeadm_'.($Year-1),'ProdiID',$ProdiID);
-                 $total = $query[0]['Total'];
-                 $c1 = $total;
+               // year 2018 ke bawah datanya tidak ada
+               if (($Year-1) <= 2018) {
+                if ($ChkTblExist) {
+                  $query = $this->m_master->caribasedprimary('db_statistik.rekapintakeadm_'.($Year-1),'ProdiID',$ProdiID);
+                  $total = 0;
+                  if (count($query) > 0) {
+                     $total = $query[0]['Total'];
+                  }
+                  $c1 = $total;
+                }
+                else
+                {
+                  $c1 = 0;
+                }
                }
                else
                {
@@ -3896,7 +3942,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering2.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3928,7 +3974,7 @@ class M_admission extends CI_Model {
                         (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                         if(a.StatusReg = 1,
                         (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID ) as C_bayar
+                        (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= "'.$DateFiltering.'") as C_bayar
                         from db_admission.register as a
                         join db_admission.school as b on a.SchoolID = b.ID
                         LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3938,6 +3984,7 @@ class M_admission extends CI_Model {
                         left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                          where a.SetTa = "'.$Year.'"
                         ) ccc where ID_program_study = ? and C_bayar > 0';
+
                         $query=$this->db->query($sql, array($ProdiID))->result_array();
                         $total = $query[0]['total'];
               }
@@ -3959,7 +4006,7 @@ class M_admission extends CI_Model {
                           (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,"" ) as No_Ref,
                           if(a.StatusReg = 1,
                           (select DateFin from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,a.RegisterAT ) as intakedate,
-                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB(NOW(), INTERVAL 7 DAY) ) as C_bayar
+                          (select count(*) as total from db_finance.payment_pre where Status = 1 and ID_register_formulir = e.ID and Datepayment <= DATE_SUB("'.$DateFiltering.'", INTERVAL 7 DAY) ) as C_bayar
                           from db_admission.register as a
                           join db_admission.school as b on a.SchoolID = b.ID
                           LEFT JOIN db_admission.register_verification as z on a.ID = z.RegisterID
@@ -3969,6 +4016,7 @@ class M_admission extends CI_Model {
                           left join db_admission.sale_formulir_offline as xz on c.FormulirCode = xz.FormulirCodeOffline
                            where a.SetTa = "'.$Year.'"
                           ) ccc where ID_program_study = ? and C_bayar > 0';
+
                           $query=$this->db->query($sql, array($ProdiID))->result_array();
                           $total = $query[0]['total'];
                 }
@@ -3984,6 +4032,232 @@ class M_admission extends CI_Model {
        }
 
        return $rs;
+    }
+
+    public function proses_agregator_seleksi_mhs_baru($Year,$Nasional=null) // Ket Nasional => Null = All, Nasinal dan Internasional = asing
+    {
+     
+      /*
+        Data yang ada pada database adalah data dari 2019 keatas
+        Data yang 2019 kebawah dinputkan
+        Field : 
+          -- Daya tampung => table db_admission.ta_setting
+          -- Pendaftar => Yang mengembalikan formulir
+                          -> table db_admission.register_formulir
+          -- Lulus Seleksi => Yang di generate to be mhs
+                          -> table db_admission.to_be_mhs
+          -- Jml Mhs Baru -> sama dengan lulus seleksi
+          -- jml mhs -> sama dengan lulus seleksi
+          -- transfer -> 0
+          -- transfer -> 0
+      */
+
+        // cek data exist 
+        $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        for ($i=0; $i < count($G_prodi); $i++) { 
+          $ProdiID = $G_prodi[$i]['ID'];
+          $this->proses_agregator_seleksi_mhs_baru_by_prodi($Year,$ProdiID,$Nasional);
+        }
+         
+
+    }
+
+    public function proses_agregator_seleksi_mhs_baru_by_prodi($Year,$ProdiID,$Nasional=null)
+    {
+      $q_add = ($Nasional == null) ? '' : ' and Type = "'.$Nasional.'" ';
+      $sql = 'select * from db_agregator.student_selection where Year = ? and ProdiID = ? '.$q_add;
+      $query=$this->db->query($sql, array($Year,$ProdiID))->result_array();
+      if (count($query) == 0) {
+        $G_capacity = function($ProdiID,$Year){
+           $sql2 = 'select b.Capacity from db_admission.crm_period as a
+                   join db_admission.ta_setting as b on a.ID = b.ID_crm_period
+                   where a.Year = ? and b.ProdiID = ?
+                  ';
+           $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+           return $query2[0]['Capacity'];
+        };
+
+        $G_Pendaftar = function($ProdiID,$Year,$Nasional){
+          $q_add = '';
+          if ($Nasional != null && $Nasional != '') {
+            if ($Nasional == 'Nasional') {
+              $q_add = ' and d.NationalityID = "001" ';
+            }
+            else
+            {
+               $q_add = ' and d.NationalityID != "001" ';
+            }
+          }
+           $sql2 = 'select count(*) as total from (
+             select a.ID from db_admission.register as a
+             join db_admission.register_verification as b on a.ID = b.RegisterID
+             join db_admission.register_verified as c on b.ID = c.RegVerificationID
+             join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+             where a.SetTa = ? and d.ID_program_study = ? '.$q_add.'
+             ) xx';
+           $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+           return $query2[0]['total'];
+        };
+
+        $G_lulus = function($ProdiID,$Year,$Nasional)
+        {
+          $q_add = '';
+          if ($Nasional != null && $Nasional != '') {
+            if ($Nasional == 'Nasional') {
+              $q_add = ' and d.NationalityID = "001" ';
+            }
+            else
+            {
+               $q_add = ' and d.NationalityID != "001" ';
+            }
+          }
+           $sql2 = 'select count(*) as total from (
+             select a.ID from db_admission.register as a
+             join db_admission.register_verification as b on a.ID = b.RegisterID
+             join db_admission.register_verified as c on b.ID = c.RegVerificationID
+             join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+             join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+             where a.SetTa = ? and d.ID_program_study = ? '.$q_add.'
+             ) xx';
+           $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+           return $query2[0]['total'];
+        };
+
+        $Capacity = $G_capacity($ProdiID,$Year,$Nasional);
+        $EntredAt = date('Y-m-d H:i:s');
+        $EntredBy = '0';
+        $PassSelection = $G_lulus($ProdiID,$Year,$Nasional);
+        // $ProdiID = '';
+        $ProdiName = '';
+        $Registrant = $G_Pendaftar($ProdiID,$Year,$Nasional);
+        $Regular = $PassSelection;
+        $Regular2 = $PassSelection;
+        $TotalStudemt = $PassSelection;
+        $Transfer = 0;
+        $Transfer2 = 0;
+        $Type = ($Nasional == null) ? 'Nasional' : $Nasional;
+        $dataSave = [
+          'Capacity' => $Capacity,
+          'EntredAt' => $EntredAt,
+          'EntredBy' => $EntredBy,
+          'PassSelection' => $PassSelection,
+          'ProdiID' => $ProdiID,
+          'Registrant' => $Registrant,
+          'Regular' => $Regular,
+          'Regular2' => $Regular2,
+          'TotalStudemt' => $TotalStudemt,
+          'Transfer' => $Transfer,
+          'Transfer2' => $Transfer2,
+          'Type' => $Type,
+          'Year' => $Year,
+        ];
+
+        $this->db->insert('db_agregator.student_selection',$dataSave);
+      }
+      else
+      {
+         $ID = $query[0]['ID'];
+        /*
+          angkatan >= 2019
+            Data Capacity Fix dari Admission
+            Pendaftar & lulus ambil dari data admission (auto update)
+        */
+
+        if ($Year >= 2019) {
+          $G_capacity = function($ProdiID,$Year){
+             $sql2 = 'select b.Capacity from db_admission.crm_period as a
+                     join db_admission.ta_setting as b on a.ID = b.ID_crm_period
+                     where a.Year = ? and b.ProdiID = ?
+                    ';
+             $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+             return $query2[0]['Capacity'];
+          };
+
+          $G_Pendaftar = function($ProdiID,$Year,$Nasional){
+            $q_add = '';
+            if ($Nasional != null && $Nasional != '') {
+              if ($Nasional == 'Nasional') {
+                $q_add = ' and d.NationalityID = "001" ';
+              }
+              else
+              {
+                 $q_add = ' and d.NationalityID != "001" ';
+              }
+            }
+             $sql2 = 'select count(*) as total from (
+               select a.ID from db_admission.register as a
+               join db_admission.register_verification as b on a.ID = b.RegisterID
+               join db_admission.register_verified as c on b.ID = c.RegVerificationID
+               join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+               where a.SetTa = ? and d.ID_program_study = ? '.$q_add.'
+               ) xx';
+             $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+             return $query2[0]['total'];
+          };
+
+          $G_lulus = function($ProdiID,$Year,$Nasional)
+          {
+            $q_add = '';
+            if ($Nasional != null && $Nasional != '') {
+              if ($Nasional == 'Nasional') {
+                $q_add = ' and d.NationalityID = "001" ';
+              }
+              else
+              {
+                 $q_add = ' and d.NationalityID != "001" ';
+              }
+            }
+             $sql2 = 'select count(*) as total from (
+               select a.ID from db_admission.register as a
+               join db_admission.register_verification as b on a.ID = b.RegisterID
+               join db_admission.register_verified as c on b.ID = c.RegVerificationID
+               join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+               join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+               where a.SetTa = ? and d.ID_program_study = ? '.$q_add.'
+               ) xx';
+             $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+             return $query2[0]['total'];
+          };
+
+          $Capacity = $G_capacity($ProdiID,$Year,$Nasional);
+          $PassSelection = $G_lulus($ProdiID,$Year,$Nasional);
+          $Registrant = $G_Pendaftar($ProdiID,$Year,$Nasional);
+          $Regular = $PassSelection;
+          $Regular2 = $PassSelection;
+          $TotalStudemt = $PassSelection;
+
+          $dataSave = [
+            'Capacity' => $Capacity,
+            'PassSelection' => $PassSelection,
+            'Registrant' => $Registrant,
+            'Regular' => $Regular,
+            'Regular2' => $Regular2,
+            'TotalStudemt' => $TotalStudemt,
+          ];
+
+          $this->db->where('ID',$ID);
+          $this->db->update('db_agregator.student_selection',$dataSave);
+
+        }
+        else
+        {
+          $G_capacity = function($ProdiID,$Year){
+             $sql2 = 'select b.Capacity from db_admission.crm_period as a
+                     join db_admission.ta_setting as b on a.ID = b.ID_crm_period
+                     where a.Year = ? and b.ProdiID = ?
+                    ';
+             $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+             return $query2[0]['Capacity'];
+          };
+
+          $dataSave = [
+            'Capacity' => $G_capacity($ProdiID,$Year),
+          ];
+
+          $this->db->where('ID',$ID);
+          $this->db->update('db_agregator.student_selection',$dataSave);
+        }
+      }
     }
 
 }

@@ -809,7 +809,7 @@ class M_api extends CI_Model {
 
      public function views_files1($NIP,$srata) {
 
-             $sql = "SELECT NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
+             $sql = "SELECT ID, NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
                     FROM db_employees.files
                     WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
              $query=$this->db->query($sql, array());
@@ -850,14 +850,14 @@ class M_api extends CI_Model {
 
      public function delistacademicemployee($ID1, $ID2){
 
-        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID IN ('".$ID1."', '".$ID2."') ";
+        $sql = "DELETE  WHERE ID IN ('".$ID1."', '".$ID2."') ";
         $query=$this->db->query($sql);
 
      }
 
      public function delistotherfiles($ID1){
 
-        $sql = "UPDATE db_employees.files SET Active='0' WHERE ID = '".$ID1."' ";
+        $sql = "DELETE db_employees.files WHERE ID = '".$ID1."' ";
         $query=$this->db->query($sql);
 
      }
@@ -2340,9 +2340,11 @@ class M_api extends CI_Model {
     {
         // GET SET TA
         $this->load->model('master/m_master');
-        // $Q_Years = $this->m_master->showData_array('db_admission.set_ta');
-        // $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
         $Years = '';
+        if ($StatusJual == 0) {
+            $Q_Years = $this->m_master->showData_array('db_admission.set_ta');
+            $Years = ' and Years = "'.$Q_Years[0]['Ta'].'"';
+        }
 
         // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where StatusJual = ".$StatusJual." and Print = 1 ".$Years;
         // $sql = "select FormulirCode from db_admission.formulir_number_offline_m where Status = ".$StatusJual." and StatusJual = ".$StatusJual." ".$Years;

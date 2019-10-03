@@ -19,7 +19,8 @@
         <div class="col-md-12">
             <p style="color:#3968c6;"><b> HKI (Hak Cipta, Desain Produk Industri, dan lainnya)</b></p>
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
+                <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable"></div>
         </div>
@@ -27,7 +28,9 @@
 </div>
 
 <script>
-    
+    var oTable;
+    var oSettings;
+
      $('#btnLembagaMitra').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -78,6 +81,19 @@
             'backdrop' : 'static'
         });
 
+    });
+
+
+     $('#saveToExcel').click(function () {
+
+        $('select[name="dataTablesLuaran_length"]').val(-1);
+
+        oSettings[0]._iDisplayLength = oSettings[0].fnRecordsTotal();
+        oTable.draw();
+
+        setTimeout(function () {
+            saveTable2Excel('dataTable2Excel');
+        },1000);
     });
 
 </script>
@@ -135,6 +151,7 @@
 </script>
 
 <script>
+
     $(document).ready(function () {
 
         window.act = "<?= $accessUser; ?>";
@@ -149,7 +166,7 @@
 
          $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
             '    <thead>  '+
-            '     <tr>   '+
+            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
             '        <th style="text-align: center; width: 5%;">No</th>  '+
             '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
             '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
@@ -179,7 +196,9 @@
                 }
             }
                 
-            $('#dataTablesLuaran').dataTable();
+            //$('#dataTablesLuaran').dataTable();
+            oTable = $('#dataTablesLuaran').DataTable();
+            oSettings = oTable.settings();
         });
 
     }
@@ -187,7 +206,7 @@
     function hitungRow(cl) {
 
         var res = 0;
-        $(cl).each(function () {
+        $(cl).each(function () { 
             res += parseInt($(this).attr('data-val'));
         });
 

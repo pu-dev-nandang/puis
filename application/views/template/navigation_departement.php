@@ -185,6 +185,22 @@
                     <span class="title">Other</span>
                 </a>
             </li>
+            <li class="departement <?php if($departement=='learning-development-center'){echo 'current';} ?>"
+                division="39"
+                data-dpt="learning-development-center">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="title">Learning & Development Center</span>
+                </a>
+            </li>
+            <li class="departement <?php if($departement=='pu-press'){echo 'current';} ?>"
+                division="40"
+                data-dpt="pu-press">
+                <a href="javascript:void(0);">
+                    <span class="image"><img src="<?php echo base_url('assets/icon/other.png'); ?>"></span>
+                    <span class="title">PU Press</span>
+                </a>
+            </li>
         </ul>
     </div> <!-- /#frame -->
 </div> <!-- /#project-switcher -->

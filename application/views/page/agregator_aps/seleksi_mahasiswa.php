@@ -1,3 +1,4 @@
+<h3 align="center">Seleksi Mahasiswa</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div id="content_data">
 	

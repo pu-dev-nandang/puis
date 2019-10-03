@@ -1,7 +1,10 @@
 
 <style>
-    #tableData tr th, #tableData tr td {
+    .dataTable2Excel tr th, .dataTable2Excel tr td {
         text-align: center;
+    }
+    .dataTable2Excel tr td:nth-child(2) {
+        text-align: left;
     }
 </style>
 
@@ -11,7 +14,7 @@
         
         <div class="col-md-12">
             <div style="text-align: right;">
-                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> <p></p>
                 <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
             </div>
             <div id = "content_dt">
@@ -79,7 +82,7 @@
             var arr_header_table = jsonResult.header;
             var arr_total = [];
             // make table
-            var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPenelitian">'+
+            var htmlTable = '<table class = "table table-striped table-bordered dataTable2Excel" data-name="TabelProduktivitasPKMdosen">'+
                                 '<thead>'+
                                  '<tr style="background: #20485A;color: #FFFFFF;">'+
                                    '<td style="vertical-align : middle;text-align:center;width: 1%;" rowspan="2">No</td>'+
@@ -110,16 +113,23 @@
                                             '<td>'+No+'</td>';
                     var arr = arr_body_table[i];
                     for(var key in arr) {
-                        htmlTableBody += '<td>'+arr[key]+'</td>';
+                        var viewDataTb = (key==0) ? arr[key] : arr[key].length;
+                        var tokenPen = jwt_encode(arr[key],'UAP)(*');
+
+                        var isi = (viewDataTb!=0 && key!=0) ? '<a href="javascript:void(0);" class="showDetailLect"  data-pkm="'+tokenPen+'">'+viewDataTb+'</a>' : viewDataTb;
+                        //htmlTableBody += '<td>'+arr[key]+'</td>';
+                        htmlTableBody += '<td style="vertical-align : middle;">'+isi+'</td>';
                     }
 
                     for (var m = 1; m < arr.length; m++) {
                         // console.log(m + ' ,,' +arr[m]);
-                       arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m]);
-                       jumlahKanan += parseInt(arr[m]);
+                       //arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m]);
+                       //jumlahKanan += parseInt(arr[m]);
+                        arr_total[(m-1)] = parseInt(arr_total[(m-1)]) + parseInt(arr[m].length);
+                       jumlahKanan += parseInt(arr[m].length);
                     }
 
-                     htmlTableBody += '<td>'+jumlahKanan+'</td>';
+                     htmlTableBody += '<td style="vertical-align : middle;text-align:center;">'+jumlahKanan+'</td>';
                     htmlTableBody += '</tr>';
 
                     $('#listStd').append(htmlTableBody);
@@ -129,10 +139,10 @@
                 var isian = '';
                 var jumlahbawahkanan = 0;
                 for (var i = 0; i < arr_total.length; i++) {
-                    isian += '<td>'+arr_total[i]+'</td>';
+                    isian += '<td style="vertical-align : middle;text-align:center;">'+arr_total[i]+'</td>';
                     jumlahbawahkanan += parseInt(arr_total[i]);
                 }
-                isian += '<td>'+jumlahbawahkanan+'</td>';
+                isian += '<td style="vertical-align : middle;text-align:center;">'+jumlahbawahkanan+'</td>';
                 tbl.append(
                     '<tfoot>'+
                         '<tr>'+
@@ -150,4 +160,51 @@
         });
 
     }
+
+
+    $(document).on('click','.showDetailLect',function () {
+       var  tokenLect = $(this).attr('data-pkm');
+       var d = jwt_decode(tokenLect,'UAP)(*');
+       //console.log(d);
+       //return false;
+
+        var tr = '';
+        if(d.length>0){
+            $.each(d,function (i,v) {
+
+                //var NID = (v.NIDN!='' && v.NIDN!=null && v.NIDN!=0 && v.NIDN!='0') ? v.NIDN : '-';
+                //NID = (v.NIDK!='' && v.NIDK!=null && v.NIDK!=0 && v.NIDK!='0') ? v.NIDK : NID;
+
+               tr = tr+'<tr>' +
+                   '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                   '<td>'+v.Judul_PKM+'</td>' +
+                   '<td>'+v.Name+'</td>' +
+                   '</tr>';
+            });
+        }
+
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Judul PKM Dosen</h4>');
+        $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table table-striped table-bordered" id="tableLect" style="margin-bottom: 0px;">' +
+            '            <thead>' +
+            '            <tr style="background: #20485A;color: #FFFFFF;">' +
+            '                <th style="width: 5%;">No</th>' +
+            '                <th style="width: 25%;">Nama Judul</th>' +
+             '                <th style="width: 20%;">Nama Dosen</th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '            <tbody>'+tr+'</tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
 </script>

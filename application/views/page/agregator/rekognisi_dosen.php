@@ -48,6 +48,22 @@
             '                <label>Rekognisi </label> '+
             '                <input class="form-control" id="rekognisi" />' +
             '            </div>' +
+            '          <div class="form-group">' +
+            '                <label>Bukti Pendukung </label> '+
+            '                <input class="form-control" id="BuktiPendukungName" />' +
+            '            </div>' +
+            '          <div class="form-group">' +
+            '                <label>Bukti Pendukung Upload</label> '+
+            '                <input type="file" data-style="fileinput" class="input" name="BuktiPendukungUpload">' +
+            '            </div>' +
+                        '<div class="form-group">'+
+                           ' <label>Tingkat</label>'+
+                            '<select class="form-control input" ID ="Tingkat">'+
+                               ' <option value="Wilayah">Wilayah</option>'+
+                               ' <option value="Nasional">Nasional</option>'+
+                               ' <option value="Internasional">Internasional</option>'+
+                            '</select>'+
+                        '</div>'+
             '            <div class="form-group">' +
              '                <label>Tahun </label> '+
             '                 <input type="number"  class="form-control" id="tahun"/>' +
@@ -73,13 +89,17 @@
         });
 
         $('#btnSaveRekognisi').click(function () {
-
+            // Form
+            var form_data = new FormData();
             var formID = $('#formID').val();
             var nip = $('#nip').val();
             var bidang_keahlian = $('#bidang_keahlian').val();
             var rekognisi = $('#rekognisi').val();
             var tahun = $('#tahun').val();
-
+            var BuktiPendukungName = $('#BuktiPendukungName').val();
+            var Tingkat = $('#Tingkat option:selected').val();
+            var S_file = $('.input[name="BuktiPendukungUpload"]');
+            
             if(nip!='' && nip!=null &&
                 bidang_keahlian!='' && bidang_keahlian!=null &&
                 rekognisi!='' && rekognisi!=null &&
@@ -94,15 +114,32 @@
                         NIP : nip,
                         Bidang_keahlian : bidang_keahlian,
                         Rekognisi : rekognisi,
-                        Tahun : tahun
+                        Tahun : tahun,
+                        BuktiPendukungName : BuktiPendukungName,
+                        Tingkat : Tingkat,
                     }
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
                 var url = base_url_js+'api3/__crudAgregatorTB3';
+                form_data.append('token',token);
 
-                $.post(url,{token:token},function (result) {
+                // for upload
+                if ( S_file.length ) {
+                    var UploadFile = S_file[0].files;
+                    form_data.append("BuktiUpload[]", UploadFile[0]);
+                }
 
+                $.ajax({
+                  type:"POST",
+                  url:url,
+                  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+                  contentType: false,       // The content type used when sending data to the server.
+                  cache: false,             // To unable request pages to be cached
+                  processData:false,
+                  dataType: "json",
+                  success:function(result)
+                  {
                     if(result==0 || result=='0'){
                         toastr.error('Maaf, Gagal simpan data !','Error');
                     }
@@ -119,7 +156,32 @@
                     setTimeout(function () {
                         $('#GlobalModal').modal('hide');
                     },500);
-                });
+                 }, 
+                 error: function (data) {
+                    toastr.error("Connection Error, Please try again", 'Error!!');
+                    // $(el).prop('disabled',false).html('Save');
+                 }
+                })
+
+                // $.post(url,{token:token},function (result) {
+
+                //     if(result==0 || result=='0'){
+                //         toastr.error('Maaf, Gagal simpan data !','Error');
+                //     }
+                //     else {
+                //         loadRekognisiDosen();
+                //         $('#GlobalModal').modal('hide');
+                //         toastr.success('Data saved','Success');
+                //         $('#nama_dosen').val('');
+                //         $('#bidang_keahlian').val('');
+                //         $('#rekognisi').val('');
+                //         $('#tahun').val('');
+                //     }
+
+                //     setTimeout(function () {
+                //         $('#GlobalModal').modal('hide');
+                //     },500);
+                // });
 
             } else {
                 toastr.error('All form required','Error');

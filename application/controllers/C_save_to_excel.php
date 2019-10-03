@@ -2763,20 +2763,23 @@ class C_save_to_excel extends CI_Controller
 
     public function intake_Excel()
     {
+        // error_reporting(0);
         $token = $this->input->post('token');
         $key = "UAP)(*";
         $input = (array) $this->jwt->decode($token,$key);
         $this->load->model('admission/m_admission');
         $Year = $input['Year'];
-        $getData = $this->m_admission->getIntakeByYear($Year);
-        $this->getExcelIntake_admission($getData,$Year);
+        $datechoose = $input['datechoose'];
+        $getData = $this->m_admission->getIntakeByYear($Year,$datechoose);
+        $this->getExcelIntake_admission($getData,$Year,$datechoose);
     }
 
-    public function getExcelIntake_admission($getData,$Year)
+    public function getExcelIntake_admission($getData,$Year,$datechoose = null)
     {
         $GetDateNow = date('Y-m-d');
         $this->load->model('master/m_master');
-        $GetDateNow = $this->m_master->getIndoBulan($GetDateNow);
+        $GetDateNow = ($datechoose == null) ? $this->m_master->getIndoBulan($GetDateNow) : $this->m_master->getIndoBulan($datechoose) ;
+         // print_r($GetDateNow);die();
         include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         $excel2 = PHPExcel_IOFactory::createReader('Excel2007');
         $excel2 = $excel2->load('./uploads/admisi/rekap_intake.xlsx'); // Empty Sheet
@@ -4875,7 +4878,7 @@ class C_save_to_excel extends CI_Controller
         $data_arr = $this->getInputToken($token);
 
         //$data = $this->m_save_to_excel->_getCumulativeRecap($data_arr);
-        $data = $this->db->query('SELECT a.LembagaID, a.Type, a.Scope, a.Level, a.DueDate, a.Description, b.Lembaga 
+        $data = $this->db->query('SELECT a.LembagaID, a.Type, a.Scope, a.Level, a.DueDate, a.Description, b.Lembaga
                                 FROM db_agregator.external_accreditation AS a
                                 INNER JOIN db_agregator.lembaga_surview AS b ON (a.LembagaID = b.ID)')->result_array();
 
@@ -4936,8 +4939,8 @@ class C_save_to_excel extends CI_Controller
 
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Sertifikasi/ Akreditasi"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Sertifikasi/ Akreditasi");
         $excel->setActiveSheetIndex(0)->setCellValue('C3', "Jenis Sertifikasi/Akreditasi");
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "Lingkup (PT/Fakultas/Unit)");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Tingkat (Nasional/Internasional)");
@@ -4952,7 +4955,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('G3')->applyFromArray($style_col);
-    
+
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
         if(count($data)>0){
@@ -5063,8 +5066,8 @@ class C_save_to_excel extends CI_Controller
 
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Sertifikasi/ Akreditasi"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Sertifikasi/ Akreditasi");
         $excel->setActiveSheetIndex(0)->setCellValue('C3', "Program Studi");
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "Status/ Peringkat");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Masa Berlaku");
@@ -5077,7 +5080,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('F3')->applyFromArray($style_col);
-    
+
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
         if(count($data)>0){
@@ -5187,8 +5190,8 @@ class C_save_to_excel extends CI_Controller
 
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Audit"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Lembaga Audit");
         $excel->setActiveSheetIndex(0)->setCellValue('C3', "Tahun");
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "Opini");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Keterangan");
@@ -5199,7 +5202,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
-    
+
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
         if(count($data)>0){
@@ -5303,8 +5306,8 @@ class C_save_to_excel extends CI_Controller
 
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama Lembaga"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+        $excel->setActiveSheetIndex(0)->setCellValue('B3', "Nama Lembaga");
         $excel->setActiveSheetIndex(0)->setCellValue('C3', "Tingkat");
         $excel->setActiveSheetIndex(0)->setCellValue('D3', "Bentuk Kegiatan / Manfaat");
         $excel->setActiveSheetIndex(0)->setCellValue('E3', "Masa Berlaku");
@@ -5315,7 +5318,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('C3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('D3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E3')->applyFromArray($style_col);
-    
+
         $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
 
         if(count($data)>0){
@@ -5445,7 +5448,7 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('C4')->getFont()->setBold(TRUE); // Set bold kolom A1
         $excel->getActiveSheet()->getStyle('C4')->getFont()->setSize(12); // Set font size 15 untuk kolom A1
         $excel->getActiveSheet()->getStyle('C4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
-       
+
         $jml_calon_baru = ' Jumlah Calon Mahasiswa ';
         $excel->setActiveSheetIndex(0)->setCellValue('D4', $jml_calon_baru); // Set kolom A1 dengan tulisan "DATA KARYAWAN"
         $excel->getActiveSheet()->mergeCells('D4:E4'); // Set Merge Cell pada kolom A1 sampai O1
@@ -5468,8 +5471,8 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('H4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('D5', "Pendaftar"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('E5', "Lulus Seleksi"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('D5', "Pendaftar");
+        $excel->setActiveSheetIndex(0)->setCellValue('E5', "Lulus Seleksi");
         $excel->setActiveSheetIndex(0)->setCellValue('F5', "Reguler");
         $excel->setActiveSheetIndex(0)->setCellValue('G5', "Transfer");
         $excel->setActiveSheetIndex(0)->setCellValue('H5', "Reguler");
@@ -5490,12 +5493,12 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('G5')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('H5')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('I5')->applyFromArray($style_col);
-    
+
         $numrow = 6; // Set baris pertama untuk isi tabel adalah baris ke 4
-      
+
         if(count($data)>0){
             $no = 1;
-            foreach ($data AS $item){ 
+            foreach ($data AS $item){
                 // Buat header tabel nya pada baris ke 3
                 $excel->setActiveSheetIndex(0)->setCellValue('A'.$numrow, $no);
                 $excel->setActiveSheetIndex(0)->setCellValue('B'.$numrow, $item['ProdiName']);
@@ -5549,7 +5552,7 @@ class C_save_to_excel extends CI_Controller
         $footer = $Input['footer'];
         $body = json_decode(json_encode($body),true);
         $footer = json_decode(json_encode($footer),true);
-      
+
       include APPPATH.'third_party/PHPExcel/PHPExcel.php';
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', 600); //600 seconds = 10 minutes
@@ -5586,7 +5589,7 @@ class C_save_to_excel extends CI_Controller
             )
         );
 
-        
+
         $excel->setActiveSheetIndex(0)->setCellValue('A1', "Tabel 2.a Seleksi Mahasiswa Baru");
 
         $excel->setActiveSheetIndex(0)->setCellValue('A3', "Tahun Akademik");
@@ -5623,14 +5626,14 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('H4')->applyFromArray($style_col);
 
         $r = 5;
-        for ($i=0; $i < count($body); $i++) { 
-            $excel->setActiveSheetIndex(0)->setCellValue('A'.$r, $body[$i]['Year'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('B'.$r, $body[$i]['Capacity'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('C'.$r, $body[$i]['Registrant'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('D'.$r, $body[$i]['PassSelection'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('E'.$r, $body[$i]['Regular'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('F'.$r, $body[$i]['Transfer'] );   
-            $excel->setActiveSheetIndex(0)->setCellValue('G'.$r, $body[$i]['Regular2'] );   
+        for ($i=0; $i < count($body); $i++) {
+            $excel->setActiveSheetIndex(0)->setCellValue('A'.$r, $body[$i]['Year'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('B'.$r, $body[$i]['Capacity'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('C'.$r, $body[$i]['Registrant'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('D'.$r, $body[$i]['PassSelection'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('E'.$r, $body[$i]['Regular'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('F'.$r, $body[$i]['Transfer'] );
+            $excel->setActiveSheetIndex(0)->setCellValue('G'.$r, $body[$i]['Regular2'] );
             $excel->setActiveSheetIndex(0)->setCellValue('H'.$r, $body[$i]['Transfer2'] );
 
             $excel->getActiveSheet()->getStyle('A'.$r)->applyFromArray($style_row);
@@ -5650,10 +5653,10 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('A'.$r.':B'.$r)->applyFromArray($style_row);
 
         $col = 2;
-        for ($i=0; $i < count($footer); $i++) { 
+        for ($i=0; $i < count($footer); $i++) {
             $huruf = $this->m_master->HurufColExcelNumber($col);
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $footer[$i]);
-            $excel->getActiveSheet()->getStyle($huruf.$r, $footer[$i])->applyFromArray($style_row);    
+            $excel->getActiveSheet()->getStyle($huruf.$r, $footer[$i])->applyFromArray($style_row);
             $col++;
         }
 
@@ -5746,17 +5749,17 @@ class C_save_to_excel extends CI_Controller
 
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
         $excel->setActiveSheetIndex(0)->setCellValue('B3', "Fakultas/ Program Studi");
         $excel->setActiveSheetIndex(0)->setCellValue('B14', "Jumlah");
-        
+
         $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('B14')->applyFromArray($style_col);
         // get years by data
         $temp = $GetData[0]['Detail'];
         $st = 2;
-        for ($i=0; $i < count($temp); $i++) { 
+        for ($i=0; $i < count($temp); $i++) {
             $huruf = $this->m_master->HurufColExcelNumber($st);
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.'3', $temp[$i]['Year'] );
             $excel->getActiveSheet()->getStyle($huruf.'3')->applyFromArray($style_col);
@@ -5765,7 +5768,7 @@ class C_save_to_excel extends CI_Controller
 
         $r = 4;
         $arr_total = array(0,0,0,0); // array 4 indeks
-        for ($i=0; $i < count($GetData); $i++) { 
+        for ($i=0; $i < count($GetData); $i++) {
             $no = $i+1;
             $st = 0;
             $NameProdi = $GetData[$i]['Name'];
@@ -5780,7 +5783,7 @@ class C_save_to_excel extends CI_Controller
 
             $Detail = $GetData[$i]['Detail'];
             $st++;
-            for ($j=0; $j < count($Detail); $j++) { 
+            for ($j=0; $j < count($Detail); $j++) {
                 $huruf = $this->m_master->HurufColExcelNumber($st);
                 $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Detail[$j]['Count'] );
                 $arr_total[$j] = $arr_total[$j] + $Detail[$j]['Count'];
@@ -5793,7 +5796,7 @@ class C_save_to_excel extends CI_Controller
         }
 
         $st = 2;
-        for ($i=0; $i < count($arr_total); $i++) { 
+        for ($i=0; $i < count($arr_total); $i++) {
             $huruf = $this->m_master->HurufColExcelNumber($st);
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $arr_total[$i] );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col_fill);
@@ -5816,7 +5819,7 @@ class C_save_to_excel extends CI_Controller
         $write->save('php://output');
 
     }
-       
+
 
     public function excel_akreditasi_program_studi()
     {
@@ -5882,7 +5885,7 @@ class C_save_to_excel extends CI_Controller
         $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, "No");
         $excel->getActiveSheet()->mergeCells($huruf.$r.':'.$huruf.$rUntil);
         $excel->getActiveSheet()->getStyle($huruf.$r.':'.$huruf.$rUntil)->applyFromArray($style_col);
-        
+
         $st++;
 
         $huruf = $this->m_master->HurufColExcelNumber($st);
@@ -5900,9 +5903,9 @@ class C_save_to_excel extends CI_Controller
 
         $r++;
         $st= 2;
-        for ($i=0; $i < count($header); $i++) { 
-            $Type = $header[$i]['Type']; 
-            $ll = count($header[$i]['Detail']); 
+        for ($i=0; $i < count($header); $i++) {
+            $Type = $header[$i]['Type'];
+            $ll = count($header[$i]['Detail']);
             $huruf = $this->m_master->HurufColExcelNumber($st);
             $stUntil = $st + $ll - 1;
             $huruf_ = $this->m_master->HurufColExcelNumber($stUntil);
@@ -5920,19 +5923,19 @@ class C_save_to_excel extends CI_Controller
 
         $st= 2;
         $r++;
-        for ($i=0; $i < count($header); $i++) { 
+        for ($i=0; $i < count($header); $i++) {
             $Detail = $header[$i]['Detail'];
-            for ($j=0; $j < count($Detail); $j++) { 
+            for ($j=0; $j < count($Detail); $j++) {
                 $huruf = $this->m_master->HurufColExcelNumber($st);
                 $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Detail[$j]['Name'] );
-                $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);    
-                $st++;    
+                $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
+                $st++;
             }
         }
 
         $r++;
         for ($i=0; $i < count($fill); $i++) {
-            $st = 0; 
+            $st = 0;
             $No = $i+1;
             $AccreditationName = $fill[$i]['AccreditationName'];
             $Total = 0;
@@ -5946,10 +5949,10 @@ class C_save_to_excel extends CI_Controller
              $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $AccreditationName );
              $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
-             $TypeProgramStudy = $fill[$i]['TypeProgramStudy']; 
-             for ($j=0; $j < count($TypeProgramStudy); $j++) { 
+             $TypeProgramStudy = $fill[$i]['TypeProgramStudy'];
+             for ($j=0; $j < count($TypeProgramStudy); $j++) {
                 $Data = $TypeProgramStudy[$j]['Data'];
-                for ($k=0; $k < count($Data); $k++) { 
+                for ($k=0; $k < count($Data); $k++) {
                     $st++;
                     $huruf = $this->m_master->HurufColExcelNumber($st);
                     $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Data[$k]['Count'] );
@@ -5965,7 +5968,7 @@ class C_save_to_excel extends CI_Controller
              $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Total );
              $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
-           $r++;    
+           $r++;
         }
 
 
@@ -6063,8 +6066,8 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('C4')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); // Set text center untuk kolom A1
 
         // Buat header tabel nya pada baris ke 3
-        $excel->setActiveSheetIndex(0)->setCellValue('C5', "Doktor/ Doktor Terapan/ Subspesialis"); 
-        $excel->setActiveSheetIndex(0)->setCellValue('D5', "Magister/ Magister Terapan/ Spesialis"); 
+        $excel->setActiveSheetIndex(0)->setCellValue('C5', "Doktor/ Doktor Terapan/ Subspesialis");
+        $excel->setActiveSheetIndex(0)->setCellValue('D5', "Magister/ Magister Terapan/ Spesialis");
         $excel->setActiveSheetIndex(0)->setCellValue('E5', "Profesi");
 
         // Apply style header yang telah kita buat tadi ke masing-masing kolom header
@@ -6075,11 +6078,11 @@ class C_save_to_excel extends CI_Controller
         $excel->getActiveSheet()->getStyle('C5')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('D5')->applyFromArray($style_col);
         $excel->getActiveSheet()->getStyle('E5')->applyFromArray($style_col);
-       
+
         // get years by data
         //$temp = $GetData[0]['dataLecturers'];
         //$st = 2;
-        //for ($i=0; $i < count($temp); $i++) { 
+        //for ($i=0; $i < count($temp); $i++) {
         //    $huruf = $this->m_master->HurufColExcelNumber($st);
         //    $excel->setActiveSheetIndex(0)->setCellValue($huruf.'3', $temp[$i]['Level'] );
         //    $excel->getActiveSheet()->getStyle($huruf.'3')->applyFromArray($style_col);
@@ -6088,7 +6091,7 @@ class C_save_to_excel extends CI_Controller
 
         $r = 6;
         $arr_total = array(0,0,0); // array 4 indeks
-        for ($i=0; $i < count($GetData); $i++) { 
+        for ($i=0; $i < count($GetData); $i++) {
             $no = $i+1;
             $st = 0;
             $NameProdi = $GetData[$i]['Name'];
@@ -6104,7 +6107,7 @@ class C_save_to_excel extends CI_Controller
 
            // $Detail = $GetData[$i]['Detail'];
            // $st++;
-            //for ($j=0; $j < count($Detail); $j++) { 
+            //for ($j=0; $j < count($Detail); $j++) {
             //    $huruf = $this->m_master->HurufColExcelNumber($st);
             //    $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Detail[$j]['Count'] );
             //    $arr_total[$j] = $arr_total[$j] + $Detail[$j]['Count'];
@@ -6116,14 +6119,14 @@ class C_save_to_excel extends CI_Controller
         }
 
         $st = 2;
-        for ($i=0; $i < count($arr_total); $i++) { 
+        for ($i=0; $i < count($arr_total); $i++) {
             $huruf = $this->m_master->HurufColExcelNumber($st);
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $arr_total[$i] );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col_fill);
             $st++;
         }
-       
- 
+
+
         foreach(range('A','Z') as $columnID) {
             $excel->getActiveSheet()->getColumnDimension($columnID)
                 ->setAutoSize(true);
@@ -6140,6 +6143,6 @@ class C_save_to_excel extends CI_Controller
         $write->save('php://output');
 
     }
-    
+
 
 }

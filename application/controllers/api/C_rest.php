@@ -1040,8 +1040,15 @@ class C_rest extends CI_Controller {
             if ($auth) {
                 $Ta = $this->m_master->showData_array('db_admission.set_ta');
                 $Ta = $Ta[0]['Ta'];
+                $where = '';
                 $where = (!array_key_exists("division",$dataToken)) ? ' where a.Status = 0 ' : ' where a.Division ="'.$dataToken['division'].'" and a.Status = 0';
-                $sql = 'SELECT a.*,b.FormulirCode from db_admission.formulir_number_global as a left join db_admission.formulir_number_offline_m as b on a.FormulirCodeGlobal = b.No_Ref'.$where.' group by a.FormulirCodeGlobal';
+                if (array_key_exists('action',$dataToken)) {
+                   if ($dataToken['action'] == 'add') {
+                       $q_add = ($where == '') ? ' where ' : ' and ';
+                       $where .= $q_add.' a.Years = '.$Ta;
+                   }
+                }
+                $sql = 'SELECT a.* from db_admission.formulir_number_global as a '.$where.' group by a.FormulirCodeGlobal';
                 $query=$this->db->query($sql, array())->result_array();
                 echo json_encode($query);
             }

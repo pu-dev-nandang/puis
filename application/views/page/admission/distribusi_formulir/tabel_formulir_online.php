@@ -35,7 +35,8 @@
 			</thead>
 			<tbody> 
 				<?php for ($i = 0; $i < count($datadb); $i++): ?>
-							 <tr>
+						<?php $tokenEdit = $datadb[$i]; $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");?>
+							 <tr data-id = "<?php echo $datadb[$i]['ID'] ?>" token = "<?php echo $tokenEdit ?>">
 							 	<td><?php echo $datadb[$i]['Years'] ?></td>
 							 	<td><?php echo $datadb[$i]['FormulirCode'] ?></td>
 							 	<td><?php echo $datadb[$i]['No_Ref'] ?></td>

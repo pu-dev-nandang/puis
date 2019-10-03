@@ -53,9 +53,10 @@ class C_akademik extends Academic_Controler {
 
         $folder = $this->input->get('f');
         $fileName = $this->input->get('fileName');
-
+        $config['overwrite'] = TRUE;
         $config['upload_path']          = './uploads/students/'.$folder.'/';
-        $config['allowed_types']        = 'gif|jpg|png|jpeg';
+        // $config['allowed_types']        = 'gif|jpg|png|jpeg';
+        $config['allowed_types']        = '*';
         $config['max_size']             = 8000; // 8 mb
         $config['file_name']            = $fileName;
 
@@ -79,9 +80,6 @@ class C_akademik extends Academic_Controler {
 
             return print_r(json_encode($success));
         }
-
-
-
     }
 
 }

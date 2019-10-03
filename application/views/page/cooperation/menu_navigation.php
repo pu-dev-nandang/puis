@@ -1,19 +1,19 @@
 <div id="sidebar" class="sidebar-fixed">
     <div id="sidebar-content">
-
-        <!--=== Navigation ===-->
-
-<!--        <ul id="nav">-->
-<!--            <li class="--><?php //if($this->uri->segment(2)=='p'){echo"current";}?><!--">-->
-<!--                <a href="javascript:void(0)">-->
-<!--                    <i class="fa fa-paperclip"></i>-->
-<!--                    Diploma Supplement-->
-<!--                </a>-->
-<!--            </li>-->
-<!--        </ul>-->
-
-
-
+        <ul id="nav">
+            <li class="<?php if($this->uri->segment(1)=='dashboard'){echo "current";} ?>">
+                <a href="<?php echo base_url('dashboard'); ?>">
+                    <i class="fa fa-tachometer"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(1)=='cooperation'  && $this->uri->segment(2)=='kerjasama-perguruan-tinggi' ){echo "current";} ?>">
+                <a href="<?php echo base_url('cooperation/kerjasama-perguruan-tinggi'); ?>">
+                    <i class="fa fa-user-circle"></i>
+                    Kerja Sama Perguruan Tinggi
+                </a>
+            </li>
+        </ul>
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">

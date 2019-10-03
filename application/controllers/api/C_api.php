@@ -1026,13 +1026,49 @@ class C_api extends CI_Controller {
         if($data_arr['action']=='deleteacademic'){
             $ID1 = $data_arr['ID1'];
             $ID2 = $data_arr['ID2'];
-            $dataCek = $this->m_api->delistacademicemployee($ID1, $ID2);
-            return print_r(1);
+
+            $sql = 'SELECT ID,LinkFiles FROM db_employees.files 
+                    WHERE ID IN ("'.$ID1.'", "'.$ID2.'") ';
+            $data=$this->db->query($sql, array())->result_array();   
+            // print_r($sql);die();
+            if(count($data)>0) {
+
+                for($d=0;$d<count($data);$d++) { 
+                    $LinkFiles = $data[$d]['LinkFiles'];
+                    $pathPhoto = './uploads/files/'.$LinkFiles;
+                    if(file_exists($pathPhoto)) {
+                        unlink($pathPhoto);
+                    }
+                    $ID = $data[$d]['ID'];
+                    $this->db->where('ID', $ID);
+                    $this->db->delete('db_employees.files'); 
+                }
+
+                return print_r(1);
+            }
+                
         }
         else if($data_arr['action']=='deleteother') {
             $ID1 = $data_arr['otfile1'];
-            $dataCek = $this->m_api->delistotherfiles($ID1);
-            return print_r(1);
+            //$dataCek = $this->m_api->delistotherfiles($ID1);
+
+            $sql = 'SELECT ID, LinkFiles FROM db_employees.files 
+                    WHERE ID = "'.$ID1.'" ';
+            $data=$this->db->query($sql, array())->result_array();   
+
+            if(count($data)>0) {
+                for($d=0;$d<count($data);$d++) { 
+                    $LinkFiles = $data[$d]['LinkFiles'];
+                    $pathPhoto = './uploads/files/'.$LinkFiles;
+                    if(file_exists($pathPhoto)) {
+                        unlink($pathPhoto);
+                    }
+                    $ID = $data[$d]['ID'];
+                    $this->db->where('ID', $ID);
+                    $this->db->delete('db_employees.files'); 
+                }
+                return print_r(1);
+            }
         }
 
     }

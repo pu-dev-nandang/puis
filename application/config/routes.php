@@ -1044,6 +1044,11 @@ $route['rest2/__load_budget_onprocess_detail_byMonthYear'] = 'api/c_rest2/load_b
 $route['rest2/__Supplier_DataIntable_server_side'] = 'api/c_rest2/Supplier_DataIntable_server_side';
 $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
+$route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
+$route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
+// rest3 
+$route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
+$route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolback_door_to_be_mhs_admission';
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1147,6 +1152,7 @@ $route['mobile/__getSemesterActive'] = 'api/c_mobile/getSemesterActive';
 
 $route['api3/loginCRM'] = 'api/c_mobile/loginCRM';
 $route['api3/__crudqna'] = 'api/c_api3/crudqna';
+$route['api3/__getAllTA_MHS'] = 'api/c_api3/getAllTA_MHS';
 $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 
@@ -1349,7 +1355,7 @@ $route['agregator/rekognisi-dosen'] = 'page/agregator/c_agregator/rekognisi_dose
 $route['agregator/uploadFile'] = 'page/agregator/c_agregator/uploadFile';
 $route['agregator/produktivitas-penelitian-dosen'] = 'page/agregator/c_agregator/produktivitas_penelitian_dosen';
 $route['agregator/produktivitas-pkm-dosen'] = 'page/agregator/c_agregator/produktivitas_pkm_dosen';
-
+$route['agregator/publikasi-ilmiah'] = 'page/agregator/c_agregator/publikasi_ilmiah';
 
 //Agregator Excel
 $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_eksternal';
@@ -1365,6 +1371,8 @@ $route['agregator/excel-akreditasi-program-studi'] = 'c_save_to_excel/excel_akre
 $route['agregator/excel-dosen-tidak-tetap'] = 'c_save_to_excel2/excel_dosen_tidak_tetap';
 $route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel2/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-aps-program-study'] = 'c_save_to_excel2/excel_aps_program_study';
+$route['agregator/excel-kerjasama-perguruan-tinggi'] = 'c_save_to_excel2/excel_kerjasama_perguruan_tinggi';
+$route['agregator_aps/excel-kerjasama-tridarma'] = 'c_save_to_excel2/aps_excel_kerjasama_tridarma';
 
 
 
@@ -1815,6 +1823,10 @@ $route['it/saveDivision'] = 'page/it/c_rule_service/saveDivision';
 $route['it/saveService'] = 'page/it/c_rule_service/saveService';
 $route['it/saveRuleService'] = 'page/it/c_rule_service/saveRuleService';
 $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
+$route['it/admission/change-kode-formulir-online'] = 'page/it/c_it/change_kode_formulir_online';
+$route['it/admission/submit-change-kode-formulir-online'] = 'page/it/c_it/submit_change_kode_formulir_online';
+$route['it/admission/roolback-to-be-mhs'] = 'page/it/c_it/roolback_to_be_mhs';
+
 
 // end it
 $route['ApiServerToServer'] = 'c_login/ApiServerToServer';
@@ -1851,7 +1863,15 @@ $route['upload/remove-skripsi'] = 'api/c_upload/remove_skripsi';
 // Loging
 $route['api3/__crudLogging'] = 'api/c_api3/crudLogging';
 
-
 // don't show Digital Signature
 $route['uploads/signature/(:any)'] =  'api/c_global/error_page/$1';
+
+// Cooperation
+$route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
+$route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
+$route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
+
+
+
 

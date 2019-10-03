@@ -259,10 +259,11 @@
                         <th style="width: 10%">Name Study Indo</th>
                         <th style="width: 10%">Name Study Eng</th>
                         <th style="width: 10%">Program</th>
-                        <th style="width: 10%">Name Faculty</th>
+                        <th style="width: 10%">Faculty Name</th>
 
-                        <th style="width: 10%">Akreditasi Date </th>
-                        <th style="width: 10%">No Akreditasi </th>
+                        <th style="width: 10%">Accreditation Status</th>
+                        <th style="width: 10%">Accreditation Date </th>
+                        <th style="width: 10%">Accreditation </th>
                         <th style="width: 2%">Action</th>
                     </tr>
 
@@ -272,6 +273,8 @@
                             <td><?php echo $itemX['NameEng']; ?></td>
                             <td><?php echo $itemX['NameLevel']; ?></td>
                             <td><?php echo $itemX['NameFak']; ?></td>
+                            <td><?php echo $itemX['accreditation']; ?></td>
+
                             <td>
                                 <span id="SKBANPTDate<?php echo $itemX['ID']; ?>"><?php echo $itemX['SKBANPTDate']; ?></span>
                                 <!--<input class="form-control frmdatepicker hide" id="formAkreditasiBANPTDate<?php //echo $itemX['ID']; ?>" value="<?php //echo $itemX['AkreditasiBANPTDate']; ?>"> -->
@@ -549,11 +552,11 @@
 
     // Program Study Accreditation
     $(document).on('click','.btnEditEdStudy',function () {
-        
+
         var tr = $(this).closest('tr');
         tr.find('td:eq(4)').html('<center><input type = "text" class = "form-control" id="formAkreditasiBANPTDate"></center>');
         tr.find('td:eq(5)').html('<input type = "text" class = "form-control" >');
-        
+
         $('.btnDropDownEdStudy').addClass('hide');
         $('.btnSaveEdStudy').removeClass('hide');
 
