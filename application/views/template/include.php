@@ -666,6 +666,25 @@
         });
     }
 
+    function loadSelectOptionCurriculumForlap(element,selected) {
+        var url = base_url_js+"api/__getKurikulumSelectOption";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+
+                var sc = '';
+                if(selected!='' && selected!=null && typeof selected !== undefined){
+                    sc = (data_json[i].ID==selected) ? 'selected' : '';
+                } else {
+                    sc = (data_json[i].StatusSemester=='1') ? 'selected' : '';
+                }
+
+                var yn = parseInt(data_json[i].Year) + 1;
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>Tahun '+data_json[i].Year+' / '+yn+' </option>');
+            }
+        });
+    }
+
     function loadSelectOptionForce(element,selected) {
         var url = base_url_js+"api/__getKurikulumSelectOption";
         $.get(url,function (data_json) {

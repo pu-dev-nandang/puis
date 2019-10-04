@@ -34,9 +34,9 @@
                 <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
             </div>
             <div id = "content_dt">
-                
+
             </div>
-        </div>
+        </div><p style="color: orangered;">*) Mahasiswa asing dapat terdaftar untuk mengikuti program secara penuh atau sebagian <br> **) Jumlah mahasiswa asing/mahasiswa aktif x 100% >= 0.5 %, Score : 4 </p>
     </div>
 
 <script>
@@ -112,7 +112,7 @@
                         '</thead>'+
                         '<tbody id="listStd"></tbody>'+
                         '</table>';
-            $('#content_dt').html(htmlTable);            
+            $('#content_dt').html(htmlTable);
             $('#listStd').empty();
 
             var arr_body_table = jsonResult.body;
@@ -148,7 +148,7 @@
                             '<td colspan = "2">Jumlah</td>'+
                             isian+
                         '</tr>'+
-                    '</tfoot>'        
+                    '</tfoot>'
                     );
 
 

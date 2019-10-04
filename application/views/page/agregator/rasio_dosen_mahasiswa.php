@@ -46,6 +46,8 @@
             <p style="color: orangered;">
                 <br/>*) Mahasiswa yang terhitung adalah mahasiswa yang aktif (Tidak termasuk mahasiswa cuti / mangkir)
                 <br/>*) Dosen yang terhitung adalah semua dosen kontrak maupun tetap
+                <br/>*) Sarjana : Jumlah dosen tetap/ mahasiswa = 20 s/d 30 mahasiswa
+                <br/>*) Vokasi : Jumlah dosen tetap/ mahasiswa = 12 s/d 24 mahasiswa
             </p>
         </div>
     </div>

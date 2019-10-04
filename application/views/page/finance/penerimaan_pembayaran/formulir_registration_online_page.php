@@ -539,4 +539,39 @@
         });
 
 	});
+
+	$(document).off('click', '.ShowKwitansi').on('click', '.ShowKwitansi',function(e) {
+		// console.log('asd');
+		var NoKwitansi = $(this).attr('NoKwitansi');
+		if (NoKwitansi != '-' && NoKwitansi != '' && NoKwitansi != null) {
+			var FormulirCode = $(this).attr('formulir');
+			var NoFormRef = $(this).attr('ref');
+			var namalengkap = $(this).attr('namalengkap');
+			var hp = $(this).attr('hp');
+			var jurusan = $(this).attr('jurusan');
+			var pembayaran = $(this).attr('pembayaran');
+			var jenis = $(this).attr('jenis');
+			var jumlah = $(this).attr('jumlah');
+			var date = $(this).attr('date');
+			var formulir = $(this).attr('formulir');
+			var url = base_url_js+'admission/export_kwitansi_formulironline';
+			var NumForm = NoKwitansi;
+				data = {
+					NoFormRef : NoFormRef ,
+					namalengkap : namalengkap ,
+					hp : hp ,
+					jurusan :  jurusan ,
+					pembayaran :  pembayaran,
+					jenis : jenis ,
+					jumlah : jumlah ,
+					date : date,
+					NumForm : NumForm,
+				}
+				var token = jwt_encode(data,"UAP)(*");
+				FormSubmitAuto(url, 'POST', [
+					{ name: 'token', value: token },
+				]);
+		}
+		
+	})
 </script>

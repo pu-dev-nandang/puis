@@ -91,6 +91,8 @@
           <!-- </div> -->
         </div>
     </div>
+    <p style="color: orangered;">*) Cantumkan keterangan yang menunjukkan salah satu program sebagai program utama yang diselenggarakan di perguruan tinggi. Program utama ditentukan berdasarkan jumlah mahasiswa aktif terbesar <br> **) Jumlah mahasiswa regular : Lulus seleksi harus >=90% </p>
+
 </div>
 
 <script>
@@ -126,14 +128,14 @@
         var data = {
             Year : filterYear
         };
-    
+
         var url = base_url_js+'agregator/excel-seleksi-mahasiswa-baru';
         var token = jwt_encode(data,"UAP)(*");
         FormSubmitAuto(url, 'POST', [
             { name: 'token', value: token },
         ]);
     })
-    
+
 
     $('#filterYear').change(function () {
         loadDataTable();
@@ -293,9 +295,9 @@
         // $('#formYear').val(d.Year);
         $("#formYear option").filter(function() {
            //may want to use $.trim in here
-           return $(this).val() == d.Year; 
+           return $(this).val() == d.Year;
          }).prop("selected", true);
-        
+
         $('#formProdiID').val(d.ProdiID+'.'+d.ProdiCode);
         // $('#formCapacity').val(d.Capacity);
         // $('#formRegistrant').val(d.Registrant);
@@ -321,7 +323,7 @@
 
     })
 
-    
+
     $(document).off('change', '#formYear').on('change', '#formYear',function(e) {
         var v = $(this).val();
         if (v >= 2019) {
@@ -340,7 +342,7 @@
 
         var formProdiID = $('#formProdiID option:selected').val();
         var P = formProdiID.split('.');
-        var ProdiID = P[0]; 
+        var ProdiID = P[0];
         LoadDataToInput(v,ProdiID);
 
     })
@@ -365,9 +367,9 @@
             // $('#formYear').val(d.Year);
             $("#formYear option").filter(function() {
                //may want to use $.trim in here
-               return $(this).val() == d.Year; 
+               return $(this).val() == d.Year;
              }).prop("selected", true);
-            
+
             $('#formProdiID').val(d.ProdiID+'.'+d.ProdiCode);
             $('#formCapacity').val(d.Capacity);
             $('#formRegistrant').val(d.Registrant);

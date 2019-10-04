@@ -8122,10 +8122,12 @@ class C_api extends CI_Controller {
                 return print_r(1);
             }
             else if($data_arr['action']=='updateStudyAcc'){
-                $this->db->set('SKBANPTDate', $data_arr['Dateacc']);
-                $this->db->set('NoSKBANPT', $data_arr['Noacc']);
+
+                $dataForm = (array) $data_arr['dataForm'];
+
                 $this->db->where('ID', $data_arr['ID']);
-                $this->db->update('db_academic.program_study');
+                $this->db->update('db_academic.program_study',$dataForm);
+
                 return print_r(1);
             }
         }
@@ -10123,6 +10125,12 @@ class C_api extends CI_Controller {
         else if($data_arr['action']=='readLogUser'){
            $this->db->where('ID', $data_arr['ID_logging_user']);
            $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1'));             
+        }
+        elseif ($data_arr['action'] == 'ReadAllLog') {
+            $UserID = $data_arr['UserID'];
+            $this->db->where('UserID', $UserID);
+            $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
+            return print_r(json_encode(1));
         }
     }
 

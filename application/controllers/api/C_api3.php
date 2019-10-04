@@ -1603,7 +1603,8 @@ class C_api3 extends CI_Controller {
 
 
             return print_r(1);
-        } else if($data_arr['action']=='viewDataPAM'){
+        }
+        else if($data_arr['action']=='viewDataPAM'){
 
             $data = $this->db->query('SELECT * FROM db_studentlife.student_achievement ORDER BY Year, StartDate DESC')->result_array();
 
@@ -2327,6 +2328,41 @@ class C_api3 extends CI_Controller {
 
             $rs = $dt;
             return print_r(json_encode($rs));
+        }
+
+        // Table refrensi
+        else if($data_arr['action']=='readTableRef'){
+
+            $Year = (int) $data_arr['Year'];
+
+            $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
+
+            if(count($dataEd)>0){
+                for($j=0;$j<count($dataEd);$j++){
+
+                    for($i=0;$i<=2;$i++){
+                        $Year_where = $Year - $i;
+                        $dataEd[$j]['BL_'.$Year_where] = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+                                          FROM db_academic.auth_students ats
+                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
+                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                           ORDER BY ats.NPM')->result_array();
+
+//                        $data = $this->db->query('SELECT * FROM db_studentlife.alumni_experience')->result_array();
+
+                    }
+
+
+
+                }
+            }
+
+
+            return print_r(json_encode($dataEd));
+
+
+
         }
 
     }
@@ -3746,6 +3782,31 @@ class C_api3 extends CI_Controller {
         }
     }
 
+
+    function getLanguagelabels(){
+        $dataTr = $this->db->query('SELECT * FROM db_prodi.language_label ORDER BY ID ASC ')->result_array();
+
+        $keys = array_keys($dataTr[0]);
+
+        $result = array();
+
+        for ($i=1;$i<count($keys);$i++){
+
+            $temp = array();
+            foreach ($dataTr AS $item){
+                $temp[$item['Eng']] = $item[$keys[$i]];
+
+            }
+
+            $result[$keys[$i]] = $temp;
+
+
+
+        }
+
+        return print_r(json_encode($result));
+    }
+
     public function getAllTA_MHS()
     {
         $rs = [];
@@ -3760,6 +3821,7 @@ class C_api3 extends CI_Controller {
             }
         }
         echo json_encode($rs);
+
     }
 
 }

@@ -34,6 +34,10 @@
 
             <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK)</p>
             <p style="color: orangered;">*) Dosen yang Bersertifikat adalah dosen yang sudah tersertifikasi dosen (SERDOS)</p>
+            <p style="color: orangered;">*) Sarjana : Serdos >= 80% , Score : 4</p>
+            <p style="color: orangered;">*) Vokasi : Serdos >= 50% , Score : 4</p>
+            <p style="color: orangered;">**) Dosen tetap yang memiliki lebih dari 1 sertifikat hanya dapat tercatat 1 kali.</p>
+
         </div>
     </div>
 </div>
