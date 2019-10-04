@@ -10124,6 +10124,12 @@ class C_api extends CI_Controller {
            $this->db->where('ID', $data_arr['ID_logging_user']);
            $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1'));             
         }
+        elseif ($data_arr['action'] == 'ReadAllLog') {
+            $UserID = $data_arr['UserID'];
+            $this->db->where('UserID', $UserID);
+            $this->db->update('db_notifikasi.logging_user',array('StatusRead' => '1', 'ShowNotif' => '1'));
+            return print_r(json_encode(1));
+        }
     }
 
     public function dropdowngroupmodule(){
