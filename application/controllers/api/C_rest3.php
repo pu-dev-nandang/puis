@@ -875,6 +875,40 @@ class C_rest3 extends CI_Controller {
         
     }
 
+
+    public function Config_Jabatan_SKS() {
+      $dataToken = $this->data['dataToken'];
+      $mode = $dataToken['mode'];
+      if ($mode=='showDataDosen') {
+        $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
+            where ( 
+                        SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
+                        SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
+                        SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
+                        SPLIT_STR(a.PositionOther3, ".", 2) = 7
+                    ) ';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }elseif ($mode=='showJabatan') {
+        $sql = 'select a.ID,a.Position from db_employees.position as a;';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }elseif ($mode=='showSemester') {
+        $sql = 'select a.ID,a.Name, a.Status from db_academic.semester as a;';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }
+        else if($mode=='saveDataJabatanSKS'){
+
+                          $dataForm = (array) $dataToken['dataForm'];
+                          $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                          $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                          $this->db->insert('db_rektorat.tugas_tambahan',$dataForm);
+
+                          echo json_encode(1);
+                      }
+        }
+
     public function APS_CrudAgregatorTB7()
     {
         $dataToken = $this->data['dataToken'];
@@ -940,6 +974,7 @@ class C_rest3 extends CI_Controller {
 
         }
         
+
     }
 
 }
