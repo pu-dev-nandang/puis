@@ -1045,7 +1045,7 @@ $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
 $route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
-// rest3 
+// rest3
 $route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
 $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolback_door_to_be_mhs_admission';
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
@@ -1305,6 +1305,9 @@ $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
+$route['rectorat/legalitas/identitas'] = 'page/rektorat/identitas/c_identitas/list_identitas';
+$route['rectorat/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
+
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
 $route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
@@ -1398,7 +1401,7 @@ $route['agregator_aps/excel-kerjasama-tridarma'] = 'c_save_to_excel2/aps_excel_k
 
 $route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
 
-$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am
                   LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
                   WHERE amh.Type = "APS" ');
 $result = $query->result_array();
@@ -1423,7 +1426,7 @@ foreach( $result as $row )
                     setTimeout(function () {
                         clearInterval(firstLoad);
                     },5000);
-            
+
                 });
                 $('#filterProdi').change(function () {
                     var filterProdi = $('#filterProdi').val();
@@ -1440,8 +1443,8 @@ foreach( $result as $row )
                 }
             </script>";
             $data = '<h3>This is the page : '.$my_file.'</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
-                    
-                    
+
+
                     '.$sc;
             fwrite($handle, $data);
         }
@@ -1891,7 +1894,3 @@ $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperati
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
 $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
-
-
-
-
