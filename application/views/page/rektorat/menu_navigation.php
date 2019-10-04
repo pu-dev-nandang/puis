@@ -5,6 +5,11 @@
         <ul id="nav">
             <!-- list menu -->
             <li class="<?php if($this->uri->segment(1)=='requestdocument'){echo"current";}?>">
+                <a href="<?php echo base_url('rectorat/legalitas/prodi');?>">
+                    <i class="fa fa-university"></i> Legalitas Universitas
+                </a>
+            </li>
+            <li class="<?php if($this->uri->segment(1)=='requestdocument'){echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/requestdocument');?>">
                     <i class="fa fa-files-o"></i> Request Document
                 </a>
