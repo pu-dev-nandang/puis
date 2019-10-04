@@ -515,6 +515,8 @@ $route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_f
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
 $route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
+$route['admission/export_kwitansi_formulironline'] = 'c_save_to_pdf/export_kwitansi_formulironline';
+
 $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';

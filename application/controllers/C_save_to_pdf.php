@@ -6460,5 +6460,136 @@ Phone: (021) 29200456';
     }
 
 
+    public function export_kwitansi_formulironline()
+    {
+        $token = $this->input->post('token');
+        $input = $this->getInputToken($token);
+        $this->load->model('master/m_master');
+        $taGet = $this->m_master->showData_array('db_admission.set_ta');
+        $ta = substr($taGet[0]['Ta'], 2,2);
+        $InputDate = $input['date'];
+        $InputDate = explode('-', $InputDate);
+        $bulanRomawi = $this->m_master->romawiNumber($InputDate[1]);
+
+        $maxLen = 4;
+        $NoKwitansi = $input['NumForm'];
+        $aa = strlen($NoKwitansi);
+        for ($i=0; $i < ( $maxLen - $aa ); $i++) {
+            $NoKwitansi = '0'.$NoKwitansi;
+        }
+
+        $NoKwitansi = 'ON-'.$NoKwitansi;
+
+        // check tahun berdasarkan No_Ref
+         $G_dt = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$input['NoFormRef']);
+         $YearsWR_MKT = substr($G_dt[0]['Years'], 2,2);
+
+        // $nomorWr = $InputDate[0].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$ta.' / '.$NoKwitansi;
+        $nomorWr = $G_dt[0]['Years'].' / '.$bulanRomawi.' / FRM'.' / '.'MKT-PU-'.$YearsWR_MKT.' / '.$NoKwitansi;
+
+            $fpdf = new Fpdf('L', 'mm', array(216, 140));
+            //$fpdf = new Fpdf('P', 'mm', 'A4');
+            //$fpdf = new Fpdf('P', 'mm', array(215,140));
+
+            //$fpdf->SetMargins(0, 0);
+            //$fpdf->SetDisplayMode('real');
+            $fpdf->SetAutoPageBreak(true, 0);
+            $fpdf->AddPage();
+
+            //====================== WATERMARK ======================
+            // if ($data['print'] > 2) {
+            //     $fpdf->SetTextColor(209, 209, 209);
+            //     $fpdf->SetFont('Arial', '', 100);
+            //     $fpdf->Text(42, 70, 'C O P Y');
+            // }
+            // rahmat 23 Februari 2016
+            //====================== Nomor Form ======================
+            $fpdf->SetFont('Arial', 'B', 8);
+            $fpdf->SetTextColor(0, 0, 0);
+            $fpdf->SetXY(1, 5);
+            $fpdf->Cell(206, 7, 'FM-UAP/KEU-06-03', 0, 0, 'R');
+
+            // End rahmat
+
+            //====================== HEADER ======================
+            $fpdf->SetFont('Arial', 'B', 18);
+            $fpdf->SetTextColor(0, 0, 0);
+            $fpdf->SetXY(5, 5);
+            $fpdf->ln(1);
+            $fpdf->Cell(206, 7, 'TANDA TERIMA PEMBAYARAN', 0, 0, 'C');
+            $fpdf->ln(7);
+            // $fpdf->Line(65, 12.5, 163, 12.5);
+            $fpdf->SetFont('Arial', '', 12);
+            $fpdf->Cell(206, 15, 'Nomor: '.$nomorWr, 0, 0, 'C');
+
+            // //====================== CONTENT ======================
+            // if ($data['form'] == NULL) {
+            //     $no_lbl = 'NIM';
+            //     $no_txt = $data['nim'];
+            // }
+            // else {
+            //     $no_lbl = 'No Form';
+            //     $no_txt = $data['form'];
+            // }
+
+            // $fpdf->SetFont('Arial', '', 14);
+            // $fpdf->Text(23, 28, 'Telah terima dari,');
+            $no_lbl = 'No Form';
+
+            $fpdf->SetFont('Arial', '', 11);
+            $fpdf->Text(23, 36, $no_lbl);
+            $fpdf->Text(23, 43, 'Nama lengkap');
+            // $fpdf->Text(23, 50, 'Tlp / HP');
+            // $fpdf->Text(23, 57, 'Jurusan');
+            $fpdf->Text(23, 50, 'Pembayaran');
+            $fpdf->Text(23, 57, 'Jumlah');
+            $fpdf->Text(23, 64, 'Cara Pembayaran');
+            $fpdf->Text(23, 71, 'Terbilang');
+
+            $fpdf->Text(63, 36, ':');
+            $fpdf->Text(63, 43, ':');
+            // $fpdf->Tex63t(59, 50, ':');
+            // $fpdf->Text(59, 57, ':');
+            $fpdf->Text(63, 50, ':');
+            $fpdf->Text(63, 57, ':');
+            $fpdf->Text(63, 64, ':');
+            $fpdf->Text(63, 71, ':');
+
+            $terbilang = $this->m_master->moneySay($input['jumlah']).'Rupiah';
+            $terbilang = trim(ucwords($terbilang));
+            $fpdf->Text(69, 36, $input['NoFormRef'] );
+            $fpdf->Text(69, 43, $input['namalengkap']);
+            // $fpdf->Text(64, 50, $input['hp']);
+            // $fpdf->Text(64, 57, $input['jurusan']);
+            $fpdf->Text(69, 50, $input['pembayaran']);
+            $fpdf->Text(69, 57, 'Rp '.number_format($input['jumlah'],2,',','.').',-');
+            $fpdf->Text(69, 64, $input['jenis']);
+            $fpdf->Text(69, 71, $terbilang);
+
+            $fpdf->Line(69, 37, 195, 37);
+            $fpdf->Line(69, 44, 195, 44);
+            // $fpdf->Line(63, 51, 195, 51);
+            // $fpdf->Line(63, 58, 195, 58);
+            $fpdf->Line(69, 51, 195, 51);
+            $fpdf->Line(69, 58, 195, 58);
+            $fpdf->Line(69, 65, 195, 65);
+            $fpdf->Line(69, 72, 195, 72);
+
+            //====================== FOOTER / SIGN ======================
+            $printDate = $this->m_master->getIndoBulan(date('Y-m-d'));
+            $fpdf->SetFont('Arial', '', 14);
+            $fpdf->SetXY(140, 92);
+            $fpdf->Cell(60, 5, 'Jakarta, '.$printDate, 0, 0, 'C');
+            $fpdf->SetXY(140, 116);
+            $fpdf->SetFont('Arial', 'U', 14);
+            $fpdf->Cell(60, 5, '( '.$this->session->userdata('Name').' )', 0, 0, 'C');
+
+            //====================== FINISH ======================
+
+
+        $fpdf->Output('receipt.pdf','I');
+    }
+
+
 
 }
