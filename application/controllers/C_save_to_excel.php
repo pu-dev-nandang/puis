@@ -1978,7 +1978,8 @@ class C_save_to_excel extends CI_Controller
                 $title = 'Search by : Tanggal '.date('d M Y', strtotime($dateRange1)).' - '.date('d M Y', strtotime($dateRange2));
                 // $this->exCel_PenjualanFormulirData($title,$get);
                 // $get = $this->m_finance->getSaleFormulirOffline($SelectSetTa,$SelectSortBy);
-                $get = $this->m_finance->getSaleFormulirOfflineBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2);
+                //$get = $this->m_finance->getSaleFormulirOfflineBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2);
+                $get = $this->m_finance->getSaleFormulirONOFFBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2);
                 $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
                 break;
             case 1: // by Month
@@ -1989,7 +1990,8 @@ class C_save_to_excel extends CI_Controller
                // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Search by : Bulan '.date('F Y', strtotime($SelectYear.'-'.$SelectMonth.'-01'));
                // $this->exCel_PenjualanFormulirData($title,$get);
-               $get = $this->m_finance->getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
+            //    $get = $this->m_finance->getSaleFormulirOfflineMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
+               $get = $this->m_finance->getSaleFormulirOffONMonth_fin($SelectSetTa,$SelectSortBy,$SelectMonth,$SelectYear);
                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
                 break;
             case 2: // All
@@ -1998,7 +2000,8 @@ class C_save_to_excel extends CI_Controller
                // $get = $this->m_admission->getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy);
                $title = 'Search by : All ';
                // $this->exCel_PenjualanFormulirData($title,$get);
-               $get = $this->m_finance->getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy);
+            //    $get = $this->m_finance->getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy);
+               $get = $this->m_finance->getSaleFormulirOffOnnAll_fin($SelectSetTa,$SelectSortBy);
                $this->exCel_v_Finance_export_PenjualanFormulirFinance($title1,$title2,$get,$title);
                 break;
             default:
@@ -2047,6 +2050,10 @@ class C_save_to_excel extends CI_Controller
         $countNotSell = 0;
         $countFormulir = 0;
         $countSell = 0;
+        $countOFF = 0;
+        $countON = 0;
+        // print_r($data);die();
+
         for ($i=0; $i < count($data); $i++) {
             // Buat sebuah variabel untuk menampung pengaturan style dari isi tabel
             $style_row2 = array(
@@ -2066,7 +2073,24 @@ class C_save_to_excel extends CI_Controller
            $excel3->setCellValue('D'.$a, $data[$i]['FullName']);
            $dateFin = ($data[$i]['DateFin'] != '' || $data[$i]['DateFin'] != null) ? date('d M Y', strtotime($data[$i]['DateFin'])) : '';
            $excel3->setCellValue('E'.$a, $dateFin);
+           $TipeFormulir = ($data[$i]['FormulirType'] == "ON") ? 'Online' : "Offline";
+           $NoKwitansi = $data[$i]['NoKwitansi'];
+           $WrKwitansi = "";
+           if ($NoKwitansi != "" && $NoKwitansi != null) {
+               $len = strlen($NoKwitansi);
+               $Max = 4;
+               $WrKwitansi = $NoKwitansi;
+               for ($z=0; $z < $Max - $len; $z++) { 
+                  $WrKwitansi = '0'.$WrKwitansi;
+               }
+
+               if ($data[$i]['FormulirType'] == "ON") {
+                   $WrKwitansi = 'ON-'.$WrKwitansi;
+               }
+           }
            $excel3->setCellValue('F'.$a, $data[$i]['Sales']);
+           $excel3->setCellValue('G'.$a, $WrKwitansi);
+           $excel3->setCellValue('H'.$a, $TipeFormulir);
 
            // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
            if ($data[$i]['StatusGlobalFormulir'] == 0) {
@@ -2082,13 +2106,25 @@ class C_save_to_excel extends CI_Controller
            $excel3->getStyle('D'.$a)->applyFromArray($style_row2);
            $excel3->getStyle('E'.$a)->applyFromArray($style_row2);
            $excel3->getStyle('F'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('G'.$a)->applyFromArray($style_row2);
+           $excel3->getStyle('H'.$a)->applyFromArray($style_row2);
            $a = $a + 1;
            $countFormulir++;
+
+           // hitung Formulir online dan offline
+           if ($data[$i]['FormulirType'] == "ON") {
+                $countON++;
+           }
+           else{
+            $countOFF++;
+           }
         }
 
-        $excel3->setCellValue('H7', 'Terjual :'.$countSell);
-        $excel3->setCellValue('H8', 'Tidak Terjual :'.$countNotSell);
-        $excel3->setCellValue('H9', 'Total :'.$countFormulir);
+        $excel3->setCellValue('I7', 'Terjual :'.$countSell);
+        $excel3->setCellValue('I8', 'Tidak Terjual :'.$countNotSell);
+        $excel3->setCellValue('I9', 'Total :'.$countFormulir);
+        $excel3->setCellValue('I10', 'Total Formulir Online :'.$countON);
+        $excel3->setCellValue('I11', 'Total Formulir Offline:'.$countOFF);
         $filename = 'Rekap_Formulir_'.date('y-m-d').'.xlsx';
 
         $objWriter = PHPExcel_IOFactory::createWriter($excel2, 'Excel2007');
