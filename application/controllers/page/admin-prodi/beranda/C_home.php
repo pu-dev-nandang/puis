@@ -36,13 +36,46 @@ class C_home extends Prodi_Controler {
     	parent::template($content);
     }
 // ===== why ======
-    function whychoose()
-    {
-        // Database
+
+    private function menu_whyus($page){
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$data['department'].'/beranda/v_why',$data,true);
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$data['department'].'/beranda/whyus/menu_whyus',$data,true);
         parent::template($content);
     }
+    public function whychoose(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/beranda/whyus/whyus',$data,true);
+        $this->menu_whyus($page);
+    }
+    public function about(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/beranda/whyus/about',$data,true);
+        $this->menu_whyus($page);
+    }
+    public function excellence(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/beranda/whyus/excellence',$data,true);
+        $this->menu_whyus($page);
+    }
+    public function graduate_profile(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/beranda/whyus/graduate_profile',$data,true);
+        $this->menu_whyus($page);
+    }
+    public function career_opportunities(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/beranda/whyus/career_opportunities',$data,true);
+        $this->menu_whyus($page);
+    }
+
+//    function whychoose()
+//    {
+//        // Database
+//        $data['department'] = parent::__getDepartement();
+//        $content = $this->load->view('page/'.$data['department'].'/beranda/v_why',$data,true);
+//        parent::template($content);
+//    }
 // ===== Call to Action ======
     function calltoaction()
     {

@@ -1161,6 +1161,8 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
+$route['__getContentProdi'] = 'api/c_api_prodi/getContentProdi';
+
 
 // ==== API Prodi yamin=== //
 
@@ -1171,7 +1173,11 @@ $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
 $route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
 // ---- Prodi CMS ----- //
 $route['prodi/beranda/overview'] =  'page/admin-prodi/beranda/c_home/overview';
-$route['prodi/beranda/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$route['prodi/beranda/why-choose-us/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$route['prodi/beranda/why-choose-us/about'] =  'page/admin-prodi/beranda/c_home/about';
+$route['prodi/beranda/why-choose-us/excellence'] =  'page/admin-prodi/beranda/c_home/excellence';
+$route['prodi/beranda/why-choose-us/graduate-profile'] =  'page/admin-prodi/beranda/c_home/graduate_profile';
+$route['prodi/beranda/why-choose-us/career-opportunities'] =  'page/admin-prodi/beranda/c_home/career_opportunities';
 $route['prodi/beranda/calltoaction'] =  'page/admin-prodi/beranda/c_home/calltoaction';
 $route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
 // =======================//

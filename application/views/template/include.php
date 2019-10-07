@@ -1254,6 +1254,25 @@
 
     }
 
+    function loadSelectOptionLanguageProdi(element,selected) {
+
+        var token = jwt_encode({action:'readLanguageProdi'},'UAP)(*');
+        var url = base_url_js+'api-prodi/__crudDataProdi';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    $(element).append('<option value="'+v.ID+'">'+v.Language+'</option>');
+
+                });
+            }
+
+        });
+
+    }
+
     // function loadSelectOptionStudentRegisterSeminarhasil(element,selected) {
     //     var url = base_url_js+'api/__crudFinalProject';
     //     var token = jwt_encode({action : 'getAllStdReg',Status:'3'},'UAP)(*');

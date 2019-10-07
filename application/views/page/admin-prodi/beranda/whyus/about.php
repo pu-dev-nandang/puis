@@ -32,7 +32,7 @@
 <script>
     $(document).ready(function () {
 
-        window.G_Type = 'welcoming';
+        window.G_Type = 'about';
 
         loadSelectOptionLanguageProdi('#LangID','');
 
