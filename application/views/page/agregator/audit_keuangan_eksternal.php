@@ -40,12 +40,12 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-9">
             <div style="text-align: right;"> <button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div id="viewData"></div>
         </div>
-
+<p style="color: orangered;">*) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau uni yang relevan. <br> **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
     </div>
 
 </div>
@@ -65,9 +65,9 @@
 
 
     $("#btndownloaadExcel").click(function(){
-       
+
         var akred = "0";
-        var url = base_url_js+'agregator/excel-audit-keuangan-eksternal';  
+        var url = base_url_js+'agregator/excel-audit-keuangan-eksternal';
         data = {
           akred : akred
         }
@@ -112,7 +112,7 @@
             '        </table>' +
             '    </div>' +
             '</div>';
-        
+
         $('#GlobalModal .modal-body').html(body);
 
         loadDataLembagaAudit();
@@ -146,7 +146,7 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    if(jsonResult==0 || jsonResult=='0') { 
+                    if(jsonResult==0 || jsonResult=='0') {
                         toastr.error('Maaf nama Lembaga sudah Ada!','Error');
                         $('#btnSaveLembaga').html('Save').prop('disabled',false);
 
@@ -172,9 +172,9 @@
 
 
         });
-        
+
     });
-    
+
     function loadDataLembagaAudit() {
 
         var url = base_url_js+'api3/__crudLembagaSurview';
@@ -226,23 +226,23 @@
     });
 
     $(document).on('click','.btnDeleteLV',function () {
-        
+
         if(confirm('Yakin Hapus data?')) {
-    
+
             $('.btnDeleteLV').prop('disabled',true);
-    
+
             var no = $(this).attr('data-id');
             var url = base_url_js+'api3/__crudAgregatorTB1';
-    
+
             var data = {
                 action: 'removeMasterAudit',
                 ID : no
             };
-    
+
             var token = jwt_encode(data,'UAP)(*');
-    
+
             $.post(url,{token:token},function (result) {
-    
+
                 toastr.success('Data removed','Success');
                 loadDataTable();
 
@@ -255,7 +255,7 @@
                 setTimeout(function () {
                     //loadDataTable();
                 },500);
-    
+
            });
         }
     });

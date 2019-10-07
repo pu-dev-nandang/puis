@@ -66,7 +66,7 @@ class C_agregator extends Globalclass {
         if(count($dataMenu)>0){
             $i = 0;
             foreach ($dataMenu AS $itm){
-                $dataMenu[$i]['Menu'] = $this->db->get_where('db_agregator.agregator_menu',array('MHID' => $itm['ID']))->result_array();
+                $dataMenu[$i]['Menu'] = $this->db->order_by('Name','ASC')->get_where('db_agregator.agregator_menu',array('MHID' => $itm['ID']))->result_array();
                 $i++;
             }
         }
@@ -145,6 +145,7 @@ class C_agregator extends Globalclass {
         $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
         $this->menu_agregator($page);
     }
+
     public function mahasiswa_asing()
     {
         $viewPage = 'mahasiswa_asing';
@@ -153,6 +154,7 @@ class C_agregator extends Globalclass {
         $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
         $this->menu_agregator($page);
     }
+
     public function bobot_kredit_mk()
     {
         $viewPage = 'bobot_kredit_mk';
@@ -248,6 +250,14 @@ class C_agregator extends Globalclass {
 
     public function rasio_kelulusan(){
         $viewPage = 'rasio_kelulusan';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function table_refrensi(){
+        $viewPage = 'table_refrensi';
         $accessUser = $this->agregatorPrevilege($viewPage);
         $data['accessUser'] = $accessUser;
         $page = $this->load->view('page/agregator/'.$viewPage,$data,true);

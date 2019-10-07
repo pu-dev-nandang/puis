@@ -28,8 +28,21 @@
         width:2200px;
     }
 </style>
-<h3>This is the page : data_dosen.php</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div class="well">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="form-group">
+                <label for="">Status Forlap</label>
+                <select name="" id="StatusForlap" class = "form-control">
+                    <option value="%">ALL</option>
+                    <option value="0">NUP</option>
+                    <option value="1">NIDN</option>
+                    <option value="2">NIDK</option>
+                </select>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div style="text-align: right;">
@@ -73,20 +86,28 @@ function loadPage() {
     }
 }
 
+$(document).off('change', '#StatusForlap').on('change', '#StatusForlap',function(e) {
+    loadPage();
+});
+
 function LoadTableData(filterProdi)
 {
+    var StatusForlap = $('#StatusForlap option:selected').val();
+    var StatusForlapText = $('#StatusForlap option:selected').text();
+    var ProdiName = $('#filterProdi option:selected').text();
     var P = filterProdi.split('.');
     var ProdiID = P[0];
     var data = {
         auth : 's3Cr3T-G4N',
         mode : 'DataDosen',
         ProdiID : ProdiID,
+        StatusForlap : StatusForlap,
     };
     var token = jwt_encode(data,"UAP)(*");
     var url = base_url_js+"rest3/__get_APS_CrudAgregatorTB3";
     $.post(url,{token:token},function (jsonResult) {
         var selector = $('#viewTable');
-        var html = '<div style = "height:700px;overflow-y:auto;overflow-x:auto;">';
+        var html = '<div style = "overflow-x:auto;">';
 
         // get data pertama untuk ts
         var JMLDibimbingBy_PS = jsonResult[0]['JMLDibimbingBy_PS'];
@@ -97,6 +118,12 @@ function LoadTableData(filterProdi)
 
         html += '<table class="table table-bordered dataTable2Excel" id ="dataTablesDataDosen" style = "min-width: 1200px;"  data-name="DataDosen">'+
                         '<thead>'+
+                            '<tr>'+
+                                '<th colspan = "24"><label>Status Forlap : '+StatusForlapText+'</label></th>'+
+                            '</tr>'+
+                            '<tr>'+
+                                '<th colspan = "24"><label>Prodi : '+ProdiName+'</label></th>'+
+                            '</tr>'+     
                             '<tr>'+
                                 '<th rowspan = "3">No</th>'+
                                 '<th rowspan = "3">Nama Dosen</th>'+

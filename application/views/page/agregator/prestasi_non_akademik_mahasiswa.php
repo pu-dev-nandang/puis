@@ -17,7 +17,10 @@
 
 
         </div>
-
+        <p style="color: orangered;">
+            *) Non-Akademik : minimal 0.10 % dari total mahasiswa aktif. (Nilai terbesar adalah tingkat internasional)
+            *) Internasional + Nssiaonal + Provinsi/Wilayah :3
+        </p>
     </div>
 
 </div>

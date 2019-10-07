@@ -100,8 +100,8 @@ class M_finance extends CI_Model {
 
    public function updateStatusFormulirCodeOnline($FormulirCode,$year = null)
    {
-    $sql = "update db_admission.formulir_number_online_m set Status = 1 where FormulirCode = '".$FormulirCode."'";
-    $query=$this->db->query($sql, array());
+    // $sql = "update db_admission.formulir_number_online_m set Status = 1 where FormulirCode = '".$FormulirCode."'";
+    // $query=$this->db->query($sql, array()); // tidak tau fungsi ini untuk apa
 
     // link ke formulir global
       if ($year != null) {
@@ -109,9 +109,39 @@ class M_finance extends CI_Model {
         $query=$this->db->query($sql, array())->result_array();
         $FormulirCodeGlobal = $query[0]['FormulirCodeGlobal'];
 
+        // get no kwitansi
+        // $NoKwitansi = 'ON-0001';
+        /* Note  
+          ON : Fixed,
+          0001 : Increment
+        */
+        $sqlKwitansi = 'select NoKwitansi from db_admission.formulir_number_online_m where NoKwitansi is not null and NoKwitansi != 0
+                        and Years = "'.$year.'"
+                        order by NoKwitansi desc,ID Desc  
+                        Limit 1
+                        ';
+        $queryKwitansi=$this->db->query($sqlKwitansi, array())->result_array();
+        $in = 1;
+        if ( count($queryKwitansi) > 0 ) {
+          $in = $queryKwitansi[0]['NoKwitansi'];
+          $in = $in+1;
+        }
+        else{
+          $sqlKwitansi2 = 'select NoKwitansi from db_admission.formulir_number_online_m where Status = 1
+                        and Years ="'.$year.'"
+                        order by ID Desc  
+                        ';
+          $queryKwitansi2=$this->db->query($sqlKwitansi2, array())->result_array();
+
+          $in = count($queryKwitansi2);
+          $in = $in+1;
+        }
+
         // update No_Ref pada formulir number online dengan FormulirCodeGlobal
         $dataSave = array(
-          'No_Ref' => $FormulirCodeGlobal
+          'No_Ref' => $FormulirCodeGlobal,
+          'Status' => 1,
+          'NoKwitansi' => $in,
         );
 
         $this->db->where('FormulirCode',$FormulirCode);
@@ -4415,6 +4445,49 @@ class M_finance extends CI_Model {
      return $query;
    }
 
+   public function getSaleFormulirONOFFBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2)
+   {
+    $SelectSortBy = explode('.', $SelectSortBy);
+    switch ($SelectSortBy[1]) {
+      case 'No_Ref':
+      case 'FormulirCode':
+        $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+        break;
+      case 'DateSale':
+        $SelectSortBy = ' order by b.DateFin asc';
+        break;
+      default:
+        $SelectSortBy = '';
+        break;
+    }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,b.FormulirType
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,"Off" as FormulirType
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+                             UNION
+                             select a.No_Ref,"","",DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") as DateFin,c.Name,a.NoKwitansi,"ON" as FormulirType
+                             from db_admission.formulir_number_online_m as a
+                             join db_admission.register_verified as b on a.FormulirCode = b.FormulirCode
+                             join db_admission.register_verification as d on d.ID =  b.RegVerificationID
+                             join db_admission.register as c on c.ID = d.RegisterID
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where b.DateFin >= "'.$dateRange1.'" and b.DateFin <= "'.$dateRange2.'" and a.Years = ?
+               '.$SelectSortBy;
+               //print_r($sql);die();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa,$SelectSetTa))->result_array();
+     return $query;
+   }
+
    public function getSaleFormulirOfflineBetwwen_fin($SelectSetTa,$SelectSortBy,$dateRange1,$dateRange2)
    {
     $SelectSortBy = explode('.', $SelectSortBy);
@@ -4488,6 +4561,49 @@ class M_finance extends CI_Model {
      return $query;
    }
 
+   public function getSaleFormulirOffONMonth_fin($SelectSetTa,$SelectSortBy,$Month,$Year)
+   {
+    $SelectSortBy = explode('.', $SelectSortBy);
+    switch ($SelectSortBy[1]) {
+      case 'No_Ref':
+      case 'FormulirCode':
+        $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+        break;
+      case 'DateSale':
+        $SelectSortBy = ' order by b.DateFin asc';
+        break;
+      default:
+        $SelectSortBy = '';
+        break;
+    }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,b.FormulirType
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,"Off" as FormulirType
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+                             UNION
+                             select a.No_Ref,"","",DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") as DateFin,c.Name,a.NoKwitansi,"ON" as FormulirType
+                             from db_admission.formulir_number_online_m as a
+                             join db_admission.register_verified as b on a.FormulirCode = b.FormulirCode
+                             join db_admission.register_verification as d on d.ID =  b.RegVerificationID
+                             join db_admission.register as c on c.ID = d.RegisterID
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where  Month(b.DateFin) = "'.$Month.'" and Year(b.DateFin) = "'.$Year.'" and a.Years = ?
+               '.$SelectSortBy;
+               //print_r($sql);die();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa,$SelectSetTa))->result_array();
+     return $query;
+   }
+
    public function getSaleFormulirOfflineAll_fin($SelectSetTa,$SelectSortBy)
    {
       $SelectSortBy = explode('.', $SelectSortBy);
@@ -4521,6 +4637,49 @@ class M_finance extends CI_Model {
                '.$SelectSortBy;
                //print_r($sql);die();
      $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa))->result_array();
+     return $query;
+   }
+
+   public function getSaleFormulirOffOnnAll_fin($SelectSetTa,$SelectSortBy)
+   {
+      $SelectSortBy = explode('.', $SelectSortBy);
+      switch ($SelectSortBy[1]) {
+        case 'No_Ref':
+        case 'FormulirCode':
+          $SelectSortBy = ' order by a.FormulirCodeGlobal asc';
+          break;
+        case 'DateSale':
+          $SelectSortBy = ' order by b.DateFin asc';
+          break;
+        default:
+          $SelectSortBy = '';
+          break;
+      }
+     $sql = 'select a.FormulirCodeGlobal,a.Years,a.Status as StatusGlobalFormulir,
+              b.No_Ref,b.Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,b.FormulirType
+              from db_admission.formulir_number_global as a
+              LEFT JOIN
+              (
+                             select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,"Off" as FormulirType
+                             from db_admission.formulir_number_offline_m as a
+                             join db_admission.sale_formulir_offline as b
+                             on a.FormulirCode = b.FormulirCodeOffline
+                             left join db_employees.employees as c
+                             on c.NIP = b.PIC
+                             where a.Years = ?
+                             UNION
+                             select a.No_Ref,"","",DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") as DateFin,c.Name,a.NoKwitansi,"ON" as FormulirType
+                             from db_admission.formulir_number_online_m as a
+                             join db_admission.register_verified as b on a.FormulirCode = b.FormulirCode
+                             join db_admission.register_verification as d on d.ID =  b.RegVerificationID
+                             join db_admission.register as c on c.ID = d.RegisterID
+                             where a.Years = ?
+              ) as b
+              on a.FormulirCodeGlobal = b.No_Ref
+              where a.Years = ?
+               '.$SelectSortBy;
+               //print_r($sql);die();
+     $query=$this->db->query($sql, array($SelectSetTa,$SelectSetTa,$SelectSetTa))->result_array();
      return $query;
    }
 
