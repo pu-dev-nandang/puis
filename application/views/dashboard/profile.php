@@ -24,24 +24,21 @@
 						        <h3>Andre Feliks Setiawan, S.T., M.Sc</h3>
 						        <p>Studi Teknik Sipil Bidang Manajemen & Rekayasa Konstruksi</p>
 						        <hr>
-					        <div class="align-left">
-					        	<h3>Jobs Title</h3>
-						        <p>Dosen</p>	
-						        <h3>Gender</h3>
-						        <p>Male</p>						        
-					        
-						        <h3>Age</h3>
-						        <p>30 Yerd Old</p>						        
-					        
-						        <h3>Country</h3>
-						        <p>Jakarta</p>	
-						        <hr>	
-						    </div>				        
+						        <div class="align-left">
+						        	<h3>Jobs Title</h3>
+							        <p>Dosen</p>	
+							        <h3>Gender</h3>
+							        <p>Male</p>						        
+						        
+							        <h3>Age</h3>
+							        <p>30 Yerd Old</p>						        
+						        
+							        <h3>Country</h3>
+							        <p>Jakarta</p>	
+							        <hr>	
+							    </div>				        
 					        </div>
-					        
-
 				    	</div>
-						    
 					 </div>
 					<div class="col-sm-6 col-md-8">
 						<div class="thumbnail" style="padding: 20px">
