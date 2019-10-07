@@ -3543,12 +3543,13 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div,$h,'','LRT',0,'L');
         $pdf->Cell($w_Div,$h,'','LRT',1,'L');
 
-        $IPKFinal = $Result['IPK'];
-        if(strlen($Result['IPK'])==2) {
-            $IPKFinal = $Result['IPK'].'00';
-        } else if(strlen($Result['IPK'])==3){
-            $IPKFinal = $Result['IPK'].'0';
-        }
+        //$IPKFinal = $Result['IPK'];
+        $IPKFinal = number_format($Result['IPK'],2);
+        // if(strlen($Result['IPK'])==2) {
+        //     $IPKFinal = $Result['IPK'].'00';
+        // } else if(strlen($Result['IPK'])==3){
+        //     $IPKFinal = $Result['IPK'].'0';
+        // }
 
         $h=3;
         $pdf->SetFont('dinpromedium','',$font_medium);
@@ -3636,15 +3637,15 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->Ln(17);
 
-            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
+            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].'' : '';
             $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
-            $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+            $Dekan = $titleA.''.$Student['Dekan'].','.$titleB;
 
             $Rektorat = $dataStudent['Rektorat'][0];
-            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].'' : '';
             $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-            $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+            $Rektor = $titleARektor.''.$Rektorat['Name'].', '.$titleBRektor;
 
             // Foto
             $pdf->SetFont('dinpromedium','',$font_medium);
@@ -3692,9 +3693,9 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Ln(17);
 
             $Rektorat = $dataStudent['Rektorat'][0];
-            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+            $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].'' : '';
             $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
-            $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+            $Rektor = $titleARektor.''.$Rektorat['Name'].', '.$titleBRektor;
 
             // Foto
             $pdf->SetFont('dinpromedium','',$font_medium);
@@ -3959,10 +3960,10 @@ class C_save_to_pdf extends CI_Controller {
 
       // Rektor
       $Rektorat = $dataIjazah['Rektorat'][0];
-      $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].' ' : '';
+      $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].'' : '';
       $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
       $komaRektor = ($titleBRektor!='') ? ',' : '';
-      $Rektor = $titleARektor.''.$Rektorat['Name'].' '.$titleBRektor;
+      $Rektor = $titleARektor.''.$Rektorat['Name'].', '.$titleBRektor;
 
         if($Student['FacultyID']!=4 || $Student['FacultyID']!='4'){
 
@@ -3985,9 +3986,9 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Ln(13);
 
             // Dekan --
-            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].' ' : '';
+            $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].'' : '';
             $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
-            $Dekan = $titleA.''.$Student['Dekan'].' '.$titleB;
+            $Dekan = $titleA.''.$Student['Dekan'].', '.$titleB;
 
             // ----
             $pdf->SetFont('dinpromedium','',$fn_b);
@@ -5833,7 +5834,7 @@ Phone: (021) 29200456';
                      }
 
                      $Sx += $w_approved;
-                 
+
                 }
              }
              // die();
@@ -6195,7 +6196,7 @@ Phone: (021) 29200456';
             $y = $pdf->GetY()+20;
 
             $pdf->Image(base_url('images/cap.png'),130,$y+6,40);
-            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40); 
+            $pdf->Image('./uploads/signature/2617100.png',130,$y+6,40);
 
             $pdf->SetXY(130,$y);
             $pdf->Cell(60,5,'Jakarta, '.$this->getDateIndonesian($dateGen),0,1,'L');
