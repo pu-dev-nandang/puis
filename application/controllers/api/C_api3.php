@@ -3836,4 +3836,35 @@ class C_api3 extends CI_Controller {
 
     }
 
+    public function crudAlumni(){
+        $data_arr = $this->getInputToken2();
+
+        if(count($data_arr>0)) {
+
+            if($data_arr['action']=='searchAlumni'){
+
+                $key = $data_arr['key'];
+
+                $data = $this->db->query('SELECT NPM, Name FROM db_academic.auth_students 
+                                              WHERE StatusStudentID = "1" AND (NPM LIKE "%'.$key.'%" 
+                                              OR Name LIKE "%'.$key.'%") ORDER BY NPM ASC LIMIT 5')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+            else if($data_arr['action']=='jobLoadAlumni'){
+
+                $NPM = $data_arr['NPM'];
+
+                $data = $this->db->order_by('ID','DESC')->get_where('db_studentlife.alumni_experience',array(
+                    'NPM' => $NPM
+                ))->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+
+        }
+    }
+
 }
