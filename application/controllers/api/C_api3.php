@@ -3784,27 +3784,39 @@ class C_api3 extends CI_Controller {
 
 
     function getLanguagelabels(){
-        $dataTr = $this->db->query('SELECT * FROM db_prodi.language_label ORDER BY ID ASC ')->result_array();
 
-        $keys = array_keys($dataTr[0]);
+        $lang = $this->input->get('lang');
 
-        $result = array();
+        $dataLang = $this->db->get_where('db_prodi.language',array(
+            'Code' => $lang
+        ))->result_array();
 
-        for ($i=1;$i<count($keys);$i++){
+        if(count($dataLang)>0){
 
-            $temp = array();
-            foreach ($dataTr AS $item){
-                $temp[$item['Eng']] = $item[$keys[$i]];
+            $d = $dataLang[0];
 
+            $data = $this->db->query('SELECT li.IndexName, ll.Label FROM db_prodi.language_labels ll 
+                                                          LEFT JOIN db_prodi.language_index li ON (ll.LangIndexID = li.ID)
+                                                          WHERE ll.LangID = "'.$d['ID'].'" ')->result_array();
+
+            $res = array();
+            foreach ($data AS $item){
+                $res[$item['IndexName']] = $item['Label'];
             }
 
-            $result[$keys[$i]] = $temp;
+            $result = array(
+                $d['Code'] => $res
+            );
+
+            return print_r(json_encode($result));
 
 
-
+        } else {
+            return print_r(json_encode(array(
+                $lang => array()
+            )));
         }
 
-        return print_r(json_encode($result));
     }
 
     public function getAllTA_MHS()

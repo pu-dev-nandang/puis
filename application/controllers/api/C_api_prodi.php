@@ -54,6 +54,8 @@ class C_api_prodi extends CI_Controller {
 
         $data_arr = $this->getInputToken2();
 
+        $prodi_active_id = $this->session->userdata('prodi_active_id');
+
         if($data_arr['action']=='viewDataProdi')
         {
             $data=$this->m_home->getTableProdi();
@@ -131,8 +133,71 @@ class C_api_prodi extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='readLanguageProdi'){
+
+            $data = $this->db->get('db_prodi.language')->result_array();
+
+            return print_r(json_encode($data));
+        }
+
+        // Add by Nandang =====
+        else if($data_arr['action']=='updateProdiTexting'){
+
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $dataForm['ProdiID'] = $prodi_active_id;
+            $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+            // Cek apakah udah di input atau blm
+            $dataCk = $this->db->get_where('db_prodi.prodi_texting',array(
+                'ProdiID' => $prodi_active_id,
+                'Type' => $dataForm['Type'],
+                'LangID' => $dataForm['LangID'],
+            ))->result_array();
+
+            if(count($dataCk)>0){
+                $this->db->where('ID', $dataCk[0]['ID']);
+                $this->db->update('db_prodi.prodi_texting',$dataForm);
+            } else {
+                $this->db->insert('db_prodi.prodi_texting',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='readProdiTexting'){
+
+            $Type = $data_arr['Type'];
+
+            $data = $this->db->query('SELECT pt.*, l.Language FROM db_prodi.prodi_texting pt 
+                                                LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                                WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" ')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='readDataProdiTexting'){
+            $Type = $data_arr['Type'];
+            $LangID = $data_arr['LangID'];
+
+            $data = $this->db->get_where('db_prodi.prodi_texting',array(
+                'ProdiID' => $prodi_active_id,
+                'Type' => $Type,
+                'LangID' => $LangID
+            ))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
 
 
+    }
+
+
+    function getContentProdi(){
+        $id = $this->input->get('id');
+$lang = $this->input->get('lang');
+$content = $this->input->get('content');
     }
 
 

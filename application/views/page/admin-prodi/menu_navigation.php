@@ -20,11 +20,11 @@
                         <li class="<?php if($this->uri->segment(3,0)=='overview'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/overview'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Overview
+                                Greetings
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3,0)=='whychoose'){echo "current";} ?>">
-                                <a href="<?php echo base_url('prodi/beranda/whychoose'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='why-choose-us'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/beranda/why-choose-us/whychoose'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Why Choose us?
                                 </a>
