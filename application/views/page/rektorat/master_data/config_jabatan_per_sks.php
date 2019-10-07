@@ -136,6 +136,34 @@
         loadPage();
     })
 
+    $(document).off('click', '.btnRemoveSKS').on('click', '.btnRemoveSKS',function(e) {
+      var selector = $(this);
+      if (confirm('Are you sure ?')) {
+        var ID=$(this).attr('data-id')
+          var url = base_url_js+'rest3/__Config_Jabatan_SKS';
+          var data = {
+              auth : 's3Cr3T-G4N',
+              mode : 'deletelistSKS',
+              ID : ID,
+          };
+          var token = jwt_encode(data,"UAP)(*");
+            selector.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+            selector.prop('disabled',true);
+          $.post(url,{ token:token },function (resultJson) {
+              
+          }).done(function(resultJson) {
+            selector.html('<i class="fa fa-trash"></i>');
+            selector.prop('disabled',false);
+            loadPage();
+          }).fail(function() {
+            toastr.info('No Result Data');
+          }).always(function() {
+                          
+          });
+      }
+      
+    })
+
     function MakeTable(resultJson)
     {
         var dt = resultJson;
@@ -178,7 +206,8 @@
                   {
                      'targets': 5,
                      'render': function (data, type, full, meta){
-                         return 'Tombol Delete buat irfan';
+                      // console.log(full)
+                         return '<button class="btn btn-sm btn-danger btnRemoveSKS" data-id="'+full.ID+'"><i class="fa fa-trash"></i></button>';
                      }
                   },
               ],
@@ -309,6 +338,9 @@
                 ' <option value="'+i+'">'+i+'</option>'
                 )
         }
+        selector.select2({
+            //allowClear: true
+        });
     }
         $('#btnSaveSKS').click (function(){
              var formName = $('#formName').val();
@@ -338,7 +370,8 @@
                     var token = jwt_encode(data,'UAP)(*');
                     $.post(url,{token:token},function (result) {
                         toastr.success('Data saved','Success');
-                        // setDefaultTable(formName);
+                         // setDefaultTable(formName);
+                         loadPage();
 
                         setTimeout(function () {
 

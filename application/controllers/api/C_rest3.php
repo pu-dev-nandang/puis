@@ -910,7 +910,7 @@ class C_rest3 extends CI_Controller {
         }
         else if ($mode == 'listJabatanSKS') {
           $SemesterID = $dataToken['filterPeriod'];
-          $sql = 'select a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
+          $sql = 'select a.ID, a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
                   from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
                   join  db_employees.position as c on a.positionID = c.ID
                   join db_academic.semester as d on d.ID = a.SemesterID
@@ -919,6 +919,12 @@ class C_rest3 extends CI_Controller {
           $query=$this->db->query($sql, array($SemesterID))->result_array();
 
           echo json_encode($query);
+        }
+        elseif ($mode == 'deletelistSKS') {
+          $ID=$dataToken['ID'];
+          $this->db->where('ID', $ID);
+          $this->db->delete('db_rektorat.tugas_tambahan');
+          echo json_encode(1);
         }
 
     }
