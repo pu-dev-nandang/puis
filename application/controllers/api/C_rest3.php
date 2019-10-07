@@ -912,9 +912,9 @@ class C_rest3 extends CI_Controller {
           $SemesterID = $dataToken['filterPeriod'];
           $sql = 'select a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
                   from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
-                  join db_employees.Position as c on a.PositionID = c.ID
+                  join  db_employees.position as c on a.positionID = c.ID
                   join db_academic.semester as d on d.ID = a.SemesterID
-                  where a.SemesterID = ?
+                  where a.semesterID = ?
                   ';
           $query=$this->db->query($sql, array($SemesterID))->result_array();
 
