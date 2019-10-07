@@ -187,7 +187,7 @@ $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 $route['it/user-activity'] = 'page/it/c_it/user_activity';
 
 $route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
-
+$route['it/console-developer'] = 'page/it/c_it/console_developer';
 
 
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -1054,6 +1054,8 @@ $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolb
 $route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
 
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+$route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
+
 
 
 

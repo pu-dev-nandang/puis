@@ -199,4 +199,10 @@ class C_it extends It_Controler {
       $this->temp($content);
     }
 
+    public function console_developer()
+    {
+      $content = $this->load->view('page/'.$this->data['department'].'/console-developer/console_developer',$this->data,true);
+      $this->temp($content);
+    }
+
 }
