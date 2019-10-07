@@ -10,7 +10,7 @@ class M_prodi extends CI_Model {
         parent::__construct();
     }
 
-    public function auth()
+    public function auth($ProdiID = NULL)
     {
         $PositionMain = $this->session->userdata('PositionMain');
         $DivisionID = $PositionMain['IDDivision'];
@@ -50,7 +50,15 @@ class M_prodi extends CI_Model {
 
         if (count($GetProdi) > 0) {
             $this->session->set_userdata('prodi_get',$GetProdi);
-            if (count($GetProdi) == 1) {
+            if ($ProdiID == NULL || $ProdiID == '') {
+                // if (count($GetProdi) == 1) {
+                //     $a = $this->session->userdata('prodi_get');
+                //     $prodi_active = $a[0]['Name'];
+                //     $prodi_active = strtolower($prodi_active);
+                //     $prodi_active = str_replace(" ", "-", $prodi_active);
+                //     $this->session->set_userdata('prodi_active',$prodi_active);
+                //     $this->session->set_userdata('prodi_active_id',$a[0]['ID']);
+                // }
                 $a = $this->session->userdata('prodi_get');
                 $prodi_active = $a[0]['Name'];
                 $prodi_active = strtolower($prodi_active);
@@ -58,6 +66,18 @@ class M_prodi extends CI_Model {
                 $this->session->set_userdata('prodi_active',$prodi_active);
                 $this->session->set_userdata('prodi_active_id',$a[0]['ID']);
             }
+            else
+            {
+                $GetProdi_selected = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                $a = $this->session->userdata('prodi_get');
+                $prodi_active = $GetProdi_selected[0]['Name'];
+                $prodi_active = strtolower($prodi_active);
+                $prodi_active = str_replace(" ", "-", $prodi_active);
+                $this->session->set_userdata('prodi_active',$prodi_active);
+                $this->session->set_userdata('prodi_active_id',$GetProdi_selected[0]['ID']);
+
+            }
+            
         }
         else
         {

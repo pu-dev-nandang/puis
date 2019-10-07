@@ -643,8 +643,13 @@ class C_login extends CI_Controller {
                     $PositionMain = $this->session->userdata('PositionMain');
                     $Position = $PositionMain['IDPosition'];
 
-                    $URLRedirect = ($input['URLRedirect']!='') ? $input['URLRedirect'] : base_url().'dashboard';
-
+                    // $URLRedirect = ($input['URLRedirect']!='') ? $input['URLRedirect'] : base_url().'dashboard';
+                    $URLRedirect = (array_key_exists('URLRedirect', $input)) ? $input['URLRedirect'] : base_url().'dashboard';
+                    $ProdiID = NULL;
+                    if (array_key_exists('ProdiID', $ProdiID)) {
+                        $ProdiID = $input['ProdiID'];
+                    }
+                    
                     switch ($Position) {
                         case 5: // Dekan
                             $this->load->model('faculty/m_faculty');
@@ -656,7 +661,8 @@ class C_login extends CI_Controller {
                             $this->load->model('prodi/m_prodi');
                             $this->session->set_userdata('IDdepartementNavigation','15');
                             $this->session->set_userdata('departementNavigation','admin-prodi');
-                            $this->m_prodi->auth(); // get session
+                            // print($ProdiID);die();
+                            $this->m_prodi->auth($ProdiID); // get session
                             break;
                         case 7: // DOSEN
                             $this->session->set_userdata('IDdepartementNavigation','36');
