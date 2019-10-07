@@ -49,8 +49,10 @@
         </div>
 
         <div class="thumbnail" style="min-height: 50px;">
-
-            <table class="table table-striped">
+            <div id="viewtable">
+                
+            </div>
+            <!-- <table class="table table-striped" id = "tbldata">
                 <thead>
                 <tr>
                     <th style="width: 1%;">No</th>
@@ -61,7 +63,7 @@
                 </tr>
                 </thead>
                 <tbody id="listJabatanSKS"></tbody>
-            </table>
+            </table> -->
 
         </div>
     </div>
@@ -80,6 +82,125 @@
          LoadSemester();
          LoadSKS();
 
+         var firstLoad = setInterval(function () {
+             var filterPeriod = $('#filterPeriod').val();
+             if(filterPeriod!='' && filterPeriod!=null){
+                 loadPage();
+                 clearInterval(firstLoad);
+             }
+         },1000);
+         setTimeout(function () {
+             clearInterval(firstLoad);
+         },5000);
+
+    }
+
+    function loadPage()
+    {
+        var selector = $('#listJabatanSKS');
+        var filterPeriod = $('#filterPeriod').val();
+        var url = base_url_js+'rest3/__Config_Jabatan_SKS';
+        var data = {
+            auth : 's3Cr3T-G4N',
+            mode : 'listJabatanSKS',
+            filterPeriod : filterPeriod,
+        };
+        var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{ token:token },function (resultJson) {
+            
+        }).done(function(resultJson) {
+            var selector = $('#viewtable');
+            var htmltable = '<table class="table table-striped" id = "tbldata">'+
+                                '<thead>'+
+                                '<tr>'+
+                                 '   <th style="width: 1%;">No</th>'+
+                                '    <th style="width: 15%;">Nama Dosen</th>'+
+                                '    <th style="width: 15%;">Jabatan/Posisi</th>'+
+                                '    <th style="width: 15%;">Semester</th>'+
+                                '    <th style="width: 10%;">SKS</th>'+
+                                '    <th style="width: 10%;">Action</th>'+
+                               ' </tr>'+
+                               ' </thead>'+
+                               ' <tbody id="listJabatanSKS"></tbody>'+
+                            '</table>';
+            selector.html(htmltable);                
+            MakeTable(resultJson);
+        }).fail(function() {
+          toastr.info('No Result Data');
+        }).always(function() {
+                        
+        });
+    }
+
+    $(document).off('click', '#filterPeriod').on('click', '#filterPeriod',function(e) {
+        loadPage();
+    })
+
+    function MakeTable(resultJson)
+    {
+        var dt = resultJson;
+        var table = $('#tbldata').DataTable({
+              "data" : dt,
+              'columnDefs': [
+                  {
+                     'targets': 0,
+                     'searchable': false,
+                     'orderable': false,
+                     'className': 'dt-body-center',
+                     'render': function (data, type, full, meta){
+                         return '';
+                     }
+                  },
+                  {
+                     'targets': 1,
+                     'render': function (data, type, full, meta){
+                         return full.NIP+'-'+full.Name;
+                     }
+                  },
+                  {
+                     'targets': 2,
+                     'render': function (data, type, full, meta){
+                         return full.Position;
+                     }
+                  },
+                  {
+                     'targets': 3,
+                     'render': function (data, type, full, meta){
+                         return full.SemesterName;
+                     }
+                  },
+                  {
+                     'targets': 4,
+                     'render': function (data, type, full, meta){
+                         return full.SKS;
+                     }
+                  },
+                  {
+                     'targets': 5,
+                     'render': function (data, type, full, meta){
+                         return 'Tombol Delete buat irfan';
+                     }
+                  },
+              ],
+              'createdRow': function( row, data, dataIndex ) {
+                    // $(row).attr('CodePost', data.CodePost);
+                    // $(row).attr('CodeHeadAccount', data.CodeHeadAccount);
+                    // $(row).attr('CodePostRealisasi', data.CodePostRealisasi);
+                    // $(row).attr('money', (data.Value - data.Using) );
+                    // $(row).attr('id_budget_left', data.ID);
+                    // $(row).attr('NameHeadAccount', data.NameHeadAccount);
+                    // $(row).attr('RealisasiPostName', data.RealisasiPostName);
+              },
+              // 'order': [[1, 'asc']]
+        });
+
+        table.on( 'order.dt search.dt', function () {
+                table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                    cell.innerHTML = i+1;
+                } );
+            } ).draw();
+
+        Otable = table;
     }
 
     function LoadNama() {

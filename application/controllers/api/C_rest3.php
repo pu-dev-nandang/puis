@@ -898,6 +898,7 @@ class C_rest3 extends CI_Controller {
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);
       }
+
         else if($mode=='saveDataJabatanSKS'){
 
                           $dataForm = (array) $dataToken['dataForm'];
@@ -906,8 +907,21 @@ class C_rest3 extends CI_Controller {
                           $this->db->insert('db_rektorat.tugas_tambahan',$dataForm);
 
                           echo json_encode(1);
-                      }
         }
+        else if ($mode == 'listJabatanSKS') {
+          $SemesterID = $dataToken['filterPeriod'];
+          $sql = 'select a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
+                  from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
+                  join db_employees.Position as c on a.PositionID = c.ID
+                  join db_academic.semester as d on d.ID = a.SemesterID
+                  where a.SemesterID = ?
+                  ';
+          $query=$this->db->query($sql, array($SemesterID))->result_array();
+
+          echo json_encode($query);
+        }
+
+    }
 
     public function APS_CrudAgregatorTB7()
     {
@@ -973,8 +987,7 @@ class C_rest3 extends CI_Controller {
             echo json_encode($rs);
 
         }
-        
-
+       
     }
 
 }
