@@ -8416,7 +8416,8 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='getAllStdReg'){
 
                 $Status = $data_arr['Status'];
-                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project fp 
+                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2  
+                                                    FROM db_academic.final_project fp
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
                                                     LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
                                                     LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
@@ -9589,7 +9590,6 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
-
     public function crudCategoryClassroomVreservation()
     {
         $token = $this->input->post('token');
@@ -9704,7 +9704,6 @@ class C_api extends CI_Controller {
 
         }
     }
-
 
     public function getDataStudyPlanning(){
         $requestData= $_REQUEST;
@@ -10153,9 +10152,6 @@ class C_api extends CI_Controller {
             }
         }
     }
-
-
-   
 
     public function dropdownlistmodule(){
         $data_arr = $this->getInputToken();

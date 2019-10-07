@@ -72,6 +72,12 @@ class C_studentlife extends Student_Life {
         $this->menu_stracert_alumni($page);
     }
 
+    public function form_accreditation(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/tracer-alumni/form_accreditation',$data,true);
+        $this->menu_stracert_alumni($page);
+    }
+
 
 
 

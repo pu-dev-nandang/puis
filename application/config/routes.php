@@ -691,6 +691,7 @@ $route['student-life/student-achievement/list'] =  'page/student-life/c_studentl
 $route['student-life/student-achievement/update-data-achievement'] =  'page/student-life/c_studentlife/update_data_achievement';
 
 $route['student-life/tracer-alumni/list'] =  'page/student-life/c_studentlife/list_alumni';
+$route['student-life/tracer-alumni/form-accreditation'] =  'page/student-life/c_studentlife/form_accreditation';
 
 
 // --- LPMI ----
@@ -1106,6 +1107,8 @@ $route['api/__getTranscript'] = 'api/c_api/getTranscript';
 $route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
 $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
 
+
+
 // ==== Study Planning ===
 $route['api/__getDataStudyPlanning'] = 'api/c_api/getDataStudyPlanning';
 
@@ -1502,6 +1505,8 @@ $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
 $route['api3/__crudTracerAlumni'] = 'api/c_api3/crudTracerAlumni';
 
 $route['api3/__getLanguagelabels'] = 'api/c_api3/getLanguagelabels';
+
+$route['api3/__crudAlumni'] = 'api/c_api3/crudAlumni';
 
 
 // Agregator Adhi
