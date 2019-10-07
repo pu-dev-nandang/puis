@@ -252,6 +252,12 @@
                     </li>
                 </ul>
             </li>
+            <li class="<?php if($this->uri->segment(2)=='console-developer'){echo"current";}?>">
+                <a href="<?php echo base_url('it/console-developer');?>">
+                    <i class="fa fa-angellist"></i>
+                    Console Developer
+                </a>
+            </li>
 
         </ul>
 

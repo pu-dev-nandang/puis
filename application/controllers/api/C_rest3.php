@@ -990,4 +990,27 @@ class C_rest3 extends CI_Controller {
        
     }
 
+    public function submit_console_developer()
+    {
+        $dataToken = $this->data['dataToken'];
+        $mode = $dataToken['mode'];
+        if ($mode == 'read') {
+            $getDt = $this->m_master->showData_array('db_it.m_config');
+            echo json_encode($getDt);
+        }
+        elseif ($mode == 'update') {
+            $ID = $dataToken['ID'];
+           $DataForm = json_decode(json_encode($dataToken['DataForm']),true);
+           $this->db->where('ID',$ID);
+           $this->db->update('db_it.m_config',$DataForm);
+           
+           echo json_encode(1);
+        }
+        elseif ($mode == 'insert') {
+            $DataForm = json_decode(json_encode($dataToken['DataForm']),true);
+            $this->db->insert('db_it.m_config',$DataForm);
+            echo json_encode(1);
+        } 
+    }
+
 }
