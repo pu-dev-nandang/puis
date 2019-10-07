@@ -11,15 +11,18 @@
 <div class="well">
 
     <div class="row">
-        
+
         <div class="col-md-12">
             <div style="text-align: right;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> <p></p>
                 <!-- <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button> -->
             </div>
             <div id= "content_dt">
-                
+
             </div>
+            <p style="color: orangered;">
+                *) Judul dan kegiatan penelitian tercatat di unit pengelola perguruan tinggi
+            </p>
         </div>
     </div>
 
@@ -94,13 +97,13 @@
                 htmlTable += '<td style="vertical-align : middle;text-align:center;width: 5%;">'+arr_header_table[i]+'</td>';
                 arr_total.push(0);
             }
-           
+
             //htmlTable += '<td>'+'Jumlah'+'</td>';
             htmlTable += '</tr></thead>'+
                         '<tbody id="listStd"></tbody>'+
-                        '</table>';   
-            
-            $('#content_dt').html(htmlTable);            
+                        '</table>';
+
+            $('#content_dt').html(htmlTable);
             $('#listStd').empty();
 
             var arr_body_table = jsonResult.body;
@@ -148,7 +151,7 @@
                             '<td colspan = "2" style="vertical-align : middle;text-align:center;">Jumlah</td>'+
                             isian+
                         '</tr>'+
-                    '</tfoot>'        
+                    '</tfoot>'
                     );
 
 

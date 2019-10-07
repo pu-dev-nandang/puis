@@ -1,41 +1,42 @@
-<div class="row">
 
-    
-        <div class="col-md-6">
-            
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                    <h4 class="panel-title"> ENGLISH OVERVIEW</h4>
-                    </div>
-                    <div class="panel-body">
-                    <textarea class="form-control" rows="3" id="formWelcomingEng"></textarea>
-                    </div>
-                </div>
-            
-        </div>
-        <div class="col-md-6">
-            
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                    <h4 class="panel-title">INDONESIA OVERVIEW</h4>
-                    </div>
-                    <div class="panel-body">
-                    <textarea class="form-control" rows="3" class="form-control" id="formWelcomingInd"></textarea>
-                    </div>
-                </div>
-            
-            <button id="btnSubmit" class="btn btn-primary" style="margin-top: 15px;float: right;">Save</button>
-        </div>
-   
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-6">
+        <table class="table">
+            <tr>
+                <td style="width: 15%;">Language</td>
+                <td style="width: 1%;">:</td>
+                <td>
+                    <select style="max-width: 150px;" id="LangID" class="form-control"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>:</td>
+                <td>
+                    <textarea id="Description" class="form-control"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;">
+                    <button class="btn btn-success" id="btnSave">Save</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 
+    <div class="col-md-6" style="border-left: 1px solid #CCCCCC;">
+        <div id="viewDataDesc"></div>
+    </div>
 </div>
 
+<script>
+    $(document).ready(function () {
 
-<script type="text/javascript">
+        window.G_Type = 'welcoming';
 
-    $(document).ready(function(){
-//=== menampilkan data summernote js=== //
-        $('#formWelcomingEng,#formWelcomingInd').summernote({
+        loadSelectOptionLanguageProdi('#LangID','');
+
+        $('#Description').summernote({
             placeholder: 'Text your announcement',
             tabsize: 2,
             height: 300,
@@ -50,72 +51,97 @@
             ]
         });
 
-        // console.log(base_url);
-        tampil_data_sambutan();
+        loadDataWelcoming();
 
-        
+        var firsLoad = setInterval(function () {
+
+            var LangID = $('#LangID').val();
+            if(LangID!='' && LangID!=null){
+                loadDataOption();
+                clearInterval(firsLoad);
+            }
+
+        },1000);
+
     });
 
-    function tampil_data_sambutan(){
+    $('#LangID').change(function () {
+        var LangID = $('#LangID').val();
+        if(LangID!='' && LangID!=null){
+            loadDataOption();
+        }
+    });
 
-        var data = {action : 'viewDataProdi'};
-
+    function loadDataWelcoming() {
+        var data = {
+            action : 'readProdiTexting',
+            Type : G_Type
+        };
         var token = jwt_encode(data,'UAP)(*');
-
         var url = base_url_js+'api-prodi/__crudDataProdi';
 
-        $.post(url,{token:token},function(jsonResult){
+        $.post(url,{token:token},function (jsonResult) {
+            $('#viewDataDesc').empty();
             if(jsonResult.length>0){
-                var d = jsonResult[0];
-                $('#formWelcomingEng').summernote('code', d.WelcomingEng);
-                $('#formWelcomingInd').summernote('code', d.WelcomingInd);
-                // $('#formWelcomingEng').html(d.WelcomingEng);
-                // $('#formWelcomingInd').html(d.WelcomingInd);
+
+                $.each(jsonResult,function (i,v) {
+                    $('#viewDataDesc').append('<div class="well"><h3 style="margin-top: 5px;"><b>'+v.Language+'</b></h3><div>'+v.Description+'</div></div>');
+                });
+
+            } else {
+                $('#viewDataDesc').html('<div class="well">Data not yet</div>');
             }
+
         });
-        
     }
 
-    $('#btnSubmit').click(function () {
-
-        var formWelcomingEng = $('#formWelcomingEng').val();
-        var formWelcomingInd = $('#formWelcomingInd').val();
-        // console.log(formWelcomingEng);return;
-        if(formWelcomingEng!='' && formWelcomingEng!=null &&
-            formWelcomingInd!='' && formWelcomingInd!=null){
-
-            loading_button('#btnSubmit');
-
+    function loadDataOption() {
+        var LangID = $('#LangID').val();
+        if(LangID!='' && LangID!=null){
             var data = {
-                action : 'updateDataProdi',
-                dataForm : {
-                    WelcomingEng : formWelcomingEng,
-                    WelcomingInd : formWelcomingInd
-                }
+                action : 'readDataProdiTexting',
+                Type : G_Type,
+                LangID : LangID
             };
-
             var token = jwt_encode(data,'UAP)(*');
-
             var url = base_url_js+'api-prodi/__crudDataProdi';
-
             $.post(url,{token:token},function (jsonResult) {
-
-                toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    $('#btnSubmit').html('Save').prop('disabled',false);
-                },500);
+                if(jsonResult.length>0){
+                    $('#Description').summernote('code', jsonResult[0].Description);
+                } else {
+                    $('#Description').summernote('code', '');
+                }
 
             });
-
-        } else {
-            toastr.error('Form required','Error');
         }
+    }
 
+    $('#btnSave').click(function () {
+
+        var LangID = $('#LangID').val();
+        var Description = $('#Description').val();
+
+        if(LangID!='' && LangID!=null &&
+            Description!='' && Description!=null){
+
+            var data = {
+                action : 'updateProdiTexting',
+                dataForm : {
+                    Type : G_Type,
+                    LangID : LangID,
+                    Description : Description,
+                    UpdatedBy : sessionNIP
+                }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api-prodi/__crudDataProdi';
+            $.post(url,{token:token},function (jsonResult) {
+                toastr.success('Data saved','Success');
+                loadDataWelcoming();
+            })
+
+        }
 
     });
 
-
-
-
 </script>
-

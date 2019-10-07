@@ -20,10 +20,10 @@
         <div class="col-md-12">
             <div style="text-align: right"> <b>Download File : </b><button class="btn btn-success btn-circle" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o"></i> </button></div>
             <div id = "content_data">
-                
+
             </div>
         </div>
-
+<p style="color: orangered;">*) Program studi telah memiliki izin operasional dan terdaftar pada sistem akreditasi BAN-PT atau Lembaga Akreditasi MAndiri (LAM)</p>
     </div>
 
 </div>
@@ -51,9 +51,9 @@
                             '<th rowspan = "3"  style="vertical-align : middle;text-align:center;" >Status & Peringkat Akreditasi</th>'+
                             '<th colspan="'+totalCol+'" style="vertical-align : middle;text-align:center;" >Jumlah Program Studi</th>'+
                         '</tr>'+
-                        '<tr>';    
+                        '<tr>';
 
-        
+
         for (var i = 0; i < header.length; i++) {
            var Type = header[i].Type;
            var ll = header[i].Detail.length;
@@ -69,16 +69,16 @@
            for (var j = 0; j < Detail.length; j++) {
                html += '<th style="border-right: 1px solid #ccc;">'+Detail[j].Name+'</th>';
            }
-           
+
         }
 
-        html += '</tr>';  
+        html += '</tr>';
 
         html +=  '</thead>'+
                 '<tbody id="listData"></tbody>'+
             '</table> ';
 
-        return html;                      
+        return html;
     }
 
     function loadAkreditasiProdi() {
@@ -138,7 +138,7 @@
                 ]);
             }
         }
-        
+
     })
 
     function hitungRow(cl) {

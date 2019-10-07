@@ -249,7 +249,7 @@
 <br />
 
 <div class="row">
-     <div class="col-md-8">
+     <div class="col-md-12">
         <div class="thumbnail" style="padding: 0px">
             <span class="label-info" style="color: #ffffff;padding: 5px;padding-left:10px;padding-right:10px;font-weight: bold;"><i class="fa fa-cog margin-right"></i>  Study Program Accreditation</span>
 
@@ -291,7 +291,7 @@
                                         <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="javascript:void(0);" class="btnEditEdStudy" data-id="<?php echo $itemX['ID']; ?>">Edit</a></li>
+                                        <li><a href="javascript:void(0);" class="btnEditEdStudy" data-accreditation="<?= $itemX['accreditationID']; ?>" data-id="<?php echo $itemX['ID']; ?>">Edit</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li class="disabled"><a href="javascript:void(0);" class="btnDelEd disabled" disabled="disabled" data-id="<?php echo $itemX['ID']; ?>">Delete</a></li>
                                     </ul>
@@ -553,35 +553,40 @@
     // Program Study Accreditation
     $(document).on('click','.btnEditEdStudy',function () {
 
+        var ID = $(this).attr('data-id');
         var tr = $(this).closest('tr');
-        tr.find('td:eq(4)').html('<center><input type = "text" class = "form-control" id="formAkreditasiBANPTDate"></center>');
-        tr.find('td:eq(5)').html('<input type = "text" class = "form-control" >');
+        tr.find('td:eq(4)').html('<select id="AccreditationID'+ID+'" class = "form-control" ><option></option></select>');
+        tr.find('td:eq(5)').html('<input type = "text" class = "form-control" value="'+tr.find('td:eq(5)').text().trim()+'" id="SKBANPTDate_'+ID+'">');
+        tr.find('td:eq(6)').html('<input type = "text" class = "form-control" value="'+tr.find('td:eq(6)').text().trim()+'" id="NoSKBANPT_'+ID+'">');
 
-        $('.btnDropDownEdStudy').addClass('hide');
-        $('.btnSaveEdStudy').removeClass('hide');
+        var IDAccreditation = $(this).attr('data-accreditation');
 
-        $('#formAkreditasiBANPTDate').datepicker({
-              dateFormat : 'yy-mm-dd',
-              changeMonth : true,
-              changeYear : true,
-              autoclose: true,
-              todayHighlight: true,
-              uiLibrary: 'bootstrap'
-        });
+        loadSelectOptionAccreditation('#AccreditationID'+ID,IDAccreditation);
+
+        $('#btnDropDownEdStudy'+ID).addClass('hide');
+        $('#btnSaveEdStudy'+ID).removeClass('hide');
+
 
     });
 
     $(document).on('click','.btnSaveEdStudy',function () {
-        var tr = $(this).closest('tr');
-        var dateacc = tr.find('td:eq(4)').find('input').val();
-        var noacc = tr.find('td:eq(5)').find('input').val();
+
         var ID = $(this).attr('data-id');
+
+        var AccreditationID = $('#AccreditationID'+ID).val();
+        var SKBANPTDate = $('#SKBANPTDate_'+ID).val();
+        var NoSKBANPT = $('#NoSKBANPT_'+ID).val();
+
+
 
         var data = {
             action : 'updateStudyAcc',
-            Dateacc : dateacc,
             ID : ID,
-            Noacc : noacc
+            dataForm : {
+                AccreditationID : AccreditationID,
+                SKBANPTDate : SKBANPTDate,
+                NoSKBANPT : NoSKBANPT
+            }
         };
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api/__crudTranscript';

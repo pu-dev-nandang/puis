@@ -463,6 +463,142 @@ class C_rest3 extends CI_Controller {
                 }
                 echo json_encode($rs);    
                 break;
+                case 'EWMP':
+                    $rs = [];
+                    $ProdiID = $dataToken['ProdiID'];
+                    $FilterTahun = $dataToken['FilterTahun'];
+                    // get SemesterID in dalam tahun
+                    $G_yearSMT = $this->m_master->caribasedprimary('db_academic.semester','Year',$FilterTahun);
+                    $TahunFilter = [];
+                    for ($i=0; $i < count($G_yearSMT); $i++) { 
+                        $TahunFilter[] = $G_yearSMT[$i]['ID'];
+                    }
+                    
+                    $TahunFilter = implode(',',$TahunFilter);
+
+                    // Dosen tetap dengan status pada db_employees.employees StatusForlap = "1" dan "2"
+                    $sqlDosen = 'select * from db_employees.employees where ProdiID = ? and StatusForlap in ("1","2") ';
+                    $queryDosen=$this->db->query($sqlDosen, array($ProdiID))->result_array();
+                    for ($i=0; $i < count($queryDosen); $i++) {
+                        $temp = [];
+                        $No = $i+1;
+                        $temp[] = $No; 
+                        $Name = $queryDosen[$i]['Name'];
+                        $NIP = $queryDosen[$i]['NIP'];
+                        $temp[] = $Name;
+                        $temp[] = 'V'; // DTPS
+                        $arr_get = [];
+                        // total ps akreditasi
+                        $sqlPSAkreditasi = '
+                                            select SUM(Credit) as TotalCredit from (
+                                                select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
+                                                from db_academic.schedule_details_course as a 
+                                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                                join db_academic.schedule_details as sd on sd.ScheduleID = b.ID
+                                                where a.ProdiID = ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
+                                                group by b.ID,a.MKID
+                                            )xx   
+                                            ';
+                        $queryPSAkreditasi=$this->db->query($sqlPSAkreditasi, array($ProdiID,$NIP))->result_array();
+                        // get data 
+                        $sqlDataAkreditasi = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
+                                                from db_academic.schedule_details_course as a 
+                                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                                join db_academic.schedule_details as sd on sd.ScheduleID = b.ID
+                                                where a.ProdiID = ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
+                                                group by b.ID,a.MKID';
+                        $queryDataPSAkreditasi=$this->db->query($sqlDataAkreditasi, array($ProdiID,$NIP))->result_array();                        
+                        // encode token
+                        $token = $this->jwt->encode($queryDataPSAkreditasi,"UAP)(*");
+                        $tot = ($queryPSAkreditasi[0]['TotalCredit'] == null ) ? 0 : $queryPSAkreditasi[0]['TotalCredit']; 
+                        $temp[] = array('count' => $tot ,'data' => $token);  
+                        $arr_get[] = $tot;
+
+                        // Total PS tidak akreditasi
+                        $sqlPSTidakAkreditasi = '
+                                            select SUM(Credit) as TotalCredit from (
+                                                select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
+                                                from db_academic.schedule_details_course as a 
+                                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                                join db_academic.schedule_details as sd on sd.ScheduleID = b.ID
+                                                where a.ProdiID != ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
+                                                group by b.ID,a.MKID
+                                            )xx   
+                                            ';
+                        $queryPSTidakAkreditasi=$this->db->query($sqlPSTidakAkreditasi, array($ProdiID,$NIP))->result_array();
+                        $tot = ($queryPSTidakAkreditasi[0]['TotalCredit'] == null) ? 0 : $queryPSTidakAkreditasi[0]['TotalCredit'] ;                         
+                        $sqlDataPSTidakAkreditasi = '
+                        select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
+                        from db_academic.schedule_details_course as a 
+                        join db_academic.schedule as b on a.ScheduleID = b.ID
+                        join db_academic.mata_kuliah as c on a.MKID = c.ID
+                        join db_academic.schedule_details as sd on sd.ScheduleID = b.ID
+                        where a.ProdiID != ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
+                        group by b.ID,a.MKID
+                        ';
+                        $queryDataPSTidakAkreditasi=$this->db->query($sqlDataPSTidakAkreditasi, array($ProdiID,$NIP))->result_array();
+                        // encode token
+                        $token = $this->jwt->encode($queryDataPSTidakAkreditasi,"UAP)(*");
+                        $temp[] = array('count' => $tot ,'data' => $token);
+                        $arr_get[] = $tot;                        
+
+                        $temp[] = 0; // PS lain di luar PT
+                        $arr_get[] = 0;  
+                        // Penelitian Note : Convert to sks untuk mendapatkan satu penelitian
+                        $sqlPenelitian = 'select *,1 as Credit from db_research.litabmas where ID_thn_laks = ? and NIP = ? '; 
+                        $queryPenelitian =$this->db->query($sqlPenelitian, array($FilterTahun,$NIP))->result_array();
+                        // encode token
+                        $tot = count($queryPenelitian);
+                        $token = $this->jwt->encode($queryPenelitian,"UAP)(*");
+                        $temp[] = array('count' => $tot ,'data' => $token); 
+                        $arr_get[] = $tot;                       
+                        // End Penelitian                        
+                        
+                        // PKM Note : Convert to sks untuk mendapatkan satu PKM
+                        $sqlPKM = 'select *,1 as Credit from db_research.pengabdian_masyarakat where ID_thn_laks = ? and NIP = ? '; 
+                        $queryPKM =$this->db->query($sqlPKM, array($FilterTahun,$NIP))->result_array();
+                        // encode token
+                        $tot = count($queryPKM);
+                        $token = $this->jwt->encode($queryPKM,"UAP)(*");
+                        $temp[] = array('count' => $tot ,'data' => $token); 
+                        $arr_get[] = $tot; 
+                        // End PKM
+
+                        // tugas tambahan
+                        $SqlSumSKSTugas = 'select SUM(SKS) as TotalCredit from (
+                                    select SKS from db_rektorat.tugas_tambahan
+                                    where NIP = ? and SemesterID in('.$TahunFilter.')
+                        )xx
+                            ';
+                        $querySumSKSTugas =$this->db->query($SqlSumSKSTugas, array($NIP))->result_array();    
+
+                        $SqlDataSKSTugas = 'select a.*,b.Position,b.Description,c.Name as NameSemester,"'.$Name.'" as NameEmployee from
+                                            db_rektorat.tugas_tambahan as a 
+                                            join db_employees.position as b on a.PositionID = b.ID
+                                            join db_academic.semester as c on a.SemesterID = c.ID
+                                            where a.NIP = ? and a.SemesterID in('.$TahunFilter.')
+                                            ';
+                        $queryDataSKSTugas =$this->db->query($SqlDataSKSTugas, array($NIP))->result_array();
+                         // encode token
+                         $tot = ($querySumSKSTugas[0]['TotalCredit'] == null ) ? 0 : $querySumSKSTugas[0]['TotalCredit']; 
+                         $token = $this->jwt->encode($queryDataSKSTugas,"UAP)(*");
+                         $temp[] = array('count' => $tot ,'data' => $token);
+                         $arr_get[] = $tot;     
+                         // End Tugas Tambahan       
+
+                        // Jumlah SKS
+                        $temp[] = array_sum($arr_get);
+
+                        // rata-rata per semester
+                        $temp[] = array_sum($arr_get)/count($arr_get);
+
+                        $rs[] = $temp;
+                    }
+                    echo json_encode($rs);
+                break;
             default:
                 # code...
                 break;
@@ -737,6 +873,121 @@ class C_rest3 extends CI_Controller {
             
         }
         
+    }
+
+
+    public function Config_Jabatan_SKS() {
+      $dataToken = $this->data['dataToken'];
+      $mode = $dataToken['mode'];
+      if ($mode=='showDataDosen') {
+        $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
+            where ( 
+                        SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
+                        SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
+                        SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
+                        SPLIT_STR(a.PositionOther3, ".", 2) = 7
+                    ) ';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }elseif ($mode=='showJabatan') {
+        $sql = 'select a.ID,a.Position from db_employees.position as a;';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }elseif ($mode=='showSemester') {
+        $sql = 'select a.ID,a.Name, a.Status from db_academic.semester as a;';
+        $query=$this->db->query($sql, array())->result_array();
+        echo json_encode($query);
+      }
+
+        else if($mode=='saveDataJabatanSKS'){
+
+                          $dataForm = (array) $dataToken['dataForm'];
+                          $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                          $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                          $this->db->insert('db_rektorat.tugas_tambahan',$dataForm);
+
+                          echo json_encode(1);
+        }
+        else if ($mode == 'listJabatanSKS') {
+          $SemesterID = $dataToken['filterPeriod'];
+          $sql = 'select a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
+                  from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
+                  join  db_employees.position as c on a.positionID = c.ID
+                  join db_academic.semester as d on d.ID = a.SemesterID
+                  where a.semesterID = ?
+                  ';
+          $query=$this->db->query($sql, array($SemesterID))->result_array();
+
+          echo json_encode($query);
+        }
+
+    }
+
+    public function APS_CrudAgregatorTB7()
+    {
+        $dataToken = $this->data['dataToken'];
+        $mode = $dataToken['mode'];
+        if ($mode == 'IPKLulusan') {
+            $rs = [];
+            $ProdiID = $dataToken['ProdiID'];
+            $G_smt = $this->m_master->caribasedprimary('db_academic.semester','Status',1);
+            $YearNow = $G_smt[0]['Year'];
+            $YearSt = $YearNow - 2;
+
+            $arr_year = [];
+
+            for ($i=$YearSt; $i <= $YearNow ; $i++) { 
+                $arr_year[] = $i;
+            }
+
+            for ($i=0; $i < count($arr_year); $i++) { 
+                $temp = [];
+                $temp[] = $arr_year[$i];
+                // get lulusan
+                $sql = 'select NPM,Name,Year from db_academic.auth_students where GraduationYear = '.$arr_year[$i].' AND ProdiID = '.$ProdiID;
+                $query=$this->db->query($sql, array())->result_array();
+                $token = $this->jwt->encode($query,"UAP)(*");
+
+                $temp[] = ['Count'=> count($query),'token' => $token ];
+
+                $temp2 = [];
+                for ($k=0; $k < count($query); $k++) { 
+                    $TADB = 'ta_'.$query[$k]['Year'];
+                    $NPM = $query[$k]['NPM'];
+                    $sql1 = 'select * from '.$TADB.'.study_planning where NPM = ?';
+                    $query1=$this->db->query($sql1, array($NPM))->result_array();
+                    $GradeValueCredit = 0;
+                    $Credit = 0;
+                    $IPK = 0;
+                    for ($l=0; $l < count($query1); $l++) {
+                        $GradeValue = $query1[$l]['GradeValue'];
+                        $CreditSub = $query1[$l]['Credit'];
+                        $GradeValueCredit = $GradeValueCredit + ($GradeValue * $CreditSub);
+                        $Credit = $Credit + $CreditSub;
+                    }
+
+                    $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                    $temp2[] = $IPK;
+                }
+
+                if (count($temp2) > 0) {
+                    $temp[] = min($temp2);
+                    $temp[] = array_sum($temp2)/count($temp2);
+                    $temp[] = max($temp2);
+                }
+                else {
+                    $temp[] = 0;
+                    $temp[] = 0;
+                    $temp[] = 0;
+                }
+                
+                $rs[] = $temp;
+            }
+
+            echo json_encode($rs);
+
+        }
+       
     }
 
 }

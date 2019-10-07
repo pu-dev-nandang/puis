@@ -1273,16 +1273,18 @@ class C_api3 extends CI_Controller {
 
 
                     $dataForm = (array) $data_arr['dataForm'];
-
+// print_r($dataForm);die();
                     $JPID = $dataForm['JPID'];
                     $Year = $dataForm['Year'];
                     $PriceUPPS = $dataForm['PriceUPPS'];
                     $PricePS = $dataForm['PricePS'];
+                    $ProdiID = $dataForm['ProdiID'];
                     $dataCk = $this->db->get_where('db_agregator.penggunaan_dana_aps',array(
                         'JPID' => $JPID,
                         'Year' => $Year,
                         'PriceUPPS' => $PriceUPPS,
-                        'PricePS' => $PricePS
+                        'PricePS' => $PricePS,
+                        'ProdiID' => $ProdiID,
                     ))->result_array();
 
 
@@ -1354,6 +1356,7 @@ class C_api3 extends CI_Controller {
             $Year3 = $data_arr['Year3'];
             $Year4 = $data_arr['Year4'];
             $Year5 = $data_arr['Year5'];
+            $ProdiID = $data_arr['ProdiID'];
 
             // Load Jenis P
             $dataJenis = $this->db->get('db_agregator.jenis_penggunaan_aps')->result_array();
@@ -1376,9 +1379,30 @@ class C_api3 extends CI_Controller {
                         }
 
                         $dataPD = $this->db->query('SELECT pd.* FROM db_agregator.penggunaan_dana_aps pd
-                                                  WHERE pd.Year = "'.$YearEx.'" AND pd.JPID = "'.$d['ID'].'" ')->result_array();
+                                                  WHERE pd.Year = "'.$YearEx.'" AND pd.JPID = "'.$d['ID'].'" and pd.ProdiID = "'.$ProdiID.'" ')->result_array();
 
-                        $dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['Price'] : 0;
+                        $dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['PriceUPPS'] : 0;
+                        //$dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['PricePS'] : 0;
+                    }
+
+                }
+                for($i=0;$i<count($dataJenis);$i++){
+                    $d = $dataJenis[$i];
+
+                    for($y=4;$y<=6;$y++){
+                        if($y==4){
+                            $YearEx = $Year3;
+                        } else if($y==5){
+                            $YearEx = $Year4;
+                        } else {
+                            $YearEx = $Year5;
+                        }
+
+                        $dataPD = $this->db->query('SELECT pd.* FROM db_agregator.penggunaan_dana_aps pd
+                                                  WHERE pd.Year = "'.$YearEx.'" AND pd.JPID = "'.$d['ID'].'" and pd.ProdiID = "'.$ProdiID.'" ')->result_array();
+
+                        $dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['PricePS'] : 0;
+                        //$dataJenis[$i]['th'.$y] = (count($dataPD)>0) ? $dataPD[0]['PricePS'] : 0;
                     }
 
                 }
@@ -3760,27 +3784,39 @@ class C_api3 extends CI_Controller {
 
 
     function getLanguagelabels(){
-        $dataTr = $this->db->query('SELECT * FROM db_prodi.language_label ORDER BY ID ASC ')->result_array();
 
-        $keys = array_keys($dataTr[0]);
+        $lang = $this->input->get('lang');
 
-        $result = array();
+        $dataLang = $this->db->get_where('db_prodi.language',array(
+            'Code' => $lang
+        ))->result_array();
 
-        for ($i=1;$i<count($keys);$i++){
+        if(count($dataLang)>0){
 
-            $temp = array();
-            foreach ($dataTr AS $item){
-                $temp[$item['Eng']] = $item[$keys[$i]];
+            $d = $dataLang[0];
 
+            $data = $this->db->query('SELECT li.IndexName, ll.Label FROM db_prodi.language_labels ll 
+                                                          LEFT JOIN db_prodi.language_index li ON (ll.LangIndexID = li.ID)
+                                                          WHERE ll.LangID = "'.$d['ID'].'" ')->result_array();
+
+            $res = array();
+            foreach ($data AS $item){
+                $res[$item['IndexName']] = $item['Label'];
             }
 
-            $result[$keys[$i]] = $temp;
+            $result = array(
+                $d['Code'] => $res
+            );
+
+            return print_r(json_encode($result));
 
 
-
+        } else {
+            return print_r(json_encode(array(
+                $lang => array()
+            )));
         }
 
-        return print_r(json_encode($result));
     }
 
     public function getAllTA_MHS()

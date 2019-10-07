@@ -5,12 +5,12 @@
         <div class="tabbable tabbable-custom tabbable-full-width">
             <?php $activeMenu = $this->uri->segment(1); ?>
             <ul class="nav nav-tabs">
-                <!--- <li class="<?php //if($activeMenu=='requestdocument') { echo 'active';} ?>"><a href="<?php //echo base_url('requestdocument'); ?>"><i class="fa fa-th-list right-margin" aria-hidden="true"></i> Request Document</a></li> -->
-                <!-- <li class="<?php //if($this->uri->segment(1)=='add_request') { echo 'active'; } ?>">
-                    <a href="<?php //echo base_url('add_request'); ?>">Add Request Document</a>
+                <li>
+                    <a href="<?php echo base_url('rectorat/master_data/config_jabatan_per_sks'); ?>">Config Jabatan Per SKS</a>
+                </li>
+                <!-- <li>
+                    <a href="<?php echo base_url('library/yudisium/final-project'); ?>">Config Jabatan Per SKS</a>
                 </li> -->
-
-                
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                 <?php echo $page; ?>
@@ -19,6 +19,16 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        var menu_active = "<?php echo $this->uri->segment(3); ?>";
+        var arrMenu = ['config_jabatan_per_sks'];
+        setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
+
+    });
+</script>
 
 
 

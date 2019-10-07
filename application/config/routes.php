@@ -515,6 +515,8 @@ $route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_f
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
 $route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
+$route['admission/export_kwitansi_formulironline'] = 'c_save_to_pdf/export_kwitansi_formulironline';
+
 $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
@@ -1045,9 +1047,14 @@ $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
 $route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
-// rest3 
+// rest3
 $route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
 $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolback_door_to_be_mhs_admission';
+
+$route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
+
+$route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1160,6 +1167,8 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
+$route['__getContentProdi'] = 'api/c_api_prodi/getContentProdi';
+
 
 // ==== API Prodi yamin=== //
 
@@ -1170,7 +1179,11 @@ $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
 $route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
 // ---- Prodi CMS ----- //
 $route['prodi/beranda/overview'] =  'page/admin-prodi/beranda/c_home/overview';
-$route['prodi/beranda/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$route['prodi/beranda/why-choose-us/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$route['prodi/beranda/why-choose-us/about'] =  'page/admin-prodi/beranda/c_home/about';
+$route['prodi/beranda/why-choose-us/excellence'] =  'page/admin-prodi/beranda/c_home/excellence';
+$route['prodi/beranda/why-choose-us/graduate-profile'] =  'page/admin-prodi/beranda/c_home/graduate_profile';
+$route['prodi/beranda/why-choose-us/career-opportunities'] =  'page/admin-prodi/beranda/c_home/career_opportunities';
 $route['prodi/beranda/calltoaction'] =  'page/admin-prodi/beranda/c_home/calltoaction';
 $route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
 // =======================//
@@ -1297,13 +1310,19 @@ $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
 // Request Document | Bismar
+
+$route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
+
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
+$route['rectorat/legalitas/identitas'] = 'page/rektorat/identitas/c_identitas/list_identitas';
+$route['rectorat/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
+
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
 $route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
@@ -1397,7 +1416,7 @@ $route['agregator_aps/excel-kerjasama-tridarma'] = 'c_save_to_excel2/aps_excel_k
 
 $route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
 
-$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am
                   LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
                   WHERE amh.Type = "APS" ');
 $result = $query->result_array();
@@ -1422,7 +1441,7 @@ foreach( $result as $row )
                     setTimeout(function () {
                         clearInterval(firstLoad);
                     },5000);
-            
+
                 });
                 $('#filterProdi').change(function () {
                     var filterProdi = $('#filterProdi').val();
@@ -1439,8 +1458,8 @@ foreach( $result as $row )
                 }
             </script>";
             $data = '<h3>This is the page : '.$my_file.'</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
-                    
-                    
+
+
                     '.$sc;
             fwrite($handle, $data);
         }
@@ -1890,7 +1909,3 @@ $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperati
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
 $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
-
-
-
-
