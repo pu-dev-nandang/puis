@@ -38,14 +38,20 @@ class M_faculty extends CI_Model {
 
         if (count($GetFaculty) > 0) {
             $this->session->set_userdata('faculty_get',$GetFaculty);
-            if (count($GetFaculty) == 1) {
-                $a = $this->session->userdata('faculty_get');
-                $faculty_active = $a[0]['Name'];
-                $faculty_active = strtolower($faculty_active);
-                $faculty_active = str_replace(" ", "-", $faculty_active);
-                $this->session->set_userdata('faculty_active',$faculty_active);
-                $this->session->set_userdata('faculty_active_id',$a[0]['ID']);
-            }
+            // if (count($GetFaculty) == 1) {
+            //     $a = $this->session->userdata('faculty_get');
+            //     $faculty_active = $a[0]['Name'];
+            //     $faculty_active = strtolower($faculty_active);
+            //     $faculty_active = str_replace(" ", "-", $faculty_active);
+            //     $this->session->set_userdata('faculty_active',$faculty_active);
+            //     $this->session->set_userdata('faculty_active_id',$a[0]['ID']);
+            // }
+            $a = $this->session->userdata('faculty_get');
+            $faculty_active = $a[0]['Name'];
+            $faculty_active = strtolower($faculty_active);
+            $faculty_active = str_replace(" ", "-", $faculty_active);
+            $this->session->set_userdata('faculty_active',$faculty_active);
+            $this->session->set_userdata('faculty_active_id',$a[0]['ID']);
         }
         else
         {

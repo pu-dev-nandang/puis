@@ -97,6 +97,28 @@
                     <span>Announcement</span>
                 </a>
             </li>
+            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation'); 
+            ?>
+            <?php if ($this->session->userdata('prodi_get')): ?>
+                <?php if (count($this->session->userdata('prodi_get')) > 1 && $DepartmentNav == 15): ?>
+                    <li>
+                        <a href="<?php echo base_url('dashboard'); ?>">
+                            <i class="icon-home"></i>
+                            <span>Change Prodi</span>
+                        </a>
+                    </li>
+                <?php endif ?>
+            <?php endif ?>
+            <?php if ($this->session->userdata('faculty_get')): ?>
+                <?php if (count($this->session->userdata('faculty_get')) > 1 && $DepartmentNav == 34): ?>
+                    <li>
+                        <a href="<?php echo base_url('dashboard'); ?>">
+                            <i class="icon-home"></i>
+                            <span>Change Faculty</span>
+                        </a>
+                    </li>
+                <?php endif ?>
+            <?php endif ?>
             <li class="dropdown hidden-xs hidden-sm" id = 'NotificationPersonal'>
 
             </li>
