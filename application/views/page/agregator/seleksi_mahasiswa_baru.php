@@ -152,11 +152,17 @@
             $('#filterYear').empty();
             $('#formYear').empty();
             if(jsonResult.length>0){
-                $.each(jsonResult,function (i,v) {
-
+                for (var i = parseInt(jsonResult.length)-1; i > -1; i--) {
+                    var v = jsonResult[i];
                     $('#filterYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
                     $('#formYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
-                })
+                }
+
+                // $.each(jsonResult,function (i,v) {
+
+                //     $('#filterYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
+                //     $('#formYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
+                // })
             }
 
         });
