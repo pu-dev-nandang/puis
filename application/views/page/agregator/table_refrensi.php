@@ -11,7 +11,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="">
-            <table class="table table-responsive table-bordered table-centre">
+            <table class="table table-striped table-centre">
 
                 <thead>
                 <tr>
@@ -109,7 +109,7 @@
                             : 0;
 
                         $('#listData').append('<tr>' +
-                            '<td>'+(i+1)+'</td>' +
+                            '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
                             '<td style="text-align: left;">'+viewDess+'</td>' +
                             '<td>'+viewBL3+'</td>' +
                             '<td>'+viewBL2+'</td>' +
