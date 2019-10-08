@@ -10,6 +10,10 @@
     <div class="row">
 
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
+
+          <div style="text-align: right;">
+              <button class="btn btn-success" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Akreditasi Internasional</button>
+          </div>
             <div class="form-group">
                 <label>Lembaga</label>
                 <input class="hide" id="formID" />
@@ -52,7 +56,8 @@
         if(parseInt(act)<=0){
             $('.form-data-edit').remove();
         } else {
-            loadSelectOptionLembaga('#formLembagaID','');
+            // loadSelectOptionLembaga('#formLembagaID','');
+            loadDataLembagaSurview();
             loadSelectOptionBaseProdi('#formProdiID','');
             $( "#formDueDate" )
                 .datepicker({
@@ -198,6 +203,189 @@
             ? $('#formDueDate').datepicker('setDate',new Date(dataDetail.DueDate))
             : '';
 
+    });
+
+
+    $('#btnLembagaSurview').click(function () {
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Lembaga Survei </h4>');
+
+        var body = '<div class="row">' +
+            '    <div class="col-md-5">' +
+            '        <div class="well">' +
+            '            <div class="form-group">' +
+            '                <input class="hide" id="formID">' +
+            '                <input class="form-control" id="formLembaga" placeholder="Nama Lembaga...">' +
+            '            </div>' +
+            '            <div class="form-group">' +
+            '                <textarea class="form-control" id="formDescription" placeholder="Description..."></textarea>' +
+            '            </div>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    ' +
+            '    <div class="col-md-7">' +
+            '        <table class="table table-bordered table-striped" id="tableViewLemabagaSurview">' +
+            '            <thead>' +
+            '            <tr style="background: #20485A;color: #FFFFFF;">' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>Nama Lembaga</th>' +
+            '                <th style="width: 2%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '           <tbody id="listLembaga"></tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(body);
+
+        loadDataLembagaSurview();
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('#btnSaveLembaga').click(function () {
+
+            var formID = $('#formID').val();
+            var formLembaga = $('#formLembaga').val();
+            var formDescription = $('#formDescription').val();
+
+            if(formLembaga!='' && formLembaga!=null &&
+                formDescription!='' && formDescription!=null){
+
+                loading_buttonSm('#btnSaveLembaga');
+
+                var data = {
+                    action : 'updateLembagaSurview' ,
+                    ID : (formID!='' && formID!=null) ? formID : '',
+                    Lembaga : formLembaga,
+                    Description : formDescription,
+                    Type : '1'
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudLembagaSurview';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    if(jsonResult==0 || jsonResult=='0') {
+                        toastr.error('Maaf nama Lembaga sudah Ada!','Error');
+                        $('#btnSaveLembaga').html('Save').prop('disabled',false);
+
+                    } else {
+
+                        $('#formID').val('');
+                        $('#formLembaga').val('');
+                        $('#formDescription').val('');
+                        toastr.success('Data saved','Success');
+                        loadDataLembagaSurview();
+
+                        setTimeout(function () {
+                            $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        },500);
+                    }
+                });
+
+            } else {
+                toastr.warning('All form is required','Warning');
+            }
+
+        });
+
+    });
+
+    function loadDataLembagaSurview() {  //tabel master survei
+
+        var url = base_url_js+'api3/__crudLembagaSurview';
+        var token = jwt_encode({action : 'readLembagaSurview',Type:'1'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#listLembaga,#formLembagaID').empty();
+
+            if(jsonResult.length>0){
+
+                $.each(jsonResult,function (i,v) {
+                    var no = i+1;
+                    $('#listLembaga').append('<tr>' +
+                        '<td>'+no+'</td>' +
+                        '<td style="text-align: left;"><b>'+v.Lembaga+'</b><br/>'+v.Description+'</td>' +
+                        '<td style="text-align: left;"><div class="btn-group btnAction"> '+
+                        '        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> '+
+                        '            <i class="fa fa-pencil"></i> <span class="caret"></span> '+
+                        '        </button>  '+
+                        '        <ul class="dropdown-menu"> '+
+                        '            <li><a class="btnEditLV_" data-no="'+v.ID+'" data-lembaga="'+v.Lembaga+'"  data-desc="'+v.Description+'"><i class="fa fa fa-edit"></i> Edit</a></li> '+
+                        '            <li role="separator" class="divider"></li> '+
+                        '            <li><a class="btnDeleteLV" data-no="'+v.ID+'"><i class="fa fa fa-trash"></i> Delete</a></li> '+
+                        '        </ul> '+
+                        '</div> </td>' +
+                        '<textarea id="btnEditLV_'+no+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
+                        '</tr>');
+
+                    $('#formLembagaID').append('<option value="'+v.ID+'">'+v.Lembaga+'</option>');
+                });
+
+            } else {
+                $('#listLembaga').append('<tr><td colspan="3">-- Tidak ada data --</td></tr>');
+            }
+
+        });
+
+    }
+
+    $(document).on('click','.btnEditLV_',function () {
+       // alert('aa');
+
+        var ID = $(this).attr('data-no');
+        var Lembaga = $(this).attr('data-lembaga');
+        var Description = $(this).attr('data-desc');
+        //var dataForm = $('#btnEditLV_'+no).val();
+        //var dataForm = JSON.parse(dataForm);
+
+        $('#formID').val(ID);
+        $('#formLembaga').val(Lembaga);
+        $('#formDescription').val(Description);
+
+    });
+
+    $(document).on('click','.btnDeleteLV',function () {
+
+        if(confirm('Yakin Hapus data?')) {
+
+            $('.btnDeleteLV').prop('disabled',true);
+
+            var no = $(this).attr('data-no');
+            var url = base_url_js+'api3/__crudAgregatorTB1';
+
+            var data = {
+                action: 'removeDataMasterSurvey',
+                ID : no
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (result) {
+
+                $('#formID').val('');
+                $('#formLembaga').val('');
+                $('#formDescription').val('');
+
+                toastr.success('Data saved','Success');
+                loadDataLembagaSurview();
+
+                setTimeout(function () {
+                    //loadDataTable();
+                },500);
+
+           });
+        }
     });
 
 
