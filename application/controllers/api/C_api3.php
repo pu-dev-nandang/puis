@@ -2325,6 +2325,17 @@ class C_api3 extends CI_Controller {
                                           AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
                                            ORDER BY ats.NPM')->result_array();
 
+                        // Mendapatkan yang menjawab sesuai tahun form dan tahun kelulusan
+                        $dataEd[$j]['BJ_'.$Year_where] = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+                                                                                       FROM db_studentlife.alumni_form af
+                                                                                      LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
+                                                                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                                                                      WHERE af.Year = "'.$Year.'" 
+                                                                                      AND ats.GraduationYear = "'.$Year_where.'" 
+                                                                                      AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                                                                      ORDER BY ats.NPM ')->result_array();
+
+
 //                        $data = $this->db->query('SELECT * FROM db_studentlife.alumni_experience')->result_array();
 
                     }
