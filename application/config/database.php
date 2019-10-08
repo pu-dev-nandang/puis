@@ -147,7 +147,7 @@ switch ($ServerName) {
             'save_queries' => TRUE
         );
         break;
-    case 'demo.pcam.podomorouniversity.ac.id':
+    case 'demopcam.podomorouniversity.ac.id':
         $db['default']['hostname'] = '10.1.30.59';
         $db['default']['username'] = 'db_itpu';
         $db['default']['password'] = 'Uap)(*&^%';
