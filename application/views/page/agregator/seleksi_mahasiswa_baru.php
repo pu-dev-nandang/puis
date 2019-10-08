@@ -122,19 +122,19 @@
 
     });
 
-    $("#btndownloaadExcel").click(function(){
-
-        var filterYear = $('#filterYear').val();
-        var data = {
-            Year : filterYear
-        };
-
-        var url = base_url_js+'agregator/excel-seleksi-mahasiswa-baru';
-        var token = jwt_encode(data,"UAP)(*");
-        FormSubmitAuto(url, 'POST', [
-            { name: 'token', value: token },
-        ]);
-    })
+    // $("#btndownloaadExcel").click(function(){
+    //
+    //     var filterYear = $('#filterYear').val();
+    //     var data = {
+    //         Year : filterYear
+    //     };
+    //
+    //     var url = base_url_js+'agregator/excel-seleksi-mahasiswa-baru';
+    //     var token = jwt_encode(data,"UAP)(*");
+    //     FormSubmitAuto(url, 'POST', [
+    //         { name: 'token', value: token },
+    //     ]);
+    // })
 
 
     $('#filterYear').change(function () {
