@@ -3863,6 +3863,35 @@ class C_api3 extends CI_Controller {
                 return print_r(json_encode($data));
 
             }
+            else if($data_arr['action']=='insert2AlumniForm'){
+                $dataForm = (array) $data_arr['dataForm'];
+                $this->db->insert('db_studentlife.alumni_form',$dataForm);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='ListYearAlumniForm'){
+
+                $data = $this->db->query('SELECT  af.Year FROM db_studentlife.alumni_form af 
+                                                  GROUP BY af.Year Order BY af.Year DESC')->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='ListDataAlumniForm'){
+
+                $Year = $data_arr['Year'];
+                $data = $this->db->query('SELECT af.*, ats.Name, ats.GraduationYear, ae.Title, ae.Company, ae.StartMonth, ae.StartYear, pl.Description AS Position 
+                                                    FROM db_studentlife.alumni_form af
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
+                                                    LEFT JOIN db_studentlife.alumni_experience ae ON (ae.ID = af.IDAE)
+                                                    LEFT JOIN db_studentlife.position_level pl ON (pl.ID = ae.PositionLevelID)
+                                                    WHERE af.Year = "'.$Year.'" 
+                                                    ORDER BY ats.GraduationYear, ats.Name ASC ')->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='removeAlumniForm'){
+                $ID = $data_arr['ID'];
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_studentlife.alumni_form');
+                return print_r(1);
+            }
 
         }
     }

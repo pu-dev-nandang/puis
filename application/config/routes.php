@@ -148,8 +148,8 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
-$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
 $route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
 $route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 $route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';

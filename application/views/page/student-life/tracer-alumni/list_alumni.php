@@ -160,7 +160,8 @@
                         var StartMonth = (v.StartMonth!='' && v.StartMonth!=null) ? moment().months((parseInt(v.StartMonth)-1)).format('MMMM') : '';
                         var StartYear = (v.StartYear!='' && v.StartYear!=null) ? v.StartYear : '';
 
-                        var EndMonth = (v.EndMonth!='' && v.EndMonth!=null) ? moment().months((parseInt(v.EndMonth)-1)).format('MMMM') : '';
+                        var EndMonth = (v.EndMonth!='' && v.EndMonth!=null)
+                            ? moment().months((parseInt(v.EndMonth)-1)).format('MMMM') : '';
                         var EndYear = (v.EndYear!='' && v.EndYear!=null) ? v.EndYear : '';
 
                         var Last = (v.Status=='1') ? 'Present job' : EndMonth+' '+EndYear;
