@@ -9,16 +9,15 @@
                     <input class="form-control" id="formSearchAlumni" placeholder="Search by Name or NIM">
                 </td>
             </tr>
-
+            <tr>
+                <td colspan="3" id="viewStudent"></td>
+            </tr>
             <tr>
                 <td style="width: 35%;">Year</td>
                 <td style="width: 1%">:</td>
                 <td>
                     <input class="form-control" id="Year">
                 </td>
-            </tr>
-            <tr>
-                <td colspan="3" id="viewStudent"></td>
             </tr>
             <tr>
                 <td>Alumni</td>
@@ -34,7 +33,7 @@
             </tr>
             <tr>
                 <td colspan="3" style="text-align: right;">
-                    <button class="btn btn-success">Save</button>
+                    <button class="btn btn-success" id="btnSaveForm">Save</button>
                 </td>
             </tr>
             </tbody>
@@ -45,23 +44,43 @@
         <div class="row">
             <div class="col-md-4 col-md-offset-4">
                 <div class="well">
-                    <select class="form-control"></select>
+                    <select class="form-control" id="filterYearAlumniForm"></select>
                 </div>
             </div>
         </div>
-        <table class="table">
+        <table class="table table-centre">
             <thead>
             <tr>
                 <th style="width: 2%;">No</th>
+                <th style="width: 10%;">Graduation Year</th>
                 <th style="width: 20%;">Alumni</th>
                 <th>Position</th>
+                <th style="width: 1%;"><i class="fa fa-cog"></i></th>
             </tr>
             </thead>
+            <tbody id="listDataTb"></tbody>
         </table>
     </div>
 </div>
 
 <script>
+
+    $(document).ready(function () {
+        getListYear();
+
+        var firstLoad = setInterval(function () {
+            var filterYearAlumniForm = $('#filterYearAlumniForm').val();
+            if(filterYearAlumniForm!='' && filterYearAlumniForm!=null){
+                getDataYear();
+                clearInterval(firstLoad);
+            }
+        },1000);
+
+        setTimeout(function () {
+            clearInterval(firstLoad);
+        },5000);
+
+    });
 
     $('#formSearchAlumni').keyup(function () {
         var formSearchAlumni = $('#formSearchAlumni').val().trim();
@@ -109,6 +128,10 @@
         }
     });
 
+    $('#filterYearAlumniForm').change(function () {
+        getDataYear();
+    });
+
     $(document).on('click','.btnShowJobs',function () {
 
         var NPM = $(this).attr('data-npm');
@@ -123,7 +146,7 @@
         $.post(url,{token:token},function (jsonResult) {
 
             var Name = $('#view_'+NPM).text();
-            $('#viewSelectAlumni').html(Name+'<br/>'+NPM);
+            $('#viewSelectAlumni').html('<input value="'+NPM+'" class="hide" id="NPM" />'+Name+'<br/>'+NPM);
             $('#listJob').empty();
 
             if(jsonResult.length>0){
@@ -136,6 +159,124 @@
 
         });
 
+
+    });
+    
+    $('#btnSaveForm').click(function () {
+        var Year = $('#Year').val();
+        var NPM = $('#NPM').val();
+        var listJob = $('#listJob').val();
+
+        if(Year!='' && Year!=null &&
+            NPM!='' && NPM!=null &&
+            listJob!='' && listJob!=null){
+
+            loading_buttonSm('#btnSaveForm');
+
+            var url = base_url_js+'api3/__crudAlumni';
+            var data = {
+                action : 'insert2AlumniForm',
+                dataForm : {
+                    Year : Year,
+                    NPM : NPM,
+                    IDAE : listJob
+                }
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (result) {
+
+                toastr.success('Data saved','Success');
+                setTimeout(function () {
+                    $('#btnSaveForm').html('Save').prop('disabled',false);
+                },500);
+
+            });
+
+        } else {
+            toastr.warning('All form are required','Warning')
+        }
+
+    });
+
+    function getListYear() {
+
+        var url = base_url_js+'api3/__crudAlumni';
+        var data = {
+            action : 'ListYearAlumniForm'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#filterYearAlumniForm').empty();
+
+            if(jsonResult.length>0){
+
+                $.each(jsonResult,function (i,v) {
+                    $('#filterYearAlumniForm').append('<option value="'+v.Year+'">Form '+v.Year+'</option>');
+                });
+
+            }
+
+        })
+
+    }
+
+    function getDataYear() {
+
+        var filterYearAlumniForm = $('#filterYearAlumniForm').val();
+        if(filterYearAlumniForm!='' && filterYearAlumniForm!=null){
+
+            var url = base_url_js+'api3/__crudAlumni';
+            var data = {
+                action : 'ListDataAlumniForm',
+                Year : filterYearAlumniForm
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (jsonResult) {
+
+                $('#listDataTb').empty();
+                if(jsonResult.length>0){
+                    $.each(jsonResult,function (i,v) {
+
+                        var GraduationYear = (v.GraduationYear!='' && v.GraduationYear!=null) ? v.GraduationYear : '';
+
+                        var month = (v.StartMonth!='' && v.StartMonth!=null) ? moment().months((parseInt(v.StartMonth)-1)).format('MMMM') : '';
+                        var year = (v.StartYear!='' && v.StartYear!=null) ? v.StartYear : '';
+
+                        var Position = '<b>'+v.Title+'</b><br/>' +
+                            '<i class="fa fa-map-marker margin-right"></i> '+v.Company+' | '+v.Position+'<br/>' +
+                            '<i class="fa fa-clock-o margin-right"></i> '+month+' '+year+' ';
+
+                        $('#listDataTb').append('<tr>' +
+                            '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                            '<td>'+GraduationYear+'</td>' +
+                            '<td style="text-align: left;">'+ucwords(v.Name)+'<br/>'+v.NPM+'</td>' +
+                            '<td style="text-align: left;">'+Position+'</td>' +
+                            '<td><button class="btn btn-danger btn-sm btnRemoveList" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>');
+
+                    });
+                }
+
+            });
+
+        }
+    }
+
+    $(document).on('click','.btnRemoveList',function () {
+
+        if(confirm('Are you sure?')){
+            var ID = $(this).attr('data-id');
+            var url = base_url_js+'api3/__crudAlumni';
+            var data = {
+                action : 'removeAlumniForm',
+                ID : ID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.post(url,{token:token},function (result) {
+
+            });
+        }
 
     });
 
