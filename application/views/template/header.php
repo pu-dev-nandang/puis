@@ -161,12 +161,12 @@
                     <ul class="dropdown-menu">
 
                         <!-- Lecturer -->
-                        <?php if(in_array(1,$rule_service)){ ?>
+                        <?php if(in_array(2,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('database/lecturers'); ?>"><i class="fa fa-user-secret"></i> Lecturers</a></li>
                         <?php } ?>
 
-                        <?php if(in_array(2,$rule_service)){ ?>
+                        <?php if(in_array(1,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('database/students'); ?>"><i class="fa fa-street-view"></i> Students</a></li>
                         <?php } ?>
