@@ -99,7 +99,7 @@
 
                          <div class="custom-file-input " style="position:relative; left:0px;">
                           <i class="fa fa-file-image-o"></i>&nbsp; &nbsp;Browse<input  id="uploadFile1"  type="file" value="" name="file-input" />
-                          <p>*Max size wight x height 1920px x 500px</p>
+                          <p class="red">*Size weight x height 1920px x 500px</p>
                          </div>              
                         
                        
@@ -236,6 +236,7 @@ $('#formStatus1').on("change", function(){
       $('#formStatus1').prop('checked',true);
       $('#formStatus1:checked').trigger('change');
     }
+    
 
     // $("#imagePreview1").css("background-image", "url("+this.result+")");
 
@@ -360,7 +361,8 @@ $('#formStatus1').on("change", function(){
                      form_data.append("uploadFile1[]", UploadFile[count]);
                     }
                   }
-            // loading_button('#btn-simpan');      
+            // loading_button('#btn-simpan');  
+             
             var data = {
                   action : 'insertDataslider',
                   dataform:{
@@ -368,6 +370,7 @@ $('#formStatus1').on("change", function(){
                     Button : formStatus1,
                     Url : formUrl1,
                     NameButton : formButtonName1,
+                   
                   }
             };
             // console.log(data);return;
@@ -389,7 +392,6 @@ $('#formStatus1').on("change", function(){
                 toastr.success('Data saved','Success');
                 thisbtn.prop('disabled',false).html('Save');
                 $('#form-modal').modal('hide');
-
               },
               error: function (data) {
                  toastr.error('Form required','Error');
@@ -397,51 +399,82 @@ $('#formStatus1').on("change", function(){
               }
             })
           }
-    // }
-    // else {
-    //         toastr.error('Form required','Error');
-    //     }
+
   });
 
-  
-     
+  // edit data
 
-  $('#btn-ubah').click(function(){ // Ketika tombol ubah di klik
-
-      var formTitle1 = $('#formTitle1').val();
-      var form = $('#formContentInd').val();
-      var formDataCall = $('#formDataCall').val();
-
-  if(formContentEng!='' && formContentEng!=null &&
-      formContentInd!='' && formContentInd!=null &&
-      formDataCall!='' && formDataCall!=null){
-
-      loading_button('#btnSubmit');
-
-      var data = {
-          action : 'updateDataProdi',
-          dataForm : {
-              ContentCallEng : formContentEng,
-              ContentCallInd : formContentInd,
-              CallAction : formDataCall
-          }
-      };
-
-      var token = jwt_encode(data,'UAP)(*');
-
-      var url = base_url_js + 'api-prodi/__crudDataProdi';
-
-      $.post(url,{token:token},function(jsonResult){
-          toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    $('#btnSubmit').html('Save').prop('disabled',false);
-                },500);
-      });
-  } else {
-        toastr.error('Form required','Error');
-  }
+    $(document).off('click', '#btn-ubah').on('click', '#btn-ubah',function(e) {
+     // console.log('asc');
+    var ID = $(this).attr('data-id');
+    var thisbtn = $(this);
+    var formTitle1 = $('#formTitle1').val();
+    var formButtonName1 = $('#formButtonName1').val();
+    var formUrl1 = $('#formUrl1').val();
+    var formStatus1 = $('#formStatus1').val();
+    var form_data = new FormData();
+    var find = true;
     
+  // if(formTitle1!='' && formTitle1!=null){
+      
+      $('input[type="file"]').each(function(){
+          var IDFile = $(this).attr('id');
+          var ev = $(this);
+          var NameItem = 'ID '+IDFile;
+          if (!file_validation2(ev,NameItem) ) {
+            find = false;
+            return false;
+          }
+        })
+        if (find) { // validasi file berhasil
+                // console.log('asd');
+                  if ( $( '#'+'uploadFile1').length ) { // jika upload file
+                  var UploadFile = $('#'+'uploadFile1')[0].files;
+                    for(var count = 0; count<UploadFile.length; count++)
+                    {
+                     form_data.append("uploadFile1[]", UploadFile[count]);
+                    }
+                  }
+            // loading_button('#btn-simpan');  
+             
+            var data = {
+                  action : 'updateDataslider',
+                  dataform:{
+                    ID : ID,
+                    Title : formTitle1,
+                    Button : formStatus1,
+                    Url : formUrl1,
+                    NameButton : formButtonName1,
+                  }
+            };
+            // console.log(data);return;
+            var token = jwt_encode(data,"UAP)(*");
+            form_data.append('token',token);
+            var url = base_url_js + "api-prodi/__crudDataProdi";
+            loading_button('#btn-ubah');
+            $.ajax({
+              type:"POST",
+              url:url,
+              data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+              contentType: false,       // The content type used when sending data to the server.
+              cache: false,             // To unable request pages to be cached
+              processData:false,
+              dataType: "json",
+              success:function(data)
+              {
+                showSlider();
+                toastr.success('Data Update','Success');
+                thisbtn.prop('disabled',false).html('Save');
+                $('#form-modal').modal('hide');
+              },
+              error: function (data) {
+                 toastr.error('Form required','Error');
+                 thisbtn.prop('disabled',false).html('Save');
+              }
+            })
+          }
   });
+  // validasi images
   function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;
@@ -485,27 +518,6 @@ $('#formStatus1').on("change", function(){
           //toastr.error("Image File Size is very big", 'Failed!!');
           //return false;
          }
-
-                
-        // oFReader.onload = function (e) { //max widht height
-
-        //     var image = new Image();
-
-        //     image.src = e.target.result;
-        //     image.onload = function () {
-
-        //         var height = this.height;
-        //         var width = this.width;
-        //         console.log(this);
-        //         if ((height == 500 ) && (width == 1920 )) {
-        //             msgStr += TheName + 'Height and Width must not exceed 1920*500.';
-        //             return false;
-        //         }else{
-        //           return true;
-        //         }
-                
-        //     };
-        // }
          
         }
       }
