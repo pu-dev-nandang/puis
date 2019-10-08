@@ -154,8 +154,9 @@
             if(jsonResult.length>0){
                 for (var i = parseInt(jsonResult.length)-1; i > -1; i--) {
                     var v = jsonResult[i];
-                    $('#filterYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
-                    $('#formYear').append('<option value="'+v.Year+'">'+v.Year+'</option>');
+                    var y = v.Year+'/'+(parseInt(v.Year)+1);
+                    $('#filterYear').append('<option value="'+v.Year+'">'+y+'</option>');
+                    $('#formYear').append('<option value="'+v.Year+'">'+y+'</option>');
                 }
 
                 // $.each(jsonResult,function (i,v) {
