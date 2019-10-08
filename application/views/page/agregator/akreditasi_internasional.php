@@ -44,7 +44,7 @@
             <div style="text-align: right;"><button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
         </div>
-<p style="color: orangered;">*) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau uni yang relevan. <br> **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
+<p style="color: orangered;">*) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau unit yang relevan. <br> **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
     </div>
 </div>
 
