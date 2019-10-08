@@ -78,7 +78,7 @@
                     </div>
                     <!-- <span id="bodyAddSesi"></span> -->
             </div>
-        <span id="loadtablefiles"></span>  
+        <div id="loadtablefiles" class="col-md-6 table-responsive"></div>  
  </div>
 
 
@@ -104,10 +104,59 @@ $('#fileOther').change(function (event) {
 <script>
     $(document).ready(function () {
         loadFilesDetails();
+        // loadformsotherfiles();
     });
-    //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+    
+    function loadformsotherfiles() {
 
-    function loadFilesDetails() {
+        // $('#typefiles').val('');
+        $('#NoDocument').val('');
+        $('#DescriptionFile').val('');
+        $('#DateDocument').val('');
+        $('#fileOther').val('');
+        $('#element1').val('');
+    
+    }
+
+    function loadFilesDetails() {  //tabel master university
+
+        $('#loadtablefiles').html('<table class="table table-bordered table-striped" id="tableData">' +
+            '                    <thead>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
+             '                       <th style="width: 5%;text-align: center;">No</th>         '+
+            '                        <th style="width: 5%;text-align: center;">Type Files</th>         '+
+            '                        <th style="width: 8%;text-align: center;">No.Document</th>        '+
+            '                        <th style="width: 5%;text-align: center;">Date Document</th>      '+
+            '                        <th style="width: 15%;text-align: center;">Description</th>       '+
+            '                        <th style="text-align: center;width: 8%;">Action</th>             '+
+            '                    </tr>' +
+            '                    </thead>' +
+            '                   <tbody id="listData"></tbody>' +
+            '                </table>');
+
+        var NIP = '<?php echo $NIP; ?>';
+        var token = jwt_encode({action:'readlist_otherfile', NIP: NIP},'UAP)(*');
+        var dataTable = $('#tableData').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api/__reviewotherfile", // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        });
+    }
+
+
+    function loadFilesDetailsxxx() {
         
         var NIP = '<?php echo $NIP; ?>';
         var url = base_url_js+'api/__reviewotherfile?NIP='+NIP;
@@ -120,11 +169,12 @@ $('#fileOther').change(function (event) {
             var response = resultJson;
             //console.log(resultJson);
 
-                $("#loadtablefiles").append(
+                $("#loadtablefilessss").append(
                     ' <div class="table-responsive">                                                '+
                     '     <table class="table table-striped table-bordered">                        '+
                     '         <thead>                                                               '+
                     '         <tr style="background: #1E90FF;color: #FFFFFF;">                      '+
+                    '             <th style="width: 5%;text-align: center;">No</th>         '+
                     '             <th style="width: 5%;text-align: center;">Type Files</th>         '+
                     '             <th style="width: 8%;text-align: center;">No.Document</th>        '+
                     '             <th style="width: 5%;text-align: center;">Date Document</th>      '+
@@ -244,7 +294,11 @@ $('#fileOther').change(function (event) {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">    </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">    </div>       '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '         <div class="btn-group">   '+ 
+                        '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
+                        '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
+                        '               </div>  '+ 
+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -311,17 +365,35 @@ $('#fileOther').change(function (event) {
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center>                     '+
+                        '                   </div>'+
+                        '               </div> '+
                         '            </div> '+
-                        '       </div> '+
-                        '        </div>'+ //
-                        '        <div class="row"> '+
-                        '           <div class="col-md-12" style="text-align: right;"> '+
+                        '        </div>'+ 
+
+                        '        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">  '+
+                        '            <label class="btn btn-sm btn-default btn-upload">                                  '+
+                        '                <i class="fa fa-upload margin-right"></i> Change File                                              '+
+                        '                       <input type="file" id="fileOther" name="userfile" class="upload_files" accept="application/pdf"> '+
+                        '                    </label>                                                                                                                   '+
+                        '                <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p>              '+
+                        '        </form>                     '+
+
+                        
+
+
+                        '    <div class="row"> '+
+                        '    <div class="col-md-12" style="text-align: right;"> '+
                         '                <hr/> '+
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>        '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+
+                              '         <div class="btn-group">   '+ 
+                        '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
+                        '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
+                        '               </div>  '+ 
+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -341,22 +413,7 @@ $('#fileOther').change(function (event) {
 </script>
 
 <script>
-    $(document).on('click','.btnSaveFiles',function () {
-        var NIP = $('#formNIP').val();
-        $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
-            'Pastikan Data Files tidak salah ! <br/>                                    ' +
-            'Periksa kembali data yang di input sebelum di Save.                        ' +
-            '<hr/>                                                                      ' +
-            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success btnSubmitFiles">Submit</button>' +
-            '</div> ');
-
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
-        });
-    });
-
+   
 $('#btnSaveEditFiles').click(function () {  
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
@@ -379,7 +436,7 @@ $('#btnSaveEditFiles').click(function () {
 <script>
      $(document).on('click','.btndelotherfile',function () {
         if (window.confirm('Are you sure to delete file ?')) {
-            loading_button('.btndelotherfile');
+            //loading_button('.btndelotherfile');
 
             var otfile1 = $(this).attr('Idotherfile');
             var data = {
@@ -391,8 +448,12 @@ $('#btnSaveEditFiles').click(function () {
             var url = base_url_js+"api/__delistacaemploy";
             $.post(url,{token:token},function (result) {
                 toastr.success('Success Delete File!','Success'); 
+                // console.log(';sdasdsad')
+                //loadFilesDetails();
+                //loadformsotherfiles();
                 setTimeout(function () {
-                    window.location.href = '';
+                    $('.menuDetails[data-page="otherfiles"]').trigger('click');
+                  //window.location.href = '';
                 },1000);
             });
         }
