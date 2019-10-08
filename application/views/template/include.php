@@ -1048,6 +1048,43 @@
         });
     }
 
+
+    function loadSelectOptionUniversity(element,selected) {
+
+        var url = base_url_js+'api/__loadUniversity';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].Code_University+'">'+data[i].Name_University+'</option>')
+                        .val(selected).trigger('change');
+            }
+        });
+    }
+
+    function loadSelectOptionMajorEmployees(element,selected) {
+
+        var url = base_url_js+'api/__loadMajorEmployee';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].ID+'">'+data[i].Name_MajorProgramstudy+'</option>')
+                        .val(selected).trigger('change');
+                }
+        });
+    }
+
+    function loadSelectOptionProgramStudyEmployees(element,selected) {
+
+        var url = base_url_js+'api/__loadMajorEmployee';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].ID+'">'+data[i].Name_MajorProgramstudy+'</option>')
+                        .val(selected).trigger('change');
+                }
+        });
+    }
+
     function loadSelectOptionStatusMarketing(element,selected) {
         var data = {
             action : 'status_PS'

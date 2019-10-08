@@ -433,7 +433,7 @@
                     $("#employee-grid_processing").css("display","none");
                 }
             }
-        } );
+        });
 
     }
 

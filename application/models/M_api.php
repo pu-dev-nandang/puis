@@ -765,8 +765,6 @@ class M_api extends CI_Model {
 
             }
 
-            // Daftar Jadwal
-
         }
 
         return $result;
@@ -790,9 +788,79 @@ class M_api extends CI_Model {
 
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND em.Active = '1' AND em.LinkFiles NOT IN ('') AND em.LinkFiles IS NOT NULL ORDER BY em.TypeFiles ASC ";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND em.Active = '1' AND em.LinkFiles NOT IN ('') AND em.LinkFiles IS NOT NULL ORDER BY em.TypeFiles ASC";
         $query=$this->db->query($sql, array());
-        return $query->result_array();
+
+        $TypeAcademic = ['S1','S2','S3'];
+        $rs = [];
+        for ($i=0; $i < count($TypeAcademic); $i++) { 
+            $TAca = $TypeAcademic[$i];
+            $temp = ['TypeAcademic' => $TAca,'Dt' => [] ];
+            $Dt = [];
+            // find ijazah dan transcript
+            $sqlIjazah = 'SELECT df.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
+                        FROM db_employees.files AS df
+                        JOIN db_employees.master_files AS mf ON df.TypeFiles = mf.ID
+                        JOIN db_research.university AS b ON (df.NameUniversity = b.Code_University)
+                        JOIN db_employees.major_programstudy_employees AS c ON (c.ID = df.Major)
+                        JOIN db_employees.major_programstudy_employees AS d ON (d.ID = df.ProgramStudy)
+                        WHERE mf.TypeFiles = "Ijazah'.$TAca.'" AND df.NIP = "'.$NIP.'"
+                        AND df.LinkFiles NOT IN ("") AND df.LinkFiles IS NOT NULL
+                        AND df.NameUniversity NOT IN ("") AND df.NameUniversity IS NOT NULL
+                        AND df.Major NOT IN ("") AND df.Major IS NOT NULL
+                        ORDER BY df.TypeFiles ASC
+                        ';
+            $queryIjazah=$this->db->query($sqlIjazah, array())->result_array();
+
+            if (count($queryIjazah) > 0) {
+                for ($k=0; $k < count($queryIjazah); $k++) { 
+                    $NameUniversity = $queryIjazah[$k]['NameUniversity'];
+                    $Major = $queryIjazah[$k]['Major'];
+                    $sqlTranscript = 'SELECT df.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
+                                    FROM db_employees.files AS df
+                                    JOIN db_employees.master_files AS mf ON df.TypeFiles = mf.ID
+                                    JOIN db_research.university AS b ON (df.NameUniversity = b.Code_University)
+                                    JOIN db_employees.major_programstudy_employees AS c ON (c.ID = df.Major)
+                                    JOIN db_employees.major_programstudy_employees AS d ON (d.ID = df.ProgramStudy)
+                                    WHERE mf.TypeFiles = "Transcript'.$TAca.'" AND df.NIP = "'.$NIP.'"
+                                    AND df.LinkFiles NOT IN ("") AND df.LinkFiles IS NOT NULL
+                                    AND df.NameUniversity NOT IN ("") AND df.NameUniversity IS NOT NULL
+                                    AND df.Major NOT IN ("") AND df.Major IS NOT NULL
+                                    AND df.NameUniversity = "'.$NameUniversity.'" AND df.Major = "'.$Major.'"
+                                    ORDER BY df.TypeFiles ASC ';
+                    //print_r($sqlTranscript); die();
+                    $queryTranscript=$this->db->query($sqlTranscript, array())->result_array();
+
+                    if (count($queryTranscript) > 0) {
+                       $queryIjazah[$k]['LinkFiles_tr'] = $queryTranscript[0]['LinkFiles'];
+                       // cek File exist ijazah
+                       if (file_exists('./uploads/files/'.$queryIjazah[$k]['LinkFiles'])) {
+                            $queryIjazah[$k]['LinkFiles_st'] = 1;
+                       }
+                       else {
+                            $queryIjazah[$k]['LinkFiles_st'] = 0;
+                       }
+
+                       // cek File exist transcript
+                       if (file_exists('./uploads/files/'.$queryIjazah[$k]['LinkFiles_tr'])) {
+                            $queryIjazah[$k]['LinkFiles_tr_st'] = 1;
+                       }
+                       else {
+                            $queryIjazah[$k]['LinkFiles_tr_st'] = 0;
+                       }
+
+                       $queryIjazah[$k]['ID2'] = $queryTranscript[0]['ID'];
+                    }
+                }
+            }
+
+            $Dt = $queryIjazah;
+
+            $temp['Dt'] = $Dt;
+            $rs[] = $temp;
+        }
+
+        return $rs;
 
     }
 
@@ -809,22 +877,27 @@ class M_api extends CI_Model {
 
      public function views_files1($NIP,$srata) {
 
-             $sql = "SELECT ID, NIP, TypeAcademic, NameUniversity, TypeFiles, LinkFiles
-                    FROM db_employees.files
-                    WHERE NIP ='".$NIP."' AND TypeAcademic ='".$srata."' AND Active = '1' AND LinkFiles NOT IN ('') AND LinkFiles IS NOT NULL";
+             $sql = "SELECT a.ID, a.NIP, a.TypeAcademic, a.NameUniversity, a.TypeFiles, a.LinkFiles, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
+                    FROM db_employees.files AS a
+                    LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.Code_University)
+                    LEFT JOIN db_employees.major_programstudy_employees AS c ON (c.ID = a.Major)
+                    LEFT JOIN db_employees.major_programstudy_employees AS d ON (d.ID = a.ProgramStudy)
+                    WHERE a.NIP ='".$NIP."' AND a.TypeAcademic ='".$srata."' AND a.LinkFiles IS NOT NULL ";
              $query=$this->db->query($sql, array());
              return $query->result_array();
 
     }
 
-    public function views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv) {
+    public function views_editacademic($NIP,$fileijazah,$filetranscripts,$nameuniv) {
 
-        $sql = "SELECT *
-                FROM db_employees.files
-                WHERE NIP= '".$NIP."' AND NameUniversity= '".$nameuniv."'";
+        $sql = "SELECT a.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
+                FROM db_employees.files AS a
+                LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.Code_University)
+                LEFT JOIN db_employees.major_programstudy_employees AS c ON (c.ID = a.Major)
+                LEFT JOIN db_employees.major_programstudy_employees AS d ON (d.ID = a.ProgramStudy)
+                WHERE a.NIP= '".$NIP."' AND a.ID IN ('".$fileijazah."','".$filetranscripts."')  AND a.LinkFiles IS NOT NULL";
         $query=$this->db->query($sql, array());
         return $query->result_array();
-
 
      }
 
