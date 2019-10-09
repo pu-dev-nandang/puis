@@ -1644,68 +1644,105 @@ class M_rest extends CI_Model {
 
         }
 
-
-
         if(count($data)>0){
             for($i=0;$i<count($data);$i++){
                 $dt = $data[$i];
 
                 if($System==1){
-                    if(($showUTS && $dt['Approval']=='1') ||($showUTS && $dt['Approval']=='2') || ($showUAS && $dt['Approval']=='2')){
 
-                        for($d=1;$d<=5;$d++){
-                            $n = '-';
-                            if($d<=$dt['TotalAssigment'] && $dt['Evaluasi'.$d]!=null && $dt['Evaluasi'.$d]!=''){
-                                $n = $data[$i]['Evaluasi'.$d];
-                            }
-                            $data[$i]['Evaluasi'.$d] = $n;
-                        }
+                    if($dt['StatusSystem']=='1'){
+                        if(($showUTS && $dt['Approval']=='1') ||($showUTS && $dt['Approval']=='2') || ($showUAS && $dt['Approval']=='2'))
+                        {
 
-                        if($dt['UTS']==null || $dt['UTS']==''){
-                            $data[$i]['UTS'] = 0;
-                        }
-
-                        // ======== UAS =========
-                        if($showUAS && $dt['Approval']=='2'){
-                            if($dt['UAS']==null || $dt['UAS']==''){
-                                $data[$i]['UAS'] = 0;
+                            for($d=1;$d<=5;$d++){
+                                $n = '-';
+                                if($d<=$dt['TotalAssigment'] && $dt['Evaluasi'.$d]!=null && $dt['Evaluasi'.$d]!=''){
+                                    $n = $data[$i]['Evaluasi'.$d];
+                                }
+                                $data[$i]['Evaluasi'.$d] = $n;
                             }
 
-                            if($dt['Score']==null || $dt['Score']==''){
-                                $data[$i]['Score'] = 0;
+                            if($dt['UTS']==null || $dt['UTS']==''){
+                                $data[$i]['UTS'] = 0;
                             }
-                            if($dt['Grade']==null || $dt['Grade']==''){
-                                $data[$i]['Grade'] = 'E';
+
+                            // ======== UAS =========
+                            if($showUAS && $dt['Approval']=='2'){
+                                if($dt['UAS']==null || $dt['UAS']==''){
+                                    $data[$i]['UAS'] = 0;
+                                }
+
+                                if($dt['Score']==null || $dt['Score']==''){
+                                    $data[$i]['Score'] = 0;
+                                }
+                                if($dt['Grade']==null || $dt['Grade']==''){
+                                    $data[$i]['Grade'] = 'E';
+                                }
+                                if($dt['GradeValue']==null || $dt['GradeValue']==''){
+                                    $data[$i]['GradeValue'] = 0;
+                                }
+
                             }
-                            if($dt['GradeValue']==null || $dt['GradeValue']==''){
+                            else {
+                                $data[$i]['UAS'] = '-';
+                                $data[$i]['Score'] = '-';
+                                $data[$i]['Grade'] = '-';
                                 $data[$i]['GradeValue'] = 0;
                             }
+                            // ======== UAS =========
 
                         }
                         else {
+
+                            $data[$i]['Evaluasi1'] = '-';
+                            $data[$i]['Evaluasi2'] = '-';
+                            $data[$i]['Evaluasi3'] = '-';
+                            $data[$i]['Evaluasi4'] = '-';
+                            $data[$i]['Evaluasi5'] = '-';
+                            $data[$i]['UTS'] = '-';
                             $data[$i]['UAS'] = '-';
                             $data[$i]['Score'] = '-';
                             $data[$i]['Grade'] = '-';
                             $data[$i]['GradeValue'] = 0;
+
                         }
-                        // ======== UAS =========
+                    } else {
+                        if($dt['Evaluasi1']==null || $dt['Evaluasi1']==''){
+                            $data[$i]['Evaluasi1'] = '-';
+                        }
+                        if($dt['Evaluasi2']==null || $dt['Evaluasi2']==''){
+                            $data[$i]['Evaluasi2'] = '-';
+                        }
+                        if($dt['Evaluasi3']==null || $dt['Evaluasi3']==''){
+                            $data[$i]['Evaluasi3'] = '-';
+                        }
+                        if($dt['Evaluasi4']==null || $dt['Evaluasi4']==''){
+                            $data[$i]['Evaluasi4'] = '-';
+                        }
+                        if($dt['Evaluasi5']==null || $dt['Evaluasi5']==''){
+                            $data[$i]['Evaluasi5'] = '-';
+                        }
 
+                        if($dt['UTS']==null || $dt['UTS']==''){
+                            $data[$i]['UTS'] = '-';
+                        }
+
+
+                        if($dt['UAS']==null || $dt['UAS']==''){
+                            $data[$i]['UAS'] = 0;
+                        }
+                        if($dt['Score']==null || $dt['Score']==''){
+                            $data[$i]['Score'] = 0;
+                        }
+                        if($dt['Grade']==null || $dt['Grade']==''){
+                            $data[$i]['Grade'] = 'E';
+                        }
+                        if($dt['GradeValue']==null || $dt['GradeValue']==''){
+                            $data[$i]['GradeValue'] = 0;
+                        }
                     }
 
-                    else {
 
-                        $data[$i]['Evaluasi1'] = '-';
-                        $data[$i]['Evaluasi2'] = '-';
-                        $data[$i]['Evaluasi3'] = '-';
-                        $data[$i]['Evaluasi4'] = '-';
-                        $data[$i]['Evaluasi5'] = '-';
-                        $data[$i]['UTS'] = '-';
-                        $data[$i]['UAS'] = '-';
-                        $data[$i]['Score'] = '-';
-                        $data[$i]['Grade'] = '-';
-                        $data[$i]['GradeValue'] = 0;
-
-                    }
                 }
                 else {
                     if($dt['Evaluasi1']==null || $dt['Evaluasi1']==''){

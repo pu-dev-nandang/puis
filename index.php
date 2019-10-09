@@ -53,43 +53,79 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
+
+	/*
+		Buat function https manual
+		Alhadi Rahman
+		08 Okt 2019
+
+	*/
+
+	function is_https_chek()
+	{
+		if ( ! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+		{
+			return TRUE;
+		}
+		elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+		{
+			return TRUE;
+		}
+		elseif ( ! empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off')
+		{
+			return TRUE;
+		}
+
+		return FALSE;			
+	}
+
+	$HostPath=(is_https_chek() ? "https://" : "http://");
+
+	stream_context_set_default([
+		'ssl' => [
+			'verify_peer' => false,
+			'verify_peer_name' => false,
+		],
+	]);
+	/* End Function https */
+
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
 	define("URLAD","http://10.1.30.2:8076/", true);
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':
-		    define("url_registration","http://admission.podomorouniversity.ac.id/", true);
-            define("serverRoot","http://pcam.podomorouniversity.ac.id", true);
-            define("url_pas","http://pcam.podomorouniversity.ac.id/", true);
+		    define("url_registration",$HostPath."admission.podomorouniversity.ac.id/", true);
+            define("serverRoot",$HostPath."pcam.podomorouniversity.ac.id", true);
+            define("url_pas",$HostPath."pcam.podomorouniversity.ac.id/", true);
             define("url_img_employees",url_pas."uploads/employees/", true);
             define("url_img_students",url_pas."uploads/students/", true);
 
-            define("url_pcam","http://pcam.podomorouniversity.ac.id/dashboard", true);
-            define("url_students","http://studentpu.podomorouniversity.ac.id/home", true);
-            define("url_lecturers","http://lecturerpu.podomorouniversity.ac.id/home", true);
-            define("url_sign_out","http://portal.podomorouniversity.ac.id/", true);
+            define("url_pcam",$HostPath."pcam.podomorouniversity.ac.id/dashboard", true);
+            define("url_students",$HostPath."studentpu.podomorouniversity.ac.id/home", true);
+            define("url_lecturers",$HostPath."lecturerpu.podomorouniversity.ac.id/home", true);
+            define("url_sign_out",$HostPath."portal.podomorouniversity.ac.id/", true);
     //
-            define("url_sign_in_lecturers","http://lecturerpu.podomorouniversity.ac.id/", true);
-            define("url_sign_in_students","http://studentpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_lecturers",$HostPath."lecturerpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_students",$HostPath."studentpu.podomorouniversity.ac.id/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
             
             define("path_register_online","/var/www/html/registeronline/", true);
             define('ENVIRONMENT', 'production',true);
 			break;
-		case 'demo.pcam.podomorouniversity.ac.id':
-		    define("url_registration","http://demo.admission.podomorouniversity.ac.id/", true);
-            define("serverRoot","http://demo.pcam.podomorouniversity.ac.id", true);
-            define("url_pas","http://demo.pcam.podomorouniversity.ac.id/", true);
+		case 'demopcam.podomorouniversity.ac.id':
+		    define("url_registration",$HostPath."demoadmission.podomorouniversity.ac.id/", true);
+            define("serverRoot",$HostPath."demopcam.podomorouniversity.ac.id", true);
+            define("url_pas",$HostPath."demopcam.podomorouniversity.ac.id/", true);
             define("url_img_employees",url_pas."uploads/employees/", true);
             define("url_img_students",url_pas."uploads/students/", true);
 
-            define("url_pcam","http://demo.pcam.podomorouniversity.ac.id/dashboard", true);
-            define("url_students","http://demo.studentpu.podomorouniversity.ac.id/home", true);
-            define("url_lecturers","http://demo.lecturerpu.podomorouniversity.ac.id/home", true);
-            define("url_sign_out","http://demo.portal.podomorouniversity.ac.id/", true);
+            define("url_pcam",$HostPath."demopcam.podomorouniversity.ac.id/dashboard", true);
+            define("url_students",$HostPath."demostudentpu.podomorouniversity.ac.id/home", true);
+            define("url_lecturers",$HostPath."demolecturerpu.podomorouniversity.ac.id/home", true);
+            define("url_sign_out",$HostPath."demoportal.podomorouniversity.ac.id/", true);
     //
-            define("url_sign_in_lecturers","http://demo.lecturerpu.podomorouniversity.ac.id/", true);
-            define("url_sign_in_students","http://demo.studentpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_lecturers",$HostPath."demolecturerpu.podomorouniversity.ac.id/", true);
+            define("url_sign_in_students",$HostPath."demostudentpu.podomorouniversity.ac.id/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
             
             define("path_register_online","C:/nginx/html/registeronline/", true);
@@ -102,19 +138,19 @@
             define("port",$port_user, true);
 
             // Local Nandang
-            define("url_registration","http://localhost/registeronline/", true);
-            define("serverRoot","http://localhost".port."/".$folder_user, true);
-            define("url_pas","http://localhost".port."/".$folder_user."/", true);
+            define("url_registration",$HostPath."localhost/registeronline/", true);
+            define("serverRoot",$HostPath."localhost".port."/".$folder_user, true);
+            define("url_pas",$HostPath."localhost".port."/".$folder_user."/", true);
             define("url_img_employees",url_pas."uploads/employees/", true);
             define("url_img_students",url_pas."uploads/students/", true);
 
             define("url_pcam",url_pas."dashboard", true);
 
-            define("url_sign_out","http://localhost".port."/".$portal_user."/", true);
+            define("url_sign_out",$HostPath."localhost".port."/".$portal_user."/", true);
 
             // Auth From PCAM
-            define("url_sign_in_lecturers","http://localhost".port."/lecturer/", true);
-            define("url_sign_in_students","http://localhost".port."/students/", true);
+            define("url_sign_in_lecturers",$HostPath."localhost".port."/lecturer/", true);
+            define("url_sign_in_students",$HostPath."localhost".port."/students/", true);
             define("url_library","http://library.podomorouniversity.ac.id/", true);
 
             define("url_lecturers",url_sign_in_lecturers."home", true);

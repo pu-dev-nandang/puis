@@ -54,7 +54,7 @@ border-radius: 17px;
 <div class="">
     <table class="table table-bordered table-striped" id="tableEmployees">
         <thead>
-        <tr style="background: #1E90FF;color: #FFFFFF;">
+        <tr style="background: #20485A;color: #FFFFFF;">
             <th style="width: 1%;">No</th>
             <th style="width: 5%;">Foto</th>
             <th class="th-center" style="width: 12%;">Name</th>

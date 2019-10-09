@@ -148,8 +148,8 @@ $route['academic/transcript'] =  'page/academic/c_transcript';
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
-$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
 $route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
 $route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 $route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';
@@ -173,6 +173,7 @@ $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
 $route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certificate';
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
+$route['human-resources/upload_edit_academic'] = 'page/hr/c_employees/upload_edit_fileAcademic'; //add bismar
 
 // --- Modal Academic ---- ADD Bismar
 $route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
@@ -187,7 +188,7 @@ $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 $route['it/user-activity'] = 'page/it/c_it/user_activity';
 
 $route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
-
+$route['it/console-developer'] = 'page/it/c_it/console_developer';
 
 
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -693,6 +694,7 @@ $route['student-life/student-achievement/list'] =  'page/student-life/c_studentl
 $route['student-life/student-achievement/update-data-achievement'] =  'page/student-life/c_studentlife/update_data_achievement';
 
 $route['student-life/tracer-alumni/list'] =  'page/student-life/c_studentlife/list_alumni';
+$route['student-life/tracer-alumni/form-accreditation'] =  'page/student-life/c_studentlife/form_accreditation';
 
 
 // --- LPMI ----
@@ -881,6 +883,10 @@ $route['api/__reviewacademic'] = 'api/c_api/review_academicdetail'; //add bismar
 $route['api/__reviewotherfile'] = 'api/c_api/review_otherfile'; //add bismar
 $route['api/__reviewacademics1'] = 'api/c_api/review_academics1'; //add bismar
 $route['api/__getdataedits1'] = 'api/c_api/getedit_datas1'; //add bismar
+$route['api/__loadUniversity'] = 'api/c_api/loadUniversity'; //asd bismar
+$route['api/__loadMajorEmployee'] = 'api/c_api/loadMajorEmployee'; //asd bismar
+$route['api/__loadMstruniversity'] = 'api/c_api/loadmasteruniversity'; //add bismar
+
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
@@ -1054,6 +1060,8 @@ $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolb
 $route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
 
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+$route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
+
 
 
 
@@ -1111,6 +1119,8 @@ $route['api/__getTranscript'] = 'api/c_api/getTranscript';
 
 $route['api/__crudFinalProject'] = 'api/c_api/crudFinalProject';
 $route['api/__getFinalProject'] = 'api/c_api/getFinalProject';
+
+
 
 // ==== Study Planning ===
 $route['api/__getDataStudyPlanning'] = 'api/c_api/getDataStudyPlanning';
@@ -1514,6 +1524,8 @@ $route['api3/__crudFileFinalProject'] = 'api/c_api3/crudFileFinalProject';
 $route['api3/__crudTracerAlumni'] = 'api/c_api3/crudTracerAlumni';
 
 $route['api3/__getLanguagelabels'] = 'api/c_api3/getLanguagelabels';
+
+$route['api3/__crudAlumni'] = 'api/c_api3/crudAlumni';
 
 
 // Agregator Adhi

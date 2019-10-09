@@ -1,5 +1,33 @@
 <style>
-    .btn-circle.btn-xl {
+    
+@media (max-width: 991px) {
+  .btn-group.my-btn-group-responsive > .btn {
+    display: block;
+    width: 100%;
+  }
+  
+  .btn-group.my-btn-group-responsive > .btn:first-child {
+    border-radius: 6px 6px 0 0;
+  }
+  .btn-group.my-btn-group-responsive > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 6px;
+  }
+  .btn-group.my-btn-group-responsive > .btn:last-child:not(:first-child) {
+    border-radius: 0 0 6px 6px;
+  }
+  
+  /* fixing margin */
+  .btn-group.my-btn-group-responsive .btn + .btn {
+    margin-left: 0;
+  }
+  
+}
+</style>
+
+
+<style>
+
+.btn-circle.btn-xl {
     width: 70px;
     height: 70px;
     padding: 10px 16px;
@@ -19,9 +47,14 @@
 }
 
 .btn-round{
-border-radius: 17px;
+    border-radius: 17px;
+}
+
+.btn-group > .btn:first-child, .btn-group > .btn:last-child {
+     border-radius: 17px;
 }
 </style> 
+
 <style>
     .form-attd[readonly] {
         cursor: cell;
@@ -29,6 +62,7 @@ border-radius: 17px;
         color: #333;
     }
 </style>
+
 
 <style type="text/css">
     @media screen and (min-width: 768px) {
@@ -46,10 +80,12 @@ border-radius: 17px;
     }
 </style>
 
+
 <div class="row" style="margin-top: 30px;">
 
     <div class="col-md-12" style="margin-bottom: 15px;">
         <a href="<?php echo base_url('human-resources/academic_employees') ?>" class="btn btn-primary btn-round "><i class="fa fa-arrow-circle-left"></i> Back to list Academic Employee</a>
+        <span id="linkupdatemployee"></span>
     </div>
 
     <div class="col-md-12">
@@ -83,7 +119,7 @@ border-radius: 17px;
         <div class="tabbable tabbable-custom tabbable-full-width">
             <ul class="nav nav-tabs">
                 <li class="active"><a href="javascript:void(0)" class="menuDetails" data-page="academic_details" data-toggle="tab"><i class="fa fa-user"></i> Personal Information </a></li>
-                <!--<li class=""><a href="javascript:void(0)" class="menuDetails" data-page="list_academic" data-toggle="tab"><i class="fa fa-graduation-cap"></i> Detail Academic</a></li> -->
+                <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="list_academic" data-toggle="tab"><i class="fa fa-graduation-cap"></i> Detail Academic</a></li> 
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratasatu" data-toggle="tab"><i class="fa fa-university"></i>  Academic S1</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratadua" data-toggle="tab"><i class="fa fa-university"></i> Academic S2</a></li>
                 <li class=""><a href="javascript:void(0)" class="menuDetails" data-page="academic_sratatiga" data-toggle="tab"><i class="fa fa-university"></i> Academic S3</a></li>
@@ -97,6 +133,263 @@ border-radius: 17px;
         </div>
     </div>
 </div>
+
+
+<script>
+     $(document).on('click','.btnSaveFiles',function () {
+        var NIP = $('#formNIP').val();
+        $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
+            'Pastikan Data Files tidak salah ! <br/>                                    ' +
+            'Periksa kembali data yang di input sebelum di Save.                        ' +
+            '<hr/>                                                                      ' +
+            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
+            '<button type="button" class="btn btn-success btnSubmitFiles">Submit</button>' +
+            '</div> ');
+
+        $('#NotificationModal').modal({
+            'backdrop' : 'static',
+            'show' : true
+        });
+    });
+
+
+    $(document).on('click','.btndelist',function () {
+        if (window.confirm('Are you sure to delete data?')) {
+            //loading_button('.btndelist');
+
+            var acaid1 = $(this).attr('listid_ijazah');
+            var acaid2 = $(this).attr('listid_transcript');
+            var data = {
+                action : 'deleteacademic',
+                ID1 : acaid1,
+                ID2 : acaid2,
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+"api/__delistacaemploy";
+            $.post(url,{token:token},function (result) {
+                toastr.success('Success Delete Data!','Success'); 
+                setTimeout(function () {
+                    //$('.menuDetails[data-page="academic_sratasatu"]').trigger('click');
+                    window.location.href = '';
+                },1000);
+            });
+        }
+    });
+
+</script>
+
+<script>
+    
+    $(document).on('click','#btnSaveLembaga', function () {
+
+        var master_codeuniv = $('#master_codeuniv').val();
+        var master_nameuniv = $('#master_nameuniv').val();
+
+            if(master_codeuniv!='' && master_codeuniv!=null &&
+                master_nameuniv!='' && master_nameuniv!=null){
+                loading_button('#btnSaveLembaga');
+
+                var data = {
+                    action : 'update_mstruniv',
+                    master_codeuniv : master_codeuniv,
+                    master_nameuniv : master_nameuniv
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__loadMstruniversity';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Sorry, Name University Already!','Error');
+                        $('#btnSaveLembaga').html('Save').prop('disabled',false);
+
+                    } else {
+
+                        $('#master_codeuniv').val('');
+                        $('#master_nameuniv').val('');
+                        toastr.success('Data saved','Success');
+                        loadDataUniversity();
+
+                        setTimeout(function () {
+                            $('#btnSaveLembaga').html('Save').prop('disabled',false);
+                        },500);
+                    }
+                });
+
+            } else {
+                toastr.warning('All form is required','Warning');
+            }
+    });
+
+    function loadDataUniversity() {  //tabel master university
+        $('#viewData23').html('<table class="table table-bordered table-striped table-responsive" id="tableData">' +
+            '                    <thead>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
+            '                        <th style="width: 1%; text-align: center;";>No</th>' +
+            '                        <th style="width: 10%;text-align: center;">Name University</th>' +
+            //'                        <th style="width: 2%; text-align: center;"><i class="fa fa-cog"></i></th>' +
+            '                    </tr>' +
+            '                    </thead>' +
+            '                   <tbody id="listData"></tbody>' +
+            '                </table>');
+
+        var token = jwt_encode({action:'readmasteruniv'},'UAP)(*');
+        var dataTable = $('#tableData').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api/__loadMstruniversity", // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        });
+    }
+
+
+    $(document).on('click','.btnAddMajor', function () {
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Master Major/ Program Study </h4>');
+
+        var body = '<div class="row">' +
+            '    <div class="col-md-5">' +
+            '        <div class="well">' +
+            '            <div class="form-group">' +
+            '                <input class="form-control" id="master_namemajor" placeholder="Name Major/ program Study...">' +
+            '            </div>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSavemajor"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    ' +
+            '    <div id="viewDataMajorProgram" class="col-md-7 table-responsive">' +
+            '    </div>' +
+            '</div>';
+        $('#GlobalModalLarge .modal-body').html(body);
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+        loadProgramStudyEmployee();
+    });
+    
+    $(document).on('click','.btnNameUniversity', function () {
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Master University </h4>');
+
+        var body = '<div class="row table-responsive">' +
+            '    <div class="col-md-5">' +
+            '        <div class="well">' +
+            '            <div class="form-group">' +
+            '                <input class="hide" id="formID">' +
+            '                <input class="form-control" id="master_codeuniv" placeholder="Code University Dikti...">' +
+            '            </div>' +
+            '            <div class="form-group">' +
+            '                <input class="form-control" id="master_nameuniv" placeholder="Name University...">' +
+            '            </div>' +
+            '            <div style="text-align:right;">' +
+            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '    ' +
+            '    <div id="viewData23" class="col-md-7">' +
+            '    </div>' +
+            '</div>';
+        $('#GlobalModalLarge .modal-body').html(body);
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+        loadDataUniversity();
+    });
+
+
+    function loadProgramStudyEmployee() {  //tabel master university
+        $('#viewDataMajorProgram').html('<table class="table table-bordered table-striped table-responsive" id="tableData">' +
+            '                    <thead>' +
+            '                    <tr style="background: #20485A;color: #FFFFFF;">' +
+            '                        <th style="width: 1%; text-align: center;";>No</th>' +
+            '                        <th style="width: 10%;text-align: center;">Name Major/ Program Study</th>' +
+            //'                        <th style="width: 2%; text-align: center;"><i class="fa fa-cog"></i></th>' +
+            '                    </tr>' +
+            '                    </thead>' +
+            '                   <tbody id="listData"></tbody>' +
+            '                </table>');
+
+        var token = jwt_encode({action:'readmastermajor'},'UAP)(*');
+        var dataTable = $('#tableData').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api/__loadMstruniversity", // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        });
+    }
+
+   $(document).on('click','#btnSavemajor', function () {
+
+        var master_namemajor = $('#master_namemajor').val();
+
+            if(master_namemajor!='' && master_namemajor!=null){
+                loading_button('#btnSavemajor');
+
+                var data = {
+                    action : 'update_mstermajor',
+                    master_namemajor : master_namemajor
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__loadMstruniversity';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    if(jsonResult==0 || jsonResult=='0') { 
+                        toastr.error('Sorry, Name Major/ Program Study Already!','Error');
+                        $('#btnSavemajor').html('Save').prop('disabled',false);
+
+                    } else {
+
+                        $('#master_namemajor').val('');
+                        toastr.success('Data saved','Success');
+                        loadProgramStudyEmployee();
+
+                        setTimeout(function () {
+                            $('#btnSavemajor').html('Save').prop('disabled',false);
+                        },500);
+                    }
+                });
+
+            } else {
+                toastr.warning('All form is required','Warning');
+            }
+    });
+
+</script>
 
 <script>
     $(document).ready(function () {
@@ -114,6 +407,12 @@ border-radius: 17px;
         $('input[id$="endTime"]').datetimepicker({
             format: 'HH:mm'
         });
+
+        //var NIP = '<?php echo $NIP; ?>';
+        var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+NIP; 
+        var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round" style="text-align: right; float:right;"><i class="fa fa-edit"></i> Edit Employee</a> ');
+
+        $('#linkupdatemployee').html(buttonlinkedit);
 
     });
 
@@ -164,11 +463,11 @@ border-radius: 17px;
 
             $('#viewPhoto').html('<img class="img-rounded" src="'+base_url_img_employee+''+jsonResult.Photo+'" />');
 
-            var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+jsonResult.NIP; 
-            var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round"><i class="fa fa-edit"></i> Edit Employee</a> ');
+            //var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+jsonResult.NIP; 
+            //var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round"><i class="fa fa-edit"></i> Edit Employee</a> ');
 
             $('#viewName').html(jsonResult.NIP+' - '+jsonResult.TitleAhead.trim()+' '+jsonResult.Name+' '+jsonResult.TitleBehind.trim()+' ' +
-                            '<span style="float:right;"> '+buttonlinkedit+' | '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
+                            '<span style="float:right;"> '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
 
             Lecturer_NIP = jsonResult.NIP.trim();
 
@@ -253,21 +552,25 @@ border-radius: 17px;
         var TotSemesterS1 = $('#TotSemesterS1').val();
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
+        var id_linkijazahs1 = $('#id_linkijazahs1').val();
+        var id_linktranscripts1 = $('#id_linktranscripts1').val(); 
+        var typex = "Ijazah";
+        
         if(formNIP!=null && formNIP!=''
-                    && formNoIjazahS1!='' && formNoIjazahS1!=null
-                    && formNameUnivS1!='' && formNameUnivS1!=null
-                    && formIjazahDate!='' && formIjazahDate!=null
-                    && formMajorS1!='' && formMajorS1!=null
-                    && formStudyS1!='' && formStudyS1!=null
-                    && gradeS1!='' && gradeS1!=null
-                    && totalCreditS1!='' && totalCreditS1!=null
-                    && TotSemesterS1!='' && TotSemesterS1!=null 
-                    ){ 
-                    loading_button('#btnSubmitEmployees');
-                    $('#btnCloseEmployees').prop('disabled',true);
+                && formNoIjazahS1!='' && formNoIjazahS1!=null
+                && formNameUnivS1!='' && formNameUnivS1!=null
+                && formIjazahDate!='' && formIjazahDate!=null
+                && formMajorS1!='' && formMajorS1!=null
+                && formStudyS1!='' && formStudyS1!=null
+                && gradeS1!='' && gradeS1!=null
+                && totalCreditS1!='' && totalCreditS1!=null
+                && TotSemesterS1!='' && TotSemesterS1!=null 
+            ){ 
+                loading_button('.btnSavedits1');
+                $('.btnSavedits1').prop('disabled',true);
 
                     var data = {
-                        action : 'editAcademicS1',
+                        action : 'editAcademicS1',   //edit data academic file S1
                         formInsert : {
                                 NIP : formNIP,
                                 NoIjazah : formNoIjazahS1,
@@ -279,8 +582,11 @@ border-radius: 17px;
                                 TotalCredit : totalCreditS1,
                                 TotalSemester : TotSemesterS1,
                                 linkijazahs1 : linkijazahs1,
-                                linktranscripts1 : linktranscripts1 }
-                            };
+                                linktranscripts1 : linktranscripts1,
+                                id_linkijazahs1 : id_linkijazahs1,
+                                id_linktranscripts1 : id_linktranscripts1
+                            }
+                        };
 
                     var token = jwt_encode(data,'UAP)(*');
                     var url = base_url_js+'api/__crudEditAcademicData';
@@ -289,14 +595,37 @@ border-radius: 17px;
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
-                
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('File Edit Saved','Success');
+                            
+                            if ($('#e_fileIjazah').get(0).files.length === 0) {
+                            } 
+                            else {
+                                var formData = new FormData( $("#e_tagFM_IjazahS1")[0]);
+                                var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkijazahs1+'&c='+typex+'&u='+NIP;
+                                    $.ajax({
+                                            url : url,  
+                                            type : 'POST',
+                                            data : formData,
+                                            async : false,
+                                            cache : false,
+                                            contentType : false,
+                                            processData : false,
+                                            success : function(data) {
+                                            }
+                                    });
+                            }
 
-                        }
+                            if ($('#e_fileTranscript').get(0).files.length === 0) {
+                            } 
+                            else {
+                                e_uploadfile_transcripts(linktranscripts1);
+                            }    
+                            toastr.success('Edit Saved Academic','Success'); 
+                            loadAcademicS1Details();
+                        } 
                             setTimeout(function () {
-                                $('#NotificationModal').modal('hide');
-                              window.location.href = '';
+                               $('#NotificationModal').modal('hide');
+                               $('.menuDetails[data-page="academic_sratasatu"]').trigger('click');
+                               // window.location.href = '';
                             },1000);
                         });
                  }
@@ -416,10 +745,12 @@ border-radius: 17px;
                                     }    
                                     toastr.success('Document Saved With File','Success'); 
                                 }
+                            loadAcademicS1Details();
                         }   
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                                $('.menuDetails[data-page="academic_sratasatu"]').trigger('click');
+                                //window.location.href = '';
                             },1000);
                     });
                 }
@@ -430,6 +761,29 @@ border-radius: 17px;
             return;
         }
     }
+
+
+function e_uploadfile_transcripts(linktranscripts1) {
+
+        var NIP = '<?php echo $NIP; ?>';                
+        var type = 'Transcript';
+        var ext = 'PDF';
+        var fileName = linktranscripts1;
+        var formData = new FormData( $("#e_tagFM_TranscriptS1")[0]);
+        var url = base_url_js+'human-resources/upload_edit_academic?fileName='+fileName+'&c='+type+'&u='+NIP;
+                                            
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                    success : function(data) {
+                }
+            });   
+}
 
 
 function uploadfile_transcripts(fileName_Transcript) {
@@ -452,7 +806,7 @@ function uploadfile_transcripts(fileName_Transcript) {
                     success : function(data) {
                         
                     }
-                });   
+            });   
 }
 
 </script>
@@ -564,11 +918,13 @@ function uploadfile_transcripts(fileName_Transcript) {
                                             uploadfile_transcripts2(fileName_Transcript);
                                         }    
                                     toastr.success('Document Saved With File','Success'); 
+                                    loadAcademicS2Details();
                                 }
                         }   
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                                $('.menuDetails[data-page="academic_sratadua"]').trigger('click');
+                                //window.location.href = '';
                             },1000);
                     });
                 }
@@ -606,7 +962,7 @@ function uploadfile_transcripts2(fileName_Transcript) {
 </script>
 
 <script>
-    $(document).on('click','.btnSavedits2',function () {
+    $(document).on('click','.btnSavedits2',function () {  
         saveditEmployees2();
     });
 
@@ -623,6 +979,10 @@ function uploadfile_transcripts2(fileName_Transcript) {
         var TotSemesterS1 = $('#TotSemesterS2').val();
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
+        var id_linkijazahs1 = $('#id_linkijazahs1').val();
+        var id_linktranscripts1 = $('#id_linktranscripts1').val(); 
+        var typex = "Ijazah";
+
         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
@@ -659,14 +1019,42 @@ function uploadfile_transcripts2(fileName_Transcript) {
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
-                
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('File Edit Saved','Success');
+
+                            if ($('#e_fileIjazah').get(0).files.length === 0) {
+                                 alert('ijazahNo');
+                            } 
+                            else {
+                                alert('ijazahYes');
+                                var formData = new FormData( $("#e_tagFM_IjazahS1")[0]);
+                                var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkijazahs1+'&c='+typex+'&u='+NIP;
+                                    $.ajax({
+                                            url : url,  
+                                            type : 'POST',
+                                            data : formData,
+                                            async : false,
+                                            cache : false,
+                                            contentType : false,
+                                            processData : false,
+                                            success : function(data) {
+                                            }
+                                    });
+                            }
+
+                            if ($('#e_fileTranscript').get(0).files.length === 0) {
+                                alert('TrascriptNo');
+                            } 
+                            else {
+                                alert('TrascriptYes');
+                                e_uploadfile_transcripts(linktranscripts1);
+                            }    
+                            toastr.success('Success Edit Saved','Success');
+                            loadAcademicS2Details();
 
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                              window.location.href = '';
+                                $('.menuDetails[data-page="academic_sratadua"]').trigger('click');
+                              //window.location.href = '';
                             },1000);
                         });
                  }
@@ -739,7 +1127,7 @@ function uploadfile_transcripts2(fileName_Transcript) {
                     && xFile!='' && xFile!=null 
                     ){ 
                     loading_button('#btnSubmitEmployees3');
-                    $('#btnCloseEmployees').prop('disabled',true);
+                    $('#btnSubmitEmployees3').prop('disabled',true);
 
                     var data = {
                         action : 'addAcademicS3',
@@ -791,7 +1179,8 @@ function uploadfile_transcripts2(fileName_Transcript) {
                         }   
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                                $('.menuDetails[data-page="academic_sratatiga"]').trigger('click');
+                                //window.location.href = '';
                             },1000);
                     });
                 }
@@ -844,6 +1233,10 @@ function uploadfile_transcripts3(fileName_Transcript) {
         var TotSemesterS1 = $('#TotSemesterS3').val();
         var linkijazahs1 = $('#linkijazahs1').val();
         var linktranscripts1 = $('#linktranscripts1').val();
+        var id_linkijazahs1 = $('#id_linkijazahs1').val();
+        var id_linktranscripts1 = $('#id_linktranscripts1').val(); 
+        var typex = "Ijazah";
+
         if(formNIP!=null && formNIP!=''
                     && formNoIjazahS1!='' && formNoIjazahS1!=null
                     && formNameUnivS1!='' && formNameUnivS1!=null
@@ -880,14 +1273,41 @@ function uploadfile_transcripts3(fileName_Transcript) {
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
-                
-                                //uploadfile_transcripts(fileName_Transcript);
-                                toastr.success('File Edit Saved','Success');
+                            
+                            if ($('#e_fileIjazah').get(0).files.length === 0) {
+                                 alert('ijazahNo');
+                            } 
+                            else {
+                                alert('ijazahYes');
+                                var formData = new FormData( $("#e_tagFM_IjazahS1")[0]);
+                                var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkijazahs1+'&c='+typex+'&u='+NIP;
+                                    $.ajax({
+                                            url : url,  
+                                            type : 'POST',
+                                            data : formData,
+                                            async : false,
+                                            cache : false,
+                                            contentType : false,
+                                            processData : false,
+                                            success : function(data) {
+                                            }
+                                    });
+                            }
+
+                            if ($('#e_fileTranscript').get(0).files.length === 0) {
+                                alert('TrascriptNo');
+                            } 
+                            else {
+                                alert('TrascriptYes');
+                                e_uploadfile_transcripts(linktranscripts1);
+                            }    
+                            toastr.success('Edit data Saved','Success');
 
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                              window.location.href = '';
+                                $('.menuDetails[data-page="academic_sratatiga"]').trigger('click');
+                              //window.location.href = '';
                             },1000);
                         });
                  }
@@ -932,7 +1352,7 @@ function uploadfile_transcripts3(fileName_Transcript) {
                     && oFile!='' && oFile!=null
                     ){ 
                     loading_button('.btnSubmitFiles');
-                    $('#btnCloseEmployees').prop('disabled',true);
+                    $('#btnSaveFiles').prop('disabled',true);
 
                     var data = {
                         action : 'AddFilesDocument',
@@ -972,10 +1392,13 @@ function uploadfile_transcripts3(fileName_Transcript) {
                                 });   
                             }
                                 toastr.success('Other Data Saved','Success');
+                                // loadFilesDetails();
+                                // loadformsotherfiles();
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                                $('.menuDetails[data-page="otherfiles"]').trigger('click');
+                                //window.location.href = '';
                             },1000);
 
                         });
@@ -1031,6 +1454,26 @@ function uploadfile_transcripts3(fileName_Transcript) {
                         if(result==0 || result=='0'){
                             toastr.error('NIK / NIP is exist','Error');
                         } else {  //if success save data
+
+                            if ($('#fileOther').get(0).files.length === 0) {
+                            } 
+                            else {
+                                    var formData = new FormData( $("#tagFM_OtherFile")[0]);
+                                    var typex = 'OtherFiles';
+                                    var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkotherfile+'&c='+typex+'&u='+NIP;
+                                     
+                                    $.ajax({
+                                        url : url,  // Controller URL
+                                        type : 'POST',
+                                        data : formData,
+                                        async : false,
+                                        cache : false,
+                                        contentType : false,
+                                        processData : false,
+                                        success : function(data) {
+                                    }
+                                });   
+                            }
                 
                             //var formData = new FormData( $("#tagFM_OtherFile")[0]);
                             //var action = 'OtherFiles';
@@ -1050,11 +1493,12 @@ function uploadfile_transcripts3(fileName_Transcript) {
 
                                 //uploadfile_transcripts(fileName_Transcript);
                                 toastr.success('Document Data Saved','Success');
+                                loadFilesDetails();
 
                         }
                             setTimeout(function () {
                                 $('#NotificationModal').modal('hide');
-                                window.location.href = '';
+                                //window.location.href = '';
                             },1000);
 
                         });

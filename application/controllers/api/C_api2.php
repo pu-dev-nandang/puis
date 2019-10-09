@@ -42,6 +42,8 @@ class C_api2 extends CI_Controller {
 
     public function is_url_exist($url){
         $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_NOBODY, true);
         curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -64,12 +66,13 @@ class C_api2 extends CI_Controller {
 
     private function sendMailRest($data){
         $url = ($_SERVER['SERVER_NAME']=='localhost')
-            ? 'http://pcam.podomorouniversity.ac.id/rest/__sendEmail'
+            ? url_pas.'rest/__sendEmail'
             : base_url('rest/__sendEmail');
         $Input = $this->jwt->encode($data,"UAP)(*");
 
         $ch = curl_init();
-
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_URL,$url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS,

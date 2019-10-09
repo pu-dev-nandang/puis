@@ -18,7 +18,7 @@
         <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
 
             <div style="text-align: right;">
-                <button class="btn btn-success" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Survey</button>
+                <button class="btn btn-success" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Akreditasi</button>
             </div>
 
             <div>
@@ -34,7 +34,12 @@
                 </div>
                 <div class="form-group">
                     <label>Lingkup</label>
-                    <input class="form-control" id="formAE_Scope" />
+                    <select class="form-control" id="formAE_Scope">
+                        <option value="Nasional">PT</option>
+                        <option value="Internasional">Fakultas</option>
+                        <option value="Internasional">Program Studi</option>
+                        <option value="Internasional">Unit</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Tingkat</label>
@@ -166,7 +171,8 @@
                     action : 'updateLembagaSurview' ,
                     ID : (formID!='' && formID!=null) ? formID : '',
                     Lembaga : formLembaga,
-                    Description : formDescription
+                    Description : formDescription,
+                    Type : '0'
                 };
 
                 var token = jwt_encode(data,'UAP)(*');
@@ -204,7 +210,7 @@
     function loadDataLembagaSurview() {  //tabel master survei
 
         var url = base_url_js+'api3/__crudLembagaSurview';
-        var token = jwt_encode({action : 'readLembagaSurview'},'UAP)(*');
+        var token = jwt_encode({action : 'readLembagaSurview',Type:'0'},'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
             $('#listLembaga,#formAE_LembagaID').empty();
@@ -435,7 +441,7 @@
                     $("#employee-grid_processing").css("display","none");
                 }
             }
-        } );
+        });
 
     }
 
