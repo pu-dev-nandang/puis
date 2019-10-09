@@ -80,6 +80,13 @@
 	}
 
 	$HostPath=(is_https_chek() ? "https://" : "http://");
+
+	stream_context_set_default([
+		'ssl' => [
+			'verify_peer' => false,
+			'verify_peer_name' => false,
+		],
+	]);
 	/* End Function https */
 
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
