@@ -2353,12 +2353,23 @@ class C_api3 extends CI_Controller {
                         $Year_where = $Year - $i;
                         $dataEd[$j]['BL_'.$Year_where] = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi
                                           FROM db_academic.auth_students ats
-                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                          WHERE ats.GraduationYear = "'.$Year_where.'"
+                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
+                                          AND ats.StatusStudentID = "1"
                                           AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
                                            ORDER BY ats.NPM')->result_array();
 
-//                        $data = $this->db->query('SELECT * FROM db_studentlife.alumni_experience')->result_array();
+                        // Mendapatkan yang menjawab sesuai tahun form dan tahun kelulusan
+                        $dataEd[$j]['BJ_'.$Year_where] = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+                                                                                       FROM db_studentlife.alumni_form af
+                                                                                      LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
+                                                                                      LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                                                                      WHERE af.Year = "'.$Year.'" 
+                                                                                      AND ats.GraduationYear = "'.$Year_where.'" 
+                                                                                      AND ats.StatusStudentID = "1"
+                                                                                      AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                                                                      ORDER BY ats.NPM ')->result_array();
+
 
                     }
 
@@ -2367,6 +2378,47 @@ class C_api3 extends CI_Controller {
                 }
             }
 
+
+            return print_r(json_encode($dataEd));
+
+
+
+        }
+        else if($data_arr['action']=='readTableWaktuTungguLulus'){
+
+            $Year = $data_arr['Year'];
+            $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
+
+            if(count($dataEd)>0){
+                for($j=0;$j<count($dataEd);$j++){
+
+                    for($i=0;$i<=2;$i++){
+
+//
+                        $Year_where = $Year - $i;
+                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+                                          FROM db_academic.auth_students ats
+                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
+                                          AND ats.StatusStudentID = "1"
+                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                          ORDER BY ats.NPM')->result_array();
+
+                        // Mendapatkan pekerjaan pertamanya
+                        if(count($dataStd)>0){
+                            for ($a=0;$a<count($dataStd);$a++){
+                                $dataStd[$a]['Experience'] = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
+                                                                    WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID ASC LIMIT 1 ')->result_array();
+                            }
+                        }
+
+                        $dataEd[$j]['BL_'.$Year_where] = $dataStd;
+
+
+                    }
+
+                }
+            }
 
             return print_r(json_encode($dataEd));
 
