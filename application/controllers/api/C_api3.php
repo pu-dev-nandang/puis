@@ -863,6 +863,7 @@ class C_api3 extends CI_Controller {
                 $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
                                                     WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+
                 $query=$this->db->query($sql, array($arrExp[0]))->result_array();
                 if (count($query) == 0) {
                     $temp = [
@@ -960,22 +961,101 @@ class C_api3 extends CI_Controller {
 
         }
 
-        // else if($data_arr['action']=='filterYearMhsAsing'){
-        //     // $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
-        //     $data = [];
-        //     $sql = "show databases like '".'ta_'."%'";
-        //     $query=$this->db->query($sql, array())->result_array();
-        //     for ($i=0; $i < count($query); $i++) {
-        //         $variable = $query[$i];
-        //         foreach ($variable as $key => $value) {
-        //             $ex = explode('_', $value);
-        //             $ta = $ex[1];
-        //             $data[] = array('Year' => $ta);
-        //         }
-        //     }
-        //     return print_r(json_encode($data));
-        // }
+        else if($data_arr['action'] == 'readDataMHSBaruAsingByProdi')
+        {
+           $rs = array('header' => array(),'body' => array(),  );
+           $ProdiID = $data_arr['ProdiID'];
+           $ProdiName = $data_arr['ProdiName'];
 
+           // show all ta
+           $sql = "show databases like '".'ta_'."%'";
+           $query=$this->db->query($sql, array())->result_array();
+           $temp_ta = [];
+           for ($i=0; $i < count($query); $i++) {
+               $arr = $query[$i];
+               $db_ = '';
+
+               foreach ($arr as $key => $value) {
+                   $db_ = $value;
+               }
+
+               if ($db_ != '') {
+                   $ta_year = explode('_', $db_);
+                   $ta_year = $ta_year[1];
+                   $temp_ta[] = $ta_year;
+               }
+           }
+
+           // header
+           $temp = [
+            [
+                'Name' => 'No',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => []
+            ],
+            [
+                'Name' => 'Program Studi',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => []
+            ],
+            [
+                'Name' => 'Jumlah Mahasiswa Aktif',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],
+            [
+                'Name' => 'Jumlah Mahasiswa Asing Penuh Waktu',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],
+            [   
+                'Name' => 'Jumlah Mahasiswa Asing Paruh Waktu',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],     
+
+           ];
+            
+            $rs['header'] = $temp;
+
+            // body
+            $temp_isi = [1,$ProdiName];
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Aktif
+                $arr = $query[$i];
+                $db_ = '';
+
+                foreach ($arr as $key => $value) {
+                    $db_ = $value;
+                }
+
+                $sql1 = 'select count(*) as total from '.$db_.'.students where NationalityID !=  "001" and ProdiID = ? ';
+                $query1=$this->db->query($sql1, array($ProdiID))->result_array();
+                $total = $query1[0]['total'];
+                $temp_isi[] = $total;
+            }
+
+            /*
+                Jumlah Mahasiswa Asing Penuh Waktu = Data belum ada jadi diisin dengan 0
+                Jumlah Mahasiswa Asing Paruh Waktu = Data belum ada jadi diisin dengan 0
+            */
+
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Penuh Waktu
+                $temp_isi[] = 0;
+            }    
+
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Paruh Waktu
+                $temp_isi[] = 0;
+            }
+
+            $rs['body'] = $temp_isi; 
+            return print_r(json_encode($rs));
+
+        }
         else if($data_arr['action']=='getAllCourse'){
 
             $dataProdi = $this->db->select('ID, Name')->get_where('db_academic.program_study',array(
