@@ -958,6 +958,8 @@ class C_api3 extends CI_Controller {
         {
            $rs = array('header' => array(),'body' => array(),  );
            $ProdiID = $data_arr['ProdiID'];
+           $ex = explode('.', $ProdiID);
+           $ProdiID = $ProdiID[0];
            $ProdiName = $data_arr['ProdiName'];
 
            // show all ta
