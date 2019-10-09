@@ -47,6 +47,31 @@
 		    		$(row).attr('style','background-color: #eaf1fb;')
 		    	}
 		    },
+			dom: 'l<"toolbar">frtip',
+			initComplete: function(){
+				$("div.toolbar")
+					.html('<div class="toolbar no-padding pull-left" style = "margin-left : 10px;">'+
+					'<span data-smt="" class="btn btn-read-all" style = "background-color : #0a885f;color:whitesmoke">'+
+						'<i class="fa fa-envelope"></i> Set All Read'+
+					'</span>'+
+				'</div>');
+			}  
+			
 		});
 	}
+
+	$(document).off('click', '.btn-read-all').on('click', '.btn-read-all',function(e) {
+		if (confirm('Are you sure ?')) {
+			var url = base_url_js+'api/__crudLog';
+			var data = {
+				action : 'ReadAllLog',
+				UserID : sessionNIP
+			};
+			var token = jwt_encode(data,'UAP)(*');
+			$.post(url,{token:token},function (jsonResult) {
+				loadLoggingNotification();
+				showUnreadLog();
+			});
+		}
+	})
 </script>

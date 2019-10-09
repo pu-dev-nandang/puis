@@ -173,6 +173,7 @@ $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
 $route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certificate';
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
+$route['human-resources/upload_edit_academic'] = 'page/hr/c_employees/upload_edit_fileAcademic'; //add bismar
 
 // --- Modal Academic ---- ADD Bismar
 $route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
@@ -187,7 +188,7 @@ $route['it/academic/overwrite-course'] = 'page/it/c_it/overwrite_course';
 $route['it/user-activity'] = 'page/it/c_it/user_activity';
 
 $route['it/agregator/agregator-menu'] = 'page/it/c_it/agregator_menu';
-
+$route['it/console-developer'] = 'page/it/c_it/console_developer';
 
 
 //$route['database/lecturers'] = 'page/database/c_database/lecturers';
@@ -515,6 +516,8 @@ $route['admission/distribusi-formulir/offline/submit_import_excel_pengembalian_f
 $route['admission/mastercalonmahasiswa/generate-nim'] = 'page/admission/c_admission/generatenim';
 $route['admission/mastercalonmahasiswa/submit_import_excel_File_generate_nim'] = 'page/admission/c_admission/submit_import_excel_File_generate_nim';
 $route['admission/export_kwitansi_formuliroffline'] = 'c_save_to_pdf/export_kwitansi_formuliroffline';
+$route['admission/export_kwitansi_formulironline'] = 'c_save_to_pdf/export_kwitansi_formulironline';
+
 $route['admission/export_PenjualanFormulirData'] = 'c_save_to_excel/export_PenjualanFormulirData';
 $route['admission/export_PenjualanFormulirFinance'] = 'c_save_to_excel/export_PenjualanFormulirFinance';
 $route['finance/export_PenjualanFormulir'] = 'c_save_to_excel/v_Finance_export_PenjualanFormulir';
@@ -880,6 +883,10 @@ $route['api/__reviewacademic'] = 'api/c_api/review_academicdetail'; //add bismar
 $route['api/__reviewotherfile'] = 'api/c_api/review_otherfile'; //add bismar
 $route['api/__reviewacademics1'] = 'api/c_api/review_academics1'; //add bismar
 $route['api/__getdataedits1'] = 'api/c_api/getedit_datas1'; //add bismar
+$route['api/__loadUniversity'] = 'api/c_api/loadUniversity'; //asd bismar
+$route['api/__loadMajorEmployee'] = 'api/c_api/loadMajorEmployee'; //asd bismar
+$route['api/__loadMstruniversity'] = 'api/c_api/loadmasteruniversity'; //add bismar
+
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';
@@ -1046,10 +1053,16 @@ $route['rest2/__LoadTemplate'] = 'api/c_rest2/LoadTemplate_Budgeting';
 $route['rest2/__getNotification'] = 'api/c_rest2/getNotification';
 $route['rest2/__get_data_kerja_sama_perguruan_tinggi'] = 'api/c_rest2/get_data_kerja_sama_perguruan_tinggi';
 $route['rest2/__get_data_formulir_no_ref'] = 'api/c_rest2/get_data_formulir_no_ref';
-// rest3 
+// rest3
 $route['rest3/__get_APS_CrudAgregatorTB3'] = 'api/c_rest3/APS_CrudAgregatorTB3';
 $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolback_door_to_be_mhs_admission';
+
+$route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
+
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+$route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
+
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';
@@ -1307,13 +1320,19 @@ $route['vreservation/datafeedback'] = 'page/vreservation/c_global/datafeedback';
 $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadScheduleEquipment';
 
 // Request Document | Bismar
+
+$route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
+
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
 $route['api2/__getypedocument'] = 'api/c_api/getlistypedocument';
 $route['api2/__getmasrequestdoc'] = 'api/c_api2/getmasterrequestdoc';
 $route['api2/__crudrequestdoc'] = 'api/c_api2/crudrequestdocument';
+$route['rectorat/legalitas/identitas'] = 'page/rektorat/identitas/c_identitas/list_identitas';
+$route['rectorat/legalitas/prodi'] = 'page/academic/c_transcript/setting_transcript';
+
 
 $route['api/__getlistrequestdoc'] = 'api/c_api/getlistrequestdocument';
 $route['api/__getreqdocument'] = 'api/c_api/getreqdocument';
@@ -1407,7 +1426,7 @@ $route['agregator_aps/excel-kerjasama-tridarma'] = 'c_save_to_excel2/aps_excel_k
 
 $route["agregator-aps/programme-study"] = 'page/agregator/c_agregator_aps/programme_study';
 
-$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am 
+$query = $db->query('SELECT am.* FROM db_agregator.agregator_menu am
                   LEFT JOIN db_agregator.agregator_menu_header amh ON (amh.ID = am.MHID)
                   WHERE amh.Type = "APS" ');
 $result = $query->result_array();
@@ -1432,7 +1451,7 @@ foreach( $result as $row )
                     setTimeout(function () {
                         clearInterval(firstLoad);
                     },5000);
-            
+
                 });
                 $('#filterProdi').change(function () {
                     var filterProdi = $('#filterProdi').val();
@@ -1449,8 +1468,8 @@ foreach( $result as $row )
                 }
             </script>";
             $data = '<h3>This is the page : '.$my_file.'</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
-                    
-                    
+
+
                     '.$sc;
             fwrite($handle, $data);
         }
@@ -1902,7 +1921,3 @@ $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperati
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
 $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
-
-
-
-

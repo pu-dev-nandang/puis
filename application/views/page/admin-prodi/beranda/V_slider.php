@@ -340,7 +340,7 @@ $('#formStatus1').on("change", function(){
     var form_data = new FormData();
     var find = true;
     
-  if(formTitle1!='' && formTitle1!=null){
+  // if(formTitle1!='' && formTitle1!=null){
       
       $('input[type="file"]').each(function(){
           var IDFile = $(this).attr('id');
@@ -397,31 +397,33 @@ $('#formStatus1').on("change", function(){
               }
             })
           }
-    }
-    else {
-            toastr.error('Form required','Error');
-        }
+    // }
+    // else {
+    //         toastr.error('Form required','Error');
+    //     }
   });
 
   
-//======== EDIT ======= //
-$(document).off('click', '#btn-form-ubah').on('click', '#btn-form-ubah',function(e) { // Ketika tombol ubah di klik
+     
 
-  var formTitle1 = $('#formTitle1').val();
-  var formUrl1 = $('#formUrl1').val();
-  var formStatus1 = $('#formStatus1').val();
+  $('#btn-ubah').click(function(){ // Ketika tombol ubah di klik
 
-  if(formTitle1!='' && formTitle1!=null &&){
+      var formTitle1 = $('#formTitle1').val();
+      var form = $('#formContentInd').val();
+      var formDataCall = $('#formDataCall').val();
+
+  if(formContentEng!='' && formContentEng!=null &&
+      formContentInd!='' && formContentInd!=null &&
+      formDataCall!='' && formDataCall!=null){
 
       loading_button('#btnSubmit');
 
       var data = {
           action : 'updateDataProdi',
           dataForm : {
-              Title : formTitle1,
-              Button : formStatus1,
-              Url : formUrl1,
-              NameButton : formButtonName1,
+              ContentCallEng : formContentEng,
+              ContentCallInd : formContentInd,
+              CallAction : formDataCall
           }
       };
 
@@ -440,8 +442,6 @@ $(document).off('click', '#btn-form-ubah').on('click', '#btn-form-ubah',function
   }
     
   });
-
-  /// ======= VALIDASI IMAGES ====== ///
   function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;

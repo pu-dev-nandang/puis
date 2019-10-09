@@ -32,7 +32,7 @@ class C_requestdocument extends Globalclass {
         $this->menu_request($page);
     }
 
-     public function list_requestsuratmengajar()
+    public function list_requestsuratmengajar()
     {
         $page = $this->load->view('page/'.$this->data['department'].'/list_requestsuratmengajar','',true);
         $this->menu_request($page);
