@@ -1,5 +1,33 @@
 <style>
-    .btn-circle.btn-xl {
+    
+@media (max-width: 991px) {
+  .btn-group.my-btn-group-responsive > .btn {
+    display: block;
+    width: 100%;
+  }
+  
+  .btn-group.my-btn-group-responsive > .btn:first-child {
+    border-radius: 6px 6px 0 0;
+  }
+  .btn-group.my-btn-group-responsive > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 6px;
+  }
+  .btn-group.my-btn-group-responsive > .btn:last-child:not(:first-child) {
+    border-radius: 0 0 6px 6px;
+  }
+  
+  /* fixing margin */
+  .btn-group.my-btn-group-responsive .btn + .btn {
+    margin-left: 0;
+  }
+  
+}
+</style>
+
+
+<style>
+
+.btn-circle.btn-xl {
     width: 70px;
     height: 70px;
     padding: 10px 16px;
@@ -35,26 +63,17 @@
     }
 </style>
 
-<style type="text/css">
-    @media screen and (min-width: 768px) {
-        .modal-content {
-          width: 785px; /* New width for default modal */
-        }
-        .modal-sm {
-          width: 350px; /* New width for small modal */
-        }
-    }
-    @media screen and (min-width: 992px) {
-        .modal-lg {
-          width: 950px; /* New width for large modal */
-        }
-    }
-</style>
+<script>
+   
+    //alert('srst');
+</script>
+
 
 <div class="row" style="margin-top: 30px;">
 
     <div class="col-md-12" style="margin-bottom: 15px;">
         <a href="<?php echo base_url('human-resources/academic_employees') ?>" class="btn btn-primary btn-round "><i class="fa fa-arrow-circle-left"></i> Back to list Academic Employee</a>
+        <span id="linkupdatemployee"></span>
     </div>
 
     <div class="col-md-12">
@@ -226,7 +245,7 @@
 
 
     $(document).on('click','.btnAddMajor', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Master Major/ Program Study </h4>');
 
         var body = '<div class="row">' +
@@ -244,10 +263,10 @@
             '    <div id="viewDataMajorProgram" class="col-md-7 table-responsive">' +
             '    </div>' +
             '</div>';
-        $('#GlobalModal .modal-body').html(body);
+        $('#GlobalModalLarge .modal-body').html(body);
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModalLarge').modal({
             'show' : true,
             'backdrop' : 'static'
         });
@@ -255,10 +274,10 @@
     });
     
     $(document).on('click','.btnNameUniversity', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Master University </h4>');
 
-        var body = '<div class="row">' +
+        var body = '<div class="row table-responsive">' +
             '    <div class="col-md-5">' +
             '        <div class="well">' +
             '            <div class="form-group">' +
@@ -274,13 +293,13 @@
             '        </div>' +
             '    </div>' +
             '    ' +
-            '    <div id="viewData23" class="col-md-7 table-responsive">' +
+            '    <div id="viewData23" class="col-md-7">' +
             '    </div>' +
             '</div>';
-        $('#GlobalModal .modal-body').html(body);
+        $('#GlobalModalLarge .modal-body').html(body);
 
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
+        $('#GlobalModalLarge').modal({
             'show' : true,
             'backdrop' : 'static'
         });
@@ -377,6 +396,12 @@
             format: 'HH:mm'
         });
 
+        //var NIP = '<?php echo $NIP; ?>';
+        var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+NIP; 
+        var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round" style="text-align: right; float:right;"><i class="fa fa-edit"></i> Edit Employee</a> ');
+
+        $('#linkupdatemployee').html(buttonlinkedit);
+
     });
 
     $(document).on('click','.menuDetails',function () {
@@ -426,11 +451,11 @@
 
             $('#viewPhoto').html('<img class="img-rounded" src="'+base_url_img_employee+''+jsonResult.Photo+'" />');
 
-            var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+jsonResult.NIP; 
-            var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round"><i class="fa fa-edit"></i> Edit Employee</a> ');
+            //var linkupdate = base_url_js+"human-resources/employees/edit-employees/"+jsonResult.NIP; 
+            //var buttonlinkedit = ('<a href="'+linkupdate+'" class="btn btn-sm btn-success btn-round"><i class="fa fa-edit"></i> Edit Employee</a> ');
 
             $('#viewName').html(jsonResult.NIP+' - '+jsonResult.TitleAhead.trim()+' '+jsonResult.Name+' '+jsonResult.TitleBehind.trim()+' ' +
-                            '<span style="float:right;"> '+buttonlinkedit+' | '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
+                            '<span style="float:right;"> '+jsonResult.Division+' <i class="fa fa-angle-right"></i> <b>'+jsonResult.Position+'</b></span>');
 
             Lecturer_NIP = jsonResult.NIP.trim();
 

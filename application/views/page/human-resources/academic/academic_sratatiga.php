@@ -11,7 +11,7 @@
                                     
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
+                                            <label style="display: block"> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
                                             <select class="select2-select-00 form-exam formNameUnivS3" id="formNameUnivS3" style="width: 100%;" size="5"><option value=""></option></select>
                                            
                                         </div>
@@ -33,14 +33,14 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label>Name Major <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
+                                            <label style="display: block">Name Major <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
                                             <select class="select2-select-00 form-exam formMajorS3" id="formMajorS3" style="width: 100%;" size="5"><option value=""></option></select>
                                            
                                         </div>
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                             <label>Program Study <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
+                                             <label style="display: block">Program Study <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
                                               <select class="select2-select-00 form-exam formStudyS3" id="formStudyS3" style="width: 100%;" size="5"><option value=""></option></select>
                                         </div>
                                     </div>
