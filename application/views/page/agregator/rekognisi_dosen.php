@@ -142,7 +142,7 @@
                   {
                     if(result==0 || result=='0'){
                         toastr.error('Maaf, Gagal simpan data !','Error');
-                    }
+                    } 
                     else {
                         loadRekognisiDosen();
                         $('#GlobalModal').modal('hide');

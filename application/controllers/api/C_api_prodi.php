@@ -146,7 +146,14 @@ class C_api_prodi extends CI_Controller {
 
             return print_r(1);
         }
-        elseif ($data_arr['action'] == 'change_sorting') {
+        else if ($data_arr['action']=='deleteDataslider') 
+        {
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.slider'); 
+            return print_r(1);
+        }
+        elseif ($data_arr['action'] == 'change_sorting'){
             $ID = $data_arr['ID'];
             $Sorting = $data_arr['Sorting'];
             $sortex = $data_arr['sortex'];
@@ -204,12 +211,13 @@ class C_api_prodi extends CI_Controller {
 
             $Type = $data_arr['Type'];
 
-            $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM 
+            $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
                                                 FROM db_prodi.prodi_texting pt 
                                                 LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
-                                                INNER JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
-                                                INNER JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
-                                                INNER JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
                                                 WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" ')->result_array();
 
             return print_r(json_encode($data));
@@ -219,11 +227,21 @@ class C_api_prodi extends CI_Controller {
             $Type = $data_arr['Type'];
             $LangID = $data_arr['LangID'];
 
-            $data = $this->db->get_where('db_prodi.prodi_texting',array(
-                'ProdiID' => $prodi_active_id,
-                'Type' => $Type,
-                'LangID' => $LangID
-            ))->result_array();
+            $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
+                                                FROM db_prodi.prodi_texting pt 
+                                                LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
+                                                WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" and pt.LangID="'.$LangID.'" ')->result_array();
+
+
+            // $data = $this->db->get_where('db_prodi.prodi_texting',array(
+            //     'ProdiID' => $prodi_active_id,
+            //     'Type' => $Type,
+            //     'LangID' => $LangID
+            // ))->result_array();
 
             return print_r(json_encode($data));
 
@@ -310,6 +328,57 @@ class C_api_prodi extends CI_Controller {
             }
 
             return print_r(1);
+        }
+        else if($data_arr['action']=='saveProdiCall'){
+            $dataForm = $data_arr;
+
+            
+
+            $prodi_texting = $dataForm['prodi_texting'];
+            $prodi_texting = json_decode( json_encode($prodi_texting),true);
+            $calldetail = $dataForm['calldetail'];
+            $calldetail = json_decode( json_encode($calldetail),true);
+            // Cek apakah udah di input atau blm
+            $sql = 'select c.Tlp,c.IDProdiTexting from db_prodi.calldetail as c 
+                join db_prodi.prodi_texting as pt on pt.ID = c.IDProdiTexting
+                where pt.LangID = ? and pt.Type = ?
+            ';
+            
+            $LangID = $prodi_texting['LangID'];
+            $Type = $prodi_texting['Type'];
+            $dataCk=$this->db->query($sql, array($LangID,$Type))->result_array();
+
+            if(count($dataCk)>0){
+                // upcada call
+                
+                $ID = $dataCk[0]['IDProdiTexting'];
+                $prodi_texting = $dataForm['prodi_texting'];
+                $this->db->where('ID', $ID);
+                $this->db->update('db_prodi.prodi_texting',$prodi_texting);
+                // update prodi_texting
+                
+                $calldetail = $dataForm['calldetail'];
+                $this->db->where('IDProdiTexting', $ID);
+                $this->db->update('db_prodi.calldetail',$calldetail);
+                
+            } else {
+                // insert prodi_texting
+                $prodi_texting['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $prodi_texting['ProdiID'] = $prodi_active_id;;
+
+                $this->db->insert('db_prodi.prodi_texting',$prodi_texting);
+                $IDProdiTexting = $this->db->insert_id();
+                // insert callaction
+                $calldetail = [
+                    'IDProdiTexting' => $IDProdiTexting,
+                    'Tlp' => $calldetail['Tlp'],
+                    'ProdiID' => $prodi_active_id,
+                ];
+
+                $this->db->insert('db_prodi.calldetail',$calldetail);
+            }
+
+            return print_r(1 );
         }
 
 

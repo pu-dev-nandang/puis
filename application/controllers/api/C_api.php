@@ -607,7 +607,7 @@ class C_api extends CI_Controller {
         );
         echo json_encode($json_data);
 
-    }
+    } 
 
     public function getStudentsServerSide(){
 

@@ -10,7 +10,7 @@
                 <div class="form-group">
                     <input class="hide" id="formID">
                     <label>Nama Dosen</label>
-                    <br>
+                    <br> 
                     <select style="width: 100%;" id="formName" ></select>
                 </div>
                 <div class="form-group">
