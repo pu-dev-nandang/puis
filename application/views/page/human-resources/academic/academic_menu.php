@@ -63,10 +63,22 @@
     }
 </style>
 
-<script>
-   
-    //alert('srst');
-</script>
+
+<style type="text/css">
+    @media screen and (min-width: 768px) {
+        .modal-content {
+          width: 785px; /* New width for default modal */
+        }
+        .modal-sm {
+          width: 350px; /* New width for small modal */
+        }
+    }
+    @media screen and (min-width: 992px) {
+        .modal-lg {
+          width: 950px; /* New width for large modal */
+        }
+    }
+</style>
 
 
 <div class="row" style="margin-top: 30px;">
