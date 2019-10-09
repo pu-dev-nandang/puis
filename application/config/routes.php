@@ -173,6 +173,7 @@ $route['human-resources/upload_photo'] = 'page/hr/c_employees/upload_photo';
 $route['human-resources/upload_ijazah'] = 'page/hr/c_employees/upload_ijazah';
 $route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certificate';
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
+$route['human-resources/upload_edit_academic'] = 'page/hr/c_employees/upload_edit_fileAcademic'; //add bismar
 
 // --- Modal Academic ---- ADD Bismar
 $route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
@@ -882,6 +883,10 @@ $route['api/__reviewacademic'] = 'api/c_api/review_academicdetail'; //add bismar
 $route['api/__reviewotherfile'] = 'api/c_api/review_otherfile'; //add bismar
 $route['api/__reviewacademics1'] = 'api/c_api/review_academics1'; //add bismar
 $route['api/__getdataedits1'] = 'api/c_api/getedit_datas1'; //add bismar
+$route['api/__loadUniversity'] = 'api/c_api/loadUniversity'; //asd bismar
+$route['api/__loadMajorEmployee'] = 'api/c_api/loadMajorEmployee'; //asd bismar
+$route['api/__loadMstruniversity'] = 'api/c_api/loadmasteruniversity'; //add bismar
+
 
 $route['api/__filterStudents'] = 'api/c_api/filterStudents';
 $route['api/__getFormulirOfflineAvailable/(:any)'] = 'api/c_api/getFormulirOfflineAvailable/$1';

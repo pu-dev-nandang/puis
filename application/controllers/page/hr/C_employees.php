@@ -190,6 +190,139 @@ class C_employees extends HR_Controler {
     }
 
 
+    public function upload_edit_fileAcademic(){
+        
+        $action = $this->input->get('action');
+        $Colom = $this->input->get('c');
+        $IDuser = $this->session->userdata('NIP');
+
+        if ($Colom == 'Ijazah') {
+                $fileName = $this->input->get('fileName');
+                //$Colom = $this->input->get('c');
+                $NIP = $this->input->get('u');
+
+                // Delete files academic
+                $sql = 'SELECT LinkFiles FROM db_employees.files WHERE LinkFiles = "'.$fileName.'" ';
+                $qufiles =$this->db->query($sql, array())->result_array();   
+
+                if(count($qufiles)>0) {
+                    $NameFIles = $data[0]['LinkFiles'];
+
+                    $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                    if(file_exists($pathPhoto)){
+                            unlink($pathPhoto);
+                    }
+                }
+                // Delete files academic
+
+                //------------setting upload files
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    return print_r(json_encode($success));
+                }
+                 //------------setting upload files
+        }        
+
+        elseif ($Colom == 'Transcript') {
+
+                $fileName = $this->input->get('fileName');
+                //$Colom = $this->input->get('c');
+                $NIP = $this->input->get('u');
+
+                // Delete files academic
+                $sql = 'SELECT LinkFiles FROM db_employees.files WHERE LinkFiles = "'.$fileName.'" ';
+                $qufiles =$this->db->query($sql, array())->result_array();   
+
+                if(count($qufiles)>0) {
+                    $NameFIles = $data[0]['LinkFiles'];
+
+                    $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                    if(file_exists($pathPhoto)){
+                            unlink($pathPhoto);
+                    }
+                }
+                // Delete files academic
+                
+                //------------setting upload files
+                $config['upload_path']          = './uploads/files/';
+                $config['allowed_types']        = '*';
+                $config['max_size']             = 8000; // 8 mb
+                $config['file_name']            = $fileName;
+
+                if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+                }
+                $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    return print_r(json_encode($success));
+                }
+                //------------setting upload files
+
+            } 
+        elseif ($Colom == 'OtherFiles') {
+            $fileName = $this->input->get('fileName');
+            $NIP = $this->input->get('u');
+
+            // Delete files academic
+            $sql = 'SELECT LinkFiles FROM db_employees.files WHERE LinkFiles = "'.$fileName.'" ';
+            $qufiles =$this->db->query($sql, array())->result_array();   
+
+            if(count($qufiles)>0) {
+                $NameFIles = $data[0]['LinkFiles'];
+
+                $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                if(file_exists($pathPhoto)){
+                            unlink($pathPhoto);
+                }
+            }
+            // Delete files academic
+
+            //------------setting upload files
+            $config['upload_path']          = './uploads/files/';
+            $config['allowed_types']        = '*';
+            $config['max_size']             = 8000; // 8 mb
+            $config['file_name']            = $fileName;
+
+            if(is_file('./uploads/files/'.$fileName)){
+                    unlink('./uploads/files/'.$fileName);
+            }
+            $this->load->library('upload', $config);
+                if ( ! $this->upload->do_upload('userfile')){
+                    $error = array('error' => $this->upload->display_errors());
+                    return print_r(json_encode($error));
+                }
+                else {
+                    
+                    $success = array('success' => $this->upload->data());
+                    $success['success']['formGrade'] = 0;
+                    return print_r(json_encode($success));
+                }
+                //------------setting upload files
+        }
+    }
+
     public function upload_fileAcademic(){
 
         $action = $this->input->get('action');

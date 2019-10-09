@@ -57,169 +57,77 @@
         var token = jwt_encode({
             action:'read',
             NIP:NIP},'UAP)(*');
-
         $.post(url,{token:token},function (resultJson) {
             //console.log(resultJson);
             var response = resultJson;
-            response.sort(function(a, b){
-                var keyA = new Date(a.TypeAcademic),
-                    keyB = new Date(b.TypeAcademic);
-                // Compare the 2 dates
-                if(keyA < keyB) return -1;
-                if(keyA > keyB) return 1;
-                return 0;
-            });
-
             if (response.length > 0) {
+                // console.log(response);return;
                 for (var i = 0; i < response.length; i++) {
-                       
-                    if (response[i]['TypeAcademic'] == 'S1' ) {
-                        //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
-                        var NameUniversity1 = response[i]['NameUniversity'];
-                        var Major1 = response[i]['Major'];
-                        var Idlist1 = response[i]['ID'];
+                    var IDselector = (response[i]['TypeAcademic'] == 'S1') ? '#loadtableNow' : '#loadtableS2' ;
+                    var Dt = response[i]['Dt'];
 
-                            if (response[i]['LinkFiles'] != null) {
-                                var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
-                            } else {
-                                var Ijazah = '<img src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="width:200px; height:100px;">';
-                            }
+                    for (var j = 0; j < Dt.length; j++) {
+                        var NameUniversity = Dt[j]['Name_University'];
+                        var Major1 = Dt[j]['Major'];
+                        var Idlist1 = Dt[j]['ID'];
+                        var Idlist2 = Dt[j]['ID2'];
 
-                            if (response[i]['DateIjazah'] != null) {
-                                var strdate = response[i]['DateIjazah'];
-                                var dates = moment(strdate).format('DD-MM-YYYY');
-                            } else {
-                                var dates = '00-00-0000';
-                            }
-
-                    for (var j = i+1; j < response.length; j++) {
-    
-                        var NameUniversity2 = response[j]['NameUniversity'];
-                        var Major2 = response[j]['Major'];
-                        var Idlist2 = response[j]['ID'];
-
-                        if (NameUniversity1 == NameUniversity2 && Major1 == Major2) {
-                                //var Transcript = response[j]['LinkFiles'];
-                                if (response[j]['LinkFiles'] != null) {
-                                    var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-round btn-primary btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
-                                } else {
-                                    var Transcript = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
-                                }
-
-                            $("#loadtableNow").append('<div class="panel panel-default"> '+
-                                '<div class="panel-body" style="padding: 0px;"> '+
-                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="pull-right"><button class="btn btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"><i class="fa fa-trash"></i></button></div></h3>'+
-                                '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
-                                '<tr> '+
-                                '<td style="width: 25%;">Name University</td> '+
-                                '   <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['NameUniversity']+'</span></th> '+
-                                '     <td style="width: 25%;">No. Ijazah</td> '+
-                                '       <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['NoIjazah']+'</span></th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '   <td style="width: 25%;">Major</td> '+
-                                '       <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['Major']+'</span></th> '+
-                                '           <td style="width: 25%;">Program Study</td> '+
-                                '               <th style="width: 30%;">'+response[i]['ProgramStudy']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> Ijazah Date</td> '+
-                                '       <th style="width: 30%;"> '+ dates +' </th> '+
-                                '           <td style="width: 25%;"> Grade/ IPK </td> '+
-                                '               <th style="width: 30%;">'+response[i]['Grade']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> Total Credit (SKS) </td> '+
-                                '       <th style="width: 30%;">'+response[i]['TotalCredit']+'</th> '+
-                                '           <td style="width: 25%;"> Total Semester </td> '+
-                                '               <th style="width: 30%;">'+response[i]['TotalSemester']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> File Ijazah </td> '+
-                                '       <th style="width: 30%;"><div class="container"> '+Ijazah+' </th>'+
-                                '           <td style="width: 25%;"> File Transcript </td> '+
-                                '               <th style="width: 30%;"><div class="container"> '+Transcript+' </th>'+
-                                '</tr> ' +
-                                '</table>'+
-                                '</div> '+
-                                '</div> ')
-                                i = j;
-                                break;
-                            }
+                        if (Dt[j]['LinkFiles_st'] == 1) { // file exist
+                            var Ijazah = '<iframe src="'+base_url_js+'uploads/files/'+Dt[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+Dt[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
+                        }
+                        else {
+                            var Ijazah = '<img src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="width:200px; height:100px;">';
                         }
 
-                    }
-                    else {
-                        //var NameUniversity1 = response[i]['NameUniversity'].toLowerCase();
-                        var NameUniversity1 = response[i]['NameUniversity'];
-                        var Idlist1 = response[i]['ID'];
-                        if (response[i]['DateIjazah'] != null) {
-                                var strdate = response[i]['DateIjazah'];
-                                var dates = moment(strdate).format('DD-MM-YYYY');
-                            } else {
-                                var dates = '00-00-0000';
+                        if (Dt[j]['LinkFiles_tr_st'] == 1) { // file exist
+                            var Transcript = '<iframe src="'+base_url_js+'uploads/files/'+Dt[j]['LinkFiles_tr']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-round btn-primary btnviewlistsrata" filesub ="'+Dt[j]['LinkFiles_tr']+'"><i class="fa fa-eye"></i> View </button></center>';
                         }
-            
-                        if (response[i]['LinkFiles'] != null) {
-                            var Ijazah2 = '<iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
-                        } else {
-                            var Ijazah2 = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px;">';
+                        else {
+                            var Transcript = '<img src="<?php echo base_url('images/icon/userfalse.png'); ?>" style="width:200px; height:100px;">';
                         }
-                        for (var j = i+1; j < response.length; j++) {
-                            //var NameUniversity2 = response[j]['NameUniversity'].toLowerCase();
-                            var NameUniversity2 = response[j]['NameUniversity'];
-                            var Idlist2 = response[j]['ID'];
-                            if (NameUniversity1 == NameUniversity2) {
-                                //var Transcript = response[j]['LinkFiles'];
-                                    if (response[j]['LinkFiles'] != null) {
-                                        var Transcript2 = '<iframe src="'+base_url_js+'uploads/files/'+response[j]['LinkFiles']+'" style="width:200px; height:100px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[j]['LinkFiles']+'"><i class="fa fa-eye"></i> View </button></center>';
-                                    } else {
-                                        var Transcript2 = '<img src="<?php echo base_url('images/icon/nofiles.png'); ?>" style="width:200px; height:100px">';
-                                    }
 
-                        $("#loadtableS2").append( '<div class="panel panel-default"> '+
+                        var strdate = Dt[j]['DateIjazah'];
+                        var dates = moment(strdate).format('DD-MM-YYYY');
+                        //console.log(Dt[j]);
+                        $(IDselector).append('<div class="panel panel-default"> '+
                             '<div class="panel-body" style="padding: 0px;"> '+
-                                '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="pull-right"><button class="btn btn-xs btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid1 ="'+Idlist1+'" listid2 ="'+Idlist2+'"> <i class="fa fa-trash"></i> </button></div></h3>'+
-                                '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
-                                '<tr> '+
-                                '<td style="width: 25%;">Name University</td> '+
-                                '   <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['NameUniversity']+'</span></th> '+
-                                '     <td style="width: 25%;">No. Ijazah</td> '+
-                                '       <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['NoIjazah']+'</span></th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '   <td style="width: 25%;">Major</td> '+
-                                '       <th style="width: 30%;"><span style="color: darkblue;">'+response[i]['Major']+'</span></th> '+
-                                '           <td style="width: 25%;">Program Study</td> '+
-                                '               <th style="width: 30%;">'+response[i]['ProgramStudy']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> Ijazah Date</td> '+
-                                '       <th style="width: 30%;"> '+ dates +' </th> '+
-                                '           <td style="width: 25%;"> Grade/ IPK </td> '+
-                                '               <th style="width: 30%;">'+response[i]['Grade']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> Total Credit (SKS) </td> '+
-                                '       <th style="width: 30%;">'+response[i]['TotalCredit']+'</th> '+
-                                '           <td style="width: 25%;"> Total Semester </td> '+
-                                '               <th style="width: 30%;">'+response[i]['TotalSemester']+'</th> '+
-                                '</tr> '+
-                                '<tr> '+
-                                '    <td style="width: 25%;"> File Ijazah </td> '+
-                                '       <th style="width: 30%;"><div class="container"> '+Ijazah2+' </th>'+
-                                '           <td style="width: 25%;"> File Transcript </td> '+
-                                '               <th style="width: 30%;"><div class="container"> '+Transcript2+' </th>'+
-                                '</tr> ' +
-                                '</table>'+
-                                '</div> '+
-                                '</div> ')
-                                i = j;
-                                break;
-                            }
-                        }
+                            '<h3 class="heading-small">Academic '+response[i]['TypeAcademic']+'  <div class="pull-right"><button class="btn btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid_ijazah ="'+Idlist1+'" listid_transcript ="'+Idlist2+'"><i class="fa fa-trash"></i></button></div></h3>'+
+                            '<table id="dataPersonal" class="table table-bordered table-striped table-data" style="margin-bottom: 0px;"> '+
+                            '<tr> '+
+                            '<td style="width: 25%;">Name University</td> '+
+                            '   <th style="width: 30%;"><span style="color: darkblue;">'+NameUniversity+'</span></th> '+
+                            '     <td style="width: 25%;">No. Ijazah</td> '+
+                            '       <th style="width: 30%;"><span style="color: darkblue;">'+Dt[j]['NoIjazah']+'</span></th> '+
+                            '</tr> '+
+                            '<tr> '+
+                            '   <td style="width: 25%;">Major</td> '+
+                            '       <th style="width: 30%;"><span style="color: darkblue;">'+Dt[j]['NamaJurusan']+'</span></th> '+
+                            '           <td style="width: 25%;">Program Study</td> '+
+                            '               <th style="width: 30%;"><span style="color: darkblue;">'+Dt[j]['NamaProgramStudi']+' </span></th> '+
+                            '</tr> '+
+                            '<tr> '+
+                            '    <td style="width: 25%;"> Ijazah Date</td> '+
+                            '       <th style="width: 30%;"> '+ dates +' </th> '+
+                            '           <td style="width: 25%;"> Grade/ IPK </td> '+
+                            '               <th style="width: 30%;">'+Dt[j]['Grade']+'</th> '+
+                            '</tr> '+
+                            '<tr> '+
+                            '    <td style="width: 25%;"> Total Credit (SKS) </td> '+
+                            '       <th style="width: 30%;">'+Dt[j]['TotalCredit']+'</th> '+
+                            '           <td style="width: 25%;"> Total Semester </td> '+
+                            '               <th style="width: 30%;">'+Dt[j]['TotalSemester']+'</th> '+
+                            '</tr> '+
+                            '<tr> '+
+                            '    <td style="width: 25%;"> File Ijazah </td> '+
+                            '       <th style="width: 30%;"><div class="container"> '+Ijazah+' </th>'+
+                            '           <td style="width: 25%;"> File Transcript </td> '+
+                            '               <th style="width: 30%;"><div class="container"> '+Transcript+' </th>'+
+                            '</tr> ' +
+                            '</table>'+
+                            '</div> '+
+                            '</div> ')
+
                     }
-                    
                 }
                 
             }
