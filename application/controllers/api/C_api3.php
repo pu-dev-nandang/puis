@@ -2429,12 +2429,14 @@ class C_api3 extends CI_Controller {
                                     $m = ($J_Month >= $Y_Month) ? abs($J_Month - $Y_Month) : 12 - (abs($J_Month - $Y_Month));
 
                                     $LamaKerjaDalamBulan = $y + $m;
+
                                     $dataStd[$a]['Y'] = $y;
                                     $dataStd[$a]['M'] = $m;
 
                                 }
 
                                 $dataStd[$a]['LamaWaktuTunggu'] = $LamaKerjaDalamBulan;
+                                $dataStd[$a]['Name'] = ucwords(strtolower($dataStd[$a]['Name']));
                                 $TotalLama = $TotalLama + $LamaKerjaDalamBulan;
 
                                 $dataStd[$a]['Experience'] = $Experience;
