@@ -11,7 +11,7 @@
                                     
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
+                                            <label style="display: block"> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
                                             <select class="select2-select-00 form-exam formNameUnivS3" id="formNameUnivS3" style="width: 100%;" size="5"><option value=""></option></select>
                                            
                                         </div>
@@ -33,14 +33,14 @@
 
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label>Name Major <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
+                                            <label style="display: block">Name Major <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
                                             <select class="select2-select-00 form-exam formMajorS3" id="formMajorS3" style="width: 100%;" size="5"><option value=""></option></select>
                                            
                                         </div>
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                             <label>Program Study <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
+                                             <label style="display: block">Program Study <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
                                               <select class="select2-select-00 form-exam formStudyS3" id="formStudyS3" style="width: 100%;" size="5"><option value=""></option></select>
                                         </div>
                                     </div>
@@ -301,70 +301,6 @@
     });
 
 </script>
-
- <script>
-      $(document).on('click','.btnAddMajor', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Master Major/ Program Study </h4>');
-
-        var body = '<div class="row">' +
-            '    <div class="col-md-5">' +
-            '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <input class="form-control" id="master_namemajor" placeholder="Name Major/ program Study...">' +
-            '            </div>' +
-            '            <div style="text-align:right;">' +
-            '                <button class="btn btn-success btn-round" id="btnSavemajor"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>' +
-            '    ' +
-            '    <div id="viewDataMajorProgram" class="col-md-7 table-responsive">' +
-            '    </div>' +
-            '</div>';
-        $('#GlobalModal .modal-body').html(body);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-        loadProgramStudyEmployee();
-    });
-    
-    $(document).on('click','.btnNameUniversity', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Master University </h4>');
-
-        var body = '<div class="row">' +
-            '    <div class="col-md-5">' +
-            '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="master_codeuniv" placeholder="Code University Dikti...">' +
-            '            </div>' +
-            '            <div class="form-group">' +
-            '                <input class="form-control" id="master_nameuniv" placeholder="Name University...">' +
-            '            </div>' +
-            '            <div style="text-align:right;">' +
-            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>' +
-            '    ' +
-            '    <div id="viewData23" class="col-md-7 table-responsive">' +
-            '    </div>' +
-            '</div>';
-        $('#GlobalModal .modal-body').html(body);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-        loadDataUniversity();
-    });
- </script>
 
  <script>
      $(document).ready(function () {

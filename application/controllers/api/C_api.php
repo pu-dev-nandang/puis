@@ -607,7 +607,7 @@ class C_api extends CI_Controller {
         );
         echo json_encode($json_data);
 
-    }
+    } 
 
     public function getStudentsServerSide(){
 
@@ -868,7 +868,7 @@ class C_api extends CI_Controller {
                 //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 $stDefault =' <span class="badge progress-bar-danger btn-round">'.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
 
-                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL  ';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);
@@ -4018,7 +4018,7 @@ class C_api extends CI_Controller {
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
                     $dataSearch = 'AND ea.NameFiles LIKE "%'.$search.'%"
-                    OR ea.TypeFiles LIKE "%'.$search.'%" ';
+                    OR m.NameFiles LIKE "%'.$search.'%" ';
                 }
 
                 $queryDefault = 'SELECT ea.*, m.NameFiles
@@ -4042,23 +4042,12 @@ class C_api extends CI_Controller {
                     $nestedData=array();
                     $row = $query[$i];
 
-                    $btnActioncccc = '<div class="btn-group btnAction">
-                                        <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                           <i class="fa fa-pencil"></i> <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'" disabled> <i class="fa fa fa-edit"></i> Edit</a></li>
-                                            <li role="separator" class="divider"></li>
-                                            <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" disabled> <i class="fa fa fa-trash"></i> Delete</a></li>
-                                        </ul>
-                                        </div>';
-
                     $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> ';
 
                     if ($row['No_Document'] == null){
-                         $datadoc = '<center> - </center>';
+                         $nodoc = '<center> - </center>';
                     } else {
-                         $datadoc = $row['No_Document'];
+                         $nodoc = $row['No_Document'];
                     } 
 
                     if ($row['Date_Files'] == null){
@@ -4075,12 +4064,10 @@ class C_api extends CI_Controller {
 
                     $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
                     $nestedData[] = '<div style="text-align:left;">'.$row['NameFiles'].' </div>';
-                    $nestedData[] = '<div style="text-align:left;">'.$datadoc.' </div>';
+                    $nestedData[] = '<div style="text-align:left;">'.$nodoc.' </div>';
                     $nestedData[] = '<div style="text-align:center;">'.$datadate.' </div>';
                     $nestedData[] = '<div style="text-align:left;">'.$datadesc.' </div>';
                     $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
-                    // $nestedData[] = '<div style="text-align:left;">'.$row['Code_University'].' - '.$row['Name_University'].'</div>';
-
                     $data[] = $nestedData;
                     $no++;
                 }

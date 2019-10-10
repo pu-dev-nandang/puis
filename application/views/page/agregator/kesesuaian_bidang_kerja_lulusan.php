@@ -1,5 +1,5 @@
 
- 
+
 <style>
     #dataTablesPAM tr th, #dataTablesPAM tr td {
         text-align: center;
@@ -35,6 +35,8 @@
         </div>
         <div class="col-md-9">
             <div id="viewTable"></div>
+            <p style="color: orangered;">
+              *) Target kesesuaian bidang kerja lulusan >80%, Score 4 </p>
         </div>
 
     </div>
@@ -133,8 +135,8 @@
 		            '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
 		            '</div>');
 		          $('#NotificationModal').modal('show');
-                } 
-                else {  
+                }
+                else {
                 	loadDataKBKL();
 	                toastr.success('Data saved','Success');
 	                $('#programpendidikan').val('');
@@ -151,9 +153,9 @@
         }
 
     });
-    
+
     function loadDataKBKL() {
-    	
+
         var thisYear = (new Date()).getFullYear();
 		var startTahun = parseInt(thisYear) - parseInt(3);
 		var selisih =  parseInt(thisYear) - parseInt(startTahun);
@@ -161,14 +163,14 @@
 		var arr_years =[];
 		for (var i = 0; i < 3; i++) {
 			var y = parseInt(thisYear) - parseInt(i);
-			arr_years.push(y); 
+			arr_years.push(y);
 		}
 
 		var thYear = '';
 		for (var i = 0; i < arr_years.length; i++) {
 			thYear += '<th>'+arr_years[i]+'</th>';
 		}
-		
+
         $('#viewTable').html(' <table class="table" id="dataTablesPAM">' +
             '                <thead>' +
 			'                <tr>    ' +
@@ -197,7 +199,7 @@
             if(jsonResult.length>0){
 
             		for (var i = 0; i < jsonResult.length; i++) {
-            			var persentase = ''; 
+            			var persentase = '';
             			var v = jsonResult[i];
             			var v_ID_programpendik = v.ID_programpendik;
 

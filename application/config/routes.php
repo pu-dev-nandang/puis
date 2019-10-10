@@ -1060,6 +1060,7 @@ $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolb
 $route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
 
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+
 $route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
 
 

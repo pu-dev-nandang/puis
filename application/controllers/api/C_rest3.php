@@ -912,6 +912,7 @@ class C_rest3 extends CI_Controller {
         }
         else if ($mode == 'listJabatanSKS') {
           $SemesterID = $dataToken['filterPeriod'];
+
           $sql = 'select a.ID, a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
                   from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
                   join  db_employees.position as c on a.positionID = c.ID
@@ -922,12 +923,14 @@ class C_rest3 extends CI_Controller {
 
           echo json_encode($query);
         }
+
         elseif ($mode == 'deletelistSKS') {
           $ID=$dataToken['ID'];
           $this->db->where('ID', $ID);
           $this->db->delete('db_rektorat.tugas_tambahan');
           echo json_encode(1);
         }
+
 
     }
 
@@ -994,6 +997,141 @@ class C_rest3 extends CI_Controller {
 
             echo json_encode($rs);
 
+        }
+
+        elseif ($mode == 'MasaStudiLulusan') {
+          $ProdiID = $dataToken['ProdiID'];
+          $ex = explode('.', $ProdiID);
+          $ProdiID = $ProdiID[0];
+          $ProdiName = $dataToken['ProdiName'];
+          /*  
+              Tahun Masuk = ta
+              ta awal adalah = 2014, 2014 kebawah tidak ada
+          */
+          $YearMin = 2014;
+          $Year = date('Y');
+          $YearTS6 = $Year - 6;
+          $YearMinRow = $Year - 3;
+          $arr_y_temp = [];
+          $arr_row = [];
+          $TaSelection = [];
+          for ($i=$YearTS6; $i <= $Year; $i++) { 
+            $arr_y_temp[] = $i;
+          }
+
+          for ($i=$YearTS6; $i <= $YearMinRow; $i++) { 
+            $arr_row[] = $i;
+          }
+
+          $rs = array('header' => array(),'body' => array() );
+          $temp = [
+              [
+                 'Name' => 'Tahun Masuk',
+                 'colspan' => 1,
+                 'rowspan' => 2,
+                 'dt' => [], 
+              ],
+              [
+                'Name' => 'Jumlah Mahasiswa  Diterima',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => [], 
+              ],
+              [
+                'Name' => 'Jumlah Mahasiswa yang lulus pada',
+                'colspan' => count($arr_y_temp),
+                'rowspan' => 1,
+                'dt' => $arr_y_temp, 
+              ],
+              [
+                'Name' => 'Jumlah Lulusan s.d. akhir TS',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => [], 
+              ],
+              [
+                'Name' => 'Rata-rata Masa Studi',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => [], 
+              ],
+          ];
+
+          $rs['header'] = $temp;
+          $body = [];
+          for ($i=0; $i < count($arr_row); $i++) {
+            $temp =  []; 
+            $TahunMasuk = $arr_row[$i];
+            $temp[] = $TahunMasuk;
+            $JumlahMhsDiterima = 0;
+            if ($TahunMasuk >= $YearMin) {
+              $sql = 'select count(*) as total from ta_'.$TahunMasuk.'.students where ProdiID ='.$ProdiID;
+              $query =$this->db->query($sql, array())->result_array();
+              $JumlahMhsDiterima = $query[0]['total'];
+            }
+            $temp[] = $JumlahMhsDiterima;
+            $JmlLulus = 0;
+            $arr_rata2studi = [];
+            if ($JumlahMhsDiterima > 0) { // jumlah mahasiswa yg lulus pada
+              for ($k=0; $k < count($arr_y_temp); $k++) {
+                $get_tayear= $arr_y_temp[$k]; 
+                $sql1 = 'select NPM,Name,Year,GraduationYear from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ? and Year = '.$TahunMasuk.' and ProdiID = '.$ProdiID;
+                $query1=$this->db->query($sql1, array(1))->result_array();
+                // $sql1 = 'select NPM,Name,Year,GraduationYear from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and Year = '.$TahunMasuk.' and ProdiID = '.$ProdiID;
+                // $query1=$this->db->query($sql1, array())->result_array();
+                $tot = count($query1);
+                $token = $this->jwt->encode($query1,"UAP)(*");
+                $s = ['dt' => $token,'count' => $tot];
+                $temp[] = $s;
+                $JmlLulus += $tot;
+
+                for ($l=0; $l < count($query1); $l++) { 
+                  $Co = $query1[$l]['GraduationYear'] - $query1[$l]['Year'];
+                  $arr_rata2studi[] = $Co;
+                }
+
+              }
+            }
+            else
+            { // tahun 2014 kebawah
+              for ($k=0; $k < count($arr_y_temp); $k++) {
+                $s = ['dt' => '','count' => 0];
+                $temp[] = $s;
+              }
+            }
+
+            // jumlah lulusan sd akhir ts
+            $temp[] = $JmlLulus;
+            // rata-rata masa studi
+            if ($JumlahMhsDiterima > 0) {
+              if (count($arr_rata2studi) ==0) {
+                $temp[] = 0;
+              }
+              else
+              {
+                $rata_rata = array_sum($arr_rata2studi)/count($arr_rata2studi);
+                $temp[] = $rata_rata;
+              }
+            }
+            else
+            {
+              $temp[] = 0;
+            }
+            $body[] = $temp;
+          }
+
+          $rs['body'] = $body;
+          echo json_encode($rs);
+            
+        }
+        elseif ($mode == 'KurikulumCapaianRencana') {
+          $rs = [];
+          
+          echo json_encode($rs);
+        }
+        else
+        {
+          echo '{"status":"999","message":"Not Authorize"}'; 
         }
        
     }

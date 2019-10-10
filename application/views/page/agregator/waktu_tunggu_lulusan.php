@@ -27,6 +27,9 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
+            <p style="color: orangered;">
+              *) Target Waktu tunggu lulusan <=6 bulan, Score = 4 <br>
+             **) Waktu Tunggu Lulusan = (Tanggal pertama bekerja - Tanggal Yudisium) , jika angka (-) menyatakan kondisi sudah bekerja/berwirausaha sebelum lulus. </p>
         </div>
     </div>
 </div>
@@ -99,6 +102,7 @@
 
     }
 
+
     $(document).on('click','.showDetailData',function () {
        var token = $(this).attr('data-token');
        var d = jwt_decode(token,'UAP)(*');
@@ -153,3 +157,4 @@
     });
 
 </script>
+

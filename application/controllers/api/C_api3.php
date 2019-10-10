@@ -813,15 +813,21 @@ class C_api3 extends CI_Controller {
                         'EntredBy' => null,
                         'ID' => null,
                         'PassSelection' => null,
+                        'd_PassSelection' => '',
                         'ProdiCode' => $G_prodi[$i]['Code'],
                         'ProdiID' => $G_prodi[$i]['ID'],
                         'ProdiName' => $G_prodi[$i]['Name'],
                         'Registrant' => null,
+                        'd_Registrant' => '',
                         'Regular' => null,
+                        'd_Regular' => '',
                         'Regular2' => null,
+                        'd_Regular2' => '',
                         'TotalStudemt' => null,
                         'Transfer' => null,
+                        'd_Transfer' => '',
                         'Transfer2' => null,
+                        'd_Transfer2' => '',
                         'Type' => null,
                         'UpdatedBy' => null,
                         'Year' => $Year,
@@ -830,7 +836,59 @@ class C_api3 extends CI_Controller {
                 }
                 else
                 {
-                    $temp = $query[0];
+                    $dt = $query[0];
+                    $dt['d_PassSelection'] = '';
+                    $dt['d_Registrant'] = '';
+                    $dt['d_Regular'] = '';
+                    $dt['d_Regular2'] = '';
+                    $dt['d_Transfer'] = '';
+                    $dt['d_Transfer2'] = '';
+
+                    $ProdiID = $G_prodi[$i]['ID'];
+                    if ($dt['Registrant'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_Registrant'] = $token;
+                    }
+
+                    if ($dt['PassSelection'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName,e.NPM from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_PassSelection'] = $token;
+                        $dt['d_Regular'] = $token;
+                        $dt['d_Regular2'] = $token;
+                    }
+
+                    $temp = $dt;
                 }
 
                 $data[] = $temp;
@@ -863,6 +921,7 @@ class C_api3 extends CI_Controller {
                 $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
                                                     LEFT JOIN db_academic.program_study ps ON (ps.ID = ss.ProdiID)
                                                     WHERE ss.Year = "'.$Year.'" and  ss.ProdiID = ? ';
+
                 $query=$this->db->query($sql, array($arrExp[0]))->result_array();
                 if (count($query) == 0) {
                     $temp = [
@@ -960,22 +1019,103 @@ class C_api3 extends CI_Controller {
 
         }
 
-        // else if($data_arr['action']=='filterYearMhsAsing'){
-        //     // $data = $this->db->query('SELECT Year FROM db_agregator.student_selection_foreign GROUP BY Year ORDER BY Year ASC')->result_array();
-        //     $data = [];
-        //     $sql = "show databases like '".'ta_'."%'";
-        //     $query=$this->db->query($sql, array())->result_array();
-        //     for ($i=0; $i < count($query); $i++) {
-        //         $variable = $query[$i];
-        //         foreach ($variable as $key => $value) {
-        //             $ex = explode('_', $value);
-        //             $ta = $ex[1];
-        //             $data[] = array('Year' => $ta);
-        //         }
-        //     }
-        //     return print_r(json_encode($data));
-        // }
+        else if($data_arr['action'] == 'readDataMHSBaruAsingByProdi')
+        {
+           $rs = array('header' => array(),'body' => array(),  );
+           $ProdiID = $data_arr['ProdiID'];
+           $ex = explode('.', $ProdiID);
+           $ProdiID = $ProdiID[0];
+           $ProdiName = $data_arr['ProdiName'];
 
+           // show all ta
+           $sql = "show databases like '".'ta_'."%'";
+           $query=$this->db->query($sql, array())->result_array();
+           $temp_ta = [];
+           for ($i=0; $i < count($query); $i++) {
+               $arr = $query[$i];
+               $db_ = '';
+
+               foreach ($arr as $key => $value) {
+                   $db_ = $value;
+               }
+
+               if ($db_ != '') {
+                   $ta_year = explode('_', $db_);
+                   $ta_year = $ta_year[1];
+                   $temp_ta[] = $ta_year;
+               }
+           }
+
+           // header
+           $temp = [
+            [
+                'Name' => 'No',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => []
+            ],
+            [
+                'Name' => 'Program Studi',
+                'colspan' => 1,
+                'rowspan' => 2,
+                'dt' => []
+            ],
+            [
+                'Name' => 'Jumlah Mahasiswa Aktif',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],
+            [
+                'Name' => 'Jumlah Mahasiswa Asing Penuh Waktu',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],
+            [   
+                'Name' => 'Jumlah Mahasiswa Asing Paruh Waktu',
+                'colspan' => count($temp_ta),
+                'rowspan' => 1,
+                'dt' => $temp_ta
+            ],     
+
+           ];
+            
+            $rs['header'] = $temp;
+
+            // body
+            $temp_isi = [1,$ProdiName];
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Aktif
+                $arr = $query[$i];
+                $db_ = '';
+
+                foreach ($arr as $key => $value) {
+                    $db_ = $value;
+                }
+
+                $sql1 = 'select count(*) as total from '.$db_.'.students where NationalityID !=  "001" and ProdiID = ? ';
+                $query1=$this->db->query($sql1, array($ProdiID))->result_array();
+                $total = $query1[0]['total'];
+                $temp_isi[] = $total;
+            }
+
+            /*
+                Jumlah Mahasiswa Asing Penuh Waktu = Data belum ada jadi diisin dengan 0
+                Jumlah Mahasiswa Asing Paruh Waktu = Data belum ada jadi diisin dengan 0
+            */
+
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Penuh Waktu
+                $temp_isi[] = 0;
+            }    
+
+            for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Paruh Waktu
+                $temp_isi[] = 0;
+            }
+
+            $rs['body'] = $temp_isi; 
+            return print_r(json_encode($rs));
+
+        }
         else if($data_arr['action']=='getAllCourse'){
 
             $dataProdi = $this->db->select('ID, Name')->get_where('db_academic.program_study',array(
@@ -2879,15 +3019,20 @@ class C_api3 extends CI_Controller {
                     $EducationLevelDesc = $Detail[$k]['Description'];
                     $EducationLevelDescEng = $Detail[$k]['DescriptionEng'];
                     // find sql
-                    $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
-                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    // $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    // $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
 
+                    $sql3 = 'select * from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    $Tot = count($query3);
+                    $token = $this->jwt->encode($query3,"UAP)(*");
                     $temp3['Data'][] = array(
                         'EducationLevelID' => $EducationLevelID,
                         'EducationLevelName' => $EducationLevelName,
                         'EducationLevelDesc' => $EducationLevelDesc,
                         'EducationLevelDescEng' => $EducationLevelDescEng,
-                        'Count' => $query3[0]['Total'],
+                        'Count' => $Tot,
+                        'data' => $token,
                     );
                 }
 
@@ -3899,6 +4044,7 @@ class C_api3 extends CI_Controller {
     function getLanguagelabels(){
 
         $lang = $this->input->get('lang');
+
 
         $dataLang = $this->db->get_where('db_prodi.language',array(
             'Code' => $lang

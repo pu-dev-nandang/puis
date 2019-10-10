@@ -3637,6 +3637,7 @@ class C_save_to_pdf extends CI_Controller {
 
             $pdf->Ln(17);
 
+
             $titleA = ($Student['TitleAhead']!='') ? $Student['TitleAhead'].'' : '';
             $titleB = ($Student['TitleBehind']!='') ? $Student['TitleBehind'] : '' ;
 
@@ -3693,6 +3694,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Ln(17);
 
             $Rektorat = $dataStudent['Rektorat'][0];
+
             $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].'' : '';
             $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
             $Rektor = $titleARektor.''.$Rektorat['Name'].', '.$titleBRektor;
@@ -3960,6 +3962,7 @@ class C_save_to_pdf extends CI_Controller {
 
       // Rektor
       $Rektorat = $dataIjazah['Rektorat'][0];
+
       $titleARektor = ($Rektorat['TitleAhead']!='')? $Rektorat['TitleAhead'].'' : '';
       $titleBRektor = ($Rektorat['TitleBehind']!='')? $Rektorat['TitleBehind'] : '';
       $komaRektor = ($titleBRektor!='') ? ',' : '';

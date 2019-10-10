@@ -12,9 +12,8 @@
                                 	
                                     <div class="col-xs-12">
                                         <div class="form-group">
-                                            <label> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
+                                            <label style="display: block"> Name Univesity   <a href="javascript:void(0);" class="btnNameUniversity" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> University</span></a> </label>
                                             <select class="select2-select-00 form-exam formNameUnivS1" id="formNameUnivS1" style="width: 100%;" size="5"><option value=""></option></select>
-                                            <!-- <input class="form-control" id="formNameUnivS1"> -->
                                         </div>
                                     </div>
 
@@ -34,14 +33,14 @@
 
                                 	<div class="col-xs-6">
                                     	<div class="form-group">
-                                        	<label>Major <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
+                                        	<label style="display: block">Major <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Major </span></a></label>
                                              <select class="select2-select-00 form-exam formMajorS1" id="formMajorS1" style="width: 100%;" size="5"><option value=""></option></select>
                                         	
                                     	</div>
                                 	</div>
                                 	<div class="col-xs-6">
                                     	<div class="form-group">
-                                        	<label>Program Study <a href="javascript:void(0);" class="btnAddMajor"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
+                                        	<label style="display: block">Program Study <a href="javascript:void(0);" class="btnAddMajor" style="text-align: right; float:right;"><span class="label label-pill label-primary"><span class="fa fa-plus-circle"></span> Program Study </span></a> </label>
                                              <select class="select2-select-00 form-exam formStudyS1" id="formStudyS1" style="width: 100%;" size="5"><option value=""></option></select>
                                         	<!-- <input class="form-control" id="formStudyS1"> -->
                                     	</div>
@@ -122,7 +121,7 @@
 
                     <!-- <span id="bodyAddSesi"></span> -->
             </div>
-    <span id="loadtablefiles1"></span> 
+    <span id="loadtablefiles1" class="table-responsive"></span> 
  </div>
 
 <script>
@@ -170,7 +169,7 @@ function loadAcademicS1Details() {
             //console.log(response);
                 $("#loadtablefiles1").append(
                     ' <div class="table-responsive">                                                '+
-                    '     <table class="table table-striped table-bordered">                        '+
+                    '     <table class="table table-striped table-bordered table-responsive">                        '+
                     '         <thead>                                                               '+
                     '         <tr style="background: #20485A;color: #FFFFFF;">                      '+
                     '             <th style="width: 2%;text-align: center;">Academic</th>           '+
@@ -209,8 +208,8 @@ function loadAcademicS1Details() {
                     '       <td> '+response[i]['Name_University']+' </td>                           '+                             
                     '       <td> '+response[i]['NamaJurusan']+' </td>                               '+    
                     '       <td><center><div class="btn-group">   '+ 
-                    '          <button type="button" class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub="'+listdatas1+'"> <i class="fa fa-eye margin-right"></i>Ijazah</button> '+ 
-                    '          <button type="button" class="btn btn-sm btn-success btn-round btnviewlistsrata" filesub="'+listdatas2+'"> <i class="fa fa-eye margin-right"></i> Transcript</button> '+ 
+                    '          <button type="button" class="btn btn-sm btn-primary btnviewlistsrata" filesub="'+listdatas1+'"> <i class="fa fa-eye margin-right"></i>Ijazah</button> '+ 
+                    '          <button type="button" class="btn btn-sm btn-success btnviewlistsrata" filesub="'+listdatas2+'"> <i class="fa fa-eye margin-right"></i> Transcript</button> '+ 
                     '          </div>  '+ 
                     '          </center></td>    '+        
                     '       <td style="text-align: center;"><button class="btn btn-sm btn-primary btn-circle testdetail" data-toggle="tooltip" data-placement="top" title="Edit" listid_ijazah ="'+iddata1+'" listid_transcript ="'+iddata2+'"><i class="icon-list icon-large"></i></button>   <button class="btn btn-sm btn-primary btn-circle testEdit" data-toggle="tooltip" data-placement="top" title="Edit" listid_ijazah ="'+iddata1+'" listid_transcript ="'+iddata2+'"><i class="fa fa-edit"></i></button>   <button class="btn btn-danger btn-circle btndelist" data-toggle="tooltip" data-placement="top" title="Delete" listid_ijazah ="'+iddata1+'" listid_transcript ="'+iddata2+'"><i class="fa fa-trash"></i></button></td>      '+  
