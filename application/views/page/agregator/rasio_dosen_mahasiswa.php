@@ -13,10 +13,17 @@
 <div class="well">
 
     <div class="row">
-        <div class="col-md-2 col-md-offset-5">
+        <div class="col-md-2 col-md-offset-4">
             <select class="form-control" id="filterSemester"></select>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-2">
+            <select class="form-control" id="filterDosen">
+                <option value="0">Semua</option>
+                <option value="1">Dosen Tetap (NIDN/NIDK)</option>
+                <option value="2">Dosen Tidak Tetap (NUP)</option>
+            </select>
+        </div>
+        <div class="col-md-4">
             <div style="text-align: right;margin-bottom: 20px;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
@@ -73,7 +80,7 @@
 
     });
 
-    $('#filterSemester').change(function () {
+    $('#filterSemester,#filterDosen').change(function () {
         var filterSemester = $('#filterSemester').val();
         if(filterSemester!='' && filterSemester!=null){
             loadLecturerCertificate();
@@ -94,9 +101,11 @@
 
             var SemesterText = $('#filterSemester option:selected').text();
 
+            var filterDosen = $('#filterDosen').val();
+
             passToExcel = [];
 
-            var url = base_url_js+'api3/__getRasioDosenMahasiswa?smt='+SemesterID+'&y='+Year;
+            var url = base_url_js+'api3/__getRasioDosenMahasiswa?smt='+SemesterID+'&y='+Year+'&s='+filterDosen;
             $.getJSON(url,function (jsonResult) {
 
                 $('#listData').empty();

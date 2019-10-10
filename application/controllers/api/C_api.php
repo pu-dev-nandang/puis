@@ -868,7 +868,7 @@ class C_api extends CI_Controller {
                 //$stDefault =' <span class="label label-danger"> '.$Get_MasterFiles[$j]['TypeFiles'].'</span>';
                 $stDefault =' <span class="badge progress-bar-danger btn-round">'.$Get_MasterFiles[$j]['TypeFiles'].'</span> ';
 
-                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL  ';
+                $sql2 = 'select count(*) as total, LinkFiles from db_employees.files where NIP = ? and TypeFiles = ? and Active = 1 and LinkFiles IS NOT NULL ';
                 $query2=$this->db->query($sql2, array($NIP,$Get_MasterFiles[$j]['ID']))->result_array();
                 if ($query2[0]['total'] > 0 ) {
                     $getotfiles = $getotfiles + ($query2[0]['total']);
@@ -1168,6 +1168,8 @@ class C_api extends CI_Controller {
         $data = $this->m_api->__getDosenSelectOption();
         return print_r(json_encode($data));
     }
+
+
 
     public function crudKurikulum(){
 
@@ -2711,6 +2713,8 @@ class C_api extends CI_Controller {
     }
 
 
+
+
     public function getversiondetail(){
 
         $token = $this->input->post('token');
@@ -3996,10 +4000,87 @@ class C_api extends CI_Controller {
 
     }
 
-    public function review_otherfile(){
-        $NIP = $this->input->get('NIP');
-        $viewfiles = $this->m_api->views_otherfile($NIP);
-        echo json_encode($viewfiles);
+    public function review_otherfile() {
+        //$NIP = $this->input->get('NIP');
+        //$viewfiles = $this->m_api->views_otherfile($NIP);
+       // echo json_encode($viewfiles);
+    //$NIP = $this->session->userdata('NIP');
+    $data_arr = $this->getInputToken();
+
+        if (count($data_arr) > 0) {
+
+            if($data_arr['action']=='readlist_otherfile'){
+
+                $NIP = $data_arr['NIP'];
+                $requestData= $_REQUEST;
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = 'AND ea.NameFiles LIKE "%'.$search.'%"
+                    OR m.NameFiles LIKE "%'.$search.'%" ';
+                }
+
+                $queryDefault = 'SELECT ea.*, m.NameFiles
+                FROM db_employees.files AS ea
+                LEFT JOIN db_employees.master_files AS m ON (ea.TypeFiles = m.ID) 
+                WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.Active = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
+
+                //$queryDefault = 'SELECT ea.ID, ea.Name_University, ea.Code_University FROM db_research.university ea '.$dataSearch;
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+                //print_r($sql); die();
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++){
+
+                    $nestedData=array();
+                    $row = $query[$i];
+
+                    $btnAction = '<button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'.$row['LinkFiles'].'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'.$row['NameFiles'].'" idtypex="'.$row['TypeFiles'].'" idfiles="'.$row['ID'].'" linkfileother="'.$row['LinkFiles'].'" namedoc ="'.$row['No_Document'].'"><i class="fa fa-edit"></i></button> ';
+
+                    if ($row['No_Document'] == null){
+                         $nodoc = '<center> - </center>';
+                    } else {
+                         $nodoc = $row['No_Document'];
+                    } 
+
+                    if ($row['Date_Files'] == null){
+                         $datadate = '<center> - </center>';
+                    } else {
+                         $datadate = date('d M Y',strtotime($row['Date_Files']));
+                    } 
+
+                    if ($row['Description_Files'] == null){
+                         $datadesc = '<center> - </center>';
+                    } else {
+                         $datadesc = $row['Description_Files'];
+                    }                                      
+
+                    $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align:left;">'.$row['NameFiles'].' </div>';
+                    $nestedData[] = '<div style="text-align:left;">'.$nodoc.' </div>';
+                    $nestedData[] = '<div style="text-align:center;">'.$datadate.' </div>';
+                    $nestedData[] = '<div style="text-align:left;">'.$datadesc.' </div>';
+                    $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                    $data[] = $nestedData;
+                    $no++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+            }
+        }
 
     }
 
@@ -4018,11 +4099,11 @@ class C_api extends CI_Controller {
 
         if ($academic == 'S1') {
             $NIP = $this->input->get('n');
-            $fileijazahs1 = $this->input->get('j');
-            $filetranscripts1 = $this->input->get('t');
+            $fileijazah = $this->input->get('j');
+            $filetranscripts = $this->input->get('t');
             $nameuniv = $this->input->get('x');
 
-            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazahs1,$filetranscripts1,$nameuniv);
+            $viewfiles1 = $this->m_api->views_editacademic($NIP,$fileijazah,$filetranscripts,$nameuniv);
             echo json_encode($viewfiles1);
         }
         else if ($academic == 'S2') {
@@ -5881,6 +5962,7 @@ class C_api extends CI_Controller {
     public function editAcademicData(){
 
         $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
 
         if($data_arr['action']=='editAcademicS1'){
             $formInsert = (array) $data_arr['formInsert'];
@@ -5895,8 +5977,8 @@ class C_api extends CI_Controller {
             $Grade = $formInsert['Grade'];
             $TotalCredit = $formInsert['TotalCredit'];
             $TotalSemester = $formInsert['TotalSemester'];
-            $fileName = $formInsert['linkijazahs1'];
-            $file_trans = $formInsert['linktranscripts1'];
+            $id_linkijazahs1 = $formInsert['id_linkijazahs1'];
+            $id_linktranscripts1 = $formInsert['id_linktranscripts1'];
 
             $dataUpdate = array(
                 'TypeAcademic' => $type,
@@ -5908,10 +5990,12 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $fileName
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
+                //'LinkFiles' => $fileName
             );
             $this->db->where('NIP', $NIP);
-            $this->db->where('LinkFiles', $fileName);
+            $this->db->where('ID', $id_linkijazahs1);  //file ijazah
             $this->db->update('db_employees.files', $dataUpdate);
             //------------------------------------------------\\
             $dataUpdate2 = array(
@@ -5924,11 +6008,14 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $file_trans
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
+                //'LinkFiles' => $file_trans
             );
             $this->db->where('NIP', $NIP);
-            $this->db->where('LinkFiles', $file_trans);
+            $this->db->where('ID', $id_linktranscripts1); //file transcript
             $this->db->update('db_employees.files', $dataUpdate2);
+
             return print_r(1);
         }
         else if($data_arr['action']=='editAcademicS2'){
@@ -5957,7 +6044,9 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $fileName
+                //'LinkFiles' => $fileName,
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $fileName);
@@ -5973,7 +6062,9 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $file_trans
+                //'LinkFiles' => $file_trans
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
@@ -6007,7 +6098,9 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $fileName
+                //'LinkFiles' => $fileName
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $fileName);
@@ -6023,7 +6116,9 @@ class C_api extends CI_Controller {
                 'Grade' => $Grade,
                 'TotalCredit' => $TotalCredit,
                 'TotalSemester' => $TotalSemester,
-                'LinkFiles' => $file_trans
+                //'LinkFiles' => $file_trans
+                'DateUpdate' => date('Y-m-d H:i:s'),
+                'UserUpdate' => $IDuser
             );
             $this->db->where('NIP', $NIP);
             $this->db->where('LinkFiles', $file_trans);
@@ -6248,6 +6343,182 @@ class C_api extends CI_Controller {
             }
 
         } //end count
+
+    }
+
+
+    public function loadUniversity(){
+
+        $term = $this->input->get('term');
+        $data_result = $this->db->query('SELECT * FROM db_research.university auts WHERE auts.Name_University LIKE "%'.$term.'%" ')->result_array();
+        
+        return print_r(json_encode($data_result));
+    }
+
+     public function loadMajorEmployee(){
+
+        $term = $this->input->get('term');
+        $data_result = $this->db->query('SELECT * FROM db_employees.major_programstudy_employees auts WHERE auts.Name_MajorProgramstudy LIKE "%'.$term.'%" ')->result_array();
+        
+        return print_r(json_encode($data_result));
+    }
+
+    public function loadmasteruniversity() {
+
+        $data_arr = $this->getInputToken();
+        $IDuser = $this->session->userdata('NIP');
+
+        if($data_arr['action']=='readmasterunivxxx') { 
+
+            $data = $this->db->query('SELECT ID, Name_University, Code_University FROM db_research.university')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readmasteruniv'){
+
+            $requestData= $_REQUEST;
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' WHERE ea.Name_University LIKE "%'.$search.'%"
+                OR ea.Code_University LIKE "%'.$search.'%" ';
+            }
+
+            $queryDefault = 'SELECT ea.ID, ea.Name_University, ea.Code_University FROM db_research.university ea '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++){
+
+                $nestedData=array();
+                $row = $query[$i];
+
+               $btnAction = '<div class="btn-group btnAction">
+                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                       <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'" disabled> <i class="fa fa fa-edit"></i> Edit</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" disabled> <i class="fa fa fa-trash"></i> Delete</a></li>
+                                    </ul>
+                                    </div>';
+
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Code_University'].' - '.$row['Name_University'].'</div>';
+                //$nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+        }
+        else if($data_arr['action']=='update_mstruniv'){
+
+            $master_codeuniv = $data_arr['master_codeuniv'];
+            $master_nameuniv = ucwords($data_arr['master_nameuniv']);
+
+            $dataAttdS = $this->db->query('SELECT * FROM db_research.university
+                                          WHERE Name_University = "'.$master_nameuniv.'"
+                                          OR Code_University = "'.$master_codeuniv.'" ')->result_array();
+
+            if(count($dataAttdS)>0){
+                return print_r(0);
+            } 
+            else {
+
+                $dataSave = array(
+                    'Code_University' => $master_codeuniv, 
+                    'Name_University' => $master_nameuniv,
+                    'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_research.university',$dataSave);
+                return print_r(1);
+            }
+        }
+        else if($data_arr['action']=='update_mstermajor'){
+
+            $master_namemajor = ucwords($data_arr['master_namemajor']);
+            $dataAttdS = $this->db->query('SELECT * FROM db_employees.major_programstudy_employees
+                                          WHERE Name_MajorProgramstudy = "'.$master_namemajor.'" ')->result_array();
+
+            if(count($dataAttdS)>0){
+                return print_r(0);
+            } 
+            else {
+                $dataSave = array(
+                    'Name_MajorProgramstudy' => $master_namemajor,
+                    'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.major_programstudy_employees',$dataSave);
+                return print_r(1);
+            }
+        }
+
+        else if($data_arr['action']=='readmastermajor'){
+
+            $requestData= $_REQUEST;
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = 'WHERE ea.Name_MajorProgramstudy LIKE "%'.$search.'%" ';
+            }
+
+            $queryDefault = 'SELECT ea.ID, ea.Name_MajorProgramstudy FROM db_employees.major_programstudy_employees ea '.$dataSearch;
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++){
+
+                $nestedData=array();
+                $row = $query[$i];
+
+                $btnAction = '<div class="btn-group btnAction">
+                                    <button type="button" class="btn btn-sm btn-default dropdown-toggle dropdown-menu-left" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                       <i class="fa fa-pencil"></i> <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="javascript:void(0);" class="btnEditAE" data-no="'.$no.'" disabled> <i class="fa fa fa-edit"></i> Edit</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="javascript:void(0);" class="btnRemove" data-id="'.$row['ID'].'" disabled> <i class="fa fa fa-trash"></i> Delete</a></li>
+                                    </ul>
+                                    </div>';
+
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Name_MajorProgramstudy'].'</div>';
+                //$nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+        }
 
     }
 
@@ -8416,7 +8687,8 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='getAllStdReg'){
 
                 $Status = $data_arr['Status'];
-                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project fp 
+                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2  
+                                                    FROM db_academic.final_project fp
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
                                                     LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
                                                     LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
@@ -9589,7 +9861,6 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
     }
 
-
     public function crudCategoryClassroomVreservation()
     {
         $token = $this->input->post('token');
@@ -9704,7 +9975,6 @@ class C_api extends CI_Controller {
 
         }
     }
-
 
     public function getDataStudyPlanning(){
         $requestData= $_REQUEST;
@@ -10159,9 +10429,6 @@ class C_api extends CI_Controller {
             }
         }
     }
-
-
-   
 
     public function dropdownlistmodule(){
         $data_arr = $this->getInputToken();

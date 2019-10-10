@@ -97,6 +97,28 @@
                     <span>Announcement</span>
                 </a>
             </li>
+            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation'); 
+            ?>
+            <?php if ($this->session->userdata('prodi_get')): ?>
+                <?php if (count($this->session->userdata('prodi_get')) > 1 && $DepartmentNav == 15): ?>
+                    <li>
+                        <a href="<?php echo base_url('dashboard'); ?>">
+                            <i class="icon-home"></i>
+                            <span>Change Prodi</span>
+                        </a>
+                    </li>
+                <?php endif ?>
+            <?php endif ?>
+            <?php if ($this->session->userdata('faculty_get')): ?>
+                <?php if (count($this->session->userdata('faculty_get')) > 1 && $DepartmentNav == 34): ?>
+                    <li>
+                        <a href="<?php echo base_url('dashboard'); ?>">
+                            <i class="icon-home"></i>
+                            <span>Change Faculty</span>
+                        </a>
+                    </li>
+                <?php endif ?>
+            <?php endif ?>
             <li class="dropdown hidden-xs hidden-sm" id = 'NotificationPersonal'>
 
             </li>
@@ -139,12 +161,12 @@
                     <ul class="dropdown-menu">
 
                         <!-- Lecturer -->
-                        <?php if(in_array(1,$rule_service)){ ?>
+                        <?php if(in_array(2,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(2)=='lecturers'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('database/lecturers'); ?>"><i class="fa fa-user-secret"></i> Lecturers</a></li>
                         <?php } ?>
 
-                        <?php if(in_array(2,$rule_service)){ ?>
+                        <?php if(in_array(1,$rule_service)){ ?>
                             <li class="<?php if($this->uri->segment(2)=='students'){echo 'active';} ?>">
                                 <a href="<?php echo base_url('database/students'); ?>"><i class="fa fa-street-view"></i> Students</a></li>
                         <?php } ?>
@@ -841,24 +863,58 @@
     }
 
      function saveLogUser() {
-         var dataURL = window.location.href;
 
-         var url = base_url_js+'api3/__crudLogging';
+        try {
+            $.getJSON("https://api.ipify.org/?format=json", function(e) {
+                // console.log(e);
+                // console.log(e.ip);
 
-         var data = {
-             action : 'insertLog',
-             dataForm : {
-                 NIP : sessionNIP,
-                 UserID : sessionNIP,
-                 URL : dataURL
-             }
-         };
+                var dataURL = window.location.href;
 
-         var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudLogging';
 
-         $.post(url,{token:token},function (result) {
+                var data = {
+                    action : 'insertLog',
+                    dataForm : {
+                        NIP : sessionNIP,
+                        UserID : sessionNIP,
+                        IPPublic : e.ip,
+                        URL : dataURL
+                    }
+                };
 
-         });
+                var token = jwt_encode(data,'UAP)(*');
+
+                $.post(url,{token:token},function (result) {
+
+                });
+
+            });
+        } catch (e){
+            var dataURL = window.location.href;
+
+            var url = base_url_js+'api3/__crudLogging';
+
+            var data = {
+                action : 'insertLog',
+                dataForm : {
+                    NIP : sessionNIP,
+                    UserID : sessionNIP,
+                    IPPublic : '',
+                    URL : dataURL
+                }
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+
+            $.post(url,{token:token},function (result) {
+
+            });
+        }
+
+
+
+
      }
 
 </script>

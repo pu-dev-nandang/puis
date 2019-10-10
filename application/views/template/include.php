@@ -30,7 +30,7 @@
 <!--[if IE 8]>
 <link href="assets/css/ie8.css" rel="stylesheet" type="text/css" />
 <![endif]-->
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
 
 <link rel="stylesheet" href="<?php echo base_url('assets/datepicter/css/bootstrap-datetimepicker.min.css'); ?>">
 
@@ -1064,6 +1064,43 @@
                 });
             }
 
+        });
+    }
+
+
+    function loadSelectOptionUniversity(element,selected) {
+
+        var url = base_url_js+'api/__loadUniversity';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].Code_University+'">'+data[i].Name_University+'</option>')
+                        .val(selected).trigger('change');
+            }
+        });
+    }
+
+    function loadSelectOptionMajorEmployees(element,selected) {
+
+        var url = base_url_js+'api/__loadMajorEmployee';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].ID+'">'+data[i].Name_MajorProgramstudy+'</option>')
+                        .val(selected).trigger('change');
+                }
+        });
+    }
+
+    function loadSelectOptionProgramStudyEmployees(element,selected) {
+
+        var url = base_url_js+'api/__loadMajorEmployee';
+            $.get(url,function (data) {
+                var option = $(element);
+                for(var i=0; i<data.length; i++){
+                    option.append('<option value="'+data[i].ID+'">'+data[i].Name_MajorProgramstudy+'</option>')
+                        .val(selected).trigger('change');
+                }
         });
     }
 

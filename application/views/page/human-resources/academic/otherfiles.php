@@ -78,7 +78,7 @@
                     </div>
                     <!-- <span id="bodyAddSesi"></span> -->
             </div>
-        <span id="loadtablefiles"></span>  
+        <div id="loadtablefiles" class="col-md-6 table-responsive"></div>  
  </div>
 
 
@@ -104,76 +104,56 @@ $('#fileOther').change(function (event) {
 <script>
     $(document).ready(function () {
         loadFilesDetails();
+        loadformsotherfiles();
     });
-    //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+    
+    function loadformsotherfiles() {
 
-    function loadFilesDetails() {
-        
+        $('#typefiles').val('');
+        $('#NoDocument').val('');
+        $('#DescriptionFile').val('');
+        $('#DateDocument').val('');
+        $('#fileOther').val('');
+        $('#element1').val('');
+    
+    }
+
+    function loadFilesDetails() {  
+
+        $('#loadtablefiles').html('<table class="table table-bordered table-striped" id="tableDataotherfiles">   '+
+            '                    <thead>                                                               '+
+            '                    <tr style="background: #20485A;color: #FFFFFF;">                      '+
+            '                        <th style="width: 5%;text-align: center;">No</th>                 '+
+            '                        <th style="width: 5%;text-align: center;">Type Files</th>         '+
+            '                        <th style="width: 5%;text-align: center;">No.Document</th>        '+
+            '                        <th style="width: 5%;text-align: center;">Date Document</th>      '+
+            '                        <th style="width: 12%;text-align: center;">Description</th>       '+
+            '                        <th style="text-align: center;width: 8%;">Action</th>             '+
+            '                    </tr>' +
+            '                    </thead>' +
+            //'                   <tbody id="listData"></tbody>' +
+            '                </table>');
+
         var NIP = '<?php echo $NIP; ?>';
-        var url = base_url_js+'api/__reviewotherfile?NIP='+NIP;
-        var token = jwt_encode({
-            action:'read',
-            NIP:NIP},'UAP)(*');
-
-        $.post(url,{token:token},function (resultJson) {
-
-            var response = resultJson;
-            //console.log(resultJson);
-
-                $("#loadtablefiles").append(
-                    ' <div class="table-responsive">                                                '+
-                    '     <table class="table table-striped table-bordered">                        '+
-                    '         <thead>                                                               '+
-                    '         <tr style="background: #1E90FF;color: #FFFFFF;">                      '+
-                    '             <th style="width: 5%;text-align: center;">Type Files</th>         '+
-                    '             <th style="width: 8%;text-align: center;">No.Document</th>        '+
-                    '             <th style="width: 5%;text-align: center;">Date Document</th>      '+
-                    '             <th style="width: 15%;text-align: center;">Description</th>       '+
-                    '             <th style="text-align: center;width: 8%;">Action</th>             '+
-                    '         </tr>                                                                  '+
-                    '         </thead>                                                              '+
-                    '         <tbody id="dataRow"></tbody>                                          '+
-                    '    </table>                                                                   '+
-                    '</div> ');  
-
-            if(response.length > 0){
-                var no = 1;
-                var orbs=0;
-
-                for (var i = 0; i < response.length; i++) {
-
-                    if (response[i]['No_Document'] == null){
-                         var datadoc = '<center> - </center>';
-                    } else {
-                         var datadoc = ''+response[i]['No_Document']+'';
-                    } 
-
-                    if (response[i]['Date_Files'] == null){
-                         var datadate = '<center> - </center>';
-                    } else {
-                         var dates = ''+response[i]['Date_Files']+'';
-                         var datadate = moment(dates).format('DD-MM-YYYY');
-                    } 
-
-                    if (response[i]['Description_Files'] == null){
-                         var datadesc = '<center> - </center>';
-                    } else {
-                         var datadesc = ''+response[i]['Description_Files']+'';
-                    }                                                                                                                               
-
-                    $("#dataRow").append('<tr>                                                       '+
-                    '            <td>'+response[i]['NameFiles']+'</td>                               '+       
-                    '            <td>'+datadoc+'</td>                                                '+    
-                    '            <td><center>'+datadate+'</center></td>                              '+                                                       
-                    '            <td>'+datadesc+'</td>                                              '+    
-                    '            <td style="text-align: center;"><button type="button" class="btn btn-sm btn-primary btn-circle btnviewlistsrata" data-toggle="tooltip" data-placement="top" title="Review Files" filesub="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i></button> <button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'+response[i]['ID']+'"><i class="fa fa-trash"></i></button> <button class="btn btn-sm btn-success btn-circle testEditdocument" data-toggle="tooltip" data-placement="top" title="Edit File" filesnametype="'+response[i]['NameFiles']+'" idtypex="'+response[i]['TypeFiles']+'" idfiles="'+response[i]['ID']+'" linkfileother="'+response[i]['LinkFiles']+'" namedoc ="'+response[i]['No_Document']+'"><i class="fa fa-edit"></i></button> </td>      '+     
-                    '   </tr>');
-                } 
+        var token = jwt_encode({action:'readlist_otherfile', NIP: NIP},'UAP)(*');
+        var dataTable = $('#tableDataotherfiles').DataTable( {
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api/__reviewotherfile", // json datasource
+                data : {token:token},
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
             }
-
-        }).done(function() {
-        })
-    };
+        });
+    }
 
 </script>
 <script>
@@ -244,7 +224,11 @@ $('#fileOther').change(function (event) {
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>              '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">    </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">    </div>       '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel</button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+                        '         <div class="btn-group">   '+ 
+                        '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
+                        '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
+                        '               </div>  '+ 
+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -311,17 +295,35 @@ $('#fileOther').change(function (event) {
                         '        <div class="col-xs-6"> '+
                         '            <div class="form-group"> '+
                         '                <div id="element1">Review File : </div> '+
-                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center></div>                     '+
+                        '                   <div><iframe src="'+base_url_js+'uploads/files/'+response[i]['LinkFiles']+'" style="width:300px; height:150px;" frameborder="0"></iframe> <br/><center><button class="btn btn-sm btn-primary btn-round btnviewlistsrata" filesub ="'+response[i]['LinkFiles']+'"><i class="fa fa-eye"></i> Preview </button></center>                     '+
+                        '                   </div>'+
+                        '               </div> '+
                         '            </div> '+
-                        '       </div> '+
-                        '        </div>'+ //
-                        '        <div class="row"> '+
-                        '           <div class="col-md-12" style="text-align: right;"> '+
+                        '        </div>'+ 
+
+                        '        <form id="tagFM_OtherFile" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">  '+
+                        '            <label class="btn btn-sm btn-default btn-upload">                                  '+
+                        '                <i class="fa fa-upload margin-right"></i> Change File                                              '+
+                        '                       <input type="file" id="fileOther" name="userfile" class="upload_files" accept="application/pdf"> '+
+                        '                    </label>                                                                                                                   '+
+                        '                <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p>              '+
+                        '        </form>                     '+
+
+                        
+
+
+                        '    <div class="row"> '+
+                        '    <div class="col-md-12" style="text-align: right;"> '+
                         '                <hr/> '+
                         '    <div><input type="hidden" class="form-control" value="'+filesnametype+'" id="typeotherfiles"> </div>        '+
                         '    <div><input type="hidden" class="form-control" value="'+linkfileother+'" id="linkotherfile">   </div>       '+
                         '    <div><input type="hidden" class="form-control" value="'+idfiles+'" id="idlinkfiles">           </div>       '+
-                        '               <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i> Cancel </button> | <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="fa fa-check"></i> Save</button> '+
+
+                              '         <div class="btn-group">   '+ 
+                        '                <button type="button" class="btn btn-danger btn-round" data-dismiss="modal"> <i class="fa fa-remove"></i>Cancel</button> '+ 
+                        '                <button type="button" class="btn btn-success btn-round btnSubmitEditFiles" linkothers="'+linkfileother+'" idfiles="'+idfiles+'"> <i class="glyphicon glyphicon-floppy-disk"></i> Save</button> '+ 
+                        '               </div>  '+ 
+
                         '           </div> '+
                         '       </div>'+
                         '   </div>'+
@@ -341,22 +343,7 @@ $('#fileOther').change(function (event) {
 </script>
 
 <script>
-    $(document).on('click','.btnSaveFiles',function () {
-        var NIP = $('#formNIP').val();
-        $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
-            'Pastikan Data Files tidak salah ! <br/>                                    ' +
-            'Periksa kembali data yang di input sebelum di Save.                        ' +
-            '<hr/>                                                                      ' +
-            '<button type="button" class="btn btn-default" id="btnCloseEmployees" data-dismiss="modal">Close</button> | ' +
-            '<button type="button" class="btn btn-success btnSubmitFiles">Submit</button>' +
-            '</div> ');
-
-        $('#NotificationModal').modal({
-            'backdrop' : 'static',
-            'show' : true
-        });
-    });
-
+   
 $('#btnSaveEditFiles').click(function () {  
         var NIP = $('#formNIP').val();
         $('#NotificationModal .modal-body').html('<div style="text-align: center;">     ' +
@@ -379,7 +366,7 @@ $('#btnSaveEditFiles').click(function () {
 <script>
      $(document).on('click','.btndelotherfile',function () {
         if (window.confirm('Are you sure to delete file ?')) {
-            loading_button('.btndelotherfile');
+            //loading_button('.btndelotherfile');
 
             var otfile1 = $(this).attr('Idotherfile');
             var data = {
@@ -391,8 +378,12 @@ $('#btnSaveEditFiles').click(function () {
             var url = base_url_js+"api/__delistacaemploy";
             $.post(url,{token:token},function (result) {
                 toastr.success('Success Delete File!','Success'); 
+                // console.log(';sdasdsad')
+                //loadFilesDetails();
+                //loadformsotherfiles();
                 setTimeout(function () {
-                    window.location.href = '';
+                    $('.menuDetails[data-page="otherfiles"]').trigger('click');
+                  //window.location.href = '';
                 },1000);
             });
         }

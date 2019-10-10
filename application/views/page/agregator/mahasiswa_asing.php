@@ -6,28 +6,7 @@
 </style>
 
 <div class="well">
-
     <div class="row">
-
-        <!-- <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
-            <div class="form-group">
-                <label>Year</label>
-                <input class="hide" id="formID">
-                <select class="form-control" id="formYear"></select>
-            </div>
-            <div class="form-group">
-                <label>Prodi</label>
-                <select class="form-control" id="formProdiID"></select>
-            </div>
-            <div class="form-group">
-                <label>Jumlah Mahasiswa</label>
-                <input type="number" class="form-control" id="formTotalStudent">
-            </div>
-            <div class="form-group" style="text-align: right;">
-                <button class="btn btn-primary btn-round" id="btnSave">Save</button>
-            </div>
-
-        </div> -->
         <div class="col-md-12">
             <div style="text-align: right;">
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
@@ -38,6 +17,7 @@
             </div>
         </div><p style="color: orangered;">*) Mahasiswa asing dapat terdaftar untuk mengikuti program secara penuh atau sebagian <br> **) Jumlah mahasiswa asing/mahasiswa aktif x 100% >= 0.5 %, Score : 4 </p>
     </div>
+</div>    
 
 <script>
     $(document).ready(function () {

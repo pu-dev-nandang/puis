@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row hide">
 	<!--=== Big Buttons ===-->
 	<div class="col-md-12">
 		<div class="widget">
@@ -213,4 +213,11 @@
 		</div>
 	</div>
 	<!-- /Big Buttons -->
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Profile coming soon</h3>
+    </div>
 </div>
