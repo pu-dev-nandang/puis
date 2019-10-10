@@ -99,6 +99,14 @@
                         <input class="form-control" id="formMenuView" />
                     </div>
 
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="formHideMenu"> Hide Menu
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="form-group" style="text-align: right;">
                         <button class="btn btn-primary" id="btnSaveMenu">Save</button>
                     </div>
@@ -348,7 +356,9 @@
 
                     var Description = (v.Description!=null && v.Description!='') ? v.Description : '-';
 
-                    $('#listMenuAgregator').append('<tr>' +
+                    var colorHide = (parseInt(v.HideMenu)==1) ? 'style="color:red;"' : '';
+
+                    $('#listMenuAgregator').append('<tr '+colorHide+'>' +
                         '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+v.H_Name+'<br/>'+v.H_Type+'</td>' +
                         '<td style="text-align: left;">'+v.Name+'<br/>Desc : '+Description+'</td>' +
@@ -398,6 +408,13 @@
         $('#formMenuDescription').val(d.Description);
         $('#formMenuURL').val(d.URL);
         $('#formMenuView').val(d.View);
+
+        if(d.HideMenu=='1' || d.HideMenu==1){
+            $('#formHideMenu').prop('checked',true);
+        } else {
+            $('#formHideMenu').prop('checked',false);
+        }
+
     });
 
     $('#btnSaveMenu').click(function () {
@@ -408,6 +425,8 @@
         var formMenuDescription = $('#formMenuDescription').val();
         var formMenuURL = $('#formMenuURL').val();
         var formMenuView = $('#formMenuView').val();
+
+        var formHideMenu = ( $('#formHideMenu').is(':checked')) ? '1' : '0';
 
         if(formMenuHeaderID!='' && formMenuHeaderID!=null &&
             formMenuName!='' && formMenuName!=null &&
@@ -422,7 +441,8 @@
                     Name : formMenuName,
                     Description : formMenuDescription,
                     URL : formMenuURL,
-                    View : formMenuView
+                    View : formMenuView,
+                    HideMenu : formHideMenu
                 }
             };
 
@@ -437,6 +457,7 @@
                 $('#formMenuDescription').val('');
                 $('#formMenuURL').val('');
                 $('#formMenuView').val('');
+                $('#formHideMenu').prop('checked',false);
             });
 
         }
