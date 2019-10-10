@@ -47,9 +47,6 @@
               *) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau unit yang relevan. <br>
               **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
        </div>
-
-<p style="color: orangered;">*) Lingkup Sertifikasi /akreditasi/audit/ dapat berada di tingkat perguruan tinggi, fakultas, program studi,laboratorium,atau unit yang relevan. <br> **)Tingkat Sertifikasi : Nasional atau Internasional.</p>
-
     </div>
 </div>
 
