@@ -23,8 +23,9 @@
 
             </div>
         </div>
-<p style="color: orangered;">*) Program studi telah memiliki izin operasional dan terdaftar pada sistem akreditasi BAN-PT atau Lembaga Akreditasi MAndiri (LAM)</p>
-    </div>
+<p style="color: orangered;">
+  *) Program studi telah memiliki izin operasional dan terdaftar pada sistem akreditasi BAN-PT atau Lembaga Akreditasi Mandiri (LAM)</p>
+  </div>
 
 </div>
 
