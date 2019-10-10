@@ -1120,6 +1120,15 @@ class C_rest3 extends CI_Controller {
           echo json_encode($rs);
             
         }
+        elseif ($mode == 'KurikulumCapaianRencana') {
+          $rs = [];
+          
+          echo json_encode($rs);
+        }
+        else
+        {
+          echo '{"status":"999","message":"Not Authorize"}'; 
+        }
        
     }
 
