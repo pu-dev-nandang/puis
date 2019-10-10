@@ -8,7 +8,7 @@
 
 <div class="well">
     <div class="row">
-        <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
+        <div class="col-md-2 form-data-edit" style="border-right: 1px solid #CCCCCC;">
             <div class="form-group">
                 <label>Tahun Akademik</label>
                 <input class="hide" id="formID">
