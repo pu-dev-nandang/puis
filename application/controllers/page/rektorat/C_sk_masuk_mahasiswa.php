@@ -56,7 +56,50 @@ class C_sk_masuk_mahasiswa extends Globalclass {
             echo json_encode(1);
 
         }
+        elseif ($action == 'delete') {
+            $ID = $Input['ID'];
+            $G_data_ = $this->m_master->caribasedprimary('db_rektorat.sk_tgl_msk','ID',$ID);
+            if ($G_data_[0]['FileUpload'] != '' && $G_data_[0]['FileUpload'] != null) {
+                $arr_file = (array) json_decode($G_data_[0]['FileUpload'],true);
+                $filePath = 'rektorat\\'.$arr_file[0]; // pasti ada file karena required
+                $path = FCPATH.'uploads\\'.$filePath;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+            }
+            $this->db->where('ID',$ID);
+            $this->db->delete('db_rektorat.sk_tgl_msk');
+            echo json_encode(1);
+
+
+        }
         elseif ($action == 'edit') {
+            $dataSave = [];
+            $ID = $Input['ID'];
+            $data = $Input['data'];
+            $data = json_decode(json_encode($data),true);
+            $G_data_ = $this->m_master->caribasedprimary('db_rektorat.sk_tgl_msk','ID',$ID);
+            if (array_key_exists('FileUpload', $_FILES)) {
+                if ($G_data_[0]['FileUpload'] != '' && $G_data_[0]['FileUpload'] != null) {
+                    $arr_file = (array) json_decode($G_data_[0]['FileUpload'],true);
+                    $filePath = 'rektorat\\'.$arr_file[0]; // pasti ada file karena required
+                    $path = FCPATH.'uploads\\'.$filePath;
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
+                }
+
+                // do upload file
+                $FileUpload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileUpload',$path = './uploads/rektorat');
+                $FileUpload = json_encode($FileUpload); 
+                $dataSave['FileUpload'] = $FileUpload; 
+            }
+
+            $dataSave = $dataSave + $data;
+            $dataSave['Update_at'] = date('Y-m-d H:i:s');
+            $dataSave['Update_by'] = $this->session->userdata('NIP');
+            $this->db->where('ID',$ID);
+            $this->db->update('db_rektorat.sk_tgl_msk',$dataSave);
            echo json_encode(1);
         }
         elseif ($action == 'read') {

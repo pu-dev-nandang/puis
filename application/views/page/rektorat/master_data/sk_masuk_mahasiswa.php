@@ -65,6 +65,7 @@
             $('#UploadFile').val('');
             $('#btnSave').attr('action','add');
             $('#btnSave').attr('data-id','');
+            $('.fileShow').find('li').remove();
         },
         loaded : function(){
             loadingStart();
@@ -197,28 +198,31 @@
                  form_data.append("FileUpload[]", UploadFile[count]);
                 }
             }
-            loading_button2(selector);
-            var url = base_url_js + "rectorat/master_data/crud_sk_mhs";
-                    $.ajax({
-                      type:"POST",
-                      url:url,
-                      data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-                      contentType: false,       // The content type used when sending data to the server.
-                      cache: false,             // To unable request pages to be cached
-                      processData:false,
-                      dataType: "json",
-                      success:function(data)
-                      {
-                        AppJQ.setDefaultInput();
-                        end_loading_button2(selector);
-                        oTable.ajax.reload( null, false );
-                      },
-                      error: function (data) {
-                        toastr.error("Connection Error, Please try again", 'Error!!');
-                        end_loading_button2(selector);
-                        
-                      }
-                    })
+            if (confirm('Are you sure ?')) {
+                loading_button2(selector);
+                var url = base_url_js + "rectorat/master_data/crud_sk_mhs";
+                        $.ajax({
+                          type:"POST",
+                          url:url,
+                          data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+                          contentType: false,       // The content type used when sending data to the server.
+                          cache: false,             // To unable request pages to be cached
+                          processData:false,
+                          dataType: "json",
+                          success:function(data)
+                          {
+                            AppJQ.setDefaultInput();
+                            end_loading_button2(selector);
+                            oTable.ajax.reload( null, false );
+                          },
+                          error: function (data) {
+                            toastr.error("Connection Error, Please try again", 'Error!!');
+                            end_loading_button2(selector);
+                            
+                          }
+                        })
+            }
+            
         },
 
         DeleteFile : function(selector,filePath,idtable,fieldwhere,table,field,typefield,delimiter){
@@ -352,7 +356,7 @@
         }
 
         $('#btnSave').attr('action','edit');
-        $('#btnSave').attr('data-id','ID');
+        $('#btnSave').attr('data-id',ID);
     })
 
     $(document).off('click', '.btn-delete-file').on('click', '.btn-delete-file',function(e) {
@@ -365,5 +369,11 @@
         var typefield = Sthis.attr('typefield');
         var delimiter = Sthis.attr('delimiter');
         AppJQ.DeleteFile(Sthis,filePath,idtable,fieldwhere,table,field,typefield,delimiter);
+    })
+
+    $(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
+        var ID = $(this).attr('data-id');
+        var selector = $(this);
+        AppJQ.ActionData(selector,'delete',ID);
     })
 </script>
