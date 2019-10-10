@@ -1,5 +1,5 @@
 <div id="sidebar" class="sidebar-fixed">
-    <div id="sidebar-content">
+    <div id="sidebar-content" class="hide">
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- <li  class="dropdown <?php if($this->uri->segment(3,0)=='dashboard'){echo "current";} ?>">
