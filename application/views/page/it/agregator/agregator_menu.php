@@ -137,6 +137,21 @@
 
         loadMenuAgregator();
 
+        $('#formMenuDescription').summernote({
+            placeholder: 'Text your announcement',
+            tabsize: 2,
+            height: 300,
+            toolbar: [
+                // [groupName, [list of button]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']]
+            ]
+        });
+
     });
 
     // === ADMIN AGREGATOR ===
@@ -324,7 +339,7 @@
 
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudAgregator';
-        $('#divMenuAgregator').html('<textarea id="dataRowMenu" class="hide"></textarea><table class="table table-striped tb-agregator" id="tableMenu">' +
+        $('#divMenuAgregator').html('<textarea id="dataRowMenu" class="hide"></textarea><table class="table tb-agregator" id="tableMenu">' +
             '                    <thead>' +
             '                    <tr>' +
             '                        <th style="width: 1%;">No</th>' +
@@ -361,7 +376,7 @@
                     $('#listMenuAgregator').append('<tr '+colorHide+'>' +
                         '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+v.H_Name+'<br/>'+v.H_Type+'</td>' +
-                        '<td style="text-align: left;">'+v.Name+'<br/>Desc : '+Description+'</td>' +
+                        '<td style="text-align: left;">'+v.Name+'<div style="margin-top: 10px;padding: 10px;" class="well"><div style="max-height: 70px;overflow: auto;">'+Description+'</div></div></td>' +
                         '<td style="text-align: left;">URL : '+v.URL+' <br/>' +
                         'View : '+v.View+'</td>' +
                         '<td>'+btnAct+'</td>' +
@@ -405,7 +420,13 @@
         $('#formMenuHeaderID').val(d.MHID);
         $('#formMenuID').val(d.ID);
         $('#formMenuName').val(d.Name);
-        $('#formMenuDescription').val(d.Description);
+
+        if(d.Description!='' && d.Description!=null){
+            $('#formMenuDescription').summernote('code', d.Description);
+        } else {
+            $('#formMenuDescription').summernote('code', '');
+        }
+
         $('#formMenuURL').val(d.URL);
         $('#formMenuView').val(d.View);
 
@@ -454,7 +475,7 @@
                 loadMenuAgregator();
                 $('#formMenuID').val('');
                 $('#formMenuName').val('');
-                $('#formMenuDescription').val('');
+                $('#formMenuDescription').summernote('code', '');
                 $('#formMenuURL').val('');
                 $('#formMenuView').val('');
                 $('#formHideMenu').prop('checked',false);
