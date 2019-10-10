@@ -67,7 +67,8 @@ class C_agregator extends Globalclass {
             $i = 0;
             foreach ($dataMenu AS $itm){
                 $dataMenu[$i]['Menu'] = $this->db->order_by('Name','ASC')->get_where('db_agregator.agregator_menu',
-                    array('MHID' => $itm['ID'],'HideMenu' =>'0'))->result_array();
+                    array('MHID' => $itm['ID'],
+                        'HideMenu' =>'0'))->result_array();
                 $i++;
             }
         }
