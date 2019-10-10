@@ -2396,7 +2396,7 @@ class C_api3 extends CI_Controller {
 
 //
                         $Year_where = $Year - $i;
-                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
                                           FROM db_academic.auth_students ats
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
                                           WHERE ats.GraduationYear = "'.$Year_where.'" 
@@ -2404,15 +2404,50 @@ class C_api3 extends CI_Controller {
                                           AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
                                           ORDER BY ats.NPM')->result_array();
 
+                        $TotalLama = 0;
                         // Mendapatkan pekerjaan pertamanya
                         if(count($dataStd)>0){
+
                             for ($a=0;$a<count($dataStd);$a++){
-                                $dataStd[$a]['Experience'] = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
+
+                                $YudisiumDate_ex = ($dataStd[$a]['YudisiumDate']!='' && $dataStd[$a]['YudisiumDate']!=null) ?
+                                    explode('-',$dataStd[$a]['YudisiumDate']) : [];
+
+                                $Experience = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
                                                                     WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID ASC LIMIT 1 ')->result_array();
+
+                                $LamaKerjaDalamBulan = 0;
+                                if(count($Experience)>0 && count($YudisiumDate_ex)>0){
+
+                                    $Y_Month = $YudisiumDate_ex[1];
+                                    $Y_Year = $YudisiumDate_ex[0];
+
+                                    $J_Month = $Experience[0]['StartMonth'];
+                                    $J_Year = $Experience[0]['StartYear'];
+
+                                    $y = ($J_Year - $Y_Year) * 12;
+                                    $m = ($J_Month >= $Y_Month) ? abs($J_Month - $Y_Month) : 12 - (abs($J_Month - $Y_Month));
+
+                                    $LamaKerjaDalamBulan = $y + $m;
+                                    $dataStd[$a]['Y'] = $y;
+                                    $dataStd[$a]['M'] = $m;
+
+                                }
+
+                                $dataStd[$a]['LamaWaktuTunggu'] = $LamaKerjaDalamBulan;
+                                $TotalLama = $TotalLama + $LamaKerjaDalamBulan;
+
+                                $dataStd[$a]['Experience'] = $Experience;
                             }
                         }
 
-                        $dataEd[$j]['BL_'.$Year_where] = $dataStd;
+                        $RataRata = (count($dataStd)>0) ? $TotalLama / count($dataStd) : 0;
+                        $dataEd[$j]['BL_'.$Year_where] = array(
+                            'DetailStudent' => $dataStd,
+                            'TotalLamaMenunggu' => $TotalLama,
+                            'TotalStudent' => count($dataStd),
+                            'RataRata' =>  $RataRata
+                        );
 
 
                     }
@@ -2651,6 +2686,7 @@ class C_api3 extends CI_Controller {
 
         $SemesterID = $this->input->get('smt');
         $Year = $this->input->get('y');
+        $Status = $this->input->get('s');
 
         $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
             'Status' => 1
@@ -2688,10 +2724,21 @@ class C_api3 extends CI_Controller {
                 //
                 if($SemesterID>=13){
 
+                    $StatusFolap = '';
+                    if($Status=='1' || $Status==1){
+                        $StatusFolap = ' AND (em.StatusForlap = "1" OR em.StatusForlap = "2")';
+                    }
+                    else if($Status=='2' || $Status==2){
+                        $StatusFolap = ' AND em.StatusForlap = "0"';
+                    }
+
                     $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
-                                                               WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               WHERE sc.SemesterID = "'.$SemesterID.'" 
+                                                               AND sdc.ProdiID = "'.$data[$i]['ID'].'" 
+                                                               AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               '.$StatusFolap.'
                                                                 GROUP BY sc.Coordinator ')->result_array();
 
                     $data[$i]['Lecturer_Sch_Co'] = $dataSchedule;
@@ -3520,7 +3567,10 @@ class C_api3 extends CI_Controller {
 
         if($data_arr['action']=='insertLog'){
 
+            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['IPLocal2'] = $this->input->ip_address();
+            $dataForm['IPLocal'] = $hostname;
             $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
             $this->db->insert('db_employees.log_employees',$dataForm);
             return print_r(1);
