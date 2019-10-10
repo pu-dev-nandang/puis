@@ -54,7 +54,7 @@
             </div>
 
         </div>
-        <div class="col-md-9">
+        <div class="col-md-10">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <div class="well">
@@ -91,8 +91,10 @@
           <!-- </div> -->
         </div>
     </div>
-    <p style="color: orangered;">*) Cantumkan keterangan yang menunjukkan salah satu program sebagai program utama yang diselenggarakan di perguruan tinggi. Program utama ditentukan berdasarkan jumlah mahasiswa aktif terbesar <br> **) Jumlah mahasiswa regular : Lulus seleksi harus >=90% </p>
-
+    <p style="color: orangered;">
+      *) Cantumkan keterangan yang menunjukkan salah satu program sebagai program utama yang diselenggarakan di perguruan tinggi,
+      Program utama ditentukan berdasarkan jumlah mahasiswa aktif terbesar <br>
+      **) Jumlah mahasiswa regular : Lulus seleksi harus >=90% </p>
 </div>
 
 <script>
