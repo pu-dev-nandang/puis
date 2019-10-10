@@ -481,6 +481,15 @@
         $(''+element).prop('disabled',true);
     }
 
+    function loading_button2(selector) {
+        selector.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+        selector.prop('disabled',true);
+    }
+
+    function end_loading_button2(selector,html='Save'){
+        selector.prop('disabled',false).html(html);
+    }
+
     function loading_buttonSm(element) {
         $(''+element).html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
         $(''+element).prop('disabled',true);

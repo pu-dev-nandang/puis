@@ -1325,6 +1325,9 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 $route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
+$route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
+$route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
