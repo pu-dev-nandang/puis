@@ -34,6 +34,8 @@
     </div>
 </div>
 
+
+
 <script>
 
     $(document).ready(function () {
@@ -45,6 +47,10 @@
                 clearInterval(firstLoad);
             }
         },1000);
+    });
+
+    $('#filterYear').change(function () {
+        loadData();
     });
 
     function loadData() {
@@ -73,9 +79,12 @@
             if(jsonResult.length>0) {
                 $.each(jsonResult, function (i, v) {
 
-                    var viewBL3 = '-';
-                    var viewBL2 = '-';
-                    var viewBL1 = '-';
+                    var viewBL3 = (parseFloat(v['BL_'+Y3].RataRata)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata+'</a>' : 0;
+                    var viewBL2 = (parseFloat(v['BL_'+Y2].RataRata)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata+'</a>' : 0;
+                    var viewBL1 = (parseFloat(v['BL_'+Y1].RataRata)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata+'</a>' : 0;
 
                     var viewDess = (v.Description!=null && v.Description!='') ? v.Description : v.Name;
 
@@ -93,4 +102,59 @@
 
     }
 
+
+    $(document).on('click','.showDetailData',function () {
+       var token = $(this).attr('data-token');
+       var d = jwt_decode(token,'UAP)(*');
+
+       console.log(d);
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Announcement</h4>');
+
+
+        var tr = '';
+        if(d.DetailStudent.length>0){
+            $.each(d.DetailStudent,function (i,v) {
+
+                var YudisiumDate = (v.YudisiumDate!='' && v.YudisiumDate!=null)
+                    ? moment(v.YudisiumDate).format('DD MMM YYYY')
+                    : '-';
+
+                var Experience = (v.Experience.length>0)
+                    ? moment().month(parseInt(v.Experience[0].StartMonth) - 1).format('MMM')+' '+v.Experience[0].StartYear
+                    : '-';
+
+                var LamaWaktuTunggu = (v.LamaWaktuTunggu!='') ? v.LamaWaktuTunggu : '';
+
+                tr = tr+'<tr>' +
+                    '<td>'+(i+1)+'</td>' +
+                    '<td>'+v.Name+'</td>' +
+                    '<td>'+YudisiumDate+'</td>' +
+                    '<td>'+Experience+'</td>' +
+                    '<td>'+LamaWaktuTunggu+'</td>' +
+                    '</tr>';
+            });
+        }
+
+        $('#GlobalModal .modal-body').html('<table class="table table-striped table-centre">' +
+            '    <thead>' +
+            '    <tr>' +
+            '        <th>No</th>' +
+            '        <th>Nama</th>' +
+            '        <th>Yudisium</th>' +
+            '        <th>Tanggal Pekerjaan Perama</th>' +
+            '        <th>Waktu Tunggu <br/>(bulan)</th>' +
+            '    </tr>' +
+            '    </thead><tbody>'+tr+'</tbody>' +
+            '</table>');
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+
 </script>
+
