@@ -99,7 +99,7 @@
 
                          <div class="custom-file-input " style="position:relative; left:0px;">
                           <i class="fa fa-file-image-o"></i>&nbsp; &nbsp;Browse<input  id="uploadFile1"  type="file" value="" name="file-input" />
-                          <p>*Max size wight x height 1920px x 500px</p>
+                          <p class="red">*Size weight x height 1920px x 500px</p>
                          </div>              
                         
                        
@@ -206,9 +206,6 @@ $('#formStatus1').on("change", function(){
       });
   });
 
-
-
-
   
   // Sembunyikan loading simpan, loading ubah, loading hapus, pesan error, pesan sukes, dan tombol reset
   $('#loading-simpan, #loading-ubah, #loading-hapus, #pesan-error, #pesan-sukses, #btn-reset').hide()
@@ -237,26 +234,13 @@ $('#formStatus1').on("change", function(){
       $('#formStatus1:checked').trigger('change');
     }
 
-    // $("#imagePreview1").css("background-image", "url("+this.result+")");
-
-    // var tr = $(this).closest('tr') // Cari tag tr paling terdekat
-    // var images = tr.find('.images-value').val() // Ambil nis dari input type hidden
-    // var title = tr.find('.title-value').val() // Ambil nama dari input type hidden
-    // var prodi = tr.find('.prodi-value').val() // Ambil jenis kelamin dari input type hidden
-    // var date = tr.find('.date-value').val() // Ambil telepon dari input type hidden
-    // var kaprodi = tr.find('.kaprodi-value').val() // Ambil alamat dari input type hidden
-  
-    // $('#images').val(images) // Set value dari textbox nis yang ada di form
-    // $('#title').val(title) // Set value dari textbox nama yang ada di form
-    // $('#prodi').val(prodi) // Set value dari textbox nama yang ada di form
-    // $('#date').val(date) // Set value dari textbox nama yang ada di form
-    // $('#kaprodi').val(kaprodi) // Set value dari textbox nama yang ada di form  
   })
 
 
   // Fungsi ini akan dipanggil ketika tombol hapus diklik
   $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
-    id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
+    id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
+    $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
   })
 
 
@@ -270,65 +254,65 @@ $('#formStatus1').on("change", function(){
   })
 
 // ======== View data ==== ////
-    $(document).ready(function(){
-        showSlider();
+$(document).ready(function(){
+    showSlider();
 
-    });
+});
      
-    //fungsi tampil barang
-    function showSlider(){
-        var data = {action : 'viewDataSlider'};
-        var token = jwt_encode(data,'UAP)(*');
-        var url = base_url_js+'api-prodi/__crudDataProdi';
+//fungsi tampil barang
+function showSlider(){
+    var data = {action : 'viewDataSlider'};
+    var token = jwt_encode(data,'UAP)(*');
+    var url = base_url_js+'api-prodi/__crudDataProdi';
 
-        $.post(url,{token:token},function(jsonResult){
-            if(jsonResult.length>0){
-                var html = '';
-                var i;
-                var data = jsonResult;
-                var totgambar = data.length;
-                var OpLoop = function(ss= '')
-                {
-                  // console.log(ss);
-                  var htmlOP = '<option value ="" selected>--Not Set--</option>';
-                  for (var z = 1; z <= totgambar; z++) {
-                    if (ss!= '') {
-                      var selected = (z==ss) ? 'selected' : '';
-                    }
-                    htmlOP += '<option value ="'+z+'" '+selected+'>'+z+'</option>';
-                  }
-
-                  return htmlOP;
-                };
-                
-                for(i=0; i<data.length; i++){
-                    var Sorting = data[i].Sorting;
-                     var htmlCombo = '<select class= "form-control UpdSort" data-id="'+data[i].ID+'"  sortex = "'+Sorting+'">'+
-                          OpLoop(Sorting)+
-                       '</select>';   
-
-                    html += 
-                          '<div class="col-sm-6 col-md-3" style="margin-bottom: 15px;">'+
-                            '<div class="thumbnail">'+
-                              '<img src="../../images/Slider/'+data[i].Images+'" alt="'+data[i].Title+'">'+
-                              '<div class="caption">'+
-                                
-                                '<p style="text-transform: capitalize;">'+data[i].Title+'</p>'+
-                                '<p>'+
-                                ' <a href="" data-id="'+data[i].ID+'" data-toggle="modal" data-target="#form-modal" class="btn btn-warning btn-form-ubah" token = "'+data[i].token+'"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
-                                ' <a href="" data-id="'+data[i].ID+'" data-toggle="modal" data-target="#delete-modal" class="btn btn-danger btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
-                                
-                                '</p>'+
-                                '<p>'+htmlCombo+'</p>'+
-                              '</div>'+
-                            '</div>'+
-                          '</div>'+
-                          '<div>';
+    $.post(url,{token:token},function(jsonResult){
+        if(jsonResult.length>0){
+            var html = '';
+            var i;
+            var data = jsonResult;
+            var totgambar = data.length;
+            var OpLoop = function(ss= '')
+            {
+              // console.log(ss);
+              var htmlOP = '<option value ="" selected>--Not Set--</option>';
+              for (var z = 1; z <= totgambar; z++) {
+                if (ss!= '') {
+                  var selected = (z==ss) ? 'selected' : '';
                 }
-                $('#show_data').html(html);
+                htmlOP += '<option value ="'+z+'" '+selected+'>'+z+'</option>';
+              }
+
+              return htmlOP;
+            };
+            
+            for(i=0; i<data.length; i++){
+                var Sorting = data[i].Sorting;
+                 var htmlCombo = '<select class= "form-control UpdSort" data-id="'+data[i].ID+'"  sortex = "'+Sorting+'">'+
+                      OpLoop(Sorting)+
+                   '</select>';   
+
+                html += 
+                      '<div class="col-sm-6 col-md-3" style="margin-bottom: 15px;">'+
+                        '<div class="thumbnail">'+
+                          '<img src="../../images/Slider/'+data[i].Images+'" alt="'+data[i].Title+'">'+
+                          '<div class="caption">'+
+                            
+                            '<p style="text-transform: capitalize;">'+data[i].Title+'</p>'+
+                            '<p>'+
+                            ' <a href="" data-id="'+data[i].ID+'" data-toggle="modal" data-target="#form-modal" class="btn btn-warning btn-form-ubah" token = "'+data[i].token+'"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
+                            ' <a href="" data-id="'+data[i].ID+'" data-toggle="modal" data-target="#delete-modal" class="btn btn-danger btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
+                            
+                            '</p>'+
+                            '<p>'+htmlCombo+'</p>'+
+                          '</div>'+
+                        '</div>'+
+                      '</div>'+
+                      '<div>';
             }
-        });
-    }
+            $('#show_data').html(html);
+        }
+    });
+}
 // ======= save ======== /////
   $(document).off('click', '.btnsave1').on('click', '.btnsave1',function(e) {
     // console.log('asc');
@@ -339,9 +323,7 @@ $('#formStatus1').on("change", function(){
     var formStatus1 = $('#formStatus1').val();
     var form_data = new FormData();
     var find = true;
-    
-  // if(formTitle1!='' && formTitle1!=null){
-      
+     
       $('input[type="file"]').each(function(){
           var IDFile = $(this).attr('id');
           var ev = $(this);
@@ -360,7 +342,8 @@ $('#formStatus1').on("change", function(){
                      form_data.append("uploadFile1[]", UploadFile[count]);
                     }
                   }
-            // loading_button('#btn-simpan');      
+            // loading_button('#btn-simpan');  
+             
             var data = {
                   action : 'insertDataslider',
                   dataform:{
@@ -368,6 +351,7 @@ $('#formStatus1').on("change", function(){
                     Button : formStatus1,
                     Url : formUrl1,
                     NameButton : formButtonName1,
+                   
                   }
             };
             // console.log(data);return;
@@ -389,7 +373,6 @@ $('#formStatus1').on("change", function(){
                 toastr.success('Data saved','Success');
                 thisbtn.prop('disabled',false).html('Save');
                 $('#form-modal').modal('hide');
-
               },
               error: function (data) {
                  toastr.error('Form required','Error');
@@ -397,51 +380,127 @@ $('#formStatus1').on("change", function(){
               }
             })
           }
-    // }
-    // else {
-    //         toastr.error('Form required','Error');
-    //     }
+
   });
 
-  
-     
+  // edit data
 
-  $('#btn-ubah').click(function(){ // Ketika tombol ubah di klik
-
-      var formTitle1 = $('#formTitle1').val();
-      var form = $('#formContentInd').val();
-      var formDataCall = $('#formDataCall').val();
-
-  if(formContentEng!='' && formContentEng!=null &&
-      formContentInd!='' && formContentInd!=null &&
-      formDataCall!='' && formDataCall!=null){
-
-      loading_button('#btnSubmit');
-
-      var data = {
-          action : 'updateDataProdi',
-          dataForm : {
-              ContentCallEng : formContentEng,
-              ContentCallInd : formContentInd,
-              CallAction : formDataCall
-          }
-      };
-
-      var token = jwt_encode(data,'UAP)(*');
-
-      var url = base_url_js + 'api-prodi/__crudDataProdi';
-
-      $.post(url,{token:token},function(jsonResult){
-          toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    $('#btnSubmit').html('Save').prop('disabled',false);
-                },500);
-      });
-  } else {
-        toastr.error('Form required','Error');
-  }
+    $(document).off('click', '#btn-ubah').on('click', '#btn-ubah',function(e) {
+     // console.log('asc');
+    var ID = $(this).attr('data-id');
+    var thisbtn = $(this);
+    var formTitle1 = $('#formTitle1').val();
+    var formButtonName1 = $('#formButtonName1').val();
+    var formUrl1 = $('#formUrl1').val();
+    var formStatus1 = $('#formStatus1').val();
+    var form_data = new FormData();
+    var find = true;
     
+  
+      
+      $('input[type="file"]').each(function(){
+          var IDFile = $(this).attr('id');
+          var ev = $(this);
+          var NameItem = 'ID '+IDFile;
+          if (!file_validation2(ev,NameItem) ) {
+            find = false;
+            return false;
+          }
+        })
+        if (find) { // validasi file berhasil
+                // console.log('asd');
+                  if ( $( '#'+'uploadFile1').length ) { // jika upload file
+                  var UploadFile = $('#'+'uploadFile1')[0].files;
+                    for(var count = 0; count<UploadFile.length; count++)
+                    {
+                     form_data.append("uploadFile1[]", UploadFile[count]);
+                    }
+                  }
+            // loading_button('#btn-simpan');  
+             
+            var data = {
+                  action : 'updateDataslider',
+                  dataform:{
+                    ID : ID,
+                    Title : formTitle1,
+                    Button : formStatus1,
+                    Url : formUrl1,
+                    NameButton : formButtonName1,
+                  }
+            };
+            // console.log(data);return;
+            var token = jwt_encode(data,"UAP)(*");
+            form_data.append('token',token);
+            var url = base_url_js + "api-prodi/__crudDataProdi";
+            loading_button('#btn-ubah');
+            $.ajax({
+              type:"POST",
+              url:url,
+              data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+              contentType: false,       // The content type used when sending data to the server.
+              cache: false,             // To unable request pages to be cached
+              processData:false,
+              dataType: "json",
+              success:function(data)
+              {
+                showSlider();
+                toastr.success('Data Update','Success');
+                thisbtn.prop('disabled',false).html('Save');
+                $('#form-modal').modal('hide');
+              },
+              error: function (data) {
+                 toastr.error('Form required','Error');
+                 thisbtn.prop('disabled',false).html('Save');
+              }
+            })
+          }
   });
+
+// DELETE
+$(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
+    var ID = $(this).attr('data-id');
+
+    var thisbtn = $(this);
+    loading_button('#btn-hapus'); // Munculkan loading hapus
+    var data = {
+                action : 'deleteDataslider',
+                ID : ID,
+              };
+    var form_data = new FormData();
+    var token = jwt_encode(data,"UAP)(*");
+    form_data.append('token',token);
+    var url = base_url_js + "api-prodi/__crudDataProdi";
+    $.ajax({
+            type :"POST",
+            url : url,
+            data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+            contentType: false,       // The content type used when sending data to the server.
+            cache: false,             // To unable request pages to be cached
+            processData:false,
+            dataType: "json",
+            beforeSend: function(e) {
+              if(e && e.overrideMimeType) {
+                e.overrideMimeType('application/jsoncharset=UTF-8');
+              }
+            },
+            success: function(data){ // Ketika proses pengiriman berhasil
+              showSlider();
+              toastr.success('Data Update','Success');
+              thisbtn.prop('disabled',false).html('Ya');
+              $('#delete-modal').modal('hide');
+            },
+            error: function (data) {
+              toastr.error('Form required','Error');
+              thisbtn.prop('disabled',false).html('Ya');
+            }
+    })
+  });
+
+  $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
+    $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
+  })
+
+// validasi images
   function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;
@@ -449,7 +508,6 @@ $('#formStatus1').on("change", function(){
       var msgStr = '';
       var max_upload_per_file = 4;
       
-
       if (files.length > max_upload_per_file) {
         msgStr += TheName +' should not be more than 4 Files<br>';
 
@@ -473,9 +531,6 @@ $('#formStatus1').on("change", function(){
          oFReader.readAsDataURL(files[count]);
          var f = files[count];
          var fsize = f.size||f.fileSize;
-
-         
-
          // console.log(fsize);
 
          if(fsize > 2000000) // 2mb
@@ -485,27 +540,6 @@ $('#formStatus1').on("change", function(){
           //toastr.error("Image File Size is very big", 'Failed!!');
           //return false;
          }
-
-                
-        // oFReader.onload = function (e) { //max widht height
-
-        //     var image = new Image();
-
-        //     image.src = e.target.result;
-        //     image.onload = function () {
-
-        //         var height = this.height;
-        //         var width = this.width;
-        //         console.log(this);
-        //         if ((height == 500 ) && (width == 1920 )) {
-        //             msgStr += TheName + 'Height and Width must not exceed 1920*500.';
-        //             return false;
-        //         }else{
-        //           return true;
-        //         }
-                
-        //     };
-        // }
          
         }
       }
@@ -519,41 +553,6 @@ $('#formStatus1').on("change", function(){
         return true;
       }
   }
-
-  $('#btn-hapus').click(function(){ // Ketika tombol hapus di klik
-    $('#loading-hapus').show() // Munculkan loading hapus
-
-    $.ajax({
-      url: base_url + 'siswa/hapus/' + id, // URL tujuan
-      type: 'GET', // Tentukan type nya POST atau GET
-      dataType: 'json',
-      beforeSend: function(e) {
-        if(e && e.overrideMimeType) {
-          e.overrideMimeType('application/jsoncharset=UTF-8')
-        }
-      },
-      success: function(response){ // Ketika proses pengiriman berhasil
-        $('#loading-hapus').hide() // Sembunyikan loading hapus
-
-        // Ganti isi dari div view dengan view yang diambil dari proses_hapus.php
-        $('#view').html(response.html)
-
-        /*
-        * Ambil pesan suksesnya dan set ke div pesan-sukses
-        * Lalu munculkan div pesan-sukes nya
-        * Setelah 10 detik, sembunyikan kembali pesan suksesnya
-        */
-        $('#pesan-sukses').html(response.pesan).fadeIn().delay(10000).fadeOut()
-
-        $('#delete-modal').modal('hide') // Close / Tutup Modal Dialog
-      }
-    })
-  })
-
-  $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
-    $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
-  })
-
 
 
 

@@ -3930,6 +3930,7 @@ class C_api3 extends CI_Controller {
 
         $lang = $this->input->get('lang');
 
+
         $dataLang = $this->db->get_where('db_prodi.language',array(
             'Code' => $lang
         ))->result_array();
