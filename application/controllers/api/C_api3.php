@@ -2425,7 +2425,7 @@ class C_api3 extends CI_Controller {
                                     $J_Month = $Experience[0]['StartMonth'];
                                     $J_Year = $Experience[0]['StartYear'];
 
-                                    $y = ($J_Year - $Y_Year) * 12;
+                                    $y = (($J_Year - $Y_Year) - 1 ) * 12;
                                     $m = ($J_Month >= $Y_Month) ? abs($J_Month - $Y_Month) : 12 - (abs($J_Month - $Y_Month));
 
                                     $LamaKerjaDalamBulan = $y + $m;
