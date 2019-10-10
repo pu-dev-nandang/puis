@@ -57,7 +57,7 @@
 								'</div>'+
 								'<p style="color: orangered;">*) Rasio Tepat Waktu >=50% Score 4, <50% Score 0  </p>'+
 								'<p style="color: orangered;">*) Rasio Keberhasilan Studi >= 85% Score 4, <85% Score 0  </p>'+
-								'<p style="color: orangered;" class = "PercentRatio"></p>'+
+								'<p style="color: green;" class = "PercentRatio"></p>'+
 								'<br/>'+
 								'<table class = "table table-bordered dataTable2Excel" data-name="TblLamaRasioKelulusan">';
 			var SumRata = 0;
@@ -153,7 +153,14 @@
 
 		rt =  getCustomtoFixed(rt,1);
 		var Ta = $('#SelectTA option:selected').val();
-		$('.PercentRatio').html('*) Presentase Rasio '+Ta+' : '+rt+'%');
+		// $('.PercentRatio').html('*) Pesentase Ratio '+Ta+' : '+rt+'%');
+		$('.PercentRatio').html('<table class = "table">'+
+									'<tr>'+
+										'<th>'+'*) Pesentase Rasio '+Ta+' : '+rt+'%'+'</th>'+
+									'</tr>'+
+								'</table>'		
+			);
+
 	}
 
 	// function MakeContentData2(jsonResult)

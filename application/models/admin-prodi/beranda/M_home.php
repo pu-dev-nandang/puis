@@ -48,7 +48,7 @@ class M_home extends CI_Model{
     function getDataSlider(){ // db_prodi
         $prodi_active_id = $this->session->userdata('prodi_active_id');
 
-        $hasil=$this->db->query("SELECT * FROM db_prodi.slider where ProdiID = '".$prodi_active_id."' order by Sorting asc ")->result_array();
+        $hasil = $this->db->query("SELECT * FROM db_prodi.slider where ProdiID = '".$prodi_active_id."' order by Sorting asc ")->result_array();
         for ($i=0; $i < count($hasil); $i++) { 
             $data = $hasil[$i];
             $token = $this->jwt->encode($data,"UAP)(*");

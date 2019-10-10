@@ -113,7 +113,49 @@ class C_api_prodi extends CI_Controller {
             return print_r(1);
 
         }
-        elseif ($data_arr['action'] == 'change_sorting') {
+        else if($data_arr['action']=='updateDataslider')
+        {   
+            $dataSave2 =[];
+            
+            if (array_key_exists('uploadFile1', $_FILES)) { // jika file di upload
+                $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile1',$path = './images/Slider');
+                $upload = json_encode($upload); 
+                // convert file
+                $upload = json_decode($upload,true);
+                $upload = $upload[0];
+                // $dataSave2['Images'] = $upload; 
+                // get posted data
+                $dataform = $data_arr['dataform']; // data di jadikan array
+                $dataform = json_decode(json_encode($dataform),true); // convert to array
+                $dataform['Images'] = $upload;
+                $dataform['ProdiID'] = $this->session->userdata('prodi_active_id');
+                $dataform['UploadBy'] = $this->session->userdata('NIP');
+                $dataform['UploadAt'] = date('Y-m-d');
+                
+                $dataSave2 = $dataform;
+                $sql = $this->db->get_where('db_prodi.slider',array(
+                'ID' => $dataSave2['ID']))->result_array();
+
+                $arr_file =  $sql[0]['Images'];
+                $path = './images/Slider/'. $arr_file;
+
+                if(is_file($path)){
+                    $this->db->where('ID',$dataSave2['ID']);
+                    $this->db->update('db_prodi.slider',$dataSave2);
+                    unlink($path);
+                }
+           }
+
+            return print_r(1);
+        }
+        else if ($data_arr['action']=='deleteDataslider') 
+        {
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.slider'); 
+            return print_r(1);
+        }
+        elseif ($data_arr['action'] == 'change_sorting'){
             $ID = $data_arr['ID'];
             $Sorting = $data_arr['Sorting'];
             $sortex = $data_arr['sortex'];
@@ -171,8 +213,15 @@ class C_api_prodi extends CI_Controller {
 
             $Type = $data_arr['Type'];
 
-            $data = $this->db->query('SELECT pt.*, l.Language FROM db_prodi.prodi_texting pt 
+
+            $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
+                                                FROM db_prodi.prodi_texting pt 
                                                 LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
+
                                                 WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" ')->result_array();
 
             return print_r(json_encode($data));
@@ -182,15 +231,163 @@ class C_api_prodi extends CI_Controller {
             $Type = $data_arr['Type'];
             $LangID = $data_arr['LangID'];
 
-            $data = $this->db->get_where('db_prodi.prodi_texting',array(
-                'ProdiID' => $prodi_active_id,
-                'Type' => $Type,
-                'LangID' => $LangID
-            ))->result_array();
+
+            $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
+                                                FROM db_prodi.prodi_texting pt 
+                                                LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
+                                                WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" and pt.LangID="'.$LangID.'" ')->result_array();
+
+
+            // $data = $this->db->get_where('db_prodi.prodi_texting',array(
+            //     'ProdiID' => $prodi_active_id,
+            //     'Type' => $Type,
+            //     'LangID' => $LangID
+            // ))->result_array();
+
 
             return print_r(json_encode($data));
 
         }
+
+        // Add by yamin =====
+        else if($data_arr['action']=='saveDataTestimonials'){
+
+            if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/Testimonials');
+                $upload = json_encode($upload); 
+                // convert file
+                $upload = json_decode($upload,true);
+                $upload = $upload[0];
+
+                $dataForm = $data_arr; 
+
+                $student_testimonials = $dataForm['student_testimonials'];
+                $student_testimonials = json_decode( json_encode($student_testimonials),true);
+
+                $prodi_texting = $dataForm['prodi_texting'];
+                $prodi_texting = json_decode( json_encode($prodi_texting),true);
+
+                // check action insert or update
+                $sql = 'select st.NPM,st.Photo,std.IDStudentTexting,std.IDProdiTexting from db_prodi.student_testimonials as st join db_prodi.student_testimonials_details as std on st.ID = std.IDStudentTexting
+                    join db_prodi.prodi_texting as pt on pt.ID = std.IDProdiTexting
+                    where st.NPM = ? and pt.LangID = ? and pt.Type = ?
+                ';
+
+                $NPM = $student_testimonials['NPM'];
+                $LangID = $prodi_texting['LangID'];
+                $Type = $prodi_texting['Type'];
+                $query=$this->db->query($sql, array($NPM,$LangID,$Type))->result_array();
+                if (count($query) == 0) { // insert
+
+                    // insert prodi_texting
+                    $prodi_texting['ProdiID'] = $prodi_active_id;
+                    $prodi_texting['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                    $this->db->insert('db_prodi.prodi_texting',$prodi_texting);
+                    $IDProdiTexting = $this->db->insert_id();
+
+                    // insert student_testimonials
+                    $student_testimonials['Photo'] = $upload;
+                    $student_testimonials['ProdiID'] = $prodi_active_id;
+
+                    $this->db->insert('db_prodi.student_testimonials',$student_testimonials);
+                    $IDStudentTexting = $this->db->insert_id();
+
+                    // insert student_testimonials_details
+                    $student_testimonials_details = [
+                        'IDStudentTexting' => $IDStudentTexting,
+                        'IDProdiTexting' => $IDProdiTexting,
+                    ];
+                    $this->db->insert('db_prodi.student_testimonials_details',$student_testimonials_details);
+                }
+                else
+                {
+                    // update student_testimonials
+                        // action photo delete dulu file fotonya kalau dia upload foto, baru insert
+
+                    $arr_file =  $query[0]['Photo'];
+                    $path = './images/Testimonials/'. $arr_file;
+
+                      if(is_file($path)){
+
+                        $IDStudentTexting = $query[0]['IDStudentTexting'];
+                        $student_testimonials['Photo'] = $upload;
+
+                        $this->db->where('ID',$IDStudentTexting);
+                        $this->db->update('db_prodi.student_testimonials',$student_testimonials);
+                        unlink($path);
+                      }
+
+                    
+                    // update prodi_textting
+                    $IDProdiTexting = $query[0]['IDProdiTexting'];
+                    $prodi_texting['ProdiID'] = $prodi_active_id;
+                    $prodi_texting['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+
+                    $this->db->where('ID',$IDProdiTexting);
+                    $this->db->update('db_prodi.prodi_texting',$prodi_texting);
+
+                }
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='saveProdiCall'){
+            $dataForm = $data_arr;
+
+            
+
+            $prodi_texting = $dataForm['prodi_texting'];
+            $prodi_texting = json_decode( json_encode($prodi_texting),true);
+            $calldetail = $dataForm['calldetail'];
+            $calldetail = json_decode( json_encode($calldetail),true);
+            // Cek apakah udah di input atau blm
+            $sql = 'select c.Tlp,c.IDProdiTexting from db_prodi.calldetail as c 
+                join db_prodi.prodi_texting as pt on pt.ID = c.IDProdiTexting
+                where pt.LangID = ? and pt.Type = ?
+            ';
+            
+            $LangID = $prodi_texting['LangID'];
+            $Type = $prodi_texting['Type'];
+            $dataCk=$this->db->query($sql, array($LangID,$Type))->result_array();
+
+            if(count($dataCk)>0){
+                // upcada call
+                
+                $ID = $dataCk[0]['IDProdiTexting'];
+                $prodi_texting = $dataForm['prodi_texting'];
+                $this->db->where('ID', $ID);
+                $this->db->update('db_prodi.prodi_texting',$prodi_texting);
+                // update prodi_texting
+                
+                $calldetail = $dataForm['calldetail'];
+                $this->db->where('IDProdiTexting', $ID);
+                $this->db->update('db_prodi.calldetail',$calldetail);
+                
+            } else {
+                // insert prodi_texting
+                $prodi_texting['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $prodi_texting['ProdiID'] = $prodi_active_id;;
+
+                $this->db->insert('db_prodi.prodi_texting',$prodi_texting);
+                $IDProdiTexting = $this->db->insert_id();
+                // insert callaction
+                $calldetail = [
+                    'IDProdiTexting' => $IDProdiTexting,
+                    'Tlp' => $calldetail['Tlp'],
+                    'ProdiID' => $prodi_active_id,
+                ];
+
+                $this->db->insert('db_prodi.calldetail',$calldetail);
+            }
+
+            return print_r(1 );
+        }
+
 
 
     }
@@ -198,8 +395,10 @@ class C_api_prodi extends CI_Controller {
 
     function getContentProdi(){
         $id = $this->input->get('id');
-$lang = $this->input->get('lang');
-$content = $this->input->get('content');
+
+        $lang = $this->input->get('lang');
+        $content = $this->input->get('content');
+
     }
 
 
