@@ -27,14 +27,7 @@ class C_home extends Prodi_Controler {
         parent::template($content);
     }
     
-// ===== overview ======
-    function overview()
-    {
-        // Database
-    	$data['department'] = parent::__getDepartement();
-    	$content = $this->load->view('page/'.$data['department'].'/beranda/v_sambutan',$data,true);
-    	parent::template($content);
-    }
+
 // ===== why ======
 
     private function menu_whyus($page){
@@ -69,6 +62,30 @@ class C_home extends Prodi_Controler {
         $this->menu_whyus($page);
     }
 
+    private function menu_visimisi($pagevisimisi){
+        $data['department'] = parent::__getDepartement();
+        $data['pagevisimisi'] = $pagevisimisi;
+        $content = $this->load->view('page/'.$data['department'].'/about/menu_visimisi',$data,true);
+        parent::template($content);
+    }
+// ===== overview ======
+    function overview()
+    {
+        // Database
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/about/v_sambutan',$data,true);
+        parent::template($content);
+    }
+    public function vision(){
+        $data['department'] = parent::__getDepartement();
+        $pagevisimisi = $this->load->view('page/'.$data['department'].'/about/v_vision',$data,true);
+        $this->menu_visimisi($pagevisimisi);
+    }
+    public function mission(){
+        $data['department'] = parent::__getDepartement();
+        $pagevisimisi = $this->load->view('page/'.$data['department'].'/about/v_mission',$data,true);
+        $this->menu_visimisi($pagevisimisi);
+    }
 //    function whychoose()
 //    {
 //        // Database
@@ -90,6 +107,14 @@ class C_home extends Prodi_Controler {
         // Database
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_testimoni',$data,true);
+        parent::template($content);
+    }
+    // ===== Cliens ======
+    function partner()
+    {
+        // Database
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/beranda/v_partner',$data,true);
         parent::template($content);
     }
 

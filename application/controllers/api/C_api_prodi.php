@@ -93,7 +93,7 @@ class C_api_prodi extends CI_Controller {
             $dataform['Images'] = $upload;
             $dataform['ProdiID'] = $this->session->userdata('prodi_active_id');
             $dataform['UploadBy'] = $this->session->userdata('NIP');
-            $dataform['UploadAt'] = date('Y-m-d');
+            $dataform['UploadAt'] = $this->m_rest->getDateTimeNow();
             
             $dataSave2 = $dataform;
             // echo print_r($dataSave2);
@@ -130,7 +130,7 @@ class C_api_prodi extends CI_Controller {
                 $dataform['Images'] = $upload;
                 $dataform['ProdiID'] = $this->session->userdata('prodi_active_id');
                 $dataform['UploadBy'] = $this->session->userdata('NIP');
-                $dataform['UploadAt'] = date('Y-m-d');
+                $dataform['UploadAt'] = $this->m_rest->getDateTimeNow();
                 
                 $dataSave2 = $dataform;
                 $sql = $this->db->get_where('db_prodi.slider',array(
@@ -333,9 +333,6 @@ class C_api_prodi extends CI_Controller {
         }
         else if($data_arr['action']=='saveProdiCall'){
             $dataForm = $data_arr;
-
-            
-
             $prodi_texting = $dataForm['prodi_texting'];
             $prodi_texting = json_decode( json_encode($prodi_texting),true);
             $calldetail = $dataForm['calldetail'];
@@ -382,10 +379,54 @@ class C_api_prodi extends CI_Controller {
 
             return print_r(1 );
         }
+        else if($data_arr['action']=='readProdiPartner'){
 
+             $data = $this->db->get('db_prodi.partner')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='saveDataPartner'){
+
+            if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/Partner');
+                $upload = json_encode($upload); 
+                // convert file
+                $upload = json_decode($upload,true);
+                $upload = $upload[0];
+
+                $dataForm = (array) $data_arr['dataForm'];
+                
+                $dataForm['ProdiID'] = $prodi_active_id;
+                $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                $dataform['CreateBy'] = $this->session->userdata('NIP');
+                $dataForm['Images']= $upload;
+                $this->db->insert('db_prodi.partner',$dataForm);
+            }
+
+            return print_r(1);
+        }
+         else if($data_arr['action']=='readDataPartner'){
+            $ID = $data_arr['ID'];
+            
+            $data = $this->db->get_where('db_prodi.partner',array(
+                'ProdiID' => $prodi_active_id,
+                'ID' => $ID,
+                
+            ))->result_array();
+
+            return print_r(json_encode($data));
+
+        }
+        else if ($data_arr['action']=='deleteDataPartner') 
+        {
+            $ID = $data_arr['ID'];
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.partner'); 
+            return print_r(1);
+        }
 
     }
-
 
     function getContentProdi(){
         $id = $this->input->get('id');

@@ -34,7 +34,7 @@
     <div class="col-md-6" style="border-left: 1px solid #CCCCCC;">
         <div id="viewDataDesc"></div>
     </div>
-</div>
+</div> 
 
 <script>
     $(document).ready(function () {
