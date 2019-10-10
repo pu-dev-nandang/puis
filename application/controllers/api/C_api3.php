@@ -813,15 +813,21 @@ class C_api3 extends CI_Controller {
                         'EntredBy' => null,
                         'ID' => null,
                         'PassSelection' => null,
+                        'd_PassSelection' => '',
                         'ProdiCode' => $G_prodi[$i]['Code'],
                         'ProdiID' => $G_prodi[$i]['ID'],
                         'ProdiName' => $G_prodi[$i]['Name'],
                         'Registrant' => null,
+                        'd_Registrant' => '',
                         'Regular' => null,
+                        'd_Regular' => '',
                         'Regular2' => null,
+                        'd_Regular2' => '',
                         'TotalStudemt' => null,
                         'Transfer' => null,
+                        'd_Transfer' => '',
                         'Transfer2' => null,
+                        'd_Transfer2' => '',
                         'Type' => null,
                         'UpdatedBy' => null,
                         'Year' => $Year,
@@ -830,7 +836,59 @@ class C_api3 extends CI_Controller {
                 }
                 else
                 {
-                    $temp = $query[0];
+                    $dt = $query[0];
+                    $dt['d_PassSelection'] = '';
+                    $dt['d_Registrant'] = '';
+                    $dt['d_Regular'] = '';
+                    $dt['d_Regular2'] = '';
+                    $dt['d_Transfer'] = '';
+                    $dt['d_Transfer2'] = '';
+
+                    $ProdiID = $G_prodi[$i]['ID'];
+                    if ($dt['Registrant'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_Registrant'] = $token;
+                    }
+
+                    if ($dt['PassSelection'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName,e.NPM from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_PassSelection'] = $token;
+                        $dt['d_Regular'] = $token;
+                        $dt['d_Regular2'] = $token;
+                    }
+
+                    $temp = $dt;
                 }
 
                 $data[] = $temp;
@@ -2912,15 +2970,20 @@ class C_api3 extends CI_Controller {
                     $EducationLevelDesc = $Detail[$k]['Description'];
                     $EducationLevelDescEng = $Detail[$k]['DescriptionEng'];
                     // find sql
-                    $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
-                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    // $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    // $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
 
+                    $sql3 = 'select * from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    $Tot = count($query3);
+                    $token = $this->jwt->encode($query3,"UAP)(*");
                     $temp3['Data'][] = array(
                         'EducationLevelID' => $EducationLevelID,
                         'EducationLevelName' => $EducationLevelName,
                         'EducationLevelDesc' => $EducationLevelDesc,
                         'EducationLevelDescEng' => $EducationLevelDescEng,
-                        'Count' => $query3[0]['Total'],
+                        'Count' => $Tot,
+                        'data' => $token,
                     );
                 }
 
