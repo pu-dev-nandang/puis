@@ -912,6 +912,7 @@ class C_rest3 extends CI_Controller {
         }
         else if ($mode == 'listJabatanSKS') {
           $SemesterID = $dataToken['filterPeriod'];
+
           $sql = 'select a.ID, a.NIP,b.Name,c.Position,d.Name as SemesterName ,a.SKS
                   from db_rektorat.tugas_tambahan as a join db_employees.employees as b on a.NIP = b.NIP
                   join  db_employees.position as c on a.positionID = c.ID
@@ -928,6 +929,14 @@ class C_rest3 extends CI_Controller {
           $this->db->delete('db_rektorat.tugas_tambahan');
           echo json_encode(1);
         }
+
+        elseif ($mode == 'deletelistSKS') {
+          $ID=$dataToken['ID'];
+          $this->db->where('ID', $ID);
+          $this->db->delete('db_rektorat.tugas_tambahan');
+          echo json_encode(1);
+        }
+
 
     }
 
@@ -995,6 +1004,7 @@ class C_rest3 extends CI_Controller {
             echo json_encode($rs);
 
         }
+
         elseif ($mode == 'MasaStudiLulusan') {
           $ProdiID = $dataToken['ProdiID'];
           $ex = explode('.', $ProdiID);
@@ -1120,6 +1130,17 @@ class C_rest3 extends CI_Controller {
           echo json_encode($rs);
             
         }
+
+        elseif ($mode == 'KurikulumCapaianRencana') {
+          $rs = [];
+          
+          echo json_encode($rs);
+        }
+        else
+        {
+          echo '{"status":"999","message":"Not Authorize"}'; 
+        }
+
        
     }
 

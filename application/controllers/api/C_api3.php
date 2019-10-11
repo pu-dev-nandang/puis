@@ -813,15 +813,21 @@ class C_api3 extends CI_Controller {
                         'EntredBy' => null,
                         'ID' => null,
                         'PassSelection' => null,
+                        'd_PassSelection' => '',
                         'ProdiCode' => $G_prodi[$i]['Code'],
                         'ProdiID' => $G_prodi[$i]['ID'],
                         'ProdiName' => $G_prodi[$i]['Name'],
                         'Registrant' => null,
+                        'd_Registrant' => '',
                         'Regular' => null,
+                        'd_Regular' => '',
                         'Regular2' => null,
+                        'd_Regular2' => '',
                         'TotalStudemt' => null,
                         'Transfer' => null,
+                        'd_Transfer' => '',
                         'Transfer2' => null,
+                        'd_Transfer2' => '',
                         'Type' => null,
                         'UpdatedBy' => null,
                         'Year' => $Year,
@@ -830,7 +836,59 @@ class C_api3 extends CI_Controller {
                 }
                 else
                 {
-                    $temp = $query[0];
+                    $dt = $query[0];
+                    $dt['d_PassSelection'] = '';
+                    $dt['d_Registrant'] = '';
+                    $dt['d_Regular'] = '';
+                    $dt['d_Regular2'] = '';
+                    $dt['d_Transfer'] = '';
+                    $dt['d_Transfer2'] = '';
+
+                    $ProdiID = $G_prodi[$i]['ID'];
+                    if ($dt['Registrant'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_Registrant'] = $token;
+                    }
+
+                    if ($dt['PassSelection'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[$i]['Name'].'" as ProdiName,e.NPM from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_PassSelection'] = $token;
+                        $dt['d_Regular'] = $token;
+                        $dt['d_Regular2'] = $token;
+                    }
+
+                    $temp = $dt;
                 }
 
                 $data[] = $temp;
@@ -1049,6 +1107,7 @@ class C_api3 extends CI_Controller {
             for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Penuh Waktu
                 $temp_isi[] = 0;
             }    
+
 
             for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Paruh Waktu
                 $temp_isi[] = 0;
@@ -2478,7 +2537,9 @@ class C_api3 extends CI_Controller {
 
 //
                         $Year_where = $Year - $i;
-                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi 
+
+                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
+
                                           FROM db_academic.auth_students ats
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
                                           WHERE ats.GraduationYear = "'.$Year_where.'" 
@@ -2486,15 +2547,54 @@ class C_api3 extends CI_Controller {
                                           AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
                                           ORDER BY ats.NPM')->result_array();
 
+
+                        $TotalLama = 0;
                         // Mendapatkan pekerjaan pertamanya
                         if(count($dataStd)>0){
+
                             for ($a=0;$a<count($dataStd);$a++){
-                                $dataStd[$a]['Experience'] = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
+
+                                $YudisiumDate_ex = ($dataStd[$a]['YudisiumDate']!='' && $dataStd[$a]['YudisiumDate']!=null) ?
+                                    explode('-',$dataStd[$a]['YudisiumDate']) : [];
+
+                                $Experience = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
                                                                     WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID ASC LIMIT 1 ')->result_array();
+
+                                $LamaKerjaDalamBulan = 0;
+                                if(count($Experience)>0 && count($YudisiumDate_ex)>0){
+
+                                    $Y_Month = $YudisiumDate_ex[1];
+                                    $Y_Year = $YudisiumDate_ex[0];
+
+                                    $J_Month = $Experience[0]['StartMonth'];
+                                    $J_Year = $Experience[0]['StartYear'];
+
+                                    $y = (($J_Year - $Y_Year) - 1 ) * 12;
+                                    $m = ($J_Month >= $Y_Month) ? abs($J_Month - $Y_Month) : 12 - (abs($J_Month - $Y_Month));
+
+                                    $LamaKerjaDalamBulan = $y + $m;
+
+                                    $dataStd[$a]['Y'] = $y;
+                                    $dataStd[$a]['M'] = $m;
+
+                                }
+
+                                $dataStd[$a]['LamaWaktuTunggu'] = $LamaKerjaDalamBulan;
+                                $dataStd[$a]['Name'] = ucwords(strtolower($dataStd[$a]['Name']));
+                                $TotalLama = $TotalLama + $LamaKerjaDalamBulan;
+
+                                $dataStd[$a]['Experience'] = $Experience;
                             }
                         }
 
-                        $dataEd[$j]['BL_'.$Year_where] = $dataStd;
+                        $RataRata = (count($dataStd)>0) ? $TotalLama / count($dataStd) : 0;
+                        $dataEd[$j]['BL_'.$Year_where] = array(
+                            'DetailStudent' => $dataStd,
+                            'TotalLamaMenunggu' => $TotalLama,
+                            'TotalStudent' => count($dataStd),
+                            'RataRata' =>  $RataRata
+                        );
+
 
 
                     }
@@ -2733,6 +2833,7 @@ class C_api3 extends CI_Controller {
 
         $SemesterID = $this->input->get('smt');
         $Year = $this->input->get('y');
+        $Status = $this->input->get('s');
 
         $data = $this->db->select('ID, Code, Name')->get_where('db_academic.program_study',array(
             'Status' => 1
@@ -2770,10 +2871,21 @@ class C_api3 extends CI_Controller {
                 //
                 if($SemesterID>=13){
 
+                    $StatusFolap = '';
+                    if($Status=='1' || $Status==1){
+                        $StatusFolap = ' AND (em.StatusForlap = "1" OR em.StatusForlap = "2")';
+                    }
+                    else if($Status=='2' || $Status==2){
+                        $StatusFolap = ' AND em.StatusForlap = "0"';
+                    }
+
                     $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
-                                                               WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               WHERE sc.SemesterID = "'.$SemesterID.'" 
+                                                               AND sdc.ProdiID = "'.$data[$i]['ID'].'" 
+                                                               AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                               '.$StatusFolap.'
                                                                 GROUP BY sc.Coordinator ')->result_array();
 
                     $data[$i]['Lecturer_Sch_Co'] = $dataSchedule;
@@ -2912,15 +3024,20 @@ class C_api3 extends CI_Controller {
                     $EducationLevelDesc = $Detail[$k]['Description'];
                     $EducationLevelDescEng = $Detail[$k]['DescriptionEng'];
                     // find sql
-                    $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
-                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    // $sql3 = 'select count(*) as Total from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    // $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
 
+                    $sql3 = 'select * from db_academic.program_study where EducationLevelID = ? and AccreditationID = ? ';
+                    $query3=$this->db->query($sql3, array($EducationLevelID,$AccreditationID))->result_array();
+                    $Tot = count($query3);
+                    $token = $this->jwt->encode($query3,"UAP)(*");
                     $temp3['Data'][] = array(
                         'EducationLevelID' => $EducationLevelID,
                         'EducationLevelName' => $EducationLevelName,
                         'EducationLevelDesc' => $EducationLevelDesc,
                         'EducationLevelDescEng' => $EducationLevelDescEng,
-                        'Count' => $query3[0]['Total'],
+                        'Count' => $Tot,
+                        'data' => $token,
                     );
                 }
 
@@ -3602,7 +3719,10 @@ class C_api3 extends CI_Controller {
 
         if($data_arr['action']=='insertLog'){
 
+            $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
             $dataForm = (array) $data_arr['dataForm'];
+            $dataForm['IPLocal2'] = $this->input->ip_address();
+            $dataForm['IPLocal'] = $hostname;
             $dataForm['AccessedOn'] = $this->m_rest->getDateTimeNow();
             $this->db->insert('db_employees.log_employees',$dataForm);
             return print_r(1);
@@ -3929,6 +4049,7 @@ class C_api3 extends CI_Controller {
     function getLanguagelabels(){
 
         $lang = $this->input->get('lang');
+
 
         $dataLang = $this->db->get_where('db_prodi.language',array(
             'Code' => $lang

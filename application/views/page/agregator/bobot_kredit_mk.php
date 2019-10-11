@@ -32,6 +32,10 @@
             </thead>
             <tbody id="listData"></tbody>
         </table>
+        <p style="color: orangered;">
+          *) Tuliskan bobot kredit mata kuliah dengan bentuk pembelajaran teori/ praktikum/praktik dan praktik Lapangan <br>
+          **) Khusus untuk Vokasi (D4)
+        </p>
     </div>
 </div>
 

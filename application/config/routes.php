@@ -1063,6 +1063,9 @@ $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
 $route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
 
 
+$route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
+
+
 
 
 $route['api/__getProvinsi'] = 'api/c_api/getProvinsi';

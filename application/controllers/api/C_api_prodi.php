@@ -213,6 +213,7 @@ class C_api_prodi extends CI_Controller {
 
             $Type = $data_arr['Type'];
 
+
             $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
                                                 FROM db_prodi.prodi_texting pt 
                                                 LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
@@ -220,6 +221,7 @@ class C_api_prodi extends CI_Controller {
                                                 LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
                                                 LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
                                                 LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
+
                                                 WHERE pt.ProdiID = "'.$prodi_active_id.'" AND pt.Type="'.$Type.'" ')->result_array();
 
             return print_r(json_encode($data));
@@ -228,6 +230,7 @@ class C_api_prodi extends CI_Controller {
         else if($data_arr['action']=='readDataProdiTexting'){
             $Type = $data_arr['Type'];
             $LangID = $data_arr['LangID'];
+
 
             $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
                                                 FROM db_prodi.prodi_texting pt 
@@ -245,9 +248,11 @@ class C_api_prodi extends CI_Controller {
             //     'LangID' => $LangID
             // ))->result_array();
 
+
             return print_r(json_encode($data));
 
         }
+
         // Add by yamin =====
         else if($data_arr['action']=='saveDataTestimonials'){
 
@@ -383,6 +388,7 @@ class C_api_prodi extends CI_Controller {
 
              $data = $this->db->get('db_prodi.partner')->result_array();
 
+
             return print_r(json_encode($data));
 
         }
@@ -417,6 +423,7 @@ class C_api_prodi extends CI_Controller {
 
             return print_r(json_encode($data));
 
+
         }
         else if ($data_arr['action']=='deleteDataPartner') 
         {
@@ -430,8 +437,10 @@ class C_api_prodi extends CI_Controller {
 
     function getContentProdi(){
         $id = $this->input->get('id');
+
         $lang = $this->input->get('lang');
         $content = $this->input->get('content');
+
     }
 
 

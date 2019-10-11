@@ -303,70 +303,7 @@
 </script>
 
  <script>
-      $(document).on('click','.btnAddMajor', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Master Major/ Program Study </h4>');
 
-        var body = '<div class="row">' +
-            '    <div class="col-md-5">' +
-            '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <input class="form-control" id="master_namemajor" placeholder="Name Major/ program Study...">' +
-            '            </div>' +
-            '            <div style="text-align:right;">' +
-            '                <button class="btn btn-success btn-round" id="btnSavemajor"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>' +
-            '    ' +
-            '    <div id="viewDataMajorProgram" class="col-md-7 table-responsive">' +
-            '    </div>' +
-            '</div>';
-        $('#GlobalModal .modal-body').html(body);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-        loadProgramStudyEmployee();
-    });
-    
-    $(document).on('click','.btnNameUniversity', function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Master University </h4>');
-
-        var body = '<div class="row">' +
-            '    <div class="col-md-5">' +
-            '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="master_codeuniv" placeholder="Code University Dikti...">' +
-            '            </div>' +
-            '            <div class="form-group">' +
-            '                <input class="form-control" id="master_nameuniv" placeholder="Name University...">' +
-            '            </div>' +
-            '            <div style="text-align:right;">' +
-            '                <button class="btn btn-success btn-round" id="btnSaveLembaga"><i class="glyphicon glyphicon-floppy-disk"></i> Save</button>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>' +
-            '    ' +
-            '    <div id="viewData23" class="col-md-7 table-responsive">' +
-            '    </div>' +
-            '</div>';
-        $('#GlobalModal .modal-body').html(body);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-primary btn-round" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>');
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-        loadDataUniversity();
-    });
- </script>
-
- <script>
      $(document).ready(function () {
         loadAcademicS3Details();
         loadforms3();

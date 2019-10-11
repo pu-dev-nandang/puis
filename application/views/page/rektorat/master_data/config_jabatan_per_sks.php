@@ -10,7 +10,9 @@
                 <div class="form-group">
                     <input class="hide" id="formID">
                     <label>Nama Dosen</label>
-                    <br> 
+
+                    <br>
+
                     <select style="width: 100%;" id="formName" ></select>
                 </div>
                 <div class="form-group">
@@ -136,6 +138,7 @@
         loadPage();
     })
 
+
     $(document).off('click', '.btnRemoveSKS').on('click', '.btnRemoveSKS',function(e) {
       var selector = $(this);
       if (confirm('Are you sure ?')) {
@@ -206,8 +209,12 @@
                   {
                      'targets': 5,
                      'render': function (data, type, full, meta){
+
+
                       // console.log(full)
                          return '<button class="btn btn-sm btn-danger btnRemoveSKS" data-id="'+full.ID+'"><i class="fa fa-trash"></i></button>';
+
+
                      }
                   },
               ],
@@ -338,9 +345,12 @@
                 ' <option value="'+i+'">'+i+'</option>'
                 )
         }
+
+
         selector.select2({
             //allowClear: true
         });
+
     }
         $('#btnSaveSKS').click (function(){
              var formName = $('#formName').val();
@@ -370,6 +380,7 @@
                     var token = jwt_encode(data,'UAP)(*');
                     $.post(url,{token:token},function (result) {
                         toastr.success('Data saved','Success');
+
                          // setDefaultTable(formName);
                          loadPage();
 
