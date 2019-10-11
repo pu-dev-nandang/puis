@@ -35,8 +35,6 @@
         </div>
         <div class="col-md-9">
             <div id="viewTable"></div>
-            <p style="color: orangered;">
-              *) Target kesesuaian bidang kerja lulusan >80%, Score 4 </p>
         </div>
 
     </div>
