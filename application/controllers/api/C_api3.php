@@ -2845,18 +2845,53 @@ class C_api3 extends CI_Controller {
         return print_r(json_encode($data));
     }
 
-    public function getLuaranHkipaten(){
+    public function getLuaranHkipaten() {
 
-        $Status = $this->input->get('s');
-        $data = $this->db->query('
-            SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-            FROM db_research.publikasi
-            WHERE ID_kat_capaian = 2
-            UNION
-            SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-            FROM db_research.pengabdian_masyarakat
-            WHERE ID_kat_capaian = 2')->result_array();
-        return print_r(json_encode($data));
+        $data_arr = $this->getInputToken2();
+        $hki_year = $data_arr['hkiyear'];
+
+         if(count($data_arr>0)) {
+
+            if($data_arr['action']=='readHKI_paten'){
+
+                if($hki_year == "" && $hki_year == null) {
+
+                    $Yearx = date('Y');
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 2 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat 
+                    WHERE ID_kat_capaian = 2 " ')->result_array();
+
+                } 
+                else {
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 2 AND YEAR(Tgl_terbit) = "'.$hki_year.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat 
+                        WHERE ID_kat_capaian = 2 AND ID_thn_laks = "'.$hki_year.'" ')->result_array();
+                }
+                //print_r($data);
+                return print_r(json_encode($data));
+            }
+        }
+
+        //$Status = $this->input->get('s');
+        //$data = $this->db->query('
+        //    SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        //    FROM db_research.publikasi
+         //   WHERE ID_kat_capaian = 2
+        //    UNION
+         //   SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+         //   FROM db_research.pengabdian_masyarakat
+         //   WHERE ID_kat_capaian = 2')->result_array();
+        //return print_r(json_encode($data));
     }
 
     public function getsitasikarya(){

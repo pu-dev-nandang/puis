@@ -220,6 +220,12 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
+    public function __getKurikulumSelectOptionDSC(){
+        $data = $this->db->query('SELECT * FROM db_academic.curriculum ORDER BY Year DESC');
+
+        return $data->result_array();
+    }
+
     public function __geteducationLevel(){
         $data = $this->db->query('SELECT * FROM db_academic.education_level ORDER BY EducationLevelID DESC');
 
@@ -788,7 +794,7 @@ class M_api extends CI_Model {
 
     public function views_academic($NIP) {
 
-        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND em.Active = '1' AND em.LinkFiles NOT IN ('') AND em.LinkFiles IS NOT NULL ORDER BY em.TypeFiles ASC";
+        $sql = "SELECT * FROM db_employees.files AS em WHERE em.NIP = '".$NIP."' AND em.TypeFiles IN ('1','2','3','4','5','6') AND em.Active = '1' AND em.LinkFiles NOT IN ('') AND em.LinkFiles IS NOT NULL ORDER BY em.ID ASC";
         $query=$this->db->query($sql, array());
 
         $TypeAcademic = ['S1','S2','S3'];
