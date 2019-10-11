@@ -44,6 +44,7 @@
                     <th>Prodi</th>
                     <th style="width: 15%;">Jumlah Dosen</th>
                     <th style="width: 15%;">Jumlah Mahasiswa</th>
+                    <th style="width: 15%;">Dosen : Mahasiswa</th>
                     <th style="width: 15%;">Jumlah Mahasiswa TA</th>
                 </tr>
                 </thead>
@@ -156,12 +157,16 @@
                             : v.dataMahasiwaTA.length;
 
 
+                        var Prefix = parseFloat(v.Lecturer_Sch_Fix.length);
+                        var rasioLec = (Prefix>0) ? parseFloat(v.Lecturer_Sch_Fix.length) / Prefix : 0;
+                        var rasioMhs = (Prefix>0) ? parseFloat(v.dataMahasiwa.length) / Prefix : 0;
 
                         $('#listData').append('<tr>' +
                             '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                             '<td style="text-align: left;">'+v.Name+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewLect+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewMhs+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+rasioLec.toFixed(2)+' : '+rasioMhs.toFixed(2)+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewMhs_2+'</td>' +
                             '</tr>');
 
