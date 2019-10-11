@@ -18,22 +18,18 @@
     <div class="row">
         <div class="col-md-12">
 
-            <div style="text-align: right;">
-                <button class="btn btn-success form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Luaran Penelitian dan PkM</button>
-            </div>
+            <div>
+                <div class="col-md-3 col-md-offset-4">
+                    <select class="form-control" id="filterTahun"><option disabled selected>Pilih Tahun</option></select>
 
-            <div class="col-md-3 col-md-offset-4">
-                <div class="thumbnail">
-                    <select class="form-control" id="filterTahun">
-                        <option value="" disabled="">--- Pilih Tahun ---</option>
-                        <option value="1">--- Pilih Tahun 1---</option>
-                        <option value="2">--- Pilih Tahun 2---</option>
-                    </select>
                 </div>
-                <hr/>
+                <div style="text-align: right;margin-bottom: 0px;">
+        
+                    <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                </div>
+                
             </div>
-    
-            
+            <br/>
          
             <div id="viewTable"></div>
         </div>
@@ -150,24 +146,87 @@
 
 <script>
     $(document).ready(function () {
-        window.act = "<?= $accessUser; ?>";
-        if(parseInt(act)<=0){
-            $('.form-data-add').remove();
-        } else {
-        }
-        loadhkipaten();
+        
+        loadSelectOptionClassOf_DSC('#filterTahun');
+        loadDataTable();
+        //loadSelectOptionClassOf_DSC();
     });
 
+    function loadSelectOptionClassOf_DSC() {
+        var url = base_url_js+'api/__getKurikulumSelectOptionDSC';
+        $.getJSON(url,function (jsonResult) {
+            for(var i=0;i<jsonResult.length;i++){
+               $('#filterTahun').append('<option id="'+jsonResult[i].Year+'">'+jsonResult[i].Year+' </option>');
+            }
+        });
+    }
+
     $('#filterTahun').change(function () {
-        var status = $(this).val();
-        loadhkipaten(status);
+        //var status = $(this).val();
+        var hkiyear = $('#filterTahun').find(':selected').val();
+        loadDataTable(hkiyear);
     });
+
+    function loadDataTable(hkiyear) {
+
+        $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran">' +
+            '    <thead>  '+
+            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
+            '        <th style="text-align: center; width: 5%;">No</th>  '+
+            '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
+            '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
+            '        <th style="text-align: center;">Keterangan</th>  '+
+            '    </tr>  '+
+            '    </thead>  '+
+            '       <tbody id="listData"></tbody>   '+
+            '    </tfoot> '+
+            '    </table>');
+
+        if(hkiyear!='' && hkiyear!=null){
+                
+            var data = {
+                action : 'readHKI_paten',
+                hkiyear : hkiyear
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__getHkiPaten';
+    
+            $.post(url,{token:token},function (jsonResult) {
+
+            $('#listData').empty();
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    $('#listData').append('<tr>' +
+                        '   <td style="text-align: center;">'+(i+1)+'</td>' +
+                        '   <td style="text-align: left;">'+v.NamaJudul+'</td>' +
+                        '   <td style="text-align: center;">'+moment(v.Tahun).format('YYYY')+'</td>' +
+                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
+                        '</tr>');
+                    //var total = parseInt(jsonResult.length);
+                });
+
+                 //passToExcel = jsonResult;
+                }
+            })
+        } else {
+
+
+            //alert('BBS');
+        }
+
+        
+
+        
+
+    }
 
     function loadhkipaten(status) {
 
          $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
             '    <thead>  '+
-            '     <tr>   '+
+            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
             '        <th style="text-align: center; width: 5%;">No</th>  '+
             '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
             '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
@@ -179,8 +238,13 @@
             '    </tfoot> '+
             '    </table>');
 
-        var url : base_url_js+"api3/__getHkiPaten?s="+status, // json datasource
-        //var url = base_url_js+'api3/__getHkiPaten';
+        var data = {
+            action : 'readDataMHSBarudd',
+            Year : status
+        };
+
+        //var url : base_url_js+"api3/__getHkiPaten?s="+status, // json datasource
+        var url = base_url_js+'api3/__getHkiPaten';
 
         $.getJSON(url,function (jsonResult) {
 

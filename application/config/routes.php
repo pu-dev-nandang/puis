@@ -809,6 +809,7 @@ $route['api/__changeTahunAkademik'] = 'api/c_api/changeTahunAkademik';
 $route['api/__insertKurikulum'] = 'api/c_api/insertKurikulum';
 $route['api/__getKurikulumSelectOption'] = 'api/c_api/getKurikulumSelectOption';
 $route['api/__getKurikulumSelectOptionASC'] = 'api/c_api/getKurikulumSelectOptionASC';
+$route['api/__getKurikulumSelectOptionDSC'] = 'api/c_api/getKurikulumSelectOptionDSC';
 $route['api/__getStudentYear'] = 'api/c_api/getStudentYear';
 
 

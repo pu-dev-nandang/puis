@@ -79,6 +79,11 @@ class C_api extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    public function getKurikulumSelectOptionDSC(){
+        $data = $this->m_api->__getKurikulumSelectOptionDSC();
+        return print_r(json_encode($data));
+    }
+
     public function getMKByID(){
         $ID = $this->input->post('idMK');
         $data = $this->m_api->__getMKByID($ID);
