@@ -96,7 +96,6 @@
         window.act = "<?= $accessUser; ?>";
         if(parseInt(act)<=0){
             $('.form-data-edit').remove();
-            $('.editNominal').addClass('c-block');
         } else {
 
         }

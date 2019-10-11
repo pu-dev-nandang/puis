@@ -1393,6 +1393,7 @@ $route['agregator/table-refrensi'] = 'page/agregator/c_agregator/table_refrensi'
 $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 $route['agregator/kepuasan_pengguna_lulusan'] = 'page/agregator/c_agregator/kepuasan_pengguna_lulusan';
+$route['agregator/tempat_kerja_lulusan'] = 'page/agregator/c_agregator/tempat_kerja_lulusan';
 $route['agregator/buku-isbn-chapter'] = 'page/agregator/c_agregator/buku_isbn_chapter';
 $route['agregator/teknologi-produk-karya'] = 'page/agregator/c_agregator/teknologi_produk_karya';
 $route['agregator/hki-desain-produk'] = 'page/agregator/c_agregator/hki_desain_produk';
