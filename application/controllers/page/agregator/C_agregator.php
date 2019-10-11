@@ -76,6 +76,11 @@ class C_agregator extends Globalclass {
         $data['page'] = $page;
         $data['listMenu'] = $dataMenu;
 
+        $URL = $this->uri->segment(1).'/'.$this->uri->segment(2);
+        $data['Description'] = $this->db->get_where('db_agregator.agregator_menu',array(
+            'URL' => $URL
+        ))->result_array();
+
 
         $content = $this->load->view('page/agregator/menu_agregator',$data,true);
         $this->temp($content);
