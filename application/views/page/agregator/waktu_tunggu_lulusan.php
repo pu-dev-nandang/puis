@@ -82,11 +82,11 @@
 
 
                     var viewBL3 = (parseFloat(v['BL_'+Y3].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata.toFixed(2)+'</a>' : 0;
                     var viewBL2 = (parseFloat(v['BL_'+Y2].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata.toFixed(2)+'</a>' : 0;
                     var viewBL1 = (parseFloat(v['BL_'+Y1].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata.toFixed(2)+'</a>' : 0;
 
 
                     var viewDess = (v.Description!=null && v.Description!='') ? v.Description : v.Name;

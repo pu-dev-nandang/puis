@@ -204,11 +204,21 @@
 
                 var NUP = (v.NUP!='' && v.NUP!=null && v.NUP!=0 && v.NUP!='0') ? v.NUP : '-';
 
+                var StatusForlap = '<label style="color: red;">Belum di set</label>';
+                if(parseInt(v.StatusForlap)==1){
+                    StatusForlap = 'NIDN';
+                } else if(parseInt(v.StatusForlap)==2){
+                    StatusForlap = 'NIDK';
+                } else if(parseInt(v.StatusForlap)==0){
+                    StatusForlap = 'NUP';
+                }
+
                 tr = tr+'<tr>' +
                     '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                     '<td>'+NID+'</td>' +
                     '<td>'+NUP+'</td>' +
                     '<td style="text-align: left;">'+v.Name+'</td>' +
+                    '<td style="width: 1%;">'+StatusForlap+'</td>' +
                     '</tr>';
             });
         }
@@ -225,6 +235,7 @@
             '                <th style="width: 25%;">NIDN / NIDK</th>' +
             '                <th style="width: 25%;">NUP</th>' +
             '                <th>Name</th>' +
+            '                <th>Status Forlap</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +
