@@ -6129,8 +6129,8 @@ Phone: (021) 29200456';
             $pdf->AddPage();
 
             $pdf->SetAutoPageBreak(true, 0);
-
-            $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+            $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+            // $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
 
 
             $pdf->Ln(30);
