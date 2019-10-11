@@ -1,5 +1,5 @@
 <div id="sidebar" class="sidebar-fixed">
-    <div id="sidebar-content">
+    <div id="sidebar-content" class="hide">
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- <li  class="dropdown <?php if($this->uri->segment(3,0)=='dashboard'){echo "current";} ?>">
@@ -7,7 +7,7 @@
             <li class="<?= ($this->uri->segment(2)=='beranda') ? 'current open' : ''; ?>">
                 <a href="javascript:void(0);">
                     <i class="fa fa-tachometer"></i>
-                    Beranda
+                    Home
                     
                 </a>
                 <ul class="sub-menu">
@@ -15,12 +15,6 @@
                                 <a href="<?php echo base_url('prodi/beranda/slide'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Slider
-                                </a>
-                        </li>
-                        <li class="<?php if($this->uri->segment(3)=='overview'){echo "current";} ?>">
-                                <a href="<?php echo base_url('prodi/beranda/overview'); ?>">
-                                <i class="icon-angle-right"></i>
-                                Greetings
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='why-choose-us'){echo "current";} ?>">
@@ -39,34 +33,34 @@
                         <li class="<?php if($this->uri->segment(3)=='testimoni'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/testimoni'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Testimoni
+                                Testimonials
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='client'){echo "current";} ?>">
-                                <a href="<?php echo base_url('prodi/beranda/client'); ?>">
+                                <a href="<?php echo base_url('prodi/beranda/partner'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Our Clients
+                                Partner Collaborations
                                 </a>
                         </li>
                     </ul>
             </li>
-            <li class="<?= ($this->uri->segment(2)=='tentang') ? 'current open' : ''; ?>">
+            <li class="<?= ($this->uri->segment(2)=='about') ? 'current open' : ''; ?>">
                 <a href="javascript:void(0);">
-                    <i class="fa fa-users"></i>
-                    Tentang
+                    <i class="fa fa-diamond"></i>
+                    About
                     
                 </a>
                 <ul class="sub-menu">
-                        <li class="<?php if($this->uri->segment(3)=='sambutan'){echo "current";} ?>">
-                                <a href="<?php echo base_url('sambutan'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='overview'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/about/overview'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Sambuatan
+                                Greetings
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='visi'){echo "current";} ?>">
-                                <a href="<?php echo base_url('visi'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='visimisi'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/about/vision'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Visi dan Misi
+                                Vision dan Mission
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='struktur'){echo "current";} ?>">
@@ -78,13 +72,13 @@
                         <li class="<?php if($this->uri->segment(3)=='dosen'){echo "current";} ?>">
                                 <a href="<?php echo base_url('dosen'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Dosen
+                                Lecturer
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='fasilitas'){echo "current";} ?>">
                                 <a href="<?php echo base_url('fasilitas'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Fasilitas
+                                Amenities
                                 </a>
                         </li>
                         
@@ -93,21 +87,21 @@
             <li class="<?php if($this->uri->segment(3)=='choose'){echo "penelitian";} ?>">
                 <a href="<?php echo base_url('penelitian'); ?>">
                     <i class="fa fa-flask"></i>
-                    Penelitian
+                    Research
                     
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(3)=='berita'){echo "current";} ?>">
                 <a href="<?php echo base_url('berita'); ?>">
                     <i class="fa fa-newspaper-o"></i>
-                    Berita
+                    News
                     
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(3)=='mahasiswa'){echo "current";} ?>">
                 <a href="<?php echo base_url('mahasiswa'); ?>">
                     <i class="fa fa-graduation-cap"></i>
-                    Mahasiswa
+                    Student
                     
                 </a>
             </li>
@@ -121,14 +115,14 @@
             <li class="<?php if($this->uri->segment(3)=='galeri'){echo "current";} ?>">
                 <a href="<?php echo base_url('galeri'); ?>">
                     <i class="fa fa-th-large"></i>
-                    Galeri
+                    Gallery
                     
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(3)=='kontak'){echo "current";} ?>">
                 <a href="<?php echo base_url('kontak'); ?>">
                     <i class="fa fa-phone"></i>
-                    Kontak
+                   Contact
                     
                 </a>
             </li>

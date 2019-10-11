@@ -328,7 +328,9 @@
             //'                        <th style="width: 2%; text-align: center;"><i class="fa fa-cog"></i></th>' +
             '                    </tr>' +
             '                    </thead>' +
+
             //'                   <tbody id="listData"></tbody>' +
+
             '                </table>');
 
         var token = jwt_encode({action:'readmastermajor'},'UAP)(*');
@@ -1021,9 +1023,11 @@ function uploadfile_transcripts2(fileName_Transcript) {
                         } else {  //if success save data
 
                             if ($('#e_fileIjazah').get(0).files.length === 0) {
+
                             } 
                             else {
                             
+
                                 var formData = new FormData( $("#e_tagFM_IjazahS1")[0]);
                                 var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkijazahs1+'&c='+typex+'&u='+NIP;
                                     $.ajax({
@@ -1040,9 +1044,11 @@ function uploadfile_transcripts2(fileName_Transcript) {
                             }
 
                             if ($('#e_fileTranscript').get(0).files.length === 0) {
+
                                 
                             } 
                             else {
+
                                 e_uploadfile_transcripts(linktranscripts1);
                             }    
                             toastr.success('Success Edit Saved','Success');
@@ -1273,8 +1279,10 @@ function uploadfile_transcripts3(fileName_Transcript) {
                         } else {  //if success save data
                             
                             if ($('#e_fileIjazah').get(0).files.length === 0) {
+
                             } 
                             else {
+
                                 var formData = new FormData( $("#e_tagFM_IjazahS1")[0]);
                                 var url = base_url_js+'human-resources/upload_edit_academic?fileName='+linkijazahs1+'&c='+typex+'&u='+NIP;
                                     $.ajax({
@@ -1291,8 +1299,10 @@ function uploadfile_transcripts3(fileName_Transcript) {
                             }
 
                             if ($('#e_fileTranscript').get(0).files.length === 0) {
+
                             } 
                             else {
+
                                 e_uploadfile_transcripts(linktranscripts1);
                             }    
                             toastr.success('Edit data Saved','Success');

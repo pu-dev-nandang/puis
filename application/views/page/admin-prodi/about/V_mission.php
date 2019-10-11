@@ -9,15 +9,7 @@
                     <select style="max-width: 150px;" id="LangID" class="form-control"></select>
                 </td>
             </tr>
-            <tr>
-                <td style="width: 15%;">Phone</td>
-                <td style="width: 1%;">:</td>
-                <td>
-                    <input type="text" id="Tlp" class="form-control required" placeholder="ex: 08XXXXXXXXX">
-                </td>
-            </tr>
-            <tr>
-                <td>Description</td>
+            <tr>                <td>Description</td>
                 <td>:</td>
                 <td>
                     <textarea id="Description" class="form-control"></textarea>
@@ -34,12 +26,12 @@
     <div class="col-md-6" style="border-left: 1px solid #CCCCCC;">
         <div id="viewDataDesc"></div>
     </div>
-</div> 
+</div>
 
 <script>
     $(document).ready(function () {
 
-        window.G_Type = 'call';
+        window.G_Type = 'mission';
 
         loadSelectOptionLanguageProdi('#LangID','');
 
@@ -58,7 +50,7 @@
             ]
         });
 
-        loadDataCall();
+        loadDataVision();
 
         var firsLoad = setInterval(function () {
 
@@ -79,7 +71,7 @@
         }
     });
 
-    function loadDataCall() {
+    function loadDataVision() {
         var data = {
             action : 'readProdiTexting',
             Type : G_Type
@@ -92,7 +84,7 @@
             if(jsonResult.length>0){
 
                 $.each(jsonResult,function (i,v) {
-                    $('#viewDataDesc').append('<div class="well"><h3 style="margin-top: 5px;"><b>'+v.Language+'</b></h3><p>'+v.Tlp+'</p><div>'+v.Description+'</div></div>');
+                    $('#viewDataDesc').append('<div class="well"><h3 style="margin-top: 5px;"><b>'+v.Language+'</b></h3><div>'+v.Description+'</div></div>');
                 });
 
             } else {
@@ -115,10 +107,8 @@
             $.post(url,{token:token},function (jsonResult) {
                 if(jsonResult.length>0){
                     $('#Description').summernote('code', jsonResult[0].Description);
-                    $('#Tlp').val(jsonResult[0].Tlp);
                 } else {
                     $('#Description').summernote('code', '');
-                    $('#Tlp').val('');
                 }
 
             });
@@ -129,32 +119,24 @@
 
         var LangID = $('#LangID').val();
         var Description = $('#Description').val();
-        var Tlp = $('#Tlp').val();
+
         if(LangID!='' && LangID!=null &&
-            Description!='' && Description!=null &&
-            Tlp!='' && Tlp!=null){
-            var prodi_texting = {
+            Description!='' && Description!=null){
+
+            var data = {
+                action : 'updateProdiTexting',
+                dataForm : {
                     Type : G_Type,
                     LangID : LangID,
                     Description : Description,
-                    UpdatedBy : sessionNIP,
+                    UpdatedBy : sessionNIP
+                }
             };
-
-            var calldetail = {
-              Tlp : Tlp,
-            }
-            var data = {
-                action : 'saveProdiCall',
-                calldetail : calldetail,
-                prodi_texting : prodi_texting,
-            };
-
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api-prodi/__crudDataProdi';
             $.post(url,{token:token},function (jsonResult) {
-
                 toastr.success('Data saved','Success');
-                loadDataCall();
+                loadDataVision();
             })
 
         }
@@ -162,4 +144,3 @@
     });
 
 </script>
-    

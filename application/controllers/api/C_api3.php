@@ -1108,6 +1108,7 @@ class C_api3 extends CI_Controller {
                 $temp_isi[] = 0;
             }    
 
+
             for ($i=0; $i < count($query); $i++) { // Jumlah Mahasiswa Asing Paruh Waktu
                 $temp_isi[] = 0;
             }
@@ -2536,13 +2537,16 @@ class C_api3 extends CI_Controller {
 
 //
                         $Year_where = $Year - $i;
+
                         $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
+
                                           FROM db_academic.auth_students ats
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
                                           WHERE ats.GraduationYear = "'.$Year_where.'" 
                                           AND ats.StatusStudentID = "1"
                                           AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
                                           ORDER BY ats.NPM')->result_array();
+
 
                         $TotalLama = 0;
                         // Mendapatkan pekerjaan pertamanya
@@ -2590,6 +2594,7 @@ class C_api3 extends CI_Controller {
                             'TotalStudent' => count($dataStd),
                             'RataRata' =>  $RataRata
                         );
+
 
 
                     }

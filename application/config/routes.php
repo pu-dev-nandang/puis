@@ -1060,6 +1060,8 @@ $route['rest3/__get_roolback_door_to_be_mhs_admission'] = 'api/c_rest3/get_roolb
 $route['rest3/__Config_Jabatan_SKS'] = 'api/c_rest3/Config_Jabatan_SKS';
 
 $route['rest3/__get_APS_CrudAgregatorTB7'] = 'api/c_rest3/APS_CrudAgregatorTB7';
+$route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
+
 
 $route['rest3/__submit_console_developer'] = 'api/c_rest3/submit_console_developer';
 
@@ -1186,10 +1188,7 @@ $route['__getContentProdi'] = 'api/c_api_prodi/getContentProdi';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//
-
 $route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
-// ---- Prodi CMS ----- //
-$route['prodi/beranda/overview'] =  'page/admin-prodi/beranda/c_home/overview';
 $route['prodi/beranda/why-choose-us/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
 $route['prodi/beranda/why-choose-us/about'] =  'page/admin-prodi/beranda/c_home/about';
 $route['prodi/beranda/why-choose-us/excellence'] =  'page/admin-prodi/beranda/c_home/excellence';
@@ -1197,6 +1196,10 @@ $route['prodi/beranda/why-choose-us/graduate-profile'] =  'page/admin-prodi/bera
 $route['prodi/beranda/why-choose-us/career-opportunities'] =  'page/admin-prodi/beranda/c_home/career_opportunities';
 $route['prodi/beranda/calltoaction'] =  'page/admin-prodi/beranda/c_home/calltoaction';
 $route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
+$route['prodi/beranda/partner'] =  'page/admin-prodi/beranda/c_home/partner';
+$route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
+$route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
+$route['prodi/about/mission'] =  'page/admin-prodi/beranda/c_home/mission';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//

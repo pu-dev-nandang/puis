@@ -210,8 +210,10 @@
                      'targets': 5,
                      'render': function (data, type, full, meta){
 
+
                       // console.log(full)
                          return '<button class="btn btn-sm btn-danger btnRemoveSKS" data-id="'+full.ID+'"><i class="fa fa-trash"></i></button>';
+
 
                      }
                   },
@@ -343,6 +345,7 @@
                 ' <option value="'+i+'">'+i+'</option>'
                 )
         }
+
 
         selector.select2({
             //allowClear: true

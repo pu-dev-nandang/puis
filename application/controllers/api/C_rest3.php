@@ -923,6 +923,12 @@ class C_rest3 extends CI_Controller {
 
           echo json_encode($query);
         }
+        elseif ($mode == 'deletelistSKS') {
+          $ID=$dataToken['ID'];
+          $this->db->where('ID', $ID);
+          $this->db->delete('db_rektorat.tugas_tambahan');
+          echo json_encode(1);
+        }
 
         elseif ($mode == 'deletelistSKS') {
           $ID=$dataToken['ID'];
@@ -1124,6 +1130,7 @@ class C_rest3 extends CI_Controller {
           echo json_encode($rs);
             
         }
+
         elseif ($mode == 'KurikulumCapaianRencana') {
           $rs = [];
           
@@ -1133,6 +1140,7 @@ class C_rest3 extends CI_Controller {
         {
           echo '{"status":"999","message":"Not Authorize"}'; 
         }
+
        
     }
 

@@ -303,6 +303,7 @@
 </script>
 
  <script>
+
      $(document).ready(function () {
         loadAcademicS3Details();
         loadforms3();
