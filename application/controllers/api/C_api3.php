@@ -2734,7 +2734,7 @@ class C_api3 extends CI_Controller {
                         $StatusFolap = ' AND em.StatusForlap = "0"';
                     }
 
-                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_academic.schedule_details_course sdc
+                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
                                                                WHERE sc.SemesterID = "'.$SemesterID.'" 
@@ -2754,11 +2754,12 @@ class C_api3 extends CI_Controller {
 
                     $data[$i]['Lecturer_Sch_Co_arr'] = $listCoord;
 
-                    $dataScheduleTeam = $this->db->query('SELECT stt.NIP, em.NUP, em.NIDN, em.NIDK, em.Name  FROM db_academic.schedule_team_teaching stt
+                    $dataScheduleTeam = $this->db->query('SELECT stt.NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap  FROM db_academic.schedule_team_teaching stt
                                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = stt.ScheduleID)
                                                                 LEFT JOIN db_academic.schedule_details_course sdc ON (sc.ID = sdc.ScheduleID)
                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
-                                                                WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" 
+                                                                AND em.ProdiID = "'.$data[$i]['ID'].'" '.$StatusFolap.'
                                                                 GROUP BY stt.NIP
                                                                  ')->result_array();
 
