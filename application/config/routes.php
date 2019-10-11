@@ -1414,7 +1414,7 @@ $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_ek
 $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
-$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+//$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
 $route['agregator/excel-kecukupan-dosen'] = 'c_save_to_excel/excel_kecukupan_dosen';
 

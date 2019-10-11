@@ -9465,7 +9465,7 @@ class C_api extends CI_Controller {
                     Graduation Year ambil yang dari auth_students
                 */
                 $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
-                                      ss.Description AS StatusStudentDesc, au.KTPNumber, au.Access_Card_Number,au.GraduationDate,au.YudisiumDate,
+                                      ss.Description AS StatusStudentDesc, au.KTPNumber, au.Access_Card_Number,au.GraduationDate,au.YudisiumDate,au.Tgl_msk,
                                       em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$DB_Student.'.students s
                                       LEFT JOIN db_academic.program_study p ON (s.ProdiID = p.ID)
@@ -9514,7 +9514,6 @@ class C_api extends CI_Controller {
                         echo json_encode($rs);
                         die(); // stop script
                     }
-                    
                 }
 
                 $DB_Student = $data_arr['DB_Student'];
@@ -9533,6 +9532,10 @@ class C_api extends CI_Controller {
                     $dataUpdtAuth['StatusStudentID'] = 3;
                 }
                 $dataUpdate->GraduationYear = $GraduationYear;
+
+                // dataTAStd
+                $dataTAStd = json_decode(json_encode($data_arr['dataTAStd']),true);
+                $dataUpdate->NationalityID = $dataTAStd['NationalityID'];
                 
                 $this->db->where('NPM', $NPM);
                 $this->db->update($DB_Student.'.students',$dataUpdate);
