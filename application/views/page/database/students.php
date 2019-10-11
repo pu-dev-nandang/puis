@@ -397,7 +397,7 @@
                     // trigger remove button
                     if (DivSessionID != 12 && DivSessionID != 6) { // selain IT dan Academic
                         waitForEl(".btnLoginPortalStudents", function() { 
-                          $("#btnSelect,#btnPrintIDCard,.btn-upload,.btn-group,.btnLoginPortalStudents").remove();
+                          $("#btnSelect,#btnPrintIDCard,.btn-upload,.btn-group").remove();
                         });
                     }
                 }
