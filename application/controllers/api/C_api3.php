@@ -1924,11 +1924,24 @@ class C_api3 extends CI_Controller {
                         else // Rata-rata Masa Studi Lulusan pada
                         {
                             $arr_temp = [];
-                            $sql = 'select NPM,Year,GraduationYear from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                            $sql = 'select NPM,Year,GraduationYear,GraduationDate,Tgl_msk from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
                             $query=$this->db->query($sql, array(1))->result_array();
                             if (count($query) > 0 ) {
                                 for ($k=0; $k < count($query); $k++) {
-                                   $Co = $query[$k]['GraduationYear'] - $query[$k]['Year'];
+                                   if ($query[$k]['Tgl_msk'] != null && $query[$k]['Tgl_msk'] != '') {
+                                        $date1=strtotime($query[$k]['GraduationDate']);
+                                        $date2=strtotime($query[$k]['Tgl_msk']); 
+                                        $diff = abs($date1 - $date2);
+                                        
+                                        $day = $diff/(60*60*24); // in day
+                                        $month = $day / 30;
+                                        $Co = $month;
+                                    }
+                                    else{
+                                        $Co = $query[$k]['GraduationYear'] - $query[$k]['Year'];
+                                        $Co = $Co * 12; // dalam bulan
+                                    } 
+                                   
                                    $arr_temp[] = $Co;
                                 }
 
