@@ -55,8 +55,6 @@
 								'<div style="text-align: right;">'+
 								    '<button onclick="saveTable2Excel(\'dataTable2Excel\')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>'+
 								'</div>'+
-								'<p style="color: orangered;">*) Rasio Tepat Waktu >=50% Score 4, <50% Score 0  </p>'+
-								'<p style="color: orangered;">*) Rasio Keberhasilan Studi >= 85% Score 4, <85% Score 0  </p>'+
 								'<p style="color: green;" class = "PercentRatio"></p>'+
 								'<br/>'+
 								'<table class = "table table-bordered dataTable2Excel" data-name="TblLamaRasioKelulusan">';
@@ -158,7 +156,7 @@
 									'<tr>'+
 										'<th>'+'*) Pesentase Rasio '+Ta+' : '+rt+'%'+'</th>'+
 									'</tr>'+
-								'</table>'		
+								'</table>'
 			);
 
 	}

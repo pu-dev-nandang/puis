@@ -22,10 +22,6 @@
             <br/>
             <div id="viewTable"></div>
         </div>
-        <p style="color: orangered;">
-            *) Tanggal Lulus - Tanggal SK penerimaan mahasiswa (hitungan dalam bulan)
-
-        </p>
     </div>
 </div>
 <script>

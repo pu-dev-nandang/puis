@@ -91,10 +91,6 @@
           <!-- </div> -->
         </div>
     </div>
-    <p style="color: orangered;">
-      *) Cantumkan keterangan yang menunjukkan salah satu program sebagai program utama yang diselenggarakan di perguruan tinggi,
-      Program utama ditentukan berdasarkan jumlah mahasiswa aktif terbesar <br>
-      **) Jumlah mahasiswa regular : Lulus seleksi harus >=90% </p>
 </div>
 
 <script>
@@ -425,9 +421,9 @@
                     {
                         html += '<tr>'+
                                     '<td colspan="4"><label>No Data Detail</label></td>'+
-                                '</tr>';    
+                                '</tr>';
                     }
-                    
+
 
                     html  += '</tbody></table></div></div>';
 
@@ -475,9 +471,9 @@
                     {
                         html += '<tr>'+
                                     '<td colspan="4"><label>No Data Detail</label></td>'+
-                                '</tr>';    
+                                '</tr>';
                     }
-                    
+
 
                     html  += '</tbody></table></div></div>';
 
