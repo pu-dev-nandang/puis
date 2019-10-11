@@ -175,10 +175,15 @@
                         ds_x = ds_x + parseInt(v.dataMahasiwaTA.length);
                     });
 
+                    var PrefixTotal = parseFloat(ds);
+                    var TotalRata2Lec = (PrefixTotal>0)? parseFloat(ds) / PrefixTotal : 0;
+                    var TotalRata2Std = (PrefixTotal>0)? parseFloat(ds_c) / PrefixTotal : 0;
+
                     $('#listData').append('<tr>' +
                         '<th colspan="2">Jumlah</th>' +
                         '<th>'+ds+'</th>' +
                         '<th>'+ds_c+'</th>' +
+                        '<th>'+TotalRata2Lec.toFixed(2)+' : '+TotalRata2Std.toFixed(2)+'</th>' +
                         '<th>'+ds_x+'</th>' +
                         '</tr>');
 

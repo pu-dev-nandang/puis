@@ -33,6 +33,10 @@
     .active-left-menu {
         background: #c8e0ff;
     }
+
+    .alert-note-agregator {
+        border-color: #5db2c3 !important;
+    }
 </style>
 
 
@@ -73,6 +77,14 @@
     <div class="col-md-10">
         <?= $page; ?>
 
+        <?php if(count($Description)>0){
+
+            if($Description[0]['Description']!='' && $Description[0]['Description']!=null){ ?>
+                <div class="alert alert-info alert-note-agregator" role="alert"><h3 style="margin-top: 0px;font-weight: bold;">Catatan : </h3><div><?= $Description[0]['Description']; ?></div></div>
+            <?php }
+
+        } ?>
+
     </div>
 </div>
 
@@ -91,27 +103,6 @@
         var elm = $('a[href="'+base_url_js+'<?= $this->uri->segment(1).'/'.$this->uri->segment(2); ?>"]');
         elm.addClass('active-left-menu');
         elm.parent().parent().addClass('in');
-
-
-
-
-        //var elm2 = $('#"'+base_url_js+'agregator/<?//= $this->uri->segment(2); ?>//"]');
-
-
-        //console.log(elm.attr('id'));
-        //
-        //var IDMenu =  $('#data_');
-        //
-        //
-        //var MyMenu = JSON.parse('<?//= $MyMenu; ?>//');
-        //
-        //console.log(IDMenu);
-        //console.log(MyMenu);
-        //
-        //var v = ($.inArray(IDMenu,MyMenu)!=-1) ? '1' : '0';
-        //$('#dataView').val(v);
-
-        //         elm.attr('id', 'classAct');
 
 
     });
