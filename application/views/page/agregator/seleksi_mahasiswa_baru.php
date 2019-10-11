@@ -256,6 +256,7 @@
             $('#listData').empty();
 
             if(jsonResult.length>0){
+                var arr_total = [0,0,0,0,0,0,0];
                 $.each(jsonResult,function (i,v) {
 
                     var btnAction = '<div class="btn-group">' +
@@ -283,8 +284,26 @@
                         '<td>'+checkValue(v.Transfer2)+'</td>' +
                         '<td>'+btnAction+'</td>' +
                         '</tr>');
+
+                    arr_total[0] = parseInt(arr_total[0]) + parseInt(checkValue(v.Capacity));
+                    arr_total[1] = parseInt(arr_total[1]) + parseInt(checkValue(v.Registrant));
+                    arr_total[2] = parseInt(arr_total[2]) + parseInt(checkValue(v.PassSelection));
+                    arr_total[3] = parseInt(arr_total[3]) + parseInt(checkValue(v.Regular));
+                    arr_total[4] = parseInt(arr_total[4]) + parseInt(checkValue(v.Transfer));
+                    arr_total[5] = parseInt(arr_total[5]) + parseInt(checkValue(v.Regular2));
+                    arr_total[6] = parseInt(arr_total[6]) + parseInt(checkValue(v.Transfer2));
+
                 });
 
+                var AddhtmlBody = '<tr>'+
+                                '<td colspan = "2"><label>Total</label></td>';
+
+                for (var i = 0; i < arr_total.length; i++) {
+                   AddhtmlBody += '<td>'+arr_total[i]+'</td>';
+                }
+                AddhtmlBody += '<td></td>'; // col action
+                AddhtmlBody += '</tr>';
+                $('#listData').append(AddhtmlBody);
                 passToExcel = jsonResult;
             }
 

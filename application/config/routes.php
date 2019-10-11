@@ -1328,6 +1328,9 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 $route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
+$route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
+$route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
@@ -1414,7 +1417,7 @@ $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_ek
 $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
-$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+//$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
 $route['agregator/excel-kecukupan-dosen'] = 'c_save_to_excel/excel_kecukupan_dosen';
 

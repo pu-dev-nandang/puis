@@ -25,7 +25,7 @@
 
     <div class="col-md-4">
         <hr/>
-        <div class="panel panel-primary">
+        <div class="">
             <div class="panel-body" style="min-height: 100px;">
 
                 <div style="text-align: left;">
@@ -123,6 +123,13 @@
                         </td>
                     </tr>
                     <tr>
+                        <th>Nationality</th>
+                        <th>:</th>
+                        <td>
+                            <select name="" id="formNationality" class="form-control"></select>
+                        </td>
+                    </tr>
+                    <tr>
                         <th>Jacket</th>
                         <th>:</th>
                         <td>
@@ -137,12 +144,6 @@
                         </td>
                     </tr>
                 </table>
-
-                <div style="text-align: right;">
-                    <hr/>
-                    <button class="btn btn-success" id="btnSaveBiodata"> Save</button>
-                </div>
-
             </div>
         </div>
 
@@ -150,7 +151,7 @@
 
     <div class="col-md-4">
         <hr/>
-        <div class="panel panel-primary">
+        <div class="">
             <div class="panel-body" style="min-height: 100px;">
 
                 <div style="text-align: left;">
@@ -201,6 +202,18 @@
                         </td>
                     </tr>
                     <tr style="background: #fba94314">
+                        <th>Tanggal Masuk </th>
+                        <th>:</th>
+                        <td>
+                            <div>
+                                <span class="btn btn-warning setTglMasukToNull">Set To Null</span>
+                            </div>
+                            <br/>
+                            <input class="form-control hide" id="formTglMasukValue" readonly>
+                            <input class="form-control formBiodata" data-desc="bio" id="formTglMasuk">
+                        </td>
+                    </tr>
+                    <tr style="background: #fba94314">
                         <th>Graduation Date </th>
                         <th>:</th>
                         <td>
@@ -234,7 +247,7 @@
 
     <div class="col-md-4">
         <hr/>
-        <div class="panel panel-primary">
+        <div class="">
             <div class="panel-body" style="min-height: 100px;">
 
                 <div style="text-align: left;">
@@ -371,14 +384,36 @@
 
 
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="thumbnail" style="padding: 15px;">
+            <div style="text-align: right;">
+                <button class="btn btn-success btn-lg" id="btnSaveBiodata"> Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 <?php 
     // echo date('Y', strtotime('2017-09-10'));
     
  ?>
 <script>
+    var Arr_nationality = <?php echo $Arr_nationality; ?>;
     $(document).ready(function () {
         loadDataStd();
     });
+
+    function LoadNationality(selectedvalue = '001')
+    {
+       var selector = $('#formNationality');
+       selector.empty();
+       for (var i = 0; i < Arr_nationality.length; i++) {
+            var selected = (Arr_nationality[i].ctr_code == selectedvalue) ? 'selected' : '';
+            selector.append(
+                '<option value = "'+Arr_nationality[i].ctr_code+'" '+selected+' >'+Arr_nationality[i].ctr_name+'</option>'
+                );
+        } 
+    }
 
     $(document).off('click', '.setGraduationDateToNull').on('click', '.setGraduationDateToNull',function(e) {
         $('#formDateOfGraduationValue').val('');
@@ -388,6 +423,11 @@
     $(document).off('click', '.setYudisiumDateToNull').on('click', '.setYudisiumDateToNull',function(e) {
         $('#formDateOfYudisiumValue').val('');
         $('#formDateOfYudisium').val('');
+    })
+
+    $(document).off('click', '.setTglMasukToNull').on('click', '.setTglMasukToNull',function(e) {
+        $('#formTglMasukValue').val('');
+        $('#formTglMasuk').val('');
     })
 
     $('#btnSaveBiodata').click(function () {
@@ -400,6 +440,8 @@
         if(formNPM!='' && formNPM!=null
             && formName!='' && formName!=null
             && formEmailPU!='' && formEmailPU!=null){
+
+            formName = ucwords(formName);
 
             loading_buttonSm('#btnSaveBiodata');
             $('.formBiodata').prop('disabled',true);
@@ -422,6 +464,13 @@
             if (formDateOfYudisiumValue.trim() == '' )  {
                 formDateOfYudisiumValue = null;
             }
+
+            var formTglMasukValue = $('#formTglMasukValue').val();
+            if (formTglMasukValue.trim() == '' )  {
+                formTglMasukValue = null;
+            }
+
+            var formNationality = $('#formNationality option:selected').val();
 
             var data = {
                 action : 'updateBiodataStudent',
@@ -447,6 +496,10 @@
                     Access_Card_Number : formAcc,
                     GraduationDate : formDateOfGraduationValue,
                     YudisiumDate : formDateOfYudisiumValue,
+                    Tgl_msk : formTglMasukValue,
+                },
+                dataTAStd : {
+                    NationalityID : formNationality,
                 }
             };
 
@@ -526,6 +579,9 @@
                 $('#formMentorAcademic').val(d.Mentor);
                 $('#formMentorEmail').val(d.MentorEmailPU);
 
+                //--- Nationality --
+                LoadNationality(d.NationalityID);
+
                 $( "#formDateOfBirth" )
                     .datepicker({
                         showOtherMonths:true,
@@ -547,6 +603,26 @@
                         }
                     });
                 $('#formDateOfBirth').datepicker('setDate',new Date(d.DateOfBirth));
+
+                $( "#formTglMasuk" )
+                    .datepicker({
+                        showOtherMonths:true,
+                        autoSize: true,
+                        dateFormat: 'dd MM yy',
+                        onSelect : function () {
+                            var data_date = $(this).val().split(' ');
+                            var CustomMoment = moment(data_date[2]+'-'+(parseInt(convertDateMMtomm(data_date[1])) + 1)+'-'+data_date[0]).format('YYYY-MM-DD');
+                            var Desc = $(this).attr('data-desc');
+
+                            var elm = '#formTglMasukValue';
+                            $(elm).val(CustomMoment);
+                        }
+                    });
+
+                if (d.Tgl_msk != '' && d.Tgl_msk != null) {
+                    $('#formTglMasuk').datepicker('setDate',new Date(d.Tgl_msk));
+                }
+
 
                 $( "#formDateOfGraduation" )
                     .datepicker({
