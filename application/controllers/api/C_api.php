@@ -5625,6 +5625,21 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']=='resetPassword2BirthDay'){
+                $PasswordOld = $data_arr['PasswordOld'];
+                $NIP = $data_arr['NIP'];
+                $dataUpd = array(
+                    'Password_Old' => md5($PasswordOld),
+                    'Status' => '-1'
+                );
+
+                $this->db->where('NIP', $NIP);
+                $this->db->update('db_employees.employees',$dataUpd);
+
+                return print_r(1);
+
+            }
+
             else if($data_arr['action']=='UpdateCertificateLec'){
 
                 $ID = $data_arr['ID'];
@@ -9196,6 +9211,8 @@ class C_api extends CI_Controller {
 
             $token = $this->jwt->encode($dataToken,'UAP)(*');
 
+            $DateOfBirth = ($row['DateOfBirth']!='' && $row['DateOfBirth']!=null) ? $row['DateOfBirth'] : '';
+            $disDateOfBirth = ($row['DateOfBirth']!='' && $row['DateOfBirth']!=null) ? '' : 'disabled';
 
 
             $btnAct = '<div class="btn-group">
@@ -9203,7 +9220,8 @@ class C_api extends CI_Controller {
                             <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password (Send Email)</a></li>
+                            <li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>
                             <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
                             <li><a class = "PrintIDCard" href="javascript:void(0);" type = "employees" data-npm="'.$row['NIP'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImg.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
                           </ul>
