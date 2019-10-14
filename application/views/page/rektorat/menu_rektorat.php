@@ -10,6 +10,9 @@
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/sk_masuk_mahasiswa'); ?>">SK Masuk Mahasiswa</a>
                 </li>
+                <li>
+                    <a href="<?php echo base_url('rectorat/master_data/credit_type_courses'); ?>">Type Credit Course MK</a>
+                </li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                 <?php echo $page; ?>
@@ -21,7 +24,7 @@
 <script>
     $(document).ready(function () {
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['config_jabatan_per_sks','sk_masuk_mahasiswa'];
+        var arrMenu = ['config_jabatan_per_sks','sk_masuk_mahasiswa','credit_type_courses'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
     });
 </script>
