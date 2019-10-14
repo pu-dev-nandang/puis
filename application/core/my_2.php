@@ -261,26 +261,26 @@ abstract class Admission_Controler extends Globalclass{
 
 
     // overide function
-    // public function template($content)
-    // {
+    public function template($content)
+    {
 
-    //     $data['include'] = $this->load->view('template/include','',true);
+        $data['include'] = $this->load->view('template/include','',true);
 
-    //     $data['header'] = $this->menu_header();
-    //     $data['navigation'] = $this->menu_navigation();
-    //     $data['crumbs'] = $this->crumbs();
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
 
-    //     $data['content'] = $content;
-    //     $this->load->view('template/template',$data);
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
 
-    // }
+    }
 
-    // // overide function
-    // public function  menu_navigation(){
-    //     $data['departement'] = $this->__getDepartement();
-    //     $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
-    //     return $page;
-    // }
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+        return $page;
+    }
 
     public function auth_ajax()
     {
@@ -633,26 +633,26 @@ abstract class Purchasing_Controler extends Globalclass{
 
 
     // overide function
-    // public function template($content)
-    // {
+    public function template($content)
+    {
 
-    //     $data['include'] = $this->load->view('template/include','',true);
+        $data['include'] = $this->load->view('template/include','',true);
 
-    //     $data['header'] = $this->menu_header();
-    //     $data['navigation'] = $this->menu_navigation();
-    //     $data['crumbs'] = $this->crumbs();
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
 
-    //     $data['content'] = $content;
-    //     $this->load->view('template/template',$data);
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
 
-    // }
+    }
 
-    // // overide function
-    // public function  menu_navigation(){
-    //     $data['departement'] = $this->__getDepartement();
-    //     $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
-    //     return $page;
-    // }
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+        return $page;
+    }
 
     public function auth_ajax()
     {
@@ -759,26 +759,26 @@ abstract class It_Controler extends Globalclass{
 
 
     // overide function
-    // public function template($content)
-    // {
+    public function template($content)
+    {
 
-    //     $data['include'] = $this->load->view('template/include','',true);
+        $data['include'] = $this->load->view('template/include','',true);
 
-    //     $data['header'] = $this->menu_header();
-    //     $data['navigation'] = $this->menu_navigation();
-    //     $data['crumbs'] = $this->crumbs();
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
 
-    //     $data['content'] = $content;
-    //     $this->load->view('template/template',$data);
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
 
-    // }
+    }
 
-    // // overide function
-    // public function  menu_navigation(){
-    //     $data['departement'] = $this->__getDepartement();
-    //     $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
-    //     return $page;
-    // }
+    // overide function
+    public function  menu_navigation(){
+        $data['departement'] = $this->__getDepartement();
+        $page = $this->load->view('page/'.$data['departement'].'/menu_navigation','',true);
+        return $page;
+    }
 
     public function auth_ajax()
     {
