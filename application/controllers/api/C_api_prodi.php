@@ -212,8 +212,6 @@ class C_api_prodi extends CI_Controller {
         else if($data_arr['action']=='readProdiTexting'){
 
             $Type = $data_arr['Type'];
-
-
             $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
                                                 FROM db_prodi.prodi_texting pt 
                                                 LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
@@ -230,7 +228,6 @@ class C_api_prodi extends CI_Controller {
         else if($data_arr['action']=='readDataProdiTexting'){
             $Type = $data_arr['Type'];
             $LangID = $data_arr['LangID'];
-
 
             $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp 
                                                 FROM db_prodi.prodi_texting pt 
@@ -254,6 +251,41 @@ class C_api_prodi extends CI_Controller {
         }
 
         // Add by yamin =====
+        else if($data_arr['action']=='loadDataLecturer'){
+            // $Type = $data_arr['Type'];
+            // $LangID = $data_arr['LangID'];
+
+            // $data = $this->db->query('SELECT pt.* FROM db_prodi.lecturer 
+            //                           WHERE pt.ProdiID = "'.$prodi_active_id.'" ')->result_array();
+            $data = $this->db->get_where('db_prodi.lecturer',array(
+                'ProdiID' => $prodi_active_id,
+                
+            ))->result_array();
+
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='saveDataLecturer'){
+
+            if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/Lecturer');
+                $upload = json_encode($upload); 
+                // convert file
+                $upload = json_decode($upload,true);
+                $upload = $upload[0];
+
+                $dataForm = (array) $data_arr['dataForm'];
+                
+                $dataForm['ProdiID'] = $prodi_active_id;
+                $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                $dataform['CreateBy'] = $this->session->userdata('NIP');
+                $dataForm['Photo']= $upload;
+                $this->db->insert('db_prodi.lecturer',$dataForm);
+            }
+
+            return print_r(1);
+        }
         else if($data_arr['action']=='saveDataTestimonials'){
 
             if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
@@ -336,6 +368,66 @@ class C_api_prodi extends CI_Controller {
 
             return print_r(1);
         }
+        else if($data_arr['action']=='saveDataPhoto'){
+            if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/Kaprodi');
+                $upload = json_encode($upload);
+                // convert file
+                $upload = json_decode($upload,true);
+                $upload = $upload[0];
+
+                $dataForm = $data_arr;
+
+                // check action insert or update
+                $sql = 'select ps.*, ps.Photo,ps.IDProdiTexting from db_prodi.prodi_sambutan as ps  join db_prodi.prodi_texting as pt on pt.ID = ps.IDProdiTexting
+                    where pt.LangID = ? and pt.Type = ?
+                ';
+
+                $LangID = $dataForm['LangID'];
+                $Type = $dataForm['Type'];
+                $query = $this->db->query($sql, array($LangID,$Type))->result_array();
+                if (count($query) == 0) { // insert
+                    $datasave['IDProdiTexting'] = $data_arr['ID'];
+                    $datasave['Photo'] = $upload;
+                    $datasave['ProdiID'] = $prodi_active_id;
+                    $this->db->insert('db_prodi.prodi_sambutan',$datasave);
+                   
+                }
+                else
+                {
+                    // update student_testimonials
+                    // action photo delete dulu file fotonya kalau dia upload foto, baru insert
+
+                    $arr_file =  $query[0]['Photo'];
+                    $path = './images/Kaprodi/'. $arr_file;
+
+                      if(is_file($path)){
+                        $IDProdiTexting = $query[0]['ID'];
+                        $dataupdate['Photo'] = $upload;
+                        $this->db->where('ID',$IDProdiTexting);
+                        $this->db->update('db_prodi.prodi_sambutan',$dataupdate);
+                        unlink($path);
+                      }
+                       
+                }
+
+            }
+
+            return print_r(1);
+        }
+        else if($data_arr['action']=='readProdiPhoto'){
+            $Type = $data_arr['Type'];
+            $LangID = $data_arr['LangID'];
+
+            $data = $this->db->query('SELECT pt.*,ps.Photo,ps.IDProdiTexting 
+                                                FROM db_prodi.prodi_texting pt 
+                                                INNER join db_prodi.prodi_sambutan ps on ps.IDProdiTexting = pt.ID
+                                                ')->result_array();
+
+            return print_r(json_encode($data));
+
+                
+        }
         else if($data_arr['action']=='saveProdiCall'){
             $dataForm = $data_arr;
             $prodi_texting = $dataForm['prodi_texting'];
@@ -388,7 +480,6 @@ class C_api_prodi extends CI_Controller {
 
              $data = $this->db->get('db_prodi.partner')->result_array();
 
-
             return print_r(json_encode($data));
 
         }
@@ -433,6 +524,21 @@ class C_api_prodi extends CI_Controller {
             return print_r(1);
         }
 
+    }
+
+    function getProdiLecture(){
+        $prodi_active_id = $this->session->userdata('prodi_active_id');
+        $key = $this->input->post('key');
+        $data = 'SELECT em.NIDN, em.Name, em.Gender, em.PositionMain, em.ProdiID, ps.NameEng AS         ProdiNameEng
+                FROM db_employees.employees em
+                INNER JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                WHERE (em.PositionMain = "14.6" )  AND ( ';
+        $data.= ' em.NIP LIKE "'.$key.'%" ';
+        $data.= ' OR em.Name LIKE "'.$key.'%" ';
+        $data.= ') ORDER BY Name ASC';
+
+        $query = $this->db->query($data)->result_array();
+        return print_r(json_encode($query));
     }
 
     function getContentProdi(){

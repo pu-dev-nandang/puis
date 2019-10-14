@@ -1,5 +1,10 @@
 <div id="sidebar" class="sidebar-fixed">
-    <div id="sidebar-content" class="hide">
+
+<?php 
+    $ServerName = $_SERVER['SERVER_NAME'];
+?>
+
+    <div id="sidebar-content" class="<?= ($ServerName=='localhost') ? '' : 'hide' ?>" >
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- <li  class="dropdown <?php if($this->uri->segment(3,0)=='dashboard'){echo "current";} ?>">
@@ -64,21 +69,21 @@
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='struktur'){echo "current";} ?>">
-                                <a href="<?php echo base_url('sambutan'); ?>">
+                                <a href="<?php echo base_url('prodi/about/sambutan'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Strukture Organisasi
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='dosen'){echo "current";} ?>">
-                                <a href="<?php echo base_url('dosen'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='lecturer'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/about/lecturer'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Lecturer
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='fasilitas'){echo "current";} ?>">
-                                <a href="<?php echo base_url('fasilitas'); ?>">
+                                <a href="<?php echo base_url('prodi/about/fasilitas'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Amenities
+                                Facilities
                                 </a>
                         </li>
                         

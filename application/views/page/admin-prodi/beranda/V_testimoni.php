@@ -172,7 +172,7 @@
         // alert(NPM);
         var LangID = $('#LangID').val();
         var Description = $('#Description').val();
-        
+        var thisbtn= $(this);
         var form_data = new FormData();
         var find = true;
 
@@ -201,50 +201,51 @@
                 }
             })
             if (find) { // validasi file berhasil
-                    // console.log('asd');
-                      if ( $( '#'+'uploadFile').length ) { // jika upload file
-                      var UploadFile = $('#'+'uploadFile')[0].files;
-                        for(var count = 0; count<UploadFile.length; count++)
-                        {
-                         form_data.append("uploadFile[]", UploadFile[count]);
-                        }
-                      }
-            var data = {
-              action : 'saveDataTestimonials',
-              prodi_texting : prodi_texting,
-              student_testimonials : student_testimonials,
-            };
-          
-            loading_button('#btnSave');
-            var token = jwt_encode(data,'UAP)(*');
-            form_data.append('token',token);
-            var url = base_url_js+'api-prodi/__crudDataProdi';
-            $.ajax({
-              type:"POST",
-              url:url,
-              data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-              contentType: false,       // The content type used when sending data to the server.
-              cache: false,             // To unable request pages to be cached
-              processData:false,
-              dataType: "json",
-              success:function(data)
-              {
-                loadDataTestimonials();
-                toastr.success('Data saved','Success');
-                $('#btnSave').html('save');
-                $('#btnSave').prop('disabled',false);
+                // console.log('asd');
+                if ( $( '#'+'uploadFile').length ) { // jika upload file
+                var UploadFile = $('#'+'uploadFile')[0].files;
+                  for(var count = 0; count<UploadFile.length; count++)
+                  {
+                   form_data.append("uploadFile[]", UploadFile[count]);
+                  }
+                }
+                
+                var data = {
+                    action : 'saveDataTestimonials',
+                    prodi_texting : prodi_texting,
+                    student_testimonials : student_testimonials,
+                };
+              
+                loading_button('#btnSave');
+                var token = jwt_encode(data,'UAP)(*');
+                form_data.append('token',token);
+                var url = base_url_js+'api-prodi/__crudDataProdi';
+                $.ajax({
+                  type:"POST",
+                  url:url,
+                  data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+                  contentType: false,       // The content type used when sending data to the server.
+                  cache: false,             // To unable request pages to be cached
+                  processData:false,
+                  dataType: "json",
+                  success:function(data)
+                  {
+                    loadDataTestimonials();
+                    toastr.success('Data saved','Success');
+                    $('#btnSave').html('save');
+                    $('#btnSave').prop('disabled',false);
 
-              },
-              error: function (data) {
-                 toastr.error('Form required','Error');
-                 thisbtn.prop('disabled',false).html('Save');
+                  },
+                  error: function (data) {
+                     toastr.error('Form required','Error');
+                     thisbtn.prop('disabled',false).html('Save');
+                  }
+                })
               }
-            })
-          }
         }
     });
 
-    function file_validation2(ev,TheName = '')
+  function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;
       var error = '';
@@ -287,26 +288,7 @@
           //return false;
          }
 
-                
-        // oFReader.onload = function (e) { //max widht height
-
-        //     var image = new Image();
-
-        //     image.src = e.target.result;
-        //     image.onload = function () {
-
-        //         var height = this.height;
-        //         var width = this.width;
-        //         console.log(this);
-        //         if ((height == 500 ) && (width == 1920 )) {
-        //             msgStr += TheName + 'Height and Width must not exceed 1920*500.';
-        //             return false;
-        //         }else{
-        //           return true;
-        //         }
-                
-        //     };
-        // }
+       
          
         }
       }
