@@ -80,7 +80,8 @@
                     ?>
                     <?php $uriSubMenu1 = $SubMenu1_arr[0]['Submenu'][0]['Slug'] ?>
                     <?php $uriSubMenu1 = explode('/', $uriSubMenu1)  ?>
-                    <?php if (array_key_exists(1, $uriSubMenu1)): ?>
+                    <?php //echo json_encode($uriSubMenu1) ?>
+                    <?php if (array_key_exists(2, $uriSubMenu1)): ?>
                         <?php $uriSubMenu1 = $uriSubMenu1[1]  ?>
                         <li segment2 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(2)==$uriSubMenu1){echo "current ".$open;} ?>">
                             <a href="<?php echo $a = ($open == 'open') ? '#' : $uri ?>">
@@ -158,8 +159,10 @@
                             <?php endif ?>
                         </li>     
                     <?php else: ?>
-                        <?php $uriSubMenu1 = $uriSubMenu1[0]  ?>
-                        <li segment1 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(1)==$uriSubMenu1){echo "current ";} ?>">
+                        <?php //echo json_encode($uriSubMenu1) ?>
+                        <?php $uri1 = $uriSubMenu1[1];   ?>
+                        <?php $uriSubMenu1 = $uriSubMenu1[0].'/'.$uriSubMenu1[1]  ?>
+                        <li segment1 = "<?php echo $uriSubMenu1 ?>" class="<?php if($this->uri->segment(2)==$uri1){echo "current ";} ?>">
                             <a href="<?php echo base_url($uriSubMenu1); ?>">
                                 <i class="<?php echo ($getData[$i]['Menu'] == '' || $getData[$i]['Menu'] == null) ? 'fa fa-globe' :  $getData[$i]['Icon'] ?>" aria-hidden="true"></i>
                                     <?php echo $getData[$i]['Menu'] ?>
@@ -172,6 +175,7 @@
 
              ?>
         </ul>
+
         <div class="sidebar-widget align-center">
             <div class="btn-group" data-toggle="buttons" id="theme-switcher">
                 <label class="btn active">
@@ -188,6 +192,6 @@
 </div>
 <!-- /Sidebar -->
 <?php 
-$this->m_menu->checkAuth_user('db_purchasing');
+$this->m_menu2->checkAuth_user('db_purchasing');
  ?>
 

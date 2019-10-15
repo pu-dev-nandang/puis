@@ -9,10 +9,11 @@ class MY_Controller extends CI_Controller {
 
         if($this->session->userdata('loggedIn')){
             $departement = $this->__getDepartement();
+            $this->load->model('master/m_master');
+            $this->load->model('m_menu');
+            $this->load->model('m_menu2');
             // define config Virtual Account
             if (!defined('VA_client_id')) {
-                $this->load->model('master/m_master');
-                $this->load->model('m_menu');
                 $getCFGVA = $this->m_master->showData_array('db_va.cfg_bank');
                 define('VA_client_id',$getCFGVA[0]['client_id'] ,true);
                 define('VA_secret_key',$getCFGVA[0]['secret_key'] ,true);
@@ -105,7 +106,6 @@ abstract class Globalclass extends MyAbstract{
 
 
     protected function menu_header(){
-        $this->load->model('master/m_master');
 
         $nav_departement['departement'] = $this->__getDepartement();
         $data['page_departement'] = $this->load->view('template/navigation_departement',$nav_departement,true);
@@ -238,7 +238,6 @@ abstract class Admission_Controler extends Globalclass{
 
     private function GetNameMenu()
     {
-        $this->load->model('master/m_master');
         $currentURL = current_url();
         $Slug = str_replace(serverRoot.'/', '', $currentURL);
         $get = $this->m_master->caribasedprimary('db_admission.cfg_sub_menu','Slug',$Slug);
@@ -305,7 +304,6 @@ abstract class Finnance_Controler extends Globalclass{
     public function get_PolicySYS()
     {
         if (!$this->session->userdata('finance_auth_Policy_SYS')) {
-            $this->load->model('master/m_master');
             $get = $this->m_master->showData_array('db_finance.cfg_policy_sys');
             $this->session->set_userdata('finance_auth_Policy_SYS',$get[0]['VA_active']);
         }
@@ -322,7 +320,6 @@ abstract class Vreservation_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
         $this->load->model('vreservation/m_reservation');
         if (!$this->session->userdata('auth_vreservation_sess')) {
             $this->getAuthVreservation();
@@ -368,7 +365,6 @@ abstract class Vreservation_Controler extends Globalclass{
     private function getAuthVreservation()
     {
         $data = array();
-        $this->load->model('master/m_master');
         $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_reservation');
         $data_sess = array();
         if (count($getDataMenu) > 0) {
@@ -418,7 +414,6 @@ abstract class Vreservation_Controler extends Globalclass{
         $base_url = base_url();
         $currentURL = current_url();
         $getURL = str_replace($base_url,"",$currentURL);
-        $this->load->model('master/m_master');
         $chk = $this->m_reservation->chkAuthDB_Base_URL_vreservation($getURL);
 
         if (!$this->input->is_ajax_request()) {
@@ -450,7 +445,6 @@ abstract class Budgeting_Controler extends Globalclass{
         $this->load->model('budgeting/m_budgeting');
         $this->load->model('budgeting/m_global');
         $this->load->model('budgeting/m_pr_po');
-        $this->load->model('master/m_master');
         $this->load->model('budgeting/m_spb');
 
         $this->session->unset_userdata('auth_budgeting_sess');
@@ -551,7 +545,6 @@ abstract class Budgeting_Controler extends Globalclass{
     public function groupBYMenu_sess()
     {
         $DataDB = $this->session->userdata('menu_budgeting_sess');
-        $this->load->model('master/m_master');
         $arr = array();
         for ($i=0; $i < count($DataDB); $i++) {
             $submenu1 = $this->m_budgeting->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_budgeting');
@@ -587,7 +580,6 @@ abstract class Purchasing_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
 
         // add session department budgeting
         $PositionMain = $this->session->userdata('PositionMain');
@@ -596,34 +588,7 @@ abstract class Purchasing_Controler extends Globalclass{
         // adding menu department
         $IDDepartementPUBudget= ($PositionMain['IDDivision']== 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$PositionMain['IDDivision']; 
         $this->session->set_userdata('IDDepartementPUBudget',$IDDepartementPUBudget);
-
-        // $this->load->model('budgeting/m_budgeting');
-        // check user auth
-        if (!$this->session->userdata('purchasing_sess')) {
-            $check = $this->authPurchasing();
-            if (!$check) {
-                // not authorize
-                redirect(base_url().'dashboard');
-            }
-            else
-            {
-                if (!$this->session->userdata('auth_purchasing_sess')) {
-                    $this->getAuthSession();
-                }
-            }
-        }
-    }
-
-    private function authPurchasing()
-    {
-        $NIP = $this->session->userdata('NIP');
-        $getData = $this->m_master->getUserSessAuth($NIP,4);
-        if (count($getData) > 0) {
-            $this->session->set_userdata('purchasing_sess',1);
-            return true;
-        }
-
-        return false;
+        $this->m_menu2->set_model('purchasing_sess','auth_purchasing_sess','menu_purchasing_sess','menu_purchasing_grouping','db_purchasing');
     }
 
     public function temp($content)
@@ -659,44 +624,6 @@ abstract class Purchasing_Controler extends Globalclass{
         if (!$this->input->is_ajax_request()) {
             exit('No direct script access allowed');
         }
-    }
-
-    public function getAuthSession()
-    {
-        $data = array();
-        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_purchasing');
-        $data_sess = array();
-        if (count($getDataMenu) > 0) {
-            $this->session->set_userdata('auth_purchasing_sess',1);
-            $this->session->set_userdata('menu_purchasing_sess',$getDataMenu);
-            $this->session->set_userdata('menu_purchasing_grouping',$this->groupBYMenu_sess());
-        }
-    }
-
-    public function groupBYMenu_sess()
-    {
-        $DataDB = $this->session->userdata('menu_purchasing_sess');
-        $arr = array();
-        for ($i=0; $i < count($DataDB); $i++) {
-            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_purchasing');
-            $arr2 = array();
-            for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_purchasing',$DataDB[$i]['ID_menu']);
-                $arr2[] = array(
-                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
-                    'Submenu' => $submenu2,
-                );
-            }
-
-            $arr[] =array(
-                'Menu' => $DataDB[$i]['Menu'],
-                'Icon' => $DataDB[$i]['Icon'],
-                'Submenu' => $arr2
-
-            );
-            
-        }
-        return $arr;
     }
 
 }
@@ -717,44 +644,24 @@ class Transaksi_Controler extends Purchasing_Controler{
 
 
 abstract class It_Controler extends Globalclass{
-
     public $data = array();
 
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
-        // check user auth
-        if (!$this->session->userdata('it_sess')) {
-            $check = $this->authIT();
-            if (!$check) {
-                // not authorize
-                redirect(base_url().'dashboard');
-            }
-            else
-            {
-                if (!$this->session->userdata('auth_it_sess')) {
-                    $this->getAuthSession();
-                }
-            }
-        }
-    }
-
-    private function authIT()
-    {
-        $NIP = $this->session->userdata('NIP');
-        $getData = $this->m_master->getUserSessAuth($NIP,12);
-        if (count($getData) > 0) {
-            $this->session->set_userdata('it_sess',1);
-            return true;
-        }
-
-        return false;
+        $this->m_menu2->set_model('it_sess','auth_it_sess','menu_it_sess','menu_it_grouping','db_it');
     }
 
     public function temp($content)
     {
         $this->template($content);
+    }
+
+    public function auth_ajax()
+    {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
     }
 
 
@@ -780,51 +687,6 @@ abstract class It_Controler extends Globalclass{
     //     return $page;
     // }
 
-    public function auth_ajax()
-    {
-        if (!$this->input->is_ajax_request()) {
-            exit('No direct script access allowed');
-        }
-    }
-
-    public function getAuthSession()
-    {
-        $data = array();
-        $getDataMenu = $this->m_master->getMenuGroupUser($this->session->userdata('NIP'),'db_it');
-        $data_sess = array();
-        if (count($getDataMenu) > 0) {
-            $this->session->set_userdata('auth_it_sess',1);
-            $this->session->set_userdata('menu_it_sess',$getDataMenu);
-            $this->session->set_userdata('menu_it_grouping',$this->groupBYMenu_sess());
-        }
-    }
-
-    public function groupBYMenu_sess()
-    {
-        $DataDB = $this->session->userdata('menu_it_sess');
-        $arr = array();
-        for ($i=0; $i < count($DataDB); $i++) {
-            $submenu1 = $this->m_master->getSubmenu1BaseMenu_grouping($DataDB[$i]['ID_menu'],'db_it');
-            $arr2 = array();
-            for ($k=0; $k < count($submenu1); $k++) { 
-                $submenu2 = $this->m_master->getSubmenu2BaseSubmenu1_grouping($submenu1[$k]['SubMenu1'],'db_it',$DataDB[$i]['ID_menu']);
-                $arr2[] = array(
-                    'SubMenu1' => $submenu1[$k]['SubMenu1'],
-                    'Submenu' => $submenu2,
-                );
-            }
-
-            $arr[] =array(
-                'Menu' => $DataDB[$i]['Menu'],
-                'Icon' => $DataDB[$i]['Icon'],
-                'Submenu' => $arr2
-
-            );
-            
-        }
-        return $arr;
-    }
-
 }
 
 
@@ -833,7 +695,6 @@ abstract class Prodi_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
         $this->load->model('prodi/m_prodi');
         if (!$this->session->userdata('prodi_get')) {
           $this->m_prodi->auth();  
@@ -848,7 +709,6 @@ abstract class Ga_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('master/m_master');
         $this->load->model('m_sendemail');
         $this->load->model('vreservation/m_reservation');
     }

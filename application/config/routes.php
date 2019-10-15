@@ -1885,6 +1885,19 @@ $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
 $route['it/admission/change-kode-formulir-online'] = 'page/it/c_it/change_kode_formulir_online';
 $route['it/admission/submit-change-kode-formulir-online'] = 'page/it/c_it/submit_change_kode_formulir_online';
 $route['it/admission/roolback-to-be-mhs'] = 'page/it/c_it/roolback_to_be_mhs';
+$route['it/menu/save_menu'] = 'page/it/menu_previleges/c_menu/save_menu';
+$route['it/menu_previleges/submenu'] = 'page/it/menu_previleges/c_menu/sub_menu';
+$route['it/menu/sub_menu/save'] = 'page/it/menu_previleges/c_menu/save_sub_menu';
+$route['it/menu_previleges/user_access'] = 'page/it/menu_previleges/c_menu/groupuser';
+$route['it/config/getAuthDataTables'] = 'page/it/menu_previleges/c_menu/getAuthDataTables';
+$route['it/config/authUser/cud'] = 'page/it/menu_previleges/c_menu/authUser_cud';
+$route['it/menu/group_previleges/crud'] = 'page/it/menu_previleges/c_menu/group_previleges_crud';
+$route['it/menu/group_previleges/get_submenu_by_menu'] = 'page/it/menu_previleges/c_menu/get_submenu_by_menu';
+$route['it/menu/group_previleges/save_submenu_by_menu'] = 'page/it/menu_previleges/c_menu/save_submenu_by_menu';
+$route['it/menu/group_previleges/rud'] = 'page/it/menu_previleges/c_menu/group_previleges_rud';
+$route['it/menu/changes-db'] = 'page/it/menu_previleges/c_menu/set_session_db';
+
+
 
 
 // end it
