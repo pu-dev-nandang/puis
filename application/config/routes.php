@@ -1181,7 +1181,9 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
-$route['__getContentProdi'] = 'api/c_api_prodi/getContentProdi';
+$route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
+$route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
+
 
 
 // ==== API Prodi yamin=== //

@@ -435,12 +435,38 @@ class C_api_prodi extends CI_Controller {
 
     }
 
-    function getContentProdi(){
-        $id = $this->input->get('id');
+    function getDataProdiTexting(){
 
-        $lang = $this->input->get('lang');
-        $content = $this->input->get('content');
+        $data_arr = $this->getInputToken2();
 
+        $LangCode = $data_arr['LangCode'];
+        $ProdiID = $data_arr['ProdiID'];
+        $Type = $data_arr['Type'];
+
+        $data = $this->db->query('SELECT pt.*, l.language FROM db_prodi.prodi_texting pt 
+                                            LEFT JOIN db_prodi.language l ON (l.ID = pt.LangID)
+                                            WHERE l.Code LIKE "'.$LangCode.'"
+                                             AND pt.ProdiID = "'.$ProdiID.'"
+                                             AND pt.Type = "'.$Type.'" ')->result_array();
+
+        return print_r(json_encode($data));
+
+    }
+
+    function getDetailProdi(){
+        $data_arr = $this->getInputToken2();
+        $LangCode = $data_arr['LangCode'];
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT ps.Name, ps.NameEng, em.Name AS Kaprodi, em.TitleAhead, em.TitleBehind  FROM db_academic.program_study ps 
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = ps.KaprodiID)
+                                            WHERE ps.ID = "'.$ProdiID.'" ')->result_array();
+
+        if(count($data)>0){
+            $data[0]['ProdiName'] = ($LangCode=='Ind') ? $data[0]['Name'] : $data[0]['NameEng'];
+        }
+
+        return print_r(json_encode($data));
     }
 
 
