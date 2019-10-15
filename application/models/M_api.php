@@ -807,7 +807,7 @@ class M_api extends CI_Model {
             $sqlIjazah = 'SELECT df.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
                         FROM db_employees.files AS df
                         JOIN db_employees.master_files AS mf ON df.TypeFiles = mf.ID
-                        JOIN db_research.university AS b ON (df.NameUniversity = b.Code_University)
+                        JOIN db_research.university AS b ON (df.NameUniversity = b.ID)
                         JOIN db_employees.major_programstudy_employees AS c ON (c.ID = df.Major)
                         JOIN db_employees.major_programstudy_employees AS d ON (d.ID = df.ProgramStudy)
                         WHERE mf.TypeFiles = "Ijazah'.$TAca.'" AND df.NIP = "'.$NIP.'"
@@ -825,7 +825,7 @@ class M_api extends CI_Model {
                     $sqlTranscript = 'SELECT df.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
                                     FROM db_employees.files AS df
                                     JOIN db_employees.master_files AS mf ON df.TypeFiles = mf.ID
-                                    JOIN db_research.university AS b ON (df.NameUniversity = b.Code_University)
+                                    JOIN db_research.university AS b ON (df.NameUniversity = b.ID)
                                     JOIN db_employees.major_programstudy_employees AS c ON (c.ID = df.Major)
                                     JOIN db_employees.major_programstudy_employees AS d ON (d.ID = df.ProgramStudy)
                                     WHERE mf.TypeFiles = "Transcript'.$TAca.'" AND df.NIP = "'.$NIP.'"
@@ -885,7 +885,7 @@ class M_api extends CI_Model {
 
              $sql = "SELECT a.ID, a.NIP, a.TypeAcademic, a.NameUniversity, a.TypeFiles, a.LinkFiles, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
                     FROM db_employees.files AS a
-                    LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.Code_University)
+                    LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.ID)
                     LEFT JOIN db_employees.major_programstudy_employees AS c ON (c.ID = a.Major)
                     LEFT JOIN db_employees.major_programstudy_employees AS d ON (d.ID = a.ProgramStudy)
                     WHERE a.NIP ='".$NIP."' AND a.TypeAcademic ='".$srata."' AND a.LinkFiles IS NOT NULL ";
@@ -898,7 +898,7 @@ class M_api extends CI_Model {
 
         $sql = "SELECT a.*, b.Name_University, c.Name_MajorProgramstudy AS NamaJurusan, d.Name_MajorProgramstudy AS NamaProgramStudi
                 FROM db_employees.files AS a
-                LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.Code_University)
+                LEFT JOIN db_research.university AS b ON (a.NameUniversity = b.ID)
                 LEFT JOIN db_employees.major_programstudy_employees AS c ON (c.ID = a.Major)
                 LEFT JOIN db_employees.major_programstudy_employees AS d ON (d.ID = a.ProgramStudy)
                 WHERE a.NIP= '".$NIP."' AND a.ID IN ('".$fileijazah."','".$filetranscripts."')  AND a.LinkFiles IS NOT NULL";

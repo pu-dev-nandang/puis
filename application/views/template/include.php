@@ -1083,7 +1083,7 @@
             $.get(url,function (data) {
                 var option = $(element);
                 for(var i=0; i<data.length; i++){
-                    option.append('<option value="'+data[i].Code_University+'">'+data[i].Name_University+'</option>')
+                    option.append('<option value="'+data[i].ID+'">'+data[i].Name_University+'</option>')
                         .val(selected).trigger('change');
             }
         });

@@ -94,7 +94,6 @@ $route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_s
 $route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
 $route['academic/semester-antara/setting/(:num)'] = 'page/academic/c_semester_antara/setting/$1';
 
-
 $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_antara/loadDetails/$1';
 
 

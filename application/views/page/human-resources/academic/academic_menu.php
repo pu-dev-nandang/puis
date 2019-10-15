@@ -183,16 +183,13 @@
     
     $(document).on('click','#btnSaveLembaga', function () {
 
-        var master_codeuniv = $('#master_codeuniv').val();
         var master_nameuniv = $('#master_nameuniv').val();
 
-            if(master_codeuniv!='' && master_codeuniv!=null &&
-                master_nameuniv!='' && master_nameuniv!=null){
+            if(master_nameuniv!='' && master_nameuniv!=null){
                 loading_button('#btnSaveLembaga');
 
                 var data = {
                     action : 'update_mstruniv',
-                    master_codeuniv : master_codeuniv,
                     master_nameuniv : master_nameuniv
                 };
 
@@ -207,7 +204,6 @@
 
                     } else {
 
-                        $('#master_codeuniv').val('');
                         $('#master_nameuniv').val('');
                         toastr.success('Data saved','Success');
                         loadDataUniversity();
@@ -229,7 +225,6 @@
             '                    <tr style="background: #20485A;color: #FFFFFF;">' +
             '                        <th style="width: 1%; text-align: center;";>No</th>' +
             '                        <th style="width: 10%;text-align: center;">Name University</th>' +
-            //'                        <th style="width: 2%; text-align: center;"><i class="fa fa-cog"></i></th>' +
             '                    </tr>' +
             '                    </thead>' +
             '                   <tbody id="listData"></tbody>' +
@@ -292,10 +287,6 @@
         var body = '<div class="row table-responsive">' +
             '    <div class="col-md-5">' +
             '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="master_codeuniv" placeholder="Code University Dikti...">' +
-            '            </div>' +
             '            <div class="form-group">' +
             '                <input class="form-control" id="master_nameuniv" placeholder="Name University...">' +
             '            </div>' +
@@ -626,8 +617,9 @@
                         } 
                             setTimeout(function () {
                                $('#NotificationModal').modal('hide');
+                               window.location.href = '';
                                $('.menuDetails[data-page="academic_sratasatu"]').trigger('click');
-                               // window.location.href = '';
+                               
                             },1000);
                         });
                  }
