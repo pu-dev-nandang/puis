@@ -1202,6 +1202,7 @@ $route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
 $route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
 $route['prodi/about/mission'] =  'page/admin-prodi/beranda/c_home/mission';
 $route['prodi/about/lecturer'] =  'page/admin-prodi/beranda/c_home/lecturer';
+$route['prodi/about/facilities'] =  'page/admin-prodi/beranda/c_home/facilities';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//
