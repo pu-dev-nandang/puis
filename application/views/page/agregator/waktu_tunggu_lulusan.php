@@ -27,7 +27,7 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-            
+
         </div>
     </div>
 </div>
@@ -145,8 +145,8 @@
             '        <th>No</th>' +
             '        <th>Nama</th>' +
             '        <th>Yudisium</th>' +
-            '        <th>Tanggal Pekerjaan Perama</th>' +
-            '        <th>Waktu Tunggu <br/>(bulan)</th>' +
+            '        <th>Tanggal Pekerjaan Pertama</th>' +
+            '        <th>Waktu Tunggu <br/>(Bulan)</th>' +
             '    </tr>' +
             '    </thead><tbody>'+tr+'</tbody>' +
             '</table>');
