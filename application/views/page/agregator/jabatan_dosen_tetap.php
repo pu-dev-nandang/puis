@@ -36,8 +36,6 @@
 
         </div>
     </div>
-    <p style="color: orangered;">*) Sarjana : Guru Besar >= 15% , Score : 4 <br>
-       **) Vokasi : Lektor kepala >= 25%, Score : 4</p>
 </div>
 
 <script>

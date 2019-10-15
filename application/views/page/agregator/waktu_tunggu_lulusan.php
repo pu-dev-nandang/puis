@@ -27,9 +27,7 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-            <p style="color: orangered;">
-              *) Target Waktu tunggu lulusan <=6 bulan, Score = 4 <br>
-             **) Waktu Tunggu Lulusan = (Tanggal pertama bekerja - Tanggal Yudisium) , jika angka (-) menyatakan kondisi sudah bekerja/berwirausaha sebelum lulus. </p>
+
         </div>
     </div>
 </div>
@@ -82,11 +80,11 @@
 
 
                     var viewBL3 = (parseFloat(v['BL_'+Y3].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata.toFixed(2)+'</a>' : 0;
                     var viewBL2 = (parseFloat(v['BL_'+Y2].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata.toFixed(2)+'</a>' : 0;
                     var viewBL1 = (parseFloat(v['BL_'+Y1].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata+'</a>' : 0;
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata.toFixed(2)+'</a>' : 0;
 
 
                     var viewDess = (v.Description!=null && v.Description!='') ? v.Description : v.Name;
@@ -147,8 +145,8 @@
             '        <th>No</th>' +
             '        <th>Nama</th>' +
             '        <th>Yudisium</th>' +
-            '        <th>Tanggal Pekerjaan Perama</th>' +
-            '        <th>Waktu Tunggu <br/>(bulan)</th>' +
+            '        <th>Tanggal Pekerjaan Pertama</th>' +
+            '        <th>Waktu Tunggu <br/>(Bulan)</th>' +
             '    </tr>' +
             '    </thead><tbody>'+tr+'</tbody>' +
             '</table>');
@@ -161,4 +159,3 @@
     });
 
 </script>
-

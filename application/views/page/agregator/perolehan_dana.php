@@ -258,7 +258,7 @@
         </div>
         <div class="row">
             <div class="col-md-12" style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-default" id="btnEditSumberDana"><i class="fa fa-edit"></i> Edit</button>
+                <button class="btn btn-default form-data-edit" id="btnEditSumberDana"><i class="fa fa-edit"></i> Edit</button>
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
 

@@ -20,9 +20,6 @@
             <div id= "content_dt">
 
             </div>
-            <p style="color: orangered;">
-                *) Judul dan kegiatan penelitian tercatat di unit pengelola perguruan tinggi
-            </p>
         </div>
     </div>
 

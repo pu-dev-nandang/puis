@@ -11,7 +11,6 @@ class C_dashboard extends Globalclass {
     {
         parent::template($content);
         $this->load->model('master/m_master');
-        $this->load->model('m_menu');
     }
 
     public function maintenance(){
@@ -33,12 +32,12 @@ class C_dashboard extends Globalclass {
                     $this->temp($content);
                 break;
                 case 4: // Purchasing
-                    $this->m_menu->set_model('purchasing_sess','auth_purchasing_sess','menu_purchasing_sess','menu_purchasing_grouping','db_purchasing');
+                    $this->m_menu2->set_model('purchasing_sess','auth_purchasing_sess','menu_purchasing_sess','menu_purchasing_grouping','db_purchasing');
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;
                 case 12: // IT
-                    $this->m_menu->set_model('it_sess','auth_it_sess','menu_it_sess','menu_it_grouping','db_it');
+                    $this->m_menu2->set_model('it_sess','auth_it_sess','menu_it_sess','menu_it_grouping','db_it');
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;

@@ -32,8 +32,6 @@
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NUP)</p>
-            <p style="color: orangered;">**) Total dosen tidak tetap seharusnya =< 10%, Score : 4</p>
         </div>
     </div>
 </div>

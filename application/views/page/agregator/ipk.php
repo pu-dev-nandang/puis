@@ -9,9 +9,6 @@
              <div id="viewTable"></div>
         </div>
     </div>
-    <p style="color: orangered;">
-        *) Rata-rata IPK harus >= 3.25 , Score : 4
-    </p>
 </div>
 
 <script>

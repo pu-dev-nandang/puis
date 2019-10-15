@@ -300,6 +300,7 @@ class C_save_to_excel2 extends CI_Controller
         $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
 
         $r++;
+        $Arr_total = [0,0,0,0,0,0,0];
         for ($i=0; $i < count($passToExcel); $i++) { 
             $st = 0;
             $No = $i + 1;
@@ -356,11 +357,24 @@ class C_save_to_excel2 extends CI_Controller
             $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Transfer2 );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
+            $Arr_total[0] = $Arr_total[0] + $Capacity;
+            $Arr_total[1] = $Arr_total[1] + $Registrant;
+            $Arr_total[2] = $Arr_total[2] + $PassSelection;
+            $Arr_total[3] = $Arr_total[3] + $Regular;
+            $Arr_total[4] = $Arr_total[4] + $Transfer;
+            $Arr_total[5] = $Arr_total[5] + $Regular2;
+            $Arr_total[6] = $Arr_total[6] + $Transfer2;
+
             $r++;
 
         }
 
-
+        $st = 2;
+        for ($i=0; $i <count($Arr_total) ; $i++) { 
+            $huruf = $this->m_master->HurufColExcelNumber($st);
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $Arr_total[$i] );    
+            $st++;
+        }
 
         $excel->setActiveSheetIndex(0);
 

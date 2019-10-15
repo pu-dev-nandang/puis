@@ -809,6 +809,7 @@ $route['api/__changeTahunAkademik'] = 'api/c_api/changeTahunAkademik';
 $route['api/__insertKurikulum'] = 'api/c_api/insertKurikulum';
 $route['api/__getKurikulumSelectOption'] = 'api/c_api/getKurikulumSelectOption';
 $route['api/__getKurikulumSelectOptionASC'] = 'api/c_api/getKurikulumSelectOptionASC';
+$route['api/__getKurikulumSelectOptionDSC'] = 'api/c_api/getKurikulumSelectOptionDSC';
 $route['api/__getStudentYear'] = 'api/c_api/getStudentYear';
 
 
@@ -1180,8 +1181,10 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
-$route['api-prodi/__getProdiLecture'] = 'api/c_api_prodi/getProdiLecture';
-$route['__getContentProdi'] = 'api/c_api_prodi/getContentProdi';
+
+$route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
+$route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
+
 
 
 // ==== API Prodi yamin=== //
@@ -1331,6 +1334,9 @@ $route['vreservation/loadScheduleEquipment'] = 'page/vreservation/c_global/loadS
 $route['rectorat/master_data/config_jabatan_per_sks'] = 'page/rektorat/c_config_jabatan_per_sks/config_jabatan_per_sks';
 $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/list_requestdocument';
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
+$route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
+$route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
 $route['api2/__getRequestdoc'] = 'api/c_api2/getrequestdocument';
@@ -1400,6 +1406,7 @@ $route['agregator/table-refrensi'] = 'page/agregator/c_agregator/table_refrensi'
 $route['agregator/waktu-tunggu-lulusan'] = 'page/agregator/c_agregator/waktu_tunggu_lulusan';
 $route['agregator/kesesuaian-bidang-kerja-lulusan'] = 'page/agregator/c_agregator/kesesuaian_bidang_kerja_lulusan';
 $route['agregator/kepuasan_pengguna_lulusan'] = 'page/agregator/c_agregator/kepuasan_pengguna_lulusan';
+$route['agregator/tempat_kerja_lulusan'] = 'page/agregator/c_agregator/tempat_kerja_lulusan';
 $route['agregator/buku-isbn-chapter'] = 'page/agregator/c_agregator/buku_isbn_chapter';
 $route['agregator/teknologi-produk-karya'] = 'page/agregator/c_agregator/teknologi_produk_karya';
 $route['agregator/hki-desain-produk'] = 'page/agregator/c_agregator/hki_desain_produk';
@@ -1417,7 +1424,7 @@ $route['agregator/excel_akreditasi_eksternal'] =  'c_save_to_excel/akreditasi_ek
 $route['agregator/excel-akreditasi-international'] =  'c_save_to_excel/akreditasi_international';
 $route['agregator/excel-audit-keuangan-eksternal'] =  'c_save_to_excel/excel_audit_keuangan_eksternal';
 $route['agregator/excel-kerjasama-perguruantinggi'] = 'c_save_to_excel/excel_kerjasama_perguruan_tinggi';
-$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
+//$route['agregator/excel-seleksi-mahasiswa-baru'] = 'c_save_to_excel/excel_seleksi_mahasiswa_baru';
 $route['agregator/excel-mahasiswa-asing'] = 'c_save_to_excel/excel_mahasiswa_asing';
 $route['agregator/excel-kecukupan-dosen'] = 'c_save_to_excel/excel_kecukupan_dosen';
 
@@ -1883,6 +1890,19 @@ $route['it/saveRuleUser'] = 'page/it/c_rule_service/saveRuleUser';
 $route['it/admission/change-kode-formulir-online'] = 'page/it/c_it/change_kode_formulir_online';
 $route['it/admission/submit-change-kode-formulir-online'] = 'page/it/c_it/submit_change_kode_formulir_online';
 $route['it/admission/roolback-to-be-mhs'] = 'page/it/c_it/roolback_to_be_mhs';
+$route['it/menu/save_menu'] = 'page/it/menu_previleges/c_menu/save_menu';
+$route['it/menu_previleges/submenu'] = 'page/it/menu_previleges/c_menu/sub_menu';
+$route['it/menu/sub_menu/save'] = 'page/it/menu_previleges/c_menu/save_sub_menu';
+$route['it/menu_previleges/user_access'] = 'page/it/menu_previleges/c_menu/groupuser';
+$route['it/config/getAuthDataTables'] = 'page/it/menu_previleges/c_menu/getAuthDataTables';
+$route['it/config/authUser/cud'] = 'page/it/menu_previleges/c_menu/authUser_cud';
+$route['it/menu/group_previleges/crud'] = 'page/it/menu_previleges/c_menu/group_previleges_crud';
+$route['it/menu/group_previleges/get_submenu_by_menu'] = 'page/it/menu_previleges/c_menu/get_submenu_by_menu';
+$route['it/menu/group_previleges/save_submenu_by_menu'] = 'page/it/menu_previleges/c_menu/save_submenu_by_menu';
+$route['it/menu/group_previleges/rud'] = 'page/it/menu_previleges/c_menu/group_previleges_rud';
+$route['it/menu/changes-db'] = 'page/it/menu_previleges/c_menu/set_session_db';
+
+
 
 
 // end it

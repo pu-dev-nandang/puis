@@ -12,7 +12,7 @@
 <div class="well">
     <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-3 form-data-edit">
 
             <div class="form-group">
                 <label>Jenis Penggunaan</label>
@@ -77,17 +77,36 @@
     </div>
 </div>
 
+<style>
+    .c-block {
+        cursor: text;
+        text-decoration: none !important;
+        color: #333333;
+    }
 
+    .c-block:hover {
+        color: #333333 !important;
+    }
+</style>
 
 <script>
 
     $(document).ready(function () {
+
+        window.act = "<?= $accessUser; ?>";
+        if(parseInt(act)<=0){
+            $('.form-data-edit').remove();
+        } else {
+
+        }
 
         loadSOPenggunaanDanaYear('filterYear');
 
         $('#formPrice').maskMoney({thousands:'.', decimal:',', precision:0,allowZero: true});
         $('#formPrice').maskMoney('mask', '9894');
         loadJenisDana();
+
+
 
         var firstLoad = setInterval(function (args) {
             var filterYear = $('#filterYear').val();
@@ -210,16 +229,23 @@
                     var jml_th2 = 0;
                     var jml_th1 = 0;
                     var jml_jml = 0;
+
+
+                    var class_block = (parseInt(act)<=0)? 'c-block' : '';
+
+
                     $.each(jsonResult,function (i,v) {
 
                         var jml = parseFloat(v.th3) + parseFloat(v.th2) + parseFloat(v.th1);
 
+
+
                         $('#loadListDana').append('<tr>' +
                             '<td>'+no+'</td>' +
                             '<td style="text-align: left;">'+v.Jenis+'</td>' +
-                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
-                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
-                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal '+class_block+'" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal '+class_block+'" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
+                            '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal '+class_block+'" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
                             '<td style="text-align: right;">'+formatRupiah(jml)+'</td>' +
                             '</tr>');
                         jml_th3 = jml_th3+ parseFloat(v.th3);
