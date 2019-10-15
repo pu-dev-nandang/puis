@@ -6400,11 +6400,10 @@ class C_api extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE ea.Name_University LIKE "%'.$search.'%"
-                OR ea.Code_University LIKE "%'.$search.'%" ';
+                $dataSearch = ' WHERE ea.Name_University LIKE "%'.$search.'%" ';
             }
 
-            $queryDefault = 'SELECT ea.ID, ea.Name_University, ea.Code_University FROM db_research.university ea '.$dataSearch;
+            $queryDefault = 'SELECT ea.ID, ea.Name_University FROM db_research.university ea '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -6431,7 +6430,7 @@ class C_api extends CI_Controller {
                                     </div>';
 
                 $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
-                $nestedData[] = '<div style="text-align:left;">'.$row['Code_University'].' - '.$row['Name_University'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row['Name_University'].'</div>';
                 //$nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
 
                 $data[] = $nestedData;
@@ -6448,12 +6447,11 @@ class C_api extends CI_Controller {
         }
         else if($data_arr['action']=='update_mstruniv'){
 
-            $master_codeuniv = $data_arr['master_codeuniv'];
+            //$master_codeuniv = $data_arr['master_codeuniv'];
             $master_nameuniv = ucwords($data_arr['master_nameuniv']);
 
             $dataAttdS = $this->db->query('SELECT * FROM db_research.university
-                                          WHERE Name_University = "'.$master_nameuniv.'"
-                                          OR Code_University = "'.$master_codeuniv.'" ')->result_array();
+                                          WHERE Name_University = "'.$master_nameuniv.'" ')->result_array();
 
             if(count($dataAttdS)>0){
                 return print_r(0);
@@ -6461,7 +6459,6 @@ class C_api extends CI_Controller {
             else {
 
                 $dataSave = array(
-                    'Code_University' => $master_codeuniv, 
                     'Name_University' => $master_nameuniv,
                     'UserCreate' => $IDuser
                 );
