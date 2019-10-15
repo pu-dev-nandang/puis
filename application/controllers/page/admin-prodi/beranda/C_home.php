@@ -21,7 +21,7 @@ class C_home extends Prodi_Controler {
 // ===== Slide ======
     function slide()
     {
-        // Database
+        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_slider',$data,true);
         parent::template($content);
@@ -71,7 +71,7 @@ class C_home extends Prodi_Controler {
 // ===== overview ======
     function overview()
     {
-        // Database
+        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/about/v_sambutan',$data,true);
         parent::template($content);
@@ -88,7 +88,7 @@ class C_home extends Prodi_Controler {
     }
 //    function whychoose()
 //    {
-//        // Database
+//        
 //        $data['department'] = parent::__getDepartement();
 //        $content = $this->load->view('page/'.$data['department'].'/beranda/v_why',$data,true);
 //        parent::template($content);
@@ -96,7 +96,7 @@ class C_home extends Prodi_Controler {
 // ===== Call to Action ======
     function calltoaction()
     {
-        // Database
+        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_call',$data,true);
         parent::template($content);
@@ -104,19 +104,27 @@ class C_home extends Prodi_Controler {
 // ===== Call to Action ======
     function testimoni()
     {
-        // Database
+        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_testimoni',$data,true);
         parent::template($content);
     }
-    // ===== Cliens ======
+// ===== Cliens ======
     function partner()
     {
-        // Database
+        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_partner',$data,true);
         parent::template($content);
     }
+// ===== lecturer ======
+    function lecturer()
+    {
+        
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/about/v_lecturer',$data,true);
+        parent::template($content);
+    }    
 
         
 }

@@ -1181,6 +1181,7 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
+
 $route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
 $route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
 
@@ -1203,6 +1204,7 @@ $route['prodi/beranda/partner'] =  'page/admin-prodi/beranda/c_home/partner';
 $route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
 $route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
 $route['prodi/about/mission'] =  'page/admin-prodi/beranda/c_home/mission';
+$route['prodi/about/lecturer'] =  'page/admin-prodi/beranda/c_home/lecturer';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//
