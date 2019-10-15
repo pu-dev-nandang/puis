@@ -37,9 +37,6 @@
                 </thead>
                 <tbody id="listTable"></tbody>
             </table>
-
-            <p style="color: orangered;">*) Dosen yang terhitung adalah dosen mempunyai (NIDN atau NIDK) dan all status <br>
-               **) Daftar dosen harus sesuai dengan data PD-DIKTI (pangkalan data pendidikan tinggi)</p>
         </div>
 
     </div>

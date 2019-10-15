@@ -18,9 +18,6 @@
 
 
         </div>
-        <p style="color: orangered;">
-            *) Akademik : minimal 0.05 % dari total mahasiswa aktif. (Nilai terbesar adalah tingkat internasional)
-        </p>
     </div>
 
 </div>

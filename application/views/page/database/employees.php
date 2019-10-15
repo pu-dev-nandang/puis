@@ -482,4 +482,39 @@
 
     });
 
+
+    $(document).on('click','.resetpassBirthDay',function () {
+
+        if(confirm('You are sure to reset your password ?')){
+            var date = $(this).attr('data-day');
+            var NIP = $(this).attr('data-nip');
+            if(date!=''){
+
+                var dataExp = date.split('-');
+                var DD = dataExp[2];
+                var MM = dataExp[1];
+                var YY = dataExp[0].substr(2,2);
+
+                var data = {
+                    action : 'resetPassword2BirthDay',
+                    NIP :  NIP,
+                    PasswordOld : DD+''+MM+''+YY
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudEmployees';
+
+                $.post(url,{token:token},function (result) {
+                    alert('Birthday : '+date+' | Password : '+DD+''+MM+''+YY);
+                    toastr.success('Data updated','Success');
+                });
+
+
+            } else {
+                toastr.warning('Date of birth not yet setting','Warning');
+            }
+        }
+
+    });
+
 </script>

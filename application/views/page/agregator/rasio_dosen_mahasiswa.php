@@ -44,18 +44,12 @@
                     <th>Prodi</th>
                     <th style="width: 15%;">Jumlah Dosen</th>
                     <th style="width: 15%;">Jumlah Mahasiswa</th>
+                    <th style="width: 15%;">Dosen : Mahasiswa</th>
                     <th style="width: 15%;">Jumlah Mahasiswa TA</th>
                 </tr>
                 </thead>
                 <tbody id="listData"></tbody>
             </table>
-
-            <p style="color: orangered;">
-                <br/>*) Mahasiswa yang terhitung adalah mahasiswa yang aktif (Tidak termasuk mahasiswa cuti / mangkir)
-                <br/>*) Dosen yang terhitung adalah semua dosen kontrak maupun tetap
-                <br/>*) Sarjana : Jumlah dosen tetap/ mahasiswa = 20 s/d 30 mahasiswa
-                <br/>*) Vokasi : Jumlah dosen tetap/ mahasiswa = 12 s/d 24 mahasiswa
-            </p>
         </div>
     </div>
 </div>
@@ -156,12 +150,16 @@
                             : v.dataMahasiwaTA.length;
 
 
+                        var Prefix = parseFloat(v.Lecturer_Sch_Fix.length);
+                        var rasioLec = (Prefix>0) ? parseFloat(v.Lecturer_Sch_Fix.length) / Prefix : 0;
+                        var rasioMhs = (Prefix>0) ? parseFloat(v.dataMahasiwa.length) / Prefix : 0;
 
                         $('#listData').append('<tr>' +
                             '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                             '<td style="text-align: left;">'+v.Name+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewLect+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewMhs+'</td>' +
+                            '<td style="border-left: 1px solid #ccc;">'+rasioLec.toFixed(2)+' : '+rasioMhs.toFixed(2)+'</td>' +
                             '<td style="border-left: 1px solid #ccc;">'+viewMhs_2+'</td>' +
                             '</tr>');
 
@@ -170,10 +168,15 @@
                         ds_x = ds_x + parseInt(v.dataMahasiwaTA.length);
                     });
 
+                    var PrefixTotal = parseFloat(ds);
+                    var TotalRata2Lec = (PrefixTotal>0)? parseFloat(ds) / PrefixTotal : 0;
+                    var TotalRata2Std = (PrefixTotal>0)? parseFloat(ds_c) / PrefixTotal : 0;
+
                     $('#listData').append('<tr>' +
                         '<th colspan="2">Jumlah</th>' +
                         '<th>'+ds+'</th>' +
                         '<th>'+ds_c+'</th>' +
+                        '<th>'+TotalRata2Lec.toFixed(2)+' : '+TotalRata2Std.toFixed(2)+'</th>' +
                         '<th>'+ds_x+'</th>' +
                         '</tr>');
 
@@ -204,11 +207,21 @@
 
                 var NUP = (v.NUP!='' && v.NUP!=null && v.NUP!=0 && v.NUP!='0') ? v.NUP : '-';
 
+                var StatusForlap = '<label style="color: red;">Belum di set</label>';
+                if(parseInt(v.StatusForlap)==1){
+                    StatusForlap = 'NIDN';
+                } else if(parseInt(v.StatusForlap)==2){
+                    StatusForlap = 'NIDK';
+                } else if(parseInt(v.StatusForlap)==0){
+                    StatusForlap = 'NUP';
+                }
+
                 tr = tr+'<tr>' +
                     '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                     '<td>'+NID+'</td>' +
                     '<td>'+NUP+'</td>' +
                     '<td style="text-align: left;">'+v.Name+'</td>' +
+                    '<td style="width: 1%;">'+StatusForlap+'</td>' +
                     '</tr>';
             });
         }
@@ -225,6 +238,7 @@
             '                <th style="width: 25%;">NIDN / NIDK</th>' +
             '                <th style="width: 25%;">NUP</th>' +
             '                <th>Name</th>' +
+            '                <th>Status Forlap</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +

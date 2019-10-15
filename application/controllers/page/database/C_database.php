@@ -233,7 +233,8 @@ class C_database extends Globalclass {
         $data['DB_Student'] = $DB_Student;
         $data['NPM'] = $NPM;
         $data['Name'] = $Name;
-
+        // load Nationality
+        $data['Arr_nationality'] = json_encode($this->m_master->caribasedprimary('db_admission.country','ctr_active',1));
         $content = $this->load->view('page/database/students/editStudent',$data,true);
         $this->temp($content);
     }

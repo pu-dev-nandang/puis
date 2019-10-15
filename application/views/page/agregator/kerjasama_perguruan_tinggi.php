@@ -46,7 +46,6 @@
                 </div>
             </div>
         </div>
-        <p style="color: orangered;">*) Yang terhitung hanya kerja sama yang melakukan kegiatan</p>
     </div>
 
 </div>

@@ -1924,11 +1924,24 @@ class C_api3 extends CI_Controller {
                         else // Rata-rata Masa Studi Lulusan pada
                         {
                             $arr_temp = [];
-                            $sql = 'select NPM,Year,GraduationYear from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
+                            $sql = 'select NPM,Year,GraduationYear,GraduationDate,Tgl_msk from db_academic.auth_students where GraduationYear = "'.$get_tayear.'" and StatusStudentID = ?';
                             $query=$this->db->query($sql, array(1))->result_array();
                             if (count($query) > 0 ) {
                                 for ($k=0; $k < count($query); $k++) {
-                                   $Co = $query[$k]['GraduationYear'] - $query[$k]['Year'];
+                                   if ($query[$k]['Tgl_msk'] != null && $query[$k]['Tgl_msk'] != '') {
+                                        $date1=strtotime($query[$k]['GraduationDate']);
+                                        $date2=strtotime($query[$k]['Tgl_msk']); 
+                                        $diff = abs($date1 - $date2);
+                                        
+                                        $day = $diff/(60*60*24); // in day
+                                        $month = $day / 30;
+                                        $Co = $month;
+                                    }
+                                    else{
+                                        $Co = $query[$k]['GraduationYear'] - $query[$k]['Year'];
+                                        $Co = $Co * 12; // dalam bulan
+                                    } 
+                                   
                                    $arr_temp[] = $Co;
                                 }
 
@@ -2879,7 +2892,7 @@ class C_api3 extends CI_Controller {
                         $StatusFolap = ' AND em.StatusForlap = "0"';
                     }
 
-                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name FROM db_academic.schedule_details_course sdc
+                    $dataSchedule = $this->db->query('SELECT sc.Coordinator AS NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap FROM db_academic.schedule_details_course sdc
                                                               LEFT JOIN db_academic.schedule sc ON (sc.ID = sdc.ScheduleID)
                                                               LEFT JOIN db_employees.employees em ON (em.NIP = sc.Coordinator)
                                                                WHERE sc.SemesterID = "'.$SemesterID.'" 
@@ -2899,11 +2912,12 @@ class C_api3 extends CI_Controller {
 
                     $data[$i]['Lecturer_Sch_Co_arr'] = $listCoord;
 
-                    $dataScheduleTeam = $this->db->query('SELECT stt.NIP, em.NUP, em.NIDN, em.NIDK, em.Name  FROM db_academic.schedule_team_teaching stt
+                    $dataScheduleTeam = $this->db->query('SELECT stt.NIP, em.NUP, em.NIDN, em.NIDK, em.Name, em.StatusForlap  FROM db_academic.schedule_team_teaching stt
                                                                 LEFT JOIN db_academic.schedule sc ON (sc.ID = stt.ScheduleID)
                                                                 LEFT JOIN db_academic.schedule_details_course sdc ON (sc.ID = sdc.ScheduleID)
                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
-                                                                WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" AND em.ProdiID = "'.$data[$i]['ID'].'"
+                                                                WHERE sc.SemesterID = "'.$SemesterID.'" AND sdc.ProdiID = "'.$data[$i]['ID'].'" 
+                                                                AND em.ProdiID = "'.$data[$i]['ID'].'" '.$StatusFolap.'
                                                                 GROUP BY stt.NIP
                                                                  ')->result_array();
 
@@ -2957,18 +2971,53 @@ class C_api3 extends CI_Controller {
         return print_r(json_encode($data));
     }
 
-    public function getLuaranHkipaten(){
+    public function getLuaranHkipaten() {
 
-        $Status = $this->input->get('s');
-        $data = $this->db->query('
-            SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-            FROM db_research.publikasi
-            WHERE ID_kat_capaian = 2
-            UNION
-            SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-            FROM db_research.pengabdian_masyarakat
-            WHERE ID_kat_capaian = 2')->result_array();
-        return print_r(json_encode($data));
+        $data_arr = $this->getInputToken2();
+        $hki_year = $data_arr['hkiyear'];
+
+         if(count($data_arr>0)) {
+
+            if($data_arr['action']=='readHKI_paten'){
+
+                if($hki_year == "" && $hki_year == null) {
+
+                    $Yearx = date('Y');
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 2 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat 
+                    WHERE ID_kat_capaian = 2 " ')->result_array();
+
+                } 
+                else {
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 2 AND YEAR(Tgl_terbit) = "'.$hki_year.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat 
+                        WHERE ID_kat_capaian = 2 AND ID_thn_laks = "'.$hki_year.'" ')->result_array();
+                }
+                //print_r($data);
+                return print_r(json_encode($data));
+            }
+        }
+
+        //$Status = $this->input->get('s');
+        //$data = $this->db->query('
+        //    SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        //    FROM db_research.publikasi
+         //   WHERE ID_kat_capaian = 2
+        //    UNION
+         //   SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+         //   FROM db_research.pengabdian_masyarakat
+         //   WHERE ID_kat_capaian = 2')->result_array();
+        //return print_r(json_encode($data));
     }
 
     public function getsitasikarya(){

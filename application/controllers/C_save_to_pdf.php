@@ -5966,22 +5966,23 @@ Phone: (021) 29200456';
              $pdf->AddFont('dinproExpBold','','dinproExpBold.php');
              $pdf->AddPage();
              $pdf->SetAutoPageBreak(true, 0);
-             $pdf->Image($input[$i]['PathFoto'],15.5,23,23);
+             //$pdf->Image($input[$i]['PathFoto'],15.5,23,23);
              // print_r(FCPATH);
              // die();
-             // $ConverToPath = function($PathURL)
-             // {
-             //    $rs = '';
-             //    $values = parse_url($PathURL);
-             //    $Path = $values['path'];
-             //    $Path = str_replace('/puis', '', $Path);
-             //    $rs = $Path;
-             //    return $rs;
-             // };
-             // $pathFileImage = $ConverToPath($input[$i]['PathFoto']);
-             // $pdf->Image(FCPATH.$pathFileImage,15.5,23,23);
+             $ConverToPath = function($PathURL)
+             {
+                $rs = '';
+                $values = parse_url($PathURL);
+                $Path = $values['path'];
+                $Path = str_replace('/puis', '', $Path);
+                $rs = $Path;
+                return $rs;
+             };
+             $pathFileImage = $ConverToPath($input[$i]['PathFoto']);
+             $pdf->Image(FCPATH.$pathFileImage,15.5,23,23);
              // $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs.png') : base_url('images/id_emp.png');
-             $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs2.png') : base_url('images/id_emp2.png');
+             // $template_format = ($input[$i]['type'] == 'student') ? base_url('images/id_mhs2.png') : base_url('images/id_emp2.png');
+             $template_format = ($input[$i]['type'] == 'student') ? './images/id_mhs2.png' : './images/id_emp2.png';
              $pdf->Image($template_format,0,0,54);
              $pdf->SetXY(10,54.5);
              $pdf->SetFont('dinproExpBold','',12);
@@ -6129,8 +6130,8 @@ Phone: (021) 29200456';
             $pdf->AddPage();
 
             $pdf->SetAutoPageBreak(true, 0);
-
-            $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+            $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
+            // $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
 
 
             $pdf->Ln(30);

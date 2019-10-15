@@ -15,9 +15,9 @@
             <div id = "content_dt">
 
             </div>
-        </div><p style="color: orangered;">*) Mahasiswa asing dapat terdaftar untuk mengikuti program secara penuh atau sebagian <br> **) Jumlah mahasiswa asing/mahasiswa aktif x 100% >= 0.5 %, Score : 4 </p>
+        </div>
     </div>
-</div>    
+</div>
 
 <script>
     $(document).ready(function () {

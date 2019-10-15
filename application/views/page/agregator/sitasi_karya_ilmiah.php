@@ -167,7 +167,7 @@
 
          $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran" data-name="sitasi_karya_ilmiah">' +
             '    <thead>  '+
-            '     <tr>   '+
+            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
             '        <th style="text-align: center; width: 5%;">No</th>  '+
             '        <th style="text-align: center;"> Nama Penulis</th>  '+
             '        <th style="text-align: center;"> Judul Artikel yang Disitasi (Jurnal, Volume, Tahun, Nomor, Halaman)  </th>'+
