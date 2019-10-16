@@ -19,6 +19,30 @@ class C_auth extends Globalclass {
         $this->db = $this->load->database('default', TRUE);
     }
 
+    public function cekFile()
+    {
+        $data = $this->db->query('SELECT f.NIP, em.Name, f.ID AS FID ,f.NameUniversity, u.ID FROM db_employees.files f 
+                                            LEFT JOIN db_research.university u ON (f.NameUniversity = u.Code_University)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            WHERE f.NameUniversity IS NOT NULL
+                                            ORDER BY f.NameUniversity')->result_array();
+
+        // print_r($data);
+        // exit;
+
+        $result = [];
+        for($i=0;$i<count($data);$i++){
+            $d = $data[$i];
+
+            if(!is_numeric($d['NameUniversity'])){
+
+
+                array_push($result, $data[$i]);
+            }
+        }
+        print_r($result);
+    }
+
     public function get_auth()
     {
         $username = $this->input->post('username');

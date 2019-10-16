@@ -46,6 +46,7 @@ $route['parent/(:num)'] = 'auth/c_auth/parent/$1';
 $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/$3';
 
 $route['foto'] = 'auth/c_auth/foto';
+$route['cekFile'] = 'auth/c_auth/cekFile';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
 
 $route['toStdPlanning/(:any)/(:any)'] = 'auth/c_auth/toStdPlanning/$1/$2';
