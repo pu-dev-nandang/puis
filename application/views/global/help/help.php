@@ -35,8 +35,8 @@
 
 </style>
 <div class="row">
+  <?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
     <div class="col-md-3 panel-admin" style="border-right: 1px solid #CCCCCC;">
-<?php if ($this->session->userdata('PositionMain')['IDDivision']=='12'){ ?>
      <div class="panel panel-default">
         <div class="panel-heading"></div>
         <div class="panel-body">
@@ -69,15 +69,10 @@
           <div class="form-group" style="text-align: right;">
               <button class="btn btn-primary" id="saveFormQNA">Save</button>
           </div>
-
-
-
-
-
         </div>
-
       </div>
     </div>
+    <?php } ?>
     <div class="col-md-9">
       <div class="row">
         <div class="col-md-4 col-md-offset-4">
@@ -133,8 +128,6 @@
       </div>
     </div>
   </div>
-<?php } ?>
-
   
 <script type="text/javascript">
 	$(document).ready(function () {
