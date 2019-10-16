@@ -184,6 +184,16 @@
                             ? '<i class="fa fa-check-circle margin-right" style="color: green;" aria-hidden="true"></i> Yes'
                             : '<i class="fa fa-times-circle margin-right" aria-hidden="true"></i> No';
 
+                        var WorkSuitability = '<b style="color: red;">Low</b>';
+                        if(v.WorkSuitability=='1' || v.WorkSuitability==1){
+                            WorkSuitability = '<b style="color: royalblue;">Medium</b>';
+                        }
+                        else if(v.WorkSuitability=='2' || v.WorkSuitability==2){
+                            WorkSuitability = '<b style="color: green;">Height</b>';
+                        }
+
+
+
                         $('#listBodyExperience').append('<tr>' +
                             '    <td>' +
                             '        <p>'+StartMonth+' '+StartYear+' - '+Last+'</p>' +
@@ -305,8 +315,9 @@
             '        <div class="form-group">' +
             '           <label>Work Suitability</label>' +
             '           <select class="form-control" style="width: 150px;" id="WorkSuitability">' +
-            '               <option value="1">Yes</option>' +
-            '               <option value="0">No</option>' +
+            '               <option value="0">Low</option>' +
+            '               <option value="1">Medium</option>' +
+            '               <option value="2">Height</option>' +
             '           </select>' +
             '        </div>' +
             '        <div class="form-group">' +
