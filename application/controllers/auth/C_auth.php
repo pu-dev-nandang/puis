@@ -19,6 +19,88 @@ class C_auth extends Globalclass {
         $this->db = $this->load->database('default', TRUE);
     }
 
+    public function dataSinta(){
+
+        $api_key = 'a39e735fd5049ba1f7ff0b4e05c9f207';
+        $NIDN = '0025106201';
+        $limit = '&offset=0&limit=10';
+
+        $str = 'GET : http://sinta2.ristekdikti.go.id/api/author?api_key='.$api_key.'&nidn='.$NIDN.'
+GET : http://sinta2.ristekdikti.go.id/api/gsdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/scopusdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authors?api_key='.$api_key.'&afiliasi_id=384'.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authorbooks?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authoriprs?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/affiliation?api_key='.$api_key.'&kode=002001
+GET : http://sinta2.ristekdikti.go.id/api/countauthors?api_key='.$api_key.'&kode_pt=001002&verified=1
+GET : http://sinta2.ristekdikti.go.id/api/countcitations?api_key='.$api_key.'&kode_pt=001002';
+
+        $str_arr = explode('GET : ',$str);
+        $listApi = [];
+        if(count($str_arr)>0){
+            for($i=0;$i<count($str_arr);$i++){
+                if($str_arr[$i]!=''){
+                    array_push($listApi,$str_arr[$i]);
+                }
+            }
+        }
+
+        print_r($listApi);
+
+        exit;
+
+        $URL = array(
+            0 => array(
+                'To' => 'Get Author Data',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/author'
+            ),
+            1 => array(
+                'To' => 'Author GS Documents',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/gsdocs'
+            ),
+            2 => array(
+                'To' => 'Author Scopus Documents',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/scopusdocs'
+            ),
+            3 => array(
+                'To' => 'Author by Affiliation',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/authors'
+            ),
+            4 => array(
+                'To' => 'Authors Books',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/authorbooks'
+            ),
+            5 => array(
+                'To' => 'Authors IPR (Intelectual Property Rights)',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/authoriprs'
+            ),
+            6 => array(
+                'To' => 'Affiliation Profile',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/affiliation'
+            ),
+            7 => array(
+                'To' => 'Count Authors of an Affiliation',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/countauthors'
+            ),
+            8 => array(
+                'To' => 'Count Citations and Documents of an Affiliation',
+                'Type' => 'GET',
+                'URL' => 'http://sinta2.ristekdikti.go.id/api/countcitations'
+            )
+        );
+
+        print_r($URL);
+
+    }
+
     public function cekFile()
     {
         $data = $this->db->query('SELECT f.NIP, em.Name, f.ID AS FID ,f.NameUniversity, u.ID FROM db_employees.files f 
