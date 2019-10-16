@@ -101,7 +101,7 @@ class C_home extends Prodi_Controler {
         $content = $this->load->view('page/'.$data['department'].'/beranda/v_call',$data,true);
         parent::template($content);
     }
-// ===== Call to Action ======
+// ===== testimoni ======
     function testimoni()
     {
         
@@ -123,6 +123,14 @@ class C_home extends Prodi_Controler {
         
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/about/v_lecturer',$data,true);
+        parent::template($content);
+    }   
+// ===== facilities ======
+    function facilities()
+    {
+        
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/about/v_facilities',$data,true);
         parent::template($content);
     }    
 

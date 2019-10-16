@@ -200,7 +200,6 @@
     });
     $('#btnSave2').click(function () {
         var ID = $('#ID').val();
-        var LangID = $('#LangID').val();
         var form_data = new FormData();
         var find = true;
         var thisbtn = $(this);
@@ -227,7 +226,7 @@
                     action : 'saveDataPhoto',
                         ID : ID,
                         Type : G_Type,
-                        LangID : LangID
+                        
                 };
                 loading_button('#btnSave2');
                 var token = jwt_encode(data,'UAP)(*');

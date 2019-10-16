@@ -151,7 +151,6 @@ $route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_s
 $route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
 $route['academic/semester-antara/setting/(:num)'] = 'page/academic/c_semester_antara/setting/$1';
 
-
 $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_antara/loadDetails/$1';
 
 
@@ -1262,6 +1261,7 @@ $route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
 $route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
 $route['prodi/about/mission'] =  'page/admin-prodi/beranda/c_home/mission';
 $route['prodi/about/lecturer'] =  'page/admin-prodi/beranda/c_home/lecturer';
+$route['prodi/about/facilities'] =  'page/admin-prodi/beranda/c_home/facilities';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//
@@ -1392,6 +1392,7 @@ $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/li
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
 $route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
 $route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+$route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
 
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
