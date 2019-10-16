@@ -1,8 +1,8 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(3)=='input-attendace' || $this->uri->segment(3)=='details-attendace') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/attendance/input-attendace'); ?>">Attendance</a>
+        <li class="<?php if($this->uri->segment(3)=='' || $this->uri->segment(3)=='details-attendace') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/attendance'); ?>">Attendance</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-attendace-lecturer') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/monitoring-attendace-lecturer'); ?>">Monitoring Attd. Lecturer</a>

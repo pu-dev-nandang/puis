@@ -284,7 +284,7 @@
 		            '<label class="control-label">SubMenu1:</label>'+
 		        '</div>'+    
 		        '<div class="col-sm-6">'+
-		            '<input type="text" class="form-control SubMenu1_">'+
+		            '<input type="text" value="Empty" class="form-control SubMenu1_">'+
 		        '</div>'+
 		    '</div>'+
 		'</div> '+		
@@ -294,7 +294,7 @@
                     '<label class="control-label">SubMenu2:</label>'+
                 '</div>'+    
                 '<div class="col-sm-6">'+
-                    '<input type="text" class="form-control SubMenu2_">'+
+                    '<input type="text" value="Empty" class="form-control SubMenu2_">'+
                 '</div>'+
             '</div>'+
         '</div> '+

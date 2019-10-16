@@ -34,7 +34,7 @@
     $(document).ready(function () {
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['list-exam','list-waiting-approve','set-exam-schedule','exam-setting','exam-barcode'];
+        var arrMenu = ['','list-waiting-approve','set-exam-schedule','exam-setting','exam-barcode'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
 
     });

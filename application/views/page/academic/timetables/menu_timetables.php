@@ -2,7 +2,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li>
-            <a href="<?php echo base_url('academic/timetables/list'); ?>">Timetables</a>
+            <a href="<?php echo base_url('academic/timetables'); ?>">Timetables</a>
         </li>
         <li>
             <a href="<?php echo base_url('academic/timetables/course-offer'); ?>">Course Offer</a>
@@ -26,7 +26,7 @@
     $(document).ready(function () {
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['list','course-offer','setting-timetable'];
+        var arrMenu = ['','course-offer','setting-timetable'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
 
     });

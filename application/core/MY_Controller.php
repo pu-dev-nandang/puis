@@ -190,6 +190,8 @@ class Academic_Controler extends Globalclass{
     public function __construct()
     {
         parent::__construct();
+//        print_r('ok');exit;
+        $this->m_menu2->set_model('academic_sess','auth_academic_sess','menu_academic_sess','menu_academic_grouping','db_academic');
     }
 }
 

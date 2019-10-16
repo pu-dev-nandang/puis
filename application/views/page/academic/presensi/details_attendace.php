@@ -21,7 +21,7 @@
 
 <div class="row">
     <div class="col-md-3">
-        <a href="<?php echo base_url('academic/attendance/input-attendace'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+        <a href="<?php echo base_url('academic/attendance'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
     </div>
     <div class="col-md-6">
         <div class="" style="text-align: center;background: lightyellow;padding: 15px;border: 1px solid #CCCCCC;margin-bottom: 15px;">
