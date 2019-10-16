@@ -20,13 +20,15 @@ class C_matakuliah extends Academic_Controler {
     {
         $department = parent::__getDepartement();
 //        $data['data_mk'] = $this->m_matakuliah->__getAllMK();
-        $content = $this->load->view('page/'.$department.'/matakuliah/matakuliah','',true);
+        $data['data_credit_type_courses'] = $this->m_master->showData_array('db_rektorat.credit_type_courses');
+        $content = $this->load->view('page/'.$department.'/matakuliah/matakuliah',$data,true);
         $this->temp($content);
     }
 
     public function dataTableMK(){
         $department = parent::__getDepartement();
-        $data['data_mk'] = $this->m_matakuliah->__getAllMK();
+        // $data['data_mk'] = $this->m_matakuliah->__getAllMK();
+        $data['data_mk'] = $this->m_matakuliah->__getAllMK2();
         $this->load->view('page/'.$department.'/matakuliah/matakuliah_table',$data);
     }
 

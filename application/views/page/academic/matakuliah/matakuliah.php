@@ -25,16 +25,26 @@
     </div>
 </div>
 
-
 <style>
     .TableTools_collection {
         z-index : 1;
     }
 </style>
 <script>
+    var data_credit_type_courses = <?php echo json_encode($data_credit_type_courses) ?>;
     $(document).ready(function() {
         loadDataTableMK();
     } );
+
+    function OPCourseType(dtselected = null)
+    {
+        var h = '';
+        for (var i = 0; i < data_credit_type_courses.length; i++) {
+            var selected = (dtselected == data_credit_type_courses[i].ID) ? 'selected' : '';
+            h += '<option value ="'+data_credit_type_courses[i].ID+'"  '+selected+' >'+data_credit_type_courses[i].NamaType+'</option>';
+        }
+        return h;
+    }
 
     $('#btn_addmk').click(function () {
 
@@ -76,9 +86,10 @@
             '<div class="row">' +
             '<div class="col-md-6"><select id="formTypeMK" class="form-control form-mk"></select></div> ' +
             '<div class="col-md-6"><select id="formCourseType" class="form-control">' +
-            '<option value="1">Teori</option>' +
-            '<option value="2">Praktikum / Praktik</option>' +
-            '<option value="3">Praktik Lapangan</option>' +
+            // '<option value="1">Teori</option>' +
+            // '<option value="2">Praktikum / Praktik</option>' +
+            // '<option value="3">Praktik Lapangan</option>' +
+            OPCourseType()+
             '</select></div> ' +
             '</div> ' +
             '</td>' +
@@ -151,9 +162,10 @@
                 '<div class="row">' +
                 '<div class="col-md-6"><select id="formTypeMK" class="form-control form-mk"></select></div> ' +
                 '<div class="col-md-6"><select id="formCourseType" class="form-control form-mk">' +
-                '<option value="1">Teori</option>' +
-                '<option value="2">Praktikum / Praktik</option>' +
-                '<option value="3">Praktik Lapangan</option>' +
+                // '<option value="1">Teori</option>' +
+                // '<option value="2">Praktikum / Praktik</option>' +
+                // '<option value="3">Praktik Lapangan</option>' +
+                OPCourseType(valueMK.CourseType)+
                 '</select></div> ' +
                 '</div> ' +
                 '</td>' +
@@ -171,7 +183,7 @@
                 '</table>' +
                 '</div>');
 
-            $('#formCourseType').val(valueMK.CourseType);
+            // $('#formCourseType').val(valueMK.CourseType);
 
             loadSelectOptionBaseProdi('#FormBaseProdi',valueMK.BaseProdiID);
             $('.form-mk').prop('disabled',true).css('color','#333');
