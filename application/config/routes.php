@@ -1391,6 +1391,7 @@ $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/li
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
 $route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
 $route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+$route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
 
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';
