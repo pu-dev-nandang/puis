@@ -5,7 +5,7 @@
 <!--        <li class="--><?php //if($this->uri->segment(3)=='list-student') { echo 'active'; } ?><!--">-->
 <!--            <a href="--><?php //echo base_url('academic/final-project/list-student'); ?><!--">Final Project</a>-->
 <!--        </li>-->
-        <li class="<?php if($this->uri->segment(3)=='list-student') { echo 'active'; } ?>">
+        <li class="<?php if($this->uri->segment(3)=='') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/final-project/list-student'); ?>">List Student</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='seminar-schedule') { echo 'active'; } ?>">
