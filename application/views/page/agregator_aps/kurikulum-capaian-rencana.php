@@ -61,20 +61,7 @@
                             selector.html(htmltable);            
                         
         },
-        loadPage : function(){
-                       var filterProdi = $('#filterProdi option:selected').val();
-                       var filterProdiName = $('#filterProdi option:selected').text();
-                       if(filterProdi!='' && filterProdi!=null){
-                           $('#viewProdiID').html(filterProdi);
-                           $('#viewProdiName').html($('#filterProdi option:selected').text());
-                           var data = {
-                               ProdiID : filterProdi,
-                               ProdiName : filterProdiName,
-                               auth : 's3Cr3T-G4N',
-                               mode : 'KurikulumCapaianRencana',
-                           };
-
-                            var token = jwt_encode(data,'UAP)(*');
+        loadDataTable : function(){
                             var recordTable = $('#dataTablesKurikulum').DataTable({
                                 "processing": true,
                                 "serverSide": false,
@@ -82,8 +69,21 @@
                                     url : base_url_js+"rest3/__get_APS_CrudAgregatorTB7", // json datasource
                                     ordering : false,
                                     type: "post",  // method  , by default get
-                                    data : {token : token}                                    
-                                        
+                                    data : function(token){
+                                        var Kurikulum = $('#selectKurikulum option:selected').val();
+                                        var filterProdi = $('#filterProdi option:selected').val();
+                                        var filterProdiName = $('#filterProdi option:selected').text();
+                                           // Read values
+                                            var data = {
+                                                ProdiID : filterProdi,
+                                                ProdiName : filterProdiName,
+                                                Kurikulum : Kurikulum,
+                                                auth : 's3Cr3T-G4N',
+                                                mode : 'KurikulumCapaianRencana',
+                                            };
+                                           // Append to data
+                                           token.token = jwt_encode(data,'UAP)(*');
+                                        }                                         
                                 },
                                 'createdRow': function( row, data, dataIndex ) {
                                         
@@ -93,10 +93,13 @@
                                   
                                }  
                             });
-
+                            recordTable.on('order.dt search.dt', function () {
+                                                        recordTable.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+                                                            cell.innerHTML = i+1;
+                                                        } );
+                                                    }).draw();
                             oTable = recordTable;
                             oSettings = oTable.settings();
-                       } 
         },
         loaded : function(){
                     AppJQ.BuatTable();
@@ -105,7 +108,10 @@
                         var filterProdi = $('#filterProdi').val();
                         var Kurikulum = $('#selectKurikulum').val();
                         if(filterProdi!='' && filterProdi!=null && Kurikulum != '' && Kurikulum != null){
-                            AppJQ.loadPage();
+                            AppJQ.loadDataTable();
+                            filterProdi = $('#filterProdi option:selected').val();
+                            $('#viewProdiID').html(filterProdi);
+                            $('#viewProdiName').html($('#filterProdi option:selected').text());
                             clearInterval(firstLoad);
                         }
                     },1000);
@@ -121,16 +127,23 @@
     $('#filterProdi').change(function () {
         var filterProdi = $('#filterProdi').val();
         if(filterProdi!='' && filterProdi!=null){
-            AppJQ.loadPage();
+             filterProdi = $('#filterProdi option:selected').val();
+             $('#viewProdiID').html(filterProdi);
+             $('#viewProdiName').html($('#filterProdi option:selected').text());
+             oTable.ajax.reload( null, false );
         }
     });
 
-    // $('#saveToExcel').click(function () {
-    //                    $('select[name="dataTablesKurikulum_length"]').val(-1);
-    //                    oSettings[0]._iDisplayLength = oSettings[0].fnRecordsTotal();
-    //                    oTable.draw();
-    //                    setTimeout(function () {
-    //                        saveTable2Excel('dataTable2Excel');
-    //                    },1000);
-    // });
+    $(document).off('change', '#selectKurikulum').on('change', '#selectKurikulum',function(e) {
+       oTable.ajax.reload( null, false );
+    })
+
+    $('#saveToExcel').click(function () {
+           $('select[name="dataTablesKurikulum_length"]').val(-1);
+           oSettings[0]._iDisplayLength = oSettings[0].fnRecordsTotal();
+           oTable.draw();
+           setTimeout(function () {
+               saveTable2Excel('dataTable2Excel');
+           },1000);
+    });
 </script>

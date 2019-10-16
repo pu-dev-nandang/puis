@@ -31,13 +31,14 @@
                 $TypeMKFilter = 'MKU';
             }
 
-            $CourseType = 'Teory';
-            if($item_mk['CourseType']=='2'){
-                $CourseType = 'Praktikum / Praktik';
-            }
-            else if ($item_mk['CourseType']=='3'){
-                $CourseType = 'Praktik Lampangan';
-            }
+            // $CourseType = 'Teory';
+            // if($item_mk['CourseType']=='2'){
+            //     $CourseType = 'Praktikum / Praktik';
+            // }
+            // else if ($item_mk['CourseType']=='3'){
+            //     $CourseType = 'Praktik Lampangan';
+            // }
+            $CourseType = $item_mk['NamaType'];
             ?>
             <tr>
                 <td class="td-center">
