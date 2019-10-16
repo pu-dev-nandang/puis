@@ -48,9 +48,10 @@
 <script>
     $(document).ready(function () {
 
-        LoadNama();
+       
         window.G_Type = 'testimonials';
         loadDataTestimonials();
+        LoadNama();
         loadSelectOptionLanguageProdi('#LangID','');
 
         $('#Description').summernote({
@@ -135,7 +136,7 @@
     
     function LoadNama() { // load data student
         var selector =$('#formName');
-        var url = base_url_js+'api/__getStudentsServerSide';
+        var url = base_url_js+'api-prodi/__getStudentsProdi';
         var data = {
             auth : 's3Cr3T-G4N',
             mode : 'showDataDosen'

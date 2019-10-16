@@ -65,14 +65,14 @@
 
 <script>
 $(document).ready(function () {
-    window.G_Type = 'Lecture';
+    
     loadDataLecture();
     LoadNama();
 });
 function loadDataLecture() {
     var data = {
         action : 'loadDataLecturer',
-        Type : G_Type
+        
     };
     var token = jwt_encode(data,'UAP)(*');
     var url = base_url_js+'api-prodi/__crudDataProdi';
@@ -100,7 +100,7 @@ function loadDataLecture() {
 }
 function LoadNama() { // load data student
         var selector =$('#formName');
-        var url = base_url_js+'api-prodi/__getProdiLecture';
+        var url = base_url_js+'api-prodi/__getProdiLecturer';
         var data = {
             auth : 's3Cr3T-G4N',
             mode : 'showDataDosen'
@@ -133,12 +133,12 @@ function LoadNama() { // load data student
 
 $('#btnSave').click(function () {
     
-    var formName = $('#formName').val(); 
+    var NIP = $('#NIP').val(); 
     var thisbtn = $(this);
     var form_data = new FormData();
     var find = true;
 
-    if(formName!='' && formName!=null &&
+    if(NIP!='' && NIP!=null &&
         uploadFile!='' && uploadFile!=null){
         // upload file
         $('input[type="file"]').each(function(){
@@ -162,7 +162,7 @@ $('#btnSave').click(function () {
             var data = {
                 action : 'saveDataLecturer',
                 dataForm:{
-                  NIP : formName,
+                  NIP : NIP,
                 }
             };
           
