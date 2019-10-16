@@ -4,11 +4,22 @@
         <table class="table">
             
             <tr>
-                <td style="width: 15%;">Name Lecture</td>
+                <td style="width: 15%;">Category</td>
+                <td style="width: 1%;">:</td>
+                <td>
+                    <select style="max-width: 150px;" id="Category" class="form-control">
+                      <option value="Classroom">Classroom</option>
+                      <option value="Laboratory">Laboratory</option>
+                      <option value="Public facilities">Public facilities</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 15%;">Name </td>
                 <td style="width: 1%;">:</td>
                 
                 <td>
-                      <select style="width: 100%;" id="formName" ></select>
+                      <input type="text" class="form-control" id="Name" placeholder="Input name/title images">
                 </td>
             </tr>
             <tr>
@@ -16,12 +27,12 @@
                 <td style="width: 1%;">:</td>
                 <td>
                   <input type="file" id="uploadFile" name="uploadFile" accept="jpg/png">
-                  <span class="red">* Size weight x height 200px x 200px</span>
+                  <span class="red">* Size weight x height 743px x 445px</span>
                 </td>
             </tr>
             <tr>
                 <td colspan="3" style="text-align: right;">
-                    <button class="btn btn-success" id="btnSave">Save</button>
+                    <button class="btn btn-success" id="btnSave1">Save</button>
                 </td>
             </tr>
         </table>
@@ -65,25 +76,23 @@
 
 <script>
 $(document).ready(function () {
-    window.G_Type = 'Lecture';
-    loadDataLecture();
-    LoadNama();
+    
+    loadDataFacilities();
 });
-function loadDataLecture() {
+function loadDataFacilities() {
     var data = {
-        action : 'loadDataLecturer',
-        Type : G_Type
+        action : 'readProdiFacilities',
     };
     var token = jwt_encode(data,'UAP)(*');
     var url = base_url_js+'api-prodi/__crudDataProdi';
-    var locimg = base_url_js+'images/Lecturer/';
+    var locimg = base_url_js+'images/Facilities/';
     $.post(url,{token:token},function (jsonResult) {
         $('#viewDataDesc').empty();
         if(jsonResult.length>0){
 
             $.each(jsonResult,function (i,v) {
-                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  width="800vw">'+
-                      '<p><b>'+v.NIP+'||'+v.Name+'</b></p>'+
+                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  width="100%">'+
+                      '<p><b>'+v.Name+'</b></p>'+
                        '<p>'+
                         // ' <a href="#" data-toggle="modal" data-target="#form-modal" data-id="'+v.ID+'" token = "'+v.token+'" class="btn-form-ubah"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
                         ' <a href="" data-id="'+v.ID+'" data-toggle="modal" data-target="#delete-modal" class="btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
@@ -98,48 +107,19 @@ function loadDataLecture() {
 
     });
 }
-function LoadNama() { // load data student
-        var selector =$('#formName');
-        var url = base_url_js+'api-prodi/__getProdiLecture';
-        var data = {
-            auth : 's3Cr3T-G4N',
-            mode : 'showDataDosen'
-        };
-        var token = jwt_encode(data,"UAP)(*");
-        $.post(url,{ token:token },function (resultJson) {
-            
-        }).done(function(resultJson) {
-            //var response = jQuery.parseJSON(resultJson);
-            selector.empty()
-            for (var i = 0; i < resultJson.length; i++) {
-                var NIP = resultJson[i].NIP
-                var Name = resultJson[i].Name
-                selector.append(
-                    ' <option value="'+NIP+'">'+NIP+'|'+Name+'</option>'
-                    )
 
-            }
-            selector.select2({
-                //allowClear: true
-
-            });
-        }).fail(function() {
-          toastr.info('No Result Data');
-        }).always(function() {
-                        
-        }); 
-
-    }
-
-$('#btnSave').click(function () {
+$(document).on('click', '#btnSave1', function(){  
+   
+    var Name = $('#Name').val(); 
+    var Category = $('#Category').val();
     
-    var formName = $('#formName').val(); 
     var thisbtn = $(this);
     var form_data = new FormData();
     var find = true;
 
-    if(formName!='' && formName!=null &&
-        uploadFile!='' && uploadFile!=null){
+    if(Name!='' && Name!=null && 
+       Category!='' && Category!=null &&
+       uploadFile!='' && uploadFile!=null){
         // upload file
         $('input[type="file"]').each(function(){
             var IDFile = $(this).attr('id');
@@ -160,13 +140,14 @@ $('#btnSave').click(function () {
                 }
             }
             var data = {
-                action : 'saveDataLecturer',
+                action : 'saveDataFacilities',
                 dataForm:{
-                  NIP : formName,
+                  Name : Name,
+                  Category : Category,
                 }
             };
           
-            loading_button('#btnSave');
+            loading_button('#btnSave1');
             var token = jwt_encode(data,'UAP)(*');
             form_data.append('token',token);
             var url = base_url_js+'api-prodi/__crudDataProdi';
@@ -180,10 +161,10 @@ $('#btnSave').click(function () {
               dataType: "json",
               success:function(data)
               {
-                loadDataLecture();
+                loadDataFacilities();
                 toastr.success('Data saved','Success');
-                $('#btnSave').html('save');
-                $('#btnSave').prop('disabled',false);
+                $('#btnSave1').html('save');
+                $('#btnSave1').prop('disabled',false);
 
               },
               error: function (data) {
@@ -206,7 +187,7 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
     var thisbtn = $(this);
     loading_button('#btn-hapus'); // Munculkan loading hapus
     var data = {
-                action : 'deleteDataLecturer',
+                action : 'deleteDataFacilities',
                 ID : ID,
               };
     var form_data = new FormData();
@@ -227,7 +208,7 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
               }
             },
             success: function(data){ // Ketika proses pengiriman berhasil
-              loadDataLecture();
+              loadDataFacilities();
               toastr.success('Data Update','Success');
               thisbtn.prop('disabled',false).html('Ya');
               $('#delete-modal').modal('hide');
@@ -273,8 +254,6 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
          oFReader.readAsDataURL(files[count]);
          var f = files[count];
          var fsize = f.size||f.fileSize;
-
-         
          console.log(fsize);
 
          if(fsize > 2000000) // 2mb

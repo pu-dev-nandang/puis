@@ -80,8 +80,8 @@
                                 Lecturer
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='fasilitas'){echo "current";} ?>">
-                                <a href="<?php echo base_url('prodi/about/fasilitas'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='facilities'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/about/facilities'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Facilities
                                 </a>
