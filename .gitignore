@@ -52,3 +52,8 @@ document/*
 
 #Ignores Add Images
 **/images/Facilities/
+**/images/Kaprodi/
+**/images/Partner/
+**/images/Lecture/
+**/images/Slider/
+**/images/Testimonials/
