@@ -2,7 +2,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li>
-            <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>">List Exam Schedule</a>
+            <a href="<?php echo base_url('academic/exam-schedule'); ?>">List Exam Schedule</a>
         </li>
         <li>
             <a href="<?php echo base_url('academic/exam-schedule/list-waiting-approve'); ?>">List Waiting Approve</a>

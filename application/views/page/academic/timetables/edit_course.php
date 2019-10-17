@@ -28,7 +28,7 @@
 
 
     <div class="col-md-8 col-md-offset-2">
-        <a href="<?php echo base_url('academic/timetables/list'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+        <a href="<?php echo base_url('academic/timetables'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
         <hr/>
         <table class="table">
             <tr>
