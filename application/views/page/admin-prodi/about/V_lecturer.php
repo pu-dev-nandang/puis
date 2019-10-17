@@ -8,7 +8,7 @@
                 <td style="width: 1%;">:</td>
                 
                 <td>
-                      <select style="width: 100%;" id="formName" ></select>
+                      <select style="width: 100%;" id="NIP" ></select>
                 </td>
             </tr>
             <tr>
@@ -99,7 +99,7 @@ function loadDataLecture() {
     });
 }
 function LoadNama() { // load data student
-        var selector =$('#formName');
+        var selector =$('#NIP');
         var url = base_url_js+'api-prodi/__getProdiLecturer';
         var data = {
             auth : 's3Cr3T-G4N',
@@ -132,14 +132,13 @@ function LoadNama() { // load data student
     }
 
 $('#btnSave').click(function () {
-    
+   
     var NIP = $('#NIP').val(); 
     var thisbtn = $(this);
     var form_data = new FormData();
     var find = true;
 
-    if(NIP!='' && NIP!=null &&
-        uploadFile!='' && uploadFile!=null){
+    
         // upload file
         $('input[type="file"]').each(function(){
             var IDFile = $(this).attr('id');
@@ -192,13 +191,14 @@ $('#btnSave').click(function () {
               }
             })
         }
-    }
+    
 });
 // Fungsi ini akan dipanggil ketika tombol hapus diklik
 $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
   id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
   $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
 })
+
 // DELETE
 $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
     var ID = $(this).attr('data-id');
@@ -242,6 +242,7 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
   $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
     $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
   }) 
+
   function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;

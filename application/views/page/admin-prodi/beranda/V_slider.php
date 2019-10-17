@@ -103,7 +103,7 @@
                          </div>              
                         
                        
-                         <label><br>
+                         <!-- <label><br>
                          <input type="checkbox" id="formStatus1"> Show button registrasi
                          </label><br>
                           <div class="from-group" id="showCheck">
@@ -111,7 +111,7 @@
                           <input type="text"  id="formButtonName1" class="form-control" placeholder="Name Button"><br>
                           <label class="control-label">Url:</label>
                           <input  type="text"  id="formUrl1" class="form-control" placeholder="http://example.com"><br>
-                          </div>
+                          </div> -->
                          
                         </div>
                    
