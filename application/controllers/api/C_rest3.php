@@ -1133,7 +1133,83 @@ class C_rest3 extends CI_Controller {
 
         elseif ($mode == 'KurikulumCapaianRencana') {
           $rs = [];
-          
+          $ProdiID = $dataToken['ProdiID'];
+          $P = explode('.', $ProdiID);
+          $ProdiID = $P[0];
+          $Kurikulum = $dataToken['Kurikulum'];
+          $K = explode('.', $Kurikulum);
+          $Kurikulum = $K[0];
+          $sql = 'select a.Semester,b.MKCode,b.Name as NameMataKuliah,if(b.TypeMK = "1","V","") as TypeMatakuliah,
+                  if(b.CourseType = "1","V","") as Kuliah,if(b.CourseType = "4","V","") as Seminar,if(b.CourseType = "3","V","") as Pratikum,
+                  (a.TotalSKS * c.SKSPerMinutes) as Konversi,z.Year,a.MKID
+                  from db_academic.curriculum_details as a 
+                  join db_academic.curriculum as z on z.ID = a.CurriculumID
+                  join db_academic.mata_kuliah as b on a.MKID = b.ID
+                  join db_rektorat.credit_type_courses as c on c.ID = b.ID
+                  where b.TypeMK = "1" and a.ProdiID = '.$ProdiID.' and a.CurriculumID = '.$Kurikulum.'
+                 ';
+                 //print_r($sql);die();
+          $query = $this->db->query($sql,array())->result_array();
+          $data = array();
+          // get semester
+          $Get_semester = $this->m_master->showData_array('db_academic.semester');
+          for ($i=0; $i < count($query); $i++) { 
+            $nestedData = array();
+            $row = $query[$i];
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['Semester'];
+            $nestedData[] = $row['MKCode'];
+            $nestedData[] = $row['NameMataKuliah'];
+            $nestedData[] = $row['TypeMatakuliah'];
+            $nestedData[] = $row['Kuliah'];
+            $nestedData[] = $row['Seminar'];
+            $nestedData[] = $row['Pratikum'];
+            $nestedData[] = $row['Konversi'];
+            $nestedData[] = ''; // Sikap
+            $nestedData[] = ''; // Pengetahun
+            $nestedData[] = ''; // Keteram-pilan Umum
+            $nestedData[] = ''; // Keteram-pilan Khusus
+            // get Dokumen Rencana Pembela-jaran
+            $Semester = $row['Semester'];
+            $Year = $row['Year'];
+            $MKID = $row['MKID'];
+            // get SemesterID
+            $CountSemester = 0;
+            $SemesterID = '';
+            for ($j=0; $j < count($Get_semester); $j++) { 
+              if ($Get_semester[$j]['Year'] == $Year) {
+                $CountSemester++;
+                if ($Semester == $CountSemester) {
+                  $SemesterID =  $Get_semester[$j]['ID'];
+                  break;
+                }
+              }
+            }
+            $Dokumen = '';
+            if ($SemesterID != '') {
+              $sql2 = 'select b.ScheduleID,c.SAP
+                      from db_academic.schedule as a 
+                      join db_academic.schedule_details_course as b on a.ID = b.ScheduleID
+                      join db_academic.grade_course as c on c.ScheduleID = a.ID
+                      where c.SemesterID = '.$SemesterID.' and b.ProdiID = '.$ProdiID.'
+                      and b.MKID = '.$MKID.'
+                      group by a.ID
+              ';
+              $query2 = $this->db->query($sql2,array())->result_array();
+              if (count($query2) > 0) {
+                $Dokumen = '<a href = "'.url_sign_in_lecturers.'uploads/sap/'.$query2[0]['SAP'].'" target = "_blank">'.$query2[0]['SAP'].'</a>';
+              }
+            }
+            $nestedData[] = $Dokumen;
+            $nestedData[] = $SemesterID; // Unit Penyeleng-gara
+            $data[] = $nestedData;
+          }
+           $rs = array(
+               "draw"            => intval( 0 ),
+               "recordsTotal"    => intval(count($query)),
+               "recordsFiltered" => intval( count($query) ),
+               "data"            => $data
+           );       
           echo json_encode($rs);
         }
         else

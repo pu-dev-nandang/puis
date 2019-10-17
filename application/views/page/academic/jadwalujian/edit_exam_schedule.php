@@ -181,7 +181,7 @@
 
             <div style="text-align: right;">
                 <input id="viewTotalStudent" class="hide" hidden readonly value="<?php echo $totalStudent; ?>">
-                <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
+                <a href="<?php echo base_url('academic/exam-schedule'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
                 <button id="btnSaveEditSchedule" class="btn btn-primary">Save</button>
             </div>
             <hr/>

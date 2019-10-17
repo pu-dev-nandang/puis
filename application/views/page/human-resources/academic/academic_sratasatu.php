@@ -61,15 +61,7 @@
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label>Total Semester</label>
-                                                <div class="input-group number-spinner">
-                                                <span class="input-group-btn">
-                                                    <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
-                                                </span>
-                                                <input type="text" class="form-control text-center" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS1" value="0" maxlength="2">
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
-                                                    </span>
-                                            </div>
+                                                <input type="text" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS1" value="0" maxlength="2">          
                                         </div>
                                     </div>
 
@@ -203,8 +195,8 @@ function loadAcademicS1Details() {
                        i = j;
                     }
 
-                    $("#dataRow").append('<tr>                                                          '+
-                    '       <td> S1 </td>                                                          '+         
+                    $("#dataRow").append('<tr>                                                      '+
+                    '       <td style="text-align: center;"> '+response[i]['TypeAcademic']+' </td>  '+         
                     '       <td> '+response[i]['Name_University']+' </td>                           '+                             
                     '       <td> '+response[i]['NamaJurusan']+' </td>                               '+    
                     '       <td><center><div class="btn-group">   '+ 
@@ -310,16 +302,8 @@ function loadAcademicS1Details() {
                         '            </div>                                                             '+
                         '            <div class="col-xs-3">                                             '+
                         '               <div class="form-group">                                        '+ 
-                        '                    <label>Total Semester</label>                              '+
-                        '                        <div class="input-group number-spinner">               '+
-                        '                        <span class="input-group-btn">                         '+
-                        '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
-                        '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" > '+
-                        '                           <span class="input-group-btn"> '+
-                        '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button> '+
-                        '                           </span>                                             '+
-                        '                   </div>                                                      '+
+                        '                    <label>Total Semester</label>                              '+                                                
+                        '                    <input type="text" class="form-control" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" maxlength="2"> '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '      <div class="col-xs-6">                                              '+
@@ -497,15 +481,7 @@ function loadAcademicS1Details() {
                         '            <div class="col-xs-3">                                             '+
                         '               <div class="form-group">                                        '+ 
                         '                    <label>Total Semester</label>                              '+
-                        '                        <div class="input-group number-spinner">               '+
-                        '                        <span class="input-group-btn">                         '+
-                        '                            <button class="btn btn-default" data-dir="dwn" disabled><span class="glyphicon glyphicon-minus"></span></button> '+
-                        '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" disabled> '+
-                        '                           <span class="input-group-btn"> '+
-                        '                               <button class="btn btn-default" data-dir="up" disabled><span class="glyphicon glyphicon-plus"></span></button> '+
-                        '                           </span>                                             '+
-                        '                   </div>                                                      '+
+                        '                    <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" disabled> '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '      <div class="col-xs-6">                                              '+

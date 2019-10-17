@@ -46,6 +46,8 @@ $route['parent/(:num)'] = 'auth/c_auth/parent/$1';
 $route['getReportEdom/(:num)/(:num)/(:num)'] = 'auth/c_auth/getReportEdom/$1/$2/$3';
 
 $route['foto'] = 'auth/c_auth/foto';
+$route['cekFile'] = 'auth/c_auth/cekFile';
+$route['dataSinta'] = 'auth/c_auth/dataSinta';
 $route['migration-students'] = 'auth/c_auth/migrationStudent';
 
 $route['toStdPlanning/(:any)/(:any)'] = 'auth/c_auth/toStdPlanning/$1/$2';
@@ -62,7 +64,7 @@ $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
 // === Academic ===
 $route['academic/curriculum_cross/(:any)/(:any)'] = 'page/academic/c_kurikulum/curriculum_cross/$1/$2';
-$route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
+
 $route['academic/kurikulum-detail'] = 'page/academic/c_kurikulum/kurikulum_detail';
 $route['academic/kurikulum/add-kurikulum'] = 'page/academic/c_kurikulum/add_kurikulum';
 $route['academic/kurikulum/loadPageDetailMataKuliah'] = 'page/academic/c_kurikulum/loadPageDetailMataKuliah';
@@ -70,13 +72,68 @@ $route['academic/kurikulum/loadPageDetailMataKuliah'] = 'page/academic/c_kurikul
 $route['academic/kurikulum/data-conf'] = 'page/academic/c_kurikulum/getDataConf';
 //$route['academic/kurikulum/getClassGroup'] = 'page/academic/c_kurikulum/getClassGroup';
 
+// Academic
+$query = $db->get('db_academic.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+    $Slug = $row->Slug;
+    $Slug = explode('/', $Slug);
+    if (in_array('(:any)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:any)' ] = $row->Controller;
+    }
+    elseif(in_array('(:num)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:num)' ] = $row->Controller;
+    }
+    else
+    {
+        $route[ $row->Slug ] = $row->Controller;
+    }
+
+}
+
+// === SIAP DI HAPUS ====
+//$route['academic/curriculum'] = 'page/academic/c_kurikulum/kurikulum';
+//$route['academic/courses'] = 'page/academic/c_matakuliah/mata_kuliah';
+//$route['academic/academic-year'] = 'page/academic/c_tahun_akademik/tahun_akademik';
+//$route['academic/semester-antara'] = 'page/academic/c_semester_antara';
+//$route['academic/transfer-student/programme-study'] = 'page/academic/c_transfer_student/transfer_prodi';
+//$route['academic/references'] = 'page/academic/c_reference';
+
+//$route['academic/timetables/list'] = 'page/academic/c_timetables/list_timetables';
+
+//$route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
+
+//$route['academic/attendance/input-attendace'] = 'page/academic/c_presensi';
+
+//$route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_exam';
+//$route['academic/score'] =  'page/academic/c_score';
+
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
+//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+
+//$route['academic/transcript'] =  'page/academic/c_transcript';
+
+// ==== PENUTUP SIAP DI HAPUS ===
+
 
 $route['academic/kurikulum-detail-mk'] = 'page/academic/c_kurikulum/kurikulum_detail_mk';
-$route['academic/courses'] = 'page/academic/c_matakuliah/mata_kuliah';
+
 $route['academic/dataTableMK'] = 'page/academic/c_matakuliah/dataTableMK';
 
 $route['academic/tesdb'] = 'page/academic/c_tahun_akademik/tesdb';
-$route['academic/academic-year'] = 'page/academic/c_tahun_akademik/tahun_akademik';
+
 $route['academic/tahun-akademik-table'] = 'page/academic/c_tahun_akademik/tahun_akademik_table';
 $route['academic/detail-tahun-akademik'] = 'page/academic/c_tahun_akademik/page_detail_tahun_akademik';
 $route['academic/modal-tahun-akademik'] = 'page/academic/c_tahun_akademik/modal_tahun_akademik';
@@ -85,7 +142,7 @@ $route['academic/tahun-akademik/(:any)'] = 'page/academic/c_tahun_akademik/tahun
 $route['academic/tahun-akademik-detail'] = 'page/academic/c_tahun_akademik/tahun_akademik_detail2';
 $route['academic/tahun-akademik-detail-date'] = 'page/academic/c_tahun_akademik/tahun_akademik_detail_date';
 
-$route['academic/semester-antara'] = 'page/academic/c_semester_antara';
+
 $route['academic/semester-antara/timetable/(:num)'] = 'page/academic/c_semester_antara/timetable/$1';
 $route['academic/semester-antara/students/(:num)'] = 'page/academic/c_semester_antara/students/$1';
 $route['academic/semester-antara/recap-attendance/(:num)/(:num)'] = 'page/academic/c_semester_antara/recap_attendance/$1/$2';
@@ -94,16 +151,15 @@ $route['academic/semester-antara/setting-timetable/(:num)'] = 'page/academic/c_s
 $route['academic/semester-antara/setting-exam/(:num)'] = 'page/academic/c_semester_antara/setting_exam/$1';
 $route['academic/semester-antara/setting/(:num)'] = 'page/academic/c_semester_antara/setting/$1';
 
-
 $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_antara/loadDetails/$1';
 
 
 $route['academic/ketersediaan-dosen'] = 'page/academic/c_akademik/ketersediaan_dosen';
 $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_KetersediaanDosen';
 
-$route['academic/timetables'] = 'page/academic/c_jadwal';
+//$route['academic/timetables'] = 'page/academic/c_jadwal';
 
-$route['academic/timetables/list'] = 'page/academic/c_timetables/list_timetables';
+
 $route['academic/timetables/list/edit/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_course/$1/$2/$3';
 $route['academic/timetables/list/edit-schedule/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_schedule/$1/$2/$3';
 
@@ -112,15 +168,15 @@ $route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/se
 
 $route['academic/study-planning'] = 'page/academic/c_study_planning';
 
-$route['academic/study-planning/list-student'] = 'page/academic/c_study_planning/liststudent';
+
 $route['academic/study-planning/course-offer/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/course_offer/$1/$2/$3';
 $route['academic/study-planning/batal-tambah/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/batal_tambah/$1/$2/$3';
 $route['academic/study-planning/outstanding'] = 'page/academic/c_study_planning/outstanding';
-$route['academic/references'] = 'page/academic/c_reference';
+
 
 
 // TRANSFER STUDENT
-$route['academic/transfer-student/programme-study'] = 'page/academic/c_transfer_student/transfer_prodi';
+
 $route['academic/transfer-student/course-conversion/(:num)'] = 'page/academic/c_transfer_student/course_conversion/$1';
 $route['academic/transfer-student/__loadListTransferStudent'] = 'page/academic/c_transfer_student/loadListTransferStudent';
 
@@ -129,9 +185,9 @@ $route['academic/transfer-student/__loadListTransferStudent'] = 'page/academic/c
 // Jadwal Ujian
 $route['academic/__setPageJadwalUjian'] = 'page/academic/c_jadwal_ujian/setPageJadwal';
 $route['academic/__setPageJadwal'] = 'page/academic/c_jadwal/setPageJadwal';
-$route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
+//$route['academic/exam-schedule'] = 'page/academic/c_jadwal_ujian';
 
-$route['academic/exam-schedule/list-exam'] = 'page/academic/c_jadwal_ujian/list_exam';
+
 $route['academic/exam-schedule/list-waiting-approve'] = 'page/academic/c_jadwal_ujian/list_waiting_approve';
 $route['academic/exam-schedule/set-exam-schedule'] = 'page/academic/c_jadwal_ujian/set_exam_schedule';
 $route['academic/exam-schedule/edit-exam-schedule/(:num)'] = 'page/academic/c_jadwal_ujian/edit_exam_schedule/$1';
@@ -139,17 +195,17 @@ $route['academic/exam-schedule/exam-setting'] = 'page/academic/c_jadwal_ujian/ex
 $route['academic/exam-schedule/exam-barcode'] = 'page/academic/c_jadwal_ujian/exam_barcode';
 
 // ---- Score ----
-$route['academic/score'] =  'page/academic/c_score';
+
 $route['academic/inputScore'] =  'page/academic/c_score/inputScore';
 $route['academic/score/monitoring-score'] =  'page/academic/c_score/monitoring_score';
 
 // ---- Transcript ----
-$route['academic/transcript'] =  'page/academic/c_transcript';
+
 $route['academic/transcript/setting-transcript'] =  'page/academic/c_transcript/setting_transcript';
 
 // ---- Final Project ----
-$route['academic/final-project/list-student'] =  'page/academic/c_final_project';
-//$route['academic/final-project/list-student'] =  'page/academic/c_final_project/list_student';
+
+
 $route['academic/final-project/seminar-schedule'] =  'page/academic/c_final_project/seminar_schedule';
 $route['academic/final-project/uploadIjazahStudent'] =  'page/academic/c_final_project/uploadIjazahStudent';
 $route['academic/final-project/scheduling-final-project'] =  'page/academic/c_final_project/scheduling_final_project';
@@ -222,7 +278,7 @@ $route['database/mentor-academic'] = 'page/database/c_database/mentor_academic';
 
 
 // --- Presensi ---
-$route['academic/attendance/input-attendace'] = 'page/academic/c_presensi';
+
 $route['academic/attendance/details-attendace/(:num)'] = 'page/academic/c_presensi/details_attendace/$1';
 
 $route['academic/loadPagePresensi'] = 'page/academic/c_presensi/loadPagePresensi';
@@ -1182,6 +1238,12 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
 
+
+$route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
+$route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
+
+
+
 $route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
 $route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
 $route['api-prodi/__getProdiLecturer'] = 'api/c_api_prodi/getProdiLecturer';
@@ -1338,6 +1400,10 @@ $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/li
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
 $route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
 $route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+
+$route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
+$route['rectorat/master_data/crud_credit_type_courses'] = 'page/rektorat/c_credit_type_courses/crud_credit_type_courses';
+
 
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';

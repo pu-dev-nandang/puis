@@ -13,6 +13,17 @@ class M_matakuliah extends CI_Model {
         return $data->result_array();
     }
 
+    public function __getAllMK2()
+    {
+        $data = $this->db->query('SELECT mk.*, ps.Code,
+                                ps.Name AS NameProdi, ps.NameEng AS NameProdiEng,cts.NamaType
+                                  FROM db_academic.mata_kuliah mk
+                                  JOIN db_academic.program_study ps ON (mk.BaseProdiID = ps.ID)
+								  JOIN db_rektorat.credit_type_courses as cts on cts.ID = mk.CourseType
+                                  '
+                              );
 
+        return $data->result_array();
+    }
 
 }

@@ -5,7 +5,7 @@
         <ul id="nav">
             <!-- list menu -->
 
-            <li class="<?php if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='master_data' && $this->uri->segment(3)=='config_jabatan_per_sks' ){echo"current";}?>">
+            <li class="<?php if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='master_data') {echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/master_data/config_jabatan_per_sks');?>">
                     <i class="fa fa-globe"></i> Master Data
                 </a>

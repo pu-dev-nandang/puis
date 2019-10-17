@@ -1,10 +1,10 @@
 
 
-<?php $arrMenu = ['programme-study','course-conversion']; ?>
+<?php $arrMenu = ['transfer-student','programme-study','course-conversion']; ?>
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if(in_array($this->uri->segment(3),$arrMenu)) { echo 'active'; } ?>">
+        <li class="<?php if(in_array($this->uri->segment(2),$arrMenu)) { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/transfer-student/programme-study'); ?>">Transfer Programme Study</a>
         </li>
 

@@ -668,6 +668,7 @@ class C_api_prodi extends CI_Controller {
     
     function getDataProdiTexting(){
 
+
         $data_arr = $this->getInputToken2();
 
         $LangCode = $data_arr['LangCode'];
@@ -728,6 +729,7 @@ class C_api_prodi extends CI_Controller {
         return print_r(json_encode($data));
 
     }
+
     function getTestiProdi(){
 
         $data_arr = $this->getInputToken2();
@@ -752,6 +754,7 @@ class C_api_prodi extends CI_Controller {
        
         return print_r(json_encode($data));
         
+
     }
     function getPartnerProdi(){
         $data_arr = $this->getInputToken2();

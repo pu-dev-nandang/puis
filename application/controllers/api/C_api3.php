@@ -2552,18 +2552,20 @@ class C_api3 extends CI_Controller {
                         $Year_where = $Year - $i;
 
                         $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
-
-                                          FROM db_academic.auth_students ats
-                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
-                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
-                                          AND ats.StatusStudentID = "1"
-                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
-                                          ORDER BY ats.NPM')->result_array();
+                                                                          FROM db_academic.auth_students ats
+                                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
+                                                                          AND ats.StatusStudentID = "1"
+                                                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                                                          ORDER BY ats.NPM')->result_array();
 
 
                         $TotalLama = 0;
+                        $TotalPembagi = 0;
                         // Mendapatkan pekerjaan pertamanya
                         if(count($dataStd)>0){
+
+
 
                             for ($a=0;$a<count($dataStd);$a++){
 
@@ -2572,6 +2574,7 @@ class C_api3 extends CI_Controller {
 
                                 $Experience = $this->db->query('SELECT ae.StartMonth, ae.StartYear FROM db_studentlife.alumni_experience ae 
                                                                     WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID ASC LIMIT 1 ')->result_array();
+
 
                                 $LamaKerjaDalamBulan = 0;
                                 if(count($Experience)>0 && count($YudisiumDate_ex)>0){
@@ -2582,7 +2585,17 @@ class C_api3 extends CI_Controller {
                                     $J_Month = $Experience[0]['StartMonth'];
                                     $J_Year = $Experience[0]['StartYear'];
 
-                                    $y = (($J_Year - $Y_Year) - 1 ) * 12;
+                                    $y_k = ($J_Year - $Y_Year);
+
+                                    if($y_k==0 && $J_Month<$Y_Month){
+                                        $y = ($y_k - 1 ) * 12;
+                                    } else if($y_k>0) {
+                                        $y = ($y_k - 1 ) * 12;
+                                    } else {
+                                        $y = $y_k * 12;
+                                    }
+
+//                                    $y = ($y_k>0 && $J_Month<$Y_Month) ? ($y_k - 1 ) * 12 : $y_k * 12;
                                     $m = ($J_Month >= $Y_Month) ? abs($J_Month - $Y_Month) : 12 - (abs($J_Month - $Y_Month));
 
                                     $LamaKerjaDalamBulan = $y + $m;
@@ -2590,6 +2603,7 @@ class C_api3 extends CI_Controller {
                                     $dataStd[$a]['Y'] = $y;
                                     $dataStd[$a]['M'] = $m;
 
+                                    $TotalPembagi = $TotalPembagi + 1;
                                 }
 
                                 $dataStd[$a]['LamaWaktuTunggu'] = $LamaKerjaDalamBulan;
@@ -2600,9 +2614,10 @@ class C_api3 extends CI_Controller {
                             }
                         }
 
-                        $RataRata = (count($dataStd)>0) ? $TotalLama / count($dataStd) : 0;
+                        $RataRata = ($TotalPembagi>0) ? $TotalLama / $TotalPembagi : 0;
                         $dataEd[$j]['BL_'.$Year_where] = array(
                             'DetailStudent' => $dataStd,
+                            'TotalPembagi' => $TotalPembagi,
                             'TotalLamaMenunggu' => $TotalLama,
                             'TotalStudent' => count($dataStd),
                             'RataRata' =>  $RataRata
@@ -2619,6 +2634,74 @@ class C_api3 extends CI_Controller {
 
 
 
+        }
+        else if($data_arr['action']=='readKesesuaianBidangKerjaLulusan'){
+            $Year = $data_arr['Year'];
+            $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
+
+            if(count($dataEd)>0) {
+                for ($j = 0; $j < count($dataEd); $j++) {
+
+                    for($i=0;$i<=2;$i++){
+
+                        $Year_where = $Year - $i;
+
+                        $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
+                                                                          FROM db_academic.auth_students ats
+                                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                                                          WHERE ats.GraduationYear = "'.$Year_where.'" 
+                                                                          AND ats.StatusStudentID = "1"
+                                                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                                                          ORDER BY ats.NPM')->result_array();
+
+                        $TotalPembagi = 0;
+                        $TotalKesesuaian = 0;
+                        // Mendapatkan pekerjaan terakhirnya
+                        if(count($dataStd)>0){
+
+                            for ($a=0;$a<count($dataStd);$a++){
+                                $Experience = $this->db->query('SELECT ae.StartMonth, ae.StartYear, ae.WorkSuitability FROM db_studentlife.alumni_experience ae 
+                                                                    WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID DESC LIMIT 1 ')->result_array();
+
+
+                                $TotalKesesuaianPerStd = 0;
+                                if(count($Experience)>0){
+
+                                    if($Experience[0]['WorkSuitability']!='' && $Experience[0]['WorkSuitability']!=null){
+                                        $WorkSuitability = (integer) $Experience[0]['WorkSuitability'];
+                                        $TotalKesesuaianPerStd = ($WorkSuitability > 0) ? 1 : 0;
+                                    }
+
+
+
+                                    $TotalPembagi = $TotalPembagi + 1;
+                                }
+
+                                $dataStd[$a]['Kesesuaian'] = (count($Experience)>0) ? $Experience[0]['WorkSuitability'] : '-';
+                                $dataStd[$a]['Name'] = ucwords(strtolower($dataStd[$a]['Name']));
+                                $dataStd[$a]['Experience'] = $Experience;
+
+                                $TotalKesesuaian = $TotalKesesuaian + $TotalKesesuaianPerStd;
+                            }
+
+
+
+                        }
+
+                        $RataRata = ($TotalPembagi>0) ? ($TotalKesesuaian / $TotalPembagi) * 100 : 0;
+                        $dataEd[$j]['BL_'.$Year_where] = array(
+                            'RataRata' => $RataRata,
+                            'TotalKesesuaian' => $TotalKesesuaian,
+                            'DetailStudent' => $dataStd,
+                            'TotalPembagi' => $TotalPembagi,
+                            'TotalStudent' => count($dataStd)
+                        );
+
+                    }
+
+                }
+            }
+            return print_r(json_encode($dataEd));
         }
 
     }

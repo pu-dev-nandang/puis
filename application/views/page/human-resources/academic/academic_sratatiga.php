@@ -56,19 +56,10 @@
                                             <input class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="totalCreditS3" maxlength="3">
                                         </div>
                                     </div>
-
                                     <div class="col-xs-3">
                                         <div class="form-group">
                                             <label>Total Semester</label>
-                                                <div class="input-group number-spinner">
-                                                <span class="input-group-btn">
-                                                    <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button>
-                                                </span>
-                                                <input type="text" class="form-control text-center" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS3" value="0" maxlength="2">
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button>
-                                                    </span>
-                                            </div>
+                                                <input type="text" class="form-control" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" id="TotSemesterS3" value="0" maxlength="2"> 
                                         </div>
                                     </div>
 
@@ -206,16 +197,8 @@
                         '            </div>                                                             '+
                         '            <div class="col-xs-3">                                             '+
                         '               <div class="form-group">                                        '+ 
-                        '                    <label>Total Semester</label>                              '+
-                        '                        <div class="input-group number-spinner">               '+
-                        '                        <span class="input-group-btn">                         '+
-                        '                            <button class="btn btn-default" data-dir="dwn"><span class="glyphicon glyphicon-minus"></span></button> '+
-                        '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS3" value="'+response[i]['TotalSemester']+'" > '+
-                        '                           <span class="input-group-btn"> '+
-                        '                               <button class="btn btn-default" data-dir="up"><span class="glyphicon glyphicon-plus"></span></button> '+
-                        '                           </span>                                             '+
-                        '                   </div>                                                      '+
+                        '                    <label>Total Semester</label>                              '+                                           
+                        '                    <input type="text" class="form-control" id="TotSemesterS3" value="'+response[i]['TotalSemester']+'" maxlength="2"> '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '      <div class="col-xs-6">                                              '+
@@ -592,15 +575,7 @@ $(document).ready(function () {
                         '            <div class="col-xs-3">                                             '+
                         '               <div class="form-group">                                        '+ 
                         '                    <label>Total Semester</label>                              '+
-                        '                        <div class="input-group number-spinner">               '+
-                        '                        <span class="input-group-btn">                         '+
-                        '                            <button class="btn btn-default" data-dir="dwn" disabled><span class="glyphicon glyphicon-minus"></span></button> '+
-                        '                        </span>                                                '+
-                        '                        <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" disabled> '+
-                        '                           <span class="input-group-btn"> '+
-                        '                               <button class="btn btn-default" data-dir="up" disabled><span class="glyphicon glyphicon-plus"></span></button> '+
-                        '                           </span>                                             '+
-                        '                   </div>                                                      '+
+                        '                    <input type="text" class="form-control text-center" id="TotSemesterS1" value="'+response[i]['TotalSemester']+'" disabled> '+
                         '               </div>                                                          '+
                         '           </div>                                                              '+
                         '      <div class="col-xs-6">                                              '+
