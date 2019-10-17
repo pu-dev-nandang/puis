@@ -78,16 +78,21 @@
             if(jsonResult.length>0) {
                 $.each(jsonResult, function (i, v) {
 
-
-                    var viewBL3 = (parseFloat(v['BL_'+Y3].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y3].RataRata.toFixed(2)+'</a>' : 0;
-                    var viewBL2 = (parseFloat(v['BL_'+Y2].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y2].RataRata.toFixed(2)+'</a>' : 0;
-                    var viewBL1 = (parseFloat(v['BL_'+Y1].RataRata)>0)
-                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData">'+v['BL_'+Y1].RataRata.toFixed(2)+'</a>' : 0;
-
-
                     var viewDess = (v.Description!=null && v.Description!='') ? v.Description : v.Name;
+
+
+                    var viewBL3 = (parseFloat(v['BL_'+Y3].TotalPembagi)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y3],'UAP)(*')+'" class="showDetailData" data-title="'+viewDess+' | TS - '+Y3+'">'+v['BL_'+Y3].RataRata.toFixed(2)+'</a>'
+                        : '-';
+                    var viewBL2 = (parseFloat(v['BL_'+Y2].TotalPembagi)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y2],'UAP)(*')+'" class="showDetailData" data-title="'+viewDess+' | TS - '+Y2+'">'+v['BL_'+Y2].RataRata.toFixed(2)+'</a>'
+                        : '-';
+                    var viewBL1 = (parseFloat(v['BL_'+Y1].TotalPembagi)>0)
+                        ? '<a href="javascript:void(0)" data-token="'+jwt_encode(v['BL_'+Y1],'UAP)(*')+'" class="showDetailData" data-title="'+viewDess+' | TS - '+Y1+'">'+v['BL_'+Y1].RataRata.toFixed(2)+'</a>'
+                        : '-';
+
+
+
 
                     $('#listData').append('<tr>' +
                         '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
@@ -107,12 +112,13 @@
 
     $(document).on('click','.showDetailData',function () {
        var token = $(this).attr('data-token');
+       var title = $(this).attr('data-title');
        var d = jwt_decode(token,'UAP)(*');
 
        console.log(d);
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Announcement</h4>');
+            '<h4 class="modal-title">'+title+'</h4>');
 
 
         var tr = '';
@@ -120,7 +126,7 @@
             $.each(d.DetailStudent,function (i,v) {
 
                 var YudisiumDate = (v.YudisiumDate!='' && v.YudisiumDate!=null)
-                    ? moment(v.YudisiumDate).format('DD MMM YYYY')
+                    ? moment(v.YudisiumDate).format('MMM YYYY')
                     : '-';
 
                 var Experience = (v.Experience.length>0)
@@ -130,11 +136,11 @@
                 var LamaWaktuTunggu = (v.LamaWaktuTunggu!='') ? v.LamaWaktuTunggu : '';
 
                 tr = tr+'<tr>' +
-                    '<td>'+(i+1)+'</td>' +
-                    '<td>'+v.Name+'</td>' +
+                    '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
+                    '<td style="text-align: left;">'+v.Name+'</td>' +
                     '<td>'+YudisiumDate+'</td>' +
                     '<td>'+Experience+'</td>' +
-                    '<td>'+LamaWaktuTunggu+'</td>' +
+                    '<td style="border-left: 1px solid #CCCCCC;">'+LamaWaktuTunggu+'</td>' +
                     '</tr>';
             });
         }
@@ -142,11 +148,11 @@
         $('#GlobalModal .modal-body').html('<table class="table table-striped table-centre">' +
             '    <thead>' +
             '    <tr>' +
-            '        <th>No</th>' +
+            '        <th style="width: 1%;">No</th>' +
             '        <th>Nama</th>' +
-            '        <th>Yudisium</th>' +
-            '        <th>Tanggal Pekerjaan Pertama</th>' +
-            '        <th>Waktu Tunggu <br/>(Bulan)</th>' +
+            '        <th style="width: 19%;">Yudisium</th>' +
+            '        <th style="width: 19%;">Tanggal Pekerjaan Pertama</th>' +
+            '        <th style="width: 5%;">Waktu Tunggu <br/>(Bulan)</th>' +
             '    </tr>' +
             '    </thead><tbody>'+tr+'</tbody>' +
             '</table>');
