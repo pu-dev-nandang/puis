@@ -13,6 +13,7 @@
 	</div>
 </div>
 <script type="text/javascript">
+	var oTable;
 	function ModalTblLembaga(vfor='')
 	{
 		vfor = (vfor == '' || vfor == undefined) ? '' : vfor;
@@ -54,7 +55,7 @@
 	 	var data = {
 	 	    auth : 's3Cr3T-G4N',
 	 	    mode : 'DataKerjaSama',
-	 	    Active : 1,
+	 	    // Active : 1,
 	 	};
 
 	 	var token = jwt_encode(data,"UAP)(*");
@@ -134,13 +135,22 @@
 			var ID = row.attr('data-id');
 			var tokenEdit = row.attr('data');
 			var data = jwt_decode(tokenEdit);
+			// console.log(data);
 			var vforGet = $(this).attr('vfor');
 			var s_show = (vforGet == '') ? '.inputshow[name="KerjasamaID"]' : '.inputshowSearch[name="KerjasamaID"]';
 			var s_input = (vforGet == '') ? '.input[name="KerjasamaID"]' : '.inputSearch[name="KerjasamaID"]';
 			$(s_show).val(data['Lembaga'])
 			$(s_input).val(data['KerjasamaID'])
+			$(s_input).attr('kategori',data['Kategori']);
 			$('#GlobalModalLarge').modal('hide');
-			$('.inputSearch').trigger('change');
+			if (vforGet != '') {
+				$('.inputSearch').trigger('change');
+			}
+			else
+			{
+				$(s_input).trigger('change');
+			}
+			
 		});
 	 }
 
@@ -186,7 +196,7 @@
 	 	console.log(dt);
 	 	for (key in dt){
 	 		if (key != 'Perjanjian' && key != 'DepartmentKS' && key != 'BuktiUpload' && key != 'KerjasamaID' && key != 'ID') {
-	 			if (key == 'SemesterID') {
+	 			if (key == 'SemesterID' || key == 'Kategori_kegiatan') {
 	 				$('.input[name="'+key+'"] option').filter(function() {
 	 				   //may want to use $.trim in here
 	 				   return $(this).val() == dt[key]; 
@@ -222,6 +232,7 @@
 	 			  break;
 	 			  case 'KerjasamaID':
 	 			  	$('.input[name="KerjasamaID"]').val(dt[key]);
+	 			  	$('.input[name="KerjasamaID"]').attr('kategori',dt['Kategori_kegiatan']);
 	 			  	$('.inputshow[name="KerjasamaID"]').val(dt['Lembaga']);
 	 			  break;
 	 			  default:
@@ -229,5 +240,6 @@
 	 			}
 	 		}
 	 	}
+	 	$('.input[name="KerjasamaID"]').trigger('change');
 	 }
 </script>
