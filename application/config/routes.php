@@ -1188,6 +1188,7 @@ $route['api-prodi/__getProdiLecturer'] = 'api/c_api_prodi/getProdiLecturer';
 $route['api-prodi/__getDosenProdi'] = 'api/c_api_prodi/getDosenProdi';
 $route['api-prodi/__getStudentsProdi'] = 'api/c_api_prodi/getStudentsProdi';
 $route['api-prodi/__getTestiProdi'] = 'api/c_api_prodi/getTestiProdi';
+$route['api-prodi/__getPartnerProdi'] = 'api/c_api_prodi/getPartnerProdi';
 // ==== API Prodi yamin=== //
 
 // =======================//

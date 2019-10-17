@@ -572,37 +572,45 @@ class C_api_prodi extends CI_Controller {
 
                 $dataForm = (array) $data_arr['dataForm'];
                 // check action insert or update
-                $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
-                    where fc.ProdiID = ?
-                ';
-                $ProdiID = $prodi_active_id;
-                $query = $this->db->query($sql, array($ProdiID))->result_array();
-               if (count($query) == 0) { 
+                // $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
+                //     where fc.ProdiID = ?
+                // ';
+                // $ProdiID = $prodi_active_id;
+                // $query = $this->db->query($sql, array($ProdiID))->result_array();
+                // if (count($query) == 0) { 
+                //     $dataForm['ProdiID'] = $prodi_active_id;
+                //     $dataForm['Photo'] = $upload;
+                //     $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                //     $dataform['CreateBy'] = $this->session->userdata('NIP');
+                    
+                //     $this->db->insert('db_prodi.facilities',$dataForm);
+                //     }
+               // else{ // Update
+               //      $arr_file =  $query[0]['Photo'];
+               //      $path = './images/Facilities/'. $arr_file;
+
+               //        if(is_file($path)){
+               //          $ID = $query[0]['ID'];
+               //          $dataupdate = $dataForm;
+               //          $dataupdate['Photo'] = $upload;
+               //          $this->db->where('ID',$ID);
+               //          $this->db->update('db_prodi.facilities',$dataupdate);
+               //          unlink($path);
+               //        }
+               //        else{
+               //          $ID = $query[0]['ID'];
+               //          $dataupdate = $dataForm;
+               //          $dataupdate['Photo'] = $upload;
+               //          $this->db->where('ID',$ID);
+               //          $this->db->update('db_prodi.facilities',$dataupdate);
+               //        }
+               //  }
                     $dataForm['ProdiID'] = $prodi_active_id;
                     $dataForm['Photo'] = $upload;
                     $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
                     $dataform['CreateBy'] = $this->session->userdata('NIP');
                     
                     $this->db->insert('db_prodi.facilities',$dataForm);
-                    }
-               else{
-                    $arr_file =  $query[0]['Photo'];
-                    $path = './images/Facilities/'. $arr_file;
-
-                      if(is_file($path)){
-                        $ID = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$ID);
-                        $this->db->update('db_prodi.facilities',$dataupdate);
-                        unlink($path);
-                      }
-                      else{
-                        $ID = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$ID);
-                        $this->db->update('db_prodi.facilities',$dataupdate);
-                      }
-                }
                 
             }
 
@@ -634,7 +642,7 @@ class C_api_prodi extends CI_Controller {
                 $arr_file =  $query[0]['Photo'];
                 
                 $path = './images/Facilities/'. $arr_file;
-             unlink($path);
+                unlink($path);
             return print_r(1);
         }
 
@@ -647,7 +655,7 @@ class C_api_prodi extends CI_Controller {
         $data = 'SELECT em.NIP, em.Name, em.Gender, em.PositionMain, em.ProdiID, ps.NameEng AS         ProdiNameEng
                 FROM db_employees.employees em
                 INNER JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                WHERE (em.PositionMain = "14.6" OR em.PositionMain = "14.7" OR)  AND ( ';//dosen kaprodi
+                WHERE (em.PositionMain = "14.6" OR em.PositionMain = "14.7" )  AND ( ';//dosen kaprodi
         $data.= ' em.NIP LIKE "'.$key.'%" ';
         $data.= ' OR em.Name LIKE "'.$key.'%" ';
         $data.= ' OR ps.ID LIKE "'. $prodi_active_id .'%" ';
@@ -744,6 +752,15 @@ class C_api_prodi extends CI_Controller {
        
         return print_r(json_encode($data));
         
+    }
+    function getPartnerProdi(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT * FROM db_prodi.partner prt
+                                  WHERE prt.ProdiID = "'.$ProdiID.'"')->result_array();
+        
+        return print_r(json_encode($data));
     }
 
 
