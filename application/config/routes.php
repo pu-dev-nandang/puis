@@ -2016,3 +2016,33 @@ $route['cooperation/kerjasama-perguruan-tinggi'] = 'page/cooperation/c_cooperati
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Master/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_master';
 $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_cooperation/master_kerja_sama_perguruan_tinggi';
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
+
+// routes db
+$query = $db->get('db_it.routes');
+$result = $query->result();
+foreach( $result as $row )
+{
+    $Slug = $row->Slug;
+    $Slug = explode('/', $Slug);
+    if (in_array('(:any)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:any)' ] = $row->Controller;
+    }
+    elseif(in_array('(:num)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:num)' ] = $row->Controller;
+    }
+    else
+    {
+        $route[ $row->Slug ] = $row->Controller;
+    }
+
+}

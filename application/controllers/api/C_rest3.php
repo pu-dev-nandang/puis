@@ -1201,7 +1201,7 @@ class C_rest3 extends CI_Controller {
               }
             }
             $nestedData[] = $Dokumen;
-            $nestedData[] = $SemesterID; // Unit Penyeleng-gara
+            $nestedData[] = ''; // Unit Penyeleng-gara
             $data[] = $nestedData;
           }
            $rs = array(

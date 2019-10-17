@@ -1,9 +1,15 @@
+<style type="text/css">
+    #TblKerjaSama tr th {
+        text-align: center;
+    }
+</style>
 <h3 align="center"><b>Kerjasama Tridarma</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div id="content_dt">
     
 </div>
 <script>
     var passToExcel = [];
+    var oTable;
     $(document).ready(function () {
 
         var firstLoad = setInterval(function () {
@@ -26,10 +32,14 @@
         var filterProdi = $('#filterProdi').val();
 
         if(filterProdi!='' && filterProdi!=null){
-            loadPage();
+            oTable.ajax.reload( null, false );
         }
 
     });
+
+    $(document).off('change', '.Kategori_kegiatan').on('change', '.Kategori_kegiatan',function(e) {
+        oTable.ajax.reload( null, false );
+    })
 
     function loadPage() {
         var filterProdi = $('#filterProdi').val();
@@ -59,7 +69,7 @@
                                                 '<th colspan="3">Tingkat</th>'+
                                              '   <th rowspan="2">Judul Kegiatan Kerjasama</th>'+
                                              '   <th rowspan="2">Manfaat bagi PS yang Diakreditasi</th>'+
-                                             '   <th rowspan="2">Waktu dan Durasi</th>'+
+                                             '   <th rowspan="2" style="width:15%;">Waktu dan Durasi</th>'+
                                              '   <th rowspan="2">Bukti Kerjasama</th>'+
                                              '   <th rowspan="2">Masa Berlaku (Tahun Berakhir, YYYY)</th>'+
                                              '   <th rowspan="2">Semester</th>'+
@@ -84,16 +94,8 @@
 
     function LoadTableData(filterProdi)
     {
-        var P = filterProdi.split('.');
-        var ProdiID = P[0];
-        var data = {
-            auth : 's3Cr3T-G4N',
-            mode : 'DataKerjaSamaAggregator',
-            ProdiID : ProdiID,
-        };
-        var token = jwt_encode(data,"UAP)(*");
+       
         $('#TblKerjaSama tbody').empty();
-
         var table = $('#TblKerjaSama').DataTable({
             "fixedHeader": true,
             "processing": true,
@@ -109,7 +111,20 @@
                 url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi", // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
-                data : {token : token},
+                // data : {token : token},
+                data : function(token){
+                    var P = filterProdi.split('.');
+                    var ProdiID = P[0];
+                    var Kategori_kegiatan = $('.Kategori_kegiatan option:selected').val();
+                    var data = {
+                        auth : 's3Cr3T-G4N',
+                        mode : 'DataKerjaSamaAggregator',
+                        ProdiID : ProdiID,
+                        Kategori_kegiatan : Kategori_kegiatan,
+                    };
+                    var get_token = jwt_encode(data,"UAP)(*");
+                    token.token = get_token;
+                },
                 error: function(){  // error handling
                     $(".employee-grid-error").html("");
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -125,10 +140,10 @@
                 $( row ).find('td:eq(4)').html(Nasional);
                 $( row ).find('td:eq(4)').attr('style','text-align:center');
                 $( row ).find('td:eq(5)').html(Lokal);
-                $( row ).find('td:eq(6)').attr('style','text-align:center');
+                $( row ).find('td:eq(5)').attr('style','text-align:center');
                 $( row ).find('td:eq(6)').html(data[10]);
                 $( row ).find('td:eq(7)').html(data[11]);
-                $( row ).find('td:eq(8)').html('Start : '+data[12]+'<br/>'+'End : '+data[8]);
+                $( row ).find('td:eq(8)').html('Start : '+data[12]+'<br/>'+'End : '+data[8]+'<br/><div style="color:red">'+data[16]+' Days</div>');
 
                 var File = jQuery.parseJSON(data[7]);
                 var html = data[6]+'</br><a href = "'+base_url_js+'fileGetAny/cooperation-'+File[0]+'" target="_blank" class = "Fileexist">Attachment</a>';
@@ -140,8 +155,20 @@
             dom: 'l<"toolbar">frtip',
             "initComplete": function(settings, json) {
                 passToExcel = json.queryPass;
+                $("div.toolbar")
+                   .html('<div class="toolbar no-padding pull-right" style = "margin-left : 15px;">'+
+                      '<select class="form-control Kategori_kegiatan"">'+
+                          '<option disabled selected value="">--Pilih Kategori Kegiatan--</option>'+
+                          '<option value="PKM">PKM</option>'+
+                          '<option value="Penelitian">Penelitian</option>'+
+                          '<option value="Pendidikan">Pendidikan</option>'+
+                          '<option value="%">All</option>'+
+                      '</div>'+    
+                  '</div>');
             }
         });
+
+        oTable = table;
     }
 
     $(document).off('click', '#btndownloaadExcel').on('click', '#btndownloaadExcel',function(e) {

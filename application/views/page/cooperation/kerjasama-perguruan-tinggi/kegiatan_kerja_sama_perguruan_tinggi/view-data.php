@@ -10,7 +10,7 @@
 						<div class="col-md-3">
 							<div class="thumbnail">
 								<div class="form-group">
-									<label>Kategori</label>
+									<label>Kategori Kerja Sama</label>
 									<select class="form-control SearchKategori" name ="Kategori">
 										<option selected value="%">--All--</option>
 										<option value="PKM">PKM</option>
@@ -26,6 +26,16 @@
 										<option value="Internasional">Internasional</option>
 										<option value="Nasional">Nasional</option>
 										<option value="Lokal">Wilayah/ Lokal</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label>Kategori Kegiatan</label>
+									<select class="form-control SearchKategoriKegiatan" name ="Kategori">
+										<option selected value="%">--All--</option>
+										<option value="PKM">PKM</option>
+										<option value="Penelitian">Penelitian</option>
+										<option value="Pendidikan">Pendidikan</option>
+										<!-- <option value="Tridarma">Tridarma</option> -->
 									</select>
 								</div>
 							</div>
@@ -97,7 +107,7 @@
 										</span>
 									</div>
 									<div align="right" style="margin-top:10px;">
-										<button class="btn btn-primary SetEmpty">Set Empty</button>
+										<button class="btn btn-warning SetEmpty">Set Empty</button>
 									</div>
 								</div>
 							</div>
@@ -114,10 +124,10 @@
 						<tr>
 							<th>No</th>
 							<th>Lembaga</th>
-							<th>Judul</th>
+							<th>Judul & Kategori</th>
 							<th>Bentuk</th>
 							<th>Manfaat</th>
-							<th>Date</th>
+							<th style="width: 15%;">Date</th>
 							<th>Department</th>
 							<th><i class="fa fa-cog btnaction"></i></th>
 						</tr>
@@ -135,29 +145,6 @@
 
 	function LoadDataForTable()
 	{
-		var SearchPerjanjian = [];
-		$('.SearchPerjanjian:checked').each(function(){
-			var v = $(this).val();
-			SearchPerjanjian.push(v);
-		})
-
-		var StartDate = $('.SearchDate[name="StartDate"]').val();
-		var EndDate = $('.SearchDate[name="EndDate"]').val();
-
-		var SearchKategori = $('.SearchKategori option:selected').val();
-		var SearchTingkat = $('.SearchTingkat option:selected').val();
-		var SearchLembaga = $('.inputSearch[name="KerjasamaID"]').val();
-		var data = {
-		    auth : 's3Cr3T-G4N',
-		    SearchPerjanjian : SearchPerjanjian,
-		    SearchKategori : SearchKategori,
-		    SearchTingkat : SearchTingkat,
-		    StartDate : StartDate,
-		    EndDate : EndDate,
-		    SearchLembaga : SearchLembaga,
-		    mode : 'DataKegiatan',
-		};
-		var token = jwt_encode(data,"UAP)(*");
 		$('#TblKerjaSama tbody').empty();
 
 		var table = $('#TblKerjaSama').DataTable({
@@ -175,7 +162,37 @@
 		        url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi", // json datasource
 		        ordering : false,
 		        type: "post",  // method  , by default get
-		        data : {token : token},
+		        type: "post",  // method  , by default get
+		        // data : {token : token},
+		       data : function(token){
+                       // Read values
+               			var SearchPerjanjian = [];
+               			$('.SearchPerjanjian:checked').each(function(){
+               				var v = $(this).val();
+               				SearchPerjanjian.push(v);
+               			})
+
+               			var StartDate = $('.SearchDate[name="StartDate"]').val();
+               			var EndDate = $('.SearchDate[name="EndDate"]').val();
+
+               			var SearchKategori = $('.SearchKategori option:selected').val();
+               			var SearchKategoriKegiatan = $('.SearchKategoriKegiatan option:selected').val();
+               			var SearchTingkat = $('.SearchTingkat option:selected').val();
+               			var SearchLembaga = $('.inputSearch[name="KerjasamaID"]').val();
+               			var data = {
+               			    auth : 's3Cr3T-G4N',
+               			    SearchPerjanjian : SearchPerjanjian,
+               			    SearchKategori : SearchKategori,
+               			    SearchTingkat : SearchTingkat,
+               			    StartDate : StartDate,
+               			    EndDate : EndDate,
+               			    SearchLembaga : SearchLembaga,
+               			    SearchKategoriKegiatan : SearchKategoriKegiatan,
+               			    mode : 'DataKegiatan',
+               			};
+               			var get_token = jwt_encode(data,"UAP)(*");
+               			token.token = get_token;
+                },
 		        error: function(){  // error handling
 		            $(".employee-grid-error").html("");
 		            $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -203,7 +220,7 @@
 
 	   	    	var tokenEdit = data[9];
 
-	   	    	html = '<div class="btn-group btnaction">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[8]+'" tokenedit="'+tokenEdit+'"><i class="fa fa fa-edit"></i> Edit</a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[8]+'"><i class="fa fa fa-trash"></i> Remove</a></li>  </ul></div>';
+	   	    	html = '<div class="btn-group btnaction">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu" style="min-width:50px !important;">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[8]+'" tokenedit="'+tokenEdit+'"><i class="fa fa fa-edit"></i> </a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[8]+'"><i class="fa fa fa-trash"></i> </a></li>  </ul></div>';
 	   	    	$( row ).find('td:eq(7)').html(html);
 	   	    },
 	        dom: 'l<"toolbar">frtip',
@@ -211,18 +228,23 @@
 
 	   	    }
 		});
+
+		oTable = table;
 	}
 
-	$(document).off('change', '.SearchTingkat,.SearchKategori').on('change', '.SearchTingkat,.SearchKategori',function(e) {
-		LoadDataForTable();
+	$(document).off('change', '.SearchTingkat,.SearchKategori,.SearchKategoriKegiatan').on('change', '.SearchTingkat,.SearchKategori,.SearchKategoriKegiatan',function(e) {
+		// LoadDataForTable();
+		oTable.ajax.reload( null, false );
 	})
 
 	$(document).off('click', '.SearchPerjanjian').on('click', '.SearchPerjanjian',function(e) {
-		LoadDataForTable();
+		// LoadDataForTable();
+		oTable.ajax.reload( null, false );
 	})
 
 	$(document).off('change', '.inputSearch').on('change', '.inputSearch',function(e) {
-		LoadDataForTable();
+		// LoadDataForTable();
+		oTable.ajax.reload( null, false );
 	})
 
 	$(document).off('click', '#dateOPRange').on('click', '#dateOPRange',function(e) {
@@ -239,7 +261,8 @@
 	})
 
 	$(document).off('click', '.SearchDateBtn').on('click', '.SearchDateBtn',function(e) {
-		LoadDataForTable();
+		// LoadDataForTable();
+		oTable.ajax.reload( null, false );
 	})
 
 	$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
@@ -264,7 +287,8 @@
 			  		toastr.error("Connection Error, Please try again", 'Error!!');
 				}
 			  	else{
-			  		LoadDataForTable();
+			  		// LoadDataForTable();
+			  		oTable.ajax.reload( null, false );
 			  		SetDataDefault();
 			  		toastr.success('The data has been deleted');
 				}
@@ -279,6 +303,7 @@
 	$(document).off('click', '.SetEmpty').on('click', '.SetEmpty',function(e) {
 		$('.inputSearch').val('');
 		$('.inputshowSearch').val('');
-		LoadDataForTable();
+		// LoadDataForTable();
+		oTable.ajax.reload( null, false );
 	});
 </script>
