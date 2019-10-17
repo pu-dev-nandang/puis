@@ -93,6 +93,7 @@ function loadDataFacilities() {
             $.each(jsonResult,function (i,v) {
                 $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  width="100%">'+
                       '<p><b>'+v.Name+'</b></p>'+
+                      '<p><b>'+v.Category+'</b></p>'+
                        '<p>'+
                         // ' <a href="#" data-toggle="modal" data-target="#form-modal" data-id="'+v.ID+'" token = "'+v.token+'" class="btn-form-ubah"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
                         ' <a href="" data-id="'+v.ID+'" data-toggle="modal" data-target="#delete-modal" class="btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+

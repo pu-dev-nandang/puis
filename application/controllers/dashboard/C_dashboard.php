@@ -34,11 +34,13 @@ class C_dashboard extends Globalclass {
                 break;
                 case 4: // Purchasing
                     $this->m_menu2->set_model('purchasing_sess','auth_purchasing_sess','menu_purchasing_sess','menu_purchasing_grouping','db_purchasing');
+
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;
                 case 6: // Academic
                     $this->m_menu2->set_model('academic_sess','auth_academic_sess','menu_academic_sess','menu_academic_grouping','db_academic');
+
                     $content = $this->load->view('page/'.$data['department'].'/dashboard',$data,true);
                     $this->temp($content);
                 break;

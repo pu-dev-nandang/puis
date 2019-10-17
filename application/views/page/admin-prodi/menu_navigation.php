@@ -28,12 +28,12 @@
                                 Why Choose us?
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='calltoaction'){echo "current";} ?>">
+                        <!-- <li class="<?php if($this->uri->segment(3)=='calltoaction'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/calltoaction'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Call to action
                                 </a>
-                        </li>
+                        </li> -->
                        
                         <li class="<?php if($this->uri->segment(3)=='testimoni'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/testimoni'); ?>">

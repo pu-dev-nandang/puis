@@ -1238,11 +1238,19 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
 
+
 $route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
 $route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
 
 
 
+$route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
+$route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
+$route['api-prodi/__getProdiLecturer'] = 'api/c_api_prodi/getProdiLecturer';
+$route['api-prodi/__getDosenProdi'] = 'api/c_api_prodi/getDosenProdi';
+$route['api-prodi/__getStudentsProdi'] = 'api/c_api_prodi/getStudentsProdi';
+$route['api-prodi/__getTestiProdi'] = 'api/c_api_prodi/getTestiProdi';
+$route['api-prodi/__getPartnerProdi'] = 'api/c_api_prodi/getPartnerProdi';
 // ==== API Prodi yamin=== //
 
 // =======================//
@@ -1392,8 +1400,10 @@ $route['rectorat/requestdocument'] = 'page/request-document/c_requestdocument/li
 $route['rectorat/reqsuratmengajar'] = 'page/request-document/c_requestdocument/list_requestsuratmengajar';
 $route['rectorat/master_data/sk_masuk_mahasiswa'] = 'page/rektorat/c_sk_masuk_mahasiswa/index';
 $route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa/crud_sk_mhs';
+
 $route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
 $route['rectorat/master_data/crud_credit_type_courses'] = 'page/rektorat/c_credit_type_courses/crud_credit_type_courses';
+
 
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';

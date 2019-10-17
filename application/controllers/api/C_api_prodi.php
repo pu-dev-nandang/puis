@@ -493,7 +493,7 @@ class C_api_prodi extends CI_Controller {
         else if($data_arr['action']=='loadDataLecturer'){
 
             $data = $this->db->query('SELECT l.* , l.photo,em.Name FROM db_prodi.lecturer l
-                                    INNER JOIN db_employees.employees as em ON em.NIP=l.NIP
+                                      INNER JOIN db_employees.employees as em ON em.NIP=l.NIP
                                       WHERE l.ProdiID = "'.$prodi_active_id.'" ')->result_array();
             // $data = $this->db->get_where('db_prodi.lecturer',array(
             //     'ProdiID' => $prodi_active_id,
@@ -572,37 +572,45 @@ class C_api_prodi extends CI_Controller {
 
                 $dataForm = (array) $data_arr['dataForm'];
                 // check action insert or update
-                $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
-                    where fc.ProdiID = ?
-                ';
-                $ProdiID = $prodi_active_id;
-                $query = $this->db->query($sql, array($ProdiID))->result_array();
-               if (count($query) == 0) { 
+                // $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
+                //     where fc.ProdiID = ?
+                // ';
+                // $ProdiID = $prodi_active_id;
+                // $query = $this->db->query($sql, array($ProdiID))->result_array();
+                // if (count($query) == 0) { 
+                //     $dataForm['ProdiID'] = $prodi_active_id;
+                //     $dataForm['Photo'] = $upload;
+                //     $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                //     $dataform['CreateBy'] = $this->session->userdata('NIP');
+                    
+                //     $this->db->insert('db_prodi.facilities',$dataForm);
+                //     }
+               // else{ // Update
+               //      $arr_file =  $query[0]['Photo'];
+               //      $path = './images/Facilities/'. $arr_file;
+
+               //        if(is_file($path)){
+               //          $ID = $query[0]['ID'];
+               //          $dataupdate = $dataForm;
+               //          $dataupdate['Photo'] = $upload;
+               //          $this->db->where('ID',$ID);
+               //          $this->db->update('db_prodi.facilities',$dataupdate);
+               //          unlink($path);
+               //        }
+               //        else{
+               //          $ID = $query[0]['ID'];
+               //          $dataupdate = $dataForm;
+               //          $dataupdate['Photo'] = $upload;
+               //          $this->db->where('ID',$ID);
+               //          $this->db->update('db_prodi.facilities',$dataupdate);
+               //        }
+               //  }
                     $dataForm['ProdiID'] = $prodi_active_id;
                     $dataForm['Photo'] = $upload;
                     $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
                     $dataform['CreateBy'] = $this->session->userdata('NIP');
                     
                     $this->db->insert('db_prodi.facilities',$dataForm);
-                    }
-               else{
-                    $arr_file =  $query[0]['Photo'];
-                    $path = './images/Facilities/'. $arr_file;
-
-                      if(is_file($path)){
-                        $ID = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$ID);
-                        $this->db->update('db_prodi.facilities',$dataupdate);
-                        unlink($path);
-                      }
-                      else{
-                        $ID = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$ID);
-                        $this->db->update('db_prodi.facilities',$dataupdate);
-                      }
-                }
                 
             }
 
@@ -634,22 +642,23 @@ class C_api_prodi extends CI_Controller {
                 $arr_file =  $query[0]['Photo'];
                 
                 $path = './images/Facilities/'. $arr_file;
-             unlink($path);
+                unlink($path);
             return print_r(1);
         }
 
     }
 
 
-    function getProdiLecture(){
+    function getProdiLecturer(){
         $prodi_active_id = $this->session->userdata('prodi_active_id');
         $key = $this->input->post('key');
         $data = 'SELECT em.NIP, em.Name, em.Gender, em.PositionMain, em.ProdiID, ps.NameEng AS         ProdiNameEng
                 FROM db_employees.employees em
                 INNER JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                WHERE (em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';//dosen kaprodi
+                WHERE (em.PositionMain = "14.6" OR em.PositionMain = "14.7" )  AND ( ';//dosen kaprodi
         $data.= ' em.NIP LIKE "'.$key.'%" ';
         $data.= ' OR em.Name LIKE "'.$key.'%" ';
+        $data.= ' OR ps.ID LIKE "'. $prodi_active_id .'%" ';
         $data.= ') ORDER BY Name ASC';
 
         $query = $this->db->query($data)->result_array();
@@ -658,6 +667,7 @@ class C_api_prodi extends CI_Controller {
 
     
     function getDataProdiTexting(){
+
 
         $data_arr = $this->getInputToken2();
 
@@ -680,8 +690,10 @@ class C_api_prodi extends CI_Controller {
         $LangCode = $data_arr['LangCode'];
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT ps.Name, ps.NameEng, em.Name AS Kaprodi, em.TitleAhead, em.TitleBehind  FROM db_academic.program_study ps 
+        $data = $this->db->query('SELECT ps.Name, ps.NameEng, em.Name AS Kaprodi, em.TitleAhead, em.TitleBehind , psm.Photo  
+                                            FROM db_academic.program_study ps 
                                             LEFT JOIN db_employees.employees em ON (em.NIP = ps.KaprodiID)
+                                            LEFT JOIN db_prodi.prodi_sambutan psm ON psm.ProdiID = ps.ID
                                             WHERE ps.ID = "'.$ProdiID.'" ')->result_array();
 
         if(count($data)>0){
@@ -691,6 +703,68 @@ class C_api_prodi extends CI_Controller {
         return print_r(json_encode($data));
     }
 
+    function getDosenProdi(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT l.*,em.Name , em.TitleAhead, em.TitleBehind, ps.Name as ProdiName FROM db_academic.program_study ps
+                                  INNER JOIN db_prodi.lecturer l ON (l.ProdiID = ps.ID)
+                                  LEFT JOIN db_employees.employees em ON (em.NIP = l.NIP)
+                                  WHERE l.ProdiID = "'.$ProdiID.'"')->result_array();
+        
+
+        return print_r(json_encode($data));
+    }
+    function getStudentsProdi(){
+
+        $key = $this->input->post('key');
+        $data_arr = $this->getInputToken2();
+        $ProdiID =  $this->session->userdata('prodi_active_id');
+
+        $data = $this->db->query('SELECT NPM, Name,ProdiID FROM db_academic.auth_students ats 
+                                                    WHERE  (ats.ProdiID = "'.$ProdiID.'")
+                                                    AND (ats.NPM LIKE "%'.$key.'%" 
+                                                    OR ats.Name LIKE "%'.$key.'%")')->result_array();
+
+        return print_r(json_encode($data));
+
+    }
+
+    function getTestiProdi(){
+
+        $data_arr = $this->getInputToken2();
+        $LangCode = $data_arr['LangCode'];
+        if($LangCode=='Ind'){
+            $LangCode1=2;
+        }else{
+            $LangCode1=1;
+        }
+        $ProdiID = $data_arr['ProdiID'];
+        $Type = $data_arr['Type'];
+
+        $data = $this->db->query('SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,ps.Name AS Name1, ps.NameEng
+                                        FROM db_prodi.prodi_texting pt 
+                                        LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                        LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                        LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                        LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                        LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID)
+                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = pt.ProdiID)
+                                        WHERE pt.LangID = "'.$LangCode1.'" AND pt.ProdiID = "'.$ProdiID.'" AND pt.Type="'.$Type.'" ')->result_array();
+       
+        return print_r(json_encode($data));
+        
+
+    }
+    function getPartnerProdi(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT * FROM db_prodi.partner prt
+                                  WHERE prt.ProdiID = "'.$ProdiID.'"')->result_array();
+        
+        return print_r(json_encode($data));
+    }
 
 
 
