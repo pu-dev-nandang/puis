@@ -30,7 +30,7 @@
 
     $('#filterProdi').change(function () {
         var filterProdi = $('#filterProdi').val();
-
+        $('#viewProdiName').html($('#filterProdi option:selected').text());
         if(filterProdi!='' && filterProdi!=null){
             oTable.ajax.reload( null, false );
         }
