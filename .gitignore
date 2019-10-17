@@ -49,3 +49,6 @@ document/*
 **/uploads/rektorat/
 
 ***/uploads/Agregator/Aps/
+
+#Ignores Add Images
+**/images/Facilities/
