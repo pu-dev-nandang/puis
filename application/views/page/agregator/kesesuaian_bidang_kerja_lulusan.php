@@ -97,6 +97,10 @@
         });
     }
 
+    $('#filterYear').change(function () {
+        loadData();
+    });
+
 
     $(document).on('click','.showDetailData',function () {
         var token = $(this).attr('data-token');
