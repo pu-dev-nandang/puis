@@ -53,6 +53,7 @@
 	                         	return full[5];
 	                         }
 	                      },
+	                      <?php if (isset($action)): ?>
 	                      <?php if ($action == 'write'): ?>
 	                      	{
 	                      	   'targets': 5,
@@ -73,6 +74,7 @@
 	                      	       return btnAction;
 	                      	   }
 	                      	},
+	                      <?php endif ?>
 	                      <?php endif ?>
 	                      
 	                   ],
@@ -98,7 +100,7 @@
 	$(document).ready(function() {
 	    AppData_Credit_Type_Courses.loaded();
 	})
-
+	<?php if (isset($action)): ?>
 	<?php if ($action == 'write'): ?>
 		$(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
 			var ID = $(this).attr('data-id');
@@ -116,5 +118,6 @@
 		    $('#btnSave').attr('action','edit');
 		    $('#btnSave').attr('data-id',ID);
 		})
+	<?php endif ?>
 	<?php endif ?>
 </script>
