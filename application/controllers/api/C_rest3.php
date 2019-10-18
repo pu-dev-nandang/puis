@@ -601,8 +601,109 @@ class C_rest3 extends CI_Controller {
                     }
                     echo json_encode($rs);
                 break;
+            case 'produk_jasa_dtps' :
+               $AddWhere = '';
+               $ProdiID = '';
+               $Year = '';
+               if (array_key_exists('ProdiID', $dataToken)) {
+                  $P = $dataToken['ProdiID'];
+                  $P = explode('.', $P);
+                  $ProdiID = $P[0];
+                  $WhereOrAnd = ($AddWhere != '' && $AddWhere  != null) ? ' and' : ' where';
+                   $AddWhere .= $WhereOrAnd.' b.ProdiID ='.$ProdiID; 
+                } 
+               if (array_key_exists('Year', $dataToken)) {
+                  $P = $dataToken['ProdiID'];
+                  $P = explode('.', $P);
+                  $ProdiID = $P[0];
+                  $Year = $dataToken['Year'];
+                  $WhereOrAnd = ($AddWhere != '' && $AddWhere  != null) ? ' and' : ' where';
+                  $AddWhere .= $WhereOrAnd.' a.Year ='.$Year;  
+                }
+               
+               $sql  = 'select a.*,b.Name,b.ProdiID,b.NIP
+                       from db_agregator.produk_jasa as a 
+                       join db_employees.employees as b on a.Updated_by = b.NIP
+                       '.$AddWhere.'
+               ';
+
+               $query = $this->db->query($sql,array())->result_array();
+               $data = array();
+               for ($i=0; $i < count($query); $i++) { 
+                 $nestedData = array();
+                 $row = $query[$i]; 
+                 $nestedData[] = $i+1;
+                 $nestedData[] = $row['NIP'].'-'.$row['Name'];
+                 $nestedData[] = $row['NamaProdukJasa'];
+                 $nestedData[] = $row['DeskripsiProdukJasa'];
+                 $UploadBukti =  '';
+                 if ($row['UploadBukti'] != '' && $row['UploadBukti'] != null) {
+                   $UP = json_decode($row['UploadBukti'],true);
+                   if (count($UP) > 0) {
+                      $UploadBukti = '<br/><a href="'.url_sign_in_lecturers.'uploads/produk_jasa/'.$UP[0].'" target = "_blank">Attachment</a>';
+                   }
+                 }
+                 $nestedData[] = $row['Bukti'].$UploadBukti;
+                 $data[] = $nestedData;
+               }
+
+               $json_data = array(
+                   "draw"            => intval( 0 ),
+                   "recordsTotal"    => intval(count($query)),
+                   "recordsFiltered" => intval( count($query) ),
+                   "data"            => $data
+               );
+               echo json_encode($json_data);
+               break;
+            case 'luaran_penelitan_dtps' :
+                $P = $dataToken['ProdiID'];
+                $P = explode('.', $P);
+                $ProdiID = $P[0];
+                $arr_ID_kat_capaian = [3,7,1,4];
+                $rs = [];
+                for ($i=0; $i < count($arr_ID_kat_capaian); $i++) {
+                  $arr_group = [];
+                  $get_kat_capaian = $this->m_master->caribasedprimary('db_research.kategori_capaian_luaran','ID_kat_capaian',$arr_ID_kat_capaian[$i]);
+                  $Nm_kat_capaian = $get_kat_capaian[0]['Nm_kat_capaian'];
+                  $arr_group = ['Name' => $Nm_kat_capaian,'Data' => [] ];
+                  $row = [];
+                  $nestedData = array();
+                  $nestedData[] = ['text' => $this->m_master->romawiNumber($i+1),'colspan' => 1,'style' => '"font-weight:600;background-color: lightyellow;"'] ;
+                  $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 3,'style' => '"font-weight:600;background-color: lightyellow;"'];
+                  // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
+                  // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
+                  $row[] = $nestedData;
+                  $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+                          from db_research.publikasi as a 
+                          join db_employees.employees as b on a.NIP = b.NIP
+                          where b.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
+                          UNION
+                          select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+                          from db_research.publikasi as a 
+                          join db_research.publikasi_list_dosen as b on a.ID_publikasi = b.ID_publikasi
+                          join db_research.penulis_dosen as c on b.ID_Penulis_Dosen = c.ID_Penulis_Dosen
+                          join db_employees.employees as d on c.NIP = d.NIP
+                           where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
+                           and c.Type_Dosen = "1"
+                         ';
+                  $query = $this->db->query($sql,array())->result_array();
+                  for ($j=0; $j < count($query); $j++) { 
+                    $nestedData = array();
+                    $nestedData[] = ['text' => $j+1 ,'colspan' => 1,'style' => '"text-align:right"'];
+                    $nestedData[] = ['text' => $query[$j]['Judul'] ,'colspan' => 1,'style' => '""'];
+                    $nestedData[] = ['text' => $query[$j]['Year'] ,'colspan' => 1,'style' => '""'];
+                    $nestedData[] = ['text' => $query[$j]['Ket'] ,'colspan' => 1,'style' => '""'];
+                    $row[] = $nestedData;
+                  }
+
+                  $arr_group['Data'] = $row;
+                  $rs[] = $arr_group;
+                }
+
+                echo json_encode($rs);
+                break;
             default:
-                # code...
+                echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
         }
     }
