@@ -2669,8 +2669,8 @@ class C_api extends CI_Controller {
 
             $stats = ($row["Active"]=='1') ? 'Active' : 'Non Active';
 
-            $StartDate = date('d M Y h:i',strtotime($row['StartDate']));
-            $EndDate = date(' d M Y h:i',strtotime($row['EndDate']));
+            $StartDate = date('d M Y H:i',strtotime($row['StartDate']));
+            $EndDate = date(' d M Y H:i',strtotime($row['EndDate']));
 
             if($row['ConfirmStatus'] == 1) {
 
