@@ -749,7 +749,7 @@ $route['student-life/diploma-supplement/list-student'] =  'page/student-life/c_s
 $route['student-life/student-achievement/list'] =  'page/student-life/c_studentlife/student_achievement';
 $route['student-life/student-achievement/update-data-achievement'] =  'page/student-life/c_studentlife/update_data_achievement';
 
-$route['student-life/tracer-alumni/list'] =  'page/student-life/c_studentlife/list_alumni';
+$route['student-life/tracer-alumni'] =  'page/student-life/c_studentlife/list_alumni';
 $route['student-life/tracer-alumni/form-accreditation'] =  'page/student-life/c_studentlife/form_accreditation';
 
 

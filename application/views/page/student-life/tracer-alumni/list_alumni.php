@@ -26,6 +26,11 @@
 
 <div class="row">
     <div class="col-md-4">
+        <div class="well">
+            <div style="text-align: right;">
+                <button class="btn btn-success" id="btnShowMasterCompany">Master Company</button>
+            </div>
+        </div>
         <table class="table table-bordered" id="tableAlumni">
             <thead>
             <tr>
@@ -52,7 +57,6 @@
 <script>
 
     $(document).ready(function () {
-
 
         getAlmuni();
     });
@@ -200,7 +204,7 @@
                             '        <p class="block-helped">'+viewLamaKerja+'</p>' +
                             '    </td>' +
                             '    <td>' +
-                            '        <h3 style="margin-top: 0px;font-weight: bold;">'+v.Title+'<br/><small>'+v.PositionLevel+' | '+v.Location+'</small></h3>' +
+                            '        <h3 style="margin-top: 0px;font-weight: bold;">'+v.Title+'<br/><small>'+v.PositionLevel+' | '+v.Address+'</small></h3>' +
                             '        <table class="table table-details">' +
                             '            <tr>' +
                             '                <td>Company</td>' +
@@ -258,28 +262,52 @@
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">'+viewName+'</h4>');
         $('#GlobalModal .modal-body').html('<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <div class="well">' +
+            '            <input class="form-control" placeholder="Search company" id="filterCompany">' +
+            '            <table class="table table-centre">' +
+            '               <thead>' +
+            '                   <tr>' +
+            '                       <th style="width: 1%;">No</th>' +
+            '                       <th>Company</th>' +
+            '                       <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+            '                   </tr>' +
+            '               </thead>' +
+            '               <tbody id="showFilterCompany"></tbody>' +
+            '            </table>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>' +
+            '<div class="row">' +
             '<input class="hide" id="ID" value="'+IDEx+'">' +
             '    <div class="col-md-12" id="formAdd">' +
+            '        <div class="form-group">' +
+            '            <input class="form-control hide" id="CompanyID">' +
+            '            <h3 id="viewCompany" style="text-align: center;color: royalblue;">-</h3>' +
+            '        </div>' +
             '        <div class="form-group">' +
             '            <label>Title</label>' +
             '            <input class="form-control hide" id="NPM" value="'+NPM+'">' +
             '            <input class="form-control" id="Title">' +
             '        </div>' +
             '        <div class="form-group">' +
-            '            <label>Company</label>' +
-            '            <input class="form-control" id="Company">' +
-            '        </div>' +
-            '        <div class="form-group">' +
-            '            <label>Industry</label>' +
-            '            <input class="form-control" id="Industry">' +
+            '            <label>Job Level</label>' +
+            '            <div class="row">' +
+            '               <div class="col-xs-5">' +
+            '                   <select class="form-control" id="JobType">' +
+            '                       <option value="1">Bekerja</option>' +
+            '                       <option value="2">Berwirausaha</option>' +
+            '                   </select>' +
+            '               </div>' +
+            '               <div class="col-xs-7">' +
+            '                   <select class="form-control" id="JobLevelID">' +
+            '                   </select>' +
+            '               </div>' +
+            '           </div>' +
             '        </div>' +
             '        <div class="form-group">' +
             '            <label>Position Level</label>' +
             '            <select class="form-control" id="PositionLevelID"></select>' +
-            '        </div>' +
-            '        <div class="form-group">' +
-            '            <label>Location</label>' +
-            '            <textarea class="form-control" id="Location" rows="2"></textarea>' +
             '        </div>' +
             '        <div class="form-group">' +
             '           <div class="row">' +
@@ -335,13 +363,16 @@
         loadSelectOptionMonth('#StartMonth','');
         loadSelectOptionMonth('#EndMonth','');
 
+
+
         if(Token!=''){
 
-            $('#Title').val(dataToken.Title);
-            $('#Company').val(dataToken.Company);
-            $('#Industry').val(dataToken.Industry);
+            console.log(dataToken);
 
-            $('#Location').val(dataToken.Location);
+            $('#Title').val(dataToken.Title);
+            $('#viewCompany').html(dataToken.Company);
+            $('#CompanyID').val(dataToken.CompanyID);
+
             $('#StartMonth').val(dataToken.StartMonth);
             $('#StartYear').val(dataToken.StartYear);
             $('#Status').val(dataToken.Status);
@@ -356,6 +387,13 @@
                 $('#formEnd').addClass('hide');
             }
 
+            var JobType = (dataToken.JobType!='' && dataToken.JobType!=null) ? dataToken.JobType : '1';
+            var JobLevelID = (dataToken.JobLevelID!='' && dataToken.JobLevelID!=null && parseInt(dataToken.JobLevelID)!=0)
+                ? dataToken.JobLevelID : '';
+            loadSelectOptionJobLevel(JobType,JobLevelID);
+
+        } else {
+            loadSelectOptionJobLevel('1','');
         }
 
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
@@ -464,4 +502,247 @@
         loadCrudExperience();
     });
 
+    $('#btnShowMasterCompany').click(function () {
+
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Master Company</h4>');
+
+        $('#GlobalModalLarge .modal-body').html('<div class="row">' +
+            '   <input class="hide" id="ID">' +
+            '    <div class="col-md-4" id="dataForm">' +
+            '        <div class="form-group">' +
+            '            <label>Company Name</label>' +
+            '            <input class="form-control" id="Name">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Industry</label>' +
+            '            <input class="form-control" id="Industry">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Phone</label>' +
+            '            <input class="form-control" id="Phone">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Address</label>' +
+            '            <textarea class="form-control" id="Address" rows="3"></textarea>' +
+            '        </div>' +
+            '        <div class="form-group" style="text-align: right;">' +
+            '           <button class="btn btn-success" id="btnSave">Save</button>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="col-md-8" id="divTableCompany">' +
+
+            '    </div>' +
+            '</div>');
+
+        loadDataCompany();
+
+        $('#btnSave').click(function () {
+            var elm = $('#dataForm .form-control');
+            var dataForm = '';
+
+            var sumt = true;
+            elm.each(function (i,v) {
+
+                var koma = ((i+1)<elm.length) ? ',' : '';
+                dataForm = dataForm+'"'+v.id+'":"'+v.value+'"'+koma;
+
+                if(v.value==''){
+                    $('#'+v.id).css('border','1px solid red');
+                    sumt = false;
+                } else {
+                    $('#'+v.id).css('border','1px solid green');
+                }
+
+            });
+
+            dataForm = JSON.parse('{'+dataForm+'}');
+
+            if(sumt){
+
+                loading_buttonSm('#btnSave');
+
+                var ID = $('#ID').val();
+
+                var data = {
+                    action : 'saveMasterCompany',
+                    ID : (ID!='' && ID!=null) ? ID : '',
+                    dataForm : dataForm
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudTracerAlumni';
+
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Data saved','Success');
+                    loadDataCompany();
+                    $('#btnSave').html('Save').prop('disabled',false);
+                    setTimeout(function () {
+                        $('#ID').val('');
+                        elm.each(function (i,v) {
+                            $('#'+v.id).css('border','1px solid #ccc');
+                            $('#'+v.id).val('');
+
+                        });
+                    },500);
+                });
+
+            } else {
+                toastr.error('All form are required');
+            }
+
+        });
+
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+    });
+
+    function loadDataCompany() {
+        var data = {
+            action : 'loadMasterCompany'
+        };
+
+        $('#divTableCompany').html('<table class="table table-centre table-striped" id="tableCompany">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>Company</th>' +
+            '                <th style="width: 30%;">Addredd</th>' +
+            '                <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '            <tbody id="listDataCompany">' +
+            '            </tbody>' +
+            '        </table>');
+
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api3/__crudTracerAlumni';
+        $.post(url,{token:token},function (jsonResult) {
+
+           if(jsonResult.length>0){
+            $.each(jsonResult,function (i,v) {
+
+                var btnAct = '<a href="javascript:void(0);" class="btnCompanyEdit" data-tkn="'+jwt_encode(v,'UAP)(*')+'">Edit</a> ' +
+                    '<a href="javascript:void(0);" class="btnCompanyRemove" data-id="'+v.ID+'">Del</a>'
+
+                $('#listDataCompany').append('<tr>' +
+                    '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
+                    '<td style="text-align: left;">'+v.Name+'</td>' +
+                    '<td style="text-align: left;">'+v.Address+'</td>' +
+                    '<td>'+btnAct+'</td>' +
+                    '</tr>');
+            });
+
+            $('#tableCompany').dataTable();
+           }
+        });
+    }
+
+    $(document).on('click','.btnCompanyEdit',function () {
+       var tkn = $(this).attr('data-tkn');
+       var d = jwt_decode(tkn,'UAP)(*');
+       $('#ID').val(d.ID);
+        $('#dataForm .form-control').each(function (i,v) {
+            $('#'+v.id).val(d[v.id]);
+        });
+    });
+
+    $(document).on('click','.btnCompanyRemove',function () {
+
+        if(confirm('Are you sure ?')){
+            var ID = $(this).attr('data-id');
+            var data = {
+                action : 'removeMasterCompany',
+                ID : ID
+            };
+            var token = jwt_encode(data,'UAP)(*');
+
+            var url = base_url_js+'api3/__crudTracerAlumni';
+            $.post(url,{token:token},function (jsonResult) {
+
+                if(jsonResult.Status==1 || jsonResult.Status=='1'){
+                    toastr.success(jsonResult.Msg,'Success');
+                    setTimeout(function (                                                                                                                                            ) {
+                        loadDataCompany();
+                    },500);
+                } else {
+                    toastr.warning(jsonResult.Msg,'Warning');
+                }
+
+            });
+        }
+
+
+    });
+
+    $(document).on('keyup','#filterCompany',function () {
+       var filterCompany = $('#filterCompany').val();
+       if(filterCompany!='' && filterCompany!=null){
+           var data = {
+               action : 'searchMasterCompany',
+               Key : filterCompany
+           };
+           var token = jwt_encode(data,'UAP)(*');
+
+           var url = base_url_js+'api3/__crudTracerAlumni';
+
+           $.post(url,{token:token},function (jsonResult) {
+
+               $('#showFilterCompany').empty();
+
+               if(jsonResult.length>0){
+                   $.each(jsonResult,function (i,v) {
+                       $('#showFilterCompany').append('<tr>' +
+                           '<td>'+(i+1)+'</td>' +
+                           '<td style="text-align: left;" id="NameC_'+v.ID+'">'+v.Name+'</td>' +
+                           '<td><button class="btn btn-sm btn-default btnSelectCompany" data-id="'+v.ID+'"><i class="fa fa-download"></i></button></td>' +
+                           '</tr>');
+                   });
+               }
+           });
+
+       }
+    });
+    $(document).on('click','.btnSelectCompany',function () {
+       var ID = $(this).attr('data-id');
+       var Name = $('#NameC_'+ID).text();
+
+       $('#CompanyID').val(ID);
+       $('#viewCompany').html(Name);
+
+    });
+
+    $(document).on('change','#JobType',function () {
+        var JobType = $('#JobType').val();
+        loadSelectOptionJobLevel(JobType)
+    });
+
+    function loadSelectOptionJobLevel(JobType,Selected) {
+
+        var data = {
+            action : 'getJobLevel',
+            JobType : JobType
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        var url = base_url_js+'api3/__crudTracerAlumni';
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#JobLevelID').empty();
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (Selected!='' && v.ID==Selected) ? 'selected' : '';
+
+                    $('#JobLevelID').append('<option value="'+v.ID+'" '+sc+'>'+v.Description+'</option>');
+                });
+            }
+
+        });
+
+    }
 </script>

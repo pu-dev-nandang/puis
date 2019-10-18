@@ -3,8 +3,8 @@
 
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
-        <li class="<?php if($this->uri->segment(3)=='list') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('student-life/tracer-alumni/list'); ?>">List Alumni</a>
+        <li class="<?php if($this->uri->segment(3)=='') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('student-life/tracer-alumni'); ?>">List Alumni</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='form-accreditation') { echo 'active'; } ?>">
             <a href="<?php echo base_url('student-life/tracer-alumni/form-accreditation'); ?>">Form Accreditation</a>
