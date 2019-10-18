@@ -1237,13 +1237,8 @@ $route['help/upload_help'] = 'dashboard/c_dashboard/upload_help';
 // ==== API Prodi yamin=== //
 
 $route['api-prodi/__crudDataProdi'] = 'api/c_api_prodi/crudDataProdi';
-
-
 $route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
 $route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
-
-
-
 $route['api-prodi/__getDetailProdi'] = 'api/c_api_prodi/getDetailProdi';
 $route['api-prodi/__getDataProdiTexting'] = 'api/c_api_prodi/getDataProdiTexting';
 $route['api-prodi/__getProdiLecturer'] = 'api/c_api_prodi/getProdiLecturer';
@@ -1251,6 +1246,8 @@ $route['api-prodi/__getDosenProdi'] = 'api/c_api_prodi/getDosenProdi';
 $route['api-prodi/__getStudentsProdi'] = 'api/c_api_prodi/getStudentsProdi';
 $route['api-prodi/__getTestiProdi'] = 'api/c_api_prodi/getTestiProdi';
 $route['api-prodi/__getPartnerProdi'] = 'api/c_api_prodi/getPartnerProdi';
+$route['api-prodi/__getSliderProdi'] = 'api/c_api_prodi/getSliderProdi';
+$route['api-prodi/__getFacilitiesProdi'] = 'api/c_api_prodi/getFacilitiesProdi';
 // ==== API Prodi yamin=== //
 
 // =======================//
