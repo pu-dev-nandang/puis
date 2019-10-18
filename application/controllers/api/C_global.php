@@ -598,15 +598,15 @@ class C_global extends CI_Controller {
         // $arr['Person'] = $Filter_;
         // print_r($arr);
 
-        $G_dt = $this->m_master->showData_array('db_cooperation.kegiatan');
-        for ($i=0; $i < count($G_dt); $i++) { 
-            $KerjasamaID = $G_dt[$i]['KerjasamaID'];
-            $ID = $G_dt[$i]['ID'];
-            $G = $this->m_master->caribasedprimary('db_cooperation.kerjasama','ID',$KerjasamaID);
-            $Kategori_kegiatan = $G[0]['Kategori'];
-            $this->db->where('ID',$ID);
-            $this->db->update('db_cooperation.kegiatan',array('Kategori_kegiatan' => $Kategori_kegiatan));
-        }
+        // $G_dt = $this->m_master->showData_array('db_cooperation.kegiatan');
+        // for ($i=0; $i < count($G_dt); $i++) { 
+        //     $KerjasamaID = $G_dt[$i]['KerjasamaID'];
+        //     $ID = $G_dt[$i]['ID'];
+        //     $G = $this->m_master->caribasedprimary('db_cooperation.kerjasama','ID',$KerjasamaID);
+        //     $Kategori_kegiatan = $G[0]['Kategori'];
+        //     $this->db->where('ID',$ID);
+        //     $this->db->update('db_cooperation.kegiatan',array('Kategori_kegiatan' => $Kategori_kegiatan));
+        // }
     }
 
 

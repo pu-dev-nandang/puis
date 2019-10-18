@@ -30,7 +30,7 @@
 
     $('#filterProdi').change(function () {
         var filterProdi = $('#filterProdi').val();
-
+        $('#viewProdiName').html($('#filterProdi option:selected').text());
         if(filterProdi!='' && filterProdi!=null){
             oTable.ajax.reload( null, false );
         }
@@ -88,11 +88,11 @@
 
             selector.html(html);
 
-            LoadTableData(filterProdi);
+            LoadTableData();
         }
     }
 
-    function LoadTableData(filterProdi)
+    function LoadTableData()
     {
        
         $('#TblKerjaSama tbody').empty();
@@ -113,6 +113,7 @@
                 type: "post",  // method  , by default get
                 // data : {token : token},
                 data : function(token){
+                    var filterProdi = $('#filterProdi option:selected').val();
                     var P = filterProdi.split('.');
                     var ProdiID = P[0];
                     var Kategori_kegiatan = $('.Kategori_kegiatan option:selected').val();
