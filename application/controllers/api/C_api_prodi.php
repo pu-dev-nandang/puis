@@ -483,6 +483,7 @@ class C_api_prodi extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        
         else if ($data_arr['action']=='deleteDataPartner') 
         {
             $ID = $data_arr['ID'];
@@ -490,6 +491,7 @@ class C_api_prodi extends CI_Controller {
             $this->db->delete('db_prodi.partner'); 
             return print_r(1);
         }
+
         else if($data_arr['action']=='loadDataLecturer'){
 
             $data = $this->db->query('SELECT l.* , l.photo,em.Name FROM db_prodi.lecturer l
@@ -515,39 +517,40 @@ class C_api_prodi extends CI_Controller {
 
                 $dataForm = (array) $data_arr['dataForm'];
                 // check action insert or update
-                $sql = 'select l.*, l.Photo,l.ProdiID from db_prodi.lecturer as l  join db_employees.employees as em on l.NIP = em.NIP
+                $sql = 'select l.* from db_prodi.lecturer as l  join db_employees.employees as em on l.NIP = em.NIP
                     where l.NIP = ? and l.ProdiID= ?
                 ';
 
                 $NIP = $dataForm['NIP'];
                 $ProdiID = $prodi_active_id;
                 $query = $this->db->query($sql, array($NIP,$ProdiID))->result_array();
-               if (count($query) == 0) { 
-                    $dataForm['ProdiID'] = $prodi_active_id;
-                    $dataForm['Photo'] = $upload;
-                    $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
-                    $dataform['CreateBy'] = $this->session->userdata('NIP');
-                    
-                    $this->db->insert('db_prodi.lecturer',$dataForm);
-                    }
-               else{
-                    $arr_file =  $query[0]['Photo'];
-                    $path = './images/Lecturer/'. $arr_file;
+                   if (count($query) == 0) { 
+                        $dataForm['ProdiID'] = $prodi_active_id;
+                        $dataForm['Photo'] = $upload;
+                        $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                        $dataform['CreateBy'] = $this->session->userdata('NIP');
+                        
+                        $this->db->insert('db_prodi.lecturer',$dataForm);
+                        }
+                   else{
+                        $arr_file =  $query[0]['Photo'];
+                        $path = './images/Lecturer/'. $arr_file;
 
-                      if(is_file($path)){
-                        $IDLecture = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$IDLecture);
-                        $this->db->update('db_prodi.lecturer',$dataupdate);
-                        unlink($path);
-                      }
-                      else{
-                        $IDLecture = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$IDLecture);
-                        $this->db->update('db_prodi.lecturer',$dataupdate);
-                      }
-                }
+                          if(is_file($path)){
+                            $IDLecture = $query[0]['ID'];
+                            $dataupdate['Photo'] = $upload;
+                            $this->db->where('ID',$IDLecture);
+                            $this->db->update('db_prodi.lecturer',$dataupdate);
+                            unlink($path);
+                          }
+                          else{
+                            $IDLecture = $query[0]['ID'];
+                            $dataupdate['Photo'] = $upload;
+                            $this->db->where('ID',$IDLecture);
+                            $this->db->update('db_prodi.lecturer',$dataupdate);
+                          }
+                    }
+
                 
             }
 
@@ -698,6 +701,8 @@ class C_api_prodi extends CI_Controller {
 
         if(count($data)>0){
             $data[0]['ProdiName'] = ($LangCode=='Ind') ? $data[0]['Name'] : $data[0]['NameEng'];
+            // $DefaultPhoto = base_url('images/Kaprodi/default.png');
+            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.png';
         }
 
         return print_r(json_encode($data));
