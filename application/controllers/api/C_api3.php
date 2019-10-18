@@ -4149,8 +4149,10 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='showExperience'){
             $NPM = $data_arr['NPM'];
 
-            $data = $this->db->query('SELECT ae.*, pl.Description AS PositionLevel FROM db_studentlife.alumni_experience ae
+            $data = $this->db->query('SELECT ae.*, pl.Description AS PositionLevel, c.Name AS Company, c.Industry, c.Phone, c.Address 
+                                              FROM db_studentlife.alumni_experience ae
                                               LEFT JOIN db_studentlife.position_level pl ON (pl.ID = ae.PositionLevelID)
+                                              LEFT JOIN db_studentlife.master_company c ON (c.ID = ae.CompanyID)
                                               WHERE ae.NPM = "'.$NPM.'" ')->result_array();
 
             return print_r(json_encode($data));
@@ -4175,6 +4177,63 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+        else if($data_arr['action']=='saveMasterCompany'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!=''){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->where('ID', $ID);
+                $this->db->update('db_studentlife.master_company',$dataForm);
+            } else {
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_studentlife.master_company',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+        else if($data_arr['action']=='loadMasterCompany'){
+            $data = $this->db->order_by('ID','DESC')->get('db_studentlife.master_company')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='removeMasterCompany'){
+            $ID = $data_arr['ID'];
+
+            // cek apakah ID digunakan atau tidak
+            $data = $this->db->get_where('db_studentlife.alumni_experience',array(
+                'CompanyID' => $ID
+            ))->result_array();
+
+            if(count($data)>0){
+                $result = array('Status'=>0,'Msg'=>'Data can not removed');
+            } else {
+                $this->db->where('ID', $ID);
+                $this->db->delete('db_studentlife.master_company');
+                $result = array('Status'=>1,'Msg'=>'Data removed');
+            }
+
+            return print_r(json_encode($result));
+        }
+        else if($data_arr['action']=='searchMasterCompany'){
+            $Key = $data_arr['Key'];
+            $data = $this->db->query('SELECT c.* FROM db_studentlife.master_company c 
+                                                WHERE c.Name LIKE "%'.$Key.'%" ORDER BY c.Name ASC LIMIT 5 ')->result_array();
+
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='getJobLevel'){
+            $JobType = $data_arr['JobType'];
+            $data = $this->db->get_where('db_studentlife.job_level',array(
+                'JobType' => $JobType
+            ))->result_array();
+            return print_r(json_encode($data));
+        }
+
     }
 
 
