@@ -708,6 +708,71 @@ class C_rest3 extends CI_Controller {
         }
     }
 
+    public function APS_CrudAgregatorTB8()
+    {
+      $dataToken = $this->data['dataToken'];
+      $mode = $dataToken['mode'];
+      switch ($mode) {
+        case 'luaran_penelitian_pkm_mhs':
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+          $arr_ID_kat_capaian = [3,7,1,4];
+          $rs = [];
+          for ($i=0; $i < count($arr_ID_kat_capaian); $i++) {
+            $arr_group = [];
+            $get_kat_capaian = $this->m_master->caribasedprimary('db_research.kategori_capaian_luaran','ID_kat_capaian',$arr_ID_kat_capaian[$i]);
+            $Nm_kat_capaian = $get_kat_capaian[0]['Nm_kat_capaian'];
+            $arr_group = ['Name' => $Nm_kat_capaian,'Data' => [] ];
+            $row = [];
+            $nestedData = array();
+            $nestedData[] = ['text' => $this->m_master->romawiNumber($i+1),'colspan' => 1,'style' => '"font-weight:600;background-color: lightyellow;"'] ;
+            $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 3,'style' => '"font-weight:600;background-color: lightyellow;"'];
+            // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
+            // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
+            $row[] = $nestedData;
+            // $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+            //         from db_research.publikasi as a 
+            //         join db_employees.employees as b on a.NIP = b.NIP
+            //         where b.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
+            //         UNION
+            //         select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+            //         from db_research.publikasi as a 
+            //         join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
+            //         join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
+            //         join db_academic.auth_students as d on c.NIM = d.NPM
+            //          where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
+            //        ';
+            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+                    from db_research.publikasi as a 
+                    join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
+                    join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
+                    join db_academic.auth_students as d on c.NPM = d.NPM
+                     where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
+                   ';
+            $query = $this->db->query($sql,array())->result_array();
+            for ($j=0; $j < count($query); $j++) { 
+              $nestedData = array();
+              $nestedData[] = ['text' => $j+1 ,'colspan' => 1,'style' => '"text-align:right"'];
+              $nestedData[] = ['text' => $query[$j]['Judul'] ,'colspan' => 1,'style' => '""'];
+              $nestedData[] = ['text' => $query[$j]['Year'] ,'colspan' => 1,'style' => '""'];
+              $nestedData[] = ['text' => $query[$j]['Ket'] ,'colspan' => 1,'style' => '""'];
+              $row[] = $nestedData;
+            }
+
+            $arr_group['Data'] = $row;
+            $rs[] = $arr_group;
+          }
+
+          echo json_encode($rs);
+          break;
+        
+        default:
+          echo '{"status":"999","message":"Not Authorize"}'; 
+          break;
+      }
+    }
+
     public function get_roolback_door_to_be_mhs_admission()
     {
         $dataToken = $this->data['dataToken'];
