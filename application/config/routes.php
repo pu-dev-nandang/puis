@@ -2018,7 +2018,17 @@ $route['cooperation/kerjasama-perguruan-tinggi/master'] = 'page/cooperation/c_co
 $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooperation/c_cooperation/kerja_sama_perguruan_tinggi_submit_kegiatan';
 
 // routes db
-$query = $db->get('db_it.routes');
+// $query = $db->get('db_it.routes');
+$arr_routes = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? 
+        array(
+            'Status' => 'live',
+            'Type' => 'pcam'
+            ) :  
+        array(
+            'Type' => 'pcam',
+            )
+        ;
+$query = $db->get_where('db_it.routes',$arr_routes);
 $result = $query->result();
 foreach( $result as $row )
 {
