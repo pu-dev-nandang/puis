@@ -4,7 +4,7 @@
             <div class = "row">
                 <div class="col-md-12">
                 <div style = "padding : 10px;">
-                    <h2>Console Developer</h2>
+                    <h2>Developer Mode</h2>
                 </div>
                 <div class="pull-left">
                     <button class="btn btn-default btn-tambah">Add</button>

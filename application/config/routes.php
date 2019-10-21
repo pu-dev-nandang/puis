@@ -2016,6 +2016,7 @@ $route['cooperation/Kerja_Sama_Perguruan_Tinggi_Kegiatan/Submit'] = 'page/cooper
 
 // routes db
 // $query = $db->get('db_it.routes');
+$route['it/console-developer/routes'] = 'page/it/c_it/routes';
 $arr_routes = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? 
         array(
             'Status' => 'live',

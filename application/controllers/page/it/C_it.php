@@ -199,10 +199,22 @@ class C_it extends It_Controler {
       $this->temp($content);
     }
 
+    public function menu_developer($page){
+        $data['page'] = $page;
+        $content = $this->load->view('page/it/console-developer/menu_developer',$data,true);
+        $this->temp($content);
+    }
+
     public function console_developer()
     {
       $content = $this->load->view('page/'.$this->data['department'].'/console-developer/console_developer',$this->data,true);
-      $this->temp($content);
+      $this->menu_developer($content);
+    }
+
+    public function routes()
+    {
+      $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
+      $this->menu_developer($content);
     }
 
 }
