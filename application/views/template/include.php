@@ -1450,6 +1450,25 @@
 
     }
 
+    function loadSelectOptionGraduationYear(element,selected) {
+
+        var data = {action : 'getGraduationYear'};
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api3/__crudTracerAlumni';
+
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+
+                $.each(jsonResult,function (i,v) {
+                    var sc = (v.GraduationYear == selected) ? 'selected' : '';
+                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+                });
+
+            }
+        });
+
+    }
+
     function getIDSemesterActive(element) {
         var url = base_url_js+'api/__getSemesterActive';
         $.getJSON(url,function (jsonResult) {

@@ -20,7 +20,7 @@
 
             <div class="form-group">
                 <label>Hasil Penilaian (%)</label>
-                <input class="form-control" id="hasil_penilaian"></input>
+                <input class="form-control" id="hasil_penilaian"/>
             </div>
 
 

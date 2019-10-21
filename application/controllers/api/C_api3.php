@@ -2565,8 +2565,6 @@ class C_api3 extends CI_Controller {
                         // Mendapatkan pekerjaan pertamanya
                         if(count($dataStd)>0){
 
-
-
                             for ($a=0;$a<count($dataStd);$a++){
 
                                 $YudisiumDate_ex = ($dataStd[$a]['YudisiumDate']!='' && $dataStd[$a]['YudisiumDate']!=null) ?
@@ -2622,9 +2620,6 @@ class C_api3 extends CI_Controller {
                             'TotalStudent' => count($dataStd),
                             'RataRata' =>  $RataRata
                         );
-
-
-
                     }
 
                 }
@@ -2632,8 +2627,67 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($dataEd));
 
+        }
+        else if($data_arr['action']=='readTableTempatKerjaLulusan'){
+            $Year = $data_arr['Year'];
+            $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
+            if(count($dataEd)>0){
+                for($j=0;$j<count($dataEd);$j++){
+
+                    $dataStd  = $this->db->query('SELECT ats.NPM, ats.Name, ats.GraduationYear, ps.Name AS Prodi, ats.YudisiumDate 
+                                                                          FROM db_academic.auth_students ats
+                                                                          LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID) 
+                                                                          WHERE ats.GraduationYear = "'.$Year.'" 
+                                                                          AND ats.StatusStudentID = "1"
+                                                                          AND ps.EducationLevelID = "'.$dataEd[$j]['ID'].'"
+                                                                          ORDER BY ats.NPM')->result_array();
+
+                    $Exp_L = [];
+                    $Exp_N = [];
+                    $Exp_M = [];
+
+                    if(count($dataStd)>0){
+                        for($a=0;$a<count($dataStd);$a++){
+
+                            $Experience = $this->db->query('SELECT ae.StartMonth, ae.StartYear, ae.JobType, ae.JobLevelID, jl.Description FROM db_studentlife.alumni_experience ae 
+                                                                    LEFT JOIN db_studentlife.job_level jl ON (jl.ID = ae.JobLevelID)
+                                                                    WHERE ae.NPM = "'.$dataStd[$a]['NPM'].'"  ORDER BY ae.ID DESC LIMIT 1 ')->result_array();
+
+                            $Job = '';
+                            $JobDescription = '';
+                            if(count($Experience)>0 && $Experience[0]['JobType']=='1'){
+                                $Job = 'Bekerja';
+                                $JobDescription = $Experience[0]['Description'];
+                            } else if(count($Experience)>0 && $Experience[0]['JobType']=='2'){
+                                $Job = 'Berwirausaha';
+                                $JobDescription = $Experience[0]['Description'];
+                            }
+                            $dataStd[$a]['Job'] = $Job;
+                            $dataStd[$a]['JobDescription'] = $JobDescription;
+                            $dataStd[$a]['Experience'] = $Experience;
+
+                            if(count($Experience)>0 && ($Experience[0]['JobLevelID']=='1' || $Experience[0]['JobLevelID']=='4')){
+                                array_push($Exp_L,$dataStd[$a]);
+                            } else if(count($Experience)>0 && ($Experience[0]['JobLevelID']=='2' || $Experience[0]['JobLevelID']=='5')){
+                                array_push($Exp_N,$dataStd[$a]);
+                            } else if(count($Experience)>0 && ($Experience[0]['JobLevelID']=='3' || $Experience[0]['JobLevelID']=='6')){
+                                array_push($Exp_M,$dataStd[$a]);
+                            }
+
+                        }
+                    }
 
 
+                    $dataEd[$j]['Exp_L'] = $Exp_L;
+                    $dataEd[$j]['Exp_N'] = $Exp_N;
+                    $dataEd[$j]['Exp_M'] = $Exp_M;
+
+                    $dataEd[$j]['StudentTotal'] = count($dataStd);
+                    $dataEd[$j]['StudentDetail'] = $dataStd;
+                }
+            }
+
+            return print_r(json_encode($dataEd));
         }
         else if($data_arr['action']=='readKesesuaianBidangKerjaLulusan'){
             $Year = $data_arr['Year'];
@@ -4102,6 +4156,9 @@ class C_api3 extends CI_Controller {
 
         if($data_arr['action']=='viewAlumni'){
 
+            $Year = $data_arr['Year'];
+            $WhereY = ($Year!='') ? ' AND ats.GraduationYear = "'.$Year.'" ' : '';
+
             $requestData= $_REQUEST;
 
             $dataSearch = '';
@@ -4111,7 +4168,7 @@ class C_api3 extends CI_Controller {
             OR qna.Answers "%'.$search.'%" ';
             }
 
-            $queryDefault = 'SELECT ats.* FROM db_academic.auth_students ats WHERE ats.StatusStudentID = "1"  '.$dataSearch;
+            $queryDefault = 'SELECT ats.* FROM db_academic.auth_students ats WHERE ats.StatusStudentID = "1" '.$WhereY.'  '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -4131,6 +4188,7 @@ class C_api3 extends CI_Controller {
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;"><b><a href="javascript:void(0);" class="showDetailAlumni" data-npm="'.$row['NPM'].'" data-name="'.$ShowName.'">'.$ShowName.'</a></b></div>';
+                $nestedData[] = $row['GraduationYear'];
 
                 $data[] = $nestedData;
                 $no++;
@@ -4233,6 +4291,12 @@ class C_api3 extends CI_Controller {
             ))->result_array();
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']=='getGraduationYear'){
+            $data = $this->db->query('SELECT ac.GraduationYear FROM db_academic.auth_students ac WHERE ac.GraduationYear 
+                                                GROUP BY ac.GraduationYear
+                                                 ORDER BY ac.GraduationYear DESC')->result_array();
+            return print_r(json_encode($data));
+        }
 
     }
 
@@ -4332,11 +4396,12 @@ class C_api3 extends CI_Controller {
             else if($data_arr['action']=='ListDataAlumniForm'){
 
                 $Year = $data_arr['Year'];
-                $data = $this->db->query('SELECT af.*, ats.Name, ats.GraduationYear, ae.Title, ae.Company, ae.StartMonth, ae.StartYear, pl.Description AS Position 
+                $data = $this->db->query('SELECT af.*, ats.Name, ats.GraduationYear, ae.Title, c.Name AS Company, ae.StartMonth, ae.StartYear, pl.Description AS Position 
                                                     FROM db_studentlife.alumni_form af
                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
                                                     LEFT JOIN db_studentlife.alumni_experience ae ON (ae.ID = af.IDAE)
                                                     LEFT JOIN db_studentlife.position_level pl ON (pl.ID = ae.PositionLevelID)
+                                                    LEFT JOIN db_studentlife.master_company c ON (c.ID = ae.CompanyID)
                                                     WHERE af.Year = "'.$Year.'" 
                                                     ORDER BY ats.GraduationYear, ats.Name ASC ')->result_array();
                 return print_r(json_encode($data));

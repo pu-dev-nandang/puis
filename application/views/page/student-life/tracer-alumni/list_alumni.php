@@ -27,18 +27,20 @@
 <div class="row">
     <div class="col-md-4">
         <div class="well">
-            <div style="text-align: right;">
-                <button class="btn btn-success" id="btnShowMasterCompany">Master Company</button>
+            <div class="row">
+                <div class="col-md-7">
+                    <select class="form-control" id="filterYear">
+                        <option value="" selected disabled>All graduation year</option>
+                        <option disabled>----------------</option>
+                    </select>
+                </div>
+                <div class="col-md-5" style="border-left: 1px solid #CCCCCC;">
+                    <button class="btn btn-block btn-default" id="btnShowMasterCompany">Master Company</button>
+                </div>
             </div>
+
         </div>
-        <table class="table table-bordered" id="tableAlumni">
-            <thead>
-            <tr>
-                <th style="width: 1%;">No</th>
-                <th>Alumni</th>
-            </tr>
-            </thead>
-        </table>
+        <div id="viewTableListAlumni"></div>
     </div>
     <div class="col-md-8" style="border-left: 1px solid #CCCCCC;">
         <input class="hide" value="" id="dataNPMStd">
@@ -50,20 +52,34 @@
     </div>
 </div>
 
-
-
-
-
 <script>
 
     $(document).ready(function () {
 
+        loadSelectOptionGraduationYear('#filterYear','');
+
+        getAlmuni();
+    });
+
+    $('#filterYear').change(function () {
         getAlmuni();
     });
 
     function getAlmuni() {
 
-        var token = jwt_encode({action : 'viewAlumni'},'UAP)(*');
+        $('#viewTableListAlumni').html('<table class="table table-bordered" id="tableAlumni">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th>Alumni</th>' +
+            '                <th  style="width: 7%;">Graduation Year</th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '        </table>');
+
+        var filterYear = $('#filterYear').val();
+
+        var token = jwt_encode({action : 'viewAlumni',Year:filterYear},'UAP)(*');
         var url = base_url_js+'api3/__crudTracerAlumni';
 
         var dataTable = $('#tableAlumni').DataTable( {
@@ -90,8 +106,6 @@
     }
 
     $(document).on('click','.showDetailAlumni',function () {
-
-
 
         var Name = $(this).attr('data-name');
         var NPM = $(this).attr('data-npm');
@@ -367,7 +381,7 @@
 
         if(Token!=''){
 
-            console.log(dataToken);
+            // console.log(dataToken);
 
             $('#Title').val(dataToken.Title);
             $('#viewCompany').html(dataToken.Company);
@@ -509,7 +523,7 @@
 
         $('#GlobalModalLarge .modal-body').html('<div class="row">' +
             '   <input class="hide" id="ID">' +
-            '    <div class="col-md-4" id="dataForm">' +
+            '    <div class="col-md-4" style="border-right: 1px solid #CCCCCC;" id="dataForm">' +
             '        <div class="form-group">' +
             '            <label>Company Name</label>' +
             '            <input class="form-control" id="Name">' +
@@ -531,7 +545,6 @@
             '        </div>' +
             '    </div>' +
             '    <div class="col-md-8" id="divTableCompany">' +
-
             '    </div>' +
             '</div>');
 
@@ -611,8 +624,8 @@
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
             '                <th>Company</th>' +
-            '                <th style="width: 30%;">Addredd</th>' +
             '                <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+            '                <th>Address</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody id="listDataCompany">' +
@@ -626,14 +639,25 @@
            if(jsonResult.length>0){
             $.each(jsonResult,function (i,v) {
 
-                var btnAct = '<a href="javascript:void(0);" class="btnCompanyEdit" data-tkn="'+jwt_encode(v,'UAP)(*')+'">Edit</a> ' +
-                    '<a href="javascript:void(0);" class="btnCompanyRemove" data-id="'+v.ID+'">Del</a>'
+                var btnAct = '<div class="btn-group">' +
+                    '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
+                    '  </button>' +
+                    '  <ul class="dropdown-menu">' +
+                    '    <li><a href="javascript:void(0);" class="btnCompanyEdit" data-tkn="'+jwt_encode(v,'UAP)(*')+'">Edit</a></li>' +
+                    '    <li role="separator" class="divider"></li>' +
+                    '    <li><a href="javascript:void(0);" class="btnCompanyRemove" data-id="'+v.ID+'">Remove</a></li>' +
+                    '  </ul>' +
+                    '</div>';
 
                 $('#listDataCompany').append('<tr>' +
                     '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                    '<td style="text-align: left;">'+v.Name+'</td>' +
-                    '<td style="text-align: left;">'+v.Address+'</td>' +
+                    '<td style="text-align: left;"><b>'+v.Name+'</b>' +
+                    '<br/>Industy : '+v.Industry+
+                    '<br/>Phone : '+v.Phone+
+                    '</td>' +
                     '<td>'+btnAct+'</td>' +
+                    '<td style="text-align: left;">'+v.Address+'</td>' +
                     '</tr>');
             });
 
