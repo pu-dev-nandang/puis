@@ -2645,6 +2645,7 @@ class C_api3 extends CI_Controller {
                     $Exp_L = [];
                     $Exp_N = [];
                     $Exp_M = [];
+                    $dataStdRes = [];
 
                     if(count($dataStd)>0){
                         for($a=0;$a<count($dataStd);$a++){
@@ -2674,6 +2675,11 @@ class C_api3 extends CI_Controller {
                                 array_push($Exp_M,$dataStd[$a]);
                             }
 
+
+                            if(count($Experience)>0){
+                                array_push($dataStdRes,$dataStd[$a]);
+                            }
+
                         }
                     }
 
@@ -2682,8 +2688,8 @@ class C_api3 extends CI_Controller {
                     $dataEd[$j]['Exp_N'] = $Exp_N;
                     $dataEd[$j]['Exp_M'] = $Exp_M;
 
-                    $dataEd[$j]['StudentTotal'] = count($dataStd);
-                    $dataEd[$j]['StudentDetail'] = $dataStd;
+                    $dataEd[$j]['StudentTotal'] = count($dataStdRes);
+                    $dataEd[$j]['StudentDetail'] = $dataStdRes;
                 }
             }
 
