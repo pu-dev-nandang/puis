@@ -262,12 +262,12 @@ $this->m_reservation->checkAuth_user_vreservation();
                    toastr.options.fadeOut = 10000;
                    toastr.success('Data berhasil disimpan', 'Success!');
                    // send notification other school from client
-                   var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                   // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                     socket.emit('update_schedule_notifikasi', { 
-                       update_schedule_notifikasi: '1',
-                       date : '',
-                     });
+                     // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                     // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                     //   socket.emit('update_schedule_notifikasi', { 
+                     //     update_schedule_notifikasi: '1',
+                     //     date : '',
+                     //   });
                    var divHtml = $("#schedule");
                    // loadDataSchedule(divHtml);
                    var OpCategory = $("#OpCategoryRoom").val();

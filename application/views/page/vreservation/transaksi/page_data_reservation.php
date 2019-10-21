@@ -63,7 +63,7 @@
     var tempEquipment = [];
     $(document).ready(function () {
         loadDataListApprove();
-        socket_messages2();
+        //socket_messages2();
     });
 
     $(document).on('click','.btn-delete', function () {
@@ -102,12 +102,12 @@
                    toastr.success('Data berhasil disimpan', 'Success!');
                    loadDataListApprove();
                    // send notification other school from client
-                   var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                   // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                     socket.emit('update_schedule_notifikasi', { 
-                       update_schedule_notifikasi: '1',
-                       date : '',
-                     });
+                   // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                   // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                   //   socket.emit('update_schedule_notifikasi', { 
+                   //     update_schedule_notifikasi: '1',
+                   //     date : '',
+                   //   });
                    $('#NotificationModal').modal('hide');
                 },500);
             }
@@ -157,12 +157,12 @@
                    toastr.success('Data berhasil disimpan', 'Success!');
                    loadDataListApprove();
                    // send notification other school from client
-                   var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                   // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                     socket.emit('update_schedule_notifikasi', { 
-                       update_schedule_notifikasi: '1',
-                       date : '',
-                     });
+                   // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                   // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                   //   socket.emit('update_schedule_notifikasi', { 
+                   //     update_schedule_notifikasi: '1',
+                   //     date : '',
+                   //   });
                    $('#NotificationModal').modal('hide');
                 },500);
             }
@@ -177,17 +177,17 @@
 
     function socket_messages2()
     {
-        var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-        // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-        socket.on( 'update_schedule_notifikasi', function( data ) {
+        // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+        // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+        // socket.on( 'update_schedule_notifikasi', function( data ) {
 
-            //$( "#new_count_message" ).html( data.new_count_message );
-            //$('#notif_audio')[0].play();
-            if (data.update_schedule_notifikasi == 1) {
-                loadDataListApprove();
-            }
+        //     //$( "#new_count_message" ).html( data.new_count_message );
+        //     //$('#notif_audio')[0].play();
+        //     if (data.update_schedule_notifikasi == 1) {
+        //         loadDataListApprove();
+        //     }
 
-        }); // exit socket
+        // }); // exit socket
     }
 
     function loadDataListApprove()
@@ -206,11 +206,11 @@
                                    //' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Time</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Agenda</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Room</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "25%">Equipment</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Support</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Markom</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Equipment</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "10%">Support</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "13%">Markom</th>'+
                                    //' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Participant</th>'+
-                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Status</th>'+
+                                   ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;" width = "15%">Status</th>'+
                                    //' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Layout</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Requester</th>'+
                                    ' <th style = "text-align: center;background: #20485A;color: #FFFFFF;">Detail</th>'+
@@ -415,12 +415,12 @@
                        toastr.success('Data berhasil disimpan', 'Success!');
                        //loadDataListApprove();
                        // send notification other school from client
-                       var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                       // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                         socket.emit('update_schedule_notifikasi', { 
-                           update_schedule_notifikasi: '1',
-                           date : '',
-                         });
+                         // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                         // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                         //   socket.emit('update_schedule_notifikasi', { 
+                         //     update_schedule_notifikasi: '1',
+                         //     date : '',
+                         //   });
                        $('#NotificationModal').modal('hide');
                     },500);
                 }
@@ -483,12 +483,12 @@
                        toastr.success('Data berhasil disimpan', 'Success!');
                        //loadDataListApprove();
                        // send notification other school from client
-                       var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-                       // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-                         socket.emit('update_schedule_notifikasi', { 
-                           update_schedule_notifikasi: '1',
-                           date : '',
-                         });
+                         // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+                         // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+                         //   socket.emit('update_schedule_notifikasi', { 
+                         //     update_schedule_notifikasi: '1',
+                         //     date : '',
+                         //   });
                          $("#pageData").html('<h3 align = "center">Thank for your appreciated</h3>');
                        $('#NotificationModal').modal('hide');
                     },500);
