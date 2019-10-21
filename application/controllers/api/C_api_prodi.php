@@ -445,9 +445,10 @@ class C_api_prodi extends CI_Controller {
             return print_r(1 );
         }
         else if($data_arr['action']=='readProdiPartner'){
-
-             $data = $this->db->get('db_prodi.partner')->result_array();
-
+            $data_arr = $this->getInputToken2();
+            $ProdiID = $data_arr['ProdiID'];
+            
+            $data = $this->db->query('SELECT * FROM db_prodi.partner WHERE ProdiID = '.$ProdiID.'')->result_array();   
             return print_r(json_encode($data));
 
         }
@@ -717,11 +718,7 @@ class C_api_prodi extends CI_Controller {
                                   INNER JOIN db_prodi.lecturer l ON (l.ProdiID = ps.ID)
                                   LEFT JOIN db_employees.employees em ON (em.NIP = l.NIP)
                                   WHERE l.ProdiID = "'.$ProdiID.'"')->result_array();
-        if(count($data)>0){
-            $data[0]['ProdiName'] = ($LangCode=='Ind') ? $data[0]['Name'] : $data[0]['NameEng'];
-            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
-            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
-        }
+        
         return print_r(json_encode($data));
     }
     function getStudentsProdi(){
@@ -770,7 +767,11 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
 
         $data = $this->db->query('SELECT * FROM db_prodi.partner WHERE ProdiID = '.$ProdiID.'')->result_array();
-        
+        if(count($data)>0){
+            // $DefaultPhoto = base_url('images/Slider/default.jpg');
+            $data[0]['Images'] = ($data[0]['Images']!='' && $data[0]['Images']!=null) ? $data[0]['Images'] :  'default.png';
+            // $data[0]['Images'] = base_url('images/slider/default.jpg');
+        }
         return print_r(json_encode($data));
     }
 
@@ -779,21 +780,17 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
 
         $data = $this->db->query('SELECT s.*,s.Images FROM db_prodi.slider s WHERE s.ProdiID = '.$ProdiID.'')->result_array();
-        if(count($data)>0){
-
-            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
-            $data[0]['Images'] = ($data[0]['Images']!='' && $data[0]['Images']!=null) ? $data[0]['Images'] :  'default.jpg';
-            // $data[0]['Images'] = base_url('images/slider/default.jpg');
-        }
+        
         
         return print_r(json_encode($data));
     }
 
-    function getFacilitiesProdi(){
+    
+    function getCategoryClassroom(){
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.'')->result_array();
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "classroom"')->result_array();
         if(count($data)>0){
 
             // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
@@ -803,6 +800,35 @@ class C_api_prodi extends CI_Controller {
         
         return print_r(json_encode($data));
     }
+    function getCategoryLaboratory(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Laboratory"')->result_array();
+        if(count($data)>0){
+
+            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
+            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
+            // $data[0]['Images'] = base_url('images/slider/default.jpg');
+        }
+        
+        return print_r(json_encode($data));
+    }
+    function getCategoryFacilities(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Facilities"')->result_array();
+        if(count($data)>0){
+
+            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
+            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
+            // $data[0]['Images'] = base_url('images/slider/default.jpg');
+        }
+        
+        return print_r(json_encode($data));
+    }
+
 
 
 
