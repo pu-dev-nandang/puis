@@ -4,6 +4,7 @@
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
         <div class="well">
+            <label>Tahun Lulus</label>
             <select class="form-control" id="filterYear"></select>
         </div>
     </div>
@@ -115,7 +116,6 @@
        var title = $(this).attr('data-title');
        var d = jwt_decode(token,'UAP)(*');
 
-       console.log(d);
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">'+title+'</h4>');
