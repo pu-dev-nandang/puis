@@ -2437,14 +2437,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         break;
                     case 3:
                     case 4:
-                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $StatusBooking = 'Awaiting<br/><span style = "color:red;"> App 2 : '.$NameApprover.'</span>';
+                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting<li><span style = "color:#0968b3;"> App 1 : '.$NameApprover1.'</span></li><li><span style = "color:red;"> App 2 : '.$NameApprover2.'</span></li>';
                         break;
                     case 5:
                         // $StatusBooking = 'Approved';
                         $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
                         $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $StatusBooking = '<li><span style = "color:#0968b3;">App 1 : '.$NameApprover1.'</span></li><li><span style = "color:#0968b3;">App 2 : '.$NameApprover2.'</span></li>';
+                        $StatusBooking = 'Approved<li><span style = "color:#0968b3;">App 1 : '.$NameApprover1.'</span></li><li><span style = "color:#0968b3;">App 2 : '.$NameApprover2.'</span></li>';
                         break;    
                     default:
                         # code...
