@@ -791,12 +791,7 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
 
         $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "classroom"')->result_array();
-        if(count($data)>0){
-
-            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
-            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
-            // $data[0]['Images'] = base_url('images/slider/default.jpg');
-        }
+        
         
         return print_r(json_encode($data));
     }
@@ -805,12 +800,7 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
 
         $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Laboratory"')->result_array();
-        if(count($data)>0){
-
-            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
-            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
-            // $data[0]['Images'] = base_url('images/slider/default.jpg');
-        }
+        
         
         return print_r(json_encode($data));
     }
@@ -819,12 +809,7 @@ class C_api_prodi extends CI_Controller {
         $ProdiID = $data_arr['ProdiID'];
 
         $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Facilities"')->result_array();
-        if(count($data)>0){
-
-            // $DefaultPhoto = base_url('images/Kaprodi/default.jpg');
-            $data[0]['Photo'] = ($data[0]['Photo']!='' && $data[0]['Photo']!=null) ? $data[0]['Photo'] :  'default.jpg';
-            // $data[0]['Images'] = base_url('images/slider/default.jpg');
-        }
+        
         
         return print_r(json_encode($data));
     }
