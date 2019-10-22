@@ -344,36 +344,38 @@ class C_it extends It_Controler {
          echo json_encode(1); 
       }
       elseif ($action == 'MigrateLive') {
-         $data = $Input['data'];
-         $data = json_decode(json_encode($data),true);
-         $dbselected =  $this->load->database('server_live', TRUE);
+        if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+          $data = $Input['data'];
+          $data = json_decode(json_encode($data),true);
+          $dbselected =  $this->load->database('server_live', TRUE);
 
-         // Truncate data local
-         $sql = 'TRUNCATE TABLE db_it.routes';
-         $this->db->query($sql,array());
+          // Truncate data local
+          $sql = 'TRUNCATE TABLE db_it.routes';
+          $this->db->query($sql,array());
 
-         for ($i=0; $i <count($data) ; $i++) { 
-           // get data
-          $ID = $data[$i];
-          $G_dt = $dbselected->query('select * from db_it.routes where ID = '.$ID.' ')->result_array();
-          if (count($G_dt) > 0) {
-            $dataSave = [];
-            $r = $G_dt[0];
-            foreach ($r as $key => $value) {
-              if ($key != 'ID') {
-                if ($key == 'Status') {
-                  $dataSave[$key] = 'live';
-                }
-                else
-                {
-                  $dataSave[$key] = $value;
-                }
-                
-              }
-            }
-            $this->db->insert('db_it.routes',$dataSave);
+          for ($i=0; $i <count($data) ; $i++) { 
+            // get data
+           $ID = $data[$i];
+           $G_dt = $dbselected->query('select * from db_it.routes where ID = '.$ID.' ')->result_array();
+           if (count($G_dt) > 0) {
+             $dataSave = [];
+             $r = $G_dt[0];
+             foreach ($r as $key => $value) {
+               if ($key != 'ID') {
+                 if ($key == 'Status') {
+                   $dataSave[$key] = 'live';
+                 }
+                 else
+                 {
+                   $dataSave[$key] = $value;
+                 }
+                 
+               }
+             }
+             $this->db->insert('db_it.routes',$dataSave);
+           }
           }
-         }
+        }
          echo json_encode(1); 
       } 
     }
