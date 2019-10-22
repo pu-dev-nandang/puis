@@ -59,6 +59,7 @@ $route['rekap/(:num)'] = 'auth/c_rekap/rekap_/$1';
 // === Dashboard ===
 $route['dashboard'] = 'dashboard/c_dashboard';
 $route['my-activities'] = 'dashboard/c_dashboard/myactivities';
+$route['ticket'] = 'dashboard/c_dashboard/ticket';
 $route['profile/(:any)'] = 'dashboard/c_dashboard/profile/$1';
 $route['change-departement'] = 'dashboard/c_dashboard/change_departement';
 
@@ -157,7 +158,6 @@ $route['academic/semester-antara/details/(:num)'] = 'page/academic/c_semester_an
 $route['academic/ketersediaan-dosen'] = 'page/academic/c_akademik/ketersediaan_dosen';
 $route['academic/ModalKetersediaanDosen'] = 'page/academic/c_akademik/Modal_KetersediaanDosen';
 
-//$route['academic/timetables'] = 'page/academic/c_jadwal';
 
 
 $route['academic/timetables/list/edit/(:num)/(:num)/(:any)'] = 'page/academic/c_timetables/edit_course/$1/$2/$3';
@@ -166,7 +166,6 @@ $route['academic/timetables/list/edit-schedule/(:num)/(:num)/(:any)'] = 'page/ac
 $route['academic/timetables/course-offer'] = 'page/academic/c_timetables/course_offer';
 $route['academic/timetables/setting-timetable'] = 'page/academic/c_timetables/setting_timetable';
 
-$route['academic/study-planning'] = 'page/academic/c_study_planning';
 
 
 $route['academic/study-planning/course-offer/(:num)/(:any)/(:any)'] = 'page/academic/c_study_planning/course_offer/$1/$2/$3';
