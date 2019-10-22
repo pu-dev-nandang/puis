@@ -271,8 +271,16 @@ class C_it extends It_Controler {
              local dan live
          */
         $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
-        $sql = 'select a.*,b.Name as NameEmp from db_it.routes as a
+        $sql = 'select a.*,b.Name as NameEmp,dp.Name2 as NameDepartment from db_it.routes as a
                 join db_employees.employees as b on a.Updated_by = b.NIP
+                join (
+                    select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",Name) as Name1, CONCAT("Study ",NameEng)  as Name2 from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Description as Name1, Division as Name2 from db_employees.division
+                    UNION
+                    select CONCAT("FT.",ID) as ID, CONCAT("Facultas ",Name) as Name1, CONCAT("Faculty ",NameEng) as Name2 from db_academic.faculty where StBudgeting = 1
+  
+                ) as dp on a.Department = dp.ID
                 where a.Status = "'.$Input['server'].'"
                 ';
         $query = $dbselected->query($sql)->result_array();
@@ -284,6 +292,7 @@ class C_it extends It_Controler {
             $nestedData[] = $row['Slug'];
             $nestedData[] = $row['Controller'];
             $nestedData[] = $row['Type'];
+            $nestedData[] = $row['NameDepartment'];
             $nestedData[] = $row['NameEmp'];
             $nestedData[] = $row['Updated_at'];
             $nestedData[] = $row['Updated_by'];
@@ -330,6 +339,39 @@ class C_it extends It_Controler {
             $this->db->where('ID',$ID);
             $this->db->update('db_it.routes',$dataSave);
 
+          }
+         }
+         echo json_encode(1); 
+      }
+      elseif ($action == 'MigrateLive') {
+         $data = $Input['data'];
+         $data = json_decode(json_encode($data),true);
+         $dbselected =  $this->load->database('server_live', TRUE);
+
+         // Truncate data local
+         $sql = 'TRUNCATE TABLE db_it.routes';
+         $this->db->query($sql,array());
+
+         for ($i=0; $i <count($data) ; $i++) { 
+           // get data
+          $ID = $data[$i];
+          $G_dt = $dbselected->query('select * from db_it.routes where ID = '.$ID.' ')->result_array();
+          if (count($G_dt) > 0) {
+            $dataSave = [];
+            $r = $G_dt[0];
+            foreach ($r as $key => $value) {
+              if ($key != 'ID') {
+                if ($key == 'Status') {
+                  $dataSave[$key] = 'live';
+                }
+                else
+                {
+                  $dataSave[$key] = $value;
+                }
+                
+              }
+            }
+            $this->db->insert('db_it.routes',$dataSave);
           }
          }
          echo json_encode(1); 

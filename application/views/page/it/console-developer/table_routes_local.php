@@ -10,6 +10,7 @@
                     <td>Slug</td>
                     <td>Controller</td>
                     <td>Type</td>
+                    <td>Department</td>
                     <td>Updated by</td>
                     <td>Updated at</td>
                     <td>Action</td>
@@ -51,7 +52,7 @@
                          'className': 'dt-body-center',
                       },
                           {
-                         'targets': 6,
+                         'targets': 7,
                          'searchable': false,
                          'orderable': false,
                          'className': 'dt-body-center',
@@ -61,9 +62,9 @@
                                  '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
                                  '  </button>' +
                                  '  <ul class="dropdown-menu" style="min-width:50px !important;">' +
-                                 '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[8]+'" data = "'+full[9]+'" server = "local"><i class="fa fa fa-edit"></i></a></li>' +
+                                 '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[9]+'" data = "'+full[10]+'" server = "local"><i class="fa fa fa-edit"></i></a></li>' +
                                  '    <li role="separator" class="divider"></li>' +
-                                 '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[8]+'" server = "local"><i class="fa fa fa-trash"></i></a></li>' +
+                                 '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[9]+'" server = "local"><i class="fa fa fa-trash"></i></a></li>' +
                                  '  </ul>' +
                                  '</div>';
                              return btnAction;
@@ -71,9 +72,9 @@
                       },
                    ],
                  'createdRow': function( row, data, dataIndex ) {
-                    $(row).attr('data-id',data[8]);     
+                    $(row).attr('data-id',data[9]);     
                  },
-                 "order": [[ 5, "desc" ]],
+                 "order": [[ 6, "desc" ]],
                  dom: 'l<"toolbar">frtip',
                  initComplete: function(){
                    
@@ -111,6 +112,15 @@
                    return $(this).val() == data.Type; 
                  }).prop("selected", true);
             }
+            else if(key == 'Department'){
+                $(".input[name='Department'] option").filter(function() {
+                   //may want to use $.trim in here
+                   return $(this).val() == data.Department; 
+                }).prop("selected", true);
+                $(".input[name='Department']").select2({
+
+                });
+            }
             else
             {
                 $('.input[name="'+key+'"]').val(data[key]);
@@ -133,7 +143,7 @@
                  var ID = tr.attr('data-id');
                  var dt = [];
                  // total col = 5
-                 for (var i = 1; i <= 5; i++) {
+                 for (var i = 1; i <= 6; i++) {
                      var dt_html = tr.find('td:eq('+i+')').html();
                      dt.push(dt_html);
                  }
@@ -157,6 +167,7 @@
                                                   '<th>Slug</th>'+
                                                   '<th>Controller</th>'+
                                                   '<th>Type</th>'+
+                                                  '<th>Department</th>'+
                                                   '<th>Updated by</th>'+
                                                   '<th>Updated at</th>'+
                                                '</tr>'+
@@ -176,7 +187,7 @@
                     html += '</div></div>'; 
 
                      var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
-                         '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Proccess</button>';
+                         '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Procces</button>';
 
                     $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'List Checklist Data'+'</h4>');
                     $('#GlobalModalLarge .modal-body').html(html);
