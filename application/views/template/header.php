@@ -91,10 +91,10 @@
                     <span>My Activities</span>
                 </a>
             </li>
-            <li class="hide">
-                <a href="javascript:void(0);" id="btn_announcement">
-                    <i class="fa fa-bullhorn" aria-hidden="true"></i>
-                    <span>Announcement</span>
+            <li class="hide <?php if($this->uri->segment(1)=='ticket'){echo 'current';} ?>">
+                <a href="<?php echo base_url('ticket'); ?>" id="btn_announcement">
+                    <i class="fa fa-ticket" aria-hidden="true"></i>
+                    <span>Ticket</span>
                 </a>
             </li>
             <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation'); 
@@ -343,18 +343,6 @@
 
         saveLogUser();
 
-    });
-
-    $(document).on('click','#btn_announcement',function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Announcement</h4>');
-        $('#GlobalModal .modal-body').html('Announcement (Under Construction)');
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '<button type="button" class="btn btn-primary"><i class="fa fa-paper-plane-o right-margin" aria-hidden="true"></i> Publish</button>');
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
     });
 
     $('#btnSimpleSearch').click(function () {
