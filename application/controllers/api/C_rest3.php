@@ -767,6 +767,60 @@ class C_rest3 extends CI_Controller {
           echo json_encode($rs);
           break;
         
+        case 'produk_jasa_mhs':
+          $AddWhere = '';
+          $ProdiID = '';
+          $Year = '';
+          if (array_key_exists('ProdiID', $dataToken)) {
+             $P = $dataToken['ProdiID'];
+             $P = explode('.', $P);
+             $ProdiID = $P[0];
+             $WhereOrAnd = ($AddWhere != '' && $AddWhere  != null) ? ' and' : ' where';
+              $AddWhere .= $WhereOrAnd.' b.ProdiID ='.$ProdiID; 
+           } 
+          if (array_key_exists('Year', $dataToken)) {
+             $P = $dataToken['ProdiID'];
+             $P = explode('.', $P);
+             $ProdiID = $P[0];
+             $Year = $dataToken['Year'];
+             $WhereOrAnd = ($AddWhere != '' && $AddWhere  != null) ? ' and' : ' where';
+             $AddWhere .= $WhereOrAnd.' a.Year ='.$Year;  
+           }
+          
+          $sql  = 'select a.*,b.Name,b.ProdiID,b.NPM
+                  from db_agregator.produk_jasa_mhs as a 
+                  join db_academic.auth_students as b on a.Updated_by = b.NPM
+                  '.$AddWhere.'
+          ';
+
+          $query = $this->db->query($sql,array())->result_array();
+          $data = array();
+          for ($i=0; $i < count($query); $i++) { 
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['NPM'].'-'.$row['Name'];
+            $nestedData[] = $row['NamaProdukJasa'];
+            $nestedData[] = $row['DeskripsiProdukJasa'];
+            $UploadBukti =  '';
+            if ($row['UploadBukti'] != '' && $row['UploadBukti'] != null) {
+              $UP = json_decode($row['UploadBukti'],true);
+              if (count($UP) > 0) {
+                 $UploadBukti = '<br/><a href="'.url_sign_in_students.'uploads/produk_jasa/'.$UP[0].'" target = "_blank">Attachment</a>';
+              }
+            }
+            $nestedData[] = $row['Bukti'].$UploadBukti;
+            $data[] = $nestedData;
+          }
+
+          $json_data = array(
+              "draw"            => intval( 0 ),
+              "recordsTotal"    => intval(count($query)),
+              "recordsFiltered" => intval( count($query) ),
+              "data"            => $data
+          );
+          echo json_encode($json_data);
+          break;
         default:
           echo '{"status":"999","message":"Not Authorize"}'; 
           break;

@@ -19,8 +19,9 @@
         </table>
     </div>
     <div class="panel-footer" style="text-align: right;">
-        <button class="btn btn-primary" id="btnMigrate">Migrate</button>
+        <button class="btn btn-primary" id="btnMigrate">Migrate to Server Live</button>
     </div>
+    <p style="color: red;">* Mohon Migrate data ke server live jika data local masih ada, dengan klik tombol Migrate to Server Live</p>
 </div>
 <script type="text/javascript">
     var App_table_routes_local = {
