@@ -20,6 +20,11 @@
             	<option value="parent">Parent</option>
             </select>
         </div>
+        <div class="form-group">
+            <label>Department</label>
+            <select name="Department" id="" class="input">
+            </select>
+        </div>
     </div>
     <div class="panel-footer" style="text-align: right;">
         <button class="btn btn-success" action= "add" data-id ="" id="btnSave" server = "local">Save</button>
@@ -35,8 +40,27 @@
         $('#btnSave').attr('data-id','');
         $('#btnSave').attr('server','local');
         $('.input[name="Slug"]').focus();
+        App_input_routes.LoadSelectDepartment();
     },
+    LoadSelectDepartment : function(){
+        var selector = $('.input[name="Department"]');
+        selector.empty();
+        var url = base_url_js + "api/__getAllDepartementPU";
+        $.post(url,{ Show:'all' },function (resultJson) {
+                
+        }).done(function(resultJson) {
+            for (var i = 0; i < resultJson.length; i++) {
+               selector.append('<option value = "'+resultJson[i].Code+'" >'+resultJson[i].Name2+'</option>');
+            }
+            selector.select2({
 
+            });
+        }).fail(function() {
+            toastr.error("Connection Error, Please try again", 'Error!!');
+            
+        });
+
+    },
     SubmitData : function(action='add',ID='',selector,server='local'){
         var data = {};
         $('.input').each(function(){
@@ -44,9 +68,15 @@
             if (field == 'Type') {
                data.Type = $(this).find('option:selected').val();
             }
+            else if (field == 'Department') {
+               data.Department = $(this).find('option:selected').val();
+            }
             else
             {
-                data[field] = $(this).val();
+                if (field != undefined) {
+                    data[field] = $(this).val(); 
+                }
+               
             }
         })
 

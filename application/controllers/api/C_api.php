@@ -8903,8 +8903,12 @@ class C_api extends CI_Controller {
     public function getAllDepartementPU()
     {
         $arr_result = array();
-        // $NA = $this->m_master->showData_array('db_employees.division');
         $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+        if (isset($_POST)) {
+            if ($_POST['Show'] == 'all') {
+                $NA = $this->m_master->showData_array('db_employees.division');
+            }
+        }
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $FT = $this->m_master->caribasedprimary('db_academic.faculty','StBudgeting',1);
         for ($i=0; $i < count($NA); $i++) {
