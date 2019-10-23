@@ -153,6 +153,7 @@ class C_api_prodi extends CI_Controller {
             $ID = $data_arr['ID'];
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.slider'); 
+
             return print_r(1);
         }
         elseif ($data_arr['action'] == 'change_sorting'){
@@ -787,7 +788,7 @@ class C_api_prodi extends CI_Controller {
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT s.*,s.Images FROM db_prodi.slider s WHERE s.ProdiID = '.$ProdiID.'')->result_array();
+        $data = $this->db->query('SELECT s.* FROM db_prodi.slider s WHERE s.ProdiID = '.$ProdiID.'')->result_array();
         
         
         return print_r(json_encode($data));

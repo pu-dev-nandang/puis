@@ -62,7 +62,7 @@
                                           <a href="" id="btn-tambah" data-toggle="modal" data-target="#form-modal">
                                           <i class="icon-plus"></i> Add Slider
                                           </a>
-                                         </span>
+                                        </span>
                                       </div>
                                   </div>
                 </div>
@@ -89,14 +89,14 @@
               <!-- Beri id "pesan-error" untuk menampung pesan error -->
                    <!--  <div id="pesan-error" class="alert alert-danger"></div>    -->    
                 <div class="col-md-12">            
-                  <div id="imagePreview1" style="margin-bottom:7.5px;"></div> 
+                  
                  
                          
                         <div class="caption">
                           <label class="control-label">Title Slider:</label>
 
                           <input type="text"  id="formTitle1" class="form-control" placeholder="Title Slide Show"><br>
-
+                        <div id="imagePreview1" style="margin-bottom:7.5px;"></div>     
                          <div class="custom-file-input " style="position:relative; left:0px;">
                           <i class="fa fa-file-image-o"></i>&nbsp; &nbsp;Browse<input  id="uploadFile1"  type="file" value="" name="file-input" />
                           <p class="red">*Size weight x height 1920px x 500px</p>
@@ -113,7 +113,7 @@
                           <input  type="text"  id="formUrl1" class="form-control" placeholder="http://example.com"><br>
                           </div> -->
                          
-                        </div>
+                      </div>
                    
   
                   <button type="submit" id="btn-simpan" class="btn btn-primary btnsave1" style="margin-top: 15px">Simpan</button>
@@ -471,28 +471,28 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
     form_data.append('token',token);
     var url = base_url_js + "api-prodi/__crudDataProdi";
     $.ajax({
-            type :"POST",
-            url : url,
-            data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-            contentType: false,       // The content type used when sending data to the server.
-            cache: false,             // To unable request pages to be cached
-            processData:false,
-            dataType: "json",
-            beforeSend: function(e) {
-              if(e && e.overrideMimeType) {
-                e.overrideMimeType('application/jsoncharset=UTF-8');
-              }
-            },
-            success: function(data){ // Ketika proses pengiriman berhasil
-              showSlider();
-              toastr.success('Data Update','Success');
-              thisbtn.prop('disabled',false).html('Ya');
-              $('#delete-modal').modal('hide');
-            },
-            error: function (data) {
-              toastr.error('Form required','Error');
-              thisbtn.prop('disabled',false).html('Ya');
-            }
+        type :"POST",
+        url : url,
+        data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+        contentType: false,       // The content type used when sending data to the server.
+        cache: false,             // To unable request pages to be cached
+        processData:false,
+        dataType: "json",
+        // beforeSend: function(e) {
+        //   if(e && e.overrideMimeType) {
+        //     e.overrideMimeType('application/jsoncharset=UTF-8');
+        //   }
+        // },
+        success: function(e){ // Ketika proses pengiriman berhasil
+            showSlider();
+            toastr.success('Data saved','Success');
+            thisbtn.prop('disabled',false).html('Ya');
+            $('#delete-modal').modal('hide');
+        },
+        error: function (e) {
+          toastr.error('Form required','Error');
+          thisbtn.prop('disabled',false).html('Ya');
+        }
     })
   });
 
