@@ -10,7 +10,7 @@
                     <select style="max-width: 150px;" id="Category" class="form-control">
                       <option value="Classroom">Classroom</option>
                       <option value="Laboratory">Laboratory</option>
-                      <option value="Public facilities">Public facilities</option>
+                      <option value="Facilities">Public facilities</option>
                     </select>
                 </td>
             </tr>

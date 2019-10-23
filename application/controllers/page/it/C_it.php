@@ -344,6 +344,7 @@ class C_it extends It_Controler {
          echo json_encode(1); 
       }
       elseif ($action == 'MigrateLive') {
+
         if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
           $data = $Input['data'];
           $data = json_decode(json_encode($data),true);
@@ -376,6 +377,7 @@ class C_it extends It_Controler {
            }
           }
         }
+
          echo json_encode(1); 
       } 
     }
