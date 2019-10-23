@@ -446,7 +446,7 @@ class C_api_prodi extends CI_Controller {
         }
         else if($data_arr['action']=='readProdiPartner'){
             $data_arr = $this->getInputToken2();
-            $ProdiID = $data_arr['ProdiID'];
+            $ProdiID = $prodi_active_id;
             
             $data = $this->db->query('SELECT * FROM db_prodi.partner WHERE ProdiID = '.$ProdiID.'')->result_array();   
             return print_r(json_encode($data));
@@ -647,6 +647,14 @@ class C_api_prodi extends CI_Controller {
                 
                 $path = './images/Facilities/'. $arr_file;
                 unlink($path);
+            return print_r(1);
+        }
+        else if($data_arr['action']=='insertContact'){
+
+                $dataForm = (array) $data_arr['dataForm'];
+                $dataForm['CreateAT'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_prodi.contact',$dataForm);
+
             return print_r(1);
         }
 
