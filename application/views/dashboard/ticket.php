@@ -65,381 +65,392 @@
     }
 </style>
 
-<div class="row" id="panel-ticket">
+<div class="row" >
     <div class="container">
+
         <div class="row">
-            <h2>Pinterest Responsive Grid</h2>
+            <div class="col-md-4 col-md-offset-4">
+                <div class="well">
+                    <input class="form-control form-lg" placeholder="Search by title, no ticket, user">
+                </div>
+                <hr/>
+            </div>
+            <div class="col-md-4" style="text-align: right;">
+                <?php
+                $noUrut = 10001;
+                $char = "TIC2019";
+                $kodeBarang = $char . sprintf("%04s", $noUrut);
+                echo $kodeBarang;
+                ?>
+                <button class="btn btn-lg btn-success" id="btnCreateNewTicket">Create New Ticket</button>
+            </div>
+        </div>
 
-            <p>Best viewed <a href="http://bootsnipp.com/iframe/Zkk0O" target="_blank">full screen</a>
-            </p>
-            <hr>
-            <section id="pinBoot">
+        <div class="row">
+            <div class="col-md-12" id="panel-ticket">
+                <section id="pinBoot">
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Nandang Mulyadi</b>
+                                <br/>2017090 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Nandang Mulyadi</b>
-                            <br/>2017090 | IT Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 1</a></h5>
+                            <img src="http://i.imgur.com/sDLIAZD.png" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in </p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 1</a></h5>
-                        <img src="http://i.imgur.com/sDLIAZD.png" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in </p>
-                    </div>
-                </article>
+                    </article>
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Alhadi Rahman PU 22</b>
+                                <br/>2018018 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Alhadi Rahman PU 22</b>
-                            <br/>2018018 | IT Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 2</a></h5>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 2</a></h5>
-                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
+                    </article>
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Novita Riani Br Ginting</b>
+                                <br/>2016065 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Novita Riani Br Ginting</b>
-                            <br/>2016065 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 3</a></h5>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 3</a></h5>
 
-                        <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                    </div>
-                </article>
-
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                         </div>
-                        <div class="col-md-9">
-                            <b>Richa Deswita</b>
-                            <br/>1016060 | SAS Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 4</a></h5>
-
-                        <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Sandra Dewi</b>
-                            <br/>2014024 | Finance Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 5</a></h5>
-                        <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Nandang Mulyadi</b>
-                            <br/>2017090 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 1</a></h5>
-                        <img src="http://i.imgur.com/sDLIAZD.png" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in </p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Alhadi Rahman PU 22</b>
-                            <br/>2018018 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 2</a></h5>
-                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Novita Riani Br Ginting</b>
-                            <br/>2016065 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 3</a></h5>
-
-                        <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                    </div>
-                </article>
+                    </article>
 
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Richa Deswita</b>
+                                <br/>1016060 | SAS Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Richa Deswita</b>
-                            <br/>1016060 | SAS Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 4</a></h5>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 4</a></h5>
 
-                        <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
+                            <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Sandra Dewi</b>
+                                <br/>2014024 | Finance Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Sandra Dewi</b>
-                            <br/>2014024 | Finance Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 5</a></h5>
+                            <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 5</a></h5>
-                        <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                    </article>
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Nandang Mulyadi</b>
+                                <br/>2017090 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Nandang Mulyadi</b>
-                            <br/>2017090 | IT Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 1</a></h5>
+                            <img src="http://i.imgur.com/sDLIAZD.png" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in </p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 1</a></h5>
-                        <img src="http://i.imgur.com/sDLIAZD.png" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in </p>
-                    </div>
-                </article>
+                    </article>
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Alhadi Rahman PU 22</b>
+                                <br/>2018018 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Alhadi Rahman PU 22</b>
-                            <br/>2018018 | IT Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 2</a></h5>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 2</a></h5>
-                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
+                    </article>
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Novita Riani Br Ginting</b>
+                                <br/>2016065 | IT Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Novita Riani Br Ginting</b>
-                            <br/>2016065 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 3</a></h5>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 3</a></h5>
 
-                        <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                    </div>
-                </article>
-
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                         </div>
-                        <div class="col-md-9">
-                            <b>Richa Deswita</b>
-                            <br/>1016060 | SAS Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 4</a></h5>
-
-                        <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Sandra Dewi</b>
-                            <br/>2014024 | Finance Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 5</a></h5>
-                        <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Nandang Mulyadi</b>
-                            <br/>2017090 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 1</a></h5>
-                        <img src="http://i.imgur.com/sDLIAZD.png" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in </p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Alhadi Rahman PU 22</b>
-                            <br/>2018018 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 2</a></h5>
-                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
-                        </div>
-                        <div class="col-md-9">
-                            <b>Novita Riani Br Ginting</b>
-                            <br/>2016065 | IT Department
-                        </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 3</a></h5>
-
-                        <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                    </div>
-                </article>
+                    </article>
 
 
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Richa Deswita</b>
+                                <br/>1016060 | SAS Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Richa Deswita</b>
-                            <br/>1016060 | SAS Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 4</a></h5>
+
+                            <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 4</a></h5>
+                    </article>
 
-                        <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                            irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
-
-                <article class="white-panel">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Sandra Dewi</b>
+                                <br/>2014024 | Finance Department
+                            </div>
                         </div>
-                        <div class="col-md-9">
-                            <b>Sandra Dewi</b>
-                            <br/>2014024 | Finance Department
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 5</a></h5>
+                            <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                    </div>
-                    <div class="white-panel-detail">
-                        <h5><a href="#">Title 5</a></h5>
-                        <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
-                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </div>
-                </article>
+                    </article>
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Nandang Mulyadi</b>
+                                <br/>2017090 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 1</a></h5>
+                            <img src="http://i.imgur.com/sDLIAZD.png" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in </p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Alhadi Rahman PU 22</b>
+                                <br/>2018018 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 2</a></h5>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Novita Riani Br Ginting</b>
+                                <br/>2016065 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 3</a></h5>
+
+                            <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        </div>
+                    </article>
+
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Richa Deswita</b>
+                                <br/>1016060 | SAS Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 4</a></h5>
+
+                            <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Sandra Dewi</b>
+                                <br/>2014024 | Finance Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 5</a></h5>
+                            <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2017090.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Nandang Mulyadi</b>
+                                <br/>2017090 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 1</a></h5>
+                            <img src="http://i.imgur.com/sDLIAZD.png" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in </p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2018018.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Alhadi Rahman PU 22</b>
+                                <br/>2018018 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 2</a></h5>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2016065.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Novita Riani Br Ginting</b>
+                                <br/>2016065 | IT Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 3</a></h5>
+
+                            <img src="http://i.imgur.com/xOIMvAe.jpg" alt="">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        </div>
+                    </article>
+
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/1016060.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Richa Deswita</b>
+                                <br/>1016060 | SAS Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 4</a></h5>
+
+                            <!--                        <img src="http://i.imgur.com/3gXW3L3.jpg" alt="">-->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                                irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
+
+                    <article class="white-panel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="white-panel-profile" src="http://localhost:8080/siak3/uploads/employees/2014024.JPG">
+                            </div>
+                            <div class="col-md-9">
+                                <b>Sandra Dewi</b>
+                                <br/>2014024 | Finance Department
+                            </div>
+                        </div>
+                        <div class="white-panel-detail">
+                            <h5><a href="#">Title 5</a></h5>
+                            <img src="http://i.imgur.com/kFFpuKA.jpg" alt="">
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                    </article>
 
 
 
-            </section>
-
-
-            <hr>
-
-
+                </section>
+            </div>
         </div>
 
     </div>
@@ -455,7 +466,91 @@
             margin_bottom: 50,
             single_column_breakpoint: 700
         });
+
+        var privateName = ID();
+        var o = { 'public': 'foo' };
+        o[privateName] = 'bar';
+
+        console.log(o);
+        console.log(privateName);
     });
+    
+    $('#btnCreateNewTicket').click(function () {
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Create new ticket</h4>');
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <div class="form-group">' +
+            '            <div class="row">' +
+            '                <div class="col-xs-5">' +
+            '                    <label>Department</label>' +
+            '                    <select class="form-control"></select>' +
+            '                </div>' +
+            '                <div class="col-xs-5">' +
+            '                    <label>Kategory</label>' +
+            '                    <select class="form-control"></select>' +
+            '                </div>' +
+            '            </div>' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Title</label>' +
+            '            <input class="form-control">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Message</label>' +
+            '            <textarea class="form-control" rows="3"></textarea>' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Files</label>' +
+            '            <input type="file">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <div style="text-align: right;">' +
+            '                <button class="btn btn-success">Submit</button>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        // $('#GlobalModal').on('shown.bs.modal', function () {
+        //     $('#formSimpleSearch').focus();
+        // });
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+
+    // Generate unique IDs for use as pseudo-private/protected names.
+    // Similar in concept to
+    // <http://wiki.ecmascript.org/doku.php?id=strawman:names>.
+    //
+    // The goals of this function are twofold:
+    //
+    // * Provide a way to generate a string guaranteed to be unique when compared
+    //   to other strings generated by this function.
+    // * Make the string complex enough that it is highly unlikely to be
+    //   accidentally duplicated by hand (this is key if you're using `ID`
+    //   as a private/protected name on an object).
+    //
+    // Use:
+    //
+    //     var privateName = ID();
+    //     var o = { 'public': 'foo' };
+    //     o[privateName] = 'bar';
+    var ID = function () {
+        // Math.random should be unique because of its seeding algorithm.
+        // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+        // after the decimal.
+        return 't-' + Math.random().toString(36).substr(2, 9);
+    };
 
     (function ($, window, document, undefined) {
         var pluginName = 'pinterest_grid',
