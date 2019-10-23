@@ -58,7 +58,7 @@
 <div class="row">
 
     <div class="col-md-12">
-        <a href="<?php echo base_url('academic/study-planning/list-student'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to list</a>
+        <a href="<?php echo base_url('academic/study-planning'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to list</a>
         <div style="text-align: center;">
             <h3 style="font-weight: bold;margin-top: 0px;margin-bottom: 5px;" id="Name">-</h3>
             <h5 style="margin-top: 0px;"><span id="NIM">-</span> | <span id="Prodi">-</span> | <span id="Mentor">-</span></h5>
