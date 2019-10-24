@@ -702,6 +702,36 @@ class C_rest3 extends CI_Controller {
 
                 echo json_encode($rs);
                 break;
+            case 'Publikasi_ilmiah_dtps' :
+                $rs = [];
+                $P = $dataToken['ProdiID'];
+                $P = explode('.', $P);
+                $ProdiID = $P[0];
+
+                $arr_ts = json_decode(json_encode($dataToken['arr_ts']),true);
+                $G_jns_forlap_publikasi = $this->m_master->showData_array('db_research.jenis_forlap_publikasi');
+                for ($i=0; $i < count($G_jns_forlap_publikasi); $i++) {
+                  $data = []; 
+                  $data[] = $i+1;
+                  $data[] = $G_jns_forlap_publikasi[$i]['NamaForlap_publikasi'];
+                  $jumlah = 0;
+                  $ID_forlap_publikasi = $G_jns_forlap_publikasi[$i]['ID'];
+                  for ($j=0; $j < count($arr_ts) ; $j++) { 
+                    $sql = 'select Judul,Tgl_terbit,a.NIP from db_research.publikasi as a
+                    join db_employees.employees as b on a.NIP = b.NIP
+                            where Year(a.Tgl_terbit) = '.$arr_ts[$j].' and a.ID_forlap_publikasi = "'.$ID_forlap_publikasi.'"
+                            and b.ProdiID = '.$ProdiID.'
+                      ';
+                    $query = $this->db->query($sql,array())->result_array();
+                    $tot = count($query);
+                    $data[] = $tot;
+                    $jumlah += $tot;
+                  }
+                  $data[] = $jumlah;
+                  $rs[] = $data;
+                }
+                echo json_encode($rs);
+                break;
             default:
                 echo '{"status":"999","message":"Not Authorize"}'; 
                 break;
@@ -821,6 +851,54 @@ class C_rest3 extends CI_Controller {
           );
           echo json_encode($json_data);
           break;
+        default:
+          echo '{"status":"999","message":"Not Authorize"}'; 
+          break;
+      }
+    }
+
+    public function APS_CrudAgregatorTB5()
+    {
+      $dataToken = $this->data['dataToken'];
+      $mode = $dataToken['mode'];
+      switch ($mode) {
+        case 'Integrasi_penelitian_dkm':
+          $rs = [];
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+
+          $S = $dataToken['FilterSemester'];
+          $S = explode('.', $S);
+          $SemesterID = $S[0];
+          $sql = '
+                  select  * from (
+                    select a.Judul_litabmas,b.Name as NameDosen,c.Name as NameMataKuliah,a.Bentuk_integrasi,a.ID_thn_laks
+                    from db_research.litabmas as a 
+                    join db_employees.employees as b on a.NIP = b.NIP
+                    join db_academic.mata_kuliah as c on c.MKCode = a.MKCode
+                    where a.SemesterID = '.$SemesterID.' and b.ProdiID = '.$ProdiID.'
+                    UNION 
+                    select a.Judul_PKM,b.Name as NameDosen,c.Name as NameMataKuliah,a.Bentuk_integrasi,a.ID_thn_laks
+                    from db_research.pengabdian_masyarakat as a 
+                    join db_employees.employees as b on a.NIP = b.NIP
+                    join db_academic.mata_kuliah as c on c.MKCode = a.MKCode
+                    where a.SemesterID = '.$SemesterID.' and b.ProdiID = '.$ProdiID.'
+                  ) as xx
+                  order by ID_thn_laks desc
+                ';
+            $query = $this->db->query($sql,array())->result_array();
+            for ($i=0; $i < count($query); $i++) { 
+                $data = [];
+                $data[] = $i+1;
+                $row = $query[$i];
+                foreach ($row as $key => $value) {
+                  $data[] = $value;
+                }
+                $rs[] = $data;
+            }    
+            echo json_encode($rs);
+        break;
         default:
           echo '{"status":"999","message":"Not Authorize"}'; 
           break;
