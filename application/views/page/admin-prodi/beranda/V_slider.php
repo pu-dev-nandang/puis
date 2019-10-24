@@ -1,20 +1,4 @@
-        <!-- <?php echo $this->session->userdata('Name') ?> -->
 
-        <!--=== Page Header ===-->
-        
-        <!-- /Page Header -->
-        
-        <!-- <div>
-          <?php echo $this->session->userdata('prodi_active') ?>
-        </div>
-        <pre>
-        <?php print_r($this->session->all_userdata()); ?>
-        </pre> -->
-        <!--=== Page Content ===-->
-
-        <!--Forms -->
-
-        <!-- /Page Content -->
 <style>
 
 #imagePreview1{ 
@@ -38,8 +22,6 @@
 <script>
     var base_url = '<?= base_url() ?>'; // Buat variabel base_url agar bisa di akses di semua file js
 </script>
-
-        <!-- <div id="pesan-sukses" class="alert alert-success"></div> -->
         <div class="row"> 
             <div class="col-md-12">
 
@@ -48,14 +30,14 @@
 
                 <h4><i class="icon-reorder"></i> Show slider</h4>
                 <div class="toolbar no-padding">
-                                      <div class="btn-group">
-                                        <span data-smt="" class="btn btn-xs btn-add">
-                                          <a href="" id="btn-tambah" data-toggle="modal" data-target="#form-modal">
-                                          <i class="icon-plus"></i> Add Slider
-                                          </a>
-                                        </span>
-                                      </div>
-                                  </div>
+                    <div class="btn-group">
+                      <span data-smt="" class="btn btn-xs btn-add">
+                        <a href="" id="btn-tambah" data-toggle="modal" data-target="#form-modal">
+                        <i class="icon-plus"></i> Add Slider
+                        </a>
+                      </span>
+                    </div>
+                </div>
                 </div>
                 
 
@@ -91,18 +73,7 @@
                          <div class="custom-file-input " style="position:relative; left:0px;">
                           <i class="fa fa-file-image-o"></i>&nbsp; &nbsp;Browse<input  id="uploadFile1"  type="file" value="" name="file-input" />
                           <p class="red">*Size weight x height 1920px x 500px</p>
-                         </div>              
-                        
-                       
-                         <!-- <label><br>
-                         <input type="checkbox" id="formStatus1"> Show button registrasi
-                         </label><br>
-                          <div class="from-group" id="showCheck">
-                          <label class="control-label">Name Button:</label>
-                          <input type="text"  id="formButtonName1" class="form-control" placeholder="Name Button"><br>
-                          <label class="control-label">Url:</label>
-                          <input  type="text"  id="formUrl1" class="form-control" placeholder="http://example.com"><br>
-                          </div> -->
+                         </div>   
                          
                       </div>
                    
@@ -133,11 +104,6 @@
                     Apakah anda yakin ingin menghapus data ini?
                 </div>
                 <div class="modal-footer">
-                    <!-- Beri id "loading-hapus" untuk loading ketika klik tombol hapus -->
-                    <!-- <div id="loading-hapus" class="pull-left">
-                        <b>Sedang meghapus...</b>
-                    </div> -->
-                    <!-- Beri id "btn-hapus" untuk tombol hapus nya -->
                     <button type="button" class="btn btn-primary" id="btn-hapus">Ya</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Tidak</button>
                 </div>

@@ -642,6 +642,37 @@ class C_api_prodi extends CI_Controller {
             unlink($path);
             return print_r(1);
         }
+        else if ($data_arr['action']=='deleteTestimonials') 
+        {
+            $sql = 'SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp,std.IDStudentTexting,std.IDProdiTexting
+                                FROM db_prodi.prodi_texting pt 
+                                LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID) 
+                                where pt.ID = ?';
+
+            $ID = $data_arr['ID'];
+            $query = $this->db->query($sql, array($ID))->result_array();
+            $ID = $query[0]['ID'];
+            $IDProdiTexting=$query[0]['IDProdiTexting'];
+            $IDStudentTexting=$query[0]['IDStudentTexting'];
+            //prodi_texting
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.prodi_texting'); 
+            //student_testimonials
+            $this->db->where('ID', $IDStudentTexting);
+            $this->db->delete('db_prodi.student_testimonials');
+            //student_testimonials_details
+            $this->db->where('IDProdiTexting', $IDProdiTexting);
+            $this->db->delete('db_prodi.student_testimonials_details'); 
+
+            $arr_file =  $query[0]['Photo'];
+            $path = './images/Testimonials/'. $arr_file;
+            unlink($path);
+            return print_r(1);
+        }
         else if($data_arr['action']=='insertContact'){
 
                 $dataForm = (array) $data_arr['dataForm'];
