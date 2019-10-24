@@ -329,7 +329,10 @@ class C_rest3 extends CI_Controller {
                         elseif ($LevelEdu == 'S1') {
                            $M_q = '(1,2)';
                         }
-                        $sql = 'select NameUniversity,Major from db_employees.files  where TypeFiles in'.$M_q.' and NIP = "'.$NIP.'"  order by ID desc limit 1';
+                        $sql = 'select b.Name_University as NameUniversity,c.Name_MajorProgramstudy as Major from db_employees.files as a
+                          join db_research.university as b on a.NameUniversity = b.ID
+                          join db_employees.major_programstudy_employees as c on c.ID = a.Major
+                          where TypeFiles in'.$M_q.' and NIP = "'.$NIP.'"  order by a.ID desc limit 1';
                         // print_r($sql);
                         $query=$this->db->query($sql, array())->result_array();
                         if (count($query) > 0) {
@@ -436,12 +439,15 @@ class C_rest3 extends CI_Controller {
                     $rata2BimBinganAll = $SumProgram_tahun / $C_year2;
 
                     $G_master_academic = $PendidikanPascaSarjana($NIP,$LevelEdu);
+                    $G_master_academic2 = $PendidikanPascaSarjana($NIP,'S2');
+                    $G_master_academic3 = $PendidikanPascaSarjana($NIP,'S3');
                    
                     $temp = ['No'  =>  ($i+1),
                              'NameDosen' => $query[$i]['Name'],
                              'NIDN' => $query[$i]['NIDN'],
                              'NIDK' => $query[$i]['NIDK'],
-                             'PendidikanPascaSarjana' => $G_master_academic['PendidikanPascaSarjana'],
+                             'PendidikanPascaSarjana' => $G_master_academic2['PendidikanPascaSarjana'],
+                             'PendidikanPascaSarjana2' => $G_master_academic3['PendidikanPascaSarjana'],
                              'PerusahaanIndustri' => '',
                              // 'PendidikanTertinggi' => $LevelEducationName($query[$i]['LevelEducationID']),
                              'PendidikanTertinggi' => $LevelEdu,
@@ -850,6 +856,338 @@ class C_rest3 extends CI_Controller {
               "data"            => $data
           );
           echo json_encode($json_data);
+          break;
+        case 'alumni_mahasiswa' :
+          $rs = [];
+          $YearNow = date('Y');
+          $YearTahunLulusAwal = $YearNow - 2;
+          $arr_tahun_lulus;
+          for ($i=$YearTahunLulusAwal; $i <= $YearNow; $i++) { 
+            $arr_tahun_lulus[] = $i;
+          }
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+          for ($i=0; $i < count($arr_tahun_lulus); $i++) { 
+            $data = [];
+            $data[] = $arr_tahun_lulus[$i];
+            $sqlJumlahLulusan = 'select NPM,Name from db_academic.auth_students
+                                where GraduationYear = '.$arr_tahun_lulus[$i].' and ProdiID = '.$ProdiID.'
+                                ';
+            $queryJumlahLulusan = $this->db->query($sqlJumlahLulusan,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryJumlahLulusan),
+                'dt' => $this->jwt->encode($queryJumlahLulusan,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanTerlacak = 'select a.NPM,a.Name from db_academic.auth_students as a 
+                                  join db_studentlife.alumni_experience as b on a.NPM = b.NPM
+                                  where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  group by a.NPM
+                                  '; 
+            $queryLulusanTerlacak = $this->db->query($sqlLulusanTerlacak,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanTerlacak),
+                'dt' => $this->jwt->encode($queryLulusanTerlacak,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            // Jumlah lulusan dengan waktu tunggu mendapatkan pekerjaan (Sarjana) hanya s1 saja
+            $sqlWaktuTungguKecil6Bulan = '
+                                        select * from (
+                                          select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                  - YEAR(GraduationDate)) 
+                                                                           + (MONTH(TglKerja) 
+                                                                               - MONTH(GraduationDate)) ) AS Bulan 
+                                           from (
+                                               select a.NPM,a.Name,a.GraduationDate,
+                                                 (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                     where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                 ) as TglKerja
+                                               from db_academic.auth_students as a 
+                                               join db_academic.program_study as b on a.ProdiID = b.ID   
+                                               where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 3
+                                            ) subprocess
+                                            
+                                        ) xx
+                                        where Bulan is not null and Bulan < 6
+                                          ';
+          $queryWaktuTungguKecil6Bulan = $this->db->query($sqlWaktuTungguKecil6Bulan,array())->result_array();
+          $arr_pass = [
+              'total' => count($queryWaktuTungguKecil6Bulan),
+              'dt' => $this->jwt->encode($queryWaktuTungguKecil6Bulan,"UAP)(*"),
+          ];
+          $data[] = $arr_pass;
+
+            $sqlWaktuTungguKecil6BulanUntil18 = '
+                                        select * from (
+                                          select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                  - YEAR(GraduationDate)) 
+                                                                           + (MONTH(TglKerja) 
+                                                                               - MONTH(GraduationDate)) ) AS Bulan 
+                                           from (
+                                               select a.NPM,a.Name,a.GraduationDate,
+                                                 (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                     where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                 ) as TglKerja
+                                               from db_academic.auth_students as a 
+                                               join db_academic.program_study as b on a.ProdiID = b.ID   
+                                               where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 3
+                                            ) subprocess
+                                            
+                                        ) xx
+                                        where Bulan is not null and Bulan >= 6 and Bulan <= 18
+                                          ';
+          $queryWaktuTungguKecil6BulanUntil18 = $this->db->query($sqlWaktuTungguKecil6BulanUntil18,array())->result_array();
+          $arr_pass = [
+              'total' => count($queryWaktuTungguKecil6BulanUntil18),
+              'dt' => $this->jwt->encode($queryWaktuTungguKecil6BulanUntil18,"UAP)(*"),
+          ];
+          $data[] = $arr_pass;
+
+            $sqlWaktuTungguKecilBesar18 = '
+                                        select * from (
+                                           select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                  - YEAR(GraduationDate)) 
+                                                                           + (MONTH(TglKerja) 
+                                                                               - MONTH(GraduationDate)) ) AS Bulan 
+                                           from (
+                                               select a.NPM,a.Name,a.GraduationDate,
+                                                 (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                     where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                 ) as TglKerja
+                                               from db_academic.auth_students as a 
+                                               join db_academic.program_study as b on a.ProdiID = b.ID   
+                                               where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 3
+                                            ) subprocess
+                                            
+                                        ) xx
+                                        where Bulan is not null and Bulan > 18
+                                          ';
+          $queryWaktuTungguKecilBesar18 = $this->db->query($sqlWaktuTungguKecilBesar18,array())->result_array();
+          $arr_pass = [
+              'total' => count($queryWaktuTungguKecilBesar18),
+              'dt' => $this->jwt->encode($queryWaktuTungguKecilBesar18,"UAP)(*"),
+          ];
+          $data[] = $arr_pass;
+
+            $sqlWaktuTungguKecil3bulan = '
+                                        select * from (
+                                          select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                  - YEAR(GraduationDate)) 
+                                                                           + (MONTH(TglKerja) 
+                                                                               - MONTH(GraduationDate)) ) AS Bulan 
+                                           from (
+                                               select a.NPM,a.Name,a.GraduationDate,
+                                                 (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                     where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                 ) as TglKerja
+                                               from db_academic.auth_students as a 
+                                               join db_academic.program_study as b on a.ProdiID = b.ID   
+                                               where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 9
+                                            ) subprocess
+                                            
+                                        ) xx
+                                        where Bulan is not null and Bulan < 3
+                                          ';
+          $queryWaktuTungguKecil3bulan = $this->db->query($sqlWaktuTungguKecil3bulan,array())->result_array();
+          $arr_pass = [
+              'total' => count($queryWaktuTungguKecil3bulan),
+              'dt' => $this->jwt->encode($queryWaktuTungguKecil3bulan,"UAP)(*"),
+          ];
+          $data[] = $arr_pass;
+
+           $sqlWaktuTungguKecil3bulan6Bulan = '
+                                       select * from (
+                                         select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                 - YEAR(GraduationDate)) 
+                                                                          + (MONTH(TglKerja) 
+                                                                              - MONTH(GraduationDate)) ) AS Bulan 
+                                          from (
+                                              select a.NPM,a.Name,a.GraduationDate,
+                                                (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                    where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                ) as TglKerja
+                                              from db_academic.auth_students as a 
+                                              join db_academic.program_study as b on a.ProdiID = b.ID   
+                                              where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 9
+                                           ) subprocess
+                                           
+                                       ) xx
+                                       where Bulan is not null and Bulan >= 3 and Bulan <= 6
+                                         ';
+                $queryWaktuTungguKecil3bulan6Bulan = $this->db->query($sqlWaktuTungguKecil3bulan6Bulan,array())->result_array();
+                $arr_pass = [
+                    'total' => count($queryWaktuTungguKecil3bulan6Bulan),
+                    'dt' => $this->jwt->encode($queryWaktuTungguKecil3bulan6Bulan,"UAP)(*"),
+                ];
+                $data[] = $arr_pass;
+
+                $sqlWaktuTungguKecilBesar6Bulan = '
+                                            select * from (
+                                              select NPM,Name,GraduationDate,TglKerja,(12 * (YEAR(TglKerja) 
+                                                                                      - YEAR(GraduationDate)) 
+                                                                               + (MONTH(TglKerja) 
+                                                                                   - MONTH(GraduationDate)) ) AS Bulan 
+                                               from (
+                                                   select a.NPM,a.Name,a.GraduationDate,
+                                                     (select concat(StartYear,"-",StartMonth,"-","01") as TglKerja from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                     ) as TglKerja
+                                                   from db_academic.auth_students as a 
+                                                   join db_academic.program_study as b on a.ProdiID = b.ID   
+                                                   where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.' and b.EducationLevelID = 9
+                                                ) subprocess
+                                                
+                                            ) xx
+                                            where Bulan is not null and Bulan > 6
+                                              ';
+                     $queryWaktuTungguKecilBesar6Bulan = $this->db->query($sqlWaktuTungguKecilBesar6Bulan,array())->result_array();
+                     $arr_pass = [
+                         'total' => count($queryWaktuTungguKecilBesar6Bulan),
+                         'dt' => $this->jwt->encode($queryWaktuTungguKecilBesar6Bulan,"UAP)(*"),
+                     ];
+                     $data[] = $arr_pass;
+
+            $sqlLulusanSesuaiBidangKerjaRendah = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count,
+                                                  (select WorkSuitability from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as WorkSuitability
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0 and WorkSuitability = "0"
+                                  '; 
+            $queryLulusanSesuaiBidangKerjaRendah = $this->db->query($sqlLulusanSesuaiBidangKerjaRendah,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanSesuaiBidangKerjaRendah),
+                'dt' => $this->jwt->encode($queryLulusanSesuaiBidangKerjaRendah,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanSesuaiBidangKerjaSedang = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count,
+                                                  (select WorkSuitability from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as WorkSuitability
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0 and WorkSuitability = "1"
+                                  '; 
+            $queryLulusanSesuaiBidangKerjaSedang = $this->db->query($sqlLulusanSesuaiBidangKerjaSedang,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanSesuaiBidangKerjaSedang),
+                'dt' => $this->jwt->encode($queryLulusanSesuaiBidangKerjaSedang,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanSesuaiBidangKerjaTinggi = '
+                                   select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count,
+                                                  (select WorkSuitability from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobType = "1" order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as WorkSuitability
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0 and WorkSuitability = "2"
+                                  '; 
+            $queryLulusanSesuaiBidangKerjaTinggi = $this->db->query($sqlLulusanSesuaiBidangKerjaTinggi,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanSesuaiBidangKerjaTinggi),
+                'dt' => $this->jwt->encode($queryLulusanSesuaiBidangKerjaTinggi,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanTelahBekerjaUsaha = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0
+                                  '; 
+            $queryLulusanTelahBekerjaUsaha = $this->db->query($sqlLulusanTelahBekerjaUsaha,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanTelahBekerjaUsaha),
+                'dt' => $this->jwt->encode($queryLulusanTelahBekerjaUsaha,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanUkuranLokal = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM and JobLevelID in(1,4) order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0
+                                  '; 
+            $queryLulusanUkuranLokal = $this->db->query($sqlLulusanUkuranLokal,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanUkuranLokal),
+                'dt' => $this->jwt->encode($queryLulusanUkuranLokal,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanUkuranNasional = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM  and JobLevelID in(2,5) order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0
+                                  '; 
+            $queryLulusanUkuranNasional = $this->db->query($sqlLulusanUkuranNasional,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanUkuranNasional),
+                'dt' => $this->jwt->encode($queryLulusanUkuranNasional,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $sqlLulusanUkuranInternasional = '
+                                  select * from (
+                                    select a.NPM,a.Name,(select count(*) as total from db_studentlife.alumni_experience
+                                                         where NPM = a.NPM  and JobLevelID in(2,5) order by StartYear asc,StartMonth asc limit 1             
+                                                  ) as count
+                                    from db_academic.auth_students as a  
+                                    where a.GraduationYear = '.$arr_tahun_lulus[$i].' and a.ProdiID = '.$ProdiID.'
+                                  )xx
+                                  where count > 0
+                                  '; 
+            $queryLulusanUkuranInternasional = $this->db->query($sqlLulusanUkuranInternasional,array())->result_array();
+            $arr_pass = [
+                'total' => count($queryLulusanUkuranInternasional),
+                'dt' => $this->jwt->encode($queryLulusanUkuranInternasional,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $arr_pass = [
+                'total' => count($queryLulusanTerlacak),
+                'dt' => $this->jwt->encode($queryLulusanTerlacak,"UAP)(*"),
+            ];
+            $data[] = $arr_pass;
+
+            $rs[] = $data;
+          }
+
+          echo json_encode($rs);
           break;
         default:
           echo '{"status":"999","message":"Not Authorize"}'; 
