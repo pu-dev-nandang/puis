@@ -9263,12 +9263,14 @@ class C_api extends CI_Controller {
                 $dataQ = $this->db->query('SELECT ec.Category, eq.* FROM db_academic.edom_question eq
                                                       LEFT JOIN db_academic.edom_category ec
                                                       ON (ec.ID = eq.CategoryID)
+                                                      WHERE ec.IDDivision = 6
                                                       ORDER BY eq.Order ASC ')->result_array();
 
                 return print_r(json_encode($dataQ));
             }
             else if($data_arr['action']=='readLECategory'){
-                $data = $this->db->order_by('ID','ASC')->get('db_academic.edom_category')->result_array();
+                $data = $this->db->order_by('ID','ASC')
+                    ->get_where('db_academic.edom_category',array('IDDivision'=>6))->result_array();
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='insertQuestion'){
