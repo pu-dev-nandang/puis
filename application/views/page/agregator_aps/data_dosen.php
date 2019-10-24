@@ -1,4 +1,4 @@
-<h3 align="center"><b>Data Dosen</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
+<!-- <h3 align="center"><b>Data Dosen</b></h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span> -->
 <style type="text/css">
     #dataTablesDataDosen thead th {
         vertical-align: middle;
@@ -32,14 +32,23 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div class="well">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
-            <div class="form-group">
-                <label for="">Status Forlap</label>
-                <select name="" id="StatusForlap" class = "form-control">
-                    <option value="%">ALL</option>
-                    <option value="0">NUP</option>
-                    <option value="1">NIDN</option>
-                    <option value="2">NIDK</option>
-                </select>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Status Forlap</label>
+                    <select name="" id="StatusForlap" class = "form-control">
+                        <option value="%">ALL</option>
+                        <option value="0">NUP</option>
+                        <option value="1">NIDN</option>
+                        <option value="2">NIDK</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="">Semester</label>
+                    <select name="" id="FilterSemester" class="form-control">
+                    </select>
+                </div>
             </div>
         </div>
     </div>
@@ -58,16 +67,18 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     
 <script>
 $(document).ready(function () {
+    loSelectOptionSemester('#FilterSemester','selectedNow');
     var firstLoad = setInterval(function () {
         var filterProdi = $('#filterProdi').val();
-        if(filterProdi!='' && filterProdi!=null){
+        var FilterSemester = $('#FilterSemester').val();
+        if(filterProdi!='' && filterProdi!=null && FilterSemester != '' && FilterSemester != null){
             loadPage();
             clearInterval(firstLoad);
         }
     },1000);
     setTimeout(function () {
         clearInterval(firstLoad);
-    },5000);
+    },2000);
 });
 
 $('#filterProdi').change(function () {
@@ -90,6 +101,10 @@ $(document).off('change', '#StatusForlap').on('change', '#StatusForlap',function
     loadPage();
 });
 
+$(document).off('change', '#FilterSemester').on('change', '#FilterSemester',function(e) {
+    loadPage();
+});
+
 function LoadTableData(filterProdi)
 {
     var StatusForlap = $('#StatusForlap option:selected').val();
@@ -97,11 +112,15 @@ function LoadTableData(filterProdi)
     var ProdiName = $('#filterProdi option:selected').text();
     var P = filterProdi.split('.');
     var ProdiID = P[0];
+    var SemesterID = $('#FilterSemester option:selected').val();
+    var S = SemesterID.split('.');
+    SemesterID = S[0];
     var data = {
         auth : 's3Cr3T-G4N',
         mode : 'DataDosen',
         ProdiID : ProdiID,
         StatusForlap : StatusForlap,
+        SemesterID : SemesterID,
     };
     var token = jwt_encode(data,"UAP)(*");
     var url = base_url_js+"rest3/__get_APS_CrudAgregatorTB3";
@@ -129,7 +148,7 @@ function LoadTableData(filterProdi)
                                 '<th rowspan = "3">Nama Dosen</th>'+
                                 '<th rowspan = "3">NIDN</th>'+
                                 '<th rowspan = "3">NIDK</th>'+
-                                '<th rowspan = "3">Pendidikan Pasca Sarjana</th>'+
+                                '<th rowspan = "2" colspan = "2">Pendidikan Pasca Sarjana</th>'+
                                 '<th rowspan = "3">Perusahaan/ Industri</th>'+
                                 '<th rowspan = "3">Pendidikan Tertinggi</th>'+
                                 '<th rowspan = "3">Bidang Keahlian</th>'+
@@ -150,6 +169,8 @@ function LoadTableData(filterProdi)
                                 '<th colspan = "3">pada PS Lain pada Program yang sama di PT</th>'+
                             '</tr>'+
                             '<tr>'+
+                                '<td>Magister/ Magister Terapan/ Spesialis</td>'+
+                                '<td>Doktor/ Doktor Terapan/ Spesialis</td>'+
                                 thYear+thYear+
                             '</tr>'+
                         '</thead>'+
