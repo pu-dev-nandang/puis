@@ -18,25 +18,16 @@
 <style>
 
 #imagePreview1{ 
-  width: 99%;
+    width: 99%;
     height: 100px;
-  margin: 2px;
+    margin: 2px;
     background-position: center center;
     background-size: cover;
     -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
     display: inline-block;
-  margin-bottom:30px;
-  background-image:url(assets/img/1000x600-46335Entre.jpg);}
-#imagePreview2{
-    width:99%;
-    height: 100px;
-  margin: 2px;
-    background-position: center center;
-    background-size: cover;
-    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
-    display: inline-block;
-  margin-bottom:30px;
-  background-image:url(assets/img/1000x600-46335Entre.jpg);}
+    margin-bottom:30px;
+}
+
 #showCheck{
   display: none;
 }
@@ -216,7 +207,7 @@ $('#formStatus1').on("change", function(){
     $('#btn-ubah').attr('data-id',id);
     var token = $(this).attr('token');
     var data = jwt_decode(token);
-    console.log(data);
+    // console.log(data);
     var Images = base_url_js+'images/Slider/'+data['Images'];
      $("#imagePreview1").css("background-image", "url("+Images+")");
      $('#formTitle1').val(data['Title']);
@@ -457,7 +448,7 @@ function showSlider(){
   });
 
 // DELETE
-$(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
+$(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(data) { // Ketika tombol hapus di klik
     var ID = $(this).attr('data-id');
 
     var thisbtn = $(this);
@@ -478,81 +469,87 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
         cache: false,             // To unable request pages to be cached
         processData:false,
         dataType: "json",
-        // beforeSend: function(e) {
-        //   if(e && e.overrideMimeType) {
-        //     e.overrideMimeType('application/jsoncharset=UTF-8');
-        //   }
-        // },
-        success: function(e){ // Ketika proses pengiriman berhasil
-            showSlider();
+        beforeSend: function(e) {
+          if(e && e.overrideMimeType) {
+            e.overrideMimeType('application/jsoncharset=UTF-8');
+          }
+        },
+        success: function(data){ // Ketika proses pengiriman berhasil
+           
             toastr.success('Data saved','Success');
             thisbtn.prop('disabled',false).html('Ya');
             $('#delete-modal').modal('hide');
+            showSlider();
+
+            setTimeout(function(){
+              window.location.href="";
+            },500);
+
         },
-        error: function (e) {
-          toastr.error('Form required','Error');
-          thisbtn.prop('disabled',false).html('Ya');
+        error: function (data) {
+            toastr.error('Form required','Error');
+            thisbtn.prop('disabled',false).html('Ya');
         }
     })
   });
 
-  $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
+  $('#form-modal').on('hidden.bs.modal', function (data){ // Ketika Modal Dialog di Close / tertutup
     $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
   })
 
 // validasi images
-  function file_validation2(ev,TheName = '')
-  {
-      var files = ev[0].files;
-      var error = '';
-      var msgStr = '';
-      var max_upload_per_file = 4;
-      
-      if (files.length > max_upload_per_file) {
-        msgStr += TheName +' should not be more than 4 Files<br>';
+function file_validation2(ev,TheName = '')
+{
+    var files = ev[0].files;
+    var error = '';
+    var msgStr = '';
+    var max_upload_per_file = 4;
+    
+    if (files.length > max_upload_per_file) {
+      msgStr += TheName +' should not be more than 4 Files<br>';
 
-      }
-      else
+    }
+    else
+    {
+      for(var count = 0; count<files.length; count++)
       {
-        for(var count = 0; count<files.length; count++)
-        {
-         var no = parseInt(count) + 1;
-         var name = files[count].name;
-         var extension = name.split('.').pop().toLowerCase();
-         if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
-         {
-          // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
-          msgStr += TheName +' Invalid Type File<br>';
-          //toastr.error("Invalid Image File", 'Failed!!');
-          // return false;
-         }
+       var no = parseInt(count) + 1;
+       var name = files[count].name;
+       var extension = name.split('.').pop().toLowerCase();
+       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+       {
+        // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
+        msgStr += TheName +' Invalid Type File<br>';
+        //toastr.error("Invalid Image File", 'Failed!!');
+        // return false;
+       }
 
-         var oFReader = new FileReader();
-         oFReader.readAsDataURL(files[count]);
-         var f = files[count];
-         var fsize = f.size||f.fileSize;
-         // console.log(fsize);
+       var oFReader = new FileReader();
+       oFReader.readAsDataURL(files[count]);
+       var f = files[count];
+       var fsize = f.size||f.fileSize;
+       // console.log(fsize);
 
-         if(fsize > 2000000) // 2mb
-         {
-          // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
-          msgStr += TheName + ' Image File Size is very big<br>';
-          //toastr.error("Image File Size is very big", 'Failed!!');
-          //return false;
-         }
-         
-        }
+       if(fsize > 2000000) // 2mb
+       {
+        // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
+        msgStr += TheName + ' Image File Size is very big<br>';
+        //toastr.error("Image File Size is very big", 'Failed!!');
+        //return false;
+       }
+       
       }
+    }
 
-      if (msgStr != '') {
-        toastr.error(msgStr, 'Failed!!');
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-  }
+    if (msgStr != '') {
+      toastr.error(msgStr, 'Failed!!');
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+}
 
 
 
