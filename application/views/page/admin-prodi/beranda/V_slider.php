@@ -1,42 +1,17 @@
-        <!-- <?php echo $this->session->userdata('Name') ?> -->
 
-        <!--=== Page Header ===-->
-        
-        <!-- /Page Header -->
-        
-        <!-- <div>
-          <?php echo $this->session->userdata('prodi_active') ?>
-        </div>
-        <pre>
-        <?php print_r($this->session->all_userdata()); ?>
-        </pre> -->
-        <!--=== Page Content ===-->
-
-        <!--Forms -->
-
-        <!-- /Page Content -->
 <style>
 
 #imagePreview1{ 
-  width: 99%;
+    width: 99%;
     height: 100px;
-  margin: 2px;
+    margin: 2px;
     background-position: center center;
     background-size: cover;
     -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
     display: inline-block;
-  margin-bottom:30px;
-  background-image:url(assets/img/1000x600-46335Entre.jpg);}
-#imagePreview2{
-    width:99%;
-    height: 100px;
-  margin: 2px;
-    background-position: center center;
-    background-size: cover;
-    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
-    display: inline-block;
-  margin-bottom:30px;
-  background-image:url(assets/img/1000x600-46335Entre.jpg);}
+    margin-bottom:30px;
+}
+
 #showCheck{
   display: none;
 }
@@ -47,8 +22,6 @@
 <script>
     var base_url = '<?= base_url() ?>'; // Buat variabel base_url agar bisa di akses di semua file js
 </script>
-
-        <!-- <div id="pesan-sukses" class="alert alert-success"></div> -->
         <div class="row"> 
             <div class="col-md-12">
 
@@ -57,14 +30,14 @@
 
                 <h4><i class="icon-reorder"></i> Show slider</h4>
                 <div class="toolbar no-padding">
-                                      <div class="btn-group">
-                                        <span data-smt="" class="btn btn-xs btn-add">
-                                          <a href="" id="btn-tambah" data-toggle="modal" data-target="#form-modal">
-                                          <i class="icon-plus"></i> Add Slider
-                                          </a>
-                                         </span>
-                                      </div>
-                                  </div>
+                    <div class="btn-group">
+                      <span data-smt="" class="btn btn-xs btn-add">
+                        <a href="" id="btn-tambah" data-toggle="modal" data-target="#form-modal">
+                        <i class="icon-plus"></i> Add Slider
+                        </a>
+                      </span>
+                    </div>
+                </div>
                 </div>
                 
 
@@ -89,31 +62,20 @@
               <!-- Beri id "pesan-error" untuk menampung pesan error -->
                    <!--  <div id="pesan-error" class="alert alert-danger"></div>    -->    
                 <div class="col-md-12">            
-                  <div id="imagePreview1" style="margin-bottom:7.5px;"></div> 
+                  
                  
                          
                         <div class="caption">
                           <label class="control-label">Title Slider:</label>
 
                           <input type="text"  id="formTitle1" class="form-control" placeholder="Title Slide Show"><br>
-
+                        <div id="imagePreview1" style="margin-bottom:7.5px;"></div>     
                          <div class="custom-file-input " style="position:relative; left:0px;">
                           <i class="fa fa-file-image-o"></i>&nbsp; &nbsp;Browse<input  id="uploadFile1"  type="file" value="" name="file-input" />
                           <p class="red">*Size weight x height 1920px x 500px</p>
-                         </div>              
-                        
-                       
-                         <!-- <label><br>
-                         <input type="checkbox" id="formStatus1"> Show button registrasi
-                         </label><br>
-                          <div class="from-group" id="showCheck">
-                          <label class="control-label">Name Button:</label>
-                          <input type="text"  id="formButtonName1" class="form-control" placeholder="Name Button"><br>
-                          <label class="control-label">Url:</label>
-                          <input  type="text"  id="formUrl1" class="form-control" placeholder="http://example.com"><br>
-                          </div> -->
+                         </div>   
                          
-                        </div>
+                      </div>
                    
   
                   <button type="submit" id="btn-simpan" class="btn btn-primary btnsave1" style="margin-top: 15px">Simpan</button>
@@ -142,11 +104,6 @@
                     Apakah anda yakin ingin menghapus data ini?
                 </div>
                 <div class="modal-footer">
-                    <!-- Beri id "loading-hapus" untuk loading ketika klik tombol hapus -->
-                    <!-- <div id="loading-hapus" class="pull-left">
-                        <b>Sedang meghapus...</b>
-                    </div> -->
-                    <!-- Beri id "btn-hapus" untuk tombol hapus nya -->
                     <button type="button" class="btn btn-primary" id="btn-hapus">Ya</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Tidak</button>
                 </div>
@@ -216,7 +173,7 @@ $('#formStatus1').on("change", function(){
     $('#btn-ubah').attr('data-id',id);
     var token = $(this).attr('token');
     var data = jwt_decode(token);
-    console.log(data);
+    // console.log(data);
     var Images = base_url_js+'images/Slider/'+data['Images'];
      $("#imagePreview1").css("background-image", "url("+Images+")");
      $('#formTitle1').val(data['Title']);
@@ -457,7 +414,7 @@ function showSlider(){
   });
 
 // DELETE
-$(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
+$(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(data) { // Ketika tombol hapus di klik
     var ID = $(this).attr('data-id');
 
     var thisbtn = $(this);
@@ -471,88 +428,94 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
     form_data.append('token',token);
     var url = base_url_js + "api-prodi/__crudDataProdi";
     $.ajax({
-            type :"POST",
-            url : url,
-            data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-            contentType: false,       // The content type used when sending data to the server.
-            cache: false,             // To unable request pages to be cached
-            processData:false,
-            dataType: "json",
-            beforeSend: function(e) {
-              if(e && e.overrideMimeType) {
-                e.overrideMimeType('application/jsoncharset=UTF-8');
-              }
-            },
-            success: function(data){ // Ketika proses pengiriman berhasil
-              showSlider();
-              toastr.success('Data Update','Success');
-              thisbtn.prop('disabled',false).html('Ya');
-              $('#delete-modal').modal('hide');
-            },
-            error: function (data) {
-              toastr.error('Form required','Error');
-              thisbtn.prop('disabled',false).html('Ya');
-            }
+        type :"POST",
+        url : url,
+        data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+        contentType: false,       // The content type used when sending data to the server.
+        cache: false,             // To unable request pages to be cached
+        processData:false,
+        dataType: "json",
+        beforeSend: function(e) {
+          if(e && e.overrideMimeType) {
+            e.overrideMimeType('application/jsoncharset=UTF-8');
+          }
+        },
+        success: function(data){ // Ketika proses pengiriman berhasil
+           
+            toastr.success('Data saved','Success');
+            thisbtn.prop('disabled',false).html('Ya');
+            $('#delete-modal').modal('hide');
+            showSlider();
+
+            setTimeout(function(){
+              window.location.href="";
+            },500);
+
+        },
+        error: function (data) {
+            toastr.error('Form required','Error');
+            thisbtn.prop('disabled',false).html('Ya');
+        }
     })
   });
 
-  $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
+  $('#form-modal').on('hidden.bs.modal', function (data){ // Ketika Modal Dialog di Close / tertutup
     $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
   })
 
 // validasi images
-  function file_validation2(ev,TheName = '')
-  {
-      var files = ev[0].files;
-      var error = '';
-      var msgStr = '';
-      var max_upload_per_file = 4;
-      
-      if (files.length > max_upload_per_file) {
-        msgStr += TheName +' should not be more than 4 Files<br>';
+function file_validation2(ev,TheName = '')
+{
+    var files = ev[0].files;
+    var error = '';
+    var msgStr = '';
+    var max_upload_per_file = 4;
+    
+    if (files.length > max_upload_per_file) {
+      msgStr += TheName +' should not be more than 4 Files<br>';
 
-      }
-      else
+    }
+    else
+    {
+      for(var count = 0; count<files.length; count++)
       {
-        for(var count = 0; count<files.length; count++)
-        {
-         var no = parseInt(count) + 1;
-         var name = files[count].name;
-         var extension = name.split('.').pop().toLowerCase();
-         if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
-         {
-          // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
-          msgStr += TheName +' Invalid Type File<br>';
-          //toastr.error("Invalid Image File", 'Failed!!');
-          // return false;
-         }
+       var no = parseInt(count) + 1;
+       var name = files[count].name;
+       var extension = name.split('.').pop().toLowerCase();
+       if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+       {
+        // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
+        msgStr += TheName +' Invalid Type File<br>';
+        //toastr.error("Invalid Image File", 'Failed!!');
+        // return false;
+       }
 
-         var oFReader = new FileReader();
-         oFReader.readAsDataURL(files[count]);
-         var f = files[count];
-         var fsize = f.size||f.fileSize;
-         // console.log(fsize);
+       var oFReader = new FileReader();
+       oFReader.readAsDataURL(files[count]);
+       var f = files[count];
+       var fsize = f.size||f.fileSize;
+       // console.log(fsize);
 
-         if(fsize > 2000000) // 2mb
-         {
-          // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
-          msgStr += TheName + ' Image File Size is very big<br>';
-          //toastr.error("Image File Size is very big", 'Failed!!');
-          //return false;
-         }
-         
-        }
+       if(fsize > 2000000) // 2mb
+       {
+        // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
+        msgStr += TheName + ' Image File Size is very big<br>';
+        //toastr.error("Image File Size is very big", 'Failed!!');
+        //return false;
+       }
+       
       }
+    }
 
-      if (msgStr != '') {
-        toastr.error(msgStr, 'Failed!!');
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-  }
+    if (msgStr != '') {
+      toastr.error(msgStr, 'Failed!!');
+      return false;
+    }
+    else
+    {
+      return true;
+    }
+}
 
 
 
