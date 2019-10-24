@@ -31,12 +31,17 @@
                     <select class="form-control" id="listJob"></select>
                 </td>
             </tr>
+            </tbody>
+
+            <tr>
+                <td colspan="3" style="text-align: center;background: lightyellow;">Form Kepuasan Pengguna Lulusan</td>
+            </tr>
+            <tbody id="showListPenggunaLulusan"></tbody>
             <tr>
                 <td colspan="3" style="text-align: right;">
                     <button class="btn btn-success" id="btnSaveForm">Save</button>
                 </td>
             </tr>
-            </tbody>
         </table>
     </div>
 
@@ -67,6 +72,8 @@
 
     $(document).ready(function () {
         getListYear();
+
+        loadAspekPenilaian();
 
         var firstLoad = setInterval(function () {
             var filterYearAlumniForm = $('#filterYearAlumniForm').val();
@@ -163,6 +170,19 @@
     });
     
     $('#btnSaveForm').click(function () {
+
+        var arrAspek = [];
+        $('.formAspek').each(function (i,v) {
+            var IDForm = v.id;
+            var Rate = $('#'+IDForm).val();
+            var arr = {
+                APKID : IDForm.split('_')[1],
+                Rate : Rate
+            }
+            arrAspek.push(arr);
+        });
+
+
         var Year = $('#Year').val();
         var NPM = $('#NPM').val();
         var listJob = $('#listJob').val();
@@ -180,7 +200,8 @@
                     Year : Year,
                     NPM : NPM,
                     IDAE : listJob
-                }
+                },
+                dataAspek : arrAspek
             };
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (result) {
@@ -188,6 +209,7 @@
                 toastr.success('Data saved','Success');
                 setTimeout(function () {
                     $('#btnSaveForm').html('Save').prop('disabled',false);
+                    window.location.href='';
                 },500);
 
             });
@@ -279,5 +301,33 @@
         }
 
     });
+    
+    function loadAspekPenilaian() {
+        var url = base_url_js+'api3/__crudAlumni';
+        var data = {
+            action : 'loadAspekPenilaian'
+        };
+        var token = jwt_encode(data,'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            $('#showListPenggunaLulusan').empty();
+            if(jsonResult.length>0){
+                var opt = '<option>1</option>' +
+                    '<option>2</option>' +
+                    '<option>3</option>' +
+                    '<option>4</option>' +
+                    '<option>5</option>';
+                $.each(jsonResult,function (i,v) {
+                    $('#showListPenggunaLulusan').append('<tr>' +
+                        '<td>'+v.Description+'</td>' +
+                        '<td>:</td>' +
+                        '<td><select class="form-control formAspek" id="fm_'+v.ID+'">'+opt+'</select></td>' +
+                        '</tr>');
+                });
+            }
+
+        });
+    }
 
 </script>

@@ -4087,7 +4087,8 @@ class C_api3 extends CI_Controller {
         $queryDefault = 'SELECT lem.ID, em.Name, lem.AccessedOn,
                             (CASE WHEN lem.NIP = lem.UserID THEN 0 ELSE lem.UserID END ) AS LoginAs,
                             (CASE WHEN em2.Name = em.Name THEN NULL ELSE em2.Name END) AS LoginAsLec,
-                            ats.Name AS LoginAsStd,lem.URL
+                            ats.Name AS LoginAsStd,lem.URL,
+                            lem.IPPublic, lem.IPLocal, lem.IPLocal2
                             FROM db_employees.log_employees lem
                             LEFT JOIN db_employees.employees em ON (em.NIP = lem.NIP)
                             LEFT JOIN db_employees.employees em2 ON (em2.NIP = lem.UserID)
@@ -4136,6 +4137,12 @@ class C_api3 extends CI_Controller {
 
             $nestedData[] = '<div>'.$no.'</div>';
             $nestedData[] = '<div>'.$row['Name'].'</div>';
+            if($dataWhere==''){
+                $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? 'Public : '.$row['IPPublic'] : '';
+                $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? '<br/>Local 1 : '.$row['IPLocal'] : '';
+                $IPLocal2 = ($row['IPLocal2']!='' && $row['IPLocal2']!=null) ? '<br/>Local 2 : '.$row['IPLocal2'] : '';
+                $nestedData[] = '<div>'.$IPPublic.''.$IPLocal.''.$IPLocal2.'</div>';
+            }
             $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
             $nestedData[] = '<div>'.$LoginAsLecturer.'</div>';
             $nestedData[] = '<div>'.$LoginAsStudent.'</div>';
@@ -4391,6 +4398,15 @@ class C_api3 extends CI_Controller {
             else if($data_arr['action']=='insert2AlumniForm'){
                 $dataForm = (array) $data_arr['dataForm'];
                 $this->db->insert('db_studentlife.alumni_form',$dataForm);
+                $insert_id = $this->db->insert_id();
+
+                $dataAspek = (array) $data_arr['dataAspek'];
+                for($i=0;$i<count($dataAspek);$i++){
+                    $d = (array) $dataAspek[$i];
+                    $d['FormID'] = $insert_id;
+                    $this->db->insert('db_studentlife.alumni_form_details',$d);
+                }
+
                 return print_r(1);
             }
             else if($data_arr['action']=='ListYearAlumniForm'){
@@ -4398,6 +4414,13 @@ class C_api3 extends CI_Controller {
                 $data = $this->db->query('SELECT  af.Year FROM db_studentlife.alumni_form af 
                                                   GROUP BY af.Year Order BY af.Year DESC')->result_array();
                 return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='loadAspekPenilaian'){
+
+                $data = $this->db->query('SELECT * FROM db_studentlife.aspek_penilaian_kepuasan')->result_array();
+
+                return print_r(json_encode($data));
+
             }
             else if($data_arr['action']=='ListDataAlumniForm'){
 
