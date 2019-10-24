@@ -584,7 +584,7 @@ class C_api_prodi extends CI_Controller {
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.lecturer'); 
             //delete images
-            $arr_file =  $query[0]['Images'];
+            $arr_file =  $query[0]['Photo'];
             $path = './images/Lecturer/'. $arr_file;
             unlink($path);
             
