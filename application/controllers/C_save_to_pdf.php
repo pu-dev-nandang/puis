@@ -6278,10 +6278,22 @@ Phone: (021) 29200456';
             $namahari = date('l', strtotime($dataRequest[0]['StartDate']));
             $starthari =  $daftar_hari[''.$namahari];
 
+            $namahari2 = date('l', strtotime($dataRequest[0]['EndDate']));
+            $starthari2 =  $daftar_hari[''.$namahari2];
+
+            if($starthari == $starthari2) {
+                    $hariday = date('l', strtotime($dataRequest[0]['StartDate']));
+            }else {
+                    $hariday = $starthari.' - '.$starthari2;
+
+            }
+
+
+
             $date1 = $this->getDateIndonesian($dataRequest[0]['StartDate']);
             $date2 = $this->getDateIndonesian($dataRequest[0]['EndDate']);
 
-            if($date1 = $date2) {
+            if($date1 == $date2) {
                     $tanggalx = $this->getDateIndonesian($dataRequest[0]['StartDate']);
             }else {
                     $tanggalx = $date1.' s/d '.$date2;
@@ -6392,13 +6404,13 @@ Phone: (021) 29200456';
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Hari',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,$starthari,0,1,'L');
+        $pdf->Cell(145,$h,$hariday,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         //$pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
-        $pdf->Cell(145,$h,$tanggalx,0,1,'L');
+        $pdf->Cell(145,$h,$tanggalx,0,1,'L'); 
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
