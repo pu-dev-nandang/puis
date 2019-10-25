@@ -273,7 +273,7 @@
                     '</tr>' 
                     );
             }
-            LoaddataTable('.datatable');
+            LoaddataTableStandard('.datatable');
             },500);
         });                
     }
