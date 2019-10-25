@@ -113,9 +113,9 @@
        if(dataToken.length>0){
            $.each(dataToken,function (i,v) {
               tr = tr+'<tr>' +
-                  '<td>'+(i+1)+'</td>' +
-                  '<td>'+v.Name+'<br/>'+v.NPM+'</td>' +
-                  '<td>'+v.Company+'</td>' +
+                  '<td style="border-left: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
+                  '<td style="text-align: left;"><b>'+v.Name+'</b><br/>'+v.NPM+'</td>' +
+                  '<td style="text-align: left;">'+v.Company+'</td>' +
                   '</tr>';
            });
        }
@@ -130,8 +130,8 @@
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th style="width: 30%; text-align: left;">Student</th>' +
-            '                <th style="text-align: left;">Company</th>' +
+            '                <th style="width: 30%;">Student</th>' +
+            '                <th>Company</th>' +
             '            </tr>' +
             '            </thead>' +
             '            <tbody>'+tr+'</tbody>' +
