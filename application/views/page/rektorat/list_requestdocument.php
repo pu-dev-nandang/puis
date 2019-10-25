@@ -75,7 +75,8 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getreqdocument?s="+status, // json datasource
+                //url : base_url_js+"api/__getreqdocument?s="+status, // json datasource
+                url : base_url_js+"api/__getreqdocument", // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
