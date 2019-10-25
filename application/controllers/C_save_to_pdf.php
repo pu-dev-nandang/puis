@@ -6282,13 +6282,12 @@ Phone: (021) 29200456';
             $starthari2 =  $daftar_hari[''.$namahari2];
 
             if($starthari == $starthari2) {
-                    $hariday = date('l', strtotime($dataRequest[0]['StartDate']));
+                    $hariyax = date('l', strtotime($dataRequest[0]['StartDate']));
+                    $hariday =  $daftar_hari[''.$hariyax];
             }else {
                     $hariday = $starthari.' - '.$starthari2;
 
             }
-
-
 
             $date1 = $this->getDateIndonesian($dataRequest[0]['StartDate']);
             $date2 = $this->getDateIndonesian($dataRequest[0]['EndDate']);
