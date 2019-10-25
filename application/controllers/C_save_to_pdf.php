@@ -6384,8 +6384,9 @@ Phone: (021) 29200456';
         $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
 
         //$pdf->SetFont('Arial','B',10);
-        $pdf->Ln(3);
-        $pdf->Cell(0,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
+        //$pdf->Ln(3);
+        //$pdf->MultiCell(145,5,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
+        $pdf->MultiCell(185, $h,'Untuk menghadiri '.$nametask.' pada :', 0, 'L',false);
 
         $pdf->Ln(3);
         $pdf->Cell(10,$h,'',0,0,'L');
