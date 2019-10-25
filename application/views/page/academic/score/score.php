@@ -556,7 +556,7 @@
         for(var i=0;i<dataIDStudyPlanning.length;i++){
             var da = {
                 DB_Student : $('#db_student'+dataIDStudyPlanning[i]).val(),
-                ID : dataIDStudyPlanning[i],
+                ID : $('#db_student_ID'+dataIDStudyPlanning[i]).val(),
                 dataForm : {
                     Evaluasi1 : $('#formAsg1'+dataIDStudyPlanning[i]).val(),
                     Evaluasi2 : $('#formAsg2'+dataIDStudyPlanning[i]).val(),
