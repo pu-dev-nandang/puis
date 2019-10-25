@@ -51,7 +51,7 @@
                 clearInterval(firstLoad);
             }
         },1000);
-
+        setTimeout(function () { clearInterval(firstLoad); },5000);
 
     });
     

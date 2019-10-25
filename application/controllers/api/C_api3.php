@@ -2695,6 +2695,56 @@ class C_api3 extends CI_Controller {
 
             return print_r(json_encode($dataEd));
         }
+        else if($data_arr['action']=='readTableKepuasanPenggunaLulusan'){
+
+            $Year = $data_arr['Year'];
+            $dataAspek = $this->db->query('SELECT * FROM db_studentlife.aspek_penilaian_kepuasan')->result_array();
+
+            if(count($dataAspek)>0){
+
+                for($i=0;$i<count($dataAspek);$i++){
+                   $dataDetails = $this->db->query('SELECT afd.*, ats.Name, ats.NPM, mc.Name AS Company FROM db_studentlife.alumni_form_details afd 
+                                                              LEFT JOIN db_studentlife.alumni_form af ON (af.ID = afd.FormID)
+                                                              LEFT JOIN db_studentlife.alumni_experience ae ON (ae.ID = af.IDAE)
+                                                              LEFT JOIN db_studentlife.master_company mc ON (mc.ID = ae.CompanyID)
+                                                              LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
+                                                              WHERE af.Year = "'.$Year.'" 
+                                                              AND afd.APKID = "'.$dataAspek[$i]['ID'].'" ')->result_array();
+
+
+                   $Total_SB_D = [];
+                   $Total_B_D = [];
+                   $Total_C_D = [];
+                   $Total_K_D = [];
+                   if(count($dataDetails)>0){
+                       for($a=0;$a<count($dataDetails);$a++){
+                            $d = $dataDetails[$a];
+                           if($d['Rate']=='1'){
+                               array_push($Total_K_D,$d);
+                           } else if($d['Rate']=='2'){
+                               array_push($Total_C_D,$d);
+                           } else if($d['Rate']=='3'){
+                               array_push($Total_B_D,$d);
+                           } else if($d['Rate']=='4'){
+                               array_push($Total_SB_D,$d);
+                           }
+
+                       }
+                   }
+
+                    $dataAspek[$i]['Total_SB_D'] = $Total_SB_D;
+                    $dataAspek[$i]['Total_B_D'] = $Total_B_D;
+                    $dataAspek[$i]['Total_C_D'] = $Total_C_D;
+                    $dataAspek[$i]['Total_K_D'] = $Total_K_D;
+                    $dataAspek[$i]['Details'] = $dataDetails;
+                }
+
+            }
+
+            return print_r(json_encode($dataAspek));
+
+
+        }
         else if($data_arr['action']=='readKesesuaianBidangKerjaLulusan'){
             $Year = $data_arr['Year'];
             $dataEd = $this->db->query('SELECT el.ID, el.Name, el.Description FROM db_academic.education_level el')->result_array();
@@ -4138,9 +4188,9 @@ class C_api3 extends CI_Controller {
             $nestedData[] = '<div>'.$no.'</div>';
             $nestedData[] = '<div>'.$row['Name'].'</div>';
             if($dataWhere==''){
-                $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? 'Public : '.$row['IPPublic'] : '';
-                $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? '<br/>Local 1 : '.$row['IPLocal'] : '';
-                $IPLocal2 = ($row['IPLocal2']!='' && $row['IPLocal2']!=null) ? '<br/>Local 2 : '.$row['IPLocal2'] : '';
+                $IPPublic = ($row['IPPublic']!='' && $row['IPPublic']!=null) ? 'Public : '.$row['IPPublic'].'<br/>' : '';
+                $IPLocal = ($row['IPLocal']!='' && $row['IPLocal']!=null) ? 'Local 1 : '.$row['IPLocal'].'<br/>' : '';
+                $IPLocal2 = ($row['IPLocal2']!='' && $row['IPLocal2']!=null) ? 'Local 2 : '.$row['IPLocal2'] : '';
                 $nestedData[] = '<div>'.$IPPublic.''.$IPLocal.''.$IPLocal2.'</div>';
             }
             $nestedData[] = '<div>'.date('d M Y H:i:s',strtotime($row['AccessedOn'])).'</div>';
@@ -4433,12 +4483,38 @@ class C_api3 extends CI_Controller {
                                                     LEFT JOIN db_studentlife.master_company c ON (c.ID = ae.CompanyID)
                                                     WHERE af.Year = "'.$Year.'" 
                                                     ORDER BY ats.GraduationYear, ats.Name ASC ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+                        $data[$i]['DetailForm'] = $this->db->query('SELECT afd.*, apk.Description FROM db_studentlife.alumni_form_details afd 
+                                                                              LEFT JOIN db_studentlife.aspek_penilaian_kepuasan apk 
+                                                                              ON (apk.ID = afd.APKID)
+                                                                              WHERE afd.FormID = "'.$data[$i]['ID'].'"')->result_array();
+                    }
+                }
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='removeAlumniForm'){
                 $ID = $data_arr['ID'];
                 $this->db->where('ID', $ID);
                 $this->db->delete('db_studentlife.alumni_form');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='updateAlumniFormRate'){
+
+                $dataForm = (array) $data_arr['dataForm'];
+
+                for($i=0;$i<count($dataForm);$i++){
+
+                    $d = (array) $dataForm[$i];
+
+                    $this->db->where('ID', $d['ID']);
+                    $this->db->update('db_studentlife.alumni_form_details',array(
+                        'Rate' => ''.$d['Rate']
+                    ));
+                    $this->db->reset_query();
+                }
+
                 return print_r(1);
             }
 
