@@ -6,12 +6,12 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                 <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable" class="table-responsive">
-                <table class="table dataTable2Excel" data-name="Produk-melibatkan-mhs" id="dataTablesPMM">
+                <table class="table dataTable2Excel" data-name="Penelitian-melibatkan-mhs" id="dataTablesPMM">
                     <thead>
                         <tr>
                             <th>No</th>
                             <th>Nama Dosen</th>
-                            <th>Tema PKM Roadmap</th>
+                            <th>Tema Penelitian Roadmap</th>
                             <th>Nama Mahasiswa</th>
                             <th>Judul Kegiatan</th>
                             <th>Tahun</th>
