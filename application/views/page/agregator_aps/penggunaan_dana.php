@@ -112,9 +112,11 @@
             $('#formPricePS').maskMoney('mask', '9894');
             loadJenisDana();
             var firstLoad_year = setInterval(function (args) {
-                var filterYear = $('#filterYear').val();
+                // var filterYear = $('#filterYear').val();
                 var filterProdi = $('#filterProdi').val();
-                if(filterYear!='' && filterYear!=null && filterProdi!='' && filterProdi!=null){
+                if(filterProdi!='' && filterProdi!=null){
+                    $('#viewProdiID').html(filterProdi);
+                    $('#viewProdiName').html($('#filterProdi option:selected').text());
                      loadPage();
                     clearInterval(firstLoad_year);
                 }
