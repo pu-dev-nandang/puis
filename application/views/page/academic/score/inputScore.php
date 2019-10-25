@@ -163,23 +163,25 @@
                 tr.append('<tr>' +
                     '<th>'+(no++)+'</th>' +
                     '<th style="font-weight: normal;text-align: left;"><b>'+nameStd+'</b> ' +
-                    '<br/> <i>'+dtsc.NPM+'</i><input type="hide" class="hide" hidden readonly id="db_student'+dtsc.ID+'" value="'+dtsc.DB_Student+'" /> ' +
+                    '<br/> <i>'+dtsc.NPM+'</i>' +
+                    '<input type="hide" class="hide" hidden readonly id="db_student_ID'+dtsc.NPM+'" value="'+dtsc.ID+'" /> ' +
+                    '<input type="hide" class="hide" hidden readonly id="db_student'+dtsc.NPM+'" value="'+dtsc.DB_Student+'" /> ' +
                     '</th>' +
-                    '                        <td><input class="form-control formScore formAsg formAsg1" style="width: 80px;" id="formAsg1'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formAsg1+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore formAsg formAsg2" style="width: 80px;" id="formAsg2'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formAsg2+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore formAsg formAsg3" style="width: 80px;" id="formAsg3'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formAsg3+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore formAsg formAsg4" style="width: 80px;" id="formAsg4'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formAsg4+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore formAsg formAsg5" style="width: 80px;" id="formAsg5'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formAsg5+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore" style="width: 80px;" id="formUTS'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formUTS+'" type="number" /></td>' +
-                    '                        <td><input class="form-control formScore" style="width: 80px;" id="formUAS'+dtsc.ID+'" data-id="'+dtsc.ID+'" value="'+formUAS+'" type="number" /></td>' +
-                    '                        <td style="text-align: center;"><span id="score'+dtsc.ID+'">'+viewScore+'</span><input class="hide" hidden readonly id="formScoreValue'+dtsc.ID+'" value="'+formScore+'" /></td>' +
-                    '                        <td style="text-align: center;"><span id="grade'+dtsc.ID+'">'+viewGrade+'</span>' +
-                    '                               <input class="hide" hidden readonly id="formGrade'+dtsc.ID+'" value="'+formGrade+'" />' +
-                    '                               <input class="hide" hidden readonly id="formGradeValue'+dtsc.ID+'" value="'+formGradeValue+'" />' +
+                    '                        <td><input class="form-control formScore formAsg formAsg1" style="width: 80px;" id="formAsg1'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formAsg1+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore formAsg formAsg2" style="width: 80px;" id="formAsg2'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formAsg2+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore formAsg formAsg3" style="width: 80px;" id="formAsg3'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formAsg3+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore formAsg formAsg4" style="width: 80px;" id="formAsg4'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formAsg4+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore formAsg formAsg5" style="width: 80px;" id="formAsg5'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formAsg5+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore" style="width: 80px;" id="formUTS'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formUTS+'" type="number" /></td>' +
+                    '                        <td><input class="form-control formScore" style="width: 80px;" id="formUAS'+dtsc.NPM+'" data-id="'+dtsc.NPM+'" value="'+formUAS+'" type="number" /></td>' +
+                    '                        <td style="text-align: center;"><span id="score'+dtsc.NPM+'">'+viewScore+'</span><input class="hide" hidden readonly id="formScoreValue'+dtsc.NPM+'" value="'+formScore+'" /></td>' +
+                    '                        <td style="text-align: center;"><span id="grade'+dtsc.NPM+'">'+viewGrade+'</span>' +
+                    '                               <input class="hide" hidden readonly id="formGrade'+dtsc.NPM+'" value="'+formGrade+'" />' +
+                    '                               <input class="hide" hidden readonly id="formGradeValue'+dtsc.NPM+'" value="'+formGradeValue+'" />' +
                     '                       </td>' +
                     '                    </tr>');
 
-                dataIDStudyPlanning.push(dtsc.ID);
+                dataIDStudyPlanning.push(dtsc.NPM);
             }
 
 
