@@ -20,9 +20,7 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                     <tbody></tbody>
                 </table>
             </div>
-            
         </div>
-
     </div>
 </div>
 

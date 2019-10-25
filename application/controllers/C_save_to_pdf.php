@@ -6329,7 +6329,7 @@ Phone: (021) 29200456';
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(true, 0);
 
-        $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+        $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
 
         $pdf->Ln(30);
         $pdf->SetFont('Arial','B',13);
@@ -6418,8 +6418,8 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',11);
         $y = $pdf->GetY()+20;
 
-        $pdf->Image(base_url('images/cap.png'),130,$y+1,40);
-        $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+4,40);
+        $pdf->Image('./images/cap.png',130,$y+1,40);
+        $pdf->Image('./uploads/signature/2617100.png',130,$y+4,40);
 
 
         $pdf->Ln(11);
