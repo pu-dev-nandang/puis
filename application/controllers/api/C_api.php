@@ -254,7 +254,7 @@ class C_api extends CI_Controller {
     public function getreqdocument(){
         $requestData= $_REQUEST;
 
-        $SemesterID = $this->input->get('s');
+        //$SemesterID = $this->input->get('s');
         $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
