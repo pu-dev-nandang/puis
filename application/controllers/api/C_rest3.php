@@ -1326,7 +1326,77 @@ class C_rest3 extends CI_Controller {
                 $rs[] = $data;
             }    
             echo json_encode($rs);
-        break;
+          break;
+        case 'LoadSelectOptionAspekRatio' :
+          $rs = [];
+          $Get_dt = $this->m_master->caribasedprimary('db_agregator.m_aspek_ratio','Status','1');
+          echo json_encode($Get_dt);
+          break;
+        case 'kepuasan_mhs':
+          $rs = [];
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+          $S = $dataToken['FilterSemester'];
+          $S = explode('.', $S);
+          $SemesterID = $S[0];
+          $sql = 'select a.ID_m_aspek_ratio, b.Aspek,a.k_sangat_baik,a.k_baik,a.k_cukup,a.k_kurang,a.RencanaTindakLanjut,a.SemesterID,a.ProdiID,a.Updated_at,a.Updated_by,a.ID
+                  from db_agregator.kepuasan_mhs as a 
+                  join db_agregator.m_aspek_ratio as b on a.ID_m_aspek_ratio = b.ID
+                  where a.ProdiID = '.$ProdiID.' and a.SemesterID = '.$SemesterID.'
+                  ';
+          $query = $this->db->query($sql,array())->result_array();
+          $data = [];
+          for ($i=0; $i < count($query); $i++) { 
+            $nestedData = [];
+            $row = $query[$i];
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['Aspek'];
+            $nestedData[] = $row['k_sangat_baik'].'%';
+            $nestedData[] = $row['k_baik'].'%';
+            $nestedData[] = $row['k_cukup'].'%';
+            $nestedData[] = $row['k_kurang'].'%';
+            $nestedData[] = $row['RencanaTindakLanjut'];
+            $nestedData[] = $row['ID'];
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $nestedData[] = $row['SemesterID'];
+            $nestedData[] = $row['ID_m_aspek_ratio'];
+            $data[] = $nestedData;
+          }
+          $rs = array(
+              "draw"            => intval( 0 ),
+              "recordsTotal"    => intval(count($query)),
+              "recordsFiltered" => intval( count($query) ),
+              "data"            => $data
+          );
+          echo json_encode($rs);
+          break; 
+
+        case 'kepuasan-mhs-add' :
+          $dataSave = $dataToken['data'];
+          $dataSave = json_decode(json_encode($dataSave),true);
+          $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+          $dataSave['Updated_by'] = $this->session->userdata('NIP');
+          $this->db->insert('db_agregator.kepuasan_mhs',$dataSave);
+          echo json_encode(1);
+          break;
+        case 'kepuasan-mhs-edit' :
+          $ID = $dataToken['ID'];
+          $dataSave = $dataToken['data'];
+          $dataSave = json_decode(json_encode($dataSave),true);
+          $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+          $dataSave['Updated_by'] = $this->session->userdata('NIP');
+          $this->db->where('ID',$ID);
+          $this->db->update('db_agregator.kepuasan_mhs',$dataSave);
+          echo json_encode(1);
+          break;
+        case 'kepuasan-mhs-delete' :
+          $ID = $dataToken['ID'];
+          $this->db->where('ID',$ID);
+          $this->db->delete('db_agregator.kepuasan_mhs');
+          echo json_encode(1);
+          break;    
         default:
           echo '{"status":"999","message":"Not Authorize"}'; 
           break;

@@ -1450,9 +1450,27 @@ class C_api3 extends CI_Controller {
                         $this->db->update('db_agregator.penggunaan_dana_aps',$dataForm);
 
                     } else {
-                        $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                        $this->db->insert('db_agregator.penggunaan_dana_aps',$dataForm);
-                        $ID = $this->db->insert_id();
+                        $JPID = $dataForm['JPID'];
+                        $Year = $dataForm['Year'];
+                        $ProdiID = $dataForm['ProdiID'];
+                         $dataCek = $this->db->get_where('db_agregator.penggunaan_dana_aps',array(
+                                                'JPID' => $JPID,
+                                                'Year' => $Year,
+                                                'ProdiID' => $ProdiID,
+                                            ))->result_array();
+                         
+                         $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                        if (count($dataCek) > 0) {
+                            $ID = $dataCek[0]['ID'];
+                            $this->db->where('ID',$ID);
+                            $this->db->update('db_agregator.penggunaan_dana_aps',$dataForm);
+                         } 
+                         else
+                         {
+                            $this->db->insert('db_agregator.penggunaan_dana_aps',$dataForm);
+                             $ID = $this->db->insert_id();
+                         }
+                       
                     }
 
                     return print_r(json_encode(array(
