@@ -744,6 +744,51 @@ class C_rest3 extends CI_Controller {
         }
     }
 
+    public function APS_CrudAgregatorTB6()
+    {
+      $dataToken = $this->data['dataToken'];
+      $mode = $dataToken['mode'];
+      switch ($mode) {
+        case 'penelitian_melibatkan_mhs':
+          $rs = [];
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+          $sql = 'select b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
+                  from db_research.litabmas as a
+                  join db_employees.employees as b on a.NIP = b.NIP
+                  join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
+                  join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
+                  where b.ProdiID = '.$ProdiID.'
+                 ';
+          $query = $this->db->query($sql,array())->result_array();
+          $data = [];
+          for ($i=0; $i < count($query); $i++) { 
+            $nestedData = [];
+            $row = $query[$i];
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['NamaDosen'];
+            $nestedData[] = $row['RoadMap'];
+            $nestedData[] = $row['Name_mahasiswa'];
+            $nestedData[] = $row['Judul_litabmas'];
+            $nestedData[] = $row['ID_thn_laks'];
+            $data[] = $nestedData;
+          }
+          $rs = array(
+              "draw"            => intval( 0 ),
+              "recordsTotal"    => intval(count($query)),
+              "recordsFiltered" => intval( count($query) ),
+              "data"            => $data
+          );       
+          echo json_encode($rs);
+          break;
+        
+        default:
+          # code...
+          break;
+      }
+    }
+
     public function APS_CrudAgregatorTB8()
     {
       $dataToken = $this->data['dataToken'];

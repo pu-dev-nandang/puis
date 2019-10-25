@@ -1,5 +1,4 @@
 <style type="text/css">
-    <style type="text/css">
         #dataTablesAM thead th {
             vertical-align: middle;
         }
@@ -24,7 +23,6 @@
         #dataTablesAM table {
             width:2000px;
         }
-    </style>
 </style>
 Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div class="well">
