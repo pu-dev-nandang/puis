@@ -915,7 +915,7 @@ class C_api3 extends CI_Controller {
             $exFPName = explode('-', $filterProdiName);
             $filterProdiName = trim($exFPName[1]);
             $arrExp = explode('.', $filterProdi);
-
+            $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$arrExp[0]);
             for ($i=0; $i < count($arr_tahun_akademik); $i++) {
                 $Year = $arr_tahun_akademik[$i];
                 $sql = 'SELECT ss.*, ps.Name AS ProdiName, ps.Code AS ProdiCode FROM db_agregator.student_selection ss
@@ -930,15 +930,21 @@ class C_api3 extends CI_Controller {
                         'EntredBy' => null,
                         'ID' => null,
                         'PassSelection' => null,
+                        'd_PassSelection' => '',
                         'ProdiCode' => $arrExp[1],
                         'ProdiID' => $arrExp[0],
                         'ProdiName' => $filterProdiName,
                         'Registrant' => null,
+                        'd_Registrant' => '',
                         'Regular' => null,
+                        'd_Regular' => '',
                         'Regular2' => null,
+                        'd_Regular2' => '',
                         'TotalStudemt' => null,
                         'Transfer' => null,
+                        'd_Transfer' => '',
                         'Transfer2' => null,
+                        'd_Transfer2' => '',
                         'Type' => null,
                         'UpdatedBy' => null,
                         'Year' => $Year,
@@ -947,7 +953,61 @@ class C_api3 extends CI_Controller {
                 }
                 else
                 {
-                    $temp = $query[0];
+                    // $temp = $query[0];
+                    $dt = $query[0];
+                    $dt['d_PassSelection'] = '';
+                    $dt['d_Registrant'] = '';
+                    $dt['d_Regular'] = '';
+                    $dt['d_Regular2'] = '';
+                    $dt['d_Transfer'] = '';
+                    $dt['d_Transfer2'] = '';
+
+                    $ProdiID = $G_prodi[0]['ID'];
+
+                    if ($dt['Registrant'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[0]['Name'].'" as ProdiName from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_Registrant'] = $token;
+                    }
+
+                    if ($dt['PassSelection'] > 0) {
+                        $sql2 = 'select * from (
+                          select a.ID,a.Name,c.FormulirCode,onf.No_ref,"'.$G_prodi[0]['Name'].'" as ProdiName,e.NPM from db_admission.register as a
+                          join db_admission.register_verification as b on a.ID = b.RegisterID
+                          join db_admission.register_verified as c on b.ID = c.RegVerificationID
+                          join db_admission.register_formulir as d on c.ID = d.ID_register_verified
+                          join db_admission.to_be_mhs as e on e.FormulirCode = c.FormulirCode
+                          join (
+                               select FormulirCode,No_ref from db_admission.formulir_number_online_m
+                               where Years = '.$Year.' 
+                               UNION
+                               select FormulirCode,No_ref from db_admission.formulir_number_offline_m
+                               where Years = '.$Year.' 
+                          ) onf on onf.FormulirCode = c.FormulirCode
+                          where a.SetTa = ? and d.ID_program_study = ?
+                          ) xx';
+                        $query2=$this->db->query($sql2, array($Year,$ProdiID))->result_array();
+                        $token = $this->jwt->encode($query2,"UAP)(*");
+                        $dt['d_PassSelection'] = $token;
+                        $dt['d_Regular'] = $token;
+                        $dt['d_Regular2'] = $token;
+                    }
+
+                    $temp = $dt;
                 }
 
                 $rs[] = $temp;

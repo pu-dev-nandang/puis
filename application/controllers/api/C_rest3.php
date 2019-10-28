@@ -730,7 +730,7 @@ class C_rest3 extends CI_Controller {
                       ';
                     $query = $this->db->query($sql,array())->result_array();
                     $tot = count($query);
-                    $data[] = $tot;
+                    $data[] =  array('token' => $this->jwt->encode($query,"UAP)(*"),'total' => $tot) ;
                     $jumlah += $tot;
                   }
                   $data[] = $jumlah;
@@ -1304,7 +1304,7 @@ class C_rest3 extends CI_Controller {
                 ';
               $query = $this->db->query($sql,array())->result_array();
               $tot = count($query);
-              $data[] = $tot;
+              $data[] =  array('token' => $this->jwt->encode($query,"UAP)(*"),'total' => $tot) ;
               $jumlah += $tot;
             }
             $data[] = $jumlah;
@@ -1312,6 +1312,86 @@ class C_rest3 extends CI_Controller {
           }
           echo json_encode($rs);
           break;
+          
+        case 'kepuasan-lulusan':
+          $Year = $dataToken['Year'];
+          $ProdiID = $dataToken['ProdiID'];
+          $dataAspek = $this->db->query('SELECT * FROM db_studentlife.aspek_penilaian_kepuasan')->result_array();
+
+          if(count($dataAspek)>0){
+
+              for($i=0;$i<count($dataAspek);$i++){
+                 $dataDetails = $this->db->query('SELECT afd.*, ats.Name, ats.NPM, mc.Name AS Company FROM db_studentlife.alumni_form_details afd 
+                                                            LEFT JOIN db_studentlife.alumni_form af ON (af.ID = afd.FormID)
+                                                            LEFT JOIN db_studentlife.alumni_experience ae ON (ae.ID = af.IDAE)
+                                                            LEFT JOIN db_studentlife.master_company mc ON (mc.ID = ae.CompanyID)
+                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = af.NPM)
+                                                            WHERE af.Year = "'.$Year.'"  and ats.ProdiID = '.$ProdiID.'
+                                                            AND afd.APKID = "'.$dataAspek[$i]['ID'].'" ')->result_array();
+
+
+                 $Total_SB_D = [];
+                 $Total_B_D = [];
+                 $Total_C_D = [];
+                 $Total_K_D = [];
+                 if(count($dataDetails)>0){
+                     for($a=0;$a<count($dataDetails);$a++){
+                          $d = $dataDetails[$a];
+                         if($d['Rate']=='1'){
+                             array_push($Total_K_D,$d);
+                         } else if($d['Rate']=='2'){
+                             array_push($Total_C_D,$d);
+                         } else if($d['Rate']=='3'){
+                             array_push($Total_B_D,$d);
+                         } else if($d['Rate']=='4'){
+                             array_push($Total_SB_D,$d);
+                         }
+
+                     }
+                 }
+
+                  $dataAspek[$i]['Total_SB_D'] = $Total_SB_D;
+                  $dataAspek[$i]['Total_B_D'] = $Total_B_D;
+                  $dataAspek[$i]['Total_C_D'] = $Total_C_D;
+                  $dataAspek[$i]['Total_K_D'] = $Total_K_D;
+                  $dataAspek[$i]['Details'] = $dataDetails;
+              }
+
+          }
+
+          echo json_encode($dataAspek);  
+          break; 
+        case 'karya_ilmiah_mhs_sitasi' : 
+          $rs = [];
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+          $Year = $dataToken['Year'];
+          $sql = 'select b.Name as NameMHS,a.judul_sitasi,a.jumlah_sitasi 
+                  from db_agregator.sitasi_karya_mhs as a 
+                  join db_academic.auth_students as b on b.NPM = a.Updated_by
+                  where b.ProdiID = '.$ProdiID.' and a.year = '.$Year.'
+
+                ';
+          $query = $this->db->query($sql,array())->result_array();
+          $data = array();
+          for ($i=0; $i < count($query); $i++) { 
+              $nestedData = array();
+              $row = $query[$i];
+              $nestedData[] = $i+1;
+              $nestedData[] = $row['NameMHS'];
+              $nestedData[] = $row['judul_sitasi'];
+              $nestedData[] = $row['jumlah_sitasi'];
+              $data[] = $nestedData;
+          }
+           $rs = array(
+               "draw"            => intval( 0 ),
+               "recordsTotal"    => intval(count($query)),
+               "recordsFiltered" => intval( count($query) ),
+               "data"            => $data
+           );          
+          echo json_encode($rs);
+          break; 
         default:
           echo '{"status":"999","message":"Not Authorize"}'; 
           break;

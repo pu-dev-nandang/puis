@@ -53,15 +53,35 @@ var App_publikasi_mhs = {
                 arr_tot_row.push(0);
             }
             arr_tot_row.push(0); // for total
+            // console.log(arr_tot_row);
             for (var i = 0; i < resultJson.length; i++) {
                 var r = resultJson[i];
                 html += '<tr>';
                 for (var j = 0; j < r.length; j++) {
-                   html += '<td>'+r[j]+'</td>';
+                    // console.log(r);
+                    if (j <= 1) {
+                        html += '<td>'+r[j]+'</td>';
+                    }
+                    else if(j > 1 && j <=(r.length) - 2 )
+                    {
+                        // console.log(r[j]);
+                    html += '<td>'+'<a href = "javascript:void(0);" class = "datadetailpublikasi" data = "'+r[j].token+'">'+r[j].total+'</a>'+'</td>';
+                    }
+                    else
+                    {
+                        html += '<td>'+r[j]+'</td>';
+                    }
+                   
                    // startIndex = 2 untill endIndex
                    if (j >= 2 && j <=(r.length) - 1 ) {
                     var ind = j - 2;
-                    arr_tot_row[ind] = arr_tot_row[ind] + r[j];
+                    if (j==(r.length) - 1) {
+                       arr_tot_row[ind] = arr_tot_row[ind] + r[j]; 
+                    }
+                    else{
+                       arr_tot_row[ind] = arr_tot_row[ind] + r[j].total; 
+                    }
+                    
                    }
                 }
                 html += '</tr>';
@@ -130,4 +150,56 @@ $('#filterProdi').change(function () {
         App_publikasi_mhs.LoadAjaxTable();
     }
 });
+
+
+$(document).off('click', '.datadetailpublikasi').on('click', '.datadetailpublikasi',function(e) {
+    var v = parseInt($(this).html());
+    if (v > 0) {
+        var dt = $(this).attr('data');
+        dt = jwt_decode(dt);
+        // console.log(dt);
+        // console.log(dt);
+        var html =  '<div class = "row">'+
+                        '<div class = "col-md-12">'+
+                            '<table class = "table">'+
+                                '<thead>'+
+                                    '<tr>'+
+                                        '<td>No</td>'+
+                                        '<td>Judul</td>'+
+                                        '<td>Nama Mahasiswa</td>'+
+                                        '<td>Tanggal Terbit</td>'+
+                                    '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                if (dt.length > 0) {
+                    for (var i = 0; i < dt.length; i++) {
+                        html += '<tr>'+
+                                    '<td>'+ (parseInt(i)+1) + '</td>'+
+                                    '<td>'+ dt[i].Judul + '</td>'+
+                                    '<td>'+ dt[i].Nama_Mahasiswa + '</td>'+
+                                    '<td>'+ dt[i].Tgl_terbit+ '</td>'+
+                                '</tr>';
+                    }
+                }
+                else
+                {
+                    html += '<tr>'+
+                                '<td colspan="4"><label>No Data Detail</label></td>'+
+                            '</tr>';
+                }
+
+
+                html  += '</tbody></table></div></div>';
+
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Detail</h4>');
+        $('#GlobalModal .modal-body').html(html);
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    }
+})
 </script>
