@@ -1,5 +1,4 @@
 <h3 align="center">Regkonisi Dosen dan Karya Ilmiah</h3><br/>Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
-Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
 <div class="well">
     <div class="row">
         <div class="col-md-12">
