@@ -10,6 +10,12 @@
     #tableSetting .input-group {
         max-width: 100px;
     }
+
+    .titleExam {
+        text-align: center;
+        font-weight: bold;
+        background: lightyellow !important;
+    }
 </style>
 
 <div class="row">
@@ -18,14 +24,14 @@
             <table class="table table-striped" id="tableSetting">
                 <thead>
                 <tr>
-                    <th style="width: 1%;">No</th>
+                    <th style="width: 1%;"><i class="fa fa-square-o" aria-hidden="true"></i></th>
                     <th>Setting</th>
                     <th style="width: 40%;">Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td>1</td>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>Random Layout</td>
                     <td>
                         <div class="checkbox checbox-switch switch-primary" style="margin: 0px;">
@@ -37,7 +43,10 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>2</td>
+                    <td colspan="3" class="titleExam">UTS Settings</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UTS Filter Payment</td>
                     <td>
 
@@ -63,7 +72,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>3</td>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UTS Filter Attendance</td>
                     <td>
                         <div class="row">
@@ -86,7 +95,20 @@
                 </tr>
 
                 <tr>
-                    <td>4</td>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
+                    <td>UTS Approval (Kaprodi)</td>
+                    <td>
+                        <div class="checkbox checbox-switch switch-primary" style="margin: 0px;margin-top: 5px;">
+                            <label>
+                                <input type="checkbox" id="UTSApproval" value="1" />
+                                <span></span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UTS Shown (show UTS H - ?)</td>
                     <td>
                         <div class="input-group">
@@ -95,8 +117,12 @@
                         </div>
                     </td>
                 </tr>
+
                 <tr>
-                    <td>5</td>
+                    <td colspan="3" class="titleExam">UAS Settings</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UAS Filter Payment</td>
                     <td>
                         <div class="row">
@@ -120,7 +146,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>6</td>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UAS Filter Attendance</td>
                     <td>
                         <div class="row">
@@ -143,7 +169,20 @@
                 </tr>
 
                 <tr>
-                    <td>7</td>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
+                    <td>UAS Approval (Kaprodi)</td>
+                    <td>
+                        <div class="checkbox checbox-switch switch-primary" style="margin: 0px;margin-top: 5px;">
+                            <label>
+                                <input type="checkbox" id="UASApproval" value="1" />
+                                <span></span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><i class="fa fa-square-o" aria-hidden="true"></i></td>
                     <td>UAS Shown (show UAS H - ?)</td>
                     <td>
                         <div class="input-group">
@@ -214,15 +253,19 @@
             var UTSPaymentBPP = (d.UTSPaymentBPP==1 || d.UTSPaymentBPP=='1') ? true : false;
             var UTSPaymentCredit = (d.UTSPaymentCredit==1 || d.UTSPaymentCredit=='1') ? true : false;
             var UTSAttd = (d.UTSAttd==1 || d.UTSAttd=='1') ? true : false;
+            var UTSApproval = (d.UTSApproval ==1 || d.UTSApproval=='1') ? true : false;
             var UASPaymentBPP = (d.UASPaymentBPP==1 || d.UASPaymentBPP=='1') ? true : false;
             var UASPaymentCredit = (d.UASPaymentCredit==1 || d.UASPaymentCredit=='1') ? true : false;
             var UASAttd = (d.UASAttd==1 || d.UASAttd=='1') ? true : false;
+            var UASApproval = (d.UASApproval ==1 || d.UASApproval=='1') ? true : false;
 
             $('#UTSPaymentBPP').prop('checked',UTSPaymentBPP);
             $('#UTSPaymentCredit').prop('checked',UTSPaymentCredit);
+            $('#UTSApproval').prop('checked',UTSApproval);
             $('#UTSAttd').prop('checked',UTSAttd);
             $('#UASPaymentBPP').prop('checked',UASPaymentBPP);
             $('#UASPaymentCredit').prop('checked',UASPaymentCredit);
+            $('#UASApproval').prop('checked',UASApproval);
             $('#UASAttd').prop('checked',UASAttd);
 
             // Diabled
@@ -241,10 +284,12 @@
         var UTSPaymentBPP = ($('#UTSPaymentBPP').is(':checked')) ? '1' : '0';
         var UTSPaymentCredit = ($('#UTSPaymentCredit').is(':checked')) ? '1' : '0';
         var UTSAttd = ($('#UTSAttd').is(':checked')) ? '1' : '0';
+        var UTSApproval = ($('#UTSApproval').is(':checked')) ? '1' : '0';
         var UTSAttdValue = ($('#UTSAttdValue').val()!='' && $('#UTSAttdValue').val()!=null) ? $('#UTSAttdValue').val() : 0;
         var UASPaymentBPP = ($('#UASPaymentBPP').is(':checked')) ? '1' : '0';
         var UASPaymentCredit = ($('#UASPaymentCredit').is(':checked')) ? '1' : '0';
         var UASAttd = ($('#UASAttd').is(':checked')) ? '1' : '0';
+        var UASApproval = ($('#UASApproval').is(':checked')) ? '1' : '0';
         var UASAttdValue = ($('#UASAttdValue').val()!='' && $('#UASAttdValue').val()!=null) ? $('#UASAttdValue').val() : 0;
 
         var UTSShown = $('#UTSShown').val();
@@ -256,10 +301,12 @@
             formData : {
                 UTSPaymentBPP : UTSPaymentBPP,
                 UTSPaymentCredit : UTSPaymentCredit,
+                UTSApproval : UTSApproval,
                 UTSAttd : UTSAttd,
                 UTSAttdValue : UTSAttdValue,
                 UASPaymentBPP : UASPaymentBPP,
                 UASPaymentCredit : UASPaymentCredit,
+                UASApproval : UASApproval,
                 UASAttd : UASAttd,
                 UASAttdValue : UASAttdValue,
                 UTSShown : UTSShown,
