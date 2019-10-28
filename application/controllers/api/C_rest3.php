@@ -723,7 +723,7 @@ class C_rest3 extends CI_Controller {
                   $jumlah = 0;
                   $ID_forlap_publikasi = $G_jns_forlap_publikasi[$i]['ID'];
                   for ($j=0; $j < count($arr_ts) ; $j++) { 
-                    $sql = 'select Judul,Tgl_terbit,a.NIP from db_research.publikasi as a
+                    $sql = 'select Judul,Tgl_terbit,a.NIP,b.Name as NameDosen from db_research.publikasi as a
                     join db_employees.employees as b on a.NIP = b.NIP
                             where Year(a.Tgl_terbit) = '.$arr_ts[$j].' and a.ID_forlap_publikasi = "'.$ID_forlap_publikasi.'"
                             and b.ProdiID = '.$ProdiID.'
@@ -1277,6 +1277,39 @@ class C_rest3 extends CI_Controller {
             $rs[] = $data;
           }
 
+          echo json_encode($rs);
+          break;
+
+        case 'Publikasi_ilmiah_mhs':
+          $rs = [];
+          $P = $dataToken['ProdiID'];
+          $P = explode('.', $P);
+          $ProdiID = $P[0];
+
+          $arr_ts = json_decode(json_encode($dataToken['arr_ts']),true);
+          $G_jns_forlap_publikasi = $this->m_master->showData_array('db_research.jenis_forlap_publikasi');
+          for ($i=0; $i < count($G_jns_forlap_publikasi); $i++) {
+            $data = []; 
+            $data[] = $i+1;
+            $data[] = $G_jns_forlap_publikasi[$i]['NamaForlap_publikasi'];
+            $jumlah = 0;
+            $ID_forlap_publikasi = $G_jns_forlap_publikasi[$i]['ID'];
+            for ($j=0; $j < count($arr_ts) ; $j++) { 
+              $sql = 'select Judul,Tgl_terbit,a.NIP,c.Nama_Mahasiswa from db_research.publikasi as a
+                      join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
+                      join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
+                      join db_employees.employees as d on a.NIP = d.NIP
+                      where Year(a.Tgl_terbit) = '.$arr_ts[$j].' and a.ID_forlap_publikasi = "'.$ID_forlap_publikasi.'"
+                      and d.ProdiID = '.$ProdiID.'
+                ';
+              $query = $this->db->query($sql,array())->result_array();
+              $tot = count($query);
+              $data[] = $tot;
+              $jumlah += $tot;
+            }
+            $data[] = $jumlah;
+            $rs[] = $data;
+          }
           echo json_encode($rs);
           break;
         default:
