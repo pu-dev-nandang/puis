@@ -17,7 +17,7 @@
                 <tr>
                     <th rowspan="2" style="width: 1%;">No</th>
                     <th rowspan="2">Aspek Penilaian</th>
-                    <th colspan="4">Hasil Penlaian (%)</th>
+                    <th colspan="4">Hasil Penilaian (%)</th>
                 </tr>
                 <tr>
                     <th style="width: 10%;">Sangat Baik</th>
