@@ -3539,5 +3539,29 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $rs;
 
     }
+
+    public function __RevisiOrNotNotif($ID,$tabledt = null,$field = null){
+        $rs = '';
+        if ($tabledt == null || $field == null ) {
+            die();
+        }
+        else
+        {
+            $G_dt = $this->caribasedprimary($tabledt,$field,$ID);
+            if (count($G_dt) > 0) {
+                $strFind = 'Reject';
+                for ($i=0; $i < count($G_dt); $i++) { 
+                    $Desc = $G_dt[$i]['Desc'];
+                    if (preg_match("/^".$strFind."/i", $Desc)) {
+                        // echo "Matches!";
+                        $rs = 'Revisi ';
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $rs;
+    }
   
 }

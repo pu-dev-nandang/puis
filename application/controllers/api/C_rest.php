@@ -2309,6 +2309,9 @@ class C_rest extends CI_Controller {
                             else
                             {
                                 // Notif to next step approval & User
+                                    // send revisi or not
+                                    $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($PRCode,'db_budgeting.pr_circulation_sheet','PRCode');
+
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     $IDdiv = $G_data[0]['Departement'];
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
@@ -2318,8 +2321,8 @@ class C_rest extends CI_Controller {
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$Code,
-                                                            'Description' => 'Please approve PR '.$PRCode.' of '.$Code,
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  '.$RevisiOrNotNotif.'Approval PR '.$PRCode.' of '.$Code,
+                                                            'Description' => 'Please approve '.$RevisiOrNotNotif.' PR '.$PRCode.' of '.$Code,
                                                             'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2757,12 +2760,16 @@ class C_rest extends CI_Controller {
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                             // $NameDepartement = $G_div[0]['NameDepartement'];
                             $Code = $G_div[0]['Code'];
+
+                            // send revisi or not
+                            $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($id_creator_budget_approval,'db_budgeting.log_budget','ID_creator_budget_approval');
+
                             // Send Notif for next approval
                                 $data = array(
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
-                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Budget of '.$Code,
-                                                    'Description' => 'Please approve budget '.$Code,
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  '.$RevisiOrNotNotif.'Approval Budget of '.$Code,
+                                                    'Description' => 'Please approve '.$RevisiOrNotNotif.' budget '.$Code,
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),

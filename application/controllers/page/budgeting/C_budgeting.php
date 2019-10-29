@@ -1790,6 +1790,9 @@ class C_budgeting extends Budgeting_Controler {
                 $msg = array('Status' => 1,'msg'=>$ID );
 
                 // Send Notif
+                    // send revisi or not
+                    $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID,'db_budgeting.log_budget','ID_creator_budget_approval');
+
                     $IDdiv = $G_data[0]['Departement'];
                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                     // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -1797,8 +1800,8 @@ class C_budgeting extends Budgeting_Controler {
                     $data = array(
                         'auth' => 's3Cr3T-G4N',
                         'Logging' => array(
-                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Set Budget of '.$Code,
-                                        'Description' => 'Budget '.$Code.' has been already set by '.$this->session->userdata('Name'),
+                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.' Set Budget of '.$Code,
+                                        'Description' => $RevisiOrNotNotif.'Budget '.$Code.' has been already set by '.$this->session->userdata('Name'),
                                         'URLDirect' => 'budgeting_entry',
                                         'CreatedBy' => $this->session->userdata('NIP'),
                                       ),

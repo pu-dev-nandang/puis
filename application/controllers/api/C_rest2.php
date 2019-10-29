@@ -795,11 +795,14 @@ class C_rest2 extends CI_Controller {
                                     // Notif to next step approval & User
                                         $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                         // Send Notif for next approval
+                                            // send revisi or not
+                                            $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($Code,'db_purchasing.po_circulation_sheet','Code');
+
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
-                                                                'Description' => 'Please approve PO/SPK '.$Code,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.' PO/SPK : '.$Code,
+                                                                'Description' => 'Please approve '.$RevisiOrNotNotif.' PO/SPK '.$Code,
                                                                 'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
@@ -3366,11 +3369,12 @@ class C_rest2 extends CI_Controller {
                                 // Notif to next step approval & User
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     // Send Notif for next approval
+                                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
-                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$RevisiOrNotNotif.$G_data[0]['Type'],
                                                             'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -3981,6 +3985,8 @@ class C_rest2 extends CI_Controller {
                                             $CodeDept = $G_div[0]['Code'];
                                            
                                             // Send Notif for next approval
+                                                // send revisi or not
+                                                $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                                 $data = array(
                                                     'auth' => 's3Cr3T-G4N',
                                                     'Logging' => array(

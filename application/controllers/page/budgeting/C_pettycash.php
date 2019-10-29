@@ -489,6 +489,8 @@ class C_pettycash extends Budgeting_Controler {
                                 $CodeUrl = $token;
 
                                 // send notifikasi
+                                    // send revisi or not
+                                    $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                     $IDdiv = $Departement;
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                                     // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -496,8 +498,8 @@ class C_pettycash extends Budgeting_Controler {
                                     $data = array(
                                         'auth' => 's3Cr3T-G4N',
                                         'Logging' => array(
-                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Petty Cash has been Revised by '.$Code,
-                                                        'Description' => 'Petty Cash has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.' Petty Cash has been Revised by '.$Code,
+                                                        'Description' => $RevisiOrNotNotif.'Petty Cash has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                         'URLDirect' => 'budgeting_menu/pembayaran/pettycash/'.$CodeUrl,
                                                         'CreatedBy' => $this->session->userdata('NIP'),
                                                       ),
