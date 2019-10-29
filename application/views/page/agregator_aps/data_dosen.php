@@ -129,11 +129,14 @@ function LoadTableData(filterProdi)
         var html = '<div style = "overflow-x:auto;">';
 
         // get data pertama untuk ts
-        var JMLDibimbingBy_PS = jsonResult[0]['JMLDibimbingBy_PS'];
         var thYear = '';
-        for (var i = 0; i < JMLDibimbingBy_PS.length; i++) {
-            thYear += '<th>'+JMLDibimbingBy_PS[i].Year+'</th>';
+        if (jsonResult.length > 0) {
+            var JMLDibimbingBy_PS = jsonResult[0]['JMLDibimbingBy_PS'];
+            for (var i = 0; i < JMLDibimbingBy_PS.length; i++) {
+                thYear += '<th>'+JMLDibimbingBy_PS[i].Year+'</th>';
+            }
         }
+        
 
         html += '<table class="table table-bordered dataTable2Excel" id ="dataTablesDataDosen" style = "min-width: 1200px;"  data-name="DataDosen">'+
                         '<thead>'+
@@ -181,49 +184,59 @@ function LoadTableData(filterProdi)
 
         var selector = $('#dataTablesDataDosen tbody');
         var html_tbody = '';
-        for (var i = 0; i < jsonResult.length; i++) {
-            var No = parseInt(i) + 1;
-            html_tbody += '<tr>';
-            var arr = jsonResult[i];
-            for (key in arr) {
-               if (key == 'rata2BimBingan' || key == 'rata2BimBinganAll') {
-                 html_tbody += '<td>'+getCustomtoFixed(arr[key],1)+'</td>';
-               }
-               else if(key == 'JMLDibimbingBy_PS')
-               {
-                var d = arr[key];
-                for (var j = 0; j < d.length; j++) {
-                   if (d[j].tot == 0) {
-                    html_tbody += '<td>'+d[j].tot+'</td>';
+        if (jsonResult.length > 0) {
+           
+           for (var i = 0; i < jsonResult.length; i++) {
+               var No = parseInt(i) + 1;
+               html_tbody += '<tr>';
+               var arr = jsonResult[i];
+               for (key in arr) {
+                  if (key == 'rata2BimBingan' || key == 'rata2BimBinganAll') {
+                    html_tbody += '<td>'+getCustomtoFixed(arr[key],1)+'</td>';
+                  }
+                  else if(key == 'JMLDibimbingBy_PS')
+                  {
+                   var d = arr[key];
+                   for (var j = 0; j < d.length; j++) {
+                      if (d[j].tot == 0) {
+                       html_tbody += '<td>'+d[j].tot+'</td>';
+                      }
+                      else
+                      {
+                        html_tbody += '<td>'+'<a href = "javascript:void(0);" class = "datadetail" data = "'+d[j].data+'">'+d[j].tot+'</a>'+'</td>';
+                      } 
                    }
-                   else
-                   {
-                     html_tbody += '<td>'+'<a href = "javascript:void(0);" class = "datadetail" data = "'+d[j].data+'">'+d[j].tot+'</a>'+'</td>';
-                   } 
-                }
-               }
-               else if(key == 'JMLDibimbingBy_LainPS')
-               {
-                var d = arr[key];
-                for (var j = 0; j < d.length; j++) {
-                   if (d[j].tot == 0) {
-                    html_tbody += '<td>'+d[j].tot+'</td>';
+                  }
+                  else if(key == 'JMLDibimbingBy_LainPS')
+                  {
+                   var d = arr[key];
+                   for (var j = 0; j < d.length; j++) {
+                      if (d[j].tot == 0) {
+                       html_tbody += '<td>'+d[j].tot+'</td>';
+                      }
+                      else
+                      {
+                        html_tbody += '<td>'+'<a href = "javascript:void(0);" class = "datadetail" data = "'+d[j].data+'">'+d[j].tot+'</a>'+'</td>';
+                      } 
                    }
-                   else
-                   {
-                     html_tbody += '<td>'+'<a href = "javascript:void(0);" class = "datadetail" data = "'+d[j].data+'">'+d[j].tot+'</a>'+'</td>';
-                   } 
-                }
+                  }
+                  else
+                  {
+                   var v = (arr[key] == null || arr[key] == undefined ) ? '' : arr[key];
+                    html_tbody += '<td>'+v+'</td>';
+                  }
                }
-               else
-               {
-                var v = (arr[key] == null || arr[key] == undefined ) ? '' : arr[key];
-                 html_tbody += '<td>'+v+'</td>';
-               }
-            }
 
-            html_tbody += '</tr>';
+               html_tbody += '</tr>';
+           } 
         }
+        else
+        {
+           html_tbody += '<tr>'+
+                                '<td colspan = "15" style = "text-align:center;font-weight:600;">No Data found in the server</td>'+
+                         '</tr>';        
+        }
+       
 
         selector.append(html_tbody);
     });
