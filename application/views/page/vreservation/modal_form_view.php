@@ -249,7 +249,7 @@
                     '</tr>' 
                     );
             }
-            LoaddataTable('.datatable3');
+            LoaddataTableStandard('.datatable3');
             },500);
         });                
     }

@@ -150,9 +150,17 @@ class C_api_prodi extends CI_Controller {
         }
         else if ($data_arr['action']=='deleteDataslider') 
         {
+            $sql = 'select * from db_prodi.slider  where ProdiID= ?';
+            $ProdiID = $prodi_active_id;
+            $query = $this->db->query($sql, array($ProdiID))->result_array();
+
             $ID = $data_arr['ID'];
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.slider'); 
+            //delete images
+            $arr_file =  $query[0]['Images'];
+            $path = './images/Slider/'. $arr_file;
+            unlink($path);
             return print_r(1);
         }
         elseif ($data_arr['action'] == 'change_sorting'){
@@ -487,9 +495,18 @@ class C_api_prodi extends CI_Controller {
         
         else if ($data_arr['action']=='deleteDataPartner') 
         {
+            $sql = 'select * from db_prodi.partner  where ProdiID= ?';
+            $ProdiID = $prodi_active_id;
+            $query = $this->db->query($sql, array($ProdiID))->result_array();
+
             $ID = $data_arr['ID'];
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.partner'); 
+            //delete images
+            $arr_file =  $query[0]['Images'];
+            $path = './images/Partner/'. $arr_file;
+            unlink($path);
+
             return print_r(1);
         }
 
@@ -559,9 +576,18 @@ class C_api_prodi extends CI_Controller {
         }
         else if ($data_arr['action']=='deleteDataLecturer') 
         {
+            $sql = 'select * from db_prodi.lecturer  where ProdiID= ?';
+            $ProdiID = $prodi_active_id;
+            $query = $this->db->query($sql, array($ProdiID))->result_array();
+
             $ID = $data_arr['ID'];
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.lecturer'); 
+            //delete images
+            $arr_file =  $query[0]['Photo'];
+            $path = './images/Lecturer/'. $arr_file;
+            unlink($path);
+            
             return print_r(1);
         }
 
@@ -575,46 +601,13 @@ class C_api_prodi extends CI_Controller {
                 $upload = $upload[0];
 
                 $dataForm = (array) $data_arr['dataForm'];
-                // check action insert or update
-                // $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
-                //     where fc.ProdiID = ?
-                // ';
-                // $ProdiID = $prodi_active_id;
-                // $query = $this->db->query($sql, array($ProdiID))->result_array();
-                // if (count($query) == 0) { 
-                //     $dataForm['ProdiID'] = $prodi_active_id;
-                //     $dataForm['Photo'] = $upload;
-                //     $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
-                //     $dataform['CreateBy'] = $this->session->userdata('NIP');
-                    
-                //     $this->db->insert('db_prodi.facilities',$dataForm);
-                //     }
-               // else{ // Update
-               //      $arr_file =  $query[0]['Photo'];
-               //      $path = './images/Facilities/'. $arr_file;
-
-               //        if(is_file($path)){
-               //          $ID = $query[0]['ID'];
-               //          $dataupdate = $dataForm;
-               //          $dataupdate['Photo'] = $upload;
-               //          $this->db->where('ID',$ID);
-               //          $this->db->update('db_prodi.facilities',$dataupdate);
-               //          unlink($path);
-               //        }
-               //        else{
-               //          $ID = $query[0]['ID'];
-               //          $dataupdate = $dataForm;
-               //          $dataupdate['Photo'] = $upload;
-               //          $this->db->where('ID',$ID);
-               //          $this->db->update('db_prodi.facilities',$dataupdate);
-               //        }
-               //  }
-                    $dataForm['ProdiID'] = $prodi_active_id;
-                    $dataForm['Photo'] = $upload;
-                    $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
-                    $dataform['CreateBy'] = $this->session->userdata('NIP');
-                    
-                    $this->db->insert('db_prodi.facilities',$dataForm);
+                
+                $dataForm['ProdiID'] = $prodi_active_id;
+                $dataForm['Photo'] = $upload;
+                $dataForm['CreateAt'] = $this->m_rest->getDateTimeNow();
+                $dataform['CreateBy'] = $this->session->userdata('NIP');
+                
+                $this->db->insert('db_prodi.facilities',$dataForm);
                 
             }
 
@@ -633,20 +626,51 @@ class C_api_prodi extends CI_Controller {
         else if ($data_arr['action']=='deleteDataFacilities') 
         {
             // check action insert or update
-                $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
-                    where fc.ProdiID = ?
-                ';
-                $ProdiID = $prodi_active_id;
-                $query = $this->db->query($sql, array($ProdiID))->result_array();
+            $sql = 'select fc.*, fc.Photo,fc.ProdiID from db_prodi.facilities as fc  join db_academic.program_study as ps on fc.ProdiID = ps.ID
+                where fc.ProdiID = ?
+            ';
+            $ProdiID = $prodi_active_id;
+            $query = $this->db->query($sql, array($ProdiID))->result_array();
 
-                $ID = $data_arr['ID'];
+            $ID = $data_arr['ID'];
 
-                $this->db->where('ID', $ID);
-                $this->db->delete('db_prodi.facilities'); 
-                $arr_file =  $query[0]['Photo'];
-                
-                $path = './images/Facilities/'. $arr_file;
-                unlink($path);
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.facilities'); 
+            $arr_file =  $query[0]['Photo'];
+            
+            $path = './images/Facilities/'. $arr_file;
+            unlink($path);
+            return print_r(1);
+        }
+        else if ($data_arr['action']=='deleteTestimonials') 
+        {
+            $sql = 'SELECT pt.*, l.Language ,st.Photo,ast.Name,ast.NPM,c.Tlp,std.IDStudentTexting,std.IDProdiTexting
+                                FROM db_prodi.prodi_texting pt 
+                                LEFT JOIN db_prodi.language l ON (pt.LangID = l.ID)
+                                LEFT JOIN db_prodi.student_testimonials_details std ON (std.IDProdiTexting = pt.ID)
+                                LEFT JOIN db_prodi.student_testimonials st ON (st.ID = std.IDStudentTexting)
+                                LEFT JOIN db_academic.auth_students ast ON (ast.NPM = st.NPM)
+                                LEFT JOIN db_prodi.calldetail c ON (c.IDProdiTexting = pt.ID) 
+                                where pt.ID = ?';
+
+            $ID = $data_arr['ID'];
+            $query = $this->db->query($sql, array($ID))->result_array();
+            $ID = $query[0]['ID'];
+            $IDProdiTexting=$query[0]['IDProdiTexting'];
+            $IDStudentTexting=$query[0]['IDStudentTexting'];
+            //prodi_texting
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.prodi_texting'); 
+            //student_testimonials
+            $this->db->where('ID', $IDStudentTexting);
+            $this->db->delete('db_prodi.student_testimonials');
+            //student_testimonials_details
+            $this->db->where('IDProdiTexting', $IDProdiTexting);
+            $this->db->delete('db_prodi.student_testimonials_details'); 
+
+            $arr_file =  $query[0]['Photo'];
+            $path = './images/Testimonials/'. $arr_file;
+            unlink($path);
             return print_r(1);
         }
         else if($data_arr['action']=='insertContact'){
@@ -656,6 +680,15 @@ class C_api_prodi extends CI_Controller {
                 $this->db->insert('db_prodi.contact',$dataForm);
 
             return print_r(1);
+        }
+        else if($data_arr['action']=='readDataContact'){
+            $data = $this->db->get_where('db_prodi.contact')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='readLogoProdi'){
+            $data = $this->db->get_where('db_academic.program_study_detail')->result_array();
+            return print_r(json_encode($data));
+
         }
 
     }
@@ -787,7 +820,7 @@ class C_api_prodi extends CI_Controller {
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT s.*,s.Images FROM db_prodi.slider s WHERE s.ProdiID = '.$ProdiID.'')->result_array();
+        $data = $this->db->query('SELECT s.* FROM db_prodi.slider s WHERE s.ProdiID = '.$ProdiID.' ORDER BY s.Sorting ASC ')->result_array();
         
         
         return print_r(json_encode($data));

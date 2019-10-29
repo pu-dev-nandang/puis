@@ -3398,5 +3398,146 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         rmdir($dir);
     }
+
+    public function auth_access_aps_rs()
+    {
+        $rs = ['input' => false,'view' => 'all','ProdiID' => [] ];
+        $NIP = $this->session->userdata('NIP');
+        $RSDivFunction = function($IDDivision){
+            $NIP = $this->session->userdata('NIP');
+            $rsSub = [];
+            $view = 'prodi';
+            $input = false;
+            $ProdiID = [];
+            if ($IDDivision == 12 || $IDDivision == 2 || $IDDivision == 3 ) { // IT, rektorat,LPMI
+                $view = 'all';
+            }
+
+            if ($IDDivision == 12) { // IT
+                $input = true;
+            }
+            else
+            {
+                if ($IDDivision == 14) { // Lecturer
+                   $dd = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                   if ($dd[0]['ProdiID'] != ''  && $dd[0]['ProdiID'] != null ) {
+                       $ProdiID[] = $dd[0]['ProdiID'];
+                   }
+
+                   $dd = $this->m_master->caribasedprimary('db_academic.program_study','KaprodiID',$NIP);
+                   for ($i=0; $i < count($dd); $i++) { 
+                        $ProdiID[] = $dd[$i]['ID'];
+                   }
+
+                   $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
+                   for ($i=0; $i < count($dd); $i++) { 
+                        $ID = $dd[$i]['ID'];
+                        $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
+                        for ($j=0; $j < count($get); $j++) { 
+                           $ProdiID[] = $get[$j]['ID'];
+                        }
+                   }
+                   // print_r($ProdiID);die();
+                   $input = true;
+                   
+                }
+                elseif ($IDDivision == 15) { // prodi
+                   $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$NIP);
+                   for ($i=0; $i < count($gg); $i++) { 
+                      $ProdiID[] = $gg[$i]['ID'];
+                   }
+
+                   $input = true;
+                }
+                elseif ($IDDivision == 34) { // faculty
+                    $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
+                    for ($i=0; $i < count($dd); $i++) { 
+                         $ID = $dd[$i]['ID'];
+                         $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
+                         for ($j=0; $j < count($get); $j++) { 
+                            $ProdiID[] = $get[$j]['ID'];
+                         }
+                    }
+
+                    $input = true;
+                }
+            }
+            $ProdiID = array_unique($ProdiID);
+            $ProdiID = array_values($ProdiID);
+            $rsSub = ['input' => $input,'view' => $view,'ProdiID' => $ProdiID ];
+            // print_r($rsSub);die();
+            return $rsSub;
+        };
+
+
+        $FilteringRS = function($PositionMain,$PositionOther1,$PositionOther2,$PositionOther3){
+            $rsSub = ['input' => false,'view' => 'prodi','ProdiID' => [] ];
+            $Pos = [];
+            $Pos[] = $PositionMain;
+            $Pos[] = $PositionOther1;
+            $Pos[] = $PositionOther2;
+            $Pos[] = $PositionOther3;
+            // print_r($Pos);die();
+            for ($i=0; $i < count($Pos); $i++) { 
+                $input = $Pos[$i]['input'];
+                if ($input) {
+                    $rsSub['input'] = $input;
+                    break;
+                }
+            }
+
+            for ($i=0; $i < count($Pos); $i++) { 
+                $view = $Pos[$i]['view'];
+                if ($view == 'all') {
+                    $rsSub['view'] = $view;
+                    break;
+                }
+            }
+
+            $Gel_AllProdi = [];
+            for ($i=0; $i < count($Pos); $i++) { 
+                $ProdiID = $Pos[$i]['ProdiID'];
+
+                if (count($ProdiID) > 0 ) {
+                    for ($j=0; $j < count($ProdiID); $j++) { 
+                        $Gel_AllProdi[] = $ProdiID[$j];
+                    }
+                    
+                }
+            }
+
+            $Gel_AllProdi = array_unique($Gel_AllProdi);
+            $Gel_AllProdi = array_values($Gel_AllProdi);
+            // print_r($Gel_AllProdi);die();
+            $rsSub['ProdiID'] = $Gel_AllProdi;
+
+            return $rsSub;
+
+        };
+        $PositionMain = $this->session->userdata('PositionMain');
+        $IDDivision = $PositionMain['IDDivision'];
+
+        $PosMain = $RSDivFunction($IDDivision);
+
+        $PositionOther1 = $this->session->userdata('PositionOther1');
+        $IDDivisionOther1 = $PositionOther1['IDDivisionOther1'];
+
+        $PosMain1 = $RSDivFunction($IDDivisionOther1);
+
+        $PositionOther2 = $this->session->userdata('PositionOther2');
+        $IDDivisionOther2 = $PositionOther2['IDDivisionOther2'];
+
+        $PosMain2 = $RSDivFunction($IDDivisionOther2);
+
+        $PositionOther3 = $this->session->userdata('PositionOther3');
+        $IDDivisionOther3 = $PositionOther3['IDDivisionOther3'];
+
+        $PosMain3 = $RSDivFunction($IDDivisionOther3);
+
+        $rs = $FilteringRS($PosMain,$PosMain1,$PosMain2,$PosMain3);
+
+        return $rs;
+
+    }
   
 }

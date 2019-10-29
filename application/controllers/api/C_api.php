@@ -254,7 +254,6 @@ class C_api extends CI_Controller {
     public function getreqdocument(){
         $requestData= $_REQUEST;
 
-        $SemesterID = $this->input->get('s');
         $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
@@ -268,8 +267,8 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
                     WHERE b.RequestDocument = 1  AND ( ';
 
-            $sql.= ' a.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' c.Name LIKE "'.$requestData['search']['value'].'%" ';
+            //$sql.= ' OR b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
             //$sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY a.IDRequest DESC ';
 

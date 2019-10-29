@@ -75,16 +75,18 @@
            $.post(url,{token:token},function (jsonResult) {
            	var arr_total = [0,0,0,0,0,0];
            	for (var i = 0; i < jsonResult.length; i++) {
+              var v = jsonResult[i];
            		$('#listData').append(
            			'<tr>'+
            				'<td>'+jsonResult[i].Year+'</td>'+
-           				'<td>'+jsonResult[i].Capacity+'</td>'+
-           				'<td>'+jsonResult[i].Registrant+'</td>'+ // 0
-           				'<td>'+jsonResult[i].PassSelection+'</td>'+ // 1
-           				'<td>'+jsonResult[i].Regular+'</td>'+ // 2
-           				'<td>'+jsonResult[i].Transfer+'</td>'+ // 3
-           				'<td>'+jsonResult[i].Regular2+'</td>'+ // 4
-           				'<td>'+jsonResult[i].Transfer2+'</td>'+ // 5
+           				'<td>'+checkValue(v.Capacity)+'</td>'+
+                  // '<td>'+jsonResult[i].Registrant+'</td>'+ // 0
+           				'<td>'+'<a href = "javascript:void(0);" class = "datadetailPendaftar" data = "'+v.d_Registrant+'">'+checkValue(v.Registrant)+'</a>'+'</td>'+ // 0
+           				'<td>'+'<a href = "javascript:void(0);" class = "datadetailPassSelection" data = "'+v.d_PassSelection+'">'+checkValue(v.PassSelection)+'</a>'+'</td>'+ // 1
+           				'<td>'+'<a href = "javascript:void(0);" class = "datadetailPassSelection" data = "'+v.d_Regular+'">'+checkValue(v.Regular)+'</a>'+'</td>'+ // 2
+           				'<td>'+checkValue(v.Transfer)+'</td>'+ // 3
+           				'<td>'+'<a href = "javascript:void(0);" class = "datadetailPassSelection" data = "'+v.d_Regular2+'">'+checkValue(v.Regular2)+'</a>'+'</td>'+ // 4
+           				'<td>'+checkValue(v.Transfer2)+'</td>'+ // 5
            			'</tr>'	
            		);
 
@@ -153,4 +155,103 @@
     	
     })
 
+    $(document).off('click', '.datadetailPendaftar').on('click', '.datadetailPendaftar',function(e) {
+        var v = parseInt($(this).html());
+        if (v > 0) {
+            var dt = $(this).attr('data');
+            dt = jwt_decode(dt);
+            // console.log(dt);
+            var html =  '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<td>No</td>'+
+                                            '<td>Name</td>'+
+                                            '<td>Formulir Code</td>'+
+                                            '<td>Program Studi</td>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>';
+                    if (dt.length > 0) {
+                        for (var i = 0; i < dt.length; i++) {
+                            html += '<tr>'+
+                                        '<td>'+ (parseInt(i)+1) + '</td>'+
+                                        '<td>'+ dt[i].Name + '</td>'+
+                                        '<td>'+ dt[i].FormulirCode+' / '+dt[i].No_ref + '</td>'+
+                                        '<td>'+ dt[i].ProdiName+ '</td>'+
+                                    '</tr>';
+                        }
+                    }
+                    else
+                    {
+                        html += '<tr>'+
+                                    '<td colspan="4"><label>No Data Detail</label></td>'+
+                                '</tr>';
+                    }
+
+
+                    html  += '</tbody></table></div></div>';
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+    })
+
+    $(document).off('click', '.datadetailPassSelection').on('click', '.datadetailPassSelection',function(e) {
+        var v = parseInt($(this).html());
+        if (v > 0) {
+            var dt = $(this).attr('data');
+            dt = jwt_decode(dt);
+            // console.log(dt);
+            var html =  '<div class = "row">'+
+                            '<div class = "col-md-12">'+
+                                '<table class = "table">'+
+                                    '<thead>'+
+                                        '<tr>'+
+                                            '<td>No</td>'+
+                                            '<td>NPM & Name</td>'+
+                                            '<td>Formulir Code</td>'+
+                                            '<td>Program Studi</td>'+
+                                        '</tr>'+
+                                    '</thead>'+
+                                    '<tbody>';
+                    if (dt.length > 0) {
+                        for (var i = 0; i < dt.length; i++) {
+                            html += '<tr>'+
+                                        '<td>'+ (parseInt(i)+1) + '</td>'+
+                                        '<td>'+ dt[i].NPM + '<br/>'+dt[i].Name + '</td>'+
+                                        '<td>'+ dt[i].FormulirCode+' / '+dt[i].No_ref + '</td>'+
+                                        '<td>'+ dt[i].ProdiName+ '</td>'+
+                                    '</tr>';
+                        }
+                    }
+                    else
+                    {
+                        html += '<tr>'+
+                                    '<td colspan="4"><label>No Data Detail</label></td>'+
+                                '</tr>';
+                    }
+
+
+                    html  += '</tbody></table></div></div>';
+
+
+            $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Detail</h4>');
+            $('#GlobalModal .modal-body').html(html);
+            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+            $('#GlobalModal').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+        }
+    })
 </script>

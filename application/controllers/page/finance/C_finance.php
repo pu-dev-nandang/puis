@@ -1924,7 +1924,51 @@ class C_finance extends Finnance_Controler {
         $requestData= $_REQUEST;
         // print_r($requestData);
         $reqTahun = $this->input->post('tahun');
-        $totalData = $this->m_finance->getCountAllPayment_admission();
+        // $totalData = $this->m_finance->getCountAllPayment_admission();
+        // get total data
+        $sqlTotalData = 'select count(*) as total from (
+                select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
+                f.Religion,concat(a.PlaceBirth,",",a.DateBirth) as PlaceDateBirth,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
+                n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
+                if((select count(*) as total from db_admission.register_nilai where Status = "Approved" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
+                as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,
+                if( (select count(*) as total from db_finance.payment_pre where ID_register_formulir = a.ID limit 1) > 1,"Cicilan","Tidak Cicilan") as cicilan,
+                if((select count(*) as total from db_finance.payment_pre where `Status` = 0 and ID_register_formulir = a.ID limit 1) = 0 ,"Lunas","Belum Lunas") as StatusPayment,px.No_Ref
+                from db_admission.register_formulir as a
+                left JOIN db_admission.register_verified as b 
+                ON a.ID_register_verified = b.ID
+                left JOIN db_admission.register_verification as c
+                ON b.RegVerificationID = c.ID
+                left JOIN db_admission.register as d
+                ON c.RegisterID = d.ID
+                left JOIN db_admission.country as e
+                ON a.NationalityID = e.ctr_code
+                left JOIN db_employees.religion as f
+                ON a.ReligionID = f.IDReligion
+                left JOIN db_admission.school_type as l
+                ON l.sct_code = a.ID_school_type
+                left JOIN db_admission.register_major_school as m
+                ON m.ID = a.ID_register_major_school
+                left JOIN db_admission.school as n
+                ON n.ID = d.SchoolID
+                left join db_academic.program_study as o
+                on o.ID = a.ID_program_study
+                left join db_finance.register_admisi as p
+                on a.ID = p.ID_register_formulir
+                left join db_admission.formulir_number_offline_m as px
+                on px.FormulirCode = b.FormulirCode
+                where p.Status = "Approved"  and d.SetTa = "'.$reqTahun.'" group by a.ID
+
+                ) SubQuery
+            ';
+        $sqlTotalData.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+                        or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
+                        or StatusPayment LIKE "'.$requestData['search']['value'].'%" or cicilan LIKE "'.$requestData['search']['value'].'%"
+                        or No_Ref LIKE "'.$requestData['search']['value'].'%" 
+                        )
+                        ';
+        $queryTotalData = $this->db->query($sqlTotalData)->result_array();
+        $totalData = $queryTotalData[0]['total'];
 
         $sql = 'select * from (
                 select a.ID as ID_register_formulir,a.ID_program_study,o.Name as NamePrody,d.Name,a.Gender,a.IdentityCard,e.ctr_name as Nationality,
