@@ -12,8 +12,12 @@
 
 <div class="row">
     <div class="col-md-12">
+        <div style="text-align: right;">
+            <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+        </div>
+
         <div class="well">
-            <table class="table table-striped table-centre">
+            <table class="table table-striped table-centre dataTable2Excel" data-name="waktu-tunggu-lulusan">
                 <thead>
                 <tr>
                     <th rowspan="2" style="width: 1%;">No</th>
