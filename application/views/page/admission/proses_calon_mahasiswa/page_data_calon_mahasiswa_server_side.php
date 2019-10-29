@@ -29,10 +29,27 @@
                          </div>
                          <br>
                          <div class="row">
-                            <div class="col-md-2" style="">
-                              Angkatan
+                            <div class="col-md-2">
+                              <label>Angkatan</label>
                               <select class="select2-select-00 col-md-2 full-width-fix" id="selectTahun">
                                   <option></option>
+                              </select>
+                            </div>
+                            <div class="col-md-2">
+                              <label>Online/Offline</label>
+                              <select class="form-control" id="selectFormulirType">
+                                  <option value="%" >All</option>
+                                  <option value="0" >Online</option>
+                                  <option value="1" >Offline</option>
+                              </select>
+                            </div>
+                            <div class="col-md-2">
+                              <label>Status Payment</label>
+                              <select class="form-control" id="selectStatusPayment">
+                                  <option value="%" >All</option>
+                                  <option value="-" >Tagihan Belum di set</option>
+                                  <option value="Lunas" >Lunas</option>
+                                  <option value="Belum Lunas" >Belum Lunas</option>
                               </select>
                             </div>
                           </div>
@@ -57,7 +74,8 @@
 <script type="text/javascript">
     window.pageHtml = '';
     window.temp = '';
-
+    var oTable1;
+    var oTable2;
     function loadTahun()
     {
         var academic_year_admission = "<?php echo $academic_year_admission ?>";
@@ -95,12 +113,22 @@
         loadPage(page);
     });
 
-    $(document).on('change','#selectTahun', function () {
-        // loaddataBelumBayar();
-        // loadDataTelahBayar();
-        loadPage(pageHtml+'/1');
-        // console.log($(this).val());
-        // loadPage('data-calon-mhs/1');
+    $(document).on('change','#selectTahun,#selectStatusPayment,#selectFormulirType', function () {
+        // loadPage(pageHtml+'/1');
+        var res = pageHtml.split("/");
+        if (res[0] == 'data-calon-mhs') {
+          // enable tagihan belum di set
+          var selector = $('#selectStatusPayment');
+          selector.find('option[value="-"]').attr('disabled',false);
+          oTable1.ajax.reload( null, false );
+        }
+        else if (res[0] == 'to-be-mhs') {
+          // disable tagihan belum di set
+          var selector = $('#selectStatusPayment');
+          selector.find('option[value="-"]').attr('disabled',true);
+          oTable2.ajax.reload( null, false );
+        }
+        
     });
 
     function loadPage(page) {
@@ -108,6 +136,8 @@
         var res = page.split("/");
         switch(res[0]) {
             case 'data-calon-mhs':
+              var selector = $('#selectStatusPayment');
+              selector.find('option[value="-"]').attr('disabled',false);
                $("#dataPageLoad").empty();
                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
                            '<thead>'+
@@ -158,7 +188,17 @@
                    "ajax":{
                        url : base_url_js+"admission/proses-calon-mahasiswa/getDataPersonal_Candidate", // json datasource
                        ordering : false,
-                       data : {tahun : $("#selectTahun").val()},
+                       // data : {tahun : $("#selectTahun").val()},
+                       data : function(datapost){
+                                  // Read values
+                            var tahunValue =$("#selectTahun option:selected").val() ;
+                            var selectFormulirType =$("#selectFormulirType option:selected").val() ;
+                            var selectStatusPayment =$("#selectStatusPayment option:selected").val() ;
+                                  // Append to data
+                                  datapost.tahun = tahunValue;
+                                  datapost.FormulirType = selectFormulirType;
+                                  datapost.StatusPayment = selectStatusPayment;
+                            },
                        type: "post",  // method  , by default get
                        error: function(){  // error handling
                            $(".employee-grid-error").html("");
@@ -174,11 +214,22 @@
                          }
                    },
                } );
-
+               oTable1 = table;
                pageHtml = 'data-calon-mhs';
                 break;
             case 'to-be-mhs':
                 $("#dataPageLoad").empty();
+                var selector = $('#selectStatusPayment');
+                selector.find('option[value="-"]').attr('disabled',true);
+                var S_StatusPayment = selector.find('option:selected').val();
+                // console.log(S_StatusPayment);
+                if (S_StatusPayment == '-' ) {
+                  // selector.find('option[value="%"]').attr('selected',true);
+                  $("#selectStatusPayment option").filter(function() {
+                     //may want to use $.trim in here
+                     return $(this).val() == '%'; 
+                  }).prop("selected", true);
+                }
                 var table = ''+
                             '<table class="table table-bordered datatable2" id = "datatable2">'+
                             '<thead>'+
@@ -224,7 +275,17 @@
                     "ajax":{
                         url : base_url_js+"admission/proses-calon-mahasiswa/getDataPersonal_Candidate_to_be_mhs", // json datasource
                         ordering : false,
-                        data : {tahun : $("#selectTahun").val()},
+                        // data : {tahun : $("#selectTahun").val()},
+                        data : function(datapost){
+                                   // Read values
+                             var tahunValue =$("#selectTahun option:selected").val() ;
+                             var selectFormulirType =$("#selectFormulirType option:selected").val() ;
+                             var selectStatusPayment =$("#selectStatusPayment option:selected").val() ;
+                                   // Append to data
+                                   datapost.tahun = tahunValue;
+                                   datapost.FormulirType = selectFormulirType;
+                                   datapost.StatusPayment = selectStatusPayment;
+                             },
                         type: "post",  // method  , by default get
                         error: function(){  // error handling
                             $(".employee-grid-error").html("");
@@ -240,6 +301,8 @@
                           }
                     },
                 } );
+
+                oTable2 = table;
 
                 // Handle click on "Select all" control
                 $('#example-select-all').on('click', function(){
