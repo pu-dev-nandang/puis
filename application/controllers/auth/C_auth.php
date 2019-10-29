@@ -50,10 +50,6 @@ GET : http://sinta2.ristekdikti.go.id/api/countcitations?api_key='.$api_key.'&ko
 
 //        print_r($listApi);
 
-
-
-
-
     }
 
     public function cekFile()
