@@ -595,19 +595,19 @@
 
     function getReloadTableSocket()
     {
-      var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-      // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+      // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+      // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
 
-      socket.on( 'update_notifikasi', function( data ) {
+      // socket.on( 'update_notifikasi', function( data ) {
 
-          //$( "#new_count_message" ).html( data.new_count_message );
-          //$('#notif_audio')[0].play();
-          if (data.update_notifikasi == 1) {
-              // action
-              loadData(1);
-          }
+      //     //$( "#new_count_message" ).html( data.new_count_message );
+      //     //$('#notif_audio')[0].play();
+      //     if (data.update_notifikasi == 1) {
+      //         // action
+      //         loadData(1);
+      //     }
 
-      }); // exit socket
+      // }); // exit socket
     }
 
 </script>
