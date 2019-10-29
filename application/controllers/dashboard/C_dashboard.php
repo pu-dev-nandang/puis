@@ -856,6 +856,60 @@ class C_dashboard extends Globalclass {
         }
 
     }
+    public function kb()
+    {
+        $post = $_POST;
+        if (count($post) > 0) {
+            $data['selected'] = $post['Division'];
+            $data['G_data'] = $this->m_master->userKB($data['selected']);
+            echo $this->load->view('global/kb/content_change',$data,true);
+        }
+        else
+        {
+            $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+            $data['selected'] = 6;
+            $data['G_data'] = $this->m_master->userKB($data['selected']);
+            $content = $this->load->view('global/kb/kb',$data,true);
+            $this->temp($content);
+        }
+
+    }
+
+    public function upload_kb(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $ID = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/kb/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!=''  && is_file('./uploads/kb/'.$old)){
+            unlink('./uploads/kb/'.$old);
+        }
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            // Update DB
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.knowledge_base',array(
+                'File' => $fileName
+            ));
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
+
+    }
 
     public function ShowLoggingNotification()
     {
