@@ -11,7 +11,9 @@
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/sk_masuk_mahasiswa'); ?>">SK Masuk Mahasiswa</a>
                 </li>
-                
+                <li>
+                    <a href="<?php echo base_url('rectorat/master_data/credit_type_courses'); ?>">Credit type Course</a>
+                </li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                 <?php echo $page; ?>
