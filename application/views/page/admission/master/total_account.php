@@ -32,6 +32,7 @@
                 <!-- end widget -->
             </div>
             <hr/>
+            <p style="color: red;">* Berfungsi untuk menentukan jumlah formulir online</p>
         </div>
     </div>
     <div class="col-md-2"></div>

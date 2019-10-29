@@ -3175,8 +3175,13 @@ class M_admission extends CI_Model {
 
     }
 
-    public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun)
+    public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
+      $AddWhere = '';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") ';
+      if ($FormulirType != '%') {
+         $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
+      }
       $sql = 'select count(*) as total from (
               select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
               xq.DiscountType,
@@ -3214,23 +3219,32 @@ class M_admission extends CI_Model {
               on xq.ID = xy.TypeBeasiswa
               left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = c.FormulirCode
-              where a.SetTa = "'.$reqTahun.'"
+              where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
             ) ccc
           ';
-
+      if ($StatusPayment != '%') {
+         $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+      }
+         
       $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              #or chklunas LIKE "'.$requestData['search']['value'].'%" 
+              or DiscountType LIKE "'.$requestData['search']['value'].'%"
               or NameSales LIKE "'.$requestData['search']['value'].'%"
               or No_Ref LIKE "'.$requestData['search']['value'].'%"
                 )
-             and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
+             and '.$AddWhere2.' and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];
     }
 
-    public function getCountAllDataPersonal_Candidate($requestData,$reqTahun)
+    public function getCountAllDataPersonal_Candidate($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
+      $AddWhere = '';
+      $AddWhere2 = '';
+      if ($FormulirType != '%') {
+         $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
+      }
       $sql = 'select count(*) as total from (
                 select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
                 xq.DiscountType,
@@ -3244,7 +3258,8 @@ class M_admission extends CI_Model {
                         "Belum Lunas"
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-                ,xx.Name as NameSales
+                ,xx.Name as NameSales,
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -3266,12 +3281,19 @@ class M_admission extends CI_Model {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'"
+                where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
               ) ccc';
-
-      $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+      if ($StatusPayment != '%') {
+         $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+      }
+      $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              #or chklunas LIKE "'.$requestData['search']['value'].'%" 
+              or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              or NameSales LIKE "'.$requestData['search']['value'].'%"
+              or No_Ref LIKE "'.$requestData['search']['value'].'%"
+              )
+              '.$AddWhere2.'
               ';
 
       $query=$this->db->query($sql, array())->result_array();
