@@ -394,11 +394,12 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                     $token = $this->jwt->encode($ID_payment,$key);
                     $CodeUrl = $token;
                     // Send Notif for next approval
+                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                         $data = array(
                             'auth' => 's3Cr3T-G4N',
                             'Logging' => array(
-                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$Type.' after edited',
-                                            'Description' => 'Please approve '.$Type.' after edited',
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$RevisiOrNotNotif.$Type.' after edited',
+                                            'Description' => 'Please approve '.$RevisiOrNotNotif.$Type.' after edited',
                                             'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
                                             'CreatedBy' => $NIP,
                                           ),
@@ -923,6 +924,8 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                          $CodeUrl = $token;    
 
                          // send notifikasi
+                             // send revisi or not
+                             $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                              $IDdiv = $Departement;
                              $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                              // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -930,8 +933,8 @@ class C_ba extends Budgeting_Controler { // SPB / Bank Advance
                              $data = array(
                                  'auth' => 's3Cr3T-G4N',
                                  'Logging' => array(
-                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Bank Advance has been Revised by '.$Code,
-                                                 'Description' => 'Bank Advance has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.' Bank Advance has been Revised by '.$Code,
+                                                 'Description' => $RevisiOrNotNotif.'Bank Advance has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                  'URLDirect' => 'budgeting_menu/pembayaran/bank_advance/'.$CodeUrl,
                                                  'CreatedBy' => $this->session->userdata('NIP'),
                                                ),

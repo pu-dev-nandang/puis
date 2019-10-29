@@ -905,11 +905,14 @@ class C_po extends Transaksi_Controler {
               $NIPApprovalNext = $JsonStatus[1]['NIP'];
               $NIP = $this->session->userdata('NIP');
               // Send Notif for next approval
+                  // send revisi or not
+                  $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($Code,'db_purchasing.po_circulation_sheet','Code');
+
                   $data = array(
                       'auth' => 's3Cr3T-G4N',
                       'Logging' => array(
-                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created PO/SPK : '.$Code,
-                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$RevisiOrNotNotif.' PO/SPK : '.$Code,
+                                      'Description' => 'Please approve '.$RevisiOrNotNotif.' PO/SPK '.$Code,
                                       'URLDirect' => 'global/purchasing/transaction/po/list/'.$CodeUrl,
                                       'CreatedBy' => $NIP,
                                     ),
@@ -1609,11 +1612,14 @@ class C_po extends Transaksi_Controler {
               $NIPApprovalNext = $JsonStatus[1]['NIP'];
               $NIP = $this->session->userdata('NIP');
               // Send Notif for next approval
+                  // send revisi or not
+                  $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($Code,'db_purchasing.po_circulation_sheet','Code');
+
                   $data = array(
                       'auth' => 's3Cr3T-G4N',
                       'Logging' => array(
-                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created PO/SPK : '.$Code,
-                                      'Description' => 'Please approve PO/SPK '.$Code,
+                                      'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$RevisiOrNotNotif.' PO/SPK : '.$Code,
+                                      'Description' => 'Please approve '.$RevisiOrNotNotif.' PO/SPK '.$Code,
                                       'URLDirect' => 'global/purchasing/transaction/spk/list/'.$CodeUrl,
                                       'CreatedBy' => $NIP,
                                     ),

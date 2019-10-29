@@ -395,11 +395,13 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                     $NIPApprovalNext = $JsonStatus[1]['NIP'];
                     $CodeUrl = str_replace('/', '-', $Code);
                     // Send Notif for next approval
+                        // send revisi or not
+                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                         $data = array(
                             'auth' => 's3Cr3T-G4N',
                             'Logging' => array(
-                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created SPB : '.$Code.' after edited',
-                                            'Description' => 'Please approve SPB '.$Code.' after edited',
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$RevisiOrNotNotif.' SPB : '.$Code.' after edited',
+                                            'Description' => 'Please approve '.$RevisiOrNotNotif.' SPB '.$Code.' after edited',
                                             'URLDirect' => 'global/purchasing/transaction/spb/list/'.$CodeUrl,
                                             'CreatedBy' => $this->session->userdata('NIP'),
                                           ),
@@ -1348,6 +1350,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                          $CodeUrl = $token;    
 
                          // send notifikasi
+                             // send revisi or not
+                             $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                              $IDdiv = $Departement;
                              $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                              // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -1355,8 +1359,8 @@ class C_spb extends Budgeting_Controler { // SPB / Bank Advance
                              $data = array(
                                  'auth' => 's3Cr3T-G4N',
                                  'Logging' => array(
-                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> SPB has been Revised by '.$Code,
-                                                 'Description' => 'SPB has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.' SPB has been Revised by '.$Code,
+                                                 'Description' => $RevisiOrNotNotif.'SPB has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                  'URLDirect' => 'budgeting_menu/pembayaran/spb/'.$CodeUrl,
                                                  'CreatedBy' => $this->session->userdata('NIP'),
                                                ),
