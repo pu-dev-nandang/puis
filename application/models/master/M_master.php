@@ -80,30 +80,30 @@ class M_master extends CI_Model {
        $sql = "SELECT * FROM db_employees.temp_files AS a WHERE a.user_create = '.$logged_in.' ";
        $query=$this->db->query($sql, array());
         return $query->result_array();
-    
+
        //$query=$this->db->query($sql, result_array());
-        
+
        //$this->db->where("user_create", $logged_in);
        //return $this->db->get("temp_files")->row_array();
     }
-    
-   
+
+
 
     public function save_image() {
 
         //$id_survey = $this->input->post('id_survey');
         //$dates = date("Y-m-d H:i:s");
         $filePath = $upload_data['file_name'];
-    
+
         $data = array(
             'kode_survey_penyewa' => $id_survey,
             'nama_file' => $filePath,
             'user_upload' => $this->session->userdata('user_id'),
             'date_upload' => $dates,
             'ip_address' => $ipget,
-            'mac_address' => $mac_address   
+            'mac_address' => $mac_address
         );
-        
+
         $this->db->insert('upload_foto_survey', $data);
     }
 
@@ -691,7 +691,7 @@ class M_master extends CI_Model {
 
     public function getUserAdmission($Nama)
     {
-        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a 
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
           join db_employees.rule_users as b
           on a.NIP = b.NIP
           where b.IDDivision = 10 and (a.Name like "%'.$Nama.'%" or a.NIP like "%'.$Nama.'%" )
@@ -702,7 +702,7 @@ class M_master extends CI_Model {
 
     public function getUserAdmissionAuth($NIP)
     {
-        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a 
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
           join db_employees.rule_users as b
           on a.NIP = b.NIP
           where b.IDDivision = 10 and a.NIP = ?
@@ -713,7 +713,7 @@ class M_master extends CI_Model {
 
     public function getUserSessAuth($NIP,$IDDivision)
     {
-        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a 
+        $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
           join db_employees.rule_users as b
           on a.NIP = b.NIP
           where b.IDDivision = ? and a.NIP = ?
@@ -944,7 +944,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getMenuUser($NIP,$db = 'db_admission')
     {
-        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,d.`read`,d.`update`,d.`write`,d.`delete`,c.Slug,c.Controller 
+        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,d.`read`,d.`update`,d.`write`,d.`delete`,c.Slug,c.Controller
                 from db_employees.employees as a
                 join '.$db.'.previleges as d
                 on a.NIP = d.NIP
@@ -958,7 +958,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getMenuGroupUser($NIP,$db = 'db_admission')
     {
-        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,x.`read`,x.`update`,x.`write`,x.`delete`,c.Slug,c.Controller 
+        $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,x.`read`,x.`update`,x.`write`,x.`delete`,c.Slug,c.Controller
                 from db_employees.employees as a
                 join '.$db.'.previleges_guser as d
                 on a.NIP = d.NIP
@@ -974,7 +974,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getSubmenu2BaseSubmenu1($submenu1,$db='db_admission')
     {
-        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete
         from '.$db.'.cfg_sub_menu as a  join '.$db.'.previleges as b on a.ID = b.ID_cfg_sub_menu where a.SubMenu1 = ? and b.NIP = ?';
         $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
         return $query;
@@ -982,7 +982,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function getSubmenu1BaseMenu($ID_Menu,$db='db_admission')
     {
-        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete
         from '.$db.'.cfg_sub_menu as a join '.$db.'.previleges as b on a.ID = b.ID_cfg_sub_menu  where a.ID_Menu = ? and b.NIP = ? group by SubMenu1';
         $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
         return $query;
@@ -991,7 +991,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_admission',$IDmenu = null)
     {
         if ($IDmenu != null) {
-            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
             join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
              where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ?';
@@ -999,19 +999,19 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         else
         {
-            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+            $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete
             from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
             join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
              where a.SubMenu1 = ? and c.NIP = ?';
             $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
         }
-        
+
         return $query;
     }
 
     public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_admission')
     {
-        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
+        $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete
         from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
         join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user  where a.ID_Menu = ? and c.NIP = ? group by a.SubMenu1';
         $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
@@ -1588,7 +1588,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
           a.District as DistrictAddress,a.Address,a.ZipCode,a.PhoneNumber,d.Email,n.SchoolName,l.sct_name_id as SchoolType,m.SchoolMajor,e.ctr_name as SchoolCountry,
           n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto
           from db_admission.register_formulir as a
-          JOIN db_admission.register_verified as b 
+          JOIN db_admission.register_verified as b
           ON a.ID_register_verified = b.ID
           JOIN db_admission.register_verification as c
           ON b.RegVerificationID = c.ID
@@ -1842,15 +1842,15 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function CountgetNotificationDivisi()
     {
         $IDDivision = $this->session->userdata('IDdepartementNavigation');
-        $sql = "select count(*) as total from db_notifikasi.notification as a 
-                            join db_notifikasi.n_div as b on a.ID = b.ID_notification 
+        $sql = "select count(*) as total from db_notifikasi.notification as a
+                            join db_notifikasi.n_div as b on a.ID = b.ID_notification
                             where b.StatusRead = 0 and b.Div = ? order by a.Created desc limit 20";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
 
         // Get Notifikasi personal
         $NIP = $this->session->userdata('NIP');
         $dataNotif = $this->db->query('SELECT COUNT(*) as Total FROM db_notifikasi.n_personal np
-                                                LEFT JOIN db_notifikasi.notification n 
+                                                LEFT JOIN db_notifikasi.notification n
                                                 ON (n.ID = np.ID_notification)
                                                 WHERE np.People = "'.$NIP.'"
                                                  AND np.StatusRead = 0 ')->result_array();
@@ -1866,15 +1866,15 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getNotificationDivisi()
     {
         $IDDivision = $this->session->userdata('IDdepartementNavigation');
-        $sql = "select * from db_notifikasi.notification as a 
-                          join db_notifikasi.n_div as b on a.ID = b.ID_notification 
+        $sql = "select * from db_notifikasi.notification as a
+                          join db_notifikasi.n_div as b on a.ID = b.ID_notification
                           where b.Div = ? order by a.ID desc limit 10";
         $query=$this->db->query($sql, array($IDDivision))->result_array();
 
         // Get Notifikasi personal
         $NIP = $this->session->userdata('NIP');
         $dataNotif = $this->db->query('SELECT np.ID AS IDUser, np.Div, np.StatusRead, np.ShowNotif, n.*  FROM db_notifikasi.n_personal np
-                                                LEFT JOIN db_notifikasi.notification n 
+                                                LEFT JOIN db_notifikasi.notification n
                                                 ON (n.ID = np.ID_notification)
                                                 WHERE np.People = "'.$NIP.'"
                                                  ORDER BY n.ID DESC LIMIT 20 ')->result_array();
@@ -1927,12 +1927,12 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         error_reporting(0);
         $arr = array();
-        $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description 
-                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM 
+        $sql = 'select a.*, b.Year,b.EmailPU,c.Name as NameSemester, d.Description
+                from db_finance.payment as a join db_academic.auth_students as b on a.NPM = b.NPM
                 join db_academic.semester as c on a.SemesterID = c.ID
                 join db_finance.payment_type as d on a.PTID = d.ID where a.NPM = ? limit 1';
         $query=$this->db->query($sql, array($NPM))->result_array();
-        
+
         $Year = $query[0]['Year'];
         $db = 'ta_'.$Year.'.students';
         $dt = $this->m_master->caribasedprimary($db,'NPM',$query[0]['NPM']);
@@ -1955,7 +1955,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             'DetailPayment' => $this->m_master->caribasedprimary('db_finance.payment_students','ID_payment',$query[0]['ID']),
         );
 
-        return $arr;        
+        return $arr;
 
     }
 
@@ -1977,14 +1977,14 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                      );
         $token = $this->jwt->encode($data,$key);
 
-        
+
         $saveToDBRegister = $this->saveToNotificationDivisi($token,$Desc,$Created,$ToDiv);
     }
 
     public function saveToNotificationDivisi($token,$Desc,$Created,$ToDiv)
     {
         $ToDiv = explode(',', $ToDiv);
-        for ($i=0; $i < count($ToDiv); $i++) { 
+        for ($i=0; $i < count($ToDiv); $i++) {
             $dataSave = array(
                     'Token' => $token,
                     'Desc' => $Desc,
@@ -2001,7 +2001,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
             $this->db->insert('db_notifikasi.n_div', $dataSave);
         }
-        
+
     }
 
     public function checkTglNow($tglInput)
@@ -2010,10 +2010,10 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 select CURDATE() as skrg
                 ) aa where "'.$tglInput.'" < skrg ';
         $query=$this->db->query($sql, array())->result_array();
-        // print_r($tglInput);   
+        // print_r($tglInput);
         if (count($query) > 0) {
             return false;
-        }     
+        }
         else
         {
             return true;
@@ -2026,10 +2026,10 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 select CURDATE() as skrg
                 ) aa where "'.$a1.'" < "'.$a2.'"';
         $query=$this->db->query($sql, array())->result_array();
-        // print_r($sql);   
+        // print_r($sql);
         if (count($query) > 0) {
             return true;
-        }     
+        }
         else
         {
             return false;
@@ -2063,7 +2063,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $bulan_arr = explode("-",$date);
         $date = $bulan_arr[1];
         switch ($date) {
-            case 1: 
+            case 1:
                 $nama_bulan = "Januari";
                 break;
             case 2:
@@ -2103,7 +2103,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 break;
         }
 
-       return $date = $bulan_arr[2]." ".$nama_bulan." ".$bulan_arr[0];  
+       return $date = $bulan_arr[2]." ".$nama_bulan." ".$bulan_arr[0];
     }
 
     public function checkDB($Database)
@@ -2143,7 +2143,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $URISlug = 'and a.Slug = "'.$URL.'"';
         if ($a[$b] == 1) {
             $URISlug = '';
-            for ($i=0; $i < count($b); $i++) { 
+            for ($i=0; $i < count($b); $i++) {
                 $URISlug .= $a[$i].'/';
             }
             $URISlug = 'and a.Slug like "%'.$URISlug.'%"';
@@ -2161,7 +2161,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $base_url = base_url();
         $currentURL = current_url();
         $URL = str_replace($base_url,"",$currentURL);
-        
+
         // get Access URL
         $getDataSess  = $this->session->userdata('menu_admission_grouping');
         $access = array(
@@ -2289,9 +2289,9 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $(".btn-delete").remove();
                         $(".btn-Active").remove();
                     });
-                     
+
                  });
-                 
+
                  </script>
             ';
             echo $html;
@@ -2338,7 +2338,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                  waitForEl(".btn-delete-menu-auth", function() {
                    $(".btn-delete-menu-auth").remove();
                  });
-                 
+
                  </script>
             ';
             echo $html;
@@ -2347,11 +2347,11 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
     public function dateDifference($date1, $date2)
-    {       
+    {
         $date1=strtotime($date1);
-        $date2=strtotime($date2); 
+        $date2=strtotime($date2);
         $diff = abs($date1 - $date2);
-        
+
         $day = $diff/(60*60*24); // in day
         $dayFix = floor($day);
         $dayPen = $day - $dayFix;
@@ -2393,7 +2393,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $sql = 'select TIMEDIFF("'.$Start.'","'.$End.'") as time';
         $query=$this->db->query($sql, array())->result_array();
         return $query;
-        
+
     }
 
     public function getAllUserAutoComplete($Nama)
@@ -2417,7 +2417,7 @@ d.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 where NIK = "'.$NIP.'"
                 ';
         $query=$this->db->query($sql, array())->result_array();
-        return $query;        
+        return $query;
     }
 
     public function getDataWithoutSuperAdmin()
@@ -2479,7 +2479,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $arr_bulan = array(
             'Jan','Feb','March','April','May','June','July','August','Sep','Oct','Nov','Des'
         );
-        for ($i=0; $i < $diff; $i++) { 
+        for ($i=0; $i < $diff; $i++) {
             $bb = $m;
             if (strlen($bb) == 1) {
                 $bb = '0'.$bb;
@@ -2495,7 +2495,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                $y++;
             }
         }
-        
+
         return $arr;
     }
 
@@ -2507,7 +2507,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 select CONCAT("NA.",ID) as ID, Division as NameDepartement from db_employees.division where StatusDiv = 1
                 ) aa where '.$field.' = ?';
         $query=$this->db->query($sql, array($value))->result_array();
-        return $query;        
+        return $query;
     }
 
     public function BulanInggris($MonthNumber)
@@ -2550,7 +2550,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         elseif ($x < 1000000000)
             return $this->moneySay($x / 1000000) . " juta" . $this->moneySay($x % 1000000);
     }
-    
+
     public function romawiNumber($get = NULL) {
         $rmw[1] = 'I';
         $rmw[2] = 'II';
@@ -2564,7 +2564,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $rmw[10] = 'X';
         $rmw[11] = 'XI';
         $rmw[12] = 'XII';
-        
+
         if (is_null($get)) {
             return $rmw;
         }
@@ -2573,21 +2573,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
     }
 
-    public function dateDiffDays ($d1, $d2) {   
+    public function dateDiffDays ($d1, $d2) {
     // Return the number of days between the two dates:
 
       return round(abs(strtotime($d1)-strtotime($d2))/86400);
 
     }  // end function dateDiff
 
-    public function dateDiffDays_ ($d1, $d2) {   
+    public function dateDiffDays_ ($d1, $d2) {
     // Return the number of days between the two dates:
       // check date d1 sudah melewati hari
       $result = round(abs(strtotime($d1)-strtotime($d2))/86400);
       $chktgl = $this->chktgl($d2,$d1);
       if (!$chktgl) {
             $result = $result -($result * 2);
-      }  
+      }
       return $result;
 
     }  // end function dateDiff
@@ -2597,7 +2597,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $Status = implode(",", $Status);
         $sql = 'select * from db_employees.employees where StatusEmployeeID in ('.$Status.')';
         $query=$this->db->query($sql, array())->result_array();
-        return $query; 
+        return $query;
     }
 
     public function MasterfileStatus($Colom)
@@ -2605,15 +2605,15 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         $sql = 'SELECT ID FROM db_employees.master_files where TypeFiles = "'.$Colom.'" ';
         $query=$this->db->query($sql, array())->result_array();
-        return $query;   
-                                      
+        return $query;
+
     }
 
     public function AuthAPI($arr_content)
     {
         $key = 's3Cr3T-G4N';
         if(array_key_exists("auth",$arr_content))
-        {    
+        {
             if ($arr_content['auth'] == $key) {
                 return true;
             }
@@ -2631,21 +2631,21 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getData_rule_service()
     {
         $sql = 'select a.ID as IDPri,a.*,b.*,c.* from db_employees.rule_service as a
-                left join db_employees.division as b on 
+                left join db_employees.division as b on
                 a.IDDivision = b.ID
                 left join db_employees.service as c
                 on a.IDService = c.ID
                 order by b.ID asc
                 ';
         $query=$this->db->query($sql, array())->result_array();
-        return $query;         
+        return $query;
     }
 
     public function GetSemester($Year,$SemesterSearch)
     {
         $get = $this->showData_array('db_academic.semester');
         $Semester = 0;
-        for ($i=0; $i < count($get); $i++) { 
+        for ($i=0; $i < count($get); $i++) {
             if ($Year == $get[$i]['Year'] && $get[$i]['Code'] == 1) {
                 $Semester++;
             }
@@ -2700,7 +2700,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
         curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10); 
+        curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
         $data = curl_exec($ch);
         curl_close ($ch);
@@ -2713,7 +2713,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
         $sql = 'select * from db_employees.user_qna '.$Q_add;
         $query=$this->db->query($sql, array())->result_array();
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
             $Type1 = $query[$i]['Type'];
             $temp = array('Type' => $Type1);
             $datatemp = array();
@@ -2723,14 +2723,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 'File' => $query[$i]['File'],
             );
 
-            for ($j=$i+1; $j < count($query); $j++) { 
+            for ($j=$i+1; $j < count($query); $j++) {
                 $Type2 = $query[$j]['Type'];
                 if ($Type1 == $Type2) {
                   $datatemp[] = array(
                       'Questions' => $query[$j]['Questions'],
                       'Answers' => $query[$j]['Answers'],
                       'File' => $query[$j]['File'],
-                  );  
+                  );
                 }
                 else
                 {
@@ -2750,6 +2750,50 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $arr_result;
     }
 
+
+    public function userKB($IDDivision = '')
+    {
+        $arr_result = array();
+        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
+        $sql = 'select * from db_employees.knowledge_base '.$Q_add;
+        $query=$this->db->query($sql, array())->result_array();
+        for ($i=0; $i < count($query); $i++) {
+            $Type1 = $query[$i]['Type'];
+            $temp = array('Type' => $Type1);
+            $datatemp = array();
+            $datatemp[] = array(
+                'Desc' => $query[$i]['Desc'],
+                'File' => $query[$i]['File'],
+            );
+
+            for ($j=$i+1; $j < count($query); $j++) {
+                $Type2 = $query[$j]['Type'];
+                if ($Type1 == $Type2) {
+                  $datatemp[] = array(
+                      'Desc' => $query[$j]['Desc'],
+                      'File' => $query[$j]['File'],
+                  );
+                }
+                else
+                {
+                    $i = $j-1;
+                    break;
+                }
+
+                 $i=$j;
+            }
+
+            $temp['data'] = $datatemp;
+            $arr_result[] = $temp;
+
+        }
+
+
+        return $arr_result;
+    }
+
+
+
     public function insert_m_tuition_fee($NPM,$PTID_Q,$ProdiID,$YearAuth,$Invoice_Q,$Discount_Q)
     {
         // untuk semester data diambil dari set tagihan awal, semester lainnya akan baca payment per prodi dan discount sama dengan = 0
@@ -2757,7 +2801,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $query1=$this->db->query($sql1, array($PTID_Q,$ProdiID,$YearAuth))->result_array();
         $PTID = $query1[0]['PTID'];
         for ($k=1; $k <= 14; $k++) {
-                $st = $k; 
+                $st = $k;
                 switch ($PTID) {
                     case 1:
                     case 4:
@@ -2851,27 +2895,27 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             // print_r($j.'--j<br>');
                             // print_r($lastchars.'--lastchars<br>');
                             // print_r($min.'--min<br>');
-                            for ($k=0; $k < count($keyM); $k++) { 
+                            for ($k=0; $k < count($keyM); $k++) {
                                 $t = $keyM[$k];
                                 if ($lastchars ==  $t) {
                                     if ( ($k+1) == count($keyM) ) {
                                         // print_r($str.'--end from last<br>');
                                         //cek lenght string yang diupdate bagian mana
                                         $bool3 = true;
-                                        for ($l=0; $l < $lengthString; $l++) { 
+                                        for ($l=0; $l < $lengthString; $l++) {
                                             if (substr($str, $l,1) != $keyM[$k]) {
                                                 $bool3 = false;
                                                 break;
                                             }
                                         }
-                                        
+
                                         // $str = substr($str, 0,($lengthString+$j) ).$keyM[0];
 
                                         $upd = $keyM[0];
                                         $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
 
                                         $bool4 = true;
-                                        for ($l=0; $l < strlen($str); $l++) { 
+                                        for ($l=0; $l < strlen($str); $l++) {
                                             if (substr($str, $l,1) != $keyM[0]) {
                                                 $bool4 = false;
                                                 break;
@@ -2882,7 +2926,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                             // print_r('--All Last<br>');
                                            $str = $keyM[0].$str;
                                         }
-                                        
+
                                         // print_r($str.'-result<br>');
                                         // print_r($str.'--Last End<br>');
                                         //break;
@@ -2890,7 +2934,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                     else
                                     {
                                         $upd = $keyM[($k+1)];
-                                        // print_r(substr($str, ($lengthString+$j+1),$lengthString).'==str'); 
+                                        // print_r(substr($str, ($lengthString+$j+1),$lengthString).'==str');
                                         $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
                                         $bool2 = false;
                                         // print_r($str.'--loopNaikHruf<br>');
@@ -2902,7 +2946,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             if ($min == $j || (!$bool2) ) {
                                 break;
                             }
-                            
+
                         }
                     }
                 }
@@ -2910,9 +2954,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
             // $WordTime++;
         }
-        
+
         // while ($bool) {
-        //     for ($i=0; $i < count($keyM); $i++) { 
+        //     for ($i=0; $i < count($keyM); $i++) {
         //         if ($inc == $ColNumber) {
         //             $string = $keyM[$i];
         //             $bool = false;
@@ -2928,13 +2972,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         //         else
         //         {
         //             if ($WordTime > 0) {
-                        
+
         //             }
         //         }
         //     }
         //     $WordTime++;
         // }
-        
+
 
         return $string;
     }
@@ -2945,7 +2989,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         $keyM = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
         $bool = true;
         $inc = 0;
-        
+
         while ($bool) {
             $str = '';
             for ($i=0; $i < count($keyM) ; $i++) {
@@ -2968,13 +3012,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             $min = '-'.$lengthString;
                             $min = (int) $min;
                             $lastchars = substr($str, $j,1);
-                            for ($k=0; $k < count($keyM); $k++) { 
+                            for ($k=0; $k < count($keyM); $k++) {
                                 $t = $keyM[$k];
                                 if ($lastchars ==  $t) {
                                     if ( ($k+1) == count($keyM) ) {
                                         //cek lenght string yang diupdate bagian mana
                                         $bool3 = true;
-                                        for ($l=0; $l < $lengthString; $l++) { 
+                                        for ($l=0; $l < $lengthString; $l++) {
                                             if (substr($str, $l,1) != $keyM[$k]) {
                                                 $bool3 = false;
                                                 break;
@@ -2985,7 +3029,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                         $str = substr($str, 0, ($lengthString+$j) ).$upd.substr($str, ($lengthString+$j+1),$lengthString);
 
                                         $bool4 = true;
-                                        for ($l=0; $l < strlen($str); $l++) { 
+                                        for ($l=0; $l < strlen($str); $l++) {
                                             if (substr($str, $l,1) != $keyM[0]) {
                                                 $bool4 = false;
                                                 break;
@@ -2995,7 +3039,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                         if ( ($bool3 || $bool4) && $j == $min) {
                                            $str = $keyM[0].$str;
                                         }
-                                        
+
                                     }
                                     else
                                     {
@@ -3010,14 +3054,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             if ($min == $j || (!$bool2) ) {
                                 break;
                             }
-                            
+
                         }
                     }
                 }
                 $inc++;
             }
         }
- 
+
         return $string;
     }
 
@@ -3026,13 +3070,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         //$path = './uploads/budgeting/pr';
         // Count total files
         $countfiles = count($_FILES[$varFiles ]['name']);
-      
+
       $output = array();
       // Looping all files
       for($i=0;$i<$countfiles;$i++){
             $config = array();
             if(!empty($_FILES[$varFiles ]['name'][$i])){
-     
+
               // Define new $_FILES array - $_FILES['file']
               $_FILES['file']['name'] = $_FILES[$varFiles]['name'][$i];
               $_FILES['file']['type'] = $_FILES[$varFiles]['type'][$i];
@@ -3043,18 +3087,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
               // Set preference
               $config['upload_path'] = $path.'/';
               $config['allowed_types'] = '*';
-              $config['overwrite'] = TRUE; 
+              $config['overwrite'] = TRUE;
               $no = $i + 1;
               $config['file_name'] = $filename.'_'.$no;
 
               $filenameUpload = $_FILES['file']['name'];
               $ext = pathinfo($filenameUpload, PATHINFO_EXTENSION);
               $filenameNew = $filename.'_'.$no.'_'.mt_rand().'.'.$ext;
-     
+
               //Load upload library
-              $this->load->library('upload',$config); 
+              $this->load->library('upload',$config);
               $this->upload->initialize($config);
-     
+
               // File upload
               if($this->upload->do_upload('file')){
                 // Get data about the file
@@ -3088,13 +3132,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 where a.Status = 1
                 GROUP by a.FacultyID';
         $query=$this->db->query($sql, array())->result_array();
-        return $query;  
+        return $query;
 
     }
 
     public function GetDateAfterOrBefore($date=null,$pass = null)
     {
-        /* 
+        /*
            passing data menggunakan tanda (+) atau (-)
            return data dalam bentuk format date time mysql
         */
@@ -3153,7 +3197,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     2 : NIP
                     3 : Division Budgeting
                     4 : url redirect
-    
+
                 */
                $TokenDep = $this->jwt->encode($DIVID_budget,"UAP)(*");
                $TokenURL = $this->jwt->encode($url,"UAP)(*");
@@ -3172,7 +3216,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                        $to = $G_emp[0]['Email'];
                    }
                }
-               
+
                $subject = $text;
                $text = 'Dear Mr/Mrs '.$G_emp[0]['Name'].',<br><br>
                             '.$text.'
@@ -3186,11 +3230,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                </tbody>
                            </table>
                        ';
-               if ($to != '') 
+               if ($to != '')
                {
                  $sendEmail = $this->M_sendemail_budgeting->sendEmail($to,$subject,$text);
-               }                
-              
+               }
+
             }
         }
     }
@@ -3209,7 +3253,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                  2 : NIP
                  3 : Division Budgeting
                  4 : url redirect
-            
+
              */
             $TokenDep = $this->jwt->encode($DIVID_budget,"UAP)(*");
             $TokenURL = $this->jwt->encode($url,"UAP)(*");
@@ -3228,7 +3272,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $to = $G_emp[0]['Email'];
                 }
             }
-            
+
             $subject = $text;
             $text = 'Dear Mr/Mrs '.$G_emp[0]['Name'].',<br><br>
                          '.$text.'
@@ -3242,10 +3286,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             </tbody>
                         </table>
                     ';
-            if ($to != '') 
+            if ($to != '')
             {
               $sendEmail = $this->M_sendemail_budgeting->sendEmail($to,$subject,$text);
-            } 
+            }
         }
     }
 
@@ -3262,7 +3306,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         // $sql = "select * from db_employees.employees
         //         where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
-        //         and SPLIT_STR(PositionMain, '.', 2) <= 12 
+        //         and SPLIT_STR(PositionMain, '.', 2) <= 12
         //         ";
         $sql = "select * from db_employees.employees
                 where SPLIT_STR(PositionMain, '.', 1) = ? and StatusEmployeeID != -1
@@ -3310,12 +3354,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         if (count($G_dt) == 0) {
               // save default daya tampung
               $G_prodi = $this->caribasedprimary('db_academic.program_study','Status',1);
-              for ($i=0; $i < count($G_prodi); $i++) { 
+              for ($i=0; $i < count($G_prodi); $i++) {
                     $ProdiID = $G_prodi[$i]['ID'];
                     $dataSave = array(
                          'ID_crm_period' => $ID_crm_period,
                          'ProdiID' => $ProdiID,
-                         'Capacity' => 0,   
+                         'Capacity' => 0,
                     );
 
                     $this->db->insert('db_admission.ta_setting',$dataSave);
@@ -3328,8 +3372,8 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     {
         $whereFiltering = '';
 
-        $sql = 'select a.Year,a.Name,b.ID as ID_ta_setting,b.ID_crm_period,b.ProdiID,b.Capacity,c.Name as ProdiNameInd,c.NameEng as ProdiNameEng 
-                from db_admission.crm_period as a 
+        $sql = 'select a.Year,a.Name,b.ID as ID_ta_setting,b.ID_crm_period,b.ProdiID,b.Capacity,c.Name as ProdiNameInd,c.NameEng as ProdiNameEng
+                from db_admission.crm_period as a
                 join db_admission.ta_setting as b on a.ID = b.ID_crm_period
                 join db_academic.program_study as c on b.ProdiID = c.ID
                 ';
@@ -3347,7 +3391,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function getDateIndonesian($date){
     	date_default_timezone_set("Asia/Jakarta");
     	setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
-    	
+
         $e = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? '%#d' : '%e';
         $data = strftime($e." %B %Y",strtotime($date));
 
@@ -3363,12 +3407,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $sql = "show databases like '".$like."%'";
             $query=$this->db->query($sql, array())->result_array();
             for ($i=0; $i < count($query); $i++) {
-                $variable = $query[$i]; 
+                $variable = $query[$i];
                 foreach ($variable as $key => $value) {
                     $data[] = $value;
                 }
             }
-        return $data;    
+        return $data;
     }
 
     public function cekConectDb($vardb = 'server22')
@@ -3380,12 +3424,12 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         else{
             return true;
-        } 
+        }
     }
 
     public function deleteDir($dirPath) {
         $dir = $dirPath;
-        
+
         $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
         $files = new RecursiveIteratorIterator($it,
                     RecursiveIteratorIterator::CHILD_FIRST);
@@ -3398,6 +3442,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         rmdir($dir);
     }
+
 
     public function auth_access_aps_rs()
     {
