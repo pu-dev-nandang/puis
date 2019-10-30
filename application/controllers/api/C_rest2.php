@@ -795,11 +795,14 @@ class C_rest2 extends CI_Controller {
                                     // Notif to next step approval & User
                                         $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                         // Send Notif for next approval
+                                            // send revisi or not
+                                            $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($Code,'db_purchasing.po_circulation_sheet','Code');
+
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
-                                                                'Description' => 'Please approve PO/SPK '.$Code,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.' PO/SPK : '.$Code,
+                                                                'Description' => 'Please approve '.$RevisiOrNotNotif.' PO/SPK '.$Code,
                                                                 'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
@@ -3366,11 +3369,12 @@ class C_rest2 extends CI_Controller {
                                 // Notif to next step approval & User
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     // Send Notif for next approval
+                                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
-                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$RevisiOrNotNotif.$G_data[0]['Type'],
                                                             'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -3981,6 +3985,8 @@ class C_rest2 extends CI_Controller {
                                             $CodeDept = $G_div[0]['Code'];
                                            
                                             // Send Notif for next approval
+                                                // send revisi or not
+                                                $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                                 $data = array(
                                                     'auth' => 's3Cr3T-G4N',
                                                     'Logging' => array(
@@ -4644,7 +4650,7 @@ class C_rest2 extends CI_Controller {
                              $queryPass = $sql;
                              // encode query pass
                              $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
-
+                             // print_r($sql);die();
                              $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                              $query = $this->db->query($sql)->result_array();
                              $No = $requestData['start'] + 1;
@@ -4728,6 +4734,14 @@ class C_rest2 extends CI_Controller {
                              }
                          }
 
+                         if (array_key_exists('SearchKategoriKegiatan', $dataToken)) {
+                             $FwhereAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                             if ($dataToken['SearchKategoriKegiatan'] != '' && $dataToken['SearchKategoriKegiatan'] != '%') {
+                                 $WhereFiltering .= $FwhereAnd.' z.Kategori_kegiatan="'.$dataToken['SearchKategoriKegiatan'].'" '; 
+                             }
+                             
+                         }
+
                          if (array_key_exists('Active', $dataToken)) {
                              if ($dataToken['Active'] == 1) {
                                  $dd = ' a.EndDate >= "'.date('Y-m-d').'" ';
@@ -4750,7 +4764,7 @@ class C_rest2 extends CI_Controller {
 
                          $sqltotalData = '
                             select count(*) as total from(
-                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate from db_cooperation.kegiatan as z
+                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan from db_cooperation.kegiatan as z
                                 join (
                                     select a.ID from db_cooperation.kerjasama as a
                                      join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
@@ -4762,7 +4776,7 @@ class C_rest2 extends CI_Controller {
                             ';
 
                         $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
-                        $sqltotalData .= $WhereORAnd.' (           
+                        $sqltotalData .= $WhereFiltering.$WhereORAnd.' (           
                                z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%"
@@ -4773,6 +4787,7 @@ class C_rest2 extends CI_Controller {
 
                          $sql = '
                                     select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Desc,z.KerjasamaID,z.SemesterID,
+                                    z.Kategori_kegiatan,
                                     x.Lembaga, x.Kategori,x.Tingkat,
                                     (
                                     select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.keg_department as zz
@@ -4814,7 +4829,7 @@ class C_rest2 extends CI_Controller {
                          $queryPass = $this->jwt->encode($queryPass,"UAP)(*"); 
 
                          $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And'; 
-                         $sql .= $WhereORAnd.' (           
+                         $sql .= $WhereFiltering.$WhereORAnd.' (           
                                 z.JudulKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                 z.BentukKegiatan LIKE "'.$requestData['search']['value'].'%" or
                                 z.ManfaatKegiatan LIKE "'.$requestData['search']['value'].'%"
@@ -4831,7 +4846,7 @@ class C_rest2 extends CI_Controller {
                                  $TokenLinkSearch = $this->jwt->encode($row['Lembaga'],"UAP)(*");
                                  //$nestedData[] = '<a href="'.base_url().'cooperation/kerjasama-perguruan-tinggi/master/'.$TokenLinkSearch.'">'.$row['Lembaga'].'</a><br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
                                  $nestedData[] = '<a href="javascript:void(0)">'.$row['Lembaga'].'</a><br/>'.'<div style = "color : red">Kategori : '.$row['Kategori'].'</div>'.'<div style = "color : red">Tingkat : '.$row['Tingkat'].'</div>';
-                                 $nestedData[] = $row['JudulKegiatan'];
+                                 $nestedData[] = $row['JudulKegiatan'].'<br/>'.'<div style = "color : red">Kategori : '.$row['Kategori_kegiatan'].'</div>';
                                  $nestedData[] = $row['BentukKegiatan'];
                                  $nestedData[] = $row['ManfaatKegiatan'];
                                  $nestedData[] = 'Start : '.$row['StartDate'].'<br/>End : '.$row['EndDate'];
@@ -4851,6 +4866,7 @@ class C_rest2 extends CI_Controller {
                                       'Desc' => $row['Desc'],
                                       'ID' => $row['ID'],
                                       'SemesterID' => $row['SemesterID'],
+                                      'Kategori_kegiatan' => $row['Kategori_kegiatan'],
                                  ];
                                  // encode data
                                  $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
@@ -4873,7 +4889,7 @@ class C_rest2 extends CI_Controller {
                         $Year = date('Y');
                         $Year3 = $Year - 2;
                         $sqltotalData = 'select count(*) as total from (
-                                    select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,x.Lembaga,x.EndDate,yy.Departement
+                                    select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.Kategori_kegiatan,x.Lembaga,x.EndDate,yy.Departement
                                     from db_cooperation.kegiatan as z
                                         join db_cooperation.kerjasama as x on z.KerjasamaID = x.ID
                                         join db_cooperation.keg_department as yy on z.ID = yy.KegiatanID
@@ -4882,6 +4898,13 @@ class C_rest2 extends CI_Controller {
                         if (array_key_exists('ProdiID', $dataToken)) {
                             $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And';
                             $WhereFiltering .= $WhereORAnd.' yy.Departement = "AC.'.$dataToken['ProdiID'].'" ';
+                            // $sqltotalData .= $WhereFiltering;  
+                        }
+                        if (array_key_exists('Kategori_kegiatan', $dataToken)) {
+                            $WhereORAnd = ($WhereFiltering == '') ? ' where ' : ' And';
+                            if ($dataToken['Kategori_kegiatan'] != '%' && $dataToken['Kategori_kegiatan'] != '') {
+                                 $WhereFiltering .= $WhereORAnd.' z.Kategori_kegiatan = "'.$dataToken['Kategori_kegiatan'].'" ';
+                            }
                             // $sqltotalData .= $WhereFiltering;  
                         }
                         $sqltotalData .= $WhereFiltering;  
@@ -4896,7 +4919,7 @@ class C_rest2 extends CI_Controller {
                         $querytotalData = $this->db->query($sqltotalData)->result_array();
                         $totalData = $querytotalData[0]['total'];
 
-                        $sql = 'select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,x.Lembaga,z.KerjasamaID,
+                        $sql = 'select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan,x.Lembaga,z.KerjasamaID,
                                 if(x.Tingkat = "Nasional",1,0) as Nasional,if(x.Tingkat = "Internasional",1,0) as Internasional,
                                 if(x.Tingkat= "Lokal",1,0) as Lokal,x.BuktiName,x.BuktiUpload,z.SemesterID,y.Name as SemesterName,x.Kategori
                                 from db_cooperation.kegiatan as z
@@ -4956,9 +4979,12 @@ class C_rest2 extends CI_Controller {
                           $nestedData[] = $row['JudulKegiatan'];
                           $nestedData[] = $row['ManfaatKegiatan'];
                           $nestedData[] = $this->m_master->getDateIndonesian($row['StartDate']);
-                          $nestedData[] = $row['Kategori'];
+                          // $nestedData[] = $row['Kategori'];
+                          $nestedData[] = $row['Kategori_kegiatan'];
                           $nestedData[] = $row['KerjasamaID'];
                           $nestedData[] = $row['ID'];
+                          $Durasi = $this->m_master->dateDiffDays ($row['StartDate'], $row['EndDate']);
+                          $nestedData[] = $Durasi;
                           $data[] = $nestedData;
                           $No++;
                       }

@@ -17,7 +17,7 @@
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='tracer-alumni'){echo"current";}?>">
-                <a href="<?php echo base_url('student-life/tracer-alumni/list');?>">
+                <a href="<?php echo base_url('student-life/tracer-alumni');?>">
                     <i class="fa fa-share-square"></i>
                     Tracer Alumni
                 </a>

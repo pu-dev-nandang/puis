@@ -648,7 +648,7 @@ class C_save_to_excel2 extends CI_Controller
 
             $st++;
             $huruf = $this->m_master->HurufColExcelNumber($st);
-            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori_kegiatan'] );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
     		$Internasional = '';
@@ -895,6 +895,9 @@ class C_save_to_excel2 extends CI_Controller
         $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_col);
 
         $r++;
+        $c_nas = 0;
+        $c_int = 0;
+        $c_lokal = 0;
         for ($i=0; $i < count($data); $i++) { 
             $No = $i+1;
             $row = $data[$i];
@@ -911,13 +914,13 @@ class C_save_to_excel2 extends CI_Controller
 
             $st++;
             $huruf = $this->m_master->HurufColExcelNumber($st);
-            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori'] );
+            $excel->setActiveSheetIndex(0)->setCellValue($huruf.$r, $data[$i]['Kategori_kegiatan'] );
             $excel->getActiveSheet()->getStyle($huruf.$r)->applyFromArray($style_row);
 
             $Internasional = '';
             if ($data[$i]['Internasional'] == 1) {
                 // print_r('Internasional == '.$data[$i]['Internasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-                if ($data[$i]['Kategori'] == 'Tridarma') {
+                if ($data[$i]['Kategori_kegiatan'] == 'Tridarma') {
 
                     $c_int++;
                     // print_r('int => '.$c_int.'<br/>');
@@ -928,7 +931,7 @@ class C_save_to_excel2 extends CI_Controller
             $Nasional = '';
             if ($data[$i]['Nasional'] == 1 ) {
                 // print_r('Nasional == '.$data[$i]['Nasional'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-                if ($data[$i]['Kategori'] == 'Tridarma') {
+                if ($data[$i]['Kategori_kegiatan'] == 'Tridarma') {
                     $c_nas++;
                     // print_r('nas => '.$c_nas.'<br/>');
                 }
@@ -938,7 +941,7 @@ class C_save_to_excel2 extends CI_Controller
             $Lokal = '';
             if ($data[$i]['Lokal'] == 1) {
                 // print_r('Lokal == '.$data[$i]['Lokal'].';Kategori == '.$data[$i]['Kategori'].'<br/>');
-                if ($data[$i]['Kategori'] == 'Tridarma') {
+                if ($data[$i]['Kategori_kegiatan'] == 'Tridarma') {
                     $c_lokal++;
                     // print_r('lokal => '.$c_lokal.'<br/>');
                 }
@@ -996,7 +999,7 @@ class C_save_to_excel2 extends CI_Controller
 
             $r++;
         }
-
+        // die();
         $excel->getActiveSheet()->getColumnDimension('A')->setWidth(5);
         $excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
         $excel->getActiveSheet()->getColumnDimension('C')->setWidth(15);

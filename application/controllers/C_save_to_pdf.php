@@ -6278,10 +6278,21 @@ Phone: (021) 29200456';
             $namahari = date('l', strtotime($dataRequest[0]['StartDate']));
             $starthari =  $daftar_hari[''.$namahari];
 
+            $namahari2 = date('l', strtotime($dataRequest[0]['EndDate']));
+            $starthari2 =  $daftar_hari[''.$namahari2];
+
+            if($starthari == $starthari2) {
+                    $hariyax = date('l', strtotime($dataRequest[0]['StartDate']));
+                    $hariday =  $daftar_hari[''.$hariyax];
+            }else {
+                    $hariday = $starthari.' - '.$starthari2;
+
+            }
+
             $date1 = $this->getDateIndonesian($dataRequest[0]['StartDate']);
             $date2 = $this->getDateIndonesian($dataRequest[0]['EndDate']);
 
-            if($date1 = $date2) {
+            if($date1 == $date2) {
                     $tanggalx = $this->getDateIndonesian($dataRequest[0]['StartDate']);
             }else {
                     $tanggalx = $date1.' s/d '.$date2;
@@ -6329,7 +6340,7 @@ Phone: (021) 29200456';
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(true, 0);
 
-        $pdf->Image(base_url('images/FA_letterhead_a4_r2.jpg'),0,0,210);
+        $pdf->Image('./images/FA_letterhead_a4_r2.jpg',0,0,210);
 
         $pdf->Ln(30);
         $pdf->SetFont('Arial','B',13);
@@ -6384,20 +6395,21 @@ Phone: (021) 29200456';
         $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
 
         //$pdf->SetFont('Arial','B',10);
-        $pdf->Ln(3);
-        $pdf->Cell(0,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
+        //$pdf->Ln(3);
+        //$pdf->MultiCell(145,5,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
+        $pdf->MultiCell(185, $h,'Untuk menghadiri '.$nametask.' pada :', 0, 'L',false);
 
         $pdf->Ln(3);
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Hari',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
-        $pdf->Cell(145,$h,$starthari,0,1,'L');
+        $pdf->Cell(145,$h,$hariday,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         //$pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
-        $pdf->Cell(145,$h,$tanggalx,0,1,'L');
+        $pdf->Cell(145,$h,$tanggalx,0,1,'L'); 
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
@@ -6418,8 +6430,8 @@ Phone: (021) 29200456';
         $pdf->SetFont('Arial','',11);
         $y = $pdf->GetY()+20;
 
-        $pdf->Image(base_url('images/cap.png'),130,$y+1,40);
-        $pdf->Image(base_url('uploads/signature/2617100.png'),130,$y+4,40);
+        $pdf->Image('./images/cap.png',130,$y+1,40);
+        $pdf->Image('./uploads/signature/2617100.png',130,$y+4,40);
 
 
         $pdf->Ln(11);

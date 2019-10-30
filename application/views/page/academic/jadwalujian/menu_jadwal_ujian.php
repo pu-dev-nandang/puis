@@ -2,7 +2,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li>
-            <a href="<?php echo base_url('academic/exam-schedule/list-exam'); ?>">List Exam Schedule</a>
+            <a href="<?php echo base_url('academic/exam-schedule'); ?>">List Exam Schedule</a>
         </li>
         <li>
             <a href="<?php echo base_url('academic/exam-schedule/list-waiting-approve'); ?>">List Waiting Approve</a>
@@ -34,7 +34,7 @@
     $(document).ready(function () {
 
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['list-exam','list-waiting-approve','set-exam-schedule','exam-setting','exam-barcode'];
+        var arrMenu = ['','list-waiting-approve','set-exam-schedule','exam-setting','exam-barcode'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
 
     });

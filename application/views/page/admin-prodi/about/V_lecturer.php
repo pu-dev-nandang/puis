@@ -6,8 +6,9 @@
             <tr>
                 <td style="width: 15%;">Name Lecture</td>
                 <td style="width: 1%;">:</td>
+                
                 <td>
-                    <input type="text" id="NameLecture" class="form-control required" placeholder="Input name Lecture">
+                      <select style="width: 100%;" id="NIP" ></select>
                 </td>
             </tr>
             <tr>
@@ -15,7 +16,7 @@
                 <td style="width: 1%;">:</td>
                 <td>
                   <input type="file" id="uploadFile" name="uploadFile" accept="jpg/png">
-                  <span class="red">* Size weight x height 140px x 100px</span>
+                  <span class="red">* Size weight x height 200px x 200px</span>
                 </td>
             </tr>
             <tr>
@@ -64,24 +65,25 @@
 
 <script>
 $(document).ready(function () {
-    window.G_Type = 'Lecture';
+    
     loadDataLecture();
+    LoadNama();
 });
 function loadDataLecture() {
     var data = {
         action : 'loadDataLecturer',
-        Type : G_Type
+        
     };
     var token = jwt_encode(data,'UAP)(*');
     var url = base_url_js+'api-prodi/__crudDataProdi';
-    var locimg = base_url_js+'images/Lecture/';
+    var locimg = base_url_js+'images/Lecturer/';
     $.post(url,{token:token},function (jsonResult) {
         $('#viewDataDesc').empty();
         if(jsonResult.length>0){
 
             $.each(jsonResult,function (i,v) {
-                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Images+'"  width="100%">'+
-                      '<p><b>'+v.Name+'</b></p>'+
+                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  width="800vw">'+
+                      '<p><b>'+v.NIP+'||'+v.Name+'</b></p>'+
                        '<p>'+
                         // ' <a href="#" data-toggle="modal" data-target="#form-modal" data-id="'+v.ID+'" token = "'+v.token+'" class="btn-form-ubah"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
                         ' <a href="" data-id="'+v.ID+'" data-toggle="modal" data-target="#delete-modal" class="btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
@@ -96,47 +98,47 @@ function loadDataLecture() {
 
     });
 }
+function LoadNama() { // load data student
+        var selector =$('#NIP');
+        var url = base_url_js+'api/__getDosenSelectOption';
+        var data = {
+            auth : 's3Cr3T-G4N',
+            mode : 'showDataDosen'
+        };
+        var token = jwt_encode(data,"UAP)(*");
+        $.post(url,{ token:token },function (resultJson) {
+            
+        }).done(function(resultJson) {
+            //var response = jQuery.parseJSON(resultJson);
+            selector.empty()
+            for (var i = 0; i < resultJson.length; i++) {
+                var NIP = resultJson[i].NIP
+                var Name = resultJson[i].Name
+                selector.append(
+                    ' <option value="'+NIP+'">'+NIP+'|'+Name+'</option>'
+                    )
 
-// $(document).on('click', '.Edit', function(){
-//     var ID = $(this).attr('data-id');
-//     if(ID!='' && ID!=null){
-//         loadDataForm();
-//     }
+            }
+            selector.select2({
+                //allowClear: true
 
-// });
+            });
+        }).fail(function() {
+          toastr.info('No Result Data');
+        }).always(function() {
+                        
+        }); 
 
-// function loadDataForm() {
-//     var NameLecture = $('#NameLecture').val();
-//         if(NameLecture!='' && NameLecture!=null){
-//             var data = {
-//                 action : 'readDataLecture',
-//                 NameLecture : NameLecture
-//             };
-//             var token = jwt_encode(data,'UAP)(*');
-//             var url = base_url_js+'api-prodi/__crudDataProdi';
-//             $.post(url,{token:token},function (jsonResult) {
-//                 if(jsonResult.length>0){
-                   
-//                     $('#NameLecture').val(jsonResult[0].Tlp);
-//                 } else {
-                    
-//                     $('#NameLecture').val('');
-//                 }
-
-//             });
-//         }
-// }
-
+    }
 
 $('#btnSave').click(function () {
-    
-    var NameLecture = $('#NameLecture').val(); 
+   
+    var NIP = $('#NIP').val(); 
     var thisbtn = $(this);
     var form_data = new FormData();
     var find = true;
 
-    if(NameLecture!='' && NameLecture!=null &&
-        uploadFile!='' && uploadFile!=null){
+    
         // upload file
         $('input[type="file"]').each(function(){
             var IDFile = $(this).attr('id');
@@ -157,9 +159,9 @@ $('#btnSave').click(function () {
                 }
             }
             var data = {
-                action : 'saveDataLecture',
+                action : 'saveDataLecturer',
                 dataForm:{
-                  NameLecture : NameLecture,
+                  NIP : NIP,
                 }
             };
           
@@ -189,13 +191,14 @@ $('#btnSave').click(function () {
               }
             })
         }
-    }
+    
 });
 // Fungsi ini akan dipanggil ketika tombol hapus diklik
 $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
   id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
   $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
 })
+
 // DELETE
 $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
     var ID = $(this).attr('data-id');
@@ -203,7 +206,7 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
     var thisbtn = $(this);
     loading_button('#btn-hapus'); // Munculkan loading hapus
     var data = {
-                action : 'deleteDataLecture',
+                action : 'deleteDataLecturer',
                 ID : ID,
               };
     var form_data = new FormData();
@@ -239,6 +242,7 @@ $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { //
   $('#form-modal').on('hidden.bs.modal', function (e){ // Ketika Modal Dialog di Close / tertutup
     $('#form-modal input, #form-modal select, #form-modal textarea').val('') // Clear inputan menjadi kosong
   }) 
+
   function file_validation2(ev,TheName = '')
   {
       var files = ev[0].files;

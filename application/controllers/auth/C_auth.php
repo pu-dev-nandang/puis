@@ -19,6 +19,63 @@ class C_auth extends Globalclass {
         $this->db = $this->load->database('default', TRUE);
     }
 
+    public function dataSinta(){
+
+        $api_key = 'a39e735fd5049ba1f7ff0b4e05c9f207';
+        $NIDN = '0025106201';
+        $limit = '&offset=0&limit=10';
+
+        $str = 'GET : http://sinta2.ristekdikti.go.id/api/author?api_key='.$api_key.'&nidn='.$NIDN.'
+GET : http://sinta2.ristekdikti.go.id/api/gsdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/scopusdocs?api_key='.$api_key.'&nidn='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authors?api_key='.$api_key.'&afiliasi_id=384'.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authorbooks?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/authoriprs?api_key='.$api_key.'&id='.$NIDN.''.$limit.'
+GET : http://sinta2.ristekdikti.go.id/api/affiliation?api_key='.$api_key.'&kode=002001
+GET : http://sinta2.ristekdikti.go.id/api/countauthors?api_key='.$api_key.'&kode_pt=001002&verified=1
+GET : http://sinta2.ristekdikti.go.id/api/countcitations?api_key='.$api_key.'&kode_pt=001002';
+
+        $str_arr = explode('GET : ',$str);
+        $listApi = [];
+        if(count($str_arr)>0){
+            for($i=0;$i<count($str_arr);$i++){
+                if($str_arr[$i]!=''){
+                    array_push($listApi,$str_arr[$i]);
+                }
+            }
+        }
+
+        $data['listApi'] = $listApi;
+        $this->load->view('template/sementara',$data);
+
+//        print_r($listApi);
+
+    }
+
+    public function cekFile()
+    {
+        $data = $this->db->query('SELECT f.NIP, em.Name, f.ID AS FID ,f.NameUniversity, u.ID FROM db_employees.files f 
+                                            LEFT JOIN db_research.university u ON (f.NameUniversity = u.Code_University)
+                                            LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                            WHERE f.NameUniversity IS NOT NULL
+                                            ORDER BY f.NameUniversity')->result_array();
+
+        // print_r($data);
+        // exit;
+
+        $result = [];
+        for($i=0;$i<count($data);$i++){
+            $d = $data[$i];
+
+            if(!is_numeric($d['NameUniversity'])){
+
+
+                array_push($result, $data[$i]);
+            }
+        }
+        print_r($result);
+    }
+
     public function get_auth()
     {
         $username = $this->input->post('username');

@@ -296,7 +296,7 @@ class C_agregator extends Globalclass {
     }
 
     public function tempat_kerja_lulusan(){
-        $viewPage = 'kepuasan_pengguna_lulusan';
+        $viewPage = 'tempat_kerja_lulusan';
         $accessUser = $this->agregatorPrevilege($viewPage);
         $data['accessUser'] = $accessUser;
         $page = $this->load->view('page/agregator/'.$viewPage,$data,true);

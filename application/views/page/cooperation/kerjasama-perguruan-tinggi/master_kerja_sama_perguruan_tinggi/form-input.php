@@ -207,7 +207,7 @@
 			      {
 			         'targets': 2,
 			         'render': function (data, type, full, meta){
-			             return full.Name1;
+			             return full.Name2;
 			         }
 			      },
 		      ],

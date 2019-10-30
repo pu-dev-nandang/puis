@@ -4,7 +4,7 @@
     $ServerName = $_SERVER['SERVER_NAME'];
 ?>
 
-    <div id="sidebar-content" class="<?= ($ServerName=='localhost') ? '' : 'hide' ?>" >
+    <div id="sidebar-content" class="<?= ($ServerName=='localhost') ? '' : '' ?>" >
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- <li  class="dropdown <?php if($this->uri->segment(3,0)=='dashboard'){echo "current";} ?>">
@@ -28,12 +28,12 @@
                                 Why Choose us?
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='calltoaction'){echo "current";} ?>">
+                        <!-- <li class="<?php if($this->uri->segment(3)=='calltoaction'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/calltoaction'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Call to action
                                 </a>
-                        </li>
+                        </li> -->
                        
                         <li class="<?php if($this->uri->segment(3)=='testimoni'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/beranda/testimoni'); ?>">
@@ -71,7 +71,7 @@
                         <li class="<?php if($this->uri->segment(3)=='struktur'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/about/sambutan'); ?>">
                                 <i class="icon-angle-right"></i>
-                                Strukture Organisasi
+                                Organizational Structure
                                 </a>
                         </li>
                         <li class="<?php if($this->uri->segment(3)=='lecturer'){echo "current";} ?>">
@@ -80,8 +80,8 @@
                                 Lecturer
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='fasilitas'){echo "current";} ?>">
-                                <a href="<?php echo base_url('prodi/about/fasilitas'); ?>">
+                        <li class="<?php if($this->uri->segment(3)=='facilities'){echo "current";} ?>">
+                                <a href="<?php echo base_url('prodi/about/facilities'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Facilities
                                 </a>
@@ -89,7 +89,7 @@
                         
                     </ul>
             </li>
-            <li class="<?php if($this->uri->segment(3)=='choose'){echo "penelitian";} ?>">
+            <!-- <li class="<?php if($this->uri->segment(3)=='choose'){echo "penelitian";} ?>">
                 <a href="<?php echo base_url('penelitian'); ?>">
                     <i class="fa fa-flask"></i>
                     Research
@@ -110,22 +110,22 @@
                     
                 </a>
             </li>
-            <!-- <li>
+            <li>
                 <a href="<?php echo base_url('Penelitian'); ?>">
                     <i class="fa fa-tachometer"></i>
                     Alumni
                     
                 </a>
-            </li> -->
+            </li>
             <li class="<?php if($this->uri->segment(3)=='galeri'){echo "current";} ?>">
                 <a href="<?php echo base_url('galeri'); ?>">
                     <i class="fa fa-th-large"></i>
                     Gallery
                     
                 </a>
-            </li>
-            <li class="<?php if($this->uri->segment(3)=='kontak'){echo "current";} ?>">
-                <a href="<?php echo base_url('kontak'); ?>">
+            </li> -->
+            <li class="<?php if($this->uri->segment(3)=='contact'){echo "current";} ?>">
+                <a href="<?php echo base_url('prodi/contact'); ?>">
                     <i class="fa fa-phone"></i>
                    Contact
                     

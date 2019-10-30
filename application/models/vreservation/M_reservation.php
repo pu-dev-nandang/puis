@@ -2427,21 +2427,25 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $CaseApproveAccess = $ApproveAccess($getRoom,$Status1,$Status,$query[$i]['CreatedBy']);
                 switch ($CaseApproveAccess) {
                     case 0:
-                         $StatusBooking = 'Awaiting approval Marcomm Division';
+                         $StatusBooking = 'Awaiting<br/> Approval Marcomm Division';
                          break;
                     case 1:
                     case 2:
                         // find nama approval
                         $NameApprover = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $StatusBooking = 'Awaiting approval 1 : '.$NameApprover;
+                        $StatusBooking = 'Awaiting<br/><span style = "color:red;"> App 1 : '.$NameApprover.'</span>';
                         break;
                     case 3:
                     case 4:
-                        $NameApprover = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $StatusBooking = 'Awaiting approval 2 : '.$NameApprover;
+                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Awaiting<li><span style = "color:#0968b3;"> App 1 : '.$NameApprover1.'</span></li><li><span style = "color:red;"> App 2 : '.$NameApprover2.'</span></li>';
                         break;
                     case 5:
-                        $StatusBooking = 'Approved';
+                        // $StatusBooking = 'Approved';
+                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $StatusBooking = 'Approved<li><span style = "color:#0968b3;">App 1 : '.$NameApprover1.'</span></li><li><span style = "color:#0968b3;">App 2 : '.$NameApprover2.'</span></li>';
                         break;    
                     default:
                         # code...
@@ -3817,7 +3821,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             case 'Division':
                                 $getApprover1 = $this->m_master->caribasedprimary('db_employees.division','ID',$Approver1[$l]->Approver);
                                 for ($k=0; $k < count($getApprover1); $k++) {
-                                   $Name =  $getApprover1[$k]['Division']; 
+                                   $Name =  $getApprover1[$k]['Abbreviation']; 
                                 }
                                 break;
 
@@ -3842,7 +3846,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 switch ($TypeApprover) {
                     case 'Division':
                         $DivisionApprove = $this->m_master->caribasedprimary('db_employees.division','ID',$rdata->Approver);
-                        $Name = $DivisionApprove[0]['Division'];
+                        $Name = $DivisionApprove[0]['Abbreviation'];
                         $bool = true;
                         break;
                     case 'Employees':

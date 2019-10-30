@@ -29,6 +29,16 @@
 				</table>
 			</div>
 			<div class="form-group">
+				<label>Kategori Kegiatan</label>
+				<select class="form-control input" name ="Kategori_kegiatan">
+					<option disabled selected value="!">--Pilih--</option>
+					<option value="PKM">PKM</option>
+					<option value="Penelitian">Penelitian</option>
+					<option value="Pendidikan">Pendidikan</option>
+					<option value="Tridarma">Tridarma</option>
+				</select>
+			</div>
+			<div class="form-group">
 				<label>Judul Kegiatan</label>
 				<input type="text" name="JudulKegiatan" class="form-control input">
 			</div>
@@ -93,11 +103,16 @@
         	format: 'yyyy-MM-dd',autoclose: true, minView: 2,pickTime: false,
         });
         // $('.input:first').focus();
-        $('input:not([type="checkbox"])').val('');
+        $('input:not([type="checkbox"]):not([type="search"])').val('');
         $('.inputshow').val('');
         $('#btnSave').attr('mode','add');
         $('#btnSave').attr('data-id','');
         $('.ListDepartmentSelected').html('<strong>--Empty Department Selected--</strong>');
+        $('.input[name = "Kategori_kegiatan"] option').filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == '!'; 
+        }).prop("selected", true);
+        $('.input[name = "Kategori_kegiatan"]').prop('disabled',false);
 	}
 
 	function loadSelectOptionSemesterByload(element,selected) {
@@ -116,6 +131,27 @@
 	       }
 	    });
 	}
+
+	$(document).off('change', '.input[name="KerjasamaID"]').on('change', '.input[name="KerjasamaID"]',function(e) {
+		var kategori = $(this).attr('kategori');
+		// console.log(kategori);
+		var k = $('.input[name="Kategori_kegiatan"] option:selected').val();
+		if (kategori != 'Tridarma') {
+			$('.input[name = "Kategori_kegiatan"] option').filter(function() {
+			   //may want to use $.trim in here
+			   return $(this).val() == kategori; 
+			}).prop("selected", true);
+			$('.input[name = "Kategori_kegiatan"]').prop('disabled',true);
+		}
+		else
+		{
+			$('.input[name = "Kategori_kegiatan"] option').filter(function() {
+			   //may want to use $.trim in here
+			   return $(this).val() == kategori; 
+			}).prop("selected", true);
+			$('.input[name = "Kategori_kegiatan"]').prop('disabled',false);
+		}
+	})
 
 	$(document).off('click', '.SearchKerjasamaID').on('click', '.SearchKerjasamaID',function(e) {
 		// get for untuk trigger search atau input
@@ -190,7 +226,7 @@
 			      {
 			         'targets': 2,
 			         'render': function (data, type, full, meta){
-			             return full.Name1;
+			             return full.Name2;
 			         }
 			      },
 		      ],
@@ -322,7 +358,8 @@
 		  		toastr.error("Connection Error, Please try again", 'Error!!');
 			}
 		  	else{
-		  		LoadDataForTable();
+		  		// LoadDataForTable();
+		  		oTable.ajax.reload( null, false );
 		  		SetDataDefault();
 		  		toastr.success('Data Saved');
 			}

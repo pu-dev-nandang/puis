@@ -22,6 +22,7 @@
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
             '                <th style="width: 20%;">Name</th>' +
+            '                <th style="width: 10%;">IP</th>' +
             '                <th style="width: 10%;">Accessed At</th>' +
             '                <th style="width: 15%;">Accessed Lecturer</th>' +
             '                <th style="width: 15%;">Accessed Student</th>' +

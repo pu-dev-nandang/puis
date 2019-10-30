@@ -411,7 +411,7 @@
                        IPS = getCustomtoFixed(Data_mhs[i]['IPS'],2);
                        // IPK = parseFloat(Data_mhs[i]['IPK']).toFixed(2);
                        IPK = getCustomtoFixed(Data_mhs[i]['IPK'],2);
-                       console.log(IPK)
+                       // console.log(IPK)
                        if (isNaN(IPK)) {
                          IPK =0;
                        }
@@ -856,7 +856,7 @@
 
     $(document).on('click','#btn-submit', function () {
         var arrValueCHK = getChecboxNPM();
-        console.log(arrValueCHK);
+        // console.log(arrValueCHK);
         if (arrValueCHK.length > 0) {
             // check status jika 1
             var bool = true;
@@ -1015,7 +1015,7 @@
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
+               // console.log(resultJson);
                if (resultJson != '')
                {
                 //toastr.info(resultJson);

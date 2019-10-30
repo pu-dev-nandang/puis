@@ -199,10 +199,187 @@ class C_it extends It_Controler {
       $this->temp($content);
     }
 
+    public function menu_developer($page){
+        $data['page'] = $page;
+        $content = $this->load->view('page/it/console-developer/menu_developer',$data,true);
+        $this->temp($content);
+    }
+
     public function console_developer()
     {
       $content = $this->load->view('page/'.$this->data['department'].'/console-developer/console_developer',$this->data,true);
-      $this->temp($content);
+      $this->menu_developer($content);
+    }
+
+    public function routes()
+    {
+      $this->data['input_routes'] = $this->load->view('page/'.$this->data['department'].'/console-developer/input_routes',$this->data,true);
+      $this->data['table_routes_local'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_local',$this->data,true);
+      $this->data['table_routes_live'] = $this->load->view('page/'.$this->data['department'].'/console-developer/table_routes_live',$this->data,true);
+      $content = $this->load->view('page/'.$this->data['department'].'/console-developer/routes',$this->data,true);
+      $this->menu_developer($content);
+    }
+
+    public function submit_routes()
+    {
+      header('Access-Control-Allow-Origin: *');
+      header('Content-Type: application/json');
+      $Input = $this->getInputToken();
+      $action = $Input['action'];
+      if ($action == 'add') {
+        /*
+          hanya untuk local
+        */
+          $dataSave = $Input['data'];
+          $dataSave = json_decode(json_encode($dataSave),true);
+          $dataSave['Status'] = $Input['server'];
+          $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+          $dataSave['Updated_by'] = $this->session->userdata('NIP');
+          $this->db->insert('db_it.routes',$dataSave);
+          echo json_encode(1);
+      }
+      elseif ($action == 'edit') {
+        /*
+            local dan live
+        */
+        $ID = $Input['ID'];
+        // deklarasi database
+            $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
+
+        $dataSave = $Input['data'];
+        $dataSave = json_decode(json_encode($dataSave),true);
+        $dataSave['Status'] = $Input['server'];
+        $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+        $dataSave['Updated_by'] = $this->session->userdata('NIP');
+        $dbselected->where('ID',$ID);
+        $dbselected->update('db_it.routes',$dataSave);
+        echo json_encode(1);  
+      }
+      elseif ($action =='delete') {
+         /*
+             local dan live
+         */
+         $ID = $Input['ID'];
+         // deklarasi database
+             $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
+         $dbselected->where('ID',$ID);
+         $dbselected->delete('db_it.routes');
+         echo json_encode(1);  
+      }
+      elseif ($action =='read') {
+         /*
+             local dan live
+         */
+        $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
+        $sql = 'select a.*,b.Name as NameEmp,dp.Name2 as NameDepartment from db_it.routes as a
+                join db_employees.employees as b on a.Updated_by = b.NIP
+                join (
+                    select CONCAT("AC.",ID) as ID, CONCAT("Prodi ",Name) as Name1, CONCAT("Study ",NameEng)  as Name2 from db_academic.program_study where Status = 1
+                    UNION
+                    select CONCAT("NA.",ID) as ID, Description as Name1, Division as Name2 from db_employees.division
+                    UNION
+                    select CONCAT("FT.",ID) as ID, CONCAT("Facultas ",Name) as Name1, CONCAT("Faculty ",NameEng) as Name2 from db_academic.faculty where StBudgeting = 1
+  
+                ) as dp on a.Department = dp.ID
+                where a.Status = "'.$Input['server'].'"
+                ';
+        $query = $dbselected->query($sql)->result_array();
+        $data = array();
+        for ($i=0; $i <count($query) ; $i++) { 
+            $nestedData = array();
+            $row = $query[$i];
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['Slug'];
+            $nestedData[] = $row['Controller'];
+            $nestedData[] = $row['Type'];
+            $nestedData[] = $row['NameDepartment'];
+            $nestedData[] = $row['NameEmp'];
+            $nestedData[] = $row['Updated_at'];
+            $nestedData[] = $row['Updated_by'];
+            $nestedData[] = $row['Status'];
+            $nestedData[] = $row['ID'];
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+
+        $json_data = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+      }
+      elseif ($action == 'Migrate') {
+         $data = $Input['data'];
+         $data = json_decode(json_encode($data),true);
+         $dbselected =  $this->load->database('server_live', TRUE);
+         for ($i=0; $i <count($data) ; $i++) { 
+           // get data
+          $ID = $data[$i];
+          $G_dt = $this->m_master->caribasedprimary('db_it.routes','ID',$ID);
+          if (count($G_dt) > 0) {
+            $dataSave = [];
+            $r = $G_dt[0];
+            foreach ($r as $key => $value) {
+              if ($key != 'ID') {
+                if ($key == 'Status') {
+                  $dataSave[$key] = 'live';
+                }
+                else
+                {
+                  $dataSave[$key] = $value;
+                }
+                
+              }
+            }
+            $dbselected->insert('db_it.routes',$dataSave);
+            // update
+            $this->db->where('ID',$ID);
+            $this->db->update('db_it.routes',$dataSave);
+
+          }
+         }
+         echo json_encode(1); 
+      }
+      elseif ($action == 'MigrateLive') {
+
+        if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+          $data = $Input['data'];
+          $data = json_decode(json_encode($data),true);
+          $dbselected =  $this->load->database('server_live', TRUE);
+
+          // Truncate data local
+          $sql = 'TRUNCATE TABLE db_it.routes';
+          $this->db->query($sql,array());
+
+          for ($i=0; $i <count($data) ; $i++) { 
+            // get data
+           $ID = $data[$i];
+           $G_dt = $dbselected->query('select * from db_it.routes where ID = '.$ID.' ')->result_array();
+           if (count($G_dt) > 0) {
+             $dataSave = [];
+             $r = $G_dt[0];
+             foreach ($r as $key => $value) {
+               if ($key != 'ID') {
+                 if ($key == 'Status') {
+                   $dataSave[$key] = 'live';
+                 }
+                 else
+                 {
+                   $dataSave[$key] = $value;
+                 }
+                 
+               }
+             }
+             $this->db->insert('db_it.routes',$dataSave);
+           }
+          }
+        }
+
+         echo json_encode(1); 
+      } 
     }
 
 }

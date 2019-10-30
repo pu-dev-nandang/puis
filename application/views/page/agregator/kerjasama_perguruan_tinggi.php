@@ -1,13 +1,13 @@
 <style>
-    #TblKerjaSama tr th, #TblKerjaSama tr td {
+    #TblKerjaSama tr th {
         text-align: center;
     }
 
-    #TblKerjaSama tr td {
+    /*#TblKerjaSama tr td {
         vertical-align : middle;
         text-align:center;
         border-right: 1px solid #ccc;
-    }
+    }*/
 </style>
 <div class="well">
 
@@ -51,6 +51,7 @@
 </div>
 <script type="text/javascript">
     var passToExcel = [];
+    var oTable;
     $(document).ready(function () {
         LoadFirst();
     });
@@ -62,11 +63,6 @@
 
     function LoadTableData()
     {
-        var data = {
-            auth : 's3Cr3T-G4N',
-            mode : 'DataKerjaSamaAggregator',
-        };
-        var token = jwt_encode(data,"UAP)(*");
         $('#TblKerjaSama tbody').empty();
 
         var table = $('#TblKerjaSama').DataTable({
@@ -84,7 +80,17 @@
                 url : base_url_js+"rest2/__get_data_kerja_sama_perguruan_tinggi", // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
-                data : {token : token},
+                // data : {token : token},
+                data : function(token){
+                    var Kategori_kegiatan = $('.Kategori_kegiatan option:selected').val();
+                    var data = {
+                        auth : 's3Cr3T-G4N',
+                        mode : 'DataKerjaSamaAggregator',
+                        Kategori_kegiatan : Kategori_kegiatan,
+                    };
+                    var get_token = jwt_encode(data,"UAP)(*");
+                    token.token = get_token;
+                },
                 error: function(){  // error handling
                     $(".employee-grid-error").html("");
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -106,12 +112,31 @@
                  $( row ).find('td:eq(8)').html(data[8]);
                  $( row ).find('td:eq(9)').html(data[9]);
                  $( row ).find('td:eq(2)').html(data[13]);
+
+                 // get center
+                 $( row ).find('td:eq(0)').attr('style','text-align:center');
+                 $( row ).find('td:eq(3)').attr('style','text-align:center');
+                 $( row ).find('td:eq(4)').attr('style','text-align:center');
+                 $( row ).find('td:eq(5)').attr('style','text-align:center');
             },
             dom: 'l<"toolbar">frtip',
             "initComplete": function(settings, json) {
                 passToExcel = json.queryPass;
+              $("div.toolbar")
+                 .html('<div class="toolbar no-padding pull-right" style = "margin-left : 15px;">'+
+                    '<select class="form-control Kategori_kegiatan"">'+
+                        '<option disabled selected value="">--Pilih Kategori Kegiatan--</option>'+
+                        '<option value="PKM">PKM</option>'+
+                        '<option value="Penelitian">Penelitian</option>'+
+                        '<option value="Pendidikan">Pendidikan</option>'+
+                        '<option value="%">All</option>'+
+                    '</div>'+    
+                '</div>');
+
             }
         });
+
+        oTable = table;
     }
 
     $("#btndownloaadExcel").click(function(){
@@ -125,5 +150,9 @@
               { name: 'token', value: token },
           ]);
         }
+    })
+
+    $(document).off('change', '.Kategori_kegiatan').on('change', '.Kategori_kegiatan',function(e) {
+        oTable.ajax.reload( null, false );
     })
 </script>

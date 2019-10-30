@@ -1450,6 +1450,25 @@
 
     }
 
+    function loadSelectOptionGraduationYear(element,selected) {
+
+        var data = {action : 'getGraduationYear'};
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api3/__crudTracerAlumni';
+
+        $.post(url,{token:token},function (jsonResult) {
+            if(jsonResult.length>0){
+
+                $.each(jsonResult,function (i,v) {
+                    var sc = (v.GraduationYear == selected) ? 'selected' : '';
+                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+                });
+
+            }
+        });
+
+    }
+
     function getIDSemesterActive(element) {
         var url = base_url_js+'api/__getSemesterActive';
         $.getJSON(url,function (jsonResult) {
@@ -1642,7 +1661,7 @@
 
     function LoaddataTableStandard(element) {
         var table = $(element).DataTable({
-            'iDisplayLength' : 10,
+            'iDisplayLength' : 5,
             'ordering' : true,
             // "sDom": "<'row'<'dataTables_header clearfix'<'col-md-3'l><'col-md-9'Tf>r>>t<'row'<'dataTables_footer clearfix'<'col-md-6'i><'col-md-6'p>>>", // T is new
         });

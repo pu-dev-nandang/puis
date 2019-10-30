@@ -4,14 +4,18 @@
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
         <div class="well">
+            <label>Tahun Kuesioner</label>
             <select class="form-control" id="filterYear"></select>
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
+        <div style="text-align: right;">
+            <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+        </div>
         <div class="">
-            <table class="table table-striped table-centre">
+            <table class="table table-striped table-centre dataTable2Excel" data-name="Tabel-refresnsi">
 
                 <thead>
                 <tr>
@@ -50,7 +54,7 @@
                 clearInterval(firstLoad);
             }
         },1000);
-
+        setTimeout(function () { clearInterval(firstLoad); },5000);
 
     });
     
@@ -89,24 +93,24 @@
                         var ket = 'Banyaknya Lulusan - ';
                         var viewBL3 = (v['BL_'+Y3].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y3+'" data-token="'+(jwt_encode(v['BL_'+Y3],'UAP)(*'))+'">'+(v['BL_'+Y3].length)+'</a>'
-                            : 0;
+                            : '-';
                         var viewBL2 = (v['BL_'+Y2].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y2+'" data-token="'+(jwt_encode(v['BL_'+Y2],'UAP)(*'))+'">'+(v['BL_'+Y2].length)+'</a>'
-                            : 0;
+                            : '-';
                         var viewBL1 = (v['BL_'+Y1].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y1+'" data-token="'+(jwt_encode(v['BL_'+Y1],'UAP)(*'))+'">'+(v['BL_'+Y1].length)+'</a>'
-                            : 0;
+                            : '-';
 
                         var ket = 'Banyaknya Lulusan yang memberikan jawaban - ';
                         var viewBJ3 = (v['BJ_'+Y3].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y2+'" data-token="'+(jwt_encode(v['BJ_'+Y3],'UAP)(*'))+'">'+(v['BJ_'+Y3].length)+'</a>'
-                            : 0;
+                            : '-';
                         var viewBJ2 = (v['BJ_'+Y2].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y2+'" data-token="'+(jwt_encode(v['BJ_'+Y2],'UAP)(*'))+'">'+(v['BJ_'+Y2].length)+'</a>'
-                            : 0;
+                            : '-';
                         var viewBJ1 = (v['BJ_'+Y1].length > 0)
                             ? '<a href="javascript:void(0);" class="btnShowData" data-ket="'+ket+' '+Y2+'" data-token="'+(jwt_encode(v['BJ_'+Y1],'UAP)(*'))+'">'+(v['BJ_'+Y1].length)+'</a>'
-                            : 0;
+                            : '-';
 
                         $('#listData').append('<tr>' +
                             '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +

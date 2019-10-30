@@ -49,3 +49,11 @@ document/*
 **/uploads/rektorat/
 
 ***/uploads/Agregator/Aps/
+
+#Ignores Add Images
+**/images/Facilities/
+**/images/Kaprodi/
+**/images/Partner/
+**/images/Lecturer/
+**/images/Slider/
+**/images/Testimonials/

@@ -218,7 +218,7 @@
                 var token = jwt_encode(data,'UAP)(*');
                 $.post(url,{token:token},function (resultJson) {
                    var resultJson = jQuery.parseJSON(resultJson);
-                   console.log(resultJson);
+                   // console.log(resultJson);
                     var Data_mhs = resultJson.loadtable;
                     var xx = resultJson.loadtable;
                     var Data_mhs = Data_mhs['Data_mhs'];
@@ -378,7 +378,7 @@
     $(document).on('click','#btn-submit', function () {
         var PTID = $("#selectPTID").val();
         var arrValueCHK = getChecboxNPM();
-        console.log(arrValueCHK);
+        // console.log(arrValueCHK);
         var thDate = '';
         if (PTID == 1 || PTID == 4) {
           thDate = '<th style="width: 55px;">Deadline</th>';
@@ -460,7 +460,7 @@
             var token = jwt_encode(data,'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
                var resultJson = jQuery.parseJSON(resultJson);
-               console.log(resultJson);
+               // console.log(resultJson);
                if (resultJson != '')
                {
                 toastr.info(resultJson); 

@@ -26,7 +26,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <a href="<?php echo base_url('academic/transfer-student/programme-study'); ?>" class="btn btn-warning">
+        <a href="<?php echo base_url('academic/transfer-student'); ?>" class="btn btn-warning">
             <i class="fa fa-arrow-left margin-right"></i>
             Back to list</a>
         <hr/>

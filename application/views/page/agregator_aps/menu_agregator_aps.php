@@ -62,7 +62,12 @@
     </div>
     <div class="col-md-10">
         <?= $page; ?>
+        <?php if(count($Description)>0){
+            if($Description[0]['Description']!='' && $Description[0]['Description']!=null){ ?>
+                <div class="alert alert-info alert-note-agregator" role="alert"><h3 style="margin-top: 0px;font-weight: bold;">Catatan : </h3><div><?= $Description[0]['Description']; ?></div></div>
+            <?php }
 
+        } ?>
     </div>
 </div>
 

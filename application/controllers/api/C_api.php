@@ -254,7 +254,6 @@ class C_api extends CI_Controller {
     public function getreqdocument(){
         $requestData= $_REQUEST;
 
-        $SemesterID = $this->input->get('s');
         $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
@@ -268,8 +267,8 @@ class C_api extends CI_Controller {
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
                     WHERE b.RequestDocument = 1  AND ( ';
 
-            $sql.= ' a.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= ' c.Name LIKE "'.$requestData['search']['value'].'%" ';
+            //$sql.= ' OR b.NameFiles LIKE "'.$requestData['search']['value'].'%" ';
             //$sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY a.IDRequest DESC ';
 
@@ -2669,8 +2668,8 @@ class C_api extends CI_Controller {
 
             $stats = ($row["Active"]=='1') ? 'Active' : 'Non Active';
 
-            $StartDate = date('d M Y h:i',strtotime($row['StartDate']));
-            $EndDate = date(' d M Y h:i',strtotime($row['EndDate']));
+            $StartDate = date('d M Y H:i',strtotime($row['StartDate']));
+            $EndDate = date(' d M Y H:i',strtotime($row['EndDate']));
 
             if($row['ConfirmStatus'] == 1) {
 
@@ -8903,8 +8902,15 @@ class C_api extends CI_Controller {
     public function getAllDepartementPU()
     {
         $arr_result = array();
-        // $NA = $this->m_master->showData_array('db_employees.division');
         $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+        if (isset($_POST)) {
+            if (array_key_exists('Show', $_POST)) {
+                if ($_POST['Show'] == 'all') {
+                    $NA = $this->m_master->showData_array('db_employees.division');
+                }
+            }
+            
+        }
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $FT = $this->m_master->caribasedprimary('db_academic.faculty','StBudgeting',1);
         for ($i=0; $i < count($NA); $i++) {
@@ -9259,12 +9265,14 @@ class C_api extends CI_Controller {
                 $dataQ = $this->db->query('SELECT ec.Category, eq.* FROM db_academic.edom_question eq
                                                       LEFT JOIN db_academic.edom_category ec
                                                       ON (ec.ID = eq.CategoryID)
+                                                      WHERE ec.IDDivision = 6
                                                       ORDER BY eq.Order ASC ')->result_array();
 
                 return print_r(json_encode($dataQ));
             }
             else if($data_arr['action']=='readLECategory'){
-                $data = $this->db->order_by('ID','ASC')->get('db_academic.edom_category')->result_array();
+                $data = $this->db->order_by('ID','ASC')
+                    ->get_where('db_academic.edom_category',array('IDDivision'=>6))->result_array();
                 return print_r(json_encode($data));
             }
             else if($data_arr['action']=='insertQuestion'){

@@ -44,13 +44,32 @@
         <div id="viewDataDesc"></div>
     </div>
 </div>
-
+<!-- ======= Hapus  ======== -->
+<div id="delete-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">
+                    Konfirmasi
+                </h4>
+            </div>
+            <div class="modal-body">
+                Apakah anda yakin ingin menghapus data ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btn-hapus">Ya</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tidak</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function () {
 
-        LoadNama();
         window.G_Type = 'testimonials';
         loadDataTestimonials();
+        LoadNama();
         loadSelectOptionLanguageProdi('#LangID','');
 
         $('#Description').summernote({
@@ -101,7 +120,7 @@
             if(jsonResult.length>0){
 
                 $.each(jsonResult,function (i,v) {
-                    $('#viewDataDesc').append('<div class="well"> <img src="'+imgmhs+''+v.Photo+'"  width="15%"><h3><b> '+v.NPM+' || '+v.Name+'</b></h3><hr><h3 style="margin-top: 5px;"><b>'+v.Language+'</b></h3><div>'+v.Description+'</div></div>');
+                    $('#viewDataDesc').append('<div class="well"> <img src="'+imgmhs+''+v.Photo+'"  width="15%"><h3><b> '+v.NPM+' || '+v.Name+'</b></h3><hr><h3 style="margin-top: 5px;"><b>'+v.Language+'</b></h3><div>'+v.Description+'</div><hr><a href="" data-id="'+v.ID+'" data-toggle="modal" data-target="#delete-modal" class="btn btn-danger btn-alert-hapus"><span class="glyphicon glyphicon-trash"></span> Delete</a></div>');
                 });
 
             } else {
@@ -135,7 +154,7 @@
     
     function LoadNama() { // load data student
         var selector =$('#formName');
-        var url = base_url_js+'api/__getStudentsServerSide';
+        var url = base_url_js+'api-prodi/__getStudentsProdi';
         var data = {
             auth : 's3Cr3T-G4N',
             mode : 'showDataDosen'
@@ -244,6 +263,54 @@
               }
         }
     });
+    // Fungsi ini akan dipanggil ketika tombol hapus diklik
+    $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
+      id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
+      $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
+    })
+    $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(data) { // Ketika tombol hapus di klik
+    var ID = $(this).attr('data-id');
+    var thisbtn = $(this);
+    loading_button('#btn-hapus'); // Munculkan loading hapus
+    var data = {
+                action : 'deleteTestimonials',
+                ID : ID,
+                };
+    var form_data = new FormData();
+    var token = jwt_encode(data,"UAP)(*");
+    form_data.append('token',token);
+    var url = base_url_js + "api-prodi/__crudDataProdi";
+    $.ajax({
+        type :"POST",
+        url : url,
+        data : form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+        contentType: false,       // The content type used when sending data to the server.
+        cache: false,             // To unable request pages to be cached
+        processData:false,
+        dataType: "json",
+        beforeSend: function(e) {
+          if(e && e.overrideMimeType) {
+            e.overrideMimeType('application/jsoncharset=UTF-8');
+          }
+        },
+        success: function(data){ // Ketika proses pengiriman berhasil
+           
+            toastr.success('Data saved','Success');
+            thisbtn.prop('disabled',false).html('Ya');
+            $('#delete-modal').modal('hide');
+            loadDataTestimonials();
+
+            setTimeout(function(){
+              window.location.href="";
+            },500);
+
+        },
+        error: function (data) {
+            toastr.error('Form required','Error');
+            thisbtn.prop('disabled',false).html('Ya');
+        }
+    });
+  });
 
   function file_validation2(ev,TheName = '')
   {

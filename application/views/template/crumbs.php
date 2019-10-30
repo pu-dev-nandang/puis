@@ -6,11 +6,13 @@
     }
 </style>
 
+<?php $Segment1 = $this->uri->segment(1); ?>
+
 <div class="crumbs">
     <ul id="breadcrumbs" class="breadcrumb">
         <li>
-            <i class="icon-home"></i>
-            <a href="<?php echo base_url().'dashboard'; ?>">Dashboard</a>
+            <i class="fa fa-thumb-tack"></i>
+            <a href="javascript:void(0);"><?= ucwords(str_replace("-"," ",$Segment1)); ?></a>
         </li>
         <?php for($i=1;$i<=count($segment);$i++){
             if($i!=1) { ?>
