@@ -2437,14 +2437,69 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         break;
                     case 3:
                     case 4:
-                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(1,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover1 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
+                        
+                        // $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
                         $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
                         $StatusBooking = 'Awaiting<li><span style = "color:#0968b3;"> App 1 : '.$NameApprover1.'</span></li><li><span style = "color:red;"> App 2 : '.$NameApprover2.'</span></li>';
                         break;
                     case 5:
                         // $StatusBooking = 'Approved';
-                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(1,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover1 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
+                        // $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        // $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(2,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover2 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover2 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover2 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
                         $StatusBooking = 'Approved<li><span style = "color:#0968b3;">App 1 : '.$NameApprover1.'</span></li><li><span style = "color:#0968b3;">App 2 : '.$NameApprover2.'</span></li>';
                         break;    
                     default:
@@ -3865,5 +3920,67 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         
         return $Name;
+    }
+
+    public function checkRuleDivisioOrNot($ApprverNumber,$ID_t_booking)
+    {
+        $this->load->model('master/m_master');
+        $Bool = false; // selain division
+        $query = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID_t_booking);
+        $Room = $query[0]['Room'];
+        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
+        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+        $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+        $Approver1 = json_decode($Approver1);
+        $CreatedBy = $query[0]['CreatedBy'];
+        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+        $ID_group_user = $ID_group_user[0]['G_user'];
+        if ($ApprverNumber == 1) {
+            for ($l=0; $l < count($Approver1); $l++) {
+                // find by ID_group_user
+                    if ($ID_group_user == $Approver1[$l]->UserType) {
+                        // get TypeApprover
+                        $TypeApprover = $Approver1[$l]->TypeApprover;
+                        if ($TypeApprover == 'Division') {
+                            $Bool = true;
+                            break;
+                        }
+                    }
+            } // end loop for
+        }
+        else
+        {
+            $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
+            $Approver2Div = json_decode($Approver2Div);
+            for ($zz=0; $zz < count($Approver2Div); $zz++) { 
+                $rdata = $Approver2Div[$zz];
+                $TypeApprover = $rdata->TypeApprover;
+                if ($TypeApprover == 'Division') {
+                    $Bool = true;
+                    break;
+                }
+            }
+        }
+        return $Bool;
+    }
+
+    public function auth_approval($Username,$Password,$DivisionID){
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+        $sql = 'select count(*) as total
+                from db_employees.employees
+                where SPLIT_STR(PositionMain, ".", 1) = "'.$DivisionID.'" and NIP = "'.$Username.'"
+                and Password = "'.$pass.'"
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        if ($query[0]['total'] == 1) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
