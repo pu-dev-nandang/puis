@@ -72,26 +72,26 @@
 
   function socket_messages_tbooking()
   {
-      var socket = io.connect( 'http://'+window.location.hostname+':3000' );
-      // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
-      socket.on( 'update_schedule_notifikasi', function( data ) {
+      // var socket = io.connect( 'http://'+window.location.hostname+':3000' );
+      // // var socket = io.connect( '<?php echo serverRoot ?>'+':3000' );
+      // socket.on( 'update_schedule_notifikasi', function( data ) {
 
-          //$( "#new_count_message" ).html( data.new_count_message );
-          //$('#notif_audio')[0].play();
-          if (data.update_schedule_notifikasi == 1) {
-              // action
-              var getDate = data.date;
-              if (getDate == '') {
-                 getDate = "<?php echo date('Y-m-d') ?>";
-              }
-              // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
-              var divHtml = $("#schedule");
-              var OpCategory = $("#OpCategoryRoom").val();
-              loadDataSchedule(divHtml,getDate,OpCategory);
-              // loadDataListApprove();
-          }
+      //     //$( "#new_count_message" ).html( data.new_count_message );
+      //     //$('#notif_audio')[0].play();
+      //     if (data.update_schedule_notifikasi == 1) {
+      //         // action
+      //         var getDate = data.date;
+      //         if (getDate == '') {
+      //            getDate = "<?php echo date('Y-m-d') ?>";
+      //         }
+      //         // $("#CaptionTBL").html('<strong>'+getDate+'</strong>');
+      //         var divHtml = $("#schedule");
+      //         var OpCategory = $("#OpCategoryRoom").val();
+      //         loadDataSchedule(divHtml,getDate,OpCategory);
+      //         // loadDataListApprove();
+      //     }
 
-      }); // exit socket
+      // }); // exit socket
   }
 
   $(document).on('click','#search', function () {

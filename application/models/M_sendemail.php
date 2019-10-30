@@ -319,7 +319,7 @@ class M_sendemail extends CI_Model {
         $mail->Host = 'ssl://smtp.gmail.com';  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
         $mail->Username = 'ithelpdesk.notif@podomorouniversity.ac.id';                 // SMTP username
-        $mail->Password = '4dm1n5!S';                           // SMTP password
+        $mail->Password = 'Podomoro2018';                           // SMTP password
         $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = 465;
         $mail->IsHTML(true);
