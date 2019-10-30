@@ -430,7 +430,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                             and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
                             and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
-                            and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                             on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
                             order by a.Room";
                 }
