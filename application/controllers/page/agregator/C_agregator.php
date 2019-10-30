@@ -287,6 +287,14 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function jasa_yang_diadopsi(){
+        $viewPage = 'jasa_yang_diadopsi';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
     public function kepuasan_pengguna_lulusan(){
         $viewPage = 'kepuasan_pengguna_lulusan';
         $accessUser = $this->agregatorPrevilege($viewPage);

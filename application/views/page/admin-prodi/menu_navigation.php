@@ -2,9 +2,11 @@
 
 <?php 
     $ServerName = $_SERVER['SERVER_NAME'];
+
+    $PositionMain = $this->session->userdata('PositionMain');
 ?>
 
-    <div id="sidebar-content" class="<?= ($ServerName=='localhost') ? '' : '' ?>" >
+    <div id="sidebar-content" class="<?= ($PositionMain['IDPosition']=='6') ? '' : 'hide' ?>" >
         <!--=== Navigation ===-->
         <ul id="nav">
             <!-- <li  class="dropdown <?php if($this->uri->segment(3,0)=='dashboard'){echo "current";} ?>">

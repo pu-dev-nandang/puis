@@ -2179,6 +2179,13 @@ class C_api3 extends CI_Controller {
             return print_r(1);
 
         }
+
+        else if($data_arr['action']=='getYearJasaAdopsi'){
+
+//            $data = $this->db->query('SELECT * FROM ')->result_array();
+
+        }
+
         else if($data_arr['action']=='viewIPK'){
             // error_reporting(0);
             $rs = array('header' => array(),'body' => array() );
