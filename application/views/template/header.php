@@ -97,7 +97,7 @@
                     <span>Ticket</span>
                 </a>
             </li>
-            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation'); 
+            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>
                 <?php if (count($this->session->userdata('prodi_get')) > 1 && $DepartmentNav == 15): ?>
@@ -260,6 +260,9 @@
                     <li><a href="<?php echo base_url('help'); ?>">
                             <i class="fa fa-bookmark"></i>
                             Help</a></li>
+                    <li><a href="<?php echo base_url('kb'); ?>">
+                                    <i class="fa fa-file"></i>
+                                    Knowledge Base</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>

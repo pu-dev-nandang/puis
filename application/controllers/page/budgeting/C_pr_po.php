@@ -1190,6 +1190,9 @@ class C_pr_po extends Budgeting_Controler {
                                 $this->m_pr_po->pr_circulation_sheet($PRCode,'Issued & Edited');
 
                                 // send notifikasi
+                                    // send revisi or not
+                                    $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($PRCode,'db_budgeting.pr_circulation_sheet','PRCode');
+
                                     $URLDirect = 'budgeting_pr/'.$PRCodeURL;
                                     $IDdiv = $Departement;
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
@@ -1198,8 +1201,8 @@ class C_pr_po extends Budgeting_Controler {
                                     $data = array(
                                         'auth' => 's3Cr3T-G4N',
                                         'Logging' => array(
-                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> PR '.$PRCode.' has been Revised by '.$Code,
-                                                        'Description' => 'PR '.$PRCode.' has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                        'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.'PR '.$PRCode.' has been Revised by '.$Code,
+                                                        'Description' => $RevisiOrNotNotif.'PR '.$PRCode.' has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                         'URLDirect' => $URLDirect,
                                                         'CreatedBy' => $this->session->userdata('NIP'),
                                                       ),
