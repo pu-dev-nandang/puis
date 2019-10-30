@@ -3340,7 +3340,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,7);
         $pdf->Cell(120,7,'',0,0,'L');
-        $pdf->Cell(32,7,'Nomor Transkrip Akademik/ ',0,0,'L');
+        $pdf->Cell(32,7,'Nomor Transkrip Akademik / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
         $pdf->Cell(20,7,'Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
@@ -6409,7 +6409,7 @@ Phone: (021) 29200456';
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         //$pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
-        $pdf->Cell(145,$h,$tanggalx,0,1,'L'); 
+        $pdf->Cell(145,$h,$tanggalx,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
