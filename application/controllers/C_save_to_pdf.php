@@ -3342,7 +3342,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(120,7,'',0,0,'L');
         $pdf->Cell(32,7,'Nomor Transkrip Akademik / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
-        $pdf->Cell(20,7,'Transcript Number',0,0,'L');
+        $pdf->Cell(20,7,' Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
         $pdf->Cell(5,7,' : ',0,0,'C');
         $pdf->Cell(20,7,$Student['CSN'],0,1,'R');
