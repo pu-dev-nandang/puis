@@ -1920,7 +1920,9 @@ class C_api3 extends CI_Controller {
             }
 
 
-            return print_r(1);
+            $dataF = $this->db->get_where('db_studentlife.student_achievement',array('ID'=>$ID))->result_array();
+            $FileName = $dataF[0]['Certificate'];
+            return print_r(json_encode(array('ID' => $ID,'FileName' => $FileName)));
         }
         else if($data_arr['action']=='viewDataPAM'){
 
@@ -2169,13 +2171,25 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='removePAM'){
 
+            // Get data
+            $data = $this->db->get_where('db_studentlife.student_achievement',array('ID'=>$data_arr['ID']))->result_array();
 
-            $this->db->where('SAID', $data_arr['ID']);
-            $this->db->delete('db_studentlife.student_achievement_student');
-            $this->db->reset_query();
+            if(count($data)>0){
+                $old = $data[0]['Certificate'];
+                if($old!=''  && is_file('./uploads/certificate/'.$old)){
+                    unlink('./uploads/certificate/'.$old);
+                }
 
-            $this->db->where('ID', $data_arr['ID']);
-            $this->db->delete('db_studentlife.student_achievement');
+
+                $this->db->where('SAID', $data_arr['ID']);
+                $this->db->delete('db_studentlife.student_achievement_student');
+                $this->db->reset_query();
+
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_studentlife.student_achievement');
+            }
+
+
             return print_r(1);
 
         }
