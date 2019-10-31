@@ -136,7 +136,10 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readTeamAggr'){
 
             $data = $this->db->get('db_agregator.agregator_user')->result_array();
-
+            $WhereFilter = '';
+            if (array_key_exists('Type', $data_arr)) {
+                $WhereFilter .= ' and b.Type ="'.$data_arr['Type'].'" ';
+            }
             for($i=0;$i<count($data);$i++){
 
                 // Get Menu Name
@@ -145,9 +148,14 @@ class C_api3 extends CI_Controller {
                 $listMenu = [];
                 for($m=0;$m<count($ArrMenu);$m++){
 
-                    $dtm = $this->db->get_where('db_agregator.agregator_menu',array(
-                        'ID' => $ArrMenu[$m]
-                    ))->result_array();
+                    // $dtm = $this->db->get_where('db_agregator.agregator_menu',array(
+                    //     'ID' => $ArrMenu[$m]
+                    // ))->result_array();
+                    $sqldtm = 'select a.*,b.Type from db_agregator.agregator_menu as a 
+                              join db_agregator.agregator_menu_header as b on a.MHID = b.ID
+                              where a.ID = '.$ArrMenu[$m].$WhereFilter.'
+                    ';
+                    $dtm = $this->db->query($sqldtm,array())->result_array();
 
                     if(count($dtm)>0){
                         array_push($listMenu,$dtm[0]);

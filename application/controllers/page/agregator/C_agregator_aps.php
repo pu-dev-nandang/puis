@@ -42,7 +42,6 @@ class C_agregator_aps extends Globalclass {
 //            print_r($MyMenu);
 
             if(count($MyMenu)>0){
-
                 // Cek apakah ada
                 if(in_array($data[0]['ID'],$MyMenu)){
                     $result = '1';
@@ -98,6 +97,17 @@ class C_agregator_aps extends Globalclass {
         $accessUser = $this->agregatorPrevilege($viewPage);
         $data['accessUser'] = $accessUser;
         $page = $this->load->view('page/agregator_aps/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
+    public function setting()
+    {
+        $dataSetting = $this->db->get_where('db_agregator.agregator_admin',array(
+            'NIP' => $this->session->userdata('NIP')
+        ))->result_array();
+
+        $data['access'] = (count($dataSetting)>0) ? '1' : '0';
+        $page = $this->load->view('page/agregator_aps/setting',$data,true);
         $this->menu_agregator($page);
     }
 

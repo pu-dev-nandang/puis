@@ -23,7 +23,12 @@
 
 <div class="row">
     <div class="col-md-2" id="menuLeft">
-
+        
+        <div>
+            <a href="<?= base_url('agregator-aps/setting'); ?>" class="btn btn-primary btn-block btn-round"><i class="fa fa-cog"></i> Setting</a>
+            <hr/>
+        </div>
+        <br/>
         <div>
             <select class="form-control" id="filterProdi"></select>
             <hr/>

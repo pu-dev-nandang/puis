@@ -50,7 +50,7 @@ if($access=='1'){ ?>
 <script>
     $(document).ready(function () {
         loadSelectOptionEmployeesSingle('#formMember','');
-        loadSelectOptionMenuAgregator('#formMenu','','APT');
+        loadSelectOptionMenuAgregator('#formMenu','','APS');
 
         $('#formMember,#formMenu').select2({allowClear: true});
 
@@ -103,7 +103,7 @@ if($access=='1'){ ?>
 
         var data = {
             action : 'readTeamAggr',
-            Type : 'APT',
+            Type : 'APS',
         };
 
         var token = jwt_encode(data,'UAP)(*');
@@ -138,7 +138,7 @@ if($access=='1'){ ?>
                         '<td><ul>'+Menu+'</ul></td>' +
                         '<td>' +
                         '<button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
-                        '<button class="btn btn-sm btn-danger btnRemove_apt" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button> ' +
+                        '<button class="btn btn-sm btn-danger btnRemove_aps" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button> ' +
                         '</td>' +
                         '</tr>')
                 });
@@ -182,7 +182,7 @@ if($access=='1'){ ?>
 
     });
 
-    $(document).on('click','.btnRemove_apt',function () {
+    $(document).on('click','.btnRemove_aps',function () {
 
         if(confirm('Are you sure?')){
 
@@ -200,8 +200,6 @@ if($access=='1'){ ?>
             });
 
         }
-
-
 
     });
 
