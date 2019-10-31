@@ -200,6 +200,7 @@
     	var data = {
     	    Status : Status,
     	    Year : Year,
+            TypeFormulir : 'On',
     	};
     	var token = jwt_encode(data,"UAP)(*");
     	$.post(url,{ token:token },function (resultJson) {

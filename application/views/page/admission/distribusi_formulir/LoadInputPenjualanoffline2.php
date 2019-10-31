@@ -246,6 +246,7 @@
                 auth : 's3Cr3T-G4N',
                 division : division,
                 action : 'add',
+                TypeFormulir : 'Off',
             };
             var token = jwt_encode(data,"UAP)(*");
             $.post(url,{token:token},function (data_json) {
@@ -625,6 +626,10 @@
                 var priceFormulir = $("#priceFormulir").val();
                 var tanggal = $("#tanggal").val();
                 var No_Ref = $("#No_Ref").val();
+                if (No_Ref == undefined || No_Ref == null || No_Ref == '') {
+                    toastr.error('Mohon Periksa No ref','!Failed');
+                    return;
+                }
                 var ChkFromCrm = $('.FromCrm:checked').val();
 
                 var ID_Crm = $("#ID_Crm").attr('idtable');

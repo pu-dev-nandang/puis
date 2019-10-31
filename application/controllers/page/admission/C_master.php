@@ -1776,7 +1776,16 @@ class C_master extends Admission_Controler {
 
             // check data already exist in table formulir_number_global
             $chk = $this->m_master->caribasedprimary('db_admission.formulir_number_global','FormulirCodeGlobal',$code);
-            if (count($chk) == 1) {
+            // if (count($chk) == 1) {
+            if (count($chk) > 0 ) {
+                // check data telah used atau unsued untuk update TypeFormulir
+                $Status = $chk[0]['Status'];
+                if ($Status == 0) {
+                    // update TypeFormulir
+                    $arr_field['TypeFormulir'] = $input['TypeFormulir'];
+                    $this->db->where('FormulirCodeGlobal',$code);
+                    $this->db->update('db_admission.formulir_number_global',$arr_field);
+                }
                 continue;
             }
             else
@@ -1786,13 +1795,13 @@ class C_master extends Admission_Controler {
                     'Years' => $input['Angkatan'],
                     'Status' => 0,
                     'Division' => $input['division'],
+                    'TypeFormulir' => $input['TypeFormulir'],
                 );
                 // check data already using in formulir_number_offline_m
                   $chk2 = $this->m_master->caribasedprimary('db_admission.formulir_number_offline_m','No_Ref',$code);
                   if (count($chk2) == 1) {
                       $arr_field['Status'] = 1;
                   }
-
                   $this->db->insert('db_admission.formulir_number_global', $arr_field);
             }
 

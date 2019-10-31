@@ -1048,6 +1048,10 @@ class C_rest extends CI_Controller {
                        $where .= $q_add.' a.Years = '.$Ta;
                    }
                 }
+                if (array_key_exists('TypeFormulir', $dataToken)) {
+                    $q_add = ($where == '') ? ' where ' : ' and ';
+                    $where .= $q_add.' a.TypeFormulir = "'.$dataToken['TypeFormulir'].'"';
+                }
                 $sql = 'SELECT a.* from db_admission.formulir_number_global as a '.$where.' group by a.FormulirCodeGlobal';
                 $query=$this->db->query($sql, array())->result_array();
                 echo json_encode($query);
