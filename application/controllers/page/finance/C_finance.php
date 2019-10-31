@@ -1864,8 +1864,10 @@ class C_finance extends Finnance_Controler {
         $tgl = $input['tgl'];
         $sql = "select FormulirCode from db_admission.formulir_number_online_m where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
         $query=$this->db->query($sql, array())->result_array();
-
-        $sql2 = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$Year."' order by ID asc limit 1";
+        // get formulir online di global
+        $sql2 = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$Year."' 
+                and TypeFormulir = 'On'
+                order by ID asc limit 1";
         $query2=$this->db->query($sql2, array())->result_array();
         if (count($query) > 0 && count($query2) > 0) {
               $RegID = $input['RegID'];
@@ -1893,7 +1895,9 @@ class C_finance extends Finnance_Controler {
             $FormulirCode = $this->m_finance->getFormulirCode('online',$Year);
             // save data to register_verified
             $this->m_master->saveDataRegisterVerified($RegVerificationID,$FormulirCode,$tgl,$this->session->userdata('NIP'));
-
+            if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id') {
+                $Email = 'alhadirahman22@gmail.com';
+            }
             $text = 'Dear Candidate,<br><br>
                         Your payment has been received,<br>
                         Please click link below to login your portal <br>

@@ -105,7 +105,9 @@ class M_finance extends CI_Model {
 
     // link ke formulir global
       if ($year != null) {
-        $sql = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$year."' order by ID asc limit 1";
+        $sql = "select FormulirCodeGlobal from db_admission.formulir_number_global where Status = 0 and Years ='".$year."' 
+                and TypeFormulir = 'On'
+        order by ID asc limit 1";
         $query=$this->db->query($sql, array())->result_array();
         $FormulirCodeGlobal = $query[0]['FormulirCodeGlobal'];
 
