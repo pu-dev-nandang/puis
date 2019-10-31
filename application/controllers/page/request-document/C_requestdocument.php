@@ -21,7 +21,7 @@ class C_requestdocument extends Globalclass {
 
     public function menu_request($page){
         $data['page'] = $page;
-        $content = $this->load->view('page/rektorat/menu_rektorat',$data,true);
+        $content = $this->load->view('page/rektorat/menu_rektorat2',$data,true);
         $this->temp($content);
     }
 

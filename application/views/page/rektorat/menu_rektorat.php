@@ -3,16 +3,19 @@
 <div class="" style="margin-top: 30px;">
      <div class="col-md-12">
         <div class="tabbable tabbable-custom tabbable-full-width">
-            <?php $activeMenu = $this->uri->segment(1); ?>
+            <?php $activeMenu = $this->uri->segment(2); ?>
             <ul class="nav nav-tabs">
                 <li>
-                    <a href="<?php echo base_url('rectorat/master_data/config_jabatan_per_sks'); ?>">Config Jabatan Per SKS</a>
+                    <a href="<?php echo base_url('rectorat/master_data/config_jabatan_per_sks'); ?>">Position To SKS</a>
                 </li>
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/sk_masuk_mahasiswa'); ?>">SK Masuk Mahasiswa</a>
                 </li>
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/credit_type_courses'); ?>">Credit type Course</a>
+                </li>
+                <li>
+                    <a href="<?php echo base_url('rectorat/master_data/mentor_sks'); ?>">Mentor Type to SKS</a>
                 </li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
