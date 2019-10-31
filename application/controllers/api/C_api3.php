@@ -2182,7 +2182,36 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='getYearJasaAdopsi'){
 
-//            $data = $this->db->query('SELECT * FROM ')->result_array();
+            $db = $data_arr['db'];
+            $data = $this->db->query('SELECT Year FROM '.$db.' GROUP BY Year ORDER BY Year DESC')->result_array();
+
+            return print_r(json_encode($data));
+
+
+        }
+        else if($data_arr['action']=='getDetailJasaAdopsi'){
+            $db = $data_arr['db'];
+            $Year = $data_arr['Year'];
+
+            $result = [];
+            for($i=0;$i<=2;$i++){
+
+                $YearWhere = (integer) $Year - $i;
+                $data = $this->db->query('SELECT * FROM '.$db.' WHERE Year = "'.$YearWhere.'" ')->result_array();
+
+                if(count($data)>0){
+                    for($a=0;$a<count($data);$a++){
+                        $d = $data[$a];
+                        $d['Year'] = $YearWhere;
+
+                        array_push($result,$d);
+                    }
+                }
+
+            }
+
+            return print_r(json_encode($result));
+
 
         }
 
