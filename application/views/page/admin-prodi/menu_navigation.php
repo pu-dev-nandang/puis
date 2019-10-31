@@ -124,7 +124,7 @@
                     
                 </a>
             </li> -->
-            <li class="<?php if($this->uri->segment(3)=='contact'){echo "current";} ?>">
+            <li class="<?php if($this->uri->segment(2)=='contact'){echo "current";} ?>">
                 <a href="<?php echo base_url('prodi/contact'); ?>">
                     <i class="fa fa-phone"></i>
                    Contact

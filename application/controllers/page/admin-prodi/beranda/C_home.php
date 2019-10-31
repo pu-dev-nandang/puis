@@ -68,6 +68,7 @@ class C_home extends Prodi_Controler {
         $content = $this->load->view('page/'.$data['department'].'/about/menu_visimisi',$data,true);
         parent::template($content);
     }
+    
 // ===== overview ======
     function overview()
     {
@@ -86,13 +87,7 @@ class C_home extends Prodi_Controler {
         $pagevisimisi = $this->load->view('page/'.$data['department'].'/about/V_mission',$data,true);
         $this->menu_visimisi($pagevisimisi);
     }
-//    function whychoose()
-//    {
-//        
-//        $data['department'] = parent::__getDepartement();
-//        $content = $this->load->view('page/'.$data['department'].'/beranda/V_why',$data,true);
-//        parent::template($content);
-//    }
+    
 // ===== Call to Action ======
     function calltoaction()
     {
@@ -133,14 +128,24 @@ class C_home extends Prodi_Controler {
         $content = $this->load->view('page/'.$data['department'].'/about/V_facilities',$data,true);
         parent::template($content);
     }  
-    function contact()
-    {
-        
+    
+    private function menu_contact($pagecontact){
+            $data['department'] = parent::__getDepartement();
+            $data['pagecontact'] = $pagecontact;
+            $content = $this->load->view('page/'.$data['department'].'/contact/V_contact',$data,true);
+            parent::template($content);
+    }
+    
+    public function sosmed(){
         $data['department'] = parent::__getDepartement();
-        $content = $this->load->view('page/'.$data['department'].'/contact/V_contact',$data,true);
-        parent::template($content);
-    }    
-
-        
+        $pagecontact = $this->load->view('page/'.$data['department'].'/contact/V_sosmed',$data,true);
+        $this->menu_contact($pagecontact);
+    }
+    public function contact(){
+        $data['department'] = parent::__getDepartement();
+        $pagecontact = $this->load->view('page/'.$data['department'].'/contact/V_address',$data,true);
+        $this->menu_contact($pagecontact);
+    }
+            
 }
 

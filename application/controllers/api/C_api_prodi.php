@@ -690,8 +690,77 @@ class C_api_prodi extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='readContactAddress'){
 
-    }
+            $data = $this->db->get_where('db_prodi.contact_detail')->result_array();
+            return print_r(json_encode($data));
+
+        }
+        
+        else if($data_arr['action']=='saveContactDetail'){
+                $dataForm = (array) $data_arr['data'];
+
+                $dataForm['ProdiID'] = $prodi_active_id;
+                $dataForm['CreateAT'] = $this->m_rest->getDateTimeNow();
+                $dataform['CreateBY'] = $this->session->userdata('NIP');
+                // Cek apakah udah di input atau blm
+                $dataCk = $this->db->get_where('db_prodi.contact_detail',array(
+                    'ProdiID' => $prodi_active_id,
+                ))->result_array();
+
+                if(count($dataCk)>0){
+                    $this->db->where('ID', $dataCk[0]['ID']);
+                    $this->db->update('db_prodi.contact_detail',$dataForm);
+                } else {
+                    $this->db->insert('db_prodi.contact_detail',$dataForm);
+                }
+
+                return print_r(1);
+        }
+        else if($data_arr['action']=='readContactSosmed'){
+           
+            $data = $this->db->get_where('db_prodi.sosmed')->result_array();
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='saveContactSosmed'){
+                if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                    $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/icon');
+                    $upload = json_encode($upload); 
+                    // convert file
+                    $upload = json_decode($upload,true);
+                    $upload = $upload[0];
+
+                    $dataform = (array) $data_arr['data'];
+                    
+                    $dataform['ProdiID'] = $prodi_active_id;
+                    $dataform['CreateAT'] = $this->m_rest->getDateTimeNow();
+                    $dataform['CreateBY'] = $this->session->userdata('NIP');
+                    $dataform['Icon']= $upload;
+                    $this->db->insert('db_prodi.sosmed',$dataform);
+                }
+                    
+            return print_r(1);
+        }
+        else if ($data_arr['action']=='deleteDatasosmed') 
+        {
+            // print_r($data_arr);die()
+            // check action insert or update
+            $sql = 'select * from db_prodi.sosmed as s where s.ID = ?';
+            $ID = $data_arr['ID'];
+            $ProdiID = $prodi_active_id;
+            $query = $this->db->query($sql, array($ID))->result_array();
+            $this->db->where('ID', $ID);
+            $this->db->delete('db_prodi.sosmed'); 
+            $arr_file =  $query[0]['Icon'];
+            
+            $path = './images/icon/'. $arr_file;
+            unlink($path);
+            return print_r(1);
+        }
+
+        //======//
+    }//and crud
 
 
     function getProdiLecturer(){
@@ -852,6 +921,13 @@ class C_api_prodi extends CI_Controller {
         $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Facilities"')->result_array();
         
         
+        return print_r(json_encode($data));
+    }
+    function getInstaProdi(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+
+        $data = $this->db->query('SELECT * FROM db_academic.program_study_detail WHERE ProdiID = '.$ProdiID.'')->result_array();
         return print_r(json_encode($data));
     }
 

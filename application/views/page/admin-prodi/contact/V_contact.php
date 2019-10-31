@@ -1,4 +1,29 @@
 
+
+
+
+<div class="tabbable tabbable-custom tabbable-full-width">
+    <ul class="nav nav-tabs">
+       
+        <li class="<?php if($this->uri->segment(2)=='contact' ) { echo 'active'; }?>">
+            <a href="<?php echo base_url('prodi/contact'); ?>">Address</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3)=='sosmed' ) { echo 'active'; } ?>">
+            <a href="<?php echo base_url('prodi/contact/sosmed'); ?>">Sosial Media</a>
+        </li>
+        
+    </ul>
+    <div style="border-top: 1px solid #cccccc"> 
+
+        <div class="row">
+            <div class="col-md-12">
+                <?= $pagecontact; ?>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <div class="row">
 <div class="col-md-12">
     <div class="widget box">
@@ -22,7 +47,7 @@
                         <th>Subject</th>
                         <th>Messages</th>
                         <th>Update Date</th>
-                        <th>Action</th>
+                        <!-- <th>Action</th> -->
                     </tr>
                 </thead>
                 <tbody id="dataContact">
@@ -37,7 +62,6 @@
 <script type="text/javascript">
 
     $(document).ready(function(){
-         alert('ok');
        loadDataContact();
     });
 
@@ -57,7 +81,7 @@
                         '<td>'+v.Name+'</td>'+
                         '<td>'+v.Email+'</td>'+
                         '<td>'+v.Subject+'</td>'+
-                        '<td>'+v.Messages+'</td>'+
+                        '<td>'+v.Message+'</td>'+
                         '<td>'+v.CreateAT+'</td>'+
                         '</tr>');
                 });
