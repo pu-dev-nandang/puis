@@ -203,12 +203,12 @@ class C_employees extends HR_Controler {
 
                 // Delete files academic
                 $sql = 'SELECT LinkFiles FROM db_employees.files WHERE LinkFiles = "'.$fileName.'" ';
-                $qufiles =$this->db->query($sql, array())->result_array();   
+                $qufiles =$this->db->query($sql, array())->result_array();
 
                 if(count($qufiles)>0) {
-                    $NameFIles = $data[0]['LinkFiles'];
+                    $NameFIles = $qufiles[0]['LinkFiles'];
 
-                    $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                    $pathPhoto = './uploads/files/'.$NameFIles;
                     if(file_exists($pathPhoto)){
                             unlink($pathPhoto);
                     }
@@ -249,9 +249,9 @@ class C_employees extends HR_Controler {
                 $qufiles =$this->db->query($sql, array())->result_array();   
 
                 if(count($qufiles)>0) {
-                    $NameFIles = $data[0]['LinkFiles'];
+                    $NameFIles = $qufiles[0]['LinkFiles'];
 
-                    $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                    $pathPhoto = './uploads/files/'.$NameFIles;
                     if(file_exists($pathPhoto)){
                             unlink($pathPhoto);
                     }
@@ -290,9 +290,9 @@ class C_employees extends HR_Controler {
             $qufiles =$this->db->query($sql, array())->result_array();   
 
             if(count($qufiles)>0) {
-                $NameFIles = $data[0]['LinkFiles'];
+                $NameFIles = $qufiles[0]['LinkFiles'];
 
-                $pathPhoto = './uploads/files/'.$data[0]['LinkFiles'];
+                $pathPhoto = './uploads/files/'.$NameFIles;
                 if(file_exists($pathPhoto)){
                             unlink($pathPhoto);
                 }
@@ -615,6 +615,7 @@ class C_employees extends HR_Controler {
         $fileName = $this->input->get('fileName');
         $old = $this->input->get('old');
         $ID = $this->input->get('id');
+        $type = $this->input->get('type');
 
         $config['upload_path']          = './uploads/certificate/';
         $config['allowed_types']        = 'pdf';
@@ -632,11 +633,23 @@ class C_employees extends HR_Controler {
         }
         else {
 
-            // Update DB
-            $this->db->where('ID', $ID);
-            $this->db->update('db_employees.employees_certificate',array(
-                'File' => $fileName
-            ));
+            if($type=='stdacv'){
+
+                $this->db->where('ID', $ID);
+                $this->db->update('db_studentlife.student_achievement',array(
+                    'Certificate' => $fileName
+                ));
+            } else {
+
+                // Update DB
+                $this->db->where('ID', $ID);
+                $this->db->update('db_employees.employees_certificate',array(
+                    'File' => $fileName
+                ));
+
+            }
+
+
 
             $success = array('success' => $this->upload->data());
             $success['success']['formGrade'] = 0;

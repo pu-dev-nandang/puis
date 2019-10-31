@@ -73,6 +73,16 @@
                         </select>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Sertifikat (Kompetensi/Profesi/Industri)</label>
+                <p style="color: #673ab7;font-size: 12px;">*) File maksimum 8 Mb</p>
+                <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                    <input type="file" name="userfile" id="upload_files" accept="application/pdf">
+                </form>
+
+                <div id="showFileUpload"></div>
 
             </div>
 
@@ -261,64 +271,88 @@
 
     $('#saveAchievement').click(function () {
 
+        if(confirm('Are you sure to save?')){
+            var formSubmit = true;
+            var dataForm = '{';
 
-        var formSubmit = true;
-        var dataForm = '{';
+            $('.form-update-data').each(function (i,v) {
 
-        $('.form-update-data').each(function (i,v) {
+                var ID = $(this).attr('id');
+                var v = ($(this).val()!='') ? $(this).val() : "";
 
-            var ID = $(this).attr('id');
-            var v = ($(this).val()!='') ? $(this).val() : "";
+                if(ID=='StartDate' || ID=='EndDate'){
+                    var d_v = $(this).datepicker("getDate");
+                    v = (d_v!=null && d_v!='') ? moment(d_v).format('YYYY-MM-DD') : '';
+                }
 
-            if(ID=='StartDate' || ID=='EndDate'){
-                var d_v = $(this).datepicker("getDate");
-                v = (d_v!=null && d_v!='') ? moment(d_v).format('YYYY-MM-DD') : '';
-            }
+                if(v==""){
+                    formSubmit = false;
+                }
 
-            if(v==""){
-                formSubmit = false;
-            }
+                var koma = (i!=0) ? ',': '';
+                dataForm = dataForm+' '+koma+' "'+ID+'" : "'+v+'"' ;
 
-            var koma = (i!=0) ? ',': '';
-            dataForm = dataForm+' '+koma+' "'+ID+'" : "'+v+'"' ;
-
-            if((i+1)==$('.form-update-data').length){
-                dataForm = dataForm+'}';
-            }
-
-        });
-
-
-        var dataListStudent = $('#dataListStudent').val();
-
-
-        if(formSubmit && dataListStudent!='' && dataListStudent!=null){
-
-            loading_modal_show();
-
-            var ID = $('#ID').val();
-
-            var data = {
-                action : 'updatePAM',
-                ID : (ID!='' && ID!=null) ? ID : '',
-                dataForm : JSON.parse(dataForm),
-                dataListStudent : JSON.parse(dataListStudent)
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api3/__crudAgregatorTB5';
-
-            $.post(url,{token:token},function (result) {
-
-                toastr.success('Data saved','Success');
-                setTimeout(function () {
-                    window.location.href = '';
-                },500);
+                if((i+1)==$('.form-update-data').length){
+                    dataForm = dataForm+'}';
+                }
 
             });
-        } else {
-            toastr.error('Form are required','Error');
+
+
+            var dataListStudent = $('#dataListStudent').val();
+
+            var file = $('#upload_files').val();
+            var fileSize = true;
+            if(file!='' && file!=null){
+                var input = $('#upload_files');
+                var files = input[0].files[0];
+
+                var sz = parseFloat(files.size) / 1000000; // ukuran MB
+                fileSize = (Math.floor(sz)<=8) ? true : false;
+            }
+
+
+
+
+
+            if(formSubmit && dataListStudent!='' && dataListStudent!=null && fileSize){
+
+                loading_modal_show();
+
+                var ID = $('#ID').val();
+
+                var data = {
+                    action : 'updatePAM',
+                    ID : (ID!='' && ID!=null) ? ID : '',
+                    dataForm : JSON.parse(dataForm),
+                    dataListStudent : JSON.parse(dataListStudent)
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudAgregatorTB5';
+
+                $.post(url,{token:token},function (jsonResult) {
+
+                    var ID = jsonResult.ID;
+                    var FileName = jsonResult.FileName;
+
+                    if(file!='' && file!=null){
+                        uploadCertificate(ID,FileName);
+                    } else {
+                        toastr.success('Data saved','Success');
+                        setTimeout(function () {
+                            window.location.href = '';
+                        },500);
+                    }
+
+                });
+            } else {
+                toastr.error('Form are required','Error');
+            }
         }
+
+
+
 
 
     });
@@ -339,6 +373,7 @@
             var url = base_url_js+'api3/__crudAgregatorTB5';
 
             $.post(url,{token:token},function (jsonResult) {
+
 
                 var dataAch = jsonResult.dataAch[0];
 
@@ -361,6 +396,12 @@
                 var dataAchStd = jsonResult.dataAchStd;
                 $('#dataListStudent').val(JSON.stringify(dataAchStd));
                 loadStdSelected();
+                $('#showFileUpload').empty();
+                if(dataAch.Certificate!='' && dataAch.Certificate!=null){
+                    $('#showFileUpload').html('<div style="padding: 10px;">' +
+                        '<a href="'+base_url_js+'uploads/certificate/'+dataAch.Certificate+'" target="_blank" class="btn btn-sm btn-default btn-default-primary">Show File</a>' +
+                        '</div>');
+                }
 
                 setTimeout(function () {
                     loading_modal_hide();
@@ -370,5 +411,46 @@
 
         }
     }
+
+    function uploadCertificate(ID,FileNameOld) {
+
+        var input = $('#upload_files');
+        var files = input[0].files[0];
+
+        var sz = parseFloat(files.size) / 1000000; // ukuran MB
+        var ext = files.type.split('/')[1];
+
+        if(Math.floor(sz)<=8){
+
+            var fileName = 'student_achievment_'+moment().unix()+'.'+ext;
+            var formData = new FormData( $("#formupload_files")[0]);
+
+            var url = base_url_js+'human-resources/upload_certificate?fileName='+fileName+'&old='+FileNameOld+'&id='+ID+'&type=stdacv';
+
+            $.ajax({
+                url : url,  // Controller URL
+                type : 'POST',
+                data : formData,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+                    toastr.success('Data & upload Success','Saved');
+                    setTimeout(function () {
+                        window.location.href = '';
+                    },500);
+                    // loadDataEmployees();
+
+                }
+            });
+
+        }
+
+
+
+    }
+
+
 
 </script>
