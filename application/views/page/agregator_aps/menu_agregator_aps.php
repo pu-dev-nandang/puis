@@ -21,9 +21,14 @@
 </style>
 
 
-<div class="row">
+<div class="row" id = "ParentContentAPS">
     <div class="col-md-2" id="menuLeft">
-
+        
+        <div>
+            <a href="<?= base_url('agregator-aps/setting'); ?>" class="btn btn-primary btn-block btn-round"><i class="fa fa-cog"></i> Setting</a>
+            <hr/>
+        </div>
+        <br/>
         <div>
             <select class="form-control" id="filterProdi"></select>
             <hr/>
@@ -60,7 +65,7 @@
 
         </div>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-10" id = "pageContentAPS">
         <?= $page; ?>
         <?php if(count($Description)>0){
             if($Description[0]['Description']!='' && $Description[0]['Description']!=null){ ?>
@@ -71,13 +76,78 @@
     </div>
 </div>
 
-
-
-
-
 <script>
-    $(document).ready(function () {
+    var App_menu_aggregator_aps = {
+        Loadauth : function(){
+            var NIP = sessionNIP;
+            var getCurrentURL = document.URL;
+            var IndexURL = "<?php echo url_pas ?>";
+            if (IndexURL+'agregator-aps/setting' != getCurrentURL && IndexURL+'agregator/setting' != getCurrentURL) {
+                var dataform = {
+                                    NIP : NIP,
+                                    getCurrentURL : getCurrentURL,
+                                    Type : 'APS',
+                                };
+                var token = jwt_encode(dataform,"UAP)(*");
+                var url = base_url_js + "agregator/authenticate";
+                $.post(url,{ token:token },function (resultJson) {
+                           
+                }).done(function(resultJson) {
+                    App_menu_aggregator_aps.PrevilgesUser(resultJson);
+                }).fail(function() {
+                    toastr.error("Connection Error, Please try again", 'Error!!');
+                }).always(function() {
 
+                });
+            }
+        },
+        PrevilgesUser : function(resultJson){
+            var AccessPage = resultJson.AccessPage;
+            var RuleAccess = resultJson.RuleAccess;
+            if (AccessPage == 'No') {
+                $('#pageContentAPS').remove();
+                $('#ParentContentAPS').append(
+                        ' <div class="col-md-10" id = "pageContentAuth">'+
+                            '<div class="well">'+
+                                '<div class="row">'+
+                                    '<div class="col-md-12" style="text-align: center;padding-bottom: 20px;">'+
+                                        '<h3>You don\'t have access to this menu</h3>'+
+                                    '</div>'+
+                               ' </div>'+
+                            '</div>'+
+                        '</div>'    
+                    );
+                loadSelectOptionBaseProdi('#filterProdi','');
+            }
+            else
+            {
+                RuleAccess =  jQuery.parseJSON(RuleAccess);
+                App_menu_aggregator_aps.LoadProdiAuth(RuleAccess);
+                var arr_ProdiID = RuleAccess.ProdiID;
+                loadSelectOptionBaseProdi('#filterProdi','',arr_ProdiID);
+            }
+        },
+        LoadProdiAuth : function(RuleAccess){
+            if (RuleAccess.input == 'false') {
+                $('#inputForm').attr('class','hide');
+                $('#ViewData').attr('class','col-md-12');
+            }
+            else
+            {
+                $('#inputForm').attr('class','col-md-4');
+                $('#ViewData').attr('class','col-md-8');
+            }
+            // console.log(RuleAccess);
+        },
+        loaded : function(){
+            loadingStart();
+            App_menu_aggregator_aps.Loadauth();
+            loadingEnd(1500)
+        }
+
+    };
+
+    $(document).ready(function () {
         $('.fixed-header').addClass('sidebar-closed');
 
         $('.list-group-item').removeClass('active-left-menu');
@@ -86,11 +156,9 @@
         var elm = $('a[href="'+base_url_js+'<?= $this->uri->segment(1).'/'.$this->uri->segment(2); ?>"]');
         elm.addClass('active-left-menu');
         elm.parent().parent().addClass('in');
+        // loadSelectOptionBaseProdi('#filterProdi','');
 
-
-        loadSelectOptionBaseProdi('#filterProdi','');
-
-
+        App_menu_aggregator_aps.loaded();
 
     });
 

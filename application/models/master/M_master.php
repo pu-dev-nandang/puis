@@ -3443,6 +3443,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         rmdir($dir);
     }
 
+    public function encode_auth_access_aps_rs($input,$view,$ProdiID){
+        // get value ProdiID
+        $arr_Prodi = [];
+        for ($i=0; $i < count($ProdiID); $i++) { 
+           // $ex = explode('.', $ProdiID[$i]);
+           $arr_Prodi[] = $ProdiID[$i];
+        }
+        $rs = ['input' => $input,'view' => $view,'ProdiID' => $arr_Prodi ];
+        return json_encode($rs);
+    }
 
     public function auth_access_aps_rs()
     {
@@ -3606,6 +3616,46 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
         }
 
+        return $rs;
+    }
+
+    public function __Previleges_aps_apt_user($NIP,$URI,$Type){
+        $sql = 'select a.* from db_agregator.agregator_menu as a 
+                join db_agregator.agregator_menu_header as b on a.MHID = b.ID
+                where b.Type = "'.$Type.'" and a.URL = "'.$URI.'"
+        ';
+        $data = $this->db->query($sql,array())->result_array();
+        $rs = [
+            'AccessPage' => 'No',
+            'RuleAccess' => [],
+        ];
+        $Table1 = 'agregator_user_member_aps';
+        $Table2 = 'agregator_user_aps';
+        if ($Type=='APT') {
+            $Table1 = 'agregator_user_member';
+            $Table2 = 'agregator_user';
+        }
+        $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.'.$Table1.' aum 
+                                            LEFT JOIN db_agregator.'.$Table2.' au ON (aum.AUPID = au.ID)
+                                            WHERE aum.NIP = "'.$NIP.'" 
+                                            LIMIT 1')->result_array();
+        $MyMenu = (count($checkMenu)>0) ? $checkMenu[0]['Menu'] : "[]" ;
+        $MyMenu = json_decode($MyMenu);
+        if(count($MyMenu)>0){
+            // Cek apakah ada
+            if(in_array($data[0]['ID'],$MyMenu)){
+                $rs['AccessPage'] = 'Yes';
+                if ($Type=='APT') {
+                   $rs['RuleAccess'] = [];
+                }
+                else
+                {
+                    $rs['RuleAccess'] = $checkMenu[0]['Access'];
+                }
+                
+            }
+
+        }
         return $rs;
     }
   
