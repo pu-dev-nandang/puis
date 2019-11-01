@@ -48,16 +48,14 @@ class C_requestdocument extends Globalclass {
 
         //$token = '488a476ba583155fd274ffad3ae741408d357054';
         // get token
-            $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$this->session->userdata('NIP'));
-            $token = $G_emp[0]['Password'];
+        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$this->session->userdata('NIP'));
+        $token = $G_emp[0]['Password'];
 
 
         $dataEmployees = $this->db->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
             'Password' => $token
         ))->result_array();
 
-
-        // $data['include'] = $this->load->view('template/include','',true);
         $data['dataEmp'] = $dataEmployees;
         $content =$this->load->view('global/form/formTugasKeluar',$data,true);
         $this->temp($content);

@@ -254,17 +254,19 @@ class C_api extends CI_Controller {
     public function getreqdocument(){
         $requestData= $_REQUEST;
 
-        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                 LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                 WHERE b.RequestDocument = 1 ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
-                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP) AND (a.UserConfirm = c.NIP)
+                    LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                     WHERE b.RequestDocument = 1  AND ( ';
 
             $sql.= ' c.Name LIKE "'.$requestData['search']['value'].'%" ';
@@ -274,10 +276,11 @@ class C_api extends CI_Controller {
 
         }
         else {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                     WHERE b.RequestDocument = 1 ';
             $sql.= 'ORDER BY a.IDRequest DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -300,7 +303,7 @@ class C_api extends CI_Controller {
             }else {
                 $endtimesz = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';
             }
-            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NIP"].' - '.$row["Name"];
             $nestedData[] = $row["NameFiles"];
@@ -316,16 +319,16 @@ class C_api extends CI_Controller {
             $tokenPDF = $this->jwt->encode(array('NIP' => $NIP, 'IDRequest' => $IDRequest),'UAP)(*');
 
             if($row['ConfirmStatus'] == 0){
-                $status = '<button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button>';
+                $status = '<div class="btn-group"><button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div>';
             } else if($row['ConfirmStatus'] == 1) {
-                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> ';
+                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> <div> <p style="color:blue;font-size:11px;"> Approved By '.$row["Namaconfirm"].'</p> </div>';
             } else {
 
-                $status = '<label class="text-danger"> Rejected</label>';
+                $status = '<label class="text-danger"> Rejected <div> <p style="color:blue;font-size:11px;"> Rejected By '.$row["Namaconfirm"].'</p> </div></label>';
             }
 
 
-            $nestedData[] = '<center><div class="btn-group">'.$status.'</div></center>';
+            $nestedData[] = '<center>'.$status.' </center>';
             //$nestedData[] = '<center><div class="btn-group">
             //  <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button>
             //  <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
@@ -2628,7 +2631,7 @@ class C_api extends CI_Controller {
 
     public function getdatarequestdocument(){
 
-        $status = $this->input->get('s');
+        //$status = $this->input->get('s');
         $requestData= $_REQUEST;
         $NIP = $this->session->userdata('NIP');
 
@@ -2669,7 +2672,7 @@ class C_api extends CI_Controller {
             $stats = ($row["Active"]=='1') ? 'Active' : 'Non Active';
 
             $StartDate = date('d M Y H:i',strtotime($row['StartDate']));
-            $EndDate = date(' d M Y H:i',strtotime($row['EndDate']));
+            $EndDate = date('d M Y H:i',strtotime($row['EndDate']));
 
             if($row['ConfirmStatus'] == 1) {
 
@@ -2678,11 +2681,12 @@ class C_api extends CI_Controller {
                     'IDRequest' => $row['IDRequest']
                 ),'UAP)(*');
                 $linksurat = base_url('save2pdf/suratTugasKeluar/'.$token);
-                $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ';
+                $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank" data-toggle="tooltip" data-placement="top" title="Download"><i class="fa fa-download"></i></a> ';
+
             } else if($row['ConfirmStatus'] == -1) {
-                $buttonlink = '<p class="text-danger"> Rejected </p>';
+                $buttonlink = '<p style="color:red;"> Rejected </p>';
             } else {
-                $buttonlink = '<p class="text-primary"> Waiting Approved </p>';
+                $buttonlink = '<p style="color:blue;"> Waiting Confirmation </p>';
             }
 
             if($row['DateConfirm'] == '0000-00-00 00:00:00' ) {
@@ -2695,13 +2699,15 @@ class C_api extends CI_Controller {
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NIP"].' - '.$row["Name"].'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
+            //$nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["ForTask"].'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$StartDate.'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$EndDate.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$StartDate.'  -  '.$EndDate.'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["DescriptionAddress"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$dateconfirms.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$buttonlink.'</div>';
+            $nestedData[] = '<div style="text-align: center;">
+            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="icon-list icon-large"></i> </button> 
+            <button class="btn btn-sm btn-circle btn-danger btndeleterequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button></div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2715,8 +2721,6 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
 
     }
-
-
 
 
     public function getversiondetail(){
