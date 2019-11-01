@@ -24,6 +24,25 @@ if($access=='1'){ ?>
                 <select class="select2-select-00 full-width-fix" multiple size="5" id="formMenu">
                 </select>
             </div>
+            <div class="form-group">
+                <label>Input Access</label>
+                <select class="form-control" id = "formInputAccess">
+                    <option value="false" selected>False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>View Access</label>
+                <select class="form-control" id = "formViewAccess">
+                    <option value="prodi" selected>Choose Prodi</option>
+                    <option value="all">All Prodi</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Program Study Access</label>
+                <select class="select2-select-00 full-width-fix" multiple size="5" id="formProdiAccess">
+                </select>
+            </div>
             <div class="form-group" style="text-align: right;">
                 <button class="btn btn-primary" id="btnSaveSetting">Save</button>
             </div>
@@ -35,6 +54,7 @@ if($access=='1'){ ?>
                     <th style="width: 1%;">No</th>
                     <th style="width: 25%;">Team</th>
                     <th>Menu</th>
+                    <th>Access</th>
                     <th style="width: 15%;"><i class="fa fa-cog"></i></th>
                 </tr>
                 </thead>
@@ -51,11 +71,31 @@ if($access=='1'){ ?>
     $(document).ready(function () {
         loadSelectOptionEmployeesSingle('#formMember','');
         loadSelectOptionMenuAgregator('#formMenu','','APS');
-
-        $('#formMember,#formMenu').select2({allowClear: true});
-
+        loadSelectOptionBaseProdi('#formProdiAccess','');
+        $('#formMember,#formMenu,#formProdiAccess').select2({allowClear: true});
+        $('#formViewAccess').trigger('change');
         loadSetting();
 
+    });
+
+    $(document).on('change','#formViewAccess',function () {
+        var v = $(this).val();
+        if (v== 'all') {
+            var PRAccess = [];
+            $('#formProdiAccess').find('option').each(function(){
+                var vOp = $(this).val();
+                PRAccess.push(vOp);
+            })
+            $('#formProdiAccess').select2('val',PRAccess);
+            $('#formProdiAccess').prop('disabled',true);
+            // $('#formProdiAccess').prop('readonly',true);
+        }
+        else
+        {
+            $('#formProdiAccess').select2('val',[]);
+            $('#formProdiAccess').prop('disabled',false);
+            // $('#formProdiAccess').prop('readonly',false);
+        }
     });
 
     $('#btnSaveSetting').click(function () {
@@ -64,20 +104,26 @@ if($access=='1'){ ?>
         var formName = $('#formName').val();
         var formMember = $('#formMember').val();
         var formMenu = $('#formMenu').val();
-
+        var formInputAccess = $('#formInputAccess option:selected').val();
+        var formProdiAccess = $('#formProdiAccess').val();
+        var formViewAccess = $('#formViewAccess option:selected').val();
+        // console.log(formProdiAccess);return;
         if(formName!='' && formName!=null &&
             formMember!='' && formMember!=null &&
-        formMenu!='' && formMenu!=null){
+        formMenu!='' && formMenu!=null && formProdiAccess != '' && formProdiAccess != null){
 
             loading_buttonSm('#btnSaveSetting');
 
             var data = {
-                action : (formID!='' && formID!=null) ? 'updateTeamAggr' : 'insertTeamAggr',
+                action : (formID!='' && formID!=null) ? 'updateTeamAggr_APS' : 'insertTeamAggr_APS',
                 ID : formID,
                 dataForm : {
                     Name : formName,
-                    Menu : JSON.stringify(formMenu)
+                    Menu : JSON.stringify(formMenu),
                 },
+                input : formInputAccess,
+                ProdiID : formProdiAccess,
+                view : formViewAccess,
                 Member : formMember
             };
 
@@ -87,7 +133,7 @@ if($access=='1'){ ?>
 
                 loadSetting();
                 $('#formName,#formID').val('');
-                $('#formMember,#formMenu').val(null).trigger('change');
+                $('#formMember,#formMenu,#formProdiAccess').val(null).trigger('change');
 
                 setTimeout(function () {
                     $('#btnSaveSetting').html('Save').prop('disabled',false);
@@ -102,14 +148,13 @@ if($access=='1'){ ?>
     function loadSetting() {
 
         var data = {
-            action : 'readTeamAggr',
+            action : 'readTeamAggr_APS',
             Type : 'APS',
         };
 
         var token = jwt_encode(data,'UAP)(*');
         var url = base_url_js+'api3/__crudTeamAgregagor';
         $.post(url,{token:token},function (jsonResult) {
-
 
             $('#viewListAll').val(JSON.stringify(jsonResult));
             $('#listTeamSetting').empty();
@@ -132,12 +177,29 @@ if($access=='1'){ ?>
                         });
                     }
 
+                    var AccessWr = '<ul>';
+                    var dtP = v.Access;
+                    dtp =  jQuery.parseJSON(dtP);
+                    // console.log(dtp);
+                    AccessWr += '<li>Input : '+dtp.input+'</li>';
+                    AccessWr += '<li>View : '+dtp.view+'</li>';
+                    AccessWr += '<li><b>Program Study</b><ul>';
+                    var PR = dtp.ProdiID;
+                    for (var z = 0; z < PR.length; z++) {
+                        var spPR = PR[z].split('.');
+                        // console.log(dtP[i]);
+                        AccessWr += '<li>'+spPR[1]+'</li>';
+                    }
+
+                    AccessWr += '</ul></li></ul>';
+                    var jwtPass = jwt_encode(dtp,'UAP)(*');
                     $('#listTeamSetting').append('<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td><b>'+v.Name+'</b><div>'+Member+'</div></td>' +
                         '<td><ul>'+Menu+'</ul></td>' +
+                        '<td>'+AccessWr+'</td>' +
                         '<td>' +
-                        '<button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                        '<button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'" dtother = "'+jwtPass+'"><i class="fa fa-edit"></i></button> ' +
                         '<button class="btn btn-sm btn-danger btnRemove_aps" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button> ' +
                         '</td>' +
                         '</tr>')
@@ -149,7 +211,8 @@ if($access=='1'){ ?>
     }
 
     $(document).on('click','.btnEdit',function () {
-
+        var dtother = $(this).attr('dtother');
+        dtother = jwt_decode(dtother);
         var viewListAll = $('#viewListAll').val();
         var viewListAll = JSON.parse(viewListAll);
 
@@ -180,6 +243,25 @@ if($access=='1'){ ?>
 
         $('#formMenu').select2('val',menu);
 
+        // dtother
+        $("#formInputAccess option").filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == dtother.input; 
+        }).prop("selected", true);
+
+        $("#formViewAccess option").filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == dtother.view; 
+        }).prop("selected", true);
+        $('#formViewAccess').trigger('change');
+        var arr_prodi = dtother.ProdiID;
+        var pass_arr_prodi = [];
+        for (var i = 0; i < arr_prodi.length; i++) {
+            pass_arr_prodi.push(arr_prodi[i]);
+        }
+
+        $('#formProdiAccess').select2('val',pass_arr_prodi);
+        
     });
 
     $(document).on('click','.btnRemove_aps',function () {
@@ -189,7 +271,7 @@ if($access=='1'){ ?>
             var ID = $(this).attr('data-id');
 
             var data = {
-                action : 'removeTeamAggr',
+                action : 'removeTeamAggr_APS',
                 ID : ID
             };
 

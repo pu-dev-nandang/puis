@@ -20,17 +20,21 @@ class C_agregator_aps extends Globalclass {
 
     private function agregatorPrevilege($viewPage){
 
-        $data = $this->db->get_where('db_agregator.agregator_menu',array(
-            'View' => $viewPage
-        ))->result_array();
-
+        // $data = $this->db->get_where('db_agregator.agregator_menu',array(
+        //     'View' => $viewPage,
+        // ))->result_array();
+        $sql = 'select a.* from db_agregator.agregator_menu as a 
+                join db_agregator.agregator_menu_header as b on a.MHID = b.ID
+                where b.Type = "APS" and a.View = "'.$viewPage.'"
+        ';
+        $data = $this->db->query($sql,array())->result_array();
 
         $result = '0';
 
         if(count($data)>0){
 
-            $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.agregator_user_member aum 
-                                                LEFT JOIN db_agregator.agregator_user au ON (aum.AUPID = au.ID)
+            $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.agregator_user_member_aps aum 
+                                                LEFT JOIN db_agregator.agregator_user_aps au ON (aum.AUPID = au.ID)
                                                 WHERE aum.NIP = "'.$this->session->userdata('NIP').'" 
                                                 LIMIT 1')->result_array();
 
@@ -79,7 +83,7 @@ class C_agregator_aps extends Globalclass {
         $data['Description'] = $this->db->get_where('db_agregator.agregator_menu',array(
             'URL' => $URL
         ))->result_array();
-
+        // print_r($data);die();
         $content = $this->load->view('page/agregator_aps/menu_agregator_aps',$data,true);
         $this->temp($content);
     }
@@ -109,6 +113,21 @@ class C_agregator_aps extends Globalclass {
         $data['access'] = (count($dataSetting)>0) ? '1' : '0';
         $page = $this->load->view('page/agregator_aps/setting',$data,true);
         $this->menu_agregator($page);
+    }
+
+    public function authenticate_aps()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        $rs = [];
+        $Input = $this->getInputToken();
+        $NIP = $Input['NIP'];
+        $URL = $Input['getCurrentURL'];
+        $Type = $Input['Type'];
+        $URI = str_replace(url_pas, '', $URL);
+        $Rule = $this->m_master->__Previleges_aps_apt_user($NIP,$URI,$Type);
+        echo json_encode($Rule);
+
     }
 
 }

@@ -609,12 +609,24 @@
         });
     }
 
-    function loadSelectOptionBaseProdi(element,selected) {
+    function loadSelectOptionBaseProdi(element,selected,filtered=[]) {
         var url = base_url_js+"api/__getBaseProdiSelectOption";
         $.get(url,function (data) {
             for(var i=0;i<data.length;i++){
                 var selc = (data[i].ID==selected) ? 'selected' : '';
-                $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                if (filtered.length == 0) {
+                    $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                }
+                else
+                {
+                    for (var k = 0; k < filtered.length; k++) {
+                        var ex = filtered[k].split('.');
+                        if (ex[0] == data[i].ID) {
+                            $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                        }
+                    }
+                }
+                
             }
         });
     }

@@ -221,19 +221,6 @@ var App_kepuasan_mhs = {
         });
     },
 
-    checkReadOrWrite : function(){
-        var arr_access = <?php echo json_encode($arr_data)  ?>;
-        if (arr_access.input) {
-            $('#inputForm').attr('class','col-md-4');
-            $('#ViewData').attr('class','col-md-8');
-        }
-        else
-        {
-            $('#inputForm').attr('class','hide');
-            $('#ViewData').attr('class','col-md-12');
-        }
-    },
-
     SubmitData : function(action='kepuasan-mhs-add',ID='',selector){
         var data = {};
         $('.input').each(function(){
@@ -289,48 +276,7 @@ var App_kepuasan_mhs = {
 
     },
 
-    SelectFilteringProdi : function(){
-        var bool = false;
-        var selector = $('#filterProdi');
-        var view = "<?php echo $arr_data['view'] ?>";
-        if (view != 'all') {
-            var jsonArr = <?php echo json_encode($arr_data['ProdiID']) ?>;
-            if (jsonArr.length > 0) {
-                console.log(jsonArr);
-                selector.find('option').each(function(){
-                    var sthis = $(this);
-                    var v = $(this).val();
-                    var sp = v.split('.');
-                    var res = sp[0];
-                    var bool2 = false;
-                    for (var i = 0; i < jsonArr.length; i++) {
-                        if (jsonArr[i] == res) {
-                            // console.log(res);
-                            bool2 = true;
-                            break;
-                        }
-                    }
-
-                    if (!bool2) {
-                        sthis.remove();
-                    }
-                })
-            }
-            else
-            {
-                  // selector.find('option').each(function(){
-                  //   var sthis = $(this);
-                  //    sthis.remove();
-                  // })
-            }
-        }
-        bool = true;
-        return bool;
-    },
-
     loaded : function(){
-        loadingStart();
-        App_kepuasan_mhs.checkReadOrWrite();
         App_kepuasan_mhs.LoadSelectOptionAspekRatio();
         loSelectOptionSemester('#FilterSemester','selectedNow');
         loSelectOptionSemester('.input[name="SemesterID"]','selectedNow');
@@ -340,15 +286,12 @@ var App_kepuasan_mhs = {
             var ID_m_aspek_ratio = $('.input[name="ID_m_aspek_ratio"]').val();
             var FilterSemester = $('#FilterSemester').val();
             var SemesterID = $('.input[name="SemesterID"]').val();
-            if (App_kepuasan_mhs.SelectFilteringProdi()) {
-                if(filterProdi!='' && filterProdi!=null && ID_m_aspek_ratio != '' && ID_m_aspek_ratio != null && FilterSemester!='' && FilterSemester !=null && SemesterID != '' && SemesterID != null ){
-                    $('#viewProdiID').html(filterProdi);
-                    $('#viewProdiName').html($('#filterProdi option:selected').text());
-                    App_kepuasan_mhs.LoadAjaxTable();
-                    App_kepuasan_mhs.setDefaultInput();
-                    clearInterval(firstLoad);
-                    loadingEnd(500)
-                }
+            if(filterProdi!='' && filterProdi!=null && ID_m_aspek_ratio != '' && ID_m_aspek_ratio != null && FilterSemester!='' && FilterSemester !=null && SemesterID != '' && SemesterID != null ){
+                $('#viewProdiID').html(filterProdi);
+                $('#viewProdiName').html($('#filterProdi option:selected').text());
+                App_kepuasan_mhs.LoadAjaxTable();
+                App_kepuasan_mhs.setDefaultInput();
+                clearInterval(firstLoad);
             }
             
         },1000);
