@@ -280,12 +280,11 @@ $d = $dataEmp[0];
                     var awal = response[i]['StartDate'];
                     var akhir = response[i]['EndDate'];
                     var datereq = response[i]['EndDate'];
-                    var datecom = response[i]['EndDate'];
+                    var datecom = response[i]['DateConfirm'];
 
                     var startdatex = moment(awal).format('DD MMM YYYY HH:mm');
                     var enddatex = moment(akhir).format('DD MMM YYYY HH:mm');
                     var daterequest = moment(datereq).format('DD MMM YYYY HH:mm');
-                    var daterconfirm = moment(datecom).format('DD MMM YYYY HH:mm');
 
                     var dayawal = moment(awal).format('dddd');
                     var dayakhir = moment(akhir).format('dddd');
@@ -301,11 +300,18 @@ $d = $dataEmp[0];
                         var confirmx = "Rejected";
                     }
 
-                    if(response[i]['UserConfirm'] == null && response[i]['UserConfirm'] == "") {
+                    if(response[i]['namaconfirm'] == null) {
                         var namcomfirm = "-";
                     } 
                     else {
                         var namcomfirm = response[i]['namaconfirm'];
+                    }
+
+                    if(response[i]['DateConfirm'] == "0000-00-00 00:00:00") {
+                        var daterconfirm = "-";
+                    } 
+                    else {
+                        var daterconfirm = moment(datecom).format('DD MMM YYYY HH:mm');
                     }
 
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
@@ -368,62 +374,6 @@ $d = $dataEmp[0];
     });
 
 
-    $(document).on('click','.btneditrequest', function () {
-
-        var requestid = $(this).attr('requestid');
-        var url = base_url_js+'api2/__crudrequestdoc?s='+requestid;                         
-        var token = jwt_encode({
-                action:'get_editrequest'
-            },'UAP)(*');
-
-        $.post(url,{token:token},function (resultJson) {
-            console.log(resultJson); 
-            var response = resultJson;
-                if(response.length>0){
-                    var no = 1;
-                    for (var i = 0; i < response.length; i++) {
-
-                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
-                        ' <span aria-hidden="true">&times;</span></button> '+
-                        ' <h4 class="modal-title">Detail Version Data</h4>');
-                    $('#GlobalModal .modal-body').html('<table class="table">' +
-                         '<tr>' +
-                        '   <td style="width: 25%;">No. Version</td>' +
-                        '   <td><b>'+response[i]['Version']+' </b></td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '   <td style="width: 25%;">Name Division</td>' +
-                        '   <td>'+response[i]['Division']+'</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '   <td style="width: 25%;">Name Module</td>' +
-                        '   <td>'+response[i]['NameModule']+'</td>' +
-                        '</tr>' +
-                        '   <td style="width: 25%;">Date Update</td>' +
-                        '   <td>'+response[i]['UpdateAt']+'</td>' +
-                        '</tr>' +
-                        '   <td style="width: 25%;">Name PIC</td>' +
-                        '   <td>'+response[i]['NamePIC']+'</td>' +
-                        '</tr>' +
-                        '<tr>' +
-                        '   <td style="width: 25%;">Description</td>' +
-                        '   <td>'+response[i]['Description']+'</td>' +
-                        '</tr>' +
-                        '</table>');
-                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
-                
-                    $('#GlobalModal').modal({
-                        'backdrop' : 'static',
-                        'show' : true
-                    }); 
-                        
-                    } //end for
-                } //end if
-            }); //end json  
-         //END IF
-    });
-
-
     $(document).on('click','.btnsaverequest',function () {
         $('#NotificationModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
                                 ' <span aria-hidden="true">&times;</span></button> '+
@@ -454,8 +404,6 @@ $d = $dataEmp[0];
         }); 
      });
 
-     
-    
 
     $(document).on('click','.reqdeleted',function () {
         var requestID = $(this).attr('idrequestdel');

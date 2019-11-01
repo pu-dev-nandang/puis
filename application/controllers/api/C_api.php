@@ -309,7 +309,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $row["NameFiles"];
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['RequestDate'])).'</div>';
             $nestedData[] = $row["ForTask"] ;
-            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['DateConfirm'])).'</div>';
             $nestedData[] = $endtimesz;
             $nestedData[] = $row["DescriptionAddress"];
 
@@ -2693,7 +2693,7 @@ class C_api extends CI_Controller {
                 $dateconfirms = '';
             } else {
                 $datex = $row['DateConfirm'];
-                $dateconfirms = date("d M Y h:i",strtotime($row['DateConfirm']));
+                $dateconfirms = date("d M Y H:i",strtotime($row['DateConfirm']));
             }
 
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
