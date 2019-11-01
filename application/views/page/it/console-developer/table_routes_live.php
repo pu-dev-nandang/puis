@@ -158,6 +158,7 @@
                 var html = '';
                     html += '<div class = "row">'+
                                 '<div class = "col-md-12">'+
+                                    '<div class="table-responsive">'+
                                     '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal2">'+
                                           '<thead>'+
                                               '<tr>'+
@@ -182,7 +183,7 @@
                     }
 
                     html += '</tbody></table>';
-                    html += '</div></div>'; 
+                    html += '</div></div></div>'; 
 
                      var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                          '<button type="button" id="ModalbtnSaveForm2" class="btn btn-success">Procces</button>';
@@ -202,7 +203,7 @@
             oTable2.rows().every(function(index, element) {
               var row = $(this.node());
               var No = row.find('td').eq(0).html();
-              row.find('td').eq(0).html('<input type = "checkbox" class = "select_migrate2"> '+No );
+              row.find('td').eq(0).html('<input type = "checkbox" class = "select_migrate2" checked> '+No );
             });
         }
     })
