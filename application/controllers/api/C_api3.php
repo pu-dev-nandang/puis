@@ -2288,6 +2288,60 @@ class C_api3 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='getDataStudentAcv'){
+
+            $Year = $data_arr['Year'];
+
+            // Get App Prodi
+            $dataP = $this->db->select('ID, Name')->get_where('db_academic.program_study',array(
+                'Status' => 1
+            ))->result_array();
+
+            if(count($dataP)>0){
+                for($i=0;$i<count($dataP);$i++){
+
+                    for($y=0;$y<=2;$y++){
+
+                        $YearWhere = $Year - $y;
+
+                        // Get data lulusan
+
+                        $dataStd = $this->db->query('SELECT NPM, Name, GraduationYear FROM db_academic.auth_students ats 
+                                                                WHERE ats.StatusStudentID = 1 AND ats.GraduationYear = "'.$YearWhere.'"
+                                                                AND ats.ProdiID =  "'.$dataP[$i]['ID'].'"
+                                                                ORDER BY ats.NPM ASC ')->result_array();
+
+                        $dataSertificate = [];
+                        if(count($dataStd)>0){
+                            foreach ($dataStd AS $item){
+
+                                $dataSer = $this->db->query('SELECT sa.Event, sa.Year, sas.NPM, sa.Certificate FROM db_studentlife.student_achievement_student sas 
+                                                                            LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
+                                                                            WHERE sas.NPM = "'.$item['NPM'].'" ')->result_array();
+
+                                if(count($dataSer)>0){
+                                    for($c=0;$c<count($dataSer);$c++){
+                                        $dataSer[$c]['Name'] = $item['Name'];
+                                        array_push($dataSertificate,$dataSer[$c]);
+                                    }
+                                }
+
+                            }
+                        }
+
+                        $dataP[$i]['L_'.$YearWhere] = $dataStd;
+                        $dataP[$i]['S_'.$YearWhere] = $dataSertificate;
+
+                    }
+
+                }
+            }
+
+
+            return print_r(json_encode($dataP));
+
+        }
+
         else if($data_arr['action']=='getPAMByID'){
             $ID = $data_arr['ID'];
             $dataAch = $this->db->get_where('db_studentlife.student_achievement',array('ID' => $ID))->result_array();

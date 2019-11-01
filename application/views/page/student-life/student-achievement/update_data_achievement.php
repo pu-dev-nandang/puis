@@ -25,7 +25,7 @@
                     </div>
                     <div class="col-xs-3">
                         <label>Year</label>
-                        <input class="form-control form-update-data" id="Year" />
+                        <input class="form-control form-update-data" type="number" id="Year" />
                     </div>
                 </div>
 

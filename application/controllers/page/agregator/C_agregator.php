@@ -231,6 +231,14 @@ class C_agregator extends Globalclass {
         $this->menu_agregator($page);
     }
 
+    public function sertifikat_kompetensi(){
+        $viewPage = 'sertifikat_kompetensi';
+        $accessUser = $this->agregatorPrevilege($viewPage);
+        $data['accessUser'] = $accessUser;
+        $page = $this->load->view('page/agregator/'.$viewPage,$data,true);
+        $this->menu_agregator($page);
+    }
+
     public function prestasi_akademik_mahasiswa(){
         $viewPage = 'prestasi_akademik_mahasiswa';
         $accessUser = $this->agregatorPrevilege($viewPage);
