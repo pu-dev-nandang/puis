@@ -18,6 +18,9 @@
     <div class="row">
 
         <div class="col-md-12">
+            <div class="col-md-3 col-md-offset-4">
+                    <select class="form-control" id="filterTahun"><option value="" selected> Semua Tahun</option></select>
+                </div>
             
             <div style="text-align: right;margin-bottom: 20px;">
                 <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
@@ -91,83 +94,15 @@
     });
 </script>
 
-
 <script>
-    $(document).ready(function () {
-        window.act = "<?= $accessUser; ?>";
-        if(parseInt(act)<=0){
-            $('.form-data-add').remove();
-        } else {
-        }
-        loadAkreditasiProdi();
-        //load_prodi();
-    });
 
-    function load_prodi() {
-
-        var url = base_url_js+'api3/crudAllProgramStudy';
-        var token = jwt_encode({action : 'viewAllProdi'},'UAP)(*');
-
-        $.post(url,{token:token},function (jsonResult) {
-            $('#formYear').append('<option disabled selected></option>');
-                for(var i=0;i<jsonResult.length;i++){
-                   $('#prodi').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name+' </option>');
-                }
-            });
-      }
-
-    function loadAkreditasiProdi() {
-
-         $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran">' +
-            '    <thead>  '+
-            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
-            '        <th style="text-align: center; width: 5%;">No</th>  '+
-            '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
-            '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
-            '        <th style="text-align: center;">Keterangan</th>  '+
-            '    </tr>  '+
-            '    </thead>  '+
-            '       <tbody id="listData"></tbody>   '+
-            '    </tfoot> '+
-            '    </table>');
-
-        var url = base_url_js+'api3/__getTeknoProduk';
+    function loadSelectOptionClassOf_DSC() {
+        var url = base_url_js+'api/__getKurikulumSelectOptionDSC';
         $.getJSON(url,function (jsonResult) {
-
-            if(jsonResult.length>0) {
-
-                for (var i = 0; i < jsonResult.length; i++) {
-                    var v = jsonResult[i]; 
-
-                    $('#listData').append('<tr>' +
-                        '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.Nama_judul+'</td>' +
-                        '   <td style="text-align: center;">'+v.Tahun_perolehan+'</td>' +
-                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
-                        '</tr>');
-
-                    var total = parseInt(jsonResult.length);
-                    //total = total + parseInt(v2.dataEmployees.length);
-                }
-
+            for(var i=0;i<jsonResult.length;i++){
+               $('#filterTahun').append('<option id="'+jsonResult[i].Year+'">'+jsonResult[i].Year+' </option>');
             }
-                
-             //$('#dataTablesLuaran').dataTable();
-             oTable = $('#dataTablesLuaran').DataTable();
-            oSettings = oTable.settings();
-
         });
-
-    }
-
-    function hitungRow(cl) {
-
-        var res = 0;
-        $(cl).each(function () {
-            res += parseInt($(this).attr('data-val'));
-        });
-
-        return res;
     }
 
 </script>
