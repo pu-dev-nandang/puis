@@ -50,6 +50,7 @@ class C_mentor_type_sks extends Globalclass {
                 $nestedData[] = $i+1;
                 $nestedData[] = $row['MentorType'];
                 $nestedData[] = $row['SKS'];
+                $nestedData[] = $row['SKSPendamping'];
                 $nestedData[] = $row['Updated_at'];
                 $nestedData[] = $row['Updated_by'];
                 $nestedData[] = $row['Name'];

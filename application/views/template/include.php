@@ -1634,6 +1634,15 @@
         }
         return result;
     }
+    function Validation_decimal(string,theName)
+    {
+        var result = {status:1, messages:""};
+        var regexx =  /^\d*\.?\d*$/;
+        if (!string.match(regexx)) {
+            result = {status : 0,messages: theName + " only decimal! "};
+        }
+        return result;
+    }
 
     function LoaddataTable(element) {
         var table = $(element).DataTable({
