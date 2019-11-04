@@ -20,137 +20,94 @@
 
             <div>
                 <div class="col-md-3 col-md-offset-4">
-                    <select class="form-control" id="filterTahun"><option disabled selected>Pilih Tahun</option></select>
-
+                    <select class="form-control" id="filterTahun"><option value="" selected> Semua Tahun</option></select>
                 </div>
                 <div style="text-align: right;margin-bottom: 0px;">
-        
-                    <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+                    <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
                 </div>
                 
             </div>
             <br/>
+
+            <div class="">
+                <table class="table dataTable2Excel" id="tableHKIPaten"  data-name="tableHKIPaten">
+                    <thead>
+                    <tr style="background: #20485A;color: #FFFFFF;">
+
+                        <th style="text-align: center; width: 5%;">No</th>
+                        <th style="text-align: center;">Luaran Penelitian dan PkM</th>
+                        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th> 
+                        <th style="text-align: center;">Keterangan</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
          
-            <div id="viewTable"></div>
+            <!-- <div id="viewTable"></div> -->
         </div>
     </div>
 </div>
 
-<script>
-    
-     $('#btnLembagaMitra').click(function () {
-
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">HKI (Hak Cipta, Desain Produk Industri, dll.)</h4>');
-
-        var body = '<div class="row">' +
-            '    <div class="col-md-12">' +
-            '        <div class="well">' +
-            '            <div class="form-group">' +
-            '                <label>Judul Penelitian dan PkM </label> '+
-            '                <input class="hide" id="formID">' +
-            '                <input class="form-control" id="judul">' +
-            '            </div>' +
-            '          <div class="form-group">' +
-            '                <label>Tahun Perolehan </label> '+
-            '                <input class="form-control" id="tahun_perolehan" ></input>' +
-            '            </div>' +
-            '            <div class="form-group">' +
-             '                <label>Keterangan </label> '+
-            '                 <textarea class="form-control" id="keterangan"></textarea>' +
-            '            </div>' +
-            
-            '        </div>' +
-            '    </div>' +
-            '    ' +
-        
-            '</div>';
-
-        $('#GlobalModal .modal-body').html(body);
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button class="btn btn-success" style="text-align: right;" id="btnSaveLembaga">Save</button>');
-
-         $( "#tahun_perolehan" )
-            .datepicker({
-                changeYear: true,
-                viewMode: 'years', 
-                autoclose: true,
-                dateFormat: 'yy',
-                // minDate: new Date(moment().year(),moment().month(),moment().date()),
-                onSelect : function () {
-                    // var data_date = $(this).val().split(' ');
-                    // var nextelement = $(this).attr('nextelement');
-                    // nextDatePick(data_date,nextelement);
-                }
-        });
-
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-
-    });
-
-</script>
 
 <script>
-     $(document).on('click','#btnSaveLembaga',function () {
 
-        var judul = $('#judul').val();
-        var tahun_perolehan = $('#tahun_perolehan').val();
-        var keterangan = $('#keterangan').val();
-        var nama_judul =  judul.toUpperCase();
+    var oTableGet;
+    var oSettingsGet;
 
-        if(judul!='' && judul!=null &&
-            tahun_perolehan!='' && tahun_perolehan!=null &&
-            keterangan!='' && keterangan!=null) {
-
-            var data = {
-                action : 'save_hki_paten',
-                //ID : (formID!='' && formID!=null) ? formID : '',
-                dataForm : {
-                    Nama_judul : nama_judul,
-                    Tahun_perolehan : tahun_perolehan,
-                    Keterangan : keterangan
-                }
-            };
-
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api3/__crudAgregatorTB5';
-
-            $.post(url,{token:token},function (result) {
-
-                if(result==0 || result=='0'){
-                  toastr.error('Maaf, Gagal simpan data !','Error');
-                } 
-                else {  
-                    loadAkreditasiProdi();
-                    $('#GlobalModal').modal('hide');
-                    toastr.success('Data saved','Success');
-                    $('#judul').val('');
-                    $('#tahun_perolehan').val('');
-                    $('#keterangan').val('');
-                }
-
-                setTimeout(function (args) {
-                    $('#btnSaveLembaga').html('Save').prop('disabled',false);
-                },500);
-            });
-
-        } else {
-            toastr.error('All form required','Error');
-      }
-    });    
-
-
-</script>
-
-<script>
     $(document).ready(function () {
-        
         loadSelectOptionClassOf_DSC('#filterTahun');
-        loadDataTable();
-        //loadSelectOptionClassOf_DSC();
+        loadDataHKI_paten('');
     });
+
+    $('#filterTahun').change(function () {
+        var status = $(this).val();
+        loadDataHKI_paten(status);
+    });
+
+
+    function loadDataHKI_paten(status) {
+
+        var dataTable = $('#tableHKIPaten').DataTable({
+            "processing": true,
+            "destroy": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "ajax":{
+                url : base_url_js+"api3/__getHkiPaten?s="+status, // json datasource
+                ordering : false,
+                type: "post",  // method  , by default get
+                error: function(){  // error handling
+                    $(".employee-grid-error").html("");
+                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                    $("#employee-grid_processing").css("display","none");
+                }
+            }
+        });
+
+        oTableGet = dataTable;
+        oSettingsGet = oTableGet.settings();
+    }
+
+    $('#saveToExcel').click(function () {
+
+       $('select[name="dataTablesKurikulum_length"]').val(-1);
+       oSettingsGet[0]._iDisplayLength = oSettingsGet[0].fnRecordsTotal();
+       oTableGet.draw();
+       setTimeout(function () {
+           saveTable2Excel('dataTable2Excel');
+       },1000);
+    });
+</script>
+
+<script>
+    //$(document).ready(function () {
+    //    
+    //    loadSelectOptionClassOf_DSC('#filterTahun');
+    //    loadDataTable();
+        //loadSelectOptionClassOf_DSC();
+    //});
 
     function loadSelectOptionClassOf_DSC() {
         var url = base_url_js+'api/__getKurikulumSelectOptionDSC';
@@ -161,121 +118,14 @@
         });
     }
 
-    $('#filterTahun').change(function () {
-        //var status = $(this).val();
-        var hkiyear = $('#filterTahun').find(':selected').val();
-        loadDataTable(hkiyear);
-    });
+    // function hitungRow(cl) {
 
-    function loadDataTable(hkiyear) {
+    //     var res = 0;
+    //     $(cl).each(function () {
+    //         res += parseInt($(this).attr('data-val'));
+    //     });
 
-        $('#viewTable').html(' <table class="table table-bordered dataTable2Excel" id="dataTablesLuaran">' +
-            '    <thead>  '+
-            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
-            '        <th style="text-align: center; width: 5%;">No</th>  '+
-            '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
-            '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
-            '        <th style="text-align: center;">Keterangan</th>  '+
-            '    </tr>  '+
-            '    </thead>  '+
-            '       <tbody id="listData"></tbody>   '+
-            '    </tfoot> '+
-            '    </table>');
-
-        if(hkiyear!='' && hkiyear!=null){
-                
-            var data = {
-                action : 'readHKI_paten',
-                hkiyear : hkiyear
-            };
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api3/__getHkiPaten';
-    
-            $.post(url,{token:token},function (jsonResult) {
-
-            $('#listData').empty();
-
-            if(jsonResult.length>0){
-                $.each(jsonResult,function (i,v) {
-
-                    $('#listData').append('<tr>' +
-                        '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.NamaJudul+'</td>' +
-                        '   <td style="text-align: center;">'+moment(v.Tahun).format('YYYY')+'</td>' +
-                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
-                        '</tr>');
-                    //var total = parseInt(jsonResult.length);
-                });
-
-                 //passToExcel = jsonResult;
-                }
-            })
-        } else {
-
-
-            //alert('BBS');
-        }
-
-        
-
-        
-
-    }
-
-    function loadhkipaten(status) {
-
-         $('#viewTable').html(' <table class="table table-bordered" id="dataTablesLuaran">' +
-            '    <thead>  '+
-            '     <tr style="background: #20485A;color: #FFFFFF;">   '+
-            '        <th style="text-align: center; width: 5%;">No</th>  '+
-            '        <th style="text-align: center;">Luaran Penelitian dan PkM</th>  '+
-            '        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th>  '+
-            '        <th style="text-align: center;">Keterangan</th>  '+
-            '    </tr>  '+
-            '    </thead>  '+
-            '       <tbody id="listData"></tbody>   '+
-            //'    <tfoot id="listDataFoot">  </tfoot>'+
-            '    </tfoot> '+
-            '    </table>');
-
-        var data = {
-            action : 'readDataMHSBarudd',
-            Year : status
-        };
-
-        //var url : base_url_js+"api3/__getHkiPaten?s="+status, // json datasource
-        var url = base_url_js+'api3/__getHkiPaten';
-
-        $.getJSON(url,function (jsonResult) {
-
-            if(jsonResult.length>0) {
-
-                for (var i = 0; i < jsonResult.length; i++) {
-                    var v = jsonResult[i];
-
-                    $('#listData').append('<tr>' +
-                        '   <td style="text-align: center;">'+(i+1)+'</td>' +
-                        '   <td style="text-align: left;">'+v.NamaJudul+'</td>' +
-                        '   <td style="text-align: center;">'+moment(v.Tahun).format('YYYY')+'</td>' +
-                        '   <td style="text-align: left;">'+v.Keterangan+'</td>' +
-                        '</tr>');
-                    var total = parseInt(jsonResult.length);
-                }
-            }
-                
-            $('#dataTablesLuaran').dataTable();
-        });
-
-    }
-
-    function hitungRow(cl) {
-
-        var res = 0;
-        $(cl).each(function () {
-            res += parseInt($(this).attr('data-val'));
-        });
-
-        return res;
-    }
+    //     return res;
+    // }
 
 </script>
