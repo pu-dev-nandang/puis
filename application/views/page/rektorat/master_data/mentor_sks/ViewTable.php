@@ -3,7 +3,8 @@
 		<tr>
 			<th>No</th>
 			<th>Mentor Type</th>
-			<th>SKS</th>
+			<th>SKS Pembimbing Utama</th>
+			<th>SKS Pembimbing Pendamping</th>
 			<th>Updated_at</th>
 			<th>Updated_by</th>
 			<?php if (isset($action)): ?>
@@ -45,7 +46,7 @@
 	                         'className': 'dt-body-center',
 	                      },
 	                      {
-	                         'targets': 4,
+	                         'targets': 5,
 	                         'searchable': false,
 	                         'orderable': false,
 	                         'className': 'dt-body-center',
@@ -56,7 +57,7 @@
 	                      <?php if (isset($action)): ?>
 	                      <?php if ($action == 'write'): ?>
 	                      	{
-	                      	   'targets': 5,
+	                      	   'targets': 6,
 	                      	   'searchable': false,
 	                      	   'orderable': false,
 	                      	   'className': 'dt-body-center',
@@ -66,9 +67,9 @@
 	                      	           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
 	                      	           '  </button>' +
 	                      	           '  <ul class="dropdown-menu">' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[7]+'" data = "'+full[6]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[8]+'" data = "'+full[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
 	                      	           '    <li role="separator" class="divider"></li>' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[8]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
 	                      	           '  </ul>' +
 	                      	           '</div>';
 	                      	       return btnAction;

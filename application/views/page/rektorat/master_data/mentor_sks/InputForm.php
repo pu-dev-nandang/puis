@@ -9,8 +9,12 @@
             <input type="text" class="form-control input" name = "MentorType">
         </div>
         <div class="form-group">
-            <label>SKS</label>
+            <label>SKS Pembimbing Utama</label>
             <input type="text" class="form-control input" name = "SKS">
+        </div>
+        <div class="form-group">
+            <label>SKS Pembimbing Pendamping</label>
+            <input type="text" class="form-control input" name = "SKSPendamping">
         </div>
     </div>
     <div class="panel-footer" style="text-align: right;">
@@ -21,8 +25,10 @@
     var AppForm_Mentor_Type_Sks = {
         setDefaultInput : function(){
             $('.input').val('');
-            $('.input[name="SKS"]').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
+            $('.input[name="SKS"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
+            $('.input[name="SKSPendamping"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
             $('.input[name="SKS"]').maskMoney('mask', '9894'); 
+            $('.input[name="SKSPendamping"]').maskMoney('mask', '9894'); 
             $('#btnSave').attr('action','add');
             $('#btnSave').attr('data-id','');
         },
@@ -64,7 +70,7 @@
             for(key in arr){
                switch(key)
                {
-                case  "NamaType" :
+                case  "MentorType" :
                       if (arr[key] != '') {
                         result = Validation_leastCharacter(3,arr[key],key);
                         if (result['status'] == 0) {
@@ -72,12 +78,17 @@
                         }
                       }
                       break;
-                case  "SKSPerMinutes" :
-                      result = Validation_numeric(arr[key],key);
-                      if (result['status'] == 0) {
-                        toatString += result['messages'] + "<br>";
-                      }
-                      break;
+                // case  "SKS" :
+                //       result = Validation_decimal(arr[key],key);
+                //       if (result['status'] == 0) {
+                //         toatString += result['messages'] + "<br>";
+                //       }
+                // case  "SKSPendamping" :
+                //       result = Validation_decimal(arr[key],key);
+                //       if (result['status'] == 0) {
+                //         toatString += result['messages'] + "<br>";
+                //       }
+                //       break;
                 // default:
                 //     result = Validation_leastCharacter(3,arr[key],key);
                 //     if (result['status'] == 0) {
