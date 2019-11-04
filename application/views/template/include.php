@@ -1653,6 +1653,16 @@
         return result;
     }
 
+    function number_comma_dot(string,theName)
+    {
+        var result = {status:1, messages:""};
+        var regexx =  /^(\d+(\.\d{0,2})?|\.?\d{1,2})$/;
+        if (!string.match(regexx)) {
+            result = {status : 0,messages: theName + " only number,comma and dot! "};
+        }
+        return result;
+    }
+
     function LoaddataTable(element) {
         var table = $(element).DataTable({
             'iDisplayLength' : 5,
