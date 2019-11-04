@@ -18,7 +18,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="col-md-3 col-md-offset-4">
-                    <select class="form-control" id="filterTahun"><option id="0" selected> Semua Tahun</option></select>
+                    <select class="form-control" id="filterTahun"><option value="" selected> Semua Tahun</option></select>
                 </div>
 
             <div style="text-align: right;margin-bottom: 20px;">
