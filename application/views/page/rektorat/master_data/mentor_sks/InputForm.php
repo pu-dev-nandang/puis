@@ -25,10 +25,12 @@
     var AppForm_Mentor_Type_Sks = {
         setDefaultInput : function(){
             $('.input').val('');
-            $('.input[name="SKS"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
-            $('.input[name="SKSPendamping"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
-            $('.input[name="SKS"]').maskMoney('mask', '9894'); 
-            $('.input[name="SKSPendamping"]').maskMoney('mask', '9894'); 
+            // $('.input[name="SKS"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
+            // $('.input[name="SKSPendamping"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
+            // $('.input[name="SKS"]').maskMoney('mask', '9894'); 
+            // $('.input[name="SKSPendamping"]').maskMoney('mask', '9894'); 
+            $('.input[name="SKS"]').val('0.0');
+            $('.input[name="SKSPendamping"]').val('0.0');
             $('#btnSave').attr('action','add');
             $('#btnSave').attr('data-id','');
         },
@@ -106,6 +108,32 @@
         loaded : function(){
             AppForm_Mentor_Type_Sks.setDefaultInput();
         },
+
+        AutoTextAllowed : function(selector){
+           var str = selector.val();
+           var nm = selector.attr('name');
+           var bool = true;
+           var rs = '';
+            for (var i = 0; i < str.length; i++) {
+                var v  = str.charAt(i);
+                var chk = number_comma_dot(str,nm);
+                if (chk.status == 1) {
+                    rs += v;
+                }
+                else
+                {
+                    bool = false;
+                    rs = ''
+                    for (var j = 0; j < (str.length) - 1; j++) {
+                         var z  = str.charAt(j);
+                        rs += z;
+                    }
+                    break;
+                }
+            }
+
+            selector.val(rs);
+        },
     };
 
     $(document).ready(function() {
@@ -117,6 +145,16 @@
        var action = selector.attr('action');
        var ID = selector.attr('data-id');
        AppForm_Mentor_Type_Sks.ActionData(selector,action,ID);
+    })
+
+    $(document).off('keyup','.input[name="SKS"],.input[name="SKSPendamping"]').on('keyup','.input[name="SKS"],.input[name="SKSPendamping"]',function(e){
+        var selector = $(this);
+        AppForm_Mentor_Type_Sks.AutoTextAllowed(selector);
+    })
+
+    $(document).off('keydown','.input[name="SKS"],.input[name="SKSPendamping"]').on('keydown','.input[name="SKS"],.input[name="SKSPendamping"]',function(e){
+        var selector = $(this);
+        AppForm_Mentor_Type_Sks.AutoTextAllowed(selector);
     })
     
 </script>
