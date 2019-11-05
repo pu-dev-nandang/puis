@@ -57,7 +57,7 @@
                             <th class="th-center" style="width: 20%;">For Request</th>
                             <th class="th-center" style="width: 8%;">Start Date</th>
                             <th class="th-center" style="width: 8%;">End Date</th>
-                            <th class="th-center" style="width: 20%;">Description Event</th>
+                            <th class="th-center" style="width: 20%;">Description Location</th>
                             <th class="th-center" style="width: 15%;">Confirmation</th>
                         </tr>
                     </thead>
@@ -102,7 +102,7 @@
         $('#NotificationModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
                                 ' <span aria-hidden="true">&times;</span></button> '+
                                 ' <h4 class="modal-title">Confirmation All Approved </h4>');
-        $('#NotificationModal .modal-body').html('<center><b><p>Apa Anda Yakin untuk All Approved Request ?</p><p>&nbsp;</p></b>'+
+        $('#NotificationModal .modal-body').html('<center><b><p>Are you sure for All Approved Request ?</p><p>&nbsp;</p></b>'+
             '<div class="btn-group"><button type="button" class="btn btn-sm btn-success btn-round btn-action save_allapproved"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup" data-dismiss="modal"><i class="glyphicon glyphicon-remove-sign"></i> Cancel</button></center></div>');
 
         $('#NotificationModal').modal({
