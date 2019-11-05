@@ -2706,7 +2706,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$dateconfirms.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$buttonlink.'</div>';
             $nestedData[] = '<div style="text-align: center;">
-            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="icon-list icon-large"></i> </button> 
+            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Detail"><i class="icon-list icon-large"></i> </button> 
             <button class="btn btn-sm btn-circle btn-danger btndeleterequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button></div>';
             $no++;
             $data[] = $nestedData;
