@@ -2083,6 +2083,7 @@ class C_api3 extends CI_Controller {
                         JOIN db_academic.auth_students as aus on sas.NPM = aus.NPM
 
                         WHERE aus.ProdiID = '.$ProdiID.'
+                        group by sa.ID
                         ORDER BY sa.Year, sa.StartDate DESC')->result_array();
 
                     if(count($data)>0){
@@ -2090,7 +2091,9 @@ class C_api3 extends CI_Controller {
                             $ID = $data[$i]['ID'];
                             $data[$i]['DataStudent'] = $this->db->query('SELECT sas.*, ats.Name FROM db_studentlife.student_achievement_student sas
                                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sas.NPM)
-                                                                    WHERE sas.SAID = "'.$ID.'" ')->result_array();
+                                                                    WHERE sas.SAID = "'.$ID.'" 
+                                                                    and ats.ProdiID = '.$ProdiID.'    
+                                                                    ')->result_array();
                         }
                     }
 

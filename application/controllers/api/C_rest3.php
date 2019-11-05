@@ -509,6 +509,73 @@ class C_rest3 extends CI_Controller {
                                             )xx   
                                             ';
                         $queryPSAkreditasi=$this->db->query($sqlPSAkreditasi, array($ProdiID,$NIP))->result_array();
+
+                        // get mentor utama sks
+                          $arr_get_mhs_by_mentor = [];
+                          $sql_get_mhs_by_mentor = 'select ats.NPM,ats.Name as Nama_Mahasiswa,ats.Year from db_academic.auth_students as ats
+                                                    join db_employees.employees as emp on ats.MentorFP1 = emp.NIP
+                                                    where ats.MentorFP1 = ? and emp.ProdiID = ? and ats.ProdiID = ?
+                                                    ';
+                          $query_get_mhs_by_mentor=$this->db->query($sql_get_mhs_by_mentor, array($NIP,$ProdiID,$ProdiID))->result_array();
+                          for ($z=0; $z < count($query_get_mhs_by_mentor); $z++) { 
+                            $ta_db = 'ta_'.$query_get_mhs_by_mentor[$z]['Year'];
+                            $NPMByMentor = $query_get_mhs_by_mentor[$z]['NPM'];
+                            $sql_stp = 'select stp.NPM from '.$ta_db.'.study_planning as stp
+                                        join db_academic.mata_kuliah as mtk on stp.MKID = mtk.ID
+                                        where stp.NPM = "'.$NPMByMentor.'" and stp.SemesterID in('.$TahunFilter.')
+                                              and mtk.Yudisium = "1"
+                            ';
+                            $querySTP = $this->db->query($sql_stp,array())->result_array();
+                            if (count($querySTP) > 0) {
+                              // hasil seleksi
+                              $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                              // utama field SKS
+                              $ID_mentor_type_sks =  $G_prodi[0]['ID_mentor_type_sks'];
+                              $G_mentor_type_sks = $this->m_master->caribasedprimary('db_rektorat.mentor_type_sks','ID',$ID_mentor_type_sks);
+                              if (count($G_mentor_type_sks) > 0) {
+                                $arr_get_mhs_by_mentor[] = array(
+                                    'NPM' => $NPMByMentor,
+                                    'Nama_Mahasiswa' => $query_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                                    'SKS' => $G_mentor_type_sks[0]['SKS'],
+                                );
+                              }
+                            }
+                          }
+                        // end get mentor utama sks
+
+                        // get mentor pendamping sks
+                          $arr_get_mhs_by_mentor_pendamping = [];
+                          $sql_get_mhs_by_mentor = 'select ats.NPM,ats.Name as Nama_Mahasiswa,ats.Year from db_academic.auth_students as ats
+                                                    join db_employees.employees as emp on ats.MentorFP1 = emp.NIP
+                                                    where ats.MentorFP2 = ? and emp.ProdiID = ? and ats.ProdiID = ?
+                                                    ';
+                          $query_get_mhs_by_mentor=$this->db->query($sql_get_mhs_by_mentor, array($NIP,$ProdiID,$ProdiID))->result_array();
+                          for ($z=0; $z < count($query_get_mhs_by_mentor); $z++) { 
+                            $ta_db = 'ta_'.$query_get_mhs_by_mentor[$z]['Year'];
+                            $NPMByMentor = $query_get_mhs_by_mentor[$z]['NPM'];
+                            $sql_stp = 'select stp.NPM from '.$ta_db.'.study_planning as stp
+                                        join db_academic.mata_kuliah as mtk on stp.MKID = mtk.ID
+                                        where stp.NPM = "'.$NPMByMentor.'" and stp.SemesterID in('.$TahunFilter.')
+                                              and mtk.Yudisium = "1"
+                            ';
+                            $querySTP = $this->db->query($sql_stp,array())->result_array();
+                            if (count($querySTP) > 0) {
+                              // hasil seleksi
+                              $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                              // utama field SKS
+                              $ID_mentor_type_sks =  $G_prodi[0]['ID_mentor_type_sks'];
+                              $G_mentor_type_sks = $this->m_master->caribasedprimary('db_rektorat.mentor_type_sks','ID',$ID_mentor_type_sks);
+                              if (count($G_mentor_type_sks) > 0) {
+                                $arr_get_mhs_by_mentor_pendamping[] = array(
+                                    'NPM' => $NPMByMentor,
+                                    'Nama_Mahasiswa' => $query_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                                    'SKS' => $G_mentor_type_sks[0]['SKSPendamping'],
+                                );
+                              }
+                            }
+                          }
+                        // end get mentor pendamping sks
+
                         // get data 
                         $sqlDataAkreditasi = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
                                                 from db_academic.schedule_details_course as a 
@@ -517,15 +584,46 @@ class C_rest3 extends CI_Controller {
                                                 join db_academic.schedule_details as sd on sd.ScheduleID = b.ID
                                                 where a.ProdiID = ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
                                                 group by b.ID,a.MKID';
-                        $queryDataPSAkreditasi=$this->db->query($sqlDataAkreditasi, array($ProdiID,$NIP))->result_array();                        
+                        $queryDataPSAkreditasi=$this->db->query($sqlDataAkreditasi, array($ProdiID,$NIP))->result_array(); 
+                        // get sum count mentor utama sks
+                        $tot = ($queryPSAkreditasi[0]['TotalCredit'] == null ) ? 0 : $queryPSAkreditasi[0]['TotalCredit'];
+                        for ($z=0; $z < count($arr_get_mhs_by_mentor); $z++) { 
+                          $tot += $arr_get_mhs_by_mentor[$z]['SKS'];
+                          $arr_adding = [
+                            'SdcID' => '',
+                            'ScheduleID' => '',
+                            'MKID' => '',
+                            'ClassGroup' => $arr_get_mhs_by_mentor[$z]['NPM'],
+                            'NameEng' => $arr_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                            'Credit' => $arr_get_mhs_by_mentor[$z]['SKS'],
+                          ];
+
+                          $queryDataPSAkreditasi[] = $arr_adding;
+                        }
+
+                        for ($z=0; $z < count($arr_get_mhs_by_mentor_pendamping); $z++) { 
+                          $tot += $arr_get_mhs_by_mentor_pendamping[$z]['SKS'];
+                          $arr_adding = [
+                            'SdcID' => '',
+                            'ScheduleID' => '',
+                            'MKID' => '',
+                            'ClassGroup' => $arr_get_mhs_by_mentor_pendamping[$z]['NPM'],
+                            'NameEng' => $arr_get_mhs_by_mentor_pendamping[$z]['Nama_Mahasiswa'],
+                            'Credit' => $arr_get_mhs_by_mentor_pendamping[$z]['SKS'],
+                          ];
+
+                          $queryDataPSAkreditasi[] = $arr_adding;
+                        }
+
                         // encode token
                         $token = $this->jwt->encode($queryDataPSAkreditasi,"UAP)(*");
-                        $tot = ($queryPSAkreditasi[0]['TotalCredit'] == null ) ? 0 : $queryPSAkreditasi[0]['TotalCredit']; 
                         $temp[] = array('count' => $tot ,'data' => $token);  
                         $arr_get[] = $tot;
 
-                        // Total PS tidak akreditasi
-                        $sqlPSTidakAkreditasi = '
+                        
+
+                        // Total PS lain di dalam pt
+                        $sqlPSLainDalamPT = '
                                             select SUM(Credit) as TotalCredit from (
                                                 select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
                                                 from db_academic.schedule_details_course as a 
@@ -536,9 +634,76 @@ class C_rest3 extends CI_Controller {
                                                 group by b.ID,a.MKID
                                             )xx   
                                             ';
-                        $queryPSTidakAkreditasi=$this->db->query($sqlPSTidakAkreditasi, array($ProdiID,$NIP))->result_array();
-                        $tot = ($queryPSTidakAkreditasi[0]['TotalCredit'] == null) ? 0 : $queryPSTidakAkreditasi[0]['TotalCredit'] ;                         
-                        $sqlDataPSTidakAkreditasi = '
+                        $queryPSLainDalamPT=$this->db->query($sqlPSLainDalamPT, array($ProdiID,$NIP))->result_array();
+                        $tot = ($queryPSLainDalamPT[0]['TotalCredit'] == null) ? 0 : $queryPSLainDalamPT[0]['TotalCredit'] ;
+
+                        // get mentor utama sks
+                          $arr_get_mhs_by_mentor = [];
+                          $sql_get_mhs_by_mentor = 'select ats.NPM,ats.Name as Nama_Mahasiswa,ats.Year from db_academic.auth_students as ats
+                                                    join db_employees.employees as emp on ats.MentorFP1 = emp.NIP
+                                                    where ats.MentorFP1 = ? and emp.ProdiID = ? and ats.ProdiID != ?
+                                                    ';
+                          $query_get_mhs_by_mentor=$this->db->query($sql_get_mhs_by_mentor, array($NIP,$ProdiID,$ProdiID))->result_array();
+                          for ($z=0; $z < count($query_get_mhs_by_mentor); $z++) { 
+                            $ta_db = 'ta_'.$query_get_mhs_by_mentor[$z]['Year'];
+                            $NPMByMentor = $query_get_mhs_by_mentor[$z]['NPM'];
+                            $sql_stp = 'select stp.NPM from '.$ta_db.'.study_planning as stp
+                                        join db_academic.mata_kuliah as mtk on stp.MKID = mtk.ID
+                                        where stp.NPM = "'.$NPMByMentor.'" and stp.SemesterID in('.$TahunFilter.')
+                                              and mtk.Yudisium = "1"
+                            ';
+                            $querySTP = $this->db->query($sql_stp,array())->result_array();
+                            if (count($querySTP) > 0) {
+                              // hasil seleksi
+                              $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                              // utama field SKS
+                              $ID_mentor_type_sks =  $G_prodi[0]['ID_mentor_type_sks'];
+                              $G_mentor_type_sks = $this->m_master->caribasedprimary('db_rektorat.mentor_type_sks','ID',$ID_mentor_type_sks);
+                              if (count($G_mentor_type_sks) > 0) {
+                                $arr_get_mhs_by_mentor[] = array(
+                                    'NPM' => $NPMByMentor,
+                                    'Nama_Mahasiswa' => $query_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                                    'SKS' => $G_mentor_type_sks[0]['SKS'],
+                                );
+                              }
+                            }
+                          }
+                        // end get mentor utama sks
+
+                        // get mentor pendamping sks
+                          $arr_get_mhs_by_mentor_pendamping = [];
+                          $sql_get_mhs_by_mentor = 'select ats.NPM,ats.Name as Nama_Mahasiswa,ats.Year from db_academic.auth_students as ats
+                                                    join db_employees.employees as emp on ats.MentorFP1 = emp.NIP
+                                                    where ats.MentorFP2 = ? and emp.ProdiID = ? and ats.ProdiID != ?
+                                                    ';
+                          $query_get_mhs_by_mentor=$this->db->query($sql_get_mhs_by_mentor, array($NIP,$ProdiID,$ProdiID))->result_array();
+                          for ($z=0; $z < count($query_get_mhs_by_mentor); $z++) { 
+                            $ta_db = 'ta_'.$query_get_mhs_by_mentor[$z]['Year'];
+                            $NPMByMentor = $query_get_mhs_by_mentor[$z]['NPM'];
+                            $sql_stp = 'select stp.NPM from '.$ta_db.'.study_planning as stp
+                                        join db_academic.mata_kuliah as mtk on stp.MKID = mtk.ID
+                                        where stp.NPM = "'.$NPMByMentor.'" and stp.SemesterID in('.$TahunFilter.')
+                                              and mtk.Yudisium = "1"
+                            ';
+                            $querySTP = $this->db->query($sql_stp,array())->result_array();
+                            if (count($querySTP) > 0) {
+                              // hasil seleksi
+                              $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                              // utama field SKS
+                              $ID_mentor_type_sks =  $G_prodi[0]['ID_mentor_type_sks'];
+                              $G_mentor_type_sks = $this->m_master->caribasedprimary('db_rektorat.mentor_type_sks','ID',$ID_mentor_type_sks);
+                              if (count($G_mentor_type_sks) > 0) {
+                                $arr_get_mhs_by_mentor_pendamping[] = array(
+                                    'NPM' => $NPMByMentor,
+                                    'Nama_Mahasiswa' => $query_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                                    'SKS' => $G_mentor_type_sks[0]['SKSPendamping'],
+                                );
+                              }
+                            }
+                          }
+                        // end get mentor pendamping sks
+
+                        $sqlDataPSLainDalamPT = '
                         select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,sd.Credit
                         from db_academic.schedule_details_course as a 
                         join db_academic.schedule as b on a.ScheduleID = b.ID
@@ -547,9 +712,38 @@ class C_rest3 extends CI_Controller {
                         where a.ProdiID != ? and b.Coordinator = ? and b.SemesterID in('.$TahunFilter.')
                         group by b.ID,a.MKID
                         ';
-                        $queryDataPSTidakAkreditasi=$this->db->query($sqlDataPSTidakAkreditasi, array($ProdiID,$NIP))->result_array();
+                        $queryDataPSLainDalamPT=$this->db->query($sqlDataPSLainDalamPT, array($ProdiID,$NIP))->result_array();
+
+                        for ($z=0; $z < count($arr_get_mhs_by_mentor); $z++) { 
+                          $tot += $arr_get_mhs_by_mentor[$z]['SKS'];
+                          $arr_adding = [
+                            'SdcID' => '',
+                            'ScheduleID' => '',
+                            'MKID' => '',
+                            'ClassGroup' => $arr_get_mhs_by_mentor[$z]['NPM'],
+                            'NameEng' => $arr_get_mhs_by_mentor[$z]['Nama_Mahasiswa'],
+                            'Credit' => $arr_get_mhs_by_mentor[$z]['SKS'],
+                          ];
+
+                          $queryDataPSLainDalamPT[] = $arr_adding;
+                        }
+
+                        for ($z=0; $z < count($arr_get_mhs_by_mentor_pendamping); $z++) { 
+                          $tot += $arr_get_mhs_by_mentor_pendamping[$z]['SKS'];
+                          $arr_adding = [
+                            'SdcID' => '',
+                            'ScheduleID' => '',
+                            'MKID' => '',
+                            'ClassGroup' => $arr_get_mhs_by_mentor_pendamping[$z]['NPM'],
+                            'NameEng' => $arr_get_mhs_by_mentor_pendamping[$z]['Nama_Mahasiswa'],
+                            'Credit' => $arr_get_mhs_by_mentor_pendamping[$z]['SKS'],
+                          ];
+
+                          $queryDataPSLainDalamPT[] = $arr_adding;
+                        }
+
                         // encode token
-                        $token = $this->jwt->encode($queryDataPSTidakAkreditasi,"UAP)(*");
+                        $token = $this->jwt->encode($queryDataPSLainDalamPT,"UAP)(*");
                         $temp[] = array('count' => $tot ,'data' => $token);
                         $arr_get[] = $tot;                        
 
@@ -675,16 +869,16 @@ class C_rest3 extends CI_Controller {
                   $row = [];
                   $nestedData = array();
                   $nestedData[] = ['text' => $this->m_master->romawiNumber($i+1),'colspan' => 1,'style' => '"font-weight:600;background-color: lightyellow;"'] ;
-                  $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 3,'style' => '"font-weight:600;background-color: lightyellow;"'];
+                  $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 4,'style' => '"font-weight:600;background-color: lightyellow;"'];
                   // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
                   // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
                   $row[] = $nestedData;
-                  $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+                  $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,b.NIP,b.Name as NameDosen
                           from db_research.publikasi as a 
                           join db_employees.employees as b on a.NIP = b.NIP
                           where b.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
                           UNION
-                          select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+                          select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,d.NIP,d.Name as NameDosen
                           from db_research.publikasi as a 
                           join db_research.publikasi_list_dosen as b on a.ID_publikasi = b.ID_publikasi
                           join db_research.penulis_dosen as c on b.ID_Penulis_Dosen = c.ID_Penulis_Dosen
@@ -697,6 +891,7 @@ class C_rest3 extends CI_Controller {
                     $nestedData = array();
                     $nestedData[] = ['text' => $j+1 ,'colspan' => 1,'style' => '"text-align:right"'];
                     $nestedData[] = ['text' => $query[$j]['Judul'] ,'colspan' => 1,'style' => '""'];
+                    $nestedData[] = ['text' => $query[$j]['NIP'].' - '.$query[$j]['NameDosen'] ,'colspan' => 1,'style' => '""'];
                     $nestedData[] = ['text' => $query[$j]['Year'] ,'colspan' => 1,'style' => '""'];
                     $nestedData[] = ['text' => $query[$j]['Ket'] ,'colspan' => 1,'style' => '""'];
                     $row[] = $nestedData;
@@ -853,7 +1048,7 @@ class C_rest3 extends CI_Controller {
             $row = [];
             $nestedData = array();
             $nestedData[] = ['text' => $this->m_master->romawiNumber($i+1),'colspan' => 1,'style' => '"font-weight:600;background-color: lightyellow;"'] ;
-            $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 3,'style' => '"font-weight:600;background-color: lightyellow;"'];
+            $nestedData[] = ['text' => $Nm_kat_capaian ,'colspan' => 4,'style' => '"font-weight:600;background-color: lightyellow;"'];
             // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
             // $nestedData[] = ['text' => '' ,'colspan' => 0,'style' => '""'];
             $row[] = $nestedData;
@@ -869,7 +1064,7 @@ class C_rest3 extends CI_Controller {
             //         join db_academic.auth_students as d on c.NIM = d.NPM
             //          where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
             //        ';
-            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket
+            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,c.Nama_Mahasiswa
                     from db_research.publikasi as a 
                     join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
                     join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
@@ -881,6 +1076,7 @@ class C_rest3 extends CI_Controller {
               $nestedData = array();
               $nestedData[] = ['text' => $j+1 ,'colspan' => 1,'style' => '"text-align:right"'];
               $nestedData[] = ['text' => $query[$j]['Judul'] ,'colspan' => 1,'style' => '""'];
+              $nestedData[] = ['text' => $query[$j]['Nama_Mahasiswa'] ,'colspan' => 1,'style' => '""'];
               $nestedData[] = ['text' => $query[$j]['Year'] ,'colspan' => 1,'style' => '""'];
               $nestedData[] = ['text' => $query[$j]['Ket'] ,'colspan' => 1,'style' => '""'];
               $row[] = $nestedData;

@@ -136,7 +136,6 @@
                             else{
                                 htmlBody += '<td>'+arr[k]+'</td>';
                             }
-                            
                         }
                     }
                     htmlBody+= '</tr>';
@@ -144,8 +143,6 @@
                     selector.append(htmlBody);
                 }
             });
-
-
         }
     }
 
@@ -162,7 +159,7 @@
                                     '<thead>'+
                                         '<tr>'+
                                             '<td>No</td>'+
-                                            '<td>Mata Kuliah</td>'+
+                                            '<td>Mata Kuliah/Pendamping</td>'+
                                             '<td>SKS</td>'+
                                         '</tr>'+
                                     '</thead>'+
