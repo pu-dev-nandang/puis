@@ -8,7 +8,7 @@
 
 <div class="well">
     <div class="row">
-        <div class="col-md-2 form-data-edit" style="border-right: 1px solid #CCCCCC;">
+        <div class="col-md-2 form-data-edit" style="border-right: 1px solid #CCCCCC;" id = "inputForm">
             <div class="form-group">
                 <label>Tahun Akademik</label>
                 <input class="hide" id="formID">
@@ -54,7 +54,7 @@
             </div>
 
         </div>
-        <div class="col-md-10">
+        <div class="col-md-10" id = "ViewData">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
                     <div class="well">
@@ -96,27 +96,21 @@
 <script>
     var passToExcel = [];
     $(document).ready(function () {
-
-        window.act = "<?= $accessUser; ?>";
-        if(parseInt(act)<=0){
-            $('.form-data-edit').remove();
-        } else {
-            loadSelectOptionBaseProdi('#formProdiID','');
-        }
-
-        filteryear();
-        var firstLoad = setInterval(function () {
+         filteryear();
+         loadSelectOptionBaseProdi('#formProdiID','');
+        var firstLoad2 = setInterval(function () {
             var filterYear = $('#filterYear').val();
-            if(filterYear!='' && filterYear!=null){
-                loadDataTable();
-                $('#formYear').trigger('change');
-                clearInterval(firstLoad);
+            var filterBaseProdi = $('#formProdiID').val();
+            if(WaitForLoading == 1 && filterYear!='' && filterYear!=null && filterBaseProdi != '' && filterBaseProdi != null){
+               loadDataTable();
+               $('#formYear').trigger('change');
+               clearInterval(firstLoad2);
             }
+            
         },1000);
-
         setTimeout(function () {
-            clearInterval(firstLoad);
-        },7000);
+            clearInterval(firstLoad2);
+        },5000);
 
     });
 
@@ -259,7 +253,7 @@
                 var arr_total = [0,0,0,0,0,0,0];
                 $.each(jsonResult,function (i,v) {
 
-                    var btnAction = '<div class="btn-group">' +
+                    var btnAction = '<div class="btn-group inputBtn">' +
                         '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
                         '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
                         '  </button>' +

@@ -91,6 +91,17 @@
 
 
 <script>
+    var WaitForLoading = 0;
+    var MyVarEbomb;
+    var waitForEl_AGG = function(selector, callback) {
+      if ($(selector).length) {
+        callback();
+      } else {
+       MyVarEbomb = setTimeout(function() {
+          waitForEl_AGG(selector, callback);
+        }, 100);
+      }
+    };
     var App_menu_aggregator = {
         Loadauth : function(){
             var NIP = sessionNIP;
@@ -133,18 +144,35 @@
                     );
                 loadSelectOptionBaseProdi('#filterProdi','');
             }
+            else{
+                RuleAccess =  jQuery.parseJSON(RuleAccess);
+                App_menu_aggregator.LoadProdiAuth(RuleAccess);
+            }
         },
         LoadProdiAuth : function(RuleAccess){
             if (RuleAccess.input == 'false') {
                 $('#inputForm').attr('class','hide');
+                waitForEl_AGG(".inputBtn", function() {
+                  $('.inputBtn').addClass('hide');
+                });
+                setTimeout(function () {
+                    clearTimeout(MyVarEbomb);
+                },10000);
+                $(document).ajaxComplete(function () {
+                    $(".inputBtn").addClass('hide');
+                });
                 $('#ViewData').attr('class','col-md-12');
             }
             else
             {
                 $('#inputForm').attr('class','col-md-4');
+                // waitForEl_AGG(".inputBtn", function() {
+                //   $('.inputBtn').removeClass('hide');
+                // });
                 $('#ViewData').attr('class','col-md-8');
             }
             // console.log(RuleAccess);
+            WaitForLoading = 1;
         },
         loaded : function(){
             loadingStart();
