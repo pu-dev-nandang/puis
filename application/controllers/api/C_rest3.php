@@ -749,11 +749,31 @@ class C_rest3 extends CI_Controller {
 
                         $temp[] = 0; // PS lain di luar PT
                         $arr_get[] = 0;  
-                        // Penelitian Note : Convert to sks untuk mendapatkan satu penelitian
-                        $sqlPenelitian = 'select *,1 as Credit from db_research.litabmas where ID_thn_laks = ? and NIP = ? '; 
-                        $queryPenelitian =$this->db->query($sqlPenelitian, array($FilterTahun,$NIP))->result_array();
+
+                        // Penelitian 
+                        //Note : Convert to sks untuk mendapatkan satu penelitian
+                        // $sqlPenelitian = 'select *,1 as Credit from db_research.litabmas where ID_thn_laks = ? and NIP = ? '; 
+                        $sqlPenelitian = 'select a.Judul,jp.Nm_jns_pub,Year(a.Tgl_terbit) as Year,a.Ket,b.NIP,b.Name as NameDosen,jp.SKS as Credit
+                          from db_research.publikasi as a
+                          join db_research.jenis_publikasi as jp on jp.ID_jns_pub = a.ID_jns_pub
+                          join db_employees.employees as b on a.NIP = b.NIP
+                          where Year(a.Tgl_terbit) = ? and a.NIP = ?
+                          UNION
+                          select a.Judul,jp.Nm_jns_pub,Year(a.Tgl_terbit) as Year,a.Ket,d.NIP,d.Name as NameDosen,jp.SKS as Credit
+                          from db_research.publikasi as a 
+                          join db_research.jenis_publikasi as jp on jp.ID_jns_pub = a.ID_jns_pub
+                          join db_research.publikasi_list_dosen as b on a.ID_publikasi = b.ID_publikasi
+                          join db_research.penulis_dosen as c on b.ID_Penulis_Dosen = c.ID_Penulis_Dosen
+                          join db_employees.employees as d on c.NIP = d.NIP
+                           where Year(a.Tgl_terbit) = ? and d.NIP = ?
+                           '; 
+                        $queryPenelitian =$this->db->query($sqlPenelitian, array($FilterTahun,$NIP,$FilterTahun,$NIP))->result_array();
+                        // $tot = count($queryPenelitian);
+                        $tot = 0;
+                        for ($z=0; $z < count($queryPenelitian); $z++) { 
+                          $tot += $queryPenelitian[$z]['Credit'];
+                        }
                         // encode token
-                        $tot = count($queryPenelitian);
                         $token = $this->jwt->encode($queryPenelitian,"UAP)(*");
                         $temp[] = array('count' => $tot ,'data' => $token); 
                         $arr_get[] = $tot;                       
