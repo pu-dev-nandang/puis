@@ -15,7 +15,7 @@
 <div class="well">
     <div class="row">
 
-        <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;">
+        <div class="col-md-3 form-data-edit" style="border-right: 1px solid #CCCCCC;" id = "inputForm">
 
             <div style="text-align: right;">
                 <button class="btn btn-success" id="btnLembagaSurview"><i class="fa fa-cog margin-right"></i> Lembaga Akreditasi</button>
@@ -61,10 +61,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9" id = "ViewData">
             <div style="text-align: right;"> <button class="btn btn-success" id="btndownloaadExcel" title="Dowload Excel"><i class="fa fa-file-excel-o margin-right"></i> Excel </button></div> <p></p>
             <div style="min-height: 30px;" id="viewData" class="table-responsive"></div>
-
         </div>
   </div>
 </div>
@@ -72,28 +71,36 @@
 
 <script>
     $(document).ready(function () {
-
-        window.act = "<?= $accessUser; ?>";
-        if(parseInt(act)<=0){
-            $('.form-data-edit').remove();
-        } else {
-            loadDataLembagaSurview();
-            $( "#formAE_DueDate" )
-                .datepicker({
-                    showOtherMonths:true,
-                    autoSize: true,
-                    dateFormat: 'dd MM yy',
-                    // minDate: new Date(moment().year(),moment().month(),moment().date()),
-                    onSelect : function () {
-                        // var data_date = $(this).val().split(' ');
-                        // var nextelement = $(this).attr('nextelement');
-                        // nextDatePick(data_date,nextelement);
-                    }
-                });
-        }
-
-            loadDataTable();
-        });
+        var firstLoad = setInterval(function () {
+            if(WaitForLoading == 1 ){
+               window.act = "<?= $accessUser; ?>";
+               if(parseInt(act)<=0){
+                   $('.form-data-edit').remove();
+               } else {
+                   loadDataLembagaSurview();
+                   $( "#formAE_DueDate" )
+                       .datepicker({
+                           showOtherMonths:true,
+                           autoSize: true,
+                           dateFormat: 'dd MM yy',
+                           // minDate: new Date(moment().year(),moment().month(),moment().date()),
+                           onSelect : function () {
+                               // var data_date = $(this).val().split(' ');
+                               // var nextelement = $(this).attr('nextelement');
+                               // nextDatePick(data_date,nextelement);
+                           }
+                       });
+               }
+                loadDataTable();
+                clearInterval(firstLoad);
+            }
+            
+        },1000);
+        setTimeout(function () {
+            clearInterval(firstLoad);
+        },5000);
+        
+    });
 
     $("#btndownloaadExcel").click(function(){
 

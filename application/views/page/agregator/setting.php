@@ -24,6 +24,13 @@ if($access=='1'){ ?>
                 <select class="select2-select-00 full-width-fix" multiple size="5" id="formMenu">
                 </select>
             </div>
+            <div class="form-group">
+                <label>Input Access</label>
+                <select class="form-control" id = "formInputAccess">
+                    <option value="false" selected>False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
             <div class="form-group" style="text-align: right;">
                 <button class="btn btn-primary" id="btnSaveSetting">Save</button>
             </div>
@@ -35,6 +42,7 @@ if($access=='1'){ ?>
                     <th style="width: 1%;">No</th>
                     <th style="width: 25%;">Team</th>
                     <th>Menu</th>
+                    <th>Access</th>
                     <th style="width: 15%;"><i class="fa fa-cog"></i></th>
                 </tr>
                 </thead>
@@ -64,6 +72,7 @@ if($access=='1'){ ?>
         var formName = $('#formName').val();
         var formMember = $('#formMember').val();
         var formMenu = $('#formMenu').val();
+        var formInputAccess = $('#formInputAccess option:selected').val();
 
         if(formName!='' && formName!=null &&
             formMember!='' && formMember!=null &&
@@ -78,6 +87,7 @@ if($access=='1'){ ?>
                     Name : formName,
                     Menu : JSON.stringify(formMenu)
                 },
+                input : formInputAccess,
                 Member : formMember
             };
 
@@ -132,12 +142,22 @@ if($access=='1'){ ?>
                         });
                     }
 
+                    var AccessWr = '<ul>';
+                    var dtP = v.Access;
+                    dtp =  jQuery.parseJSON(dtP);
+                    // console.log(dtp);
+                    AccessWr += '<li>Input : '+dtp.input+'</li>';
+                    AccessWr += '<li>View : '+dtp.view+'</li>';
+                    AccessWr += '</ul>';
+                    var jwtPass = jwt_encode(dtp,'UAP)(*');
+
                     $('#listTeamSetting').append('<tr>' +
                         '<td>'+(i+1)+'</td>' +
                         '<td><b>'+v.Name+'</b><div>'+Member+'</div></td>' +
                         '<td><ul>'+Menu+'</ul></td>' +
+                        '<td>'+AccessWr+'</td>' +
                         '<td>' +
-                        '<button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'"><i class="fa fa-edit"></i></button> ' +
+                        '<button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'" dtother = "'+jwtPass+'"><i class="fa fa-edit"></i></button> ' +
                         '<button class="btn btn-sm btn-danger btnRemove_apt" data-id="'+v.ID+'"><i class="fa fa-trash"></i></button> ' +
                         '</td>' +
                         '</tr>')
@@ -149,7 +169,8 @@ if($access=='1'){ ?>
     }
 
     $(document).on('click','.btnEdit',function () {
-
+        var dtother = $(this).attr('dtother');
+        dtother = jwt_decode(dtother);
         var viewListAll = $('#viewListAll').val();
         var viewListAll = JSON.parse(viewListAll);
 
@@ -179,6 +200,12 @@ if($access=='1'){ ?>
         }
 
         $('#formMenu').select2('val',menu);
+
+        // dtother
+        $("#formInputAccess option").filter(function() {
+           //may want to use $.trim in here
+           return $(this).val() == dtother.input; 
+        }).prop("selected", true);
 
     });
 

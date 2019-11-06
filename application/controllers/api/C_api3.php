@@ -69,6 +69,10 @@ class C_api3 extends CI_Controller {
         if($data_arr['action']=='insertTeamAggr'){
 
             $dataForm = (array) $data_arr['dataForm'];
+            $input = $data_arr['input'];
+            $view = 'all';
+            $Access = $this->m_master->encode_auth_access_aps_rs($input,$view,[]);
+            $dataForm['Access'] = $Access;
             $this->db->insert('db_agregator.agregator_user',$dataForm);
             $insert_id = $this->db->insert_id();
 
@@ -137,7 +141,10 @@ class C_api3 extends CI_Controller {
 
             $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
-
+            $input = $data_arr['input'];
+            $view = 'all';
+            $Access = $this->m_master->encode_auth_access_aps_rs($input,$view,[]);
+            $dataForm['Access'] = $Access;
             $this->db->where('ID', $ID);
             $this->db->update('db_agregator.agregator_user',$dataForm);
             $this->db->reset_query();

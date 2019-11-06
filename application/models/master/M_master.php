@@ -3645,13 +3645,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // Cek apakah ada
             if(in_array($data[0]['ID'],$MyMenu)){
                 $rs['AccessPage'] = 'Yes';
-                if ($Type=='APT') {
-                   $rs['RuleAccess'] = [];
-                }
-                else
-                {
-                    $rs['RuleAccess'] = $checkMenu[0]['Access'];
-                }
+                // if ($Type=='APT') {
+                //    $rs['RuleAccess'] = [];
+                // }
+                // else
+                // {
+                //     $rs['RuleAccess'] = $checkMenu[0]['Access'];
+                // }
+                $rs['RuleAccess'] = $checkMenu[0]['Access'];
                 
             }
 
