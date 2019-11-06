@@ -271,6 +271,12 @@ class C_cooperation extends Cooperation_Controler {
             case 'add':
                 // Save data kerjasama
                 $kegiatan = json_decode(json_encode($Input['kegiatan']),true);
+                if (array_key_exists('FileLain', $_FILES)) {
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
+                    $Upload = json_encode($Upload);
+                    $kegiatan['FileLain'] = $Upload;
+                }
+                
                 // add upload bukti kerjasama
                 $this->db->insert('db_cooperation.kegiatan',$kegiatan);
                 $insert_id = $this->db->insert_id();
@@ -291,6 +297,21 @@ class C_cooperation extends Cooperation_Controler {
             case 'edit':
                 $ID = $Input['ID'];
                 $kegiatan = json_decode(json_encode($Input['kegiatan']),true);
+                $G_kegiatan = $this->m_master->caribasedprimary('db_cooperation.kegiatan','ID',$ID);
+                if (array_key_exists('FileLain', $_FILES)) {
+                    if ($G_kegiatan[0]['FileLain'] != '' && $G_kegiatan[0]['FileLain'] != null) {
+                        $arr_file = (array) json_decode($G_kegiatan[0]['FileLain'],true);
+                        $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
+                        $path = FCPATH.'uploads\\'.$filePath;
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+
+                        $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'FileLain',$path = './uploads/cooperation');
+                        $Upload = json_encode($Upload);
+                        $kegiatan['FileLain'] = $Upload;
+                    }
+                }
                 $this->db->where('ID',$ID);
                 $this->db->update('db_cooperation.kegiatan',$kegiatan);
 
@@ -315,6 +336,16 @@ class C_cooperation extends Cooperation_Controler {
                 break;
             case 'delete':
                 $ID = $Input['ID'];
+                $G_kegiatan = $this->m_master->caribasedprimary('db_cooperation.kegiatan','ID',$ID);
+                if ($G_kegiatan[0]['FileLain'] != '' && $G_kegiatan[0]['FileLain'] != null) {
+                    $arr_file = (array) json_decode($G_kegiatan[0]['FileLain'],true);
+                    $filePath = 'cooperation\\'.$arr_file[0]; // pasti ada file karena required
+                    $path = FCPATH.'uploads\\'.$filePath;
+                    if (file_exists($path)) {
+                        // print_r('file exist');
+                        unlink($path);
+                    }
+                }
                 // kerjasama
                 $this->db->where('ID',$ID);
                 $this->db->delete('db_cooperation.kegiatan');

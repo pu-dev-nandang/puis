@@ -129,6 +129,7 @@
 							<th>Manfaat</th>
 							<th style="width: 15%;">Date</th>
 							<th>Department</th>
+							<th>File Lain</th>
 							<th><i class="fa fa-cog btnaction"></i></th>
 						</tr>
 					</thead>
@@ -219,9 +220,20 @@
 	   	    	HtmlPageDepartmentSelected(arr,selector,'listtbl');
 
 	   	    	var tokenEdit = data[9];
-
+	   	    	var DecodetokenEdit = jwt_decode(tokenEdit);
+	   	    	// console.log(DecodetokenEdit);
+	   	    	var wrFile = '';
+	   	    	var FileLain = DecodetokenEdit['FileLain'];
+	   	    	// console.log(FileLain);
+	   	    	if (FileLain != '' && FileLain != null) {
+	   	    		var jFile = jQuery.parseJSON(FileLain);
+	   	    		if (jFile.length > 0) {
+	   	    			wrFile = '<a href = "'+base_url_js+'fileGetAny/cooperation-'+jFile[0]+'" target="_blank" class = "Fileexist">File</a>';
+	   	    		}
+	   	    	}
+	   	    	$( row ).find('td:eq(7)').html(wrFile);
 	   	    	html = '<div class="btn-group btnaction">  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">    <i class="fa fa-pencil"></i> <span class="caret"></span>  </button>  <ul class="dropdown-menu" style="min-width:50px !important;">    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+data[8]+'" tokenedit="'+tokenEdit+'"><i class="fa fa fa-edit"></i> </a></li>    <li role="separator" class="divider"></li>    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+data[8]+'"><i class="fa fa fa-trash"></i> </a></li>  </ul></div>';
-	   	    	$( row ).find('td:eq(7)').html(html);
+	   	    	$( row ).find('td:eq(8)').html(html);
 	   	    },
 	        dom: 'l<"toolbar">frtip',
 	   	    "initComplete": function(settings, json) {
