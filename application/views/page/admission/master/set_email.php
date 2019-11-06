@@ -7,7 +7,7 @@
   }
   
 </style>
-<div class="row" style="margin-top: 30px;">
+<div class="row btn-read" style="margin-top: 30px;">
     <div class="col-md-2"></div>
     <div class="col-md-8 formAddFormKD">
         <div class="widget box">
