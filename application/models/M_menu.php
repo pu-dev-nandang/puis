@@ -248,14 +248,17 @@ class M_menu extends CI_Model {
           );
       }
 
-      $html = '';
+      $html = '<script type="text/javascript">
+        var MyVarEbombAccess;
+      </script>
+      ';
       if ($access['read'] == 0) {
           $html .= '<script type="text/javascript">
                var waitForEl = function(selector, callback) {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -271,6 +274,9 @@ class M_menu extends CI_Model {
                        $(".btn-read").remove();
                    });
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -281,8 +287,10 @@ class M_menu extends CI_Model {
                var waitForEl = function(selector, callback) {
                  if (jQuery(selector).length) {
                    callback();
+                   // console.log("__Length__");
                  } else {
-                   setTimeout(function() {
+                  //console.log("Not Length__");
+                    MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -304,6 +312,9 @@ class M_menu extends CI_Model {
                       $(".btn-write").remove();
                    });
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -314,7 +325,8 @@ class M_menu extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                  // console.log("Not Length__");
+                    MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -329,7 +341,11 @@ class M_menu extends CI_Model {
                    $(document).ajaxComplete(function () {
                             $(".btn-edit").remove();
                    });
+
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -340,7 +356,7 @@ class M_menu extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                    MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -363,7 +379,9 @@ class M_menu extends CI_Model {
                   });
                    
                });
-               
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -385,7 +403,7 @@ class M_menu extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                    MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -410,7 +428,9 @@ class M_menu extends CI_Model {
                waitForEl(".btn-delete-menu-auth", function() {
                  $(".btn-delete-menu-auth").remove();
                });
-               
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
