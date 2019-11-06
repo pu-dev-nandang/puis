@@ -207,7 +207,7 @@
                     for (var i = 0; i < dt.length; i++) {
                         html += '<tr>'+
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
-                                    '<td>'+ dt[i].Judul_litabmas+ '</td>'+
+                                    '<td>'+ dt[i].Nm_jns_pub+' - '+dt[i].Judul+ '</td>'+
                                     '<td>'+ dt[i].Credit + '</td>'+
                                 '</tr>';    
                     }
