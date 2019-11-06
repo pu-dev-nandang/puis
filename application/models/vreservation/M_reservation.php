@@ -2955,14 +2955,17 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         // print_r($access);die();
 
-        $html = '';
+        $html = '<script type="text/javascript">
+          var MyVarEbombAccess2;
+        </script>
+        ';
         if ($access['read'] == 0) {
             $html .= '<script type="text/javascript">
                  var waitForEl = function(selector, callback) {
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -2979,6 +2982,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          $(".btn-read").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -2990,7 +2996,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3006,6 +3012,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $(".btn-add").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -3016,7 +3025,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3032,6 +3041,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                               $(".btn-edit").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -3042,7 +3054,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3065,7 +3077,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     });
                      
                  });
-                 
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -3087,7 +3101,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3112,7 +3126,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                  waitForEl(".btn-delete-menu-auth", function() {
                    $(".btn-delete-menu-auth").remove();
                  });
-                 
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
