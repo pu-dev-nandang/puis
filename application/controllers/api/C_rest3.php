@@ -347,7 +347,7 @@ class C_rest3 extends CI_Controller {
                     };
 
                     $MKPSAkreditasi = function($NIP,$ProdiID,$SemesterID){
-                        $rs = '';
+                        $rs = '<ul style = "margin-left:-20px;" >';
                         $sql = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng
                                 from db_academic.schedule_details_course as a 
                                 join db_academic.schedule as b on a.ScheduleID = b.ID
@@ -357,11 +357,12 @@ class C_rest3 extends CI_Controller {
                                  ';
                         $query=$this->db->query($sql, array($ProdiID,$NIP,$SemesterID))->result_array();
                         if (count($query) > 0) {
-                            $rs .= $query[0]['ClassGroup'].' - '.$query[0]['NameEng'];
+                            $rs .= '<li>'.$query[0]['ClassGroup'].' - '.$query[0]['NameEng'].'</li>';
                             for ($i=1; $i < count($query); $i++) { 
-                                $rs .= ', '.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'];
+                                $rs .= '<li>'.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'].'</li>';
                             }
                         }
+                        $rs .= '</ul>';
                         return $rs;
                     };
 
@@ -377,19 +378,45 @@ class C_rest3 extends CI_Controller {
                                 group by b.ID,a.MKID    
                                  ';
                         $query=$this->db->query($sql, array($ProdiID,$NIP,$SemesterID))->result_array();
-                        $MK = '';
-                        $SKS = '';
+                        $MK = '<ul style = "margin-left:-20px;" >';
+                        // $SKS = '';
+                        $SKS = 0;
+                        $arr_SKS = ['value' => 0,'data' => ''];
+                        $dataSKS = [];
                         if (count($query) > 0) {
-                            $MK .= $query[0]['ClassGroup'].' - '.$query[0]['NameEng'];
-                            $SKS .= $query[0]['TotalSKS'];
+                            $MK .= '<li>'.$query[0]['ClassGroup'].' - '.$query[0]['NameEng'].'</li>';
+                            $dataSKS[] =array('data' => $query[0]['ClassGroup'].' - '.$query[0]['NameEng'],'SKS' => $query[0]['TotalSKS']) ;
+                            $SKS += $query[0]['TotalSKS'];
                             for ($i=1; $i < count($query); $i++) { 
-                                $MK .= ', '.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'];
-                                $SKS .= ', '.$query[$i]['TotalSKS'];
+                                $MK .= '<li>'.$query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'].'</li>';
+                                $dataSKS[] =array('data' => $query[$i]['ClassGroup'].' - '.$query[$i]['NameEng'],'SKS' => $query[$i]['TotalSKS']) ;
+                                // $SKS .= ', '.$query[$i]['TotalSKS'];
+                                $SKS += $query[$i]['TotalSKS'];
                             }
 
-                            $rs['MK'] = $MK;
-                            $rs['SKS'] = $SKS;
+                            $MK .= '</ul>';
                         }
+                        // gabung untuk bobot kredit
+                        $sql2 = 'select a.ID as SdcID,a.ScheduleID,a.MKID,b.ClassGroup,c.NameEng,d.TotalSKS
+                                from db_academic.schedule_details_course as a 
+                                join db_academic.schedule as b on a.ScheduleID = b.ID
+                                join db_academic.mata_kuliah as c on a.MKID = c.ID
+                                join db_academic.curriculum_details as d on a.CDID = d.ID
+                                where a.ProdiID = ? and b.Coordinator = ? and b.SemesterID = ?
+                                group by b.ID,a.MKID    
+                                 ';
+                        $query2=$this->db->query($sql2, array($ProdiID,$NIP,$SemesterID))->result_array();
+                        if (count($query2) > 0) {
+                            $SKS += $query2[0]['TotalSKS'];
+                            $dataSKS[] =array('data' => $query2[0]['ClassGroup'].' - '.$query2[0]['NameEng'],'SKS' => $query2[0]['TotalSKS']) ;
+                            for ($i=1; $i < count($query2); $i++) { 
+                                $SKS += $query2[$i]['TotalSKS'];
+                                $dataSKS[] =array('data' => $query2[$i]['ClassGroup'].' - '.$query2[$i]['NameEng'],'SKS' => $query2[$i]['TotalSKS']) ;
+                            }
+                        }
+                        $arr_SKS = ['value' => $SKS,'data' =>  $this->jwt->encode($dataSKS,"UAP)(*")];
+                        $rs['MK'] = $MK;
+                        $rs['SKS'] = $arr_SKS;
                         return $rs;
                     };
 
