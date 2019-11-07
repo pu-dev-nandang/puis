@@ -5817,6 +5817,35 @@ class C_api extends CI_Controller {
                         }
                     }
 
+                    // send email to IT
+                        $DescriptionWr = '<p>Dear Team,<br/> Berikut dibawah ini Create Employee  by '.$this->session->userdata('Name').', <br/>
+                                         <p>Username PC : '.$arr_callback['UsernamePC'].'</p>
+                                         <p>Username Aplikasi PCAM : '.$arr_callback['UsernamePCam'].'</p>
+                                         <p>Password : '.$arr_callback['Password'].'</p>
+                                         <p>Email PU : '.$arr_callback['EmailPU'].'</p>
+                                        ';
+                        $ToEmail = ($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') ? array(
+                                      'Div' => array(12,13),
+                                    ) : array(
+                                          'NIP' => array('2018018'),
+                                        );  
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Create Employee '.$Name.' by '.$this->session->userdata('Name'),
+                                            'Description' => $DescriptionWr,
+                                            'URLDirect' => 'ShowLoggingNotification',
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => $ToEmail,
+                            'Email' => 'Yes', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                    // send email to IT
+
                     // insert to db venue for user access
                     $dataSave = array(
                         'NIP' => $NIP,
