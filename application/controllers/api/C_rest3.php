@@ -521,7 +521,7 @@ class C_rest3 extends CI_Controller {
                         $Name = $queryDosen[$i]['Name'];
                         $NIP = $queryDosen[$i]['NIP'];
                         $temp[] = $Name;
-                        $temp[] = 'V'; // DTPS
+                        $temp[] = ''; // DTPS
                         $arr_get = [];
                         // total ps akreditasi
                         $sqlPSAkreditasi = '
@@ -2036,10 +2036,7 @@ class C_rest3 extends CI_Controller {
       if ($mode=='showDataDosen') {
         $sql = 'select a.NIP,a.Name,a.PositionMain,a.PositionOther1,a.PositionOther2,a.PositionOther3 from db_employees.employees as a
             where ( 
-                        SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
-                        SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
-                        SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
-                        SPLIT_STR(a.PositionOther3, ".", 2) = 7
+                      StatusEmployeeID = 1
                     ) ';
         $query=$this->db->query($sql, array())->result_array();
         echo json_encode($query);
