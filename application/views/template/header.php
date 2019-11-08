@@ -301,7 +301,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Global Modal Large -->
+<!-- Global Modal Small -->
 <div class="modal fade" id="GlobalModalSmall" role="dialog">
     <div class="modal-dialog" role="document" style="width:355px;">
         <div class="modal-content animated jackInTheBox">
