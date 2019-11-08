@@ -35,6 +35,12 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function mentor_final_project(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/mentor_final_project',$data,true);
+        $this->menu_transcript($page);
+    }
+
     public function seminar_schedule(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/finalproject/seminar_schedule',$data,true);

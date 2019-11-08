@@ -4354,8 +4354,32 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $SemesterID = $data_arr['SemesterID'];
-            $ProdiID = (isset($data_arr['ProdiID'])) ? $data_arr['ProdiID'] : '';
+
+            $ProdiID = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='') ? $data_arr['ProdiID'] : '';
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
+
+            $WhereStatusTA = '';
+            if(isset($data_arr['StatusTA'])){
+                $stbSts = substr($data_arr['StatusTA'],0,1);
+                $stbStsVal = substr($data_arr['StatusTA'],2,1);
+
+                if($stbSts=='l'){
+                    $WhereStatusTA = ' AND ats.ClearentLibrary = "'.$stbStsVal.'" ';
+                } else if($stbSts=='f'){
+                    $WhereStatusTA = ' AND ats.ClearentFinance = "'.$stbStsVal.'" ';
+                } else if($stbSts=='k'){
+                    $WhereStatusTA = ' AND ats.ClearentKaprodi = "'.$stbStsVal.'" ';
+                } else if($stbSts=='i'){
+
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( ats.IjazahSMA IS NULL OR ats.IjazahSMA = "") '
+                        : ' AND ( ats.IjazahSMA IS NOT NULL OR ats.IjazahSMA != "") ';
+                }
+
+            }
+
+
+
 
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
@@ -4370,7 +4394,7 @@ class C_api3 extends CI_Controller {
                                         ats.ClearentFinance, ats.ClearentFinance_By, ats.ClearentFinance_At, em2.Name AS ClearentFinance_Name,
                                         ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
-                                        ats.ID AS AUTHID
+                                        ats.ID AS AUTHID, fp.ID AS FPID, fp.Status AS FPStatus
                                         FROM db_academic.std_study_planning ssp
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
@@ -4381,7 +4405,9 @@ class C_api3 extends CI_Controller {
 
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
-                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.' '.$dataSearch;
+                                        
+                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch;
 
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -4517,6 +4543,88 @@ class C_api3 extends CI_Controller {
 
         }
 
+        else if($data_arr['action']=='viewYudisiumLecturer'){
+
+            $requestData= $_REQUEST;
+
+            $WhereProdiID = ($data_arr['ProdiID']!='') ? ' AND em.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+            $LecturerStatus = $data_arr['LecturerStatus'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND (  em.Name LIKE "%'.$search.'%"
+                                OR em.NIP LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT em.NIP, em.Name, ps.Name AS Prodi, emps.Description AS StatusLecturer FROM db_employees.employees em 
+                                                  LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                                                  LEFT JOIN db_employees.employees_status emps ON (emps.IDStatus = em.StatusLecturerID)
+                                                  WHERE  em.StatusLecturerID = "'.$LecturerStatus.'" '.$WhereProdiID.' '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+
+                // Get student
+                $dataStdFP1 = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.auth_students ats 
+                                                            WHERE ats.MentorFP1 = "'.$row['NIP'].'" ORDER BY ats.NPM ASC')->result_array();
+
+                $stdFP1 = '';
+                if(count($dataStdFP1)>0){
+                    foreach ($dataStdFP1 AS $itm1){
+                        $stdFP1 = $stdFP1.'<span class="std">'.$itm1['NPM'].' - '.ucwords(strtolower($itm1['Name'])).'</span>';
+                    }
+                }
+
+
+                $dataStdFP2 = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.auth_students ats 
+                                                            WHERE ats.MentorFP2 = "'.$row['NIP'].'" ORDER BY ats.NPM ASC')->result_array();
+
+                $stdFP2 = '';
+                if(count($dataStdFP2)>0){
+                    foreach ($dataStdFP2 AS $itm2){
+                        $stdFP2 = $stdFP2.'<span class="std2">'.$itm2['NPM'].' - '.ucwords(strtolower($itm2['Name'])).'</span>';
+                    }
+                }
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b>
+                                                        <p class="help-block"><span style="color: cornflowerblue">'.$row['Prodi'].'</span><br/>'.$row['StatusLecturer'].'</p></div>';
+                $nestedData[] = '<div style="text-align: left;">'.$stdFP1.'<hr style="margin-top: 9px;margin-bottom: 9px;" />'.$stdFP2.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='getJudiciumsYear'){
+
+            $data = $this->db->query('SELECT ats.GraduationYear FROM db_academic.auth_students ats GROUP BY ats.GraduationYear ORDER BY ats.GraduationYear DESC')->result_array();
+
+            return print_r(json_encode($data));
+
+        }
 
         else if($data_arr['action']=='updateClearent'){
 

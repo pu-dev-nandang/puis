@@ -639,6 +639,47 @@
             }
         });
     }
+    
+    function loadSelectOptionJudiciumsYear(element,selected) {
+        var url = base_url+'api3/__crudYudisium';
+        var token = jwt_encode({action:'getJudiciumsYear'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (v.GraduationYear==selected) ? 'selected' : '';
+                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+
+                });
+            }
+
+        });
+
+    }
+
+    function loadSelectOptionLecturerStatus(element,selected) {
+
+        var url = base_url_js+'api/__crudLecturer';
+        var token = jwt_encode({action : 'getLecturerStatus'},'UAP)(*');
+        
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (selected==v.IDStatus) ? 'selected' : '';
+                    var color = (parseInt(v.IDStatus)<0)
+                        ? 'style="color:red;"'
+                        : '';
+                    $(element).append('<option value="'+v.IDStatus+'" '+color+' '+sc+'>'+v.Description+'</option>');
+
+                });
+            }
+
+        });
+
+    }
 
     function loadSelectOptionLevelEducation(element,selected) {
         var url = base_url_js+"api/__getLevelEducation";

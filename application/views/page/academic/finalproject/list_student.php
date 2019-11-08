@@ -6,11 +6,39 @@
 </style>
 
 <div class="row">
-    <div class="col-md-4 col-md-offset-4" style="text-align: right;margin-top: 30px;">
+    <div class="col-md-10 col-md-offset-1" style="text-align: right;margin-top: 30px;">
         <div class="well">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-4">
                     <select class="form-control" id="filterSemester"></select>
+                </div>
+                <div class="col-md-5">
+                    <select class="form-control" id="filterBaseProdi">
+                        <option value="">-- All Programme Study --</option>
+                        <option disabled>------------------------------------------</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-control" id="filterStatus">
+                        <option value="">-- All Status --</option>
+                        <option disabled>-------------------------------------</option>
+                        <optgroup label="Ijazah SMA">
+                            <option value="i.0">Not yet upload</option>
+                            <option value="i.1">Uploaded</option>
+                        </optgroup>
+                        <optgroup label="Library">
+                            <option value="l.0">Waiting Clearance</option>
+                            <option value="l.1">Clearance</option>
+                        </optgroup>
+                        <optgroup label="Finance">
+                            <option value="f.0">Waiting Clearance</option>
+                            <option value="f.1">Clearance</option>
+                        </optgroup>
+                        <optgroup label="Kaprodi">
+                            <option value="k.0">Waiting Approval</option>
+                            <option value="k.1">Approved</option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
         </div>
@@ -27,6 +55,7 @@
 
     $(document).ready(function () {
         loSelectOptionSemester('#filterSemester','');
+        loadSelectOptionBaseProdi('#filterBaseProdi','');
 
         var firstLoad = setInterval(function () {
             var filterSemester = $('#filterSemester').val();
@@ -37,7 +66,7 @@
         },1000);
     });
 
-    $('#filterSemester').change(function () {
+    $('#filterSemester,#filterBaseProdi,#filterStatus').change(function () {
         var filterSemester = $('#filterSemester').val();
         if(filterSemester!='' && filterSemester!=null){
             loadData();
@@ -46,7 +75,16 @@
 
     function loadData() {
         var filterSemester = $('#filterSemester').val();
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        var filterStatus = $('#filterStatus').val();
+
+
         if(filterSemester!='' && filterSemester!=null){
+
+            var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
+                ? filterBaseProdi.split('.')[0] : '';
+
+            var StatusTA = (filterStatus!='' && filterStatus!=null) ? filterStatus : '';
 
             var SemesterID = filterSemester.split('.')[0];
 
@@ -66,7 +104,7 @@
                 '        </table>');
 
 
-            var token = jwt_encode({action : 'viewYudisiumList',SemesterID:SemesterID},'UAP)(*');
+            var token = jwt_encode({action : 'viewYudisiumList',SemesterID:SemesterID,ProdiID : ProdiID, StatusTA : StatusTA},'UAP)(*');
             var url = base_url_js+'api3/__crudYudisium';
 
             var dataTable = $('#tableData').DataTable( {
@@ -200,37 +238,45 @@
 
             if(formMentor1!='' && formMentor1!=null){
 
-                loading_buttonSm('#btnSaveMentor');
+                if(formMentor1!=formMentor2){
 
-                var data = {
-                    action : 'updateMentorFP',
-                    ID : ID,
-                    dataForm : {
-                        MentorFP1 : formMentor1,
-                        MentorFP2 : formMentor2
-                    }
-                };
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api3/__crudYudisium';
+                    loading_buttonSm('#btnSaveMentor');
 
-                $.post(url,{token:token},function (result) {
-                    toastr.success('Data saved','Success');
-                    // loadData();
+                    var data = {
+                        action : 'updateMentorFP',
+                        ID : ID,
+                        dataForm : {
+                            MentorFP1 : formMentor1,
+                            MentorFP2 : formMentor2
+                        }
+                    };
+                    var token = jwt_encode(data,'UAP)(*');
+                    var url = base_url_js+'api3/__crudYudisium';
 
-                    $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
-                    if(formMentor2!='' && formMentor2!=null){
-                        $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
-                    }
+                    $.post(url,{token:token},function (result) {
+                        toastr.success('Data saved','Success');
+                        // loadData();
 
-                    var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
-                    var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
-                    $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
+                        $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
+                        if(formMentor2!='' && formMentor2!=null){
+                            $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
+                        }
 
-                    setTimeout(function () {
-                        $('#GlobalModal').modal('hide');
-                    },500);
+                        var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
+                        var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
+                        $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
 
-                });
+                        setTimeout(function () {
+                            $('#GlobalModal').modal('hide');
+                        },500);
+
+                    });
+
+                } else {
+                    toastr.warning('Mentor 1 & 2 cannot same','Warning');
+                }
+
+
 
 
             } else {
