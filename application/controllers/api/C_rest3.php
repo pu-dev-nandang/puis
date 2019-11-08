@@ -2288,14 +2288,14 @@ class C_rest3 extends CI_Controller {
           $Kurikulum = $dataToken['Kurikulum'];
           $K = explode('.', $Kurikulum);
           $Kurikulum = $K[0];
-          $sql = 'select a.Semester,b.MKCode,b.Name as NameMataKuliah,if(b.TypeMK = "1","V","") as TypeMatakuliah,
+          $sql = 'select a.Semester,b.MKCode,b.NameEng as NameMataKuliah,if(b.TypeMK = "1","V","") as TypeMatakuliah,
                   if(b.CourseType = "1","V","") as Kuliah,if(b.CourseType = "4","V","") as Seminar,if(b.CourseType = "3","V","") as Pratikum,
                   (a.TotalSKS * c.SKSPerMinutes) as Konversi,z.Year,a.MKID
                   from db_academic.curriculum_details as a 
                   join db_academic.curriculum as z on z.ID = a.CurriculumID
                   join db_academic.mata_kuliah as b on a.MKID = b.ID
-                  join db_rektorat.credit_type_courses as c on c.ID = b.ID
-                  where b.TypeMK = "1" and a.ProdiID = '.$ProdiID.' and a.CurriculumID = '.$Kurikulum.'
+                  join db_rektorat.credit_type_courses as c on c.ID = b.CourseType
+                  where a.ProdiID = '.$ProdiID.' and a.CurriculumID = '.$Kurikulum.'
                  ';
                  //print_r($sql);die();
           $query = $this->db->query($sql,array())->result_array();
