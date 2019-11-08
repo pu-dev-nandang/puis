@@ -3059,6 +3059,8 @@ class C_save_to_pdf extends CI_Controller {
         $data_arr = $this->getInputToken($token);
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
+        $dataStudent['DetailCourse'] = $this->m_rest->getTranscript(substr($data_arr['DBStudent'],3,4),$data_arr['NPM'],'ASC');
+
         $Student = $dataStudent['Student'][0];
         $dataTempTr = $dataStudent['TempTranscript'][0];
 
@@ -3114,6 +3116,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(2);
 
         $this->headerTable('ind',$pdf);
+
+//        print_r($dataStudent);exit;
+
         $this->body_temp_transcript('ind',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3223,8 +3228,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $Student = $dataStudent['Student'][0];
         $Transcript = $dataStudent['Transcript'][0];
-        $DetailCourse = $dataStudent['DetailCourse'];
-        $Result = $dataStudent['Result'];
+        $DetailCourse = $dataStudent['DetailCourse']['dataCourse'];
+        $Result = $dataStudent['DetailCourse']['dataIPK'];
         $Warek1 = $dataStudent['WaRek1'][0];
 
         $border = 1;
@@ -3244,7 +3249,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_no,$h,($no++),$border,0,'C');
 //            $pdf->Cell($w_smt,$h,'1',$border,0,'C');
             $pdf->Cell($w_kode,$h,$d['MKCode'],$border,0,'C');
-            $pdf->Cell($w_mk+$w_smt,$h,$d['MKName'.$mk],$border,0,'L');
+            $pdf->Cell($w_mk+$w_smt,$h,$d['Course'.$mk],$border,0,'L');
             $pdf->Cell($w_f,$h,$d['Credit'],$border,0,'C');
             $pdf->Cell($w_f,$h,$d['Grade'],$border,0,'C');
 //            $pdf->Cell($w_f,$h, (is_int($d['GradeValue'])) ? $d['GradeValue'] : number_format($d['GradeValue'],2),$border,0,'C');
@@ -3270,12 +3275,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_f,$h,$Result['TotalSKS'],$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,number_format($Result['TotalGradeValue'],2),$border,1,'C',true);
+        $pdf->Cell($w_fv,$h,$Result['TotalPoint'],$border,1,'C',true);
 
         $ipkLabel = ($lang=='ind')? 'Indeks Prestasi Kumulatif' : 'Cummulative Grade Point Average';
         $h = 6;
 
-        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.number_format($Result['IPK'],2),$border,1,'C',true);
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.$Result['IPK'],$border,1,'C',true);
 
 
         $h = 3.5;
