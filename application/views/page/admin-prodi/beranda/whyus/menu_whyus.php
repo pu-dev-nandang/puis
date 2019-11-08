@@ -5,8 +5,8 @@
         <!--        <li class="--><?php //if($this->uri->segment(3)=='list-student') { echo 'active'; } ?><!--">-->
         <!--            <a href="--><?php //echo base_url('academic/final-project/list-student'); ?><!--">Final Project</a>-->
         <!--        </li>-->
-        <li class="<?php if($this->uri->segment(4)=='whychoose') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('prodi/beranda/why-choose-us/whychoose'); ?>">Why Choose</a>
+        <li class="<?php if($this->uri->segment(3)=='why-choose-us' && ($this->uri->segment(4) == '' || $this->uri->segment(4) == null ) ) { echo 'active'; } ?>">
+            <a href="<?php echo base_url('prodi/beranda/why-choose-us'); ?>">Why Choose</a>
         </li>
         <li class="<?php if($this->uri->segment(4)=='about') { echo 'active'; } ?>">
             <a href="<?php echo base_url('prodi/beranda/why-choose-us/about'); ?>">About</a>

@@ -3,11 +3,35 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_prodi extends CI_Model {
-
+    public $data = array();
 
     function __construct()
     {
         parent::__construct();
+    }
+
+    private function __join_prodi_auth($NIP,$GetProdi = []){
+        $G_data = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
+        if (count($G_data) > 0) {
+            $ProdiAuth = $G_data[0]['ProdiAuth']; // NIP is UNIQUE
+            $arr_ProdiAuth = json_decode(json_encode($ProdiAuth),true);
+            for ($i=0; $i < count($arr_ProdiAuth); $i++) {
+                $ProdiID =  $arr_ProdiAuth[$i];
+                // cek ProdiID exist
+                $Bool = true;
+                for ($j=0; $j <count($GetProdi) ; $j++) { 
+                    if ($GetProdi[$j]['ID'] == $ProdiID) {
+                        $Bool = false;
+                        break;
+                    }
+                }
+                if ($Bool) {
+                    $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                    $GetProdi[] = $d[0];
+                }
+            }
+        }
+        return $GetProdi;
     }
 
     public function auth($ProdiID = NULL)
@@ -47,6 +71,8 @@ class M_prodi extends CI_Model {
                redirect(base_url().'page404');die();
             }
         }
+
+        $GetProdi = $this->__join_prodi_auth($NIP,$GetProdi);
 
         if (count($GetProdi) > 0) {
             $this->session->set_userdata('prodi_get',$GetProdi);

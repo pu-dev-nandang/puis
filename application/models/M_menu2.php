@@ -123,12 +123,12 @@ class M_menu2 extends CI_Model {
                   'Submenu' => $submenu2,
               );
           }
-          if ($i == 0) {
-              // SORTING ASC
-                  usort($arr2, function($a, $b) {
-                      return $a['SubMenu1'] - $b['SubMenu1'];
-                  });
-          }
+          // if ($i == 0) {
+          //     // SORTING ASC
+          //         usort($arr2, function($a, $b) {
+          //             return $a['SubMenu1'] - $b['SubMenu1'];
+          //         });
+          // }
           
 
           $arr[] =array(

@@ -19,6 +19,21 @@ class C_dashboard extends Globalclass {
 
     public function index()
     {
+        // $G_dt = $this->m_master->showData_array('db_prodi.cfg_sub_menu');
+        // for ($i=0; $i < count($G_dt); $i++) { 
+        //     $dataSave = [
+        //         'cfg_group_user' => 1,
+        //         'ID_cfg_sub_menu' => $G_dt[$i]['ID'],
+        //         'read' => 1,
+        //         'write' => 1,
+        //         'update' => 1,
+        //         'delete' => 1,
+        //     ];
+
+        //     $this->db->insert('db_prodi.cfg_rule_g_user',$dataSave);
+        // }
+        // die();
+
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
 
@@ -96,6 +111,7 @@ class C_dashboard extends Globalclass {
                     else
                     {
                         $this->m_prodi->auth(); // get session
+                        $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                         // check multiple akses
                         if (count($this->session->userdata('prodi_get')) > 1) {
                             $content = $this->load->view('global/switch_prodi',$data,true);
