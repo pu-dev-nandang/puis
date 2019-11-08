@@ -3472,12 +3472,12 @@ class C_save_to_pdf extends CI_Controller {
 
             $ytext = $pdf->GetY()+3.5;
             $xtext = $pdf->GetX()+6.3;
-            $pdf->Text($xtext,$ytext,number_format($ds['GradeValue'],2,'.',''));
+            $pdf->Text($xtext,$ytext,str_replace(',','.',$ds['GradeValue']));
             $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
 
             $ytext = $pdf->GetY()+3.5;
             $xtext = $pdf->GetX()+9.5;
-            $pdf->Text($xtext,$ytext,number_format($ds['Point'],2,'.',''));
+            $pdf->Text($xtext,$ytext,str_replace(',','.',$ds['Point']));
             $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);

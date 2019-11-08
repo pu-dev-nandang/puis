@@ -1591,7 +1591,8 @@ class M_rest extends CI_Model {
                                             $transcript[$i2]['Grade'] = $d_sa['GradeNew'];
                                             $transcript[$i2]['Score'] = $d_sa['ScoreNew'];
                                             $transcript[$i2]['GradeValue'] = $d_sa['GradeValueNew'];
-                                            $transcript[$i2]['Point'] = $transcript[$i]['Credit'] * $d_sa['GradeValueNew'];
+                                            $transcript[$i2]['Credit'] = $d_sa['Credit'];
+                                            $transcript[$i2]['Point'] = $d_sa['Credit'] * $d_sa['GradeValueNew'];
                                             $transcript[$i2]['Source'] = 'Semester Antara';
                                         }
                                     }
