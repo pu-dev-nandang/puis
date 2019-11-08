@@ -1608,7 +1608,43 @@ class M_rest extends CI_Model {
 
         }
 
-        return $transcript;
+        $dataIPK = $this->getIPK4Transcript($transcript);
+
+        $result = array(
+            'dataIPK' => $dataIPK,
+            'dataCourse' => $transcript
+        );
+
+        return $result;
+    }
+
+    public function getIPK4Transcript($dataTranscript)
+    {
+
+
+        $data_TotalPoint = 0;
+        $data_TotalSKS = 0;
+        if(count($dataTranscript)>0){
+
+            foreach ($dataTranscript AS $item){
+                $data_TotalSKS = $data_TotalSKS + (float) $item['Credit'];
+                $data_TotalPoint = $data_TotalPoint + $item['Point'];
+            }
+
+        }
+
+        $IPK_Ori = (count($dataTranscript)>0) ? $data_TotalPoint/$data_TotalSKS : 0 ;
+        $data_ipk = round($IPK_Ori,2);
+
+        $result = array(
+            'IPK_Ori' => $IPK_Ori,
+            'IPK' => number_format($data_ipk,2,'.',''),
+            'TotalSKS' => $data_TotalSKS,
+            'TotalPoint' => number_format($data_TotalPoint,2,'.','')
+        );
+
+        return $result;
+
     }
 
 

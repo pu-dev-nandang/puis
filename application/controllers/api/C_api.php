@@ -3930,6 +3930,14 @@ class C_api extends CI_Controller {
                 return print_r(json_encode($data));
             }
 
+            else if($data_arr['action']=='getLecturerStatus'){
+
+                $data = $this->db->query('SELECT * FROM db_employees.employees_status WHERE Type = "lec" OR Type = "both" ORDER BY IDStatus DESC ')->result_array();
+
+                return print_r(json_encode($data));
+
+            }
+
             else if($data_arr['action']=='readMini'){
                 $NIP = $data_arr['NIP'];
                 $data = $this->db->select('NIP,NIDN,Name,TitleAhead,TitleBehind,PositionMain,Phone,
@@ -8526,26 +8534,28 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='viewRegistrationSchedule'){
 
-                $SemesterID = $data_arr['SemesterID'];
-
-                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
-                    'SemesterID' => $SemesterID
-                ))->result_array();
-
-                // Check
-                $getDateNow = $this->m_rest->getDateNow();
-
-                $TARegStart = $data[0]['TARegStart'];
-                $TARegEnd = $data[0]['TARegEnd'];
-
-                $sw = 0;
-                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
-                    $sw = 1;
-                }
-
-                $data[0]['Show'] = $sw;
-
-                return print_r(json_encode($data));
+//
+//
+//                $SemesterID = $data_arr['SemesterID'];
+//
+//                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
+//                    'SemesterID' => $SemesterID
+//                ))->result_array();
+//
+//                // Check
+//                $getDateNow = $this->m_rest->getDateNow();
+//
+//                $TARegStart = $data[0]['TARegStart'];
+//                $TARegEnd = $data[0]['TARegEnd'];
+//
+//                $sw = 0;
+//                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
+//                    $sw = 1;
+//                }
+//
+//                $data[0]['Show'] = $sw;
+//
+//                return print_r(json_encode($data));
 
             }
             else if($data_arr['action']=='viewDocumentSkripsi'){
