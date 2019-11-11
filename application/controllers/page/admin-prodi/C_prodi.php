@@ -431,7 +431,7 @@ class C_prodi extends Prodi_Controler {
     			break;
     		case 'delete':
     			$input = $this->getInputToken();
-    			$sql = "delete from ".$this->data['db_select'].".previleges_guser where NIP = '".$input['NIP']."'";
+    			$sql = "delete from ".$this->data['db_select'].".previleges_guser where NIP = '".$input['NIP']."'  and ProdiID = ".$ProdiID." ";
     			$query=$this->db->query($sql, array());
 
                 // insert auth prodi
