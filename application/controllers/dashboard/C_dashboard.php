@@ -117,6 +117,7 @@ class C_dashboard extends Globalclass {
                         }
                         else
                         {
+                            $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                             $data['NameProdi'] = $this->session->userdata('prodi_active');
                             if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
                                 $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
@@ -141,6 +142,7 @@ class C_dashboard extends Globalclass {
                         else
                         {
                             $data['NameProdi']  = $this->session->userdata('prodi_active');
+                            $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                             if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
                                 $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
                             }
