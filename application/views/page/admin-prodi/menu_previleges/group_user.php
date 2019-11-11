@@ -33,7 +33,7 @@
     </div>
 </div>
 
-<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? 'hide' : '' ?>" style="margin-top: 5px;">
+<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? '' : '' ?>" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -53,7 +53,7 @@
     </div>
 </div>
 
-<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? 'hide' : '' ?>" style="margin-top: 5px;">
+<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? '' : '' ?>" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -84,7 +84,7 @@
 </div>
 
 
-<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? 'hide' : '' ?>" style="margin-top: 5px;">
+<div class="row <?php echo ($PositionMain['IDDivision'] != 12) ? '' : '' ?>" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
