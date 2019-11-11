@@ -2447,6 +2447,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         if ($ProdiID != '' && $ProdiID != null) {
            $AddWhere = ' where ProdiID ='.$ProdiID;
         }
+        $PositionMain = $this->session->userdata('PositionMain');
+        if ($PositionMain['IDDivision']!= 12) {
+            $WhereOrAnd = ($AddWhere == '') ? ' where' : ' and';
+            $AddWhere .= $WhereOrAnd.' G_user != 1';
+        }
         $sql = 'select count(*) as total from '.$table.$AddWhere;
         $query=$this->db->query($sql, array())->result_array();
         return $query[0]['total'];
