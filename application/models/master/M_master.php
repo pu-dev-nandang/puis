@@ -2441,9 +2441,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function getCountAllDataAuth($table)
+    public function getCountAllDataAuth($table,$ProdiID = '')
     {
-        $sql = 'select count(*) as total from '.$table;
+        $AddWhere = '';
+        if ($ProdiID != '' && $ProdiID != null) {
+           $AddWhere = ' where ProdiID ='.$ProdiID;
+        }
+        $sql = 'select count(*) as total from '.$table.$AddWhere;
         $query=$this->db->query($sql, array())->result_array();
         return $query[0]['total'];
     }

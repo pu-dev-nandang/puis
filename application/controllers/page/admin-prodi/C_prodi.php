@@ -21,9 +21,17 @@ class C_prodi extends Prodi_Controler {
     }
 
     public function menu_request($page){
-        $data['page'] = $page;
-        $content = $this->load->view('page/'.$this->data['department'].'/menu_previleges/menu_choose',$data,true);
-        $this->temp($content);
+        $PositionMain = $this->session->userdata('PositionMain');
+        if ($PositionMain['IDDivision'] != 12 && $this->uri->segment(3) !='user_access' ) {
+            redirect(base_url().'prodi/setting/user_access');
+        }
+        else
+        {
+            $data['page'] = $page;
+            $content = $this->load->view('page/'.$this->data['department'].'/menu_previleges/menu_choose',$data,true);
+            $this->temp($content);
+        }
+        
     }
 
     public function setting(){
@@ -286,7 +294,8 @@ class C_prodi extends Prodi_Controler {
     {
         $requestData= $_REQUEST;
         // print_r($requestData);
-        $totalData = $this->m_master->getCountAllDataAuth($this->data['db_select'].'.previleges_guser');
+        $ProdiID = $this->session->userdata('prodi_active_id');
+        $totalData = $this->m_master->getCountAllDataAuth($this->data['db_select'].'.previleges_guser',$ProdiID);
 
         // get NIP
         $NIP = $this->session->userdata('NIP');
@@ -296,13 +305,15 @@ class C_prodi extends Prodi_Controler {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM '.$this->data['db_select'].'.previleges_guser as a join db_employees.employees as b
                         on a.NIP = b.NIP  left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
+                $sql.= ' where (a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%") and a.ProdiID ='.$ProdiID;
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM '.$this->data['db_select'].'.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP  left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID';
+                         on a.NIP = b.NIP  left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID
+                         where a.ProdiID = '.$ProdiID.'
+                         ';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
@@ -313,13 +324,15 @@ class C_prodi extends Prodi_Controler {
                 $sql = 'SELECT a.NIP,b.Name,a.G_user FROM '.$this->data['db_select'].'.previleges_guser as a join db_employees.employees as b
                         on a.NIP = b.NIP  left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID';
 
-                $sql.= ' where a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1 or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%"';
+                $sql.= ' where (a.NIP LIKE "'.$requestData['search']['value'].'%" or b.Name LIKE "%'.$requestData['search']['value'].'%" and a.G_user != 1 or cgu.GroupAuth LIKE "%'.$requestData['search']['value'].'%") and a.ProdiID ='.$ProdiID;
                 $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
                  $sql = 'SELECT a.NIP,b.Name,a.G_user FROM '.$this->data['db_select'].'.previleges_guser as a join db_employees.employees as b
-                         on a.NIP = b.NIP and a.G_user != 1 left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID';
+                         on a.NIP = b.NIP and a.G_user != 1 left join '.$this->data['db_select'].'.cfg_group_user as cgu on a.G_user = cgu.ID
+                          where a.ProdiID = '.$ProdiID.'
+                         ';
                  $sql.= ' ORDER BY a.NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
@@ -379,16 +392,22 @@ class C_prodi extends Prodi_Controler {
     {
     	$Input = $this->getInputToken();
     	$action = $Input['action'];
+        $ProdiID = $this->session->userdata('prodi_active_id');
     	switch ($action) {
     		case 'add':
     			// check NIP existing
-    			$G_ = $this->m_master->caribasedprimary($this->data['db_select'].'.previleges_guser','NIP',$Input['NIP']);
+                $sql = 'select * from '.$this->data['db_select'].'.previleges_guser where NIP = "'.$Input['NIP'].'" and ProdiID = '.$ProdiID.' ';
+    			$G_ = $this->db->query($sql,array())->result_array();
     			if (count($G_) == 0) {
     				$dataSave = array(
     				    'NIP' => $Input['NIP'],
     				    'G_user' => $Input['GroupUser'],
+                        'ProdiID' => $ProdiID
     				);
     				$this->db->insert($this->data['db_select'].'.previleges_guser', $dataSave);
+
+                    // insert auth prodi
+                    $this->m_prodi->__process_auth_prodi('add',$Input['NIP'],$ProdiID);
     				echo json_encode(1);
     			}
     			else
@@ -401,14 +420,22 @@ class C_prodi extends Prodi_Controler {
     			$input = $this->getInputToken();
     			$dataSave = array(
     			    'G_user' => $input['valuee'],
+                    'ProdiID' => $ProdiID,
     			);
-    			$this->db->where('NIP', $input['NIP']);
+                $this->db->where('NIP', $input['NIP']);
+    			$this->db->where('ProdiID', $ProdiID);
     			$this->db->update($this->data['db_select'].'.previleges_guser', $dataSave);
+
+                // insert auth prodi
+                $this->m_prodi->__process_auth_prodi('edit',$Input['NIP'],$ProdiID);
     			break;
     		case 'delete':
     			$input = $this->getInputToken();
     			$sql = "delete from ".$this->data['db_select'].".previleges_guser where NIP = '".$input['NIP']."'";
     			$query=$this->db->query($sql, array());
+
+                // insert auth prodi
+                $this->m_prodi->__process_auth_prodi('delete',$Input['NIP'],$ProdiID);
     			break;	
     		default:
     			# code...

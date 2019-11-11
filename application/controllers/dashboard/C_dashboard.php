@@ -34,6 +34,23 @@ class C_dashboard extends Globalclass {
         // }
         // die();
 
+        // $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        // $G_it = $this->m_master->getEmployeeByDepartment(12);
+        // for ($i=0; $i < count($G_prodi); $i++) { 
+        //     $ProdiID = $G_prodi[$i]['ID'];
+        //     for ($k=0; $k < count($G_it); $k++) { 
+        //         $NIPIT = $G_it[$k]['NIP'];
+        //         $dataSave = [
+        //             'NIP' => $NIPIT,
+        //             'G_user' => 1,
+        //             'ProdiID' => $ProdiID,
+        //         ];
+
+        //         $this->db->insert('db_prodi.previleges_guser',$dataSave);
+        //     }
+        // }
+        // die();
+
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
 
@@ -80,6 +97,10 @@ class C_dashboard extends Globalclass {
                                 $get = $this->m_master->caribasedprimary('db_academic.program_study','ID',$prodi_active_id);
                                 $this->session->set_userdata('prodi_active',$get[0]['Name']);
                                 $this->session->set_userdata('prodi_active_id',$get[0]['ID']);
+
+                                $this->session->unset_userdata(array('prodi_sess', 'auth_prodi_sess', 'menu_prodi_sess', 'menu_prodi_grouping'));
+                                $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
+                                
                                 $data['NameProdi'] = $get[0]['Name'];
                                 $data['NameProdi'] = strtolower($data['NameProdi'] );
                                 $data['NameProdi']  = str_replace(" ", "-", $data['NameProdi'] );

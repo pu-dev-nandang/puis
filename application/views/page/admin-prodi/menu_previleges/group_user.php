@@ -331,7 +331,8 @@
 		    $.post(url,{token : token},function (data_json) {
 		        var response = jQuery.parseJSON(data_json);
 		        // $("#loadingProcess").remove();
-		        for (var i = 0; i < response.length; i++) {
+		        var startI = (IDDivision == 12) ? 0 : 1;
+		        for (var i = startI; i < response.length; i++) {
 		            $(".datatable2 tbody").append(
 		                '<tr>'+
 		                    '<td><input type = "text" class = "form-control GroupPrevileges" value ="'+response[i]['GroupAuth']+'" id-key = "'+response[i]['ID']+'"><div class = "hide">'+response[i]['GroupAuth']+'</div></td>'+
@@ -512,8 +513,10 @@
 	    var token = jwt_encode(data,"UAP)(*");
 	    $.post(url,{token : token},function (data_json) {
 	        var obj = JSON.parse(data_json);
-	          for(var i=0;i<obj.length;i++){
+	        	var startI = (IDDivision == 12) ? 0 : 1;
+	          for(var i=startI;i<obj.length;i++){
 	              var selected = (i==0) ? 'selected' : '';
+
 	              $('#selectGroupuUser').append('<option value="'+obj[i].ID+'" '+selected+'>'+obj[i].GroupAuth+'</option>');
 	              $('#selectGroupuUser2').append('<option value="'+obj[i].ID+'" '+selected+'>'+obj[i].GroupAuth+'</option>');
 	              $('#selectGroupuUser3').append('<option value="'+obj[i].ID+'" '+selected+'>'+obj[i].GroupAuth+'</option>');

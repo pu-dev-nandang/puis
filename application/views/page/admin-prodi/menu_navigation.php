@@ -6,7 +6,9 @@
         <ul id="nav">
             <?php
             $getData  = $this->session->userdata('menu_prodi_grouping');
-//            print_r($getData);exit;
+            ?>
+            <!-- <pre><?php //print_r($getData);exit; ?></pre> -->
+            <?php
             for ($i=0; $i < count($getData); $i++) {
                 $temp = array();
                 $chkSubMenu1 = 0;
