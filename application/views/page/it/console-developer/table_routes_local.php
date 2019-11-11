@@ -19,7 +19,9 @@
         </table>
     </div>
     <div class="panel-footer" style="text-align: right;">
-        <button class="btn btn-primary" id="btnMigrate">Migrate to Server Live</button>
+        <?php if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id'): ?>
+            <button class="btn btn-primary" id="btnMigrate">Migrate to Server Live</button>
+        <?php endif ?>
     </div>
     <p style="color: red;">* Mohon Migrate data ke server live jika data local masih ada, dengan klik tombol Migrate to Server Live</p>
 </div>
