@@ -25,6 +25,29 @@ class M_prodi extends CI_Model {
 
                    $this->db->insert('db_prodi.auth_prodi',$dataSave);
                 }
+                else
+                {
+                    $arr_ProdiID = json_decode($G_dt[0]['ProdiAuth'],true);
+                    // check exist
+                    $Bool = true;
+                    for ($i=0; $i < count($arr_ProdiID); $i++) { 
+                       if ($arr_ProdiID[$i] == $ProdiID) {
+                          $Bool = false;
+                          break;
+                       }
+                    }
+
+                    if ($Bool) {
+                       $arr_ProdiID[] = $ProdiID;
+                       $dataSave = [
+                        'NIP' => $NIP,
+                        'ProdiAuth' => json_encode($arr_ProdiID),
+                       ];
+
+                       $this->db->where('ID',$G_dt[0]['ID']);
+                       $this->db->update('db_prodi.auth_prodi',$dataSave);
+                    }
+                }
 
                 // insert di rule  user
                 $IDDivision = $this->session->userdata('IDdepartementNavigation');
@@ -78,6 +101,7 @@ class M_prodi extends CI_Model {
                 break;
             case 'delete':
                 $this->db->where('NIP',$NIP);
+                $this->db->where('ProdiAuth',$ProdiID);
                 $this->db->delete('db_prodi.auth_prodi');
 
                  $IDDivision = $this->session->userdata('IDdepartementNavigation');
