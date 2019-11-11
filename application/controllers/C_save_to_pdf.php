@@ -6623,7 +6623,7 @@ Phone: (021) 29200456';
         if(isset($data['NPM'])){
 
             // Cek udah ada apa blm
-            $dataCekNomor = $this->db->get_where('db_academic.final_project_clearance',array(
+            $dataCekNomor = $this->db->get_where('db_academic.final_project_proof',array(
                 'Type' => 'lib',
                 'NPM' => $data['NPM']
             ))->result_array();
@@ -6631,7 +6631,7 @@ Phone: (021) 29200456';
             if(count($dataCekNomor)>0){
                 $DownloadCount = $dataCekNomor[0]['DownloadCount'] + 1;
                 $this->db->where('ID', $dataCekNomor[0]['ID']);
-                $this->db->update('db_academic.final_project_clearance',array(
+                $this->db->update('db_academic.final_project_proof',array(
                     'DownloadCount' => $DownloadCount,
                     'DownloadAt' => $this->m_rest->getDateTimeNow()
                 ));
@@ -6642,7 +6642,7 @@ Phone: (021) 29200456';
                 $noSurat_Year = $dataCekNomor[0]['Year'];
             } else {
 
-                $countNomor = $this->db->get_where('db_academic.final_project_clearance',array(
+                $countNomor = $this->db->get_where('db_academic.final_project_proof',array(
                     'Type' => 'lib',
                     'Year' => date("Y")
                 ))->result_array();
@@ -6652,7 +6652,7 @@ Phone: (021) 29200456';
                 $noSurat_Month = date("n");
                 $noSurat_Year = date("Y");
 
-                $this->db->insert('db_academic.final_project_clearance',array(
+                $this->db->insert('db_academic.final_project_proof',array(
                     'NPM' => $data['NPM'],
                     'Type' => 'lib',
                     'NoSurat' => $noSurat,
@@ -6665,9 +6665,10 @@ Phone: (021) 29200456';
             }
 
 
-            $dataCk = $this->db->query('SELECT ats.Name, ats.NPM, ats.EmailPU, ats.Year, ats.ClearentLibrary_At, ps.Name AS Prodi FROM db_academic.auth_students ats 
+            $dataCk = $this->db->query('SELECT ats.Name, ats.NPM, ats.EmailPU, ats.Year, fpc.Cl_Library_At, ps.Name AS Prodi FROM db_academic.auth_students ats 
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                                WHERE ats.NPM = "'.$data['NPM'].'" AND ats.ClearentLibrary = "1"')->result_array();
+                                                LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                                WHERE ats.NPM = "'.$data['NPM'].'" AND fpc.Cl_Library = "1"')->result_array();
 
             if(count($dataCk)>0){
                 $d = $dataCk[0];
@@ -6706,9 +6707,10 @@ Phone: (021) 29200456';
 
                 $pdf->Ln(5);
 
+                $StudentName = ucwords(strtolower($d['Name']));
                 $pdf->Cell(40,$h,'Nama',$border,0,'L');
                 $pdf->Cell(4,$h,':',$border,0,'C');
-                $pdf->Cell(125,$h,ucwords($d['Name']),$border,1,'L');
+                $pdf->Cell(125,$h,$StudentName,$border,1,'L');
 
                 $pdf->Cell(40,$h,'NIM',$border,0,'L');
                 $pdf->Cell(4,$h,':',$border,0,'C');
@@ -6736,7 +6738,7 @@ Phone: (021) 29200456';
 
 
                 $pdf->Ln(5);
-                $pdf->MultiCell(169, $h, 'Terhitung tanggal :  '.$this->getDateIndonesian($d['ClearentLibrary_At']).' dinyatakan telah bebas dari seluruh kewajiban yang berkenaan dengan perpustakaan dan telah memenuhi syarat bebas pustaka yakni :', 0, 'J',false);
+                $pdf->MultiCell(169, $h, 'Terhitung tanggal :  '.$this->getDateIndonesian($d['Cl_Library_At']).' dinyatakan telah bebas dari seluruh kewajiban yang berkenaan dengan perpustakaan dan telah memenuhi syarat bebas pustaka yakni :', 0, 'J',false);
 
                 $pdf->Ln(3);
                 $pdf->Cell(9,$h,'',$border,0,'C');
@@ -6751,7 +6753,7 @@ Phone: (021) 29200456';
 //        $border = 1;
                 $pdf->Ln(5);
                 $pdf->Cell(110,$h,'',$border,0,'L');
-                $pdf->Cell(60,$h,'Jakarta, '.$this->getDateIndonesian($d['ClearentLibrary_At']),$border,1,'L');
+                $pdf->Cell(60,$h,'Jakarta, '.$this->getDateIndonesian($d['Cl_Library_At']),$border,1,'L');
                 $pdf->Cell(110,$h,'',$border,0,'L');
                 $pdf->Cell(60,$h,'Kepala Perpustakaan',$border,1,'L');
 
@@ -6787,10 +6789,10 @@ Phone: (021) 29200456';
                 $pdf->SetFont('Arial','I',7);
                 $pdf->Ln(10);
                 $h = 3;
-                $pdf->Cell(0,$h,'Download dari Portal Mahasiswa '.chr(169).' Podomoro University | '.date("d M Y H:i:s"),$border,1,'R');
+                $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
                 $pdf->Cell(0,$h,'Jumlah Download : '.$DownloadCount,$border,1,'R');
 
-                $nameF = str_replace(' ','_',strtoupper('Nandang'));
+                $nameF = str_replace(' ','_',$StudentName);
                 $pdf->Output('SKBP__'.$nameF.'.pdf','I');
 
 
@@ -6802,6 +6804,104 @@ Phone: (021) 29200456';
 
 
 
+    }
+
+    // clearance form
+    public function clearance_form(){
+//        $pdf = new FPDF('P','mm','A4');
+
+        $pdf = new Pdf_mc_table('P', 'mm', 'A4');
+        $pdf->SetMargins(10.5,10,20.5); // w = 179
+        $pdf->AddPage();
+        $h = 10;
+        $border = 0;
+
+        $pdf->Image('./images/logo_tr.png',10,10,50);
+        $pdf->Ln(15);
+
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
+
+        $pdf->Ln(7);
+        $h = 5;
+        $pdf->SetFont('Arial','',9);
+
+        // 94.5 - 20 = 74.5
+        $pdf->Cell(35,$h,'Name',$border,0,'L');
+        $pdf->Cell(4,$h,':',$border,0,'C');
+        $pdf->Cell(140,$h,'Nandnag Mulyadi',$border,1,'L');
+
+
+        $pdf->Cell(35,$h,'NIM',$border,0,'L');
+        $pdf->Cell(4,$h,':',$border,0,'C');
+        $pdf->Cell(140,$h,'2017090',$border,1,'L');
+
+
+        $pdf->Cell(35,$h,'Study Program',$border,0,'L');
+        $pdf->Cell(4,$h,':',$border,0,'C');
+        $pdf->Cell(140,$h,'Construction Engineering and Management',$border,1,'L');
+
+        $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
+        $pdf->Cell(4,$h,':',$border,0,'C');
+        $pdf->Cell(140,$h,'Bachelor\'s Degree',$border,1,'L');
+
+
+        $pdf->Ln(7);
+        $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : 2019/2020 Genap',$border,1,'L');
+        $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+
+        $pdf->Ln(7);
+
+
+        $pdf->SetWidths(Array(10,140,29));
+        $pdf->SetLineHeight(5);
+        $pdf->SetAligns(array('C','L','C'));
+
+
+        $pdf->Row(Array(
+            '1',
+            "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro 
+            Total SKS : 160
+            Maka Kuliah Nilai D : 5
+            SKS Mata Kuliah Wajib : 120",
+            "Approved By Susy Fatena Rostiyanti"
+        ));
+
+        $pdf->Row(Array(
+            '2',
+            'Kelukusan sidang Tugas Akhir / Skripsi / Proyek Akhir
+            Pada Hari / Tanngal sidang : Kamis 09 Marent 2019',
+            "Approved By Vincent Sylvester Leewellyn"
+        ));
+
+        $pdf->Row(Array(
+            '3',
+            "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : Analisis Pengaruh Experiential Value dan Promosi terhadap Kepuasan Pemain dan Pengaruhnya terhadap Loyalitas Pemain Esports di Jabotabek \nJudul dalam Bahasa Inggris : The Analysis of the Effect of Experiential Value and Promotion on E-Sports Players' Loyalty and Satisfaction in Jabotabek",
+            "Approved By Vincent Sylvester Leewellyn"
+        ));
+
+        $pdf->Row(Array(
+            '4',
+            " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
+            "Sri Sulastri"
+        ));
+
+        $pdf->Row(Array(
+            '5',
+            "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
+            "Approved By Vincent Sylvester Leewellyn"
+        ));
+
+
+
+        $pdf->SetFont('Arial','I',7);
+        $pdf->Ln(10);
+        $h = 3;
+        $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+
+
+        $nameF = str_replace(' ','_',strtoupper('Nandang'));
+        $pdf->Output('SKBP__'.$nameF.'.pdf','I');
     }
 
 
