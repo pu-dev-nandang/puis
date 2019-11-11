@@ -3,11 +3,117 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_prodi extends CI_Model {
-
+    public $data = array();
 
     function __construct()
     {
+        $this->load->model('master/m_master');
         parent::__construct();
+    }
+
+    public function __process_auth_prodi($action,$NIP,$ProdiID){
+        $G_dt = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
+        switch ($action) {
+            case 'add':
+                if (count($G_dt) == 0) {
+                   $arr_ProdiID = [$ProdiID];
+                   $ProdiID = json_encode($arr_ProdiID);
+                   $dataSave = [
+                       'NIP' => $NIP,
+                       'ProdiAuth' => $ProdiID,
+                   ];
+
+                   $this->db->insert('db_prodi.auth_prodi',$dataSave);
+                }
+
+                // insert di rule  user
+                $IDDivision = $this->session->userdata('IDdepartementNavigation');
+                $G_rule_user = $this->db->query('select * from db_employees.rule_users where NIP = "'.$NIP.'" and IDDivision = '.$IDDivision.' ',array())->result_array();
+                if (count($G_rule_user) == 0) {
+                    $dataSave = [
+                        'NIP' => $NIP,
+                        'IDDivision' => $IDDivision,
+                        'privilege' => 1,
+                    ];
+
+                    $this->db->insert('db_employees.rule_users',$dataSave);
+                }
+
+                
+                break;
+            case 'edit':
+                if (count($G_dt) == 0) {
+                   $arr_ProdiID = [$ProdiID];
+                   $ProdiID = json_encode($arr_ProdiID);
+                   $dataSave = [
+                       'NIP' => $NIP,
+                       'ProdiAuth' => $ProdiID,
+                   ];
+
+                   $this->db->insert('db_prodi.auth_prodi',$dataSave);
+                }
+                else
+                {
+                    $arr_ProdiID = json_decode($G_dt[0]['ProdiAuth'],true);
+                    // check exist
+                    $Bool = true;
+                    for ($i=0; $i < count($arr_ProdiID); $i++) { 
+                       if ($arr_ProdiID[$i] == $ProdiID) {
+                          $Bool = false;
+                          break;
+                       }
+                    }
+
+                    if ($Bool) {
+                       $arr_ProdiID[] = $ProdiID;
+                       $dataSave = [
+                        'NIP' => $NIP,
+                        'ProdiAuth' => json_encode($arr_ProdiID),
+                       ];
+
+                       $this->db->where('ID',$G_dt[0]['ID']);
+                       $this->db->update('db_prodi.auth_prodi',$dataSave);
+                    }
+                }
+                break;
+            case 'delete':
+                $this->db->where('NIP',$NIP);
+                $this->db->delete('db_prodi.auth_prodi');
+
+                 $IDDivision = $this->session->userdata('IDdepartementNavigation');
+                 $this->db->where('NIP',$NIP);
+                 $this->db->where('IDDivision',$IDDivision);
+                 $this->db->delete('db_employees.rule_users');
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    private function __join_prodi_auth($NIP,$GetProdi = []){
+        $G_data = $this->m_master->caribasedprimary('db_prodi.auth_prodi','NIP',$NIP);
+        if (count($G_data) > 0) {
+            $ProdiAuth = $G_data[0]['ProdiAuth']; // NIP is UNIQUE
+            $arr_ProdiAuth = json_decode($ProdiAuth,true);
+            for ($i=0; $i < count($arr_ProdiAuth); $i++) {
+                $ProdiID =  $arr_ProdiAuth[$i];
+                // cek ProdiID exist
+                $Bool = true;
+                for ($j=0; $j <count($GetProdi) ; $j++) { 
+                    if ($GetProdi[$j]['ID'] == $ProdiID) {
+                        $Bool = false;
+                        break;
+                    }
+                }
+                if ($Bool) {
+                    $d = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
+                    // print_r($ProdiID);die();
+                    $GetProdi[] = $d[0];
+                }
+            }
+        }
+        return $GetProdi;
     }
 
     public function auth($ProdiID = NULL)
@@ -47,6 +153,8 @@ class M_prodi extends CI_Model {
                redirect(base_url().'page404');die();
             }
         }
+
+        $GetProdi = $this->__join_prodi_auth($NIP,$GetProdi);
 
         if (count($GetProdi) > 0) {
             $this->session->set_userdata('prodi_get',$GetProdi);

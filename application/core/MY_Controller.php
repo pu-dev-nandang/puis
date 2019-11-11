@@ -701,7 +701,7 @@ abstract class Prodi_Controler extends Globalclass{
         if (!$this->session->userdata('prodi_get')) {
           $this->m_prodi->auth();  
         }
-        
+        $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
     }
 
 }
