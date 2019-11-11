@@ -387,10 +387,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $SemesterID = $SemesterID[0]['ID'];
 
             $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
-            $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+            $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array(); // dalam ujian
 
             $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
-            $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+            $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array(); // dalam ujian
             if (count($queryWaktu) == 0) {
                 if (count($queryWaktu2) > 0) {
                     $sql = "select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
@@ -713,10 +713,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $SemesterID = $SemesterID[0]['ID'];
 
                     $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
-                    $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+                    $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array(); // dalam ujian
 
                     $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
-                    $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+                    $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array(); // dalam ujian
 
                 if (count($queryWaktu) == 0) {
                     if (count($queryWaktu2) > 0) {
@@ -765,8 +765,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                     or (
                                             c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
                                          )
-                                ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                                ) and a.Room = "'.$Room.'" and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                         on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                        // print_r($sql);die();
                     }
                 }
                 else
@@ -855,7 +856,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                             or (
                                                 c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
                                             )
-                                        ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                                        ) and a.Room = "'.$Room.'" and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                                 $query=$this->db->query($sql, array())->result_array();
                                 if ($query[0]['total'] > 0) {
