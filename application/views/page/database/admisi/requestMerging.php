@@ -96,8 +96,8 @@
       								<?php if(!empty($detail_req->Photo)){ ?>
       								<img width="100px" height="150px" src="<?=$detail_req->pathPhoto.'uploads/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
       								<?php }else{ ?>
-                                                      <img width="100px" height="150px" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
-                                                      <?php } ?>
+                      <img width="100px" height="150px" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
+                      <?php } ?>
       							</td>
       						</tr>
       						<tr class="<?=($detail_req->Name != $detail_ori->Name) ? 'different':'' ?>" >
@@ -174,6 +174,7 @@
 				  	<div class="text-center">
 				  		<button class="btn btn-sm btn-primary btn-act" type="button" data-act="1" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-check"></i> Accept</button>
 				  		<button class="btn btn-sm btn-danger btn-act" type="button" data-act="3" data-npm="<?=$NPM?>" data-ta="<?=$TA?>" ><i class="fa fa-times"></i> Reject</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				  	</div>
       			</form>
       		</div>
@@ -232,7 +233,8 @@
                                   },success : function(response){
                                     loadStudent();
                                     $("#form-approval-req").empty();
-                                    toastr.success(response.message,'Info!');  
+                                    toastr.success(response.message,'Info!'); 
+                                    $("#modal-merge-req").modal("hide");
                                   }
                               });
                         }

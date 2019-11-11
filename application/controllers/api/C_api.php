@@ -9131,7 +9131,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             /*UPDATED BY FEBRI @ NOV 2019*/
             if($DeptID==6 || $DeptID=='6'){
-                $needAppv = (!empty($isRequested) ? '<br><span class="btn btn-xs btn-info show-request" title="Need Accepting Request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" >Need Approval</span>':'');
+                $needAppv = (!empty($isRequested) ? '<br><span class="btn btn-xs btn-info show-request" title="Need Accepting Request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" > <i class="fa fa-warning"></i> Need Approval</span>':'');
             }else{$needAppv="";}
             $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].$needAppv   .'</div>';
             /*END UPDATED BY FEBRI @ NOV 2019*/

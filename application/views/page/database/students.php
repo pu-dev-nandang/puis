@@ -36,9 +36,11 @@
                     </select>
                 </div>
                 <!-- ADDED BY FEBRI @ NOV 2019 -->
-                <div class="col-xs-2">
-                    <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval</button>
+                <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
+                <div class="col-xs-3">
+                    <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Updating Biodata</button>
                 </div>
+                <?php } ?>
                 <!-- END ADDED BY FEBRI @ NOV 2019 -->
             </div>
         </div>

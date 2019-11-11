@@ -295,8 +295,7 @@ class C_database extends Globalclass {
             if(!empty($isExist)){
                 if($data_arr['ACT'] == 1){
                     $getTempStudentReq = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
-                    //update into table TA                    
-                    
+                    $dataAppv = array();
                     if(empty($getTempStudentReq->Photo)){
                         unset($getTempStudentReq->Photo);
                     }else{
@@ -308,6 +307,12 @@ class C_database extends Globalclass {
                         curl_exec($ch);
                         curl_close($ch);
                         fclose($fp);
+
+                        //remove picture
+                        $tmp_pic = $_SERVER['DOCUMENT_ROOT'].'/students/uploads/ta_'.$data_arr['TA'].'/'.$getTempStudentReq->Photo;
+                        unlink($tmp_pic);
+
+                        $dataAppv["Photo"] = null;
                     }
                     unset($getTempStudentReq->isApproval);
                     unset($getTempStudentReq->note);
@@ -326,8 +331,11 @@ class C_database extends Globalclass {
                         }
 
                         //update status table temp_student
-                        $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",array("isApproval"=>2,"note"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null),"editedby"=>$myName),$conditions);
-                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
+                        $dataAppv['isApproval'] = 2;
+                        $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
+                        $dataAppv['editedby'] = $myName;
+                        $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",$dataAppv,$conditions);
+                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.";
                         $isfinish = $updateTempStd;
                     }else{
                         $message = "Failed saved data. Try again.";
@@ -344,11 +352,6 @@ class C_database extends Globalclass {
         }
         echo json_encode($json);
     }
-
-    public function filter_std_approval(){
-        # code...
-    }
-
 
     /*END ADDED BY FEBRI @ NOV 2019*/
 
