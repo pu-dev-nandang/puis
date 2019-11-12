@@ -74,7 +74,7 @@ class C_database extends Globalclass {
         }
         $this->load->view('page/database/lecturer/requestMerging',$data);
     }
-
+ 
 
     public function lecturerRequestAppv(){
         $data = $this->input->post();
