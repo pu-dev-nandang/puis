@@ -100,14 +100,38 @@ class M_prodi extends CI_Model {
                 }
                 break;
             case 'delete':
-                $this->db->where('NIP',$NIP);
-                $this->db->where('ProdiAuth',$ProdiID);
-                $this->db->delete('db_prodi.auth_prodi');
+                if (count($G_dt) > 0 ) {
+                    $arr_ProdiID = json_decode($G_dt[0]['ProdiAuth'],true);
+                    $arr_rs = [];
+                    for ($i=0; $i < count($arr_ProdiID); $i++) { 
+                        if ($arr_ProdiID[$i] != $ProdiID) {
+                            $arr_rs[] = $arr_ProdiID[$i];
+                        }
+                    }
 
-                 $IDDivision = $this->session->userdata('IDdepartementNavigation');
-                 $this->db->where('NIP',$NIP);
-                 $this->db->where('IDDivision',$IDDivision);
-                 $this->db->delete('db_employees.rule_users');
+                    if (count($arr_rs) > 0) {
+                       $arr_ProdiID = json_encode($arr_rs);
+                       $dataSave = [
+                        'NIP' => $NIP,
+                        'ProdiAuth' => $arr_ProdiID,
+                       ];
+
+                       $this->db->where('NIP',$NIP);
+                       $this->db->update('db_prodi.auth_prodi',$dataSave);
+                    }
+                    else
+                    {
+                        $this->db->where('NIP',$NIP);
+                        $this->db->delete('db_prodi.auth_prodi');
+
+                        $IDDivision = $this->session->userdata('IDdepartementNavigation');
+                        $this->db->where('NIP',$NIP);
+                        $this->db->where('IDDivision',$IDDivision);
+                        $this->db->delete('db_employees.rule_users');
+                    }
+
+                }
+                 
                 break;
             default:
                 # code...
