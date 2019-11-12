@@ -103,7 +103,7 @@
                 <?php if (count($this->session->userdata('prodi_get')) > 1 && $DepartmentNav == 15): ?>
                     <li>
                         <a href="<?php echo base_url('dashboard'); ?>">
-                            <i class="icon-home"></i>
+                            <i class="glyphicon glyphicon-transfer"></i>
                             <span>Change Prodi</span>
                         </a>
                     </li>
@@ -113,7 +113,7 @@
                 <?php if (count($this->session->userdata('faculty_get')) > 1 && $DepartmentNav == 34): ?>
                     <li>
                         <a href="<?php echo base_url('dashboard'); ?>">
-                            <i class="icon-home"></i>
+                            <i class="glyphicon glyphicon-transfer"></i>
                             <span>Change Faculty</span>
                         </a>
                     </li>
@@ -301,7 +301,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Global Modal Large -->
+<!-- Global Modal Small -->
 <div class="modal fade" id="GlobalModalSmall" role="dialog">
     <div class="modal-dialog" role="document" style="width:355px;">
         <div class="modal-content animated jackInTheBox">

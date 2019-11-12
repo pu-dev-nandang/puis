@@ -49,7 +49,8 @@
                                   <option value="%" >All</option>
                                   <option value="-" >Tagihan Belum di set</option>
                                   <option value="Lunas" >Lunas</option>
-                                  <option value="Belum Lunas" >Belum Lunas</option>
+                                  <option value="-100" >Belum Bayar Formulir</option>
+                                  <option value="100" >Sudah Bayar Formulir</option>
                               </select>
                             </div>
                           </div>
@@ -138,6 +139,8 @@
             case 'data-calon-mhs':
               var selector = $('#selectStatusPayment');
               selector.find('option[value="-"]').attr('disabled',false);
+              selector.find('option[value="-100"]').attr('disabled',false);
+              selector.find('option[value="100"]').attr('disabled',false);
                $("#dataPageLoad").empty();
                var table = '<table class="table table-bordered datatable2" id = "datatable2">'+
                            '<thead>'+
@@ -221,9 +224,11 @@
                 $("#dataPageLoad").empty();
                 var selector = $('#selectStatusPayment');
                 selector.find('option[value="-"]').attr('disabled',true);
+                selector.find('option[value="-100"]').attr('disabled',true);
+                selector.find('option[value="100"]').attr('disabled',true);
                 var S_StatusPayment = selector.find('option:selected').val();
                 // console.log(S_StatusPayment);
-                if (S_StatusPayment == '-' ) {
+                if (S_StatusPayment == '-' || S_StatusPayment == '-100' || S_StatusPayment == '100' ) {
                   // selector.find('option[value="%"]').attr('selected',true);
                   $("#selectStatusPayment option").filter(function() {
                      //may want to use $.trim in here

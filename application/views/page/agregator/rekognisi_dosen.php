@@ -11,7 +11,7 @@
 
         <div class="col-md-12">
             <p style="color:#3968c6;"><b> Rekognisi Dosen</b></p>
-            <div style="text-align: right;margin-bottom: 20px;">
+            <div style="text-align: right;margin-bottom: 20px;" class="inputBtn">
                 <button class="btn btn-primary form-data-add" id="addRekognisiDosenMDL"><i class="fa fa-plus margin-right"></i> Rekognisi Dosen</button>
             </div>
             <div style="text-align: right;">
@@ -235,7 +235,7 @@
                 for (var i = 0; i < jsonResult.length; i++) {
                     var v = jsonResult[i]; 
 
-                    var btnAct = '<div class="btn-group">' +
+                    var btnAct = '<div class="btn-group inputBtn">' +
                         '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
                         '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '  </button>' +

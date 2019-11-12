@@ -136,7 +136,6 @@
                             else{
                                 htmlBody += '<td>'+arr[k]+'</td>';
                             }
-                            
                         }
                     }
                     htmlBody+= '</tr>';
@@ -144,8 +143,6 @@
                     selector.append(htmlBody);
                 }
             });
-
-
         }
     }
 
@@ -162,7 +159,7 @@
                                     '<thead>'+
                                         '<tr>'+
                                             '<td>No</td>'+
-                                            '<td>Mata Kuliah</td>'+
+                                            '<td>Mata Kuliah/Pendamping</td>'+
                                             '<td>SKS</td>'+
                                         '</tr>'+
                                     '</thead>'+
@@ -210,7 +207,7 @@
                     for (var i = 0; i < dt.length; i++) {
                         html += '<tr>'+
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
-                                    '<td>'+ dt[i].Judul_litabmas+ '</td>'+
+                                    '<td>'+ dt[i].Nm_jns_pub+' - '+dt[i].Judul+ '</td>'+
                                     '<td>'+ dt[i].Credit + '</td>'+
                                 '</tr>';    
                     }

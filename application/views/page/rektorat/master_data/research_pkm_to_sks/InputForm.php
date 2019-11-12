@@ -5,34 +5,26 @@
     </div>
     <div class="panel-body" style="min-height: 100px;">
         <div class="form-group">
-            <label>Mentor Type</label>
-            <input type="text" class="form-control input" name = "MentorType">
+            <label>Jenis Publikasi</label>
+            <input type="text" class="form-control input" name = "Nm_jns_pub" disabled>
         </div>
         <div class="form-group">
-            <label>SKS Pembimbing Utama</label>
+            <label>SKS</label>
             <input type="text" class="form-control input" name = "SKS">
-        </div>
-        <div class="form-group">
-            <label>SKS Pembimbing Pendamping</label>
-            <input type="text" class="form-control input" name = "SKSPendamping">
         </div>
     </div>
     <div class="panel-footer" style="text-align: right;">
-        <button class="btn btn-success" action= "add" data-id ="" id="btnSave">Save</button>
+        <button class="btn btn-success" action= "edit" data-id ="" id="btnSave">Save</button>
     </div>
 </div>
 <script type="text/javascript">
-    var AppForm_Mentor_Type_Sks = {
+    var AppForm_Research_Pkm_to_Sks = {
         setDefaultInput : function(){
             $('.input').val('');
-            // $('.input[name="SKS"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
-            // $('.input[name="SKSPendamping"]').maskMoney({thousands:'', decimal:'.', precision:1,allowZero: true});
-            // $('.input[name="SKS"]').maskMoney('mask', '9894'); 
-            // $('.input[name="SKSPendamping"]').maskMoney('mask', '9894'); 
             $('.input[name="SKS"]').val('0.0');
-            $('.input[name="SKSPendamping"]').val('0.0');
-            $('#btnSave').attr('action','add');
+            $('#btnSave').attr('action','edit');
             $('#btnSave').attr('data-id','');
+            $('#btnSave').prop('disabled',true);
         },
         ActionData : function(selector,action="add",ID=""){
             var data = {};
@@ -46,14 +38,14 @@
                 ID : ID,
             };
             // cek validation jika tidak delete
-            var validation = (action == 'delete') ? true : AppForm_Mentor_Type_Sks.validation(data);
+            var validation = (action == 'delete') ? true : AppForm_Research_Pkm_to_Sks.validation(data);
             if (validation) {
                 if (confirm('Are you sure ?')) {
                     loading_button2(selector);
-                    var url = base_url_js+"rectorat/master_data/crud_mentor_type_sks";
+                    var url = base_url_js+"rectorat/master_data/crud_research_pkm_to_sks";
                     var token = jwt_encode(dataform,'UAP)(*');
                     $.post(url,{ token:token },function (resultJson) {
-                        AppForm_Mentor_Type_Sks.setDefaultInput();
+                        AppForm_Research_Pkm_to_Sks.setDefaultInput();
                         end_loading_button2(selector);
                         oTable.ajax.reload( null, false );
                         toastr.success('Success');
@@ -72,7 +64,7 @@
             for(key in arr){
                switch(key)
                {
-                case  "MentorType" :
+                case  "Nm_jns_pub" :
                       if (arr[key] != '') {
                         result = Validation_leastCharacter(3,arr[key],key);
                         if (result['status'] == 0) {
@@ -106,7 +98,7 @@
             return true
         },
         loaded : function(){
-            AppForm_Mentor_Type_Sks.setDefaultInput();
+            AppForm_Research_Pkm_to_Sks.setDefaultInput();
         },
 
         AutoTextAllowed : function(selector){
@@ -137,24 +129,24 @@
     };
 
     $(document).ready(function() {
-        AppForm_Mentor_Type_Sks.loaded();
+        AppForm_Research_Pkm_to_Sks.loaded();
     })
 
     $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
        var selector = $(this);
        var action = selector.attr('action');
        var ID = selector.attr('data-id');
-       AppForm_Mentor_Type_Sks.ActionData(selector,action,ID);
+       AppForm_Research_Pkm_to_Sks.ActionData(selector,action,ID);
     })
 
-    $(document).off('keyup','.input[name="SKS"],.input[name="SKSPendamping"]').on('keyup','.input[name="SKS"],.input[name="SKSPendamping"]',function(e){
+    $(document).off('keyup','.input[name="SKS"]').on('keyup','.input[name="SKS"]',function(e){
         var selector = $(this);
-        AppForm_Mentor_Type_Sks.AutoTextAllowed(selector);
+        AppForm_Research_Pkm_to_Sks.AutoTextAllowed(selector);
     })
 
-    $(document).off('keydown','.input[name="SKS"],.input[name="SKSPendamping"]').on('keydown','.input[name="SKS"],.input[name="SKSPendamping"]',function(e){
+    $(document).off('keydown','.input[name="SKS"]').on('keydown','.input[name="SKS"]',function(e){
         var selector = $(this);
-        AppForm_Mentor_Type_Sks.AutoTextAllowed(selector);
+        AppForm_Research_Pkm_to_Sks.AutoTextAllowed(selector);
     })
     
 </script>

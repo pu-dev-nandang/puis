@@ -117,7 +117,7 @@
                             '</div>'+
                         '</div>'    
                     );
-                loadSelectOptionBaseProdi('#filterProdi','');
+                loadSelectOptionBaseProdi('#filterProdi','',[],0);
             }
             else
             {

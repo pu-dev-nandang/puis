@@ -3351,7 +3351,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell(5,7,' : ',0,0,'C');
         $pdf->Cell(20,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY($margin_left,35); // novie
+        $pdf->SetXY($margin_left,40); // novie
 
         $label_l = 35;
         $sparator_l = 1;
@@ -3849,7 +3849,7 @@ class C_save_to_pdf extends CI_Controller {
         $x = 60;
         $h = 4;
         $full_width = 212;
-        $pdf->SetXY($x,36.5);
+        $pdf->SetXY($x,40.5); //novie
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($full_width,$h,'Memberikan Ijazah Kepada',$border,1,'C');
         $pdf->SetX($x);
@@ -6665,7 +6665,7 @@ Phone: (021) 29200456';
             }
 
 
-            $dataCk = $this->db->query('SELECT ats.Name, ats.NPM, ats.EmailPU, ats.Year, fpc.Cl_Library_At, ps.Name AS Prodi FROM db_academic.auth_students ats 
+            $dataCk = $this->db->query('SELECT ats.Name, ats.NPM, ats.EmailPU, ats.Year, fpc.Cl_Library_At, ps.Name AS Prodi FROM db_academic.auth_students ats
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                 LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
                                                 WHERE ats.NPM = "'.$data['NPM'].'" AND fpc.Cl_Library = "1"')->result_array();

@@ -83,6 +83,10 @@
 				<label>Desc</label>
 				<input type="text" name="Desc" class="form-control input">
 			</div>
+			<div class="form-group">
+				<label>File lain lain</label>
+				<input type="file" data-style="fileinput" class="input" name = "FileLain">
+			</div>
 			<div style="padding: 5px;">
                 <button class="btn btn-block btn-success" id="btnSave" mode = "add" data-id = "">Save</button>
             </div>
@@ -340,6 +344,13 @@
 		console.log(data);
 		var token = jwt_encode(data,"UAP)(*");
 		form_data.append('token',token);
+
+		// BuktiUpload
+		var S_file = $('.input[name="FileLain"]');
+		if ( S_file.length ) {
+			var UploadFile = S_file[0].files;
+			form_data.append("FileLain[]", UploadFile[0]);
+		}
 
 		console.log(form_data);
 

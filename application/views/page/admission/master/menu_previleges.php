@@ -4,7 +4,7 @@
     $IDDivision = $PositionMain['IDDivision'] ;
  ?>
 <?php if ($IDDivision == 12): ?>
-     <div class="row" style="margin-top: 5px;">
+     <div class="row btn-read" style="margin-top: 5px;">
          <div class="col-md-12">
              <div class="widget box">
                  <div class="widget-header">
@@ -28,7 +28,7 @@
      </div>
 <?php endif ?> 
 
-<div class="row" style="margin-top: 5px;">
+<div class="row btn-read" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -48,7 +48,7 @@
     </div>
 </div>
 
-<div class="row" style="margin-top: 5px;">
+<div class="row btn-read" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
@@ -78,7 +78,7 @@
     </div>
 </div>
 
-<div class="row" style="margin-top: 5px;">
+<div class="row btn-read" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">
