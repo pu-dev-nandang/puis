@@ -263,6 +263,10 @@ $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailRes
 $route['database/students'] = 'page/database/c_database/students';
 $route['database/students/(:num)'] = 'page/database/c_database/students/$1';
 $route['database/students-group'] = 'page/database/c_database/students_group';
+/*ADDED BY FEBRI @ Nov 2019*/
+$route['database/student/req-merge'] = 'page/database/c_database/students_req_merge';
+$route['database/student/req-appv'] = 'page/database/c_database/students_req_approval';
+/*END ADDED BY FEBRI @ Nov 2019*/
 
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
