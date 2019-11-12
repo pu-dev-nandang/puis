@@ -4141,22 +4141,24 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-                // Get score
-                $dbStd = 'ta_'.$row['ClassOf'];
-                $dataScore = $this->db->select('Score')->get_where($dbStd.'.study_planning',array(
-                    'ID' => $row['SPID']
-                ))->result_array();
+                $StudentName = ucwords(strtolower($row['StudentName']));
 
+                // ========== GET TRANSCRIPT =========
 
+                $dataTranscript = $this->m_rest->getTranscript($row['ClassOf'],$row['NPM'],'ASC');
+                $dataIPK = $dataTranscript['dataIPK'];
 
-                // Score
-                $Score = (count($dataScore)>0 && $dataScore[0]['Score']!=null && $dataScore[0]['Score']!='') ? $dataScore[0]['Score'] : '';
+                $TotalSKS = ($dataIPK['TotalSKS']>0) ? '<a href="javascript:void(0);" class="btnFinalProject_ViewDetailMK" data-title="'.$row['NPM'].' '.$StudentName.' - Total Credit" data-token="'.$this->jwt->encode($dataTranscript['dataCourse'],"UAP)(*").'">'.$dataIPK['TotalSKS'].'</a>' : '0';
+                $data_mkD = (count($dataIPK['MK_D'])>0) ? '<a href="javascript:void(0)" class="btnFinalProject_ViewDetailMK" data-title="'.$row['NPM'].' '.$StudentName.' - Course D" data-token="'.$this->jwt->encode($dataIPK['MK_D'],"UAP)(*").'" >'.count($dataIPK['MK_D']).'</a>' : '0';
+                $arr_mkWajib_SKS = ($dataIPK['MK_Wajib_SKS']>0) ? '<a href="javascript:void(0)" class="btnFinalProject_ViewDetailMK" data-title="'.$row['NPM'].' '.$StudentName.' - Credit Course Required" data-token="'.$this->jwt->encode($dataIPK['MK_Wajib'],"UAP)(*").'" >'.$dataIPK['MK_Wajib_SKS'].'</a>' : '0';
+
+                // ==================================
 
                 $DeptID = $this->session->userdata('IDdepartementNavigation');
 
                 // Ijazah
                 $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
-                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/ijazah_student/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
+                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/document/'.$row['NPM'].'/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
                     : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
                 if($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)){
                     $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
@@ -4177,7 +4179,7 @@ class C_api3 extends CI_Controller {
                 $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
                 $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
 
-                $btnCrudPembimbing = ($DeptID=='6' || $DeptID==6) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
+                $btnCrudPembimbing = ($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
                 data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
                 data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button>' : '';
 
@@ -4252,13 +4254,15 @@ class C_api3 extends CI_Controller {
 
 
 
-                $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div>'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
-                $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div>'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
+                $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div style="color: royalblue;">'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
+                $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div style="color: royalblue;">'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
 
                 $nestedData[] = '<div>'.$no.'</div>';
-                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'<br/>'.$btnCrudPembimbing.'</div> ';
-                $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'<div id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div></div>';
-                $nestedData[] = '<div>'.$Score.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$StudentName.'</b><br/>'.$row['NPM'].'<br/>'.$btnCrudPembimbing.'</div> ';
+                $nestedData[] = '<div style="text-align:left;font-size: 12px;"">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'<div id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div></div>';
+                $nestedData[] = '<div style="text-align: left;font-size: 12px;">Total Credit : '.$TotalSKS.
+                    '<br/>Course "D" : '.$data_mkD.
+                    '<br/>Credit Course Req. : '.$arr_mkWajib_SKS.'</div>';
                 $nestedData[] = '<div>'.$ijazah.'</div>';
                 $nestedData[] = '<div>'.$c_Academic.'</div>';
                 $nestedData[] = '<div>'.$c_Library.'</div>';

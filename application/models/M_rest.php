@@ -1503,6 +1503,8 @@ class M_rest extends CI_Model {
 
                                 $arrTr = array(
                                     'SemesterID' => $data[$i]['ID'],
+                                    'CDID' => $d['CDID'],
+                                    'MKType' => $d['MKType'],
                                     'MKID' => $d['MKID'],
                                     'MKCode' => $d['MKCode'],
                                     'Course' => $d['Name'],
@@ -1539,7 +1541,7 @@ class M_rest extends CI_Model {
 
                 if($dateNow>=$dt['UpdateTranscript']){
                     // Cek apakah ada npmnya atau tidak
-                    $dataStd = $this->db->query('SELECT ssd.*,mk.MKCode, mk.Name, mk.NameEng FROM db_academic.sa_student_details ssd 
+                    $dataStd = $this->db->query('SELECT ssd.*,mk.MKCode, mk.Name, mk.NameEng, cd.MKType FROM db_academic.sa_student_details ssd 
                                                             LEFT JOIN db_academic.sa_student ss ON (ss.ID = ssd.IDSAStudent)
                                                             LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
                                                             LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
@@ -1563,6 +1565,8 @@ class M_rest extends CI_Model {
                                 $arrTr = array(
                                     'SemesterID' => $data[$i]['ID'],
                                     'MKID' => $d_sa['MKID'],
+                                    'CDID' => $d_sa['CDID'],
+                                    'MKType' => $d_sa['MKType'],
                                     'MKCode' => $d_sa['MKCode'],
                                     'Course' => $d_sa['Name'],
                                     'CourseEng' => $d_sa['NameEng'],
@@ -1625,11 +1629,25 @@ class M_rest extends CI_Model {
 
         $data_TotalPoint = 0;
         $data_TotalSKS = 0;
+        $dataMK_D = [];
+        $data_MK_Wajib = [];
+        $data_MK_Wajib_SKS = 0;
+
         if(count($dataTranscript)>0){
 
             foreach ($dataTranscript AS $item){
                 $data_TotalSKS = $data_TotalSKS + (float) $item['Credit'];
                 $data_TotalPoint = $data_TotalPoint + $item['Point'];
+
+                if($item['Grade']=='D'){
+                    array_push($dataMK_D,$item);
+                }
+
+                if($item['MKType']=='1'){
+                    array_push($data_MK_Wajib,$item);
+                    $data_MK_Wajib_SKS = $data_MK_Wajib_SKS + (integer) $item['Credit'];
+                }
+
             }
 
         }
@@ -1641,7 +1659,10 @@ class M_rest extends CI_Model {
             'IPK_Ori' => $IPK_Ori,
             'IPK' => number_format($data_ipk,2,'.',''),
             'TotalSKS' => $data_TotalSKS,
-            'TotalPoint' => number_format($data_TotalPoint,2,'.','')
+            'TotalPoint' => number_format($data_TotalPoint,2,'.',''),
+            'MK_D' => $dataMK_D,
+            'MK_Wajib' => $data_MK_Wajib,
+            'MK_Wajib_SKS' => $data_MK_Wajib_SKS
         );
 
         return $result;
@@ -1651,7 +1672,7 @@ class M_rest extends CI_Model {
 
     public function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
 
-        $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment 
+        $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment, cd.MKType 
                                         FROM '.$db.'.study_planning sp 
                                         LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 

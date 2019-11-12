@@ -6810,98 +6810,138 @@ Phone: (021) 29200456';
     public function clearance_form(){
 //        $pdf = new FPDF('P','mm','A4');
 
-        $pdf = new Pdf_mc_table('P', 'mm', 'A4');
-        $pdf->SetMargins(10.5,10,20.5); // w = 179
-        $pdf->AddPage();
-        $h = 10;
-        $border = 0;
 
-        $pdf->Image('./images/logo_tr.png',10,10,50);
-        $pdf->Ln(15);
+        $NPM = '11140005';
 
-        $pdf->SetFont('Arial','B',12);
-        $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
+        $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, s.Name AS SemesterName,  
+                                                        fpc.TrialDate, 
+                                                        em1.Name AS Cl_Academic_Name,
+                                                        em2.Name AS Cl_Library_Name,
+                                                        em3.Name AS Cl_Finance_Name,
+                                                        em4.Name AS Cl_Kaprodi_Name
+                                                        FROM db_academic.auth_students ats
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                        LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID)
+                                                        LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                                        LEFT JOIN db_academic.semester s ON (s.ID = fpc.SemesterID)
+                                                        
+                                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = fpc.Cl_Academic_By)
+                                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = fpc.Cl_Library_By)
+                                                        LEFT JOIN db_employees.employees em3 ON (em3.NIP = fpc.Cl_Finance_By)
+                                                        LEFT JOIN db_employees.employees em4 ON (em4.NIP = fpc.Cl_Kaprodi_By)
+                                                        
+                                                        WHERE ats.NPM = "'.$NPM.'"')->result_array();
 
-        $pdf->Ln(7);
-        $h = 5;
-        $pdf->SetFont('Arial','',9);
-
-        // 94.5 - 20 = 74.5
-        $pdf->Cell(35,$h,'Name',$border,0,'L');
-        $pdf->Cell(4,$h,':',$border,0,'C');
-        $pdf->Cell(140,$h,'Nandnag Mulyadi',$border,1,'L');
-
-
-        $pdf->Cell(35,$h,'NIM',$border,0,'L');
-        $pdf->Cell(4,$h,':',$border,0,'C');
-        $pdf->Cell(140,$h,'2017090',$border,1,'L');
+        if(count($dataStudent)>0){
 
 
-        $pdf->Cell(35,$h,'Study Program',$border,0,'L');
-        $pdf->Cell(4,$h,':',$border,0,'C');
-        $pdf->Cell(140,$h,'Construction Engineering and Management',$border,1,'L');
+            $d = $dataStudent[0];
 
-        $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
-        $pdf->Cell(4,$h,':',$border,0,'C');
-        $pdf->Cell(140,$h,'Bachelor\'s Degree',$border,1,'L');
+            $dataTranscript = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
 
-
-        $pdf->Ln(7);
-        $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : 2019/2020 Genap',$border,1,'L');
-        $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
-
-        $pdf->Ln(7);
+            $dataIPK = $dataTranscript['dataIPK'];
+            $arr_mkD = $dataIPK['MK_D'];
+            $arr_mkWajib_SKS = $dataIPK['MK_Wajib_SKS'];
 
 
-        $pdf->SetWidths(Array(10,140,29));
-        $pdf->SetLineHeight(5);
-        $pdf->SetAligns(array('C','L','C'));
+            $pdf = new Pdf_mc_table('P', 'mm', 'A4');
+            $pdf->SetMargins(10.5,10,20.5); // w = 179
+            $pdf->AddPage();
+            $h = 10;
+            $border = 0;
+
+            $pdf->Image('./images/logo_tr.png',10,10,50);
+            $pdf->Ln(15);
+
+            $pdf->SetFont('Arial','B',12);
+            $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
+
+            $pdf->Ln(7);
+            $h = 5;
+            $pdf->SetFont('Arial','',9);
+
+            // 94.5 - 20 = 74.5
+            $pdf->Cell(35,$h,'Name',$border,0,'L');
+            $pdf->Cell(4,$h,':',$border,0,'C');
+            $pdf->Cell(140,$h,ucwords(strtolower($d['Name'])),$border,1,'L');
 
 
-        $pdf->Row(Array(
-            '1',
-            "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro 
-            Total SKS : 160
-            Maka Kuliah Nilai D : 5
-            SKS Mata Kuliah Wajib : 120",
-            "Approved By Susy Fatena Rostiyanti"
-        ));
-
-        $pdf->Row(Array(
-            '2',
-            'Kelukusan sidang Tugas Akhir / Skripsi / Proyek Akhir
-            Pada Hari / Tanngal sidang : Kamis 09 Marent 2019',
-            "Approved By Vincent Sylvester Leewellyn"
-        ));
-
-        $pdf->Row(Array(
-            '3',
-            "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : Analisis Pengaruh Experiential Value dan Promosi terhadap Kepuasan Pemain dan Pengaruhnya terhadap Loyalitas Pemain Esports di Jabotabek \nJudul dalam Bahasa Inggris : The Analysis of the Effect of Experiential Value and Promotion on E-Sports Players' Loyalty and Satisfaction in Jabotabek",
-            "Approved By Vincent Sylvester Leewellyn"
-        ));
-
-        $pdf->Row(Array(
-            '4',
-            " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
-            "Sri Sulastri"
-        ));
-
-        $pdf->Row(Array(
-            '5',
-            "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
-            "Approved By Vincent Sylvester Leewellyn"
-        ));
+            $pdf->Cell(35,$h,'NIM',$border,0,'L');
+            $pdf->Cell(4,$h,':',$border,0,'C');
+            $pdf->Cell(140,$h,$d['NPM'],$border,1,'L');
 
 
+            $pdf->Cell(35,$h,'Study Program',$border,0,'L');
+            $pdf->Cell(4,$h,':',$border,0,'C');
+            $pdf->Cell(140,$h,$d['ProdiEng'],$border,1,'L');
 
-        $pdf->SetFont('Arial','I',7);
-        $pdf->Ln(10);
-        $h = 3;
-        $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+            $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
+            $pdf->Cell(4,$h,':',$border,0,'C');
+            $pdf->Cell(140,$h,$d['DescriptionEng'],$border,1,'L');
 
 
-        $nameF = str_replace(' ','_',strtoupper('Nandang'));
-        $pdf->Output('SKBP__'.$nameF.'.pdf','I');
+            $pdf->Ln(7);
+            $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : '.$d['SemesterName'],$border,1,'L');
+            $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+
+            $pdf->Ln(7);
+
+
+            $pdf->SetWidths(Array(10,140,29));
+            $pdf->SetLineHeight(5);
+            $pdf->SetAligns(array('C','L','C'));
+
+
+            $pdf->Row(Array(
+                '1',
+                "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro 
+            Total SKS : ".$dataIPK['TotalSKS']."
+            Maka Kuliah Nilai D : ".count($arr_mkD)."
+            SKS Mata Kuliah Wajib : ".$arr_mkWajib_SKS,
+                "Approved By ".$d['Cl_Academic_Name']
+            ));
+
+            $pdf->Row(Array(
+                '2',
+                'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
+            Pada Hari / Tanngal sidang : '.$this->getDateIndonesian($d['TrialDate']),
+                "Approved By ".$d['Cl_Kaprodi_Name']
+            ));
+
+            $pdf->Row(Array(
+                '3',
+                "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : Analisis Pengaruh Experiential Value dan Promosi terhadap Kepuasan Pemain dan Pengaruhnya terhadap Loyalitas Pemain Esports di Jabotabek \nJudul dalam Bahasa Inggris : The Analysis of the Effect of Experiential Value and Promotion on E-Sports Players' Loyalty and Satisfaction in Jabotabek",
+                "Approved By ".$d['Cl_Kaprodi_Name']
+            ));
+
+            $pdf->Row(Array(
+                '4',
+                " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
+                "Approved By ".$d['Cl_Library_Name']
+            ));
+
+            $pdf->Row(Array(
+                '5',
+                "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
+                "Approved By ".$d['Cl_Finance_Name']
+            ));
+
+
+
+            $pdf->SetFont('Arial','I',7);
+            $pdf->Ln(10);
+            $h = 3;
+            $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+
+
+            $nameF = str_replace(' ','_',strtoupper('Nandang'));
+            $pdf->Output('SKBP__'.$nameF.'.pdf','I');
+        } else {
+            echo 'No NIM';
+        }
+
+
+
     }
 
 

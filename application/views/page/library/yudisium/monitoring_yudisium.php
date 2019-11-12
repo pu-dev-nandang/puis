@@ -95,9 +95,9 @@
                 '            <thead>' +
                 '            <tr>' +
                 '                <th style="width: 2%;">No</th>' +
-                '                <th style="width: 20%;">Student</th>' +
+                '                <th style="width: 15%;">Student</th>' +
                 '                <th>Course</th>' +
-                '                <th style="width: 10%;">Score</th>' +
+                '                <th style="width: 15%;">Information</th>' +
                 '                <th style="width: 10%;">Ijazah SMA / SKHUN</th>' +
                 '                <th style="width: 10%;">Academic Clearance</th>' +
                 '                <th style="width: 10%;">Library Clearance</th>' +
