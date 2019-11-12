@@ -182,12 +182,13 @@ class C_rest3 extends CI_Controller {
 
                 $body = [];
                 $ProdiID = $dataToken['ProdiID'];
+                $filterTahun = $dataToken['filterTahun'];
                 $sql = 'select a.*,b.Name from db_agregator.rekognisi_dosen as a 
                         join db_employees.employees as b on a.NIP = b.NIP
-                        where b.ProdiID = ?
-                        order by a.ID desc limit 1000
+                        where b.ProdiID = ? and a.Tahun = ?
+                        order by a.NIP,a.ID desc limit 1000
                         ';
-                $query=$this->db->query($sql, array($ProdiID))->result_array();
+                $query=$this->db->query($sql, array($ProdiID,$filterTahun))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                     $No = $i + 1;
                     $NIP = $query[$i]['NIP'];
@@ -2324,7 +2325,7 @@ class C_rest3 extends CI_Controller {
           $K = explode('.', $Kurikulum);
           $Kurikulum = $K[0];
           $sql = 'select a.Semester,b.MKCode,b.NameEng as NameMataKuliah,if(b.TypeMK = "1","V","") as TypeMatakuliah,
-                  if(b.CourseType = "1","V","") as Kuliah,if(b.CourseType = "4","V","") as Seminar,if(b.CourseType = "3","V","") as Pratikum,
+                  if(b.CourseType = "1","V","") as Kuliah,if(b.CourseType = "4","V","") as Seminar,if(b.CourseType = "3" or b.CourseType = "2","V","") as Pratikum,
                   (a.TotalSKS * c.SKSPerMinutes) as Konversi,z.Year,a.MKID
                   from db_academic.curriculum_details as a 
                   join db_academic.curriculum as z on z.ID = a.CurriculumID
