@@ -74,7 +74,19 @@
                 ['color', ['color']],
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['height', ['height']]
-            ]
+            ],
+            callbacks: {
+                  onPaste: function (e) {
+                    var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('text/html');
+                    e.preventDefault();
+                    var div = $('<div />');
+                    div.append(bufferText);
+                    div.find('*').removeAttr('style');
+                    setTimeout(function () {
+                      document.execCommand('insertHtml', false, div.html());
+                    }, 10);
+                  }
+                }
         });
 
         loadDataWelcoming();
