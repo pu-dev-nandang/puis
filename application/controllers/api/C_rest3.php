@@ -996,12 +996,13 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select b.Name as NamaDosen,"" as RoadMap,d.Nama as Name_mahasiswa,a.Judul_PKM,a.ID_thn_laks 
+          $sql = 'select a.ID_PKM,b.Name as NamaDosen,"" as RoadMap,d.Nama as Name_mahasiswa,a.Judul_PKM,a.ID_thn_laks 
                   from db_research.pengabdian_masyarakat as a
                   join db_employees.employees as b on a.NIP = b.NIP
                   join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
                   join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
                   where b.ProdiID = '.$ProdiID.' and d.Type_anggota = "MHS"
+                  group by a.NIP, a.ID_PKM
                  ';
           $query = $this->db->query($sql,array())->result_array();
           $data = [];
@@ -1011,8 +1012,24 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $nestedData[] = $row['Name_mahasiswa'];
-            $nestedData[] = $row['Judul_litabmas'];
+            $sql_MHS = 'select b.Name as NamaDosen,"" as RoadMap,d.Nama as Name_mahasiswa,a.Judul_PKM,a.ID_thn_laks 
+                  from db_research.pengabdian_masyarakat as a
+                  join db_employees.employees as b on a.NIP = b.NIP
+                  join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
+                  join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
+                  where b.ProdiID = '.$ProdiID.' and d.Type_anggota = "MHS" and a.ID_PKM = "'.$row['ID_PKM'].'"
+                  ';
+            $q_MHS = $this->db->query($sql_MHS,array())->result_array();
+            $MHSName = '<ul style = "margin-left:-20px;">';
+            for ($j=0; $j < count($q_MHS); $j++) { 
+              $MHSName .=  '<li>'.$q_MHS[$j]['Name_mahasiswa'].'</li>';
+            }
+
+            $MHSName .= '</ul>';      
+
+            // $nestedData[] = $row['Name_mahasiswa'];
+            $nestedData[] = $MHSName;
+            $nestedData[] = $row['Judul_PKM'];
             $nestedData[] = $row['ID_thn_laks'];
             $data[] = $nestedData;
           }
@@ -1041,12 +1058,13 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
+          $sql = 'select a.ID_litabmas, b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
                   from db_research.litabmas as a
                   join db_employees.employees as b on a.NIP = b.NIP
                   join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
                   join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
                   where b.ProdiID = '.$ProdiID.'
+                  group by a.NIP, a.ID_litabmas
                  ';
           $query = $this->db->query($sql,array())->result_array();
           $data = [];
@@ -1056,7 +1074,24 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $nestedData[] = $row['Name_mahasiswa'];
+            $sql_MHS = 'select b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
+                  from db_research.litabmas as a
+                  join db_employees.employees as b on a.NIP = b.NIP
+                  join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
+                  join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
+                  where b.ProdiID = '.$ProdiID.' and a.ID_litabmas = "'.$row['ID_litabmas'].'"
+                  
+                  ';
+            $q_MHS = $this->db->query($sql_MHS,array())->result_array();
+            $MHSName = '<ul style = "margin-left:-20px;">';
+            for ($j=0; $j < count($q_MHS); $j++) { 
+              $MHSName .=  '<li>'.$q_MHS[$j]['Name_mahasiswa'].'</li>';
+            }
+
+            $MHSName .= '</ul>';      
+
+            // $nestedData[] = $row['Name_mahasiswa'];
+            $nestedData[] = $MHSName;
             $nestedData[] = $row['Judul_litabmas'];
             $nestedData[] = $row['ID_thn_laks'];
             $data[] = $nestedData;
