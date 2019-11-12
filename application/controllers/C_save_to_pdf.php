@@ -6807,21 +6807,25 @@ Phone: (021) 29200456';
     }
 
     // clearance form
-    public function clearance_form(){
+    public function clearance_form($token){
 //        $pdf = new FPDF('P','mm','A4');
+        $data = $this->getInputToken($token);
 
+        if(isset($data['NPM'])){
 
-        $NPM = '11140005';
+            $NPM = $data['NPM'];
 
-        $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, s.Name AS SemesterName,  
+            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, s.Name AS SemesterName,  
                                                         fpc.TrialDate, 
                                                         em1.Name AS Cl_Academic_Name,
                                                         em2.Name AS Cl_Library_Name,
                                                         em3.Name AS Cl_Finance_Name,
-                                                        em4.Name AS Cl_Kaprodi_Name
+                                                        em4.Name AS Cl_Kaprodi_Name,
+                                                        fp.TitleInd, fp.TitleEng
                                                         FROM db_academic.auth_students ats
                                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                         LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID)
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
                                                         LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
                                                         LEFT JOIN db_academic.semester s ON (s.ID = fpc.SemesterID)
                                                         
@@ -6832,113 +6836,121 @@ Phone: (021) 29200456';
                                                         
                                                         WHERE ats.NPM = "'.$NPM.'"')->result_array();
 
-        if(count($dataStudent)>0){
+            if(count($dataStudent)>0){
 
 
-            $d = $dataStudent[0];
+                $d = $dataStudent[0];
 
-            $dataTranscript = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
+                $dataTranscript = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
 
-            $dataIPK = $dataTranscript['dataIPK'];
-            $arr_mkD = $dataIPK['MK_D'];
-            $arr_mkWajib_SKS = $dataIPK['MK_Wajib_SKS'];
-
-
-            $pdf = new Pdf_mc_table('P', 'mm', 'A4');
-            $pdf->SetMargins(10.5,10,20.5); // w = 179
-            $pdf->AddPage();
-            $h = 10;
-            $border = 0;
-
-            $pdf->Image('./images/logo_tr.png',10,10,50);
-            $pdf->Ln(15);
-
-            $pdf->SetFont('Arial','B',12);
-            $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
-
-            $pdf->Ln(7);
-            $h = 5;
-            $pdf->SetFont('Arial','',9);
-
-            // 94.5 - 20 = 74.5
-            $pdf->Cell(35,$h,'Name',$border,0,'L');
-            $pdf->Cell(4,$h,':',$border,0,'C');
-            $pdf->Cell(140,$h,ucwords(strtolower($d['Name'])),$border,1,'L');
+                $dataIPK = $dataTranscript['dataIPK'];
+                $arr_mkD = $dataIPK['MK_D'];
+                $arr_mkWajib_SKS = $dataIPK['MK_Wajib_SKS'];
 
 
-            $pdf->Cell(35,$h,'NIM',$border,0,'L');
-            $pdf->Cell(4,$h,':',$border,0,'C');
-            $pdf->Cell(140,$h,$d['NPM'],$border,1,'L');
+                $pdf = new Pdf_mc_table('P', 'mm', 'A4');
+                $pdf->SetMargins(10.5,10,20.5); // w = 179
+                $pdf->AddPage();
+                $h = 10;
+                $border = 0;
+
+                $pdf->Image('./images/logo_tr.png',10,10,50);
+                $pdf->Ln(15);
+
+                $pdf->SetFont('Arial','B',12);
+                $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
+
+                $pdf->Ln(7);
+                $h = 5;
+                $pdf->SetFont('Arial','',9);
+
+                // 94.5 - 20 = 74.5
+                $pdf->Cell(35,$h,'Name',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,ucwords(strtolower($d['Name'])),$border,1,'L');
 
 
-            $pdf->Cell(35,$h,'Study Program',$border,0,'L');
-            $pdf->Cell(4,$h,':',$border,0,'C');
-            $pdf->Cell(140,$h,$d['ProdiEng'],$border,1,'L');
-
-            $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
-            $pdf->Cell(4,$h,':',$border,0,'C');
-            $pdf->Cell(140,$h,$d['DescriptionEng'],$border,1,'L');
+                $pdf->Cell(35,$h,'NIM',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['NPM'],$border,1,'L');
 
 
-            $pdf->Ln(7);
-            $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : '.$d['SemesterName'],$border,1,'L');
-            $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+                $pdf->Cell(35,$h,'Study Program',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['ProdiEng'],$border,1,'L');
 
-            $pdf->Ln(7);
-
-
-            $pdf->SetWidths(Array(10,140,29));
-            $pdf->SetLineHeight(5);
-            $pdf->SetAligns(array('C','L','C'));
+                $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['DescriptionEng'],$border,1,'L');
 
 
-            $pdf->Row(Array(
-                '1',
-                "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro 
+                $pdf->Ln(7);
+                $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : '.$d['SemesterName'],$border,1,'L');
+                $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+
+                $pdf->Ln(7);
+
+
+                $pdf->SetWidths(Array(10,140,29));
+                $pdf->SetLineHeight(5);
+                $pdf->SetAligns(array('C','L','C'));
+
+
+                $pdf->Row(Array(
+                    '1',
+                    "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro 
             Total SKS : ".$dataIPK['TotalSKS']."
             Maka Kuliah Nilai D : ".count($arr_mkD)."
             SKS Mata Kuliah Wajib : ".$arr_mkWajib_SKS,
-                "Approved By ".$d['Cl_Academic_Name']
-            ));
+                    "Approved By ".$d['Cl_Academic_Name']
+                ));
 
-            $pdf->Row(Array(
-                '2',
-                'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
+                $pdf->Row(Array(
+                    '2',
+                    'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
             Pada Hari / Tanngal sidang : '.$this->getDateIndonesian($d['TrialDate']),
-                "Approved By ".$d['Cl_Kaprodi_Name']
-            ));
+                    "Approved By ".$d['Cl_Kaprodi_Name']
+                ));
 
-            $pdf->Row(Array(
-                '3',
-                "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : Analisis Pengaruh Experiential Value dan Promosi terhadap Kepuasan Pemain dan Pengaruhnya terhadap Loyalitas Pemain Esports di Jabotabek \nJudul dalam Bahasa Inggris : The Analysis of the Effect of Experiential Value and Promotion on E-Sports Players' Loyalty and Satisfaction in Jabotabek",
-                "Approved By ".$d['Cl_Kaprodi_Name']
-            ));
+                $pdf->Row(Array(
+                    '3',
+                    "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : ".$d['TitleInd']." \nJudul dalam Bahasa Inggris : ".$d['TitleEng'],
+                    "Approved By ".$d['Cl_Kaprodi_Name']
+                ));
 
-            $pdf->Row(Array(
-                '4',
-                " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
-                "Approved By ".$d['Cl_Library_Name']
-            ));
+                $pdf->Row(Array(
+                    '4',
+                    " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
+                    "Approved By ".$d['Cl_Library_Name']
+                ));
 
-            $pdf->Row(Array(
-                '5',
-                "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
-                "Approved By ".$d['Cl_Finance_Name']
-            ));
-
-
-
-            $pdf->SetFont('Arial','I',7);
-            $pdf->Ln(10);
-            $h = 3;
-            $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+                $pdf->Row(Array(
+                    '5',
+                    "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
+                    "Approved By ".$d['Cl_Finance_Name']
+                ));
 
 
-            $nameF = str_replace(' ','_',strtoupper('Nandang'));
-            $pdf->Output('SKBP__'.$nameF.'.pdf','I');
+
+                $pdf->SetFont('Arial','I',7);
+                $pdf->Ln(10);
+                $h = 3;
+                $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+
+
+                $nameF = str_replace(' ','_',ucwords(strtolower($d['Name'])));
+                $pdf->Output('Judicium_Clearance_Form_'.$nameF.'.pdf','I');
+            } else {
+                echo 'No NIM';
+            }
+
         } else {
             echo 'No NIM';
         }
+
+
+
+
 
 
 
