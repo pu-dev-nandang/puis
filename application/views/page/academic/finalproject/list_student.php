@@ -95,10 +95,10 @@
             $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
                 '            <thead>' +
                 '            <tr>' +
-                '                <th style="width: 2%;">No</th>' +
-                '                <th style="width: 20%;">Student</th>' +
+                '                <th style="width: 1%;">No</th>' +
+                '                <th style="width: 15%;">Student</th>' +
                 '                <th>Course</th>' +
-                '                <th style="width: 10%;">Score</th>' +
+                '                <th style="width: 15%;">Information</th>' +
                 '                <th style="width: 10%;">Ijazah SMA / SKHUN</th>' +
                 '                <th style="width: 10%;">Academic Clearance</th>' +
                 '                <th style="width: 10%;">Library Clearance</th>' +
@@ -165,7 +165,6 @@
     function UploadFile(ID,NPM,FileNameOld) {
 
         var input = $('#upload_files_'+ID);
-        console.log(input);
         var files = input[0].files[0];
 
         var sz = parseFloat(files.size) / 1000000; // ukuran MB
@@ -173,9 +172,9 @@
 
         if(Math.floor(sz)<=8){
 
-            var fileName = moment().unix()+'_'+NPM+'.'+ext;
+            var fileName = 'Ijazah_'+NPM+'_'+moment().unix()+'.'+ext;
             var formData = new FormData( $("#formupload_files_"+ID)[0]);
-            var url = base_url_js+'academic/final-project/uploadIjazahStudent?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
+            var url = base_url_js+'academic/final-project/uploadIjazahStudent?fileName='+fileName+'&old='+FileNameOld+'&&NPM='+NPM;
 
             $.ajax({
                 url : url,  // Controller URL

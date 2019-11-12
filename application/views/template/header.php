@@ -486,6 +486,61 @@
         window.location.href = base_url_js+'ShowLoggingNotification';
     });
 
+    $(document).on('click','.btnFinalProject_ViewDetailMK',function () {
+
+        var token = $(this).attr('data-token');
+        var title = $(this).attr('data-title');
+        var dataToken = jwt_decode(token,'UAP)(*');
+
+        var tr = '';
+        if(dataToken.length>0){
+            $.each(dataToken,function (i,v) {
+
+                var mkt = (v.MKType=='1') ? '<br/><span class="label label-primary">Required</span>' : '';
+
+                tr = tr + '<tr>' +
+                    '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
+                    '<td>'+v.MKCode+''+mkt+'</td>' +
+                    '<td style="text-align: left;"><b>'+v.Course+'</b><br/><i>'+v.CourseEng+'</i></td>' +
+                    '<td>'+v.Credit+'</td>' +
+                    '<td>'+v.Grade+'</td>' +
+                    '</tr>'
+            });
+        }
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Detail Course | '+title+'</h4>');
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table table-centre table-striped">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th style="width: 17%;">MKCode</th>' +
+            '                <th>Course</th>' +
+            '                <th style="width: 7%;">Credit</th>' +
+            '                <th style="width: 7%;">Grade</th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '           <tbody>'+tr+'</tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
+    });
+
     $('.departement').click(function () {
         var url = base_url_js+'change-departement';
         var departement = $(this).attr('data-dpt');
