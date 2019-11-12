@@ -1,10 +1,9 @@
-<table class="table" id = "TBLMentor_Type_Sks">
+<table class="table" id = "TBLResearch_Pkm_to_Sks">
 	<thead>
 		<tr>
 			<th>No</th>
-			<th>Mentor Type</th>
-			<th>SKS Pembimbing Utama</th>
-			<th>SKS Pembimbing Pendamping</th>
+			<th>Jenis Publikasi</th>
+			<th>SKS</th>
 			<th>Updated_at</th>
 			<th>Updated_by</th>
 			<?php if (isset($action)): ?>
@@ -17,16 +16,17 @@
 	<tbody></tbody>
 </table>
 <script type="text/javascript">
-	var AppData_Mentor_Type_Sks =  {
+	// console.log('<?php echo $action ?>')
+	var AppData_Research_Pkm_to_Sks =  {
 		loaded : function(){
-		    AppData_Mentor_Type_Sks.LoadAjaxData();
+		    AppData_Research_Pkm_to_Sks.LoadAjaxData();
 		},
 		LoadAjaxData : function(){
-		         var recordTable = $('#TBLMentor_Type_Sks').DataTable({
+		         var recordTable = $('#TBLResearch_Pkm_to_Sks').DataTable({
 		             "processing": true,
 		             "serverSide": false,
 		             "ajax":{
-		                 url : base_url_js+"rectorat/master_data/crud_mentor_type_sks", // json datasource
+		                 url : base_url_js+"rectorat/master_data/crud_research_pkm_to_sks", // json datasource
 		                 ordering : false,
 		                 type: "post",  // method  , by default get
 		                 data : function(token){
@@ -45,31 +45,22 @@
 	                         'orderable': false,
 	                         'className': 'dt-body-center',
 	                      },
-	                      {
-	                         'targets': 5,
-	                         'searchable': false,
-	                         'orderable': false,
-	                         'className': 'dt-body-center',
-	                         'render': function (data, type, full, meta){
-	                         	return full[5];
-	                         }
-	                      },
+	                      
 	                      <?php if (isset($action)): ?>
 	                      <?php if ($action == 'write'): ?>
 	                      	{
-	                      	   'targets': 6,
+	                      	   'targets': 5,
 	                      	   'searchable': false,
 	                      	   'orderable': false,
 	                      	   'className': 'dt-body-center',
 	                      	   'render': function (data, type, full, meta){
+	                      	   	// console.log('<?php echo $action ?>')
 	                      	       var btnAction = '<div class="btn-group">' +
 	                      	           '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
 	                      	           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
 	                      	           '  </button>' +
 	                      	           '  <ul class="dropdown-menu">' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[8]+'" data = "'+full[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
-	                      	           '    <li role="separator" class="divider"></li>' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[8]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[6]+'" data = "'+full[5]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
 	                      	           '  </ul>' +
 	                      	           '</div>';
 	                      	       return btnAction;
@@ -99,14 +90,14 @@
 	};
 
 	$(document).ready(function() {
-	    AppData_Mentor_Type_Sks.loaded();
+	    AppData_Research_Pkm_to_Sks.loaded();
 	})
 	<?php if (isset($action)): ?>
 	<?php if ($action == 'write'): ?>
 		$(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
 			var ID = $(this).attr('data-id');
 			var selector = $(this);
-			AppForm_Mentor_Type_Sks.ActionData(selector,'delete',ID);
+			AppForm_Research_Pkm_to_Sks.ActionData(selector,'delete',ID);
 		})
 
 		$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {
@@ -118,6 +109,7 @@
 	        }
 		    $('#btnSave').attr('action','edit');
 		    $('#btnSave').attr('data-id',ID);
+		    $('#btnSave').prop('disabled',false);
 		})
 	<?php endif ?>
 	<?php endif ?>

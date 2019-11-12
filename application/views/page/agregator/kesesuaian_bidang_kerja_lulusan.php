@@ -52,7 +52,7 @@
 
 
     });
-    
+
     function loadData() {
         var filterYear = $('#filterYear').val();
         var Year = filterYear.split('.')[1];
@@ -62,7 +62,7 @@
             Year : Year
         };
         var token = jwt_encode(data,'UAP)(*');
-        
+
         $.post(url,{token:token},function (jsonResult) {
 
             var Y1 = Year;
@@ -98,7 +98,7 @@
                         '</tr>');
                 });
             }
-            
+
         });
     }
 
@@ -125,7 +125,7 @@
 
                 var viewKesesuaian = '-';
                 if(v.Kesesuaian==2 || v.Kesesuaian=='2'){
-                    viewKesesuaian = '<b style="color: green;">Height</b>';
+                    viewKesesuaian = '<b style="color: green;">High</b>';
                 } else if(v.Kesesuaian==1 || v.Kesesuaian=='1'){
                     viewKesesuaian = '<b style="color: royalblue;">Medium</b>';
                 } else if(v.Kesesuaian==0 || v.Kesesuaian=='0') {
@@ -157,6 +157,6 @@
         });
 
     });
-    
+
 
 </script>

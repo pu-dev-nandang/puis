@@ -133,7 +133,7 @@
 
 
     }
-    
+
     function loadDataExperience() {
         loading_page_simple('#loadViewAlumni','center');
 
@@ -207,7 +207,7 @@
                             WorkSuitability = '<b style="color: royalblue;">Medium</b>';
                         }
                         else if(v.WorkSuitability=='2' || v.WorkSuitability==2){
-                            WorkSuitability = '<b style="color: green;">Height</b>';
+                            WorkSuitability = '<b style="color: green;">High</b>';
                         }
 
 
@@ -359,7 +359,7 @@
             '           <select class="form-control" style="width: 150px;" id="WorkSuitability">' +
             '               <option value="0">Low</option>' +
             '               <option value="1">Medium</option>' +
-            '               <option value="2">Height</option>' +
+            '               <option value="2">High</option>' +
             '           </select>' +
             '        </div>' +
             '        <div class="form-group">' +

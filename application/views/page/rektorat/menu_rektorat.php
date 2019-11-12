@@ -17,6 +17,9 @@
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/mentor_sks'); ?>">Mentor Type to SKS</a>
                 </li>
+                <li>
+                    <a href="<?php echo base_url('rectorat/master_data/research_pkm_to_sks'); ?>">Research & PKM to SKS</a>
+                </li>
             </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                 <?php echo $page; ?>
@@ -28,7 +31,7 @@
 <script>
     $(document).ready(function () {
         var menu_active = "<?php echo $this->uri->segment(3); ?>";
-        var arrMenu = ['config_jabatan_per_sks','sk_masuk_mahasiswa','credit_type_courses'];
+        var arrMenu = ['config_jabatan_per_sks','sk_masuk_mahasiswa','credit_type_courses','mentor_sks','research_pkm_to_sks'];
         setMenuSelected('.nav-tabs','li','active',arrMenu,menu_active);
     });
 </script>

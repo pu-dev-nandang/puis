@@ -4764,7 +4764,7 @@ class C_rest2 extends CI_Controller {
 
                          $sqltotalData = '
                             select count(*) as total from(
-                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan from db_cooperation.kegiatan as z
+                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan,z.FileLain from db_cooperation.kegiatan as z
                                 join (
                                     select a.ID from db_cooperation.kerjasama as a
                                      join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
@@ -4787,7 +4787,7 @@ class C_rest2 extends CI_Controller {
 
                          $sql = '
                                     select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Desc,z.KerjasamaID,z.SemesterID,
-                                    z.Kategori_kegiatan,
+                                    z.Kategori_kegiatan,z.FileLain,
                                     x.Lembaga, x.Kategori,x.Tingkat,
                                     (
                                     select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.keg_department as zz
@@ -4867,6 +4867,7 @@ class C_rest2 extends CI_Controller {
                                       'ID' => $row['ID'],
                                       'SemesterID' => $row['SemesterID'],
                                       'Kategori_kegiatan' => $row['Kategori_kegiatan'],
+                                      'FileLain' => $row['FileLain'],
                                  ];
                                  // encode data
                                  $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");

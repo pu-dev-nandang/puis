@@ -2441,9 +2441,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         return $query;
     }
 
-    public function getCountAllDataAuth($table)
+    public function getCountAllDataAuth($table,$ProdiID = '')
     {
-        $sql = 'select count(*) as total from '.$table;
+        $AddWhere = '';
+        if ($ProdiID != '' && $ProdiID != null) {
+           $AddWhere = ' where ProdiID ='.$ProdiID;
+        }
+        $PositionMain = $this->session->userdata('PositionMain');
+        if ($PositionMain['IDDivision']!= 12) {
+            $WhereOrAnd = ($AddWhere == '') ? ' where' : ' and';
+            $AddWhere .= $WhereOrAnd.' G_user != 1';
+        }
+        $sql = 'select count(*) as total from '.$table.$AddWhere;
         $query=$this->db->query($sql, array())->result_array();
         return $query[0]['total'];
     }
@@ -3645,13 +3654,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             // Cek apakah ada
             if(in_array($data[0]['ID'],$MyMenu)){
                 $rs['AccessPage'] = 'Yes';
-                if ($Type=='APT') {
-                   $rs['RuleAccess'] = [];
-                }
-                else
-                {
-                    $rs['RuleAccess'] = $checkMenu[0]['Access'];
-                }
+                // if ($Type=='APT') {
+                //    $rs['RuleAccess'] = [];
+                // }
+                // else
+                // {
+                //     $rs['RuleAccess'] = $checkMenu[0]['Access'];
+                // }
+                $rs['RuleAccess'] = $checkMenu[0]['Access'];
                 
             }
 

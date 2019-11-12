@@ -8,22 +8,22 @@
 </style>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="well">
             <div class="row">
-                <div class="col-xs-3">
+                <div class="col-xs-2">
                     <select class="form-control filter-db-std" id="filterCurriculum">
                         <option value="">-- All Class Of --</option>
                         <option disabled>------------------------</option>
                     </select>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-3">
                     <select class="form-control filter-db-std" id="filterBaseProdi">
                         <option value="">-- All Programme Study --</option>
                         <option disabled>------------------------</option>
                     </select>
                 </div>
-                <div class="col-xs-3">
+                <div class="col-xs-2">
                     <select class="form-control filter-db-std" id="filterGroupProdi">
                         <option value="">-- All Group Student --</option>
                         <option disabled>------------------------</option>
@@ -35,6 +35,13 @@
                         <option disabled>------------------------</option>
                     </select>
                 </div>
+                <!-- ADDED BY FEBRI @ NOV 2019 -->
+                <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
+                <div class="col-xs-3">
+                    <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Updating Biodata</button>
+                </div>
+                <?php } ?>
+                <!-- END ADDED BY FEBRI @ NOV 2019 -->
             </div>
         </div>
     </div>
@@ -67,7 +74,8 @@
             </div>
             <div class="col-md-4" style="border-left: 1px solid #ccc;">
                 <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
-            </div>
+            </div>           
+
         </div>
     </div>
 </div>
@@ -82,6 +90,8 @@
     </div>
 </div>
 
+
+<div class="fetchDataRequest"></div>
 
 <script>
     var TaSegment = '<?php echo $this->uri->segment(3) ?>';
@@ -334,7 +344,7 @@
 
     });
     
-    function loadStudent() {
+    function loadStudent(approval=null) { //Updated by Febri @ Nov 2019, add param
         loading_page('#divDataStudent');
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
@@ -370,7 +380,8 @@
                 Year : Year,
                 ProdiID : ProdiID,
                 GroupProdiID : filterGroupProdi,
-                StatusStudents : StatusStudents
+                StatusStudents : StatusStudents,
+                approvalStudentReq : approval //Updated by Febri @ Nov 2019
             };
             var token = jwt_encode(data,'UAP)(*');
 
@@ -763,5 +774,50 @@
         }
 
     });
+
+
+
+    /*ADDED BY FEBRI @ NOV 2019*/
+    $(document).on('click','.show-request',function(){
+        if( !$(this).parent().hasClass("disabled") ){
+            var NPM = $(this).data("npm");
+            var TA = $(this).data("ta");
+            var data = {
+                NPM : NPM,
+                TA : TA,
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            $.ajax({
+                type : 'POST',
+                url : base_url_js+"database/student/req-merge",
+                data: {token:token},
+                dataType : 'html',
+                beforeSend : function(){
+                    loading_modal_show();
+                },error : function(jqXHR){
+                    console.log("Error info:\n"+jqXHR.responseText);
+                    $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                    $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                    $("body #GlobalModal").modal("show");
+                },success : function(response){
+                    loading_modal_hide();
+                    $(".fetchDataRequest").html(response);
+                }
+            });
+        }
+    });
+
+    $(document).on('click','.btn-approve.unselect',function(){
+        loadStudent("Yes");
+        $(this).toggleClass("btn-block btn-primary");
+        $(this).toggleClass("unselect selected");
+    });
+    $(document).on('click','.btn-approve.selected',function(){
+        loadStudent();
+        $(this).toggleClass("btn-primary btn-block");
+        $(this).toggleClass("selected unselect");
+    });
+
+    /*END ADDED BY FEBRI @ NOV 2019*/
 
 </script>

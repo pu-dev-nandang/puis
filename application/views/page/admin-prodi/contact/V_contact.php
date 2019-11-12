@@ -5,7 +5,7 @@
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
        
-        <li class="<?php if($this->uri->segment(2)=='contact' ) { echo 'active'; }?>">
+        <li class="<?php if($this->uri->segment(2)=='contact' && ($this->uri->segment(3)=='' || $this->uri->segment(3)==null ) ) { echo 'active'; }?>">
             <a href="<?php echo base_url('prodi/contact'); ?>">Address</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='sosmed' ) { echo 'active'; } ?>">

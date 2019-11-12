@@ -11,15 +11,10 @@ class C_api extends CI_Controller {
         parent::__construct();
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
-        $this->load->model('m_api');
-        $this->load->model('m_rest');
-        $this->load->model('master/m_master');
-        $this->load->model('hr/m_hr');
-        $this->load->model('vreservation/m_reservation');
-        $this->load->model('akademik/m_tahun_akademik');
-        $this->load->model('notification/m_log');
-        $this->load->library('JWT');
-        $this->load->library('google');
+        /*UPDATED BY FEBRI @ NOV 2019*/
+        $this->load->model(array('m_api','m_rest','master/m_master','hr/m_hr','vreservation/m_reservation','akademik/m_tahun_akademik','notification/m_log','General_model'));
+        $this->load->library(array('JWT','google'));
+        /*END UPDATED BY FEBRI @ NOV 2019*/
 
 //        if($this->session->userdata('loggedIn')==false){
 //            $data = array(
@@ -309,7 +304,7 @@ class C_api extends CI_Controller {
             $nestedData[] = $row["NameFiles"];
             $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['RequestDate'])).'</div>';
             $nestedData[] = $row["ForTask"] ;
-            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['DateConfirm'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['StartDate'])).'</div>';
             $nestedData[] = $endtimesz;
             $nestedData[] = $row["DescriptionAddress"];
 
@@ -2706,7 +2701,7 @@ class C_api extends CI_Controller {
             $nestedData[] = '<div style="text-align: center;">'.$dateconfirms.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$buttonlink.'</div>';
             $nestedData[] = '<div style="text-align: center;">
-            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="icon-list icon-large"></i> </button> 
+            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Detail"><i class="icon-list icon-large"></i> </button> 
             <button class="btn btn-sm btn-circle btn-danger btndeleterequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button></div>';
             $no++;
             $data[] = $nestedData;
@@ -5824,6 +5819,35 @@ class C_api extends CI_Controller {
                             }
                         }
                     }
+
+                    // send email to IT
+                        $DescriptionWr = '<p>Dear Team,<br/> Berikut dibawah ini Create Employee  by '.$this->session->userdata('Name').', <br/>
+                                         <p>Username PC : '.$arr_callback['UsernamePC'].'</p>
+                                         <p>Username Aplikasi PCAM : '.$arr_callback['UsernamePCam'].'</p>
+                                         <p>Password : '.$arr_callback['Password'].'</p>
+                                         <p>Email PU : '.$arr_callback['EmailPU'].'</p>
+                                        ';
+                        $ToEmail = ($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') ? array(
+                                      'Div' => array(12,13),
+                                    ) : array(
+                                          'NIP' => array('2018018'),
+                                        );  
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Create Employee '.$Name.' by '.$this->session->userdata('Name'),
+                                            'Description' => $DescriptionWr,
+                                            'URLDirect' => 'ShowLoggingNotification',
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => $ToEmail,
+                            'Email' => 'Yes', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                    // send email to IT
 
                     // insert to db venue for user access
                     $dataSave = array(
@@ -9016,13 +9040,16 @@ class C_api extends CI_Controller {
 
         $dataWhere = '';
 
-        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!=''){
+        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!='' 
+            || !empty($data_arr['approvalStudentReq'])  ){
             $w_Year = ($data_arr['Year']!='') ?  ' AND aut_s.Year = "'.$data_arr['Year'].'"' : '';
             $w_ProdiID = ($data_arr['ProdiID']!='') ?  ' AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
             $w_GroupProdiID = ($data_arr['GroupProdiID']!='') ?  ' AND aut_s.ProdiGroupID = "'.$data_arr['GroupProdiID'].'"' : '';
             $w_StatusStudents = ($data_arr['StatusStudents']!='') ?  ' AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'"' : '';
+            $w_NeedApprovalReq = ($data_arr['approvalStudentReq']!='') ?  ' AND (ts.ID is not null  and ts.isApproval = 1)' : '';
 
-            $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.')';
+
+            $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.''.$w_NeedApprovalReq.')';
 
             $exp_w = explode(' ',$dataWherePlan);
             if(count($exp_w)>0){
@@ -9067,6 +9094,7 @@ class C_api extends CI_Controller {
                                             select FormulirCode,No_Ref from db_admission.formulir_number_online_m
                                         ) dd on a.FormulirCode = dd.FormulirCode
                                       ) as fma on fma.NPM = aut_s.NPM
+        /*Added by Febri @ Nov 2019*/ LEFT JOIN db_academic.tmp_students ts on (ts.NPM = aut_s.NPM) /*End Added by Febri @ Nov 2019*/
                                       '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -9105,8 +9133,15 @@ class C_api extends CI_Controller {
                           </button>
                           <ul class="dropdown-menu">
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
-                            <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>
-                            <li role="separator" class="divider"></li>
+                            <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>';
+            
+            /*UPDATED BY FEBRI @ NOV 2019*/
+            $isRequested = $this->General_model->fetchData("db_academic.tmp_students",array("NPM"=>$row['NPM'],"isApproval"=>1))->row();
+            $requested = (!empty($isRequested) ? '':'disabled');
+            $btnAct .=      '<li class="'.$requested.'"><a class="show-request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'">Request Approval</a></li>';
+            /*END UPDATED BY FEBRI @ NOV 2019*/
+
+            $btnAct .=      '<li role="separator" class="divider"></li>
                             <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'"
                             data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'"
                             data-statusid="'.$row['StatusStudentID'].'">Change Status</a>
@@ -9144,7 +9179,12 @@ class C_api extends CI_Controller {
 
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
+            /*UPDATED BY FEBRI @ NOV 2019*/
+            if($DeptID==6 || $DeptID=='6'){
+                $needAppv = (!empty($isRequested) ? '<br><span class="btn btn-xs btn-info show-request" title="Need Accepting Request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" > <i class="fa fa-warning"></i> Need Approval</span>':'');
+            }else{$needAppv="";}
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].$needAppv   .'</div>';
+            /*END UPDATED BY FEBRI @ NOV 2019*/
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
             $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a>
                                                             <br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>

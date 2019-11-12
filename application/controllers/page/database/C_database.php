@@ -7,8 +7,7 @@ class C_database extends Globalclass {
     {
         parent::__construct();
 //        $this->session->set_userdata('departement_nav', 'academic');
-        $this->load->model('m_sendemail');
-        $this->load->model('database/m_database');
+        $this->load->model(array('m_sendemail','database/m_database','General_model'));
         $this->load->library('JWT');
     }
 
@@ -261,6 +260,100 @@ class C_database extends Globalclass {
         $data['dataForm'] = $this->input->post('data');
         $this->load->view('page/database/admisi/students_details',$data);
     }
+
+
+    /*ADDED BY FEBRI @ NOV 2019*/
+    public function students_req_merge(){
+
+        $data = $this->input->post();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $conditions = array("NPM"=>$data_arr['NPM']);
+            $isExist = $this->General_model->fetchData("ta_".$data_arr['TA'].".students",$conditions)->row();
+            if(!empty($isExist)){
+                $data['NPM'] = $data_arr['NPM'];
+                $data['TA'] = $data_arr['TA'];
+                $data['detail_ori'] = $isExist;
+                $conditions['isApproval'] = 1;
+                $data['detail_req'] = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
+            }
+        }
+        $this->load->view('page/database/admisi/requestMerging',$data);
+    }
+
+    public function students_req_approval(){
+        $data = $this->input->post();
+        $myName = $this->session->userdata('name');
+        $json = array();
+        if($data){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($data['token'],$key);
+            $conditions = array("NPM"=>$data_arr['NPM']);
+            $isExist = $this->General_model->fetchData("ta_".$data_arr['TA'].".students",$conditions)->row();
+            $message = ""; $isfinish = false;
+            if(!empty($isExist)){
+                if($data_arr['ACT'] == 1){
+                    $getTempStudentReq = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
+                    $dataAppv = array();
+                    if(empty($getTempStudentReq->Photo)){
+                        unset($getTempStudentReq->Photo);
+                    }else{
+                        $imgReq = $getTempStudentReq->pathPhoto."uploads/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo;
+                        $ch = curl_init($imgReq);
+                        $fp = fopen('./uploads/students/ta_'.$data_arr['TA'].'/'.$getTempStudentReq->Photo, 'wb');
+                        curl_setopt($ch, CURLOPT_FILE, $fp);
+                        curl_setopt($ch, CURLOPT_HEADER, 0);
+                        curl_exec($ch);
+                        curl_close($ch);
+                        fclose($fp);
+
+                        //remove picture
+                        $tmp_pic = $_SERVER['DOCUMENT_ROOT'].'/students/uploads/ta_'.$data_arr['TA'].'/'.$getTempStudentReq->Photo;
+                        unlink($tmp_pic);
+
+                        $dataAppv["Photo"] = null;
+                    }
+                    unset($getTempStudentReq->isApproval);
+                    unset($getTempStudentReq->note);
+                    unset($getTempStudentReq->created);
+                    unset($getTempStudentReq->createdby);
+                    unset($getTempStudentReq->edited);
+                    unset($getTempStudentReq->editedby);
+                    unset($getTempStudentReq->pathPhoto);
+
+                    $updateTA = $this->General_model->updateData("ta_".$data_arr['TA'].".students",$getTempStudentReq,$conditions);
+                    if($updateTA){
+                        //check if has a different birthdate between old and new
+                        if($isExist->DateOfBirth != $getTempStudentReq->DateOfBirth){
+                            //update birthdate-pass on auth student
+                            $updateOldPass = $this->General_model->updateData("db_academic.auth_students",array("Password_old"=>date("dmy",strtotime($getTempStudentReq->DateOfBirth))),$conditions);
+                        }
+
+                        //update status table temp_student
+                        $dataAppv['isApproval'] = 2;
+                        $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
+                        $dataAppv['editedby'] = $myName;
+                        $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",$dataAppv,$conditions);
+                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.";
+                        $isfinish = $updateTempStd;
+                    }else{
+                        $message = "Failed saved data. Try again.";
+                    }
+                }else{
+                    //update status table temp_student
+                    $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",array("isApproval"=>$data_arr['ACT'],"note"=>(!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null),"editedby"=>$myName),$conditions);
+                    $message = (($updateTempStd) ? "Successfully":"Failed")." saved." ;
+                    $isfinish = $updateTempStd;
+                }
+            }else{$message="Student data is not founded.";}
+
+            $json = array("message"=>$message,"finish"=>$isfinish);   
+        }
+        echo json_encode($json);
+    }
+
+    /*END ADDED BY FEBRI @ NOV 2019*/
 
 
     // Reset Pasword ====

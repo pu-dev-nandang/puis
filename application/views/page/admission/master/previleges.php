@@ -1,5 +1,5 @@
 <!-- <link href="<?php echo base_url('assets/custom/jquery-ui.css'); ?>" rel="stylesheet" type="text/css" /> -->
-<div class="row" style="margin-top: 5px;">
+<div class="row btn-read" style="margin-top: 5px;">
     <div class="col-md-12">
         <div class="widget box">
             <div class="widget-header">

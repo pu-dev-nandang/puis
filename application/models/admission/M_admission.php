@@ -3284,7 +3284,16 @@ class M_admission extends CI_Model {
                 where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
               ) ccc';
       if ($StatusPayment != '%') {
-         $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+        if ($StatusPayment == '-100') {
+          
+          $AddWhere2 .= ' and (FormulirCode = "" or FormulirCode is NULL ) ';
+        }
+        elseif ($StatusPayment == '100') {
+           $AddWhere2 .= ' and FormulirCode != "" or FormulirCode is not NULL  ';
+        }
+        else{
+          $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+        }
       }
       $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"

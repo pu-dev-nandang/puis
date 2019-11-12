@@ -193,9 +193,9 @@
 
 	 function FormEditSelected(dt)
 	 {
-	 	console.log(dt);
+	 	// console.log(dt);
 	 	for (key in dt){
-	 		if (key != 'Perjanjian' && key != 'DepartmentKS' && key != 'BuktiUpload' && key != 'KerjasamaID' && key != 'ID') {
+	 		if (key != 'Perjanjian' && key != 'DepartmentKS' && key != 'BuktiUpload' && key != 'KerjasamaID' && key != 'ID' && key != 'FileLain') {
 	 			if (key == 'SemesterID' || key == 'Kategori_kegiatan') {
 	 				$('.input[name="'+key+'"] option').filter(function() {
 	 				   //may want to use $.trim in here

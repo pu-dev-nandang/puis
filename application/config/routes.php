@@ -263,6 +263,10 @@ $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailRes
 $route['database/students'] = 'page/database/c_database/students';
 $route['database/students/(:num)'] = 'page/database/c_database/students/$1';
 $route['database/students-group'] = 'page/database/c_database/students_group';
+/*ADDED BY FEBRI @ Nov 2019*/
+$route['database/student/req-merge'] = 'page/database/c_database/students_req_merge';
+$route['database/student/req-appv'] = 'page/database/c_database/students_req_approval';
+/*END ADDED BY FEBRI @ Nov 2019*/
 
 $route['database/loadPageStudents'] = 'page/database/c_database/loadPageStudents';
 $route['database/showStudent'] = 'page/database/c_database/showStudent';
@@ -1252,20 +1256,48 @@ $route['api-prodi/__getFacilitiesProdi'] = 'api/c_api_prodi/getFacilitiesProdi';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//
-$route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
-$route['prodi/beranda/why-choose-us/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
+$query = $db->get('db_prodi.cfg_sub_menu');
+$result = $query->result();
+foreach( $result as $row )
+{
+    $Slug = $row->Slug;
+    $Slug = explode('/', $Slug);
+    if (in_array('(:any)', $Slug)) {
+       $a = count($Slug) - 1;
+       $URI = '';
+       for ($i=0; $i < $a; $i++) {
+        $URI .= $Slug[$i].'/';
+       }
+       $route[ $URI.'(:any)' ] = $row->Controller;
+    }
+    elseif(in_array('(:num)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:num)' ] = $row->Controller;
+    }
+    else
+    {
+        $route[ $row->Slug ] = $row->Controller;
+    }
+
+}
+# MenuDB # $route['prodi/beranda/slide']='page/admin-prodi/beranda/c_home/slide';
+# MenuDB # $route['prodi/beranda/why-choose-us/whychoose'] =  'page/admin-prodi/beranda/c_home/whychoose';
 $route['prodi/beranda/why-choose-us/about'] =  'page/admin-prodi/beranda/c_home/about';
 $route['prodi/beranda/why-choose-us/excellence'] =  'page/admin-prodi/beranda/c_home/excellence';
 $route['prodi/beranda/why-choose-us/graduate-profile'] =  'page/admin-prodi/beranda/c_home/graduate_profile';
 $route['prodi/beranda/why-choose-us/career-opportunities'] =  'page/admin-prodi/beranda/c_home/career_opportunities';
 $route['prodi/beranda/calltoaction'] =  'page/admin-prodi/beranda/c_home/calltoaction';
-$route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
-$route['prodi/beranda/partner'] =  'page/admin-prodi/beranda/c_home/partner';
-$route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
-$route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
-$route['prodi/about/mission'] =  'page/admin-prodi/beranda/c_home/mission';
-$route['prodi/about/lecturer'] =  'page/admin-prodi/beranda/c_home/lecturer';
-$route['prodi/about/facilities'] =  'page/admin-prodi/beranda/c_home/facilities';
+# MenuDB # $route['prodi/beranda/testimoni'] =  'page/admin-prodi/beranda/c_home/testimoni';
+# MenuDB # $route['prodi/beranda/partner'] =  'page/admin-prodi/beranda/c_home/partner';
+# MenuDB # $route['prodi/about/overview'] =  'page/admin-prodi/beranda/c_home/overview';
+# MenuDB # $route['prodi/about/vision'] =  'page/admin-prodi/beranda/c_home/vision';
+$route['prodi/about/vision/mission'] =  'page/admin-prodi/beranda/c_home/mission';
+# MenuDB # $route['prodi/about/lecturer'] =  'page/admin-prodi/beranda/c_home/lecturer';
+# MenuDB # $route['prodi/about/facilities'] =  'page/admin-prodi/beranda/c_home/facilities';
 // =======================//
 // ====== Prodi yamin ====\\
 // =======================//

@@ -69,6 +69,10 @@ class C_api3 extends CI_Controller {
         if($data_arr['action']=='insertTeamAggr'){
 
             $dataForm = (array) $data_arr['dataForm'];
+            $input = $data_arr['input'];
+            $view = 'all';
+            $Access = $this->m_master->encode_auth_access_aps_rs($input,$view,[]);
+            $dataForm['Access'] = $Access;
             $this->db->insert('db_agregator.agregator_user',$dataForm);
             $insert_id = $this->db->insert_id();
 
@@ -137,7 +141,10 @@ class C_api3 extends CI_Controller {
 
             $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
-
+            $input = $data_arr['input'];
+            $view = 'all';
+            $Access = $this->m_master->encode_auth_access_aps_rs($input,$view,[]);
+            $dataForm['Access'] = $Access;
             $this->db->where('ID', $ID);
             $this->db->update('db_agregator.agregator_user',$dataForm);
             $this->db->reset_query();
@@ -2083,6 +2090,7 @@ class C_api3 extends CI_Controller {
                         JOIN db_academic.auth_students as aus on sas.NPM = aus.NPM
 
                         WHERE aus.ProdiID = '.$ProdiID.'
+                        group by sa.ID
                         ORDER BY sa.Year, sa.StartDate DESC')->result_array();
 
                     if(count($data)>0){
@@ -2090,7 +2098,9 @@ class C_api3 extends CI_Controller {
                             $ID = $data[$i]['ID'];
                             $data[$i]['DataStudent'] = $this->db->query('SELECT sas.*, ats.Name FROM db_studentlife.student_achievement_student sas
                                                                     LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sas.NPM)
-                                                                    WHERE sas.SAID = "'.$ID.'" ')->result_array();
+                                                                    WHERE sas.SAID = "'.$ID.'" 
+                                                                    and ats.ProdiID = '.$ProdiID.'    
+                                                                    ')->result_array();
                         }
                     }
 
@@ -3547,33 +3557,295 @@ class C_api3 extends CI_Controller {
     }
 
 
-    public function getLuaran_lainnya(){
+    public function getLuaran_lainnya(){  //Buku ber-ISBN, Book Chapter
 
-        $Status = $this->input->get('s');
-        $stat = "('11','12','13','14','15','25','26','27','28') ";
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
 
-        $data = $this->db->query('SELECT Judul, Tgl_terbit, Ket
+        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi 
+                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 4 AND ID_thn_laks = "'.$status.'" ')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat
+                        WHERE ID_kat_capaian = 4 '.$whereStatus.' AND ( ';
+
+            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'ORDER BY NamaJudul DESC';
+
+        }
+        else {
+            
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_jns_pub IN '.$stat.' ')->result_array();
-        return print_r(json_encode($data));
+                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 4 AND ID_thn_laks = "'.$status.'" ';
+            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+    
+        $query = $this->db->query($sql)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = $row["NamaJudul"];
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = $row["Keterangan"];
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+        
     }
 
-    public function getLuaranTekno_produk(){
+    public function getLuaranTekno_produk(){  //Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa
 
-        $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.teknologi_produk_karya ORDER BY ID DESC')->result_array();
-        return print_r(json_encode($data));
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+
+        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi 
+                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 1 AND ID_thn_laks = "'.$status.'" ')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat
+                        WHERE ID_kat_capaian = 1 '.$whereStatus.' AND ( ';
+
+            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'ORDER BY NamaJudul DESC';
+
+        }
+        else {
+            
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 1 AND ID_thn_laks = "'.$status.'" ';
+            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+    
+        $query = $this->db->query($sql)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = $row["NamaJudul"];
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = $row["Keterangan"];
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
 
     }
 
-    public function getLuaranHkiproduk(){
+    public function getLuaranHkiproduk(){   //HKI (Hak Cipta, Desain Produk Industri, dan lainnya)
 
-        $Status = $this->input->get('s');
-        $data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_desain_produk ORDER BY ID DESC')->result_array();
-        return print_r(json_encode($data));
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+
+        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi 
+                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 7 AND ID_thn_laks = "'.$status.'" ')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat
+                        WHERE ID_kat_capaian = 7 '.$whereStatus.' AND ( ';
+
+            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'ORDER BY NamaJudul DESC';
+
+        }
+        else {
+            
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 7 AND ID_thn_laks = "'.$status.'" ';
+            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+    
+        $query = $this->db->query($sql)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = $row["NamaJudul"];
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = $row["Keterangan"];
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
+
+        //$Status = $this->input->get('s');
+        //$data = $this->db->query('SELECT Nama_judul, Tahun_perolehan, Keterangan FROM db_agregator.hki_desain_produk ORDER BY ID DESC')->result_array();
+        //return print_r(json_encode($data));
     }
+
 
     public function getLuaranHkipaten() {
+
+        $status = $this->input->get('s');
+        $requestData= $_REQUEST;
+
+        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 3')->result_array();
+
+        if( !empty($requestData['search']['value']) ) {
+
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat
+                        WHERE ID_kat_capaian = 3 '.$whereStatus.' AND ( ';
+
+            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'ORDER BY NamaJudul DESC';
+
+        }
+        else {
+            
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" 
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 3 AND ID_thn_laks = "'.$status.'" ';
+            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+        }
+    
+        $query = $this->db->query($sql)->result_array();
+
+        $no = $requestData['start']+1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = $row["NamaJudul"];
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = $row["Keterangan"];
+
+            $data[] = $nestedData;
+            $no++;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval( count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+    }
+
+    public function getLuaranHkipatenOLD() {
 
         $data_arr = $this->getInputToken2();
         $hki_year = $data_arr['hkiyear'];
@@ -3582,32 +3854,61 @@ class C_api3 extends CI_Controller {
 
             if($data_arr['action']=='readHKI_paten'){
 
-                if($hki_year == "" && $hki_year == null) {
+                if($hki_year == "0") {
 
                     $Yearx = date('Y');
 
                     $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 2
+                    WHERE ID_kat_capaian = 3
                     UNION
                     SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
                     FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 2 " ')->result_array();
+                    WHERE ID_kat_capaian = 3 ')->result_array();
 
                 }
                 else {
 
                     $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                         FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 2 AND YEAR(Tgl_terbit) = "'.$hki_year.'"
+                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$hki_year.'"
                         UNION
                         SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
                         FROM db_research.pengabdian_masyarakat
-                        WHERE ID_kat_capaian = 2 AND ID_thn_laks = "'.$hki_year.'" ')->result_array();
+                        WHERE ID_kat_capaian = 3 AND ID_thn_laks = "'.$hki_year.'" ')->result_array();
+                }
+                return print_r(json_encode($data));
+            }
+
+            if($data_arr['action']=='readHKI_produk'){
+
+                if($hki_year == "0") {
+
+                    $Yearx = date('Y');
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 7
+                    UNION
+                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                    FROM db_research.pengabdian_masyarakat
+                    WHERE ID_kat_capaian = 7 ')->result_array();
+
+                }
+                else {
+
+                    $data = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                        FROM db_research.publikasi
+                        WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$hki_year.'"
+                        UNION
+                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
+                        FROM db_research.pengabdian_masyarakat
+                        WHERE ID_kat_capaian = 7 AND ID_thn_laks = "'.$hki_year.'" ')->result_array();
                 }
                 //print_r($data);
                 return print_r(json_encode($data));
             }
+
         }
 
         //$Status = $this->input->get('s');

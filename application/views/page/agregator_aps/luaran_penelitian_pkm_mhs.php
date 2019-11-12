@@ -11,6 +11,7 @@ Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
                         <tr>
                             <th style="width: 3%;">No</th>
                             <th>Luaran Penelitian dan PKM</th>
+                            <th>Mahasiswa</th>
                             <th>Tahun</th>
                             <th>Keterangan</th>
                         </tr>
@@ -56,7 +57,7 @@ var APP_luaran_penelitan_pkm_mhs = {
                    html += '</tr>';
                    if (dt.length == 1) { // buat no found server
                     html += '<tr>';
-                    html += '<td colspan = "4" style = "text-align:center;font-weight:600;">'+'--No Data Found--'+'</td>';
+                    html += '<td colspan = "5" style = "text-align:center;font-weight:600;">'+'--No Data Found--'+'</td>';
                     html += '</tr>';
                    }
                }
