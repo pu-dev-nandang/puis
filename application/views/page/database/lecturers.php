@@ -1,4 +1,3 @@
-
 <div class="row">
     <div class="col-md-12">
         <div class="widget box">
@@ -37,10 +36,40 @@
     </div>
 </div>
 
+<div id="fetchRequestDataLec"></div>
 
 <script>
     $(document).ready(function () {
         load_lecturers();
+
+        /*ADDED BY FEBRI @ NOV 2019*/
+        $("body #tableLecturers").on("click",".btn-appv",function(){
+            var itsme = $(this);
+            var NIP = itsme.data("nip");
+            var data = {
+                NIP : NIP
+            };
+            var token = jwt_encode(data,'UAP)(*');
+            
+            $.ajax({
+                type : 'POST',
+                url : base_url_js+"database/lecturers/request",
+                data: {token:token},
+                dataType : 'html',
+                beforeSend :function(){
+                    $('#globalModal .modal-body').html('<i class="fa fa-spinner fa-pulse fa-fw" style="margin-right: 5px;"></i> Loading...');
+                    itsme.prop("disabled",true);
+                },error : function(jqXHR){
+                    $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                    $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                    $("body #GlobalModal").modal("show");
+                },success : function(response){
+                    itsme.prop("disabled",false);
+                    $("#fetchRequestDataLec").html(response);
+                }
+            });
+        });
+        /*END ADDED BY FEBRI @ NOV 2019*/
     });
 
     function load_lecturers() {

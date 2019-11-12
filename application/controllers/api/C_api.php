@@ -100,27 +100,22 @@ class C_api extends CI_Controller {
 
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
 
-        if( !empty($requestData['search']['value']) ) {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        /*UPDATED BY FEBRI @  NOV 2019*/
+        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
-
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")'; 
+        /*END UPDDATED BY FEBRI @  NOV 2019*/
+        if( !empty($requestData['search']['value']) ) {
+            $sql .= ' AND ( '; //UPDATED BY FEBRI @ NOV 2019
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY em.PositionMain, NIP ASC';
-
-        }
-        else {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
+        }else {
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
         }
 
         $query = $this->db->query($sql)->result_array();
@@ -143,7 +138,15 @@ class C_api extends CI_Controller {
 
             $imgEmp = url_img_employees.''.$row["Photo"];
 
-            $nestedData[] = $row["NIP"];
+            /*ADEDD BY FEBRI @ NOV 2019*/
+            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            $needAppv = "";
+            if(!empty($isRequested)){
+                $needAppv = '<button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button>';
+            }
+            /*END ADEDD BY FEBRI @ NOV 2019*/
+
+            $nestedData[] = $row["NIP"].$needAppv;
             $nestedData[] = $row["NIDN"];
             $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
