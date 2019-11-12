@@ -26,6 +26,10 @@
                             <option value="i.0">Not yet upload</option>
                             <option value="i.1">Uploaded</option>
                         </optgroup>
+                        <optgroup label="Academic">
+                            <option value="a.0">Waiting Clearance</option>
+                            <option value="a.1">Clearance</option>
+                        </optgroup>
                         <optgroup label="Library">
                             <option value="l.0">Waiting Clearance</option>
                             <option value="l.1">Clearance</option>
@@ -96,6 +100,7 @@
                 '                <th>Course</th>' +
                 '                <th style="width: 10%;">Score</th>' +
                 '                <th style="width: 10%;">Ijazah SMA / SKHUN</th>' +
+                '                <th style="width: 10%;">Academic Clearance</th>' +
                 '                <th style="width: 10%;">Library Clearance</th>' +
                 '                <th style="width: 10%;">Finance Clearance</th>' +
                 '                <th style="width: 10%;">Kaprodi</th>' +
@@ -134,9 +139,9 @@
     $(document).on('click','.btnClearnt',function () {
 
         if(confirm('Are you sure?')){
-            var ID = $(this).attr('data-id');
+            var NPM = $(this).attr('data-npm');
             var C = $(this).attr('data-c');
-            var token = jwt_encode({action : 'updateClearent',ID:ID,C:C},'UAP)(*');
+            var token = jwt_encode({action : 'updateClearent',NPM:NPM,C:C},'UAP)(*');
             var url = base_url_js+'api3/__crudYudisium';
 
             $.post(url,{token:token},function (result) {

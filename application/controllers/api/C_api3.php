@@ -4354,6 +4354,7 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $SemesterID = $data_arr['SemesterID'];
+            $AS = (isset($data_arr['AS'])) ? $data_arr['AS'] : '';
 
             $ProdiID = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='') ? $data_arr['ProdiID'] : '';
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
@@ -4364,16 +4365,28 @@ class C_api3 extends CI_Controller {
                 $stbStsVal = substr($data_arr['StatusTA'],2,1);
 
                 if($stbSts=='l'){
-                    $WhereStatusTA = ' AND ats.ClearentLibrary = "'.$stbStsVal.'" ';
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( fpc.Cl_Library = "'.$stbStsVal.'" OR fpc.Cl_Library  IS NULL OR fpc.Cl_Library  = "")'
+                        : ' AND fpc.Cl_Library = "'.$stbStsVal.'" ';
                 } else if($stbSts=='f'){
-                    $WhereStatusTA = ' AND ats.ClearentFinance = "'.$stbStsVal.'" ';
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( fpc.Cl_Finance = "'.$stbStsVal.'" OR fpc.Cl_Finance  IS NULL OR fpc.Cl_Finance  = "")'
+                        : ' AND fpc.Cl_Finance = "'.$stbStsVal.'" ';
                 } else if($stbSts=='k'){
-                    $WhereStatusTA = ' AND ats.ClearentKaprodi = "'.$stbStsVal.'" ';
-                } else if($stbSts=='i'){
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( fpc.Cl_Kaprodi = "'.$stbStsVal.'" OR fpc.Cl_Kaprodi  IS NULL OR fpc.Cl_Kaprodi  = "")'
+                        : ' AND fpc.Cl_Kaprodi = "'.$stbStsVal.'" ';
+                }
+                else if($stbSts=='a'){
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( fpc.Cl_Academic = "'.$stbStsVal.'" OR fpc.Cl_Academic IS NULL OR fpc.Cl_Academic = "")'
+                        : ' AND fpc.Cl_Academic = "'.$stbStsVal.'" ';
+                }
+                else if($stbSts=='i'){
 
                     $WhereStatusTA = ($stbStsVal=='0')
-                        ? ' AND ( ats.IjazahSMA IS NULL OR ats.IjazahSMA = "") '
-                        : ' AND ( ats.IjazahSMA IS NOT NULL OR ats.IjazahSMA != "") ';
+                        ? ' AND ( dm.Attachment IS NULL OR dm.Attachment = "") '
+                        : ' AND ( dm.Attachment IS NOT NULL OR dm.Attachment != "") ';
                 }
 
             }
@@ -4388,25 +4401,31 @@ class C_api3 extends CI_Controller {
                                 OR ats.NPM LIKE "%'.$search.'%" )';
             }
 
-            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, ats.IjazahSMA, mk.MKCode,
+            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, mk.MKCode,
                                         mk.NameEng AS CourseEng, sc.ClassGroup,
-                                        ats.ClearentLibrary, ats.ClearentLibrary_By, ats.ClearentLibrary_At, em1.Name AS ClearentLibrary_Name,
-                                        ats.ClearentFinance, ats.ClearentFinance_By, ats.ClearentFinance_At, em2.Name AS ClearentFinance_Name,
-                                        ats.ClearentKaprodi, ats.ClearentKaprodi_By, ats.ClearentKaprodi_At, em3.Name AS ClearentKaprodi_Name,
+                                        fpc.Cl_Library, fpc.Cl_Library_By, fpc.Cl_Library_At, em1.Name AS Cl_Library_Name,
+                                        fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, em2.Name AS Cl_Finance_Name,
+                                        fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, em3.Name AS Cl_Kaprodi_Name,
+                                        fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, em6.Name AS Cl_Academic_Name,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
-                                        ats.ID AS AUTHID, fp.ID AS FPID, fp.Status AS FPStatus
+                                        ats.ID AS AUTHID, dm.Attachment AS IjazahSMA
                                         FROM db_academic.std_study_planning ssp
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
                                         LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
-                                        LEFT JOIN db_employees.employees em1 ON (ats.ClearentLibrary_By = em1.NIP)
-                                        LEFT JOIN db_employees.employees em2 ON (ats.ClearentFinance_By = em2.NIP)
-                                        LEFT JOIN db_employees.employees em3 ON (ats.ClearentKaprodi_By = em3.NIP)
 
                                         LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
                                         LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
                                         
-                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
+                                        LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                        
+                                        LEFT JOIN db_employees.employees em1 ON (fpc.Cl_Library_By = em1.NIP)
+                                        LEFT JOIN db_employees.employees em2 ON (fpc.Cl_Finance_By = em2.NIP)
+                                        LEFT JOIN db_employees.employees em3 ON (fpc.Cl_Kaprodi_By = em3.NIP)
+                                        LEFT JOIN db_employees.employees em6 ON (fpc.Cl_Academic_By = em6.NIP)
+                                        
+                                        LEFT JOIN db_admission.doc_mhs dm ON (dm.NPM = ats.NPM AND dm.ID_reg_doc_checklist = 3)
+                                        
                                         WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch;
 
 
@@ -4440,8 +4459,7 @@ class C_api3 extends CI_Controller {
                 $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
                     ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/ijazah_student/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
                     : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
-                if($DeptID=='6' || $DeptID==6){
-
+                if($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)){
                     $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
 
                     $ijazah = '<form id="formupload_files_'.$row['AUTHID'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
@@ -4460,58 +4478,77 @@ class C_api3 extends CI_Controller {
                 $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
                 $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
 
-                $btnCrudPembimbing = ($DeptID=='6' || $DeptID==6) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['AUTHID'].'" data-id="'.$row['AUTHID'].'"
+                $btnCrudPembimbing = ($DeptID=='6' || $DeptID==6) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
                 data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
                 data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button>' : '';
 
 
-                // Library
-                $dateTm = ($row['ClearentLibrary_At']!='' && $row['ClearentLibrary_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentLibrary_At'])).'</div>' : '';
-                if($DeptID=='11' || $DeptID==11){
-                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentLibrary">Clearance</button>';
+                // Academic
+                $dateTm = ($row['Cl_Academic_At']!='' && $row['Cl_Academic_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Academic_At'])).'</div>' : '';
+                if($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)){
+
+                    $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Academic_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Academic">Clearance</button>';
+
                 } else {
-                    $c_Library = ($row['ClearentLibrary']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentLibrary_Name'].''.$dateTm
+                    $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Academic_Name'].''.$dateTm
+                        : 'Waiting Academic Clearance';
+                }
+
+
+                // Library
+                $dateTm = ($row['Cl_Library_At']!='' && $row['Cl_Library_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Library_At'])).'</div>' : '';
+                if($AS!='Prodi' && ($DeptID=='11' || $DeptID==11)){
+                    $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Library">Clearance</button>';
+                } else {
+                    $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
                         : 'Waiting Library Clearance';
                 }
 
 
 
                 // Finance
-                $dateTm = ($row['ClearentFinance_At']!='' && $row['ClearentFinance_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentFinance_At'])).'</div>' : '';
-                if($DeptID=='9' || $DeptID==9){
-                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentFinance">Clearance</button>';
+                $dateTm = ($row['Cl_Finance_At']!='' && $row['Cl_Finance_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Finance_At'])).'</div>' : '';
+                if($AS!='Prodi' && ($DeptID=='9' || $DeptID==9)){
+                    $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Finance">Clearance</button>';
                 } else {
-                    $c_Finance = ($row['ClearentFinance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentFinance_Name'].''.$dateTm
+                    $c_Finance = ($row['Cl_Finance']!=null && $row['Cl_Finance']!='' && $row['Cl_Finance']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Finance_Name'].''.$dateTm
                         : 'Waiting Finance Clearance';
                 }
 
 
                 // kaprodi
-                $dateTm = ($row['ClearentKaprodi_At']!='' && $row['ClearentKaprodi_At']!=null)
-                    ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['ClearentKaprodi_At'])).'</div>'
+                $dateTm = ($row['Cl_Kaprodi_At']!='' && $row['Cl_Kaprodi_At']!=null)
+                    ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Kaprodi_At'])).'</div>'
                     : '';
 
                 if($ProdiID!=''){
-                    $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-id="'.$row['AUTHID'].'" data-c="ClearentKaprodi">Clearance</button>';
+                    $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Clearance</button>';
 
                 } else {
-                    $c_Kaprodi = ($row['ClearentKaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
-                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['ClearentKaprodi_Name'].''.$dateTm
+                    $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                    <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
                         : 'Waiting Approval Kaprodi';
                 }
 
 
 
-                $c_Kaprodi = ($row['ClearentFinance']!='0' && $row['ClearentLibrary']!='0' &&
-                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded ,Library & Finance Clearance</span>';
+                $c_Kaprodi = (
+                    $row['Cl_Academic']!='0' && $row['Cl_Academic']!=null && $row['Cl_Academic']!='' &&
+                    $row['Cl_Finance']!='0' && $row['Cl_Finance']!=null && $row['Cl_Finance']!='' &&
+                    $row['Cl_Library']!='0' && $row['Cl_Library']!=null && $row['Cl_Library']!='' &&
+                    $row['IjazahSMA']!=null && $row['IjazahSMA']!='')
+                    ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded and Clearance (Academic ,Library & Finance)</span>';
 
 
 
@@ -4524,6 +4561,7 @@ class C_api3 extends CI_Controller {
                 $nestedData[] = '<div style="text-align:left;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'<div id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div></div>';
                 $nestedData[] = '<div>'.$Score.'</div>';
                 $nestedData[] = '<div>'.$ijazah.'</div>';
+                $nestedData[] = '<div>'.$c_Academic.'</div>';
                 $nestedData[] = '<div>'.$c_Library.'</div>';
                 $nestedData[] = '<div>'.$c_Finance.'</div>';
                 $nestedData[] = '<div>'.$c_Kaprodi.'</div>';
@@ -4628,18 +4666,33 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='updateClearent'){
 
-            $ID = $data_arr['ID'];
+            $NPM = $data_arr['NPM'];
             $C = $data_arr['C'];
             $NIP = (isset($data_arr['NIP'])) ? $data_arr['NIP'] : '';
 
             $arr = array(
+                'NPM' => $NPM,
                 $C => '1',
                 $C.'_By' => ($NIP!='') ? $NIP : $this->session->userdata('NIP'),
                 $C.'_At' => $this->m_rest->getDateTimeNow()
             );
 
-            $this->db->where('ID', $ID);
-            $this->db->update('db_academic.auth_students',$arr);
+            // Cek ada apa tidak rownya
+
+            $dataCk = $this->db->get_where('db_academic.final_project_clearance',
+                array(
+                    'NPM' => $NPM
+                ))->result_array();
+
+            if(count($dataCk)>0){
+                $this->db->where('ID', $dataCk[0]['ID']);
+                $this->db->update('db_academic.final_project_clearance',$arr);
+
+            } else {
+                $this->db->insert('db_academic.final_project_clearance',$arr);
+            }
+
+
 
             return print_r(1);
 
