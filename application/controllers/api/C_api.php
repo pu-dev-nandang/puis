@@ -107,7 +107,11 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")'; 
-        /*END UPDDATED BY FEBRI @  NOV 2019*/
+        
+        if($requestData['isappv'] === 'true'){
+            $sql .= " AND (te.isApproval = 1) ";
+        }
+
         if( !empty($requestData['search']['value']) ) {
             $sql .= ' AND ( '; //UPDATED BY FEBRI @ NOV 2019
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
@@ -117,6 +121,9 @@ class C_api extends CI_Controller {
         }else {
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
+
+        
+        /*END UPDDATED BY FEBRI @  NOV 2019*/
 
         $query = $this->db->query($sql)->result_array();
 

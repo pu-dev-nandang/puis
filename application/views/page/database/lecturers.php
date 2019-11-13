@@ -5,10 +5,10 @@
                 <h4 class=""><i class="icon-reorder"></i> Lecturers</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
+                        <button class="btn btn-xs btn-default btn-f-appv" type="button" data-status="close" ><i class="fa fa-warning"></i> Need Approve for request updating biodata</button>
                         <span class="btn btn-xs" id="btn_addmk">
                             <i class="icon-plus"></i> Add Lecturer
                         </span>
-
                     </div>
                 </div>
             </div>
@@ -69,11 +69,27 @@
                 }
             });
         });
+        
+        $("body").on("click",".btn-f-appv",function(){
+            var status = $(this).data("status");
+            if(status == "close"){
+                load_lecturers(true);                
+                $(this).toggleClass("btn-default btn-info");
+                $(this).data("status","open");
+            }else{
+                load_lecturers();          
+                $(this).toggleClass("btn-info btn-default");
+                $(this).data("status","close");
+            }
+            
+        });
+        
         /*END ADDED BY FEBRI @ NOV 2019*/
     });
 
-    function load_lecturers() {
+    function load_lecturers(isappv=false) { // UPDATED BY FEBRI @ NOV 2019
         var dataTable = $('#tableLecturers').DataTable( {
+            "destroy": true,  // UPDATED BY FEBRI @ NOV 2019
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
@@ -82,12 +98,13 @@
                 url : base_url_js+"api/__getLecturer", // json datasource
                 ordering : false,
                 type: "post",  // method  , by default get
+                data: {isappv:isappv},  // UPDATED BY FEBRI @ NOV 2019
                 error: function(){  // error handling
                     $(".employee-grid-error").html("");
                     $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                     $("#employee-grid_processing").css("display","none");
                 }
             }
-        } );
+        });
     }
 </script>
