@@ -9098,7 +9098,7 @@ class C_api extends CI_Controller {
             /*UPDATED BY FEBRI @ NOV 2019*/
             $isRequested = $this->General_model->fetchData("db_academic.tmp_students",array("NPM"=>$row['NPM'],"isApproval"=>1))->row();
             $requested = (!empty($isRequested) ? '':'disabled');
-            $btnAct .=      '<li class="'.$requested.'"><a class="show-request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'">Request Approval</a></li>';
+            $btnAct .=      '<li class="'.$requested.'"><a  href="javascript:void(0);" class="show-request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'">Request Approval</a></li>';
             /*END UPDATED BY FEBRI @ NOV 2019*/
 
             $btnAct .=      '<li role="separator" class="divider"></li>
