@@ -257,6 +257,10 @@ $route['human-resources/monitoring-attendance/with-range-date'] = 'page/hr/c_emp
 $route['database/lecturers'] = 'page/database/c_database/lecturers';
 $route['database/lecturer-details/(:any)'] = 'page/database/c_database/lecturersDetails/$1';
 $route['database/loadpagelecturersDetails'] = 'page/database/c_database/loadpagelecturersDetails';
+/*ADDED BY FEBRI @ Nov 2019*/
+$route['database/lecturers/request'] = 'page/database/c_database/lecturerRequest';
+$route['database/lecturers/req-appv'] = 'page/database/c_database/lecturerRequestAppv';
+/*END ADDED BY FEBRI @ Nov 2019*/
 
 $route['database/sendMailResetPassword'] = 'page/database/c_database/sendMailResetPassword';
 
