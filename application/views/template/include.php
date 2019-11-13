@@ -1330,9 +1330,17 @@
                 $.each(jsonResult,function (i,v) {
 
                     var mentor1 = (v.Mentor1!=null && v.Mentor1!='') ? '('+v.Mentor1 : '';
-                    var mentor = (v.Mentor2!=null && v.Mentor2!='') ? mentor1+', '+v.Mentor2+')' : mentor1+')';
 
-                    $(element).append('<option value="'+v.NPM+'">'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
+                    var mentor = '';
+                    if(v.Mentor2!=null && v.Mentor2!='' && v.Mentor1!=null && v.Mentor1!=''){
+                        mentor = mentor1+', '+v.Mentor2+')';
+                    } else if(v.Mentor2!=null && v.Mentor2!='' && mentor1==''){
+                        mentor =  mentor1+')';
+                    }
+
+                    var disabledrow =  (mentor=='') ? 'disabled ' : '';
+
+                    $(element).append('<option value="'+v.NPM+'" '+disabledrow+'>'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
                         .val(selected).trigger('change');
 
                 });
