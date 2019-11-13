@@ -105,7 +105,7 @@ class C_api extends CI_Controller {
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP) /*UPDATED BY FEBRI @ NOV 2019*/
                         WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")'; 
         
         if($requestData['isappv'] === 'true'){
@@ -149,7 +149,9 @@ class C_api extends CI_Controller {
             $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
             $needAppv = "";
             if(!empty($isRequested)){
-                $needAppv = '<button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button>';
+                if($this->session->userdata('IDdepartementNavigation') == 13){
+                    $needAppv = '<button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button>';
+                }
             }
             /*END ADEDD BY FEBRI @ NOV 2019*/
 
@@ -440,30 +442,28 @@ class C_api extends CI_Controller {
 
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
-        if( !empty($requestData['search']['value']) ) {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        
+        /*UPDATED BY FEBRI @ NOV 2019*/
+        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                        WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+        if($requestData['isappv'] === 'true'){
+            $sql .= " AND (te.isApproval = 1) ";
+        }
 
-            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+        if( !empty($requestData['search']['value']) ) {
+            $sql.= ' AND ( em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY NIP  ASC';
-
-        }
-        else {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                        FROM db_employees.employees em
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+        }else {
             $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
         }
+        /*END UPDATED BY FEBRI @ NOV 2019*/
 
         $query = $this->db->query($sql)->result_array();
         $data = array();
@@ -491,10 +491,20 @@ class C_api extends CI_Controller {
 
             $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
             $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
+            
+
+            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            $needAppv = "";
+            if(!empty($isRequested)){
+                if($this->session->userdata('IDdepartementNavigation') == 13){
+                    $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
+                }
+            }
+
             $nestedData[] = '<a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>
                                 '.$emailPU.'
                                 <br/>NIK : '.$row["NIP"].'
-                                '.$nidn;
+                                '.$nidn.$needAppv;
 //            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.'<br/>'.$Position;
             $nestedData[] = $row["Address"];
