@@ -20,13 +20,15 @@ class C_master extends Purchasing_Controler {
         $content = $this->load->view('page/'.$this->data['department'].'/master/catalog',$this->data,true);
         $this->temp($content);
     }
-    public function type_payment()
+    public function term_payment()
     {
-      $this->data['data']= $this->m_master->showData_array('db_purchasing.pay_type');
-        $content = $this->load->view('page/'.$this->data['department'].'/master/type_payment',$this->data,true);
-        $this->temp($content);
+        $data['InputForm'] = $this->load->view('page/'.$this->data['department'].'/master/term_payment/InputForm','',true);
+        $data2['action'] = 'write';
+        $data['ViewTable'] = $this->load->view('page/'.$this->data['department'].'/master/term_payment/ViewTable',$data2,true);
+        $page = $this->load->view('page/'.$this->data['department'].'/master/term_payment',$data,true);
+        $this->temp($page);
     }
-
+    
     public function supplier()
     {
         $content = $this->load->view('page/'.$this->data['department'].'/master/supplier',$this->data,true);
@@ -1143,6 +1145,73 @@ class C_master extends Purchasing_Controler {
         }
         echo json_encode($rs);
       }
+    }
+    
+    public function crud_term_payment()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        $Input = $this->getInputToken();
+        $action = $Input['action'];
+        if ($action == 'read') {
+            $sql = 'select a.*,b.Name from db_purchasing.term_payment as a 
+                    join db_employees.employees as b on a.Updated_by = b.NIP
+                    ';
+            $query = $this->db->query($sql,array())->result_array();
+            $data = array();
+            for ($i=0; $i < count($query); $i++) {
+                $nestedData = array();
+                $row = $query[$i]; 
+                $nestedData[] = $i+1;
+                $nestedData[] = $row['TermPayment'];
+                $nestedData[] = $row['Updated_at'];
+                $nestedData[] = $row['Name'];
+                $token = $this->jwt->encode($row,"UAP)(*");
+                $nestedData[] = $token;
+                $nestedData[] = $row['ID'];
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( 0 ),
+                "recordsTotal"    => intval(count($query)),
+                "recordsFiltered" => intval( count($query) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);   
+        }
+        elseif ($action =='add') {
+            $dataSave = json_decode(json_encode($Input['data']),true);
+            $arr_add = [
+                'Updated_at' => date('Y-m-d H:i:s'),
+                'Updated_by' => $this->session->userdata('NIP'),
+            ];
+            $dataSave = $dataSave  + $arr_add;
+            $this->db->insert('db_purchasing.term_payment',$dataSave);
+            echo json_encode(1);
+        }
+        elseif ($action =='delete') {
+            $ID = $Input['ID'];
+            $this->db->where('ID',$ID);
+            $this->db->delete('db_purchasing.term_payment');
+            echo json_encode(1);
+        }
+        elseif ($action = 'edit') {
+            $ID = $Input['ID'];
+            $dataSave = json_decode(json_encode($Input['data']),true);
+            $arr_add = [
+                'Updated_at' => date('Y-m-d H:i:s'),
+                'Updated_by' => $this->session->userdata('NIP'),
+            ];
+            $dataSave = $dataSave  + $arr_add;
+            $this->db->where('ID',$ID);
+            $this->db->update('db_purchasing.term_payment',$dataSave);
+            echo json_encode(1);
+        }
+        else
+        {
+            echo '{"status":"999","message":"Not Authorize"}'; 
+        }
     }
 
 }
