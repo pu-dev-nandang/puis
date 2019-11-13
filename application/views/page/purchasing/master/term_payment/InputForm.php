@@ -5,7 +5,7 @@
     <div class="panel-body" style="min-height: 100px;">
         <div class="form-group">
             <label>Term Payment</label>
-            <input type="text" class="form-control input" name = "TermPayment">
+            <input type="text" class="form-control input" name = "Name">
         </div>
     </div>
     <div class="panel-footer" style="text-align: right;">
