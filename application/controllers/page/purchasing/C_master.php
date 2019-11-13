@@ -42,14 +42,6 @@ class C_master extends Purchasing_Controler {
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCategory',$this->data,true);
         echo json_encode($arr_result);
     }
-     public function SaveFormType()
-    {
-        $Name=$this->input->post('Type');
-        $arr=array('Name' => $Name, );
-        $this->db->insert('db_purchasing.pay_type',$arr);
-        redirect(base_url().'purchasing/master/type_payment');
-    }
-
     public function InputCategory_FormInput()
     {
         $this->auth_ajax();
@@ -1154,8 +1146,9 @@ class C_master extends Purchasing_Controler {
         $Input = $this->getInputToken();
         $action = $Input['action'];
         if ($action == 'read') {
-            $sql = 'select a.*,b.Name from db_purchasing.term_payment as a 
-                    join db_employees.employees as b on a.Updated_by = b.NIP
+            $sql = 'select a.*,b.Name as NameEmloyess from db_purchasing.pay_type as a 
+                    left join db_employees.employees as b on a.Updated_by = b.NIP
+                    where a.Active = 1
                     ';
             $query = $this->db->query($sql,array())->result_array();
             $data = array();
@@ -1163,9 +1156,9 @@ class C_master extends Purchasing_Controler {
                 $nestedData = array();
                 $row = $query[$i]; 
                 $nestedData[] = $i+1;
-                $nestedData[] = $row['TermPayment'];
-                $nestedData[] = $row['Updated_at'];
                 $nestedData[] = $row['Name'];
+                $nestedData[] = $row['Updated_at'];
+                $nestedData[] = $row['NameEmloyess'];
                 $token = $this->jwt->encode($row,"UAP)(*");
                 $nestedData[] = $token;
                 $nestedData[] = $row['ID'];
@@ -1187,13 +1180,16 @@ class C_master extends Purchasing_Controler {
                 'Updated_by' => $this->session->userdata('NIP'),
             ];
             $dataSave = $dataSave  + $arr_add;
-            $this->db->insert('db_purchasing.term_payment',$dataSave);
+            $this->db->insert('db_purchasing.pay_type',$dataSave);
             echo json_encode(1);
         }
         elseif ($action =='delete') {
             $ID = $Input['ID'];
+            $status = [
+                'Active' => 0,
+            ];
             $this->db->where('ID',$ID);
-            $this->db->delete('db_purchasing.term_payment');
+            $this->db->update('db_purchasing.pay_type',$status);
             echo json_encode(1);
         }
         elseif ($action = 'edit') {
@@ -1205,7 +1201,7 @@ class C_master extends Purchasing_Controler {
             ];
             $dataSave = $dataSave  + $arr_add;
             $this->db->where('ID',$ID);
-            $this->db->update('db_purchasing.term_payment',$dataSave);
+            $this->db->update('db_purchasing.pay_type',$dataSave);
             echo json_encode(1);
         }
         else
