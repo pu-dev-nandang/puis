@@ -3748,7 +3748,7 @@ class M_admission extends CI_Model {
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
-             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID,n.CityName as CitySchool
+             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = b.FormulirCode limit 1)  ) as No_Ref,p.RevID,n.CityName as CitySchool
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b
              ON a.ID_register_verified = b.ID
