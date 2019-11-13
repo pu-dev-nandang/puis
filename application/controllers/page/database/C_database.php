@@ -424,6 +424,7 @@ class C_database extends Globalclass {
                     unset($getTempStudentReq->edited);
                     unset($getTempStudentReq->editedby);
                     unset($getTempStudentReq->pathPhoto);
+                    unset($getTempStudentReq->ID);
 
                     $updateTA = $this->General_model->updateData("ta_".$data_arr['TA'].".students",$getTempStudentReq,$conditions);
                     if($updateTA){

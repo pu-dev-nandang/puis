@@ -9110,8 +9110,6 @@ class C_api extends CI_Controller {
                           </ul>
                         </div>';
 
-
-
             $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" />
             <form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
                                 <input id="formPhoto" class="hide" value="" hidden />
