@@ -43,8 +43,13 @@
 				</div> 
 				<div class="col-xs-3">
 					<select class="select2-select-00 full-width-fix" id="CategoryCatalog">
-					     <!-- <option></option> -->
 					 </select>
+				</div>
+				<div class="col-xs-2">
+				    <label class="control-label">Satuan</label>
+				</div> 
+				<div class="col-xs-3">
+				   <input type="text" name="Satuan" id= "Satuan" class="form-control" value="Pcs">
 				</div>
 			</div>
 		</div>
@@ -135,6 +140,7 @@
 		<?php if ($action == 'edit'): ?>
 			$("#Desc").val("<?php echo $get[0]['Desc'] ?>");
 			$("#ItemName").val("<?php echo $get[0]['Item'] ?>");
+			$("#Satuan").val("<?php echo $get[0]['Satuan'] ?>");
 
 			<?php if ($arr_lock > 0): ?>
 				$("#Desc").prop('disabled',true);
@@ -433,6 +439,8 @@
 			})
 		}
 
+		var Satuan = $('#Satuan').val();
+
 		var DataArr = {
 		                Detail : Detail,
 		                Action : "<?php echo $action ?>",
@@ -442,6 +450,7 @@
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
 		                ID_category_catalog : $('#CategoryCatalog').val(),
 		                listDepartmentSelected : listDepartmentSelected,
+		                Satuan : Satuan,
 		                <?php if ($action == 'edit'): ?>
 		                	ID : "<?php echo $get[0]['ID'] ?>",
 		                <?php endif ?>

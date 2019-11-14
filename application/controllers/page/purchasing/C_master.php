@@ -140,6 +140,7 @@ class C_master extends Purchasing_Controler {
         $Item = $Input['Item'];
         $Desc = $Input['Desc'];
         $EstimaValue = $Input['EstimaValue'];
+        $Satuan = $Input['Satuan'];
         $Departement = $Input['Departement'];
         $Detail = $Input['Detail'];
         $Detail = json_encode($Detail);
@@ -165,6 +166,7 @@ class C_master extends Purchasing_Controler {
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
+                           'Satuan'=>$Satuan,
                            'CreatedBy' => $this->session->userdata('NIP'),
                            'CreatedAt' => date('Y-m-d'),
                            'Approval' => 1,
@@ -202,6 +204,7 @@ class C_master extends Purchasing_Controler {
                         'Photo' => '',
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
+                        'Satuan'=>$Satuan,
                         'CreatedBy' => $this->session->userdata('NIP'),
                         'CreatedAt' => date('Y-m-d'),
                         'Approval' => 1,
@@ -247,6 +250,7 @@ class C_master extends Purchasing_Controler {
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
+                           'Satuan'=>$Satuan,
                            'LastUpdateBy' => $this->session->userdata('NIP'),
                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
@@ -283,6 +287,7 @@ class C_master extends Purchasing_Controler {
                         'ID_category_catalog' => $ID_category_catalog,
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
+                        'Satuan'=>$Satuan,
                         'LastUpdateBy' => $this->session->userdata('NIP'),
                         'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
@@ -1068,6 +1073,7 @@ class C_master extends Purchasing_Controler {
           }
           $DetailCatalog = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
           $ID_category_catalog = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          $Satuan = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
 
           $dataSave = array(
             'Item' => $Item,
@@ -1076,6 +1082,7 @@ class C_master extends Purchasing_Controler {
             'Departement' => $Departement,
             'DetailCatalog' => $DetailCatalog,
             'ID_category_catalog' => $ID_category_catalog,
+            'Satuan'=> $Satuan,
             'Approval' => 1,
             'ApprovalAt' => date("Y-m-d H:i:s"),
             'ApprovalBy' => $this->session->userdata("NIP"),

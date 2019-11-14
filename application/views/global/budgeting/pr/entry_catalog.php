@@ -48,6 +48,12 @@
 						     <!-- <option></option> -->
 						 </select>
 					</div>
+					<div class="col-xs-2">
+					    <label class="control-label">Satuan</label>
+					</div> 
+					<div class="col-xs-3">
+					   <input type="text" name="Satuan" id= "Satuan" class="form-control" value="Pcs">
+					</div>
 				</div>
 			</div>
 			<div class="form-group">
@@ -126,6 +132,7 @@
 		<?php if ($action == 'edit'): ?>
 			$("#Desc").val("<?php echo $get[0]['Desc'] ?>");
 			$("#ItemName").val("<?php echo $get[0]['Item'] ?>");
+			$("#Satuan").val("<?php echo $get[0]['Satuan'] ?>");
 
 			<?php if ($arr_lock > 0): ?>
 				$("#Desc").prop('disabled',true);
@@ -421,6 +428,7 @@
 	function saveFileAndData(Detail)
 	{
 		var form_data = new FormData();
+		var Satuan = $('#Satuan').val();
 		var url = base_url_js + "rest/__InputCatalog_saveFormInput";
 		var DataArr = {
 						auth : 's3Cr3T-G4N',
@@ -431,6 +439,7 @@
 		                Desc : $("#Desc").val(),
 		                EstimaValue : findAndReplace($("#EstValue").val(),".",""),
 		                ID_category_catalog : $('#CategoryCatalog').val(),
+		                Satuan : Satuan,
 		                user : "<?php echo $this->session->userdata('NIP') ?>",
 		                <?php if ($action == 'edit'): ?>
 		                	ID : "<?php echo $get[0]['ID'] ?>",
