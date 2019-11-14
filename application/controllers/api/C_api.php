@@ -8587,6 +8587,40 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+
+            else if($data_arr['action']=='viewMyScheduleSeminar'){
+
+                $NPM = $data_arr['NPM'];
+
+                $data = $this->db->query('SELECT fps.*, cl.Room, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project_schedule_student fpss 
+                                                      LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                      
+                                                      LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                      LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                      LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                      
+                                                      WHERE fpss.NPM = "'.$NPM.'" ORDER BY fps.ID ASC ')->result_array();
+
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
+
+                        // Get Pengawas
+                        $data[$i]['Examiner'] = $this->db->query('SELECT em.Name, em.NIP, fpsl.Type FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                                                LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                                                WHERE fpsl.FPSID = "'.$data[$i]['ID'].'" ORDER BY fpsl.Type DESC ')->result_array();
+
+                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.final_project_schedule_student fpss 
+                                                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM) 
+                                                                                WHERE fpss.FPSID = "'.$data[$i]['ID'].'"')->result_array();
+
+                    }
+                }
+
+                return print_r(json_encode($data));
+
+            }
+
             else if($data_arr['action']=='viewRegistrationSchedule'){
 
 //
@@ -8771,13 +8805,29 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='getAllStdReg'){
 
-                $Status = $data_arr['Status'];
-                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2  
-                                                    FROM db_academic.final_project fp
-                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
-                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
-                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
-                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
+                $SemesterID = '15';
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, em4.Name AS Mentor1, em5.Name AS Mentor2
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        
+                                        LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
+                                        
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ORDER BY ats.NPM';
+
+                $data = $this->db->query($queryDefault)->result_array();
+
+
+
+//                $Status = $data_arr['Status'];
+//                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2
+//                                                    FROM db_academic.final_project fp
+//                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+//                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+//                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+//                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
 
                 return print_r(json_encode($data));
 

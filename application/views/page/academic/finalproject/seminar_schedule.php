@@ -12,10 +12,10 @@
         <div class="well">
 
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-12">
                     <select id="filterSemester" class="form-control"></select>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-5 hide">
                     <select id="filterSeminar" class="form-control">
                         <option value="1">Seminar Proposal</option>
                         <option value="2">Seminar Hasil</option>

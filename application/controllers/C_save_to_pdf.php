@@ -6841,6 +6841,15 @@ Phone: (021) 29200456';
 
                 $d = $dataStudent[0];
 
+                // Get tanggal ujian
+                $dataUjian = $this->db->query('SELECT fps.Date FROM db_academic.final_project_schedule_student fpss 
+                                                          LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                          WHERE fpss.NPM = "'.$NPM.'" ORDER BY fps.ID DESC LIMIT 1 ')->result_array();
+
+                $TrialDate = (count($dataUjian)>0)
+                    ? $this->getDateIndonesian($dataUjian[0]['Date'])
+                    : '';
+
                 $dataTranscript = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
 
                 $dataIPK = $dataTranscript['dataIPK'];
@@ -6908,7 +6917,7 @@ Phone: (021) 29200456';
                 $pdf->Row(Array(
                     '2',
                     'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
-            Pada Hari / Tanngal sidang : '.$this->getDateIndonesian($d['TrialDate']),
+            Pada Hari / Tanngal sidang : '.$TrialDate,
                     "Approved By ".$d['Cl_Kaprodi_Name']
                 ));
 

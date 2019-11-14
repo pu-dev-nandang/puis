@@ -19,12 +19,12 @@
             <a href="<?php echo base_url('academic/final-project/judiciums'); ?>">Judiciums List</a>
         </li>
 
-<!--        <li class="--><?php //if($this->uri->segment(3)=='seminar-schedule') { echo 'active'; } ?><!--">-->
-<!--            <a href="--><?php //echo base_url('academic/final-project/seminar-schedule'); ?><!--">Seminar Schedule</a>-->
-<!--        </li>-->
-<!--        <li class="--><?php //if($this->uri->segment(3)=='scheduling-final-project') { echo 'active'; } ?><!--">-->
-<!--            <a href="--><?php //echo base_url('academic/final-project/scheduling-final-project'); ?><!--">Set Schedule</a>-->
-<!--        </li>-->
+        <li class="<?php if($this->uri->segment(3)=='seminar-schedule') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/final-project/seminar-schedule'); ?>">Seminar Schedule</a>
+        </li>
+        <li class="<?php if($this->uri->segment(3)=='scheduling-final-project') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/final-project/scheduling-final-project'); ?>">Set Seminar Schedule</a>
+        </li>
 
     </ul>
     <div style="border-top: 1px solid #cccccc">

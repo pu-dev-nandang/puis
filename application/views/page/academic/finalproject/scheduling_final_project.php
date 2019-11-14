@@ -23,7 +23,7 @@
                         <select class="form-control" id="filterSemester"></select>
                         <div id="viewSemester"></div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 hide">
                         <label>Type</label>
                         <select id="formType" class="form-control">
                             <option value="1">Seminar Proposal</option>

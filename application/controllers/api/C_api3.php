@@ -4674,12 +4674,20 @@ class C_api3 extends CI_Controller {
             $C = $data_arr['C'];
             $NIP = (isset($data_arr['NIP'])) ? $data_arr['NIP'] : '';
 
+
+
             $arr = array(
                 'NPM' => $NPM,
                 $C => '1',
                 $C.'_By' => ($NIP!='') ? $NIP : $this->session->userdata('NIP'),
                 $C.'_At' => $this->m_rest->getDateTimeNow()
             );
+
+            if($C == 'Cl_Kaprodi'){
+                $SemesterActive = $this->m_rest->_getSemesterActive();
+                $SemesterID = $SemesterActive['SemesterID'];
+                $arr['SemesterID'] = $SemesterID;
+            }
 
             // Cek ada apa tidak rownya
 
