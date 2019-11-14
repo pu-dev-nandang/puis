@@ -686,6 +686,7 @@ class C_master extends Purchasing_Controler {
             }
             
             $nestedData[] = $temp;
+            $nestedData[] = $row['Satuan'];
             $nestedData[] = $row['NameCreated'].'<br><span style = "color : red;">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
             $st = '';
             switch ($row['Approval']) {
