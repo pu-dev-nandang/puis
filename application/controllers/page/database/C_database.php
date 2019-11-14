@@ -378,6 +378,7 @@ class C_database extends Globalclass {
                 $data['NPM'] = $data_arr['NPM'];
                 $data['TA'] = $data_arr['TA'];
                 $data['detail_ori'] = $isExist;
+                $data['detail_auth_ori'] = $this->General_model->fetchData("db_academic.auth_students",array("NPM"=>$data_arr['NPM']))->row();
                 $conditions['isApproval'] = 1;
                 $data['detail_req'] = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
             }
@@ -426,6 +427,10 @@ class C_database extends Globalclass {
                     unset($getTempStudentReq->pathPhoto);
                     unset($getTempStudentReq->ID);
                     unset($getTempStudentReq->NPM);
+                    $KTPNumber = $getTempStudentReq->KTPNumber;
+                    $Access_Card_Number = $getTempStudentReq->Access_Card_Number;
+                    unset($getTempStudentReq->KTPNumber);
+                    unset($getTempStudentReq->Access_Card_Number);
 
                     $updateTA = $this->General_model->updateData("ta_".$data_arr['TA'].".students",$getTempStudentReq,$conditions);
                     if($updateTA){
@@ -440,7 +445,35 @@ class C_database extends Globalclass {
                         $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
                         $dataAppv['editedby'] = $myName;
                         $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",$dataAppv,$conditions);
-                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.";
+                        //update to table auth student on dbaccademic
+                        $updateAuthStd = $this->General_model->updateData("db_academic.auth_students",array("KTPNumber"=>$KTPNumber,"Access_Card_Number"=>$Access_Card_Number),$conditions);
+                        $adMessage = "";
+                        if($updateTempStd && $updateAuthStd){
+                            if(!empty($Access_Card_Number)){
+                                $urlAD = URLAD.'__api/Create';
+                                $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                                if ($is_url_exist) {
+                                    //update to AD
+                                    $data_arr1 = [
+                                        'pager' => $Access_Card_Number ,
+                                    ];
+                                    $dataAD = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Type' => 'Student',
+                                        'UserID' => $data_arr['NPM'],
+                                        'data_arr' => $data_arr1,
+                                    );
+
+                                    $url = URLAD.'__api/Edit';
+                                    $token = $this->jwt->encode($dataAD,"UAP)(*");
+                                    //$this->m_master->apiservertoserver_NotWaitResponse($url,$token);                                    
+                                    $updateAD = $this->m_master->apiservertoserver($url,$token);
+                                    $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
+                                }else{$adMessage="Windows active directory server not connected";}
+                            }
+                            
+                        }
+                        $message = (($updateTempStd && $updateAuthStd) ? "Successfully":"Failed")." saved.".(!empty($adMessage) ? ' <b>'.$adMessage.'</b>':'');
                         $isfinish = $updateTempStd;
                     }else{
                         $message = "Failed saved data. Try again.";
@@ -456,6 +489,34 @@ class C_database extends Globalclass {
             $json = array("message"=>$message,"finish"=>$isfinish);   
         }
         echo json_encode($json);
+    }
+
+
+    public function testAD(){
+        $urlAD = URLAD.'__api/Create';
+        $adMessage = "";
+        $data_arr['NPM'] = 11140005;
+        $Access_Card_Number = 111111;
+        $is_url_exist = $this->m_master->is_url_exist($urlAD);
+        if ($is_url_exist) {
+            //update to AD
+            $data_arr1 = [
+                'pager' => $Access_Card_Number ,
+            ];
+            $dataAD = array(
+                'auth' => 's3Cr3T-G4N',
+                'Type' => 'Student',
+                'UserID' => $data_arr['NPM'],
+                'data_arr' => $data_arr1,
+            );
+
+            $url = URLAD.'__api/Edit';
+            $token = $this->jwt->encode($dataAD,"UAP)(*");
+            $update = $this->m_master->apiservertoserver($url,$token);
+            $adMessage = $update; 
+        }else{$adMessage="Windows active directory server not connected";}
+        echo "s:";
+        var_dump($adMessage);
     }
 
     /*END ADDED BY FEBRI @ NOV 2019*/

@@ -23,9 +23,20 @@
       							</td>
       						</tr>
       						<tr>
-      							<th>Name</th>
-      							<td><?=$detail_ori->Name?></td>
+                    <th>Name</th>
+                    <td><?=$detail_ori->Name?></td>
+                  </tr>
+                  
+                  <tr>
+                    <th>KTP Number</th>
+                    <td><?=$detail_auth_ori->KTPNumber?></td>
+                  </tr>
+                  
+                  <tr>
+      							<th>Access Card Number</th>
+      							<td><?=$detail_auth_ori->Access_Card_Number?></td>
       						</tr>
+
       						<tr>
       							<th>Gender</th>
       							<td><?=($detail_ori->Gender == "L") ? "Male":"Female"?></td>
@@ -101,9 +112,20 @@
       							</td>
       						</tr>
       						<tr class="<?=($detail_req->Name != $detail_ori->Name) ? 'different':'' ?>" >
-      							<th>Name</th>
-      							<td><?=$detail_req->Name?></td>
+                    <th>Name</th>
+                    <td><?=$detail_req->Name?></td>
+                  </tr>
+                  
+                  <tr class="<?=($detail_auth_ori->KTPNumber != $detail_req->KTPNumber) ? 'different':'' ?>" >
+                    <th>KTP Number</th>
+                    <td><?=$detail_req->KTPNumber?></td>
+                  </tr>
+                  
+                  <tr class="<?=($detail_auth_ori->Access_Card_Number != $detail_req->Access_Card_Number) ? 'different':'' ?>" >
+      							<th>Access Card Number</th>
+      							<td><?=$detail_req->Access_Card_Number?></td>
       						</tr>
+
       						<tr class="<?=($detail_req->Gender != $detail_ori->Gender) ? 'different':'' ?>">
       							<th>Gender</th>
       							<td><?=($detail_req->Gender == "L") ? "Male":"Female"?></td>
@@ -228,6 +250,8 @@
                                   dataType : 'json',
                                   beforeSend:function(){
                                     itsme.prop("disabled",true);
+                                    itsme.text("..wait for a seccond..");
+                                    $("#form-approval-req button").prop("disabled",true);
                                   },error : function(jqXHR){
                                       alert("Error info:\n"+jqXHR.responseText);
                                   },success : function(response){
