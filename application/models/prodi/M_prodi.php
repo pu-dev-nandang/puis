@@ -197,9 +197,25 @@ class M_prodi extends CI_Model {
         }
         else
         {
-            if ($DivisionID != 12 && $IDPosition > 6) {
-               redirect(base_url().'page404');die();
+            // if ($DivisionID != 12 && $IDPosition > 6) {
+            //    redirect(base_url().'page404');die();
+            // }
+            if ($DivisionID == 14 &&  $IDPosition == 7) {
+                $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
+                $ProdiID = $G_emp[0]['ProdiID'];
             }
+            else
+            {
+                if ($DivisionID == 12 || $IDPosition < 5) {
+                   $GetProdi= $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+                }
+                else
+                {
+                    $GetProdi=[]; 
+                }
+               
+            }
+            
         }
 
         $GetProdi = $this->__join_prodi_auth($NIP,$GetProdi);

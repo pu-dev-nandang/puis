@@ -387,12 +387,6 @@ class C_login extends CI_Controller {
         }
     }
 
-    public function testadi2()
-    {
-        $content = $this->load->view('page/finance/script','',true);
-        echo $content;
-    }
-
     private function genratePassword($Username,$Password){
 
         $plan_password = $Username.''.$Password;
@@ -481,8 +475,10 @@ class C_login extends CI_Controller {
                 $this->m_prodi->auth(); // get session
                 break;
             case 7: // DOSEN
-                $this->session->set_userdata('IDdepartementNavigation','36');
-                $this->session->set_userdata('departementNavigation','other-division');
+                // $this->session->set_userdata('IDdepartementNavigation','36');
+                $this->session->set_userdata('IDdepartementNavigation','15');
+                // $this->session->set_userdata('departementNavigation','other-division');
+                $this->session->set_userdata('departementNavigation','admin-prodi');
                 break;
             default:
                 break;
@@ -665,8 +661,10 @@ class C_login extends CI_Controller {
                             $this->m_prodi->auth($ProdiID); // get session
                             break;
                         case 7: // DOSEN
-                            $this->session->set_userdata('IDdepartementNavigation','36');
-                            $this->session->set_userdata('departementNavigation','other-division');
+                            // $this->session->set_userdata('IDdepartementNavigation','36');
+                            $this->session->set_userdata('IDdepartementNavigation','15');
+                            // $this->session->set_userdata('departementNavigation','other-division');
+                            $this->session->set_userdata('departementNavigation','admin-prodi');
                             break;
                         default:
                             break;
