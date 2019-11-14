@@ -5,7 +5,9 @@
                 <h4 class=""><i class="icon-reorder"></i> Lecturers</h4>
                 <div class="toolbar no-padding">
                     <div class="btn-group">
+                        <?php if($this->session->userdata('IDdepartementNavigation') == 13){ ?>
                         <button class="btn btn-xs btn-default btn-f-appv" type="button" data-status="close" ><i class="fa fa-warning"></i> Need Approve for request updating biodata</button>
+                        <?php } ?>
                         <span class="btn btn-xs" id="btn_addmk">
                             <i class="icon-plus"></i> Add Lecturer
                         </span>

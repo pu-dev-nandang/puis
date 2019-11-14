@@ -230,6 +230,11 @@ $route['human-resources/upload_certificate'] = 'page/hr/c_employees/upload_certi
 $route['human-resources/upload_academic'] = 'page/hr/c_employees/upload_fileAcademic'; //add bismar
 $route['human-resources/upload_edit_academic'] = 'page/hr/c_employees/upload_edit_fileAcademic'; //add bismar
 
+/*ADDED BY FEBRI @ NOV 2019*/
+$route['human-resources/employee-request'] = 'page/hr/c_employees/empRequest';
+$route['human-resources/employee-request-appv'] = 'page/hr/c_employees/empRequestAppv';
+/*END ADDED BY FEBRI @ NOV 2019*/
+
 // --- Modal Academic ---- ADD Bismar
 $route['human-resources/academic_employees'] = 'page/hr/c_employees/academic_employees';
 $route['human-resources/files_reviews'] = 'page/hr/c_employees/files_employees';
