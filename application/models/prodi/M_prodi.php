@@ -203,6 +203,7 @@ class M_prodi extends CI_Model {
             if ($DivisionID == 14 &&  $IDPosition == 7) {
                 $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$NIP);
                 $ProdiID = $G_emp[0]['ProdiID'];
+                $GetProdi = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
             }
             else
             {
