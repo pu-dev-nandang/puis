@@ -113,7 +113,8 @@ function LoadTableData(filterProdi)
         var selector = $('#dataTablesRekognisiDosen tbody');
         var body = jsonResult.body;
         if (body.length > 0) {
-          var BodyGrouping = __BodyGrouping(body);
+          // var BodyGrouping = __BodyGrouping(body);
+          var BodyGrouping = body;
           // console.log(BodyGrouping);
             for (var i = 0; i < BodyGrouping.length; i++) {
                   var t = '<tr>';
@@ -124,12 +125,13 @@ function LoadTableData(filterProdi)
                     for (var j = 0; j < arr.length; j++) {
                       var Obj = arr[j];
                       if (j>=2 && j<=5) { // arr
-                        // console.log(Obj)
-                        t+= '<td>'+Obj[0]+'</td>';
+                        var wrObj = (Obj[0] !== undefined) ? Obj[0] : '';
+                        t+= '<td>'+wrObj+'</td>';
                         if (Obj.length > 1) {
                           // StrTr+= '<tr>';
                           for (var y = 1; y < Obj.length; y++) {
-                             StrTr+= '<td>'+Obj[y]+'</td>';
+                            var wrObj2 = (Obj[y] !== undefined) ? Obj[y] : '';
+                             StrTr+= '<td>'+wrObj2+'</td>';
                           }
                           // StrTr+= '</tr>';
                         }
@@ -174,7 +176,7 @@ function LoadTableData(filterProdi)
     });
 
 }
-
+/*
 function __BodyGrouping(arr){
   // console.log(arr);
   var rs = [];
@@ -296,5 +298,5 @@ function __BodyGrouping(arr){
   } // end loop i
   // console.log(rs);
   return rs;
-}
+}*/
 </script>
