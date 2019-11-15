@@ -50,6 +50,9 @@ class C_dashboard extends Globalclass {
         //     }
         // }
         // die();
+        // $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
+        // print_r($rs);
+        // die();
 
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
