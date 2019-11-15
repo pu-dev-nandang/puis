@@ -98,14 +98,18 @@ class C_api extends CI_Controller {
     public function getLecturer(){
         $requestData= $_REQUEST;
 
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+
+        $whereDef = 'em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7"
+        OR em.PositionOther1 = "14.7" OR em.PositionOther2 = "14.7" OR em.PositionOther3 = "14.7"';
+
+        $totalData = $this->db->query('SELECT * FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
             $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
+                        WHERE ('.$whereDef.')  AND ( ';
 
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
@@ -118,7 +122,7 @@ class C_api extends CI_Controller {
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
+                        WHERE ('.$whereDef.')';
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
         }
