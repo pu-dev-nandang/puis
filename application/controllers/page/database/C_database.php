@@ -126,12 +126,40 @@ class C_database extends Globalclass {
                             $updateOldPass = $this->General_model->updateData("db_employees.employees",array("Password_old"=>date("dmy",strtotime($getTempEmpyReq->DateOfBirth))),$conditions);
                         }
 
+                        $adMessage="";
+                        //check if access card different
+                        if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                            if($isExist->Access_Card_Number != $getTempEmpyReq->Access_Card_Number){
+                                $urlAD = URLAD.'__api/Create';
+                                $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                                if ($is_url_exist) {
+                                    $explodeMailPU = explode("@", $isExist->EmailPU);
+                                    $username = $explodeMailPU[0];
+                                    //update to AD
+                                    $data_arr1 = [
+                                        'pager' => $getTempEmpyReq->Access_Card_Number ,
+                                    ];                                    
+                                    $dataAD = array(
+                                        'auth' => 's3Cr3T-G4N',
+                                        'Type' => 'Employee',
+                                        'UserID' => $username,
+                                        'data_arr' => $data_arr1,
+                                    );
+
+                                    $url = URLAD.'__api/Edit';
+                                    $token = $this->jwt->encode($dataAD,"UAP)(*");
+                                    $updateAD = $this->m_master->apiservertoserver_Response($url,$token,true);
+                                    $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
+                                }else{$adMessage="Windows active directory server not connected";}
+                            }
+                        }
+
                         //update status table temp_student
                         $dataAppv['isApproval'] = 2;
                         $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
                         $dataAppv['editedby'] = $myName;
                         $updateTempStd = $this->General_model->updateData("db_employees.tmp_employees",$dataAppv,$conditions);
-                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.";
+                        $message = (($updateTempStd) ? "Successfully":"Failed")." saved.".(!empty($adMessage) ? "<b>".$adMessage."</b>":"");
                         $isfinish = $updateTempStd;
                     }else{
                         $message = "Failed saved data. Try again.";
@@ -395,8 +423,9 @@ class C_database extends Globalclass {
             $data_arr = (array) $this->jwt->decode($data['token'],$key);
             $conditions = array("NPM"=>$data_arr['NPM']);
             $isExist = $this->General_model->fetchData("ta_".$data_arr['TA'].".students",$conditions)->row();
+            $isExistAuth = $this->General_model->fetchData("db_academic.auth_students",$conditions)->row();
             $message = ""; $isfinish = false;
-            if(!empty($isExist)){
+            if(!empty($isExist) && !empty($isExistAuth)){
                 if($data_arr['ACT'] == 1){
                     $getTempStudentReq = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
                     $dataAppv = array();
@@ -450,26 +479,28 @@ class C_database extends Globalclass {
                         $adMessage = "";
                         if($updateTempStd && $updateAuthStd){
                             if(!empty($Access_Card_Number)){
-                                $urlAD = URLAD.'__api/Create';
-                                $is_url_exist = $this->m_master->is_url_exist($urlAD);
-                                if ($is_url_exist) {
-                                    //update to AD
-                                    $data_arr1 = [
-                                        'pager' => $Access_Card_Number ,
-                                    ];
-                                    $dataAD = array(
-                                        'auth' => 's3Cr3T-G4N',
-                                        'Type' => 'Student',
-                                        'UserID' => $data_arr['NPM'],
-                                        'data_arr' => $data_arr1,
-                                    );
+                                if($Access_Card_Number != $isExistAuth->Access_Card_Number){ //check if different number of card
+                                    $urlAD = URLAD.'__api/Create';
+                                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                                    if ($is_url_exist) {
+                                        //update to AD
+                                        $data_arr1 = [
+                                            'pager' => $Access_Card_Number ,
+                                        ];
+                                        $dataAD = array(
+                                            'auth' => 's3Cr3T-G4N',
+                                            'Type' => 'Student',
+                                            'UserID' => $data_arr['NPM'],
+                                            'data_arr' => $data_arr1,
+                                        );
 
-                                    $url = URLAD.'__api/Edit';
-                                    $token = $this->jwt->encode($dataAD,"UAP)(*");
-                                    //$this->m_master->apiservertoserver_NotWaitResponse($url,$token);                                    
-                                    $updateAD = $this->m_master->apiservertoserver($url,$token);
-                                    $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
-                                }else{$adMessage="Windows active directory server not connected";}
+                                        $url = URLAD.'__api/Edit';
+                                        $token = $this->jwt->encode($dataAD,"UAP)(*");
+                                        //$this->m_master->apiservertoserver_NotWaitResponse($url,$token);                                    
+                                        $updateAD = $this->m_master->apiservertoserver_Response($url,$token,true);
+                                        $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
+                                    }else{$adMessage="Windows active directory server not connected";}
+                                }
                             }
                             
                         }
@@ -494,10 +525,12 @@ class C_database extends Globalclass {
 
     public function testAD(){
         $urlAD = URLAD.'__api/Create';
+        echo "URL:".$urlAD;
         $adMessage = "";
         $data_arr['NPM'] = 11140005;
         $Access_Card_Number = 111111;
         $is_url_exist = $this->m_master->is_url_exist($urlAD);
+        
         if ($is_url_exist) {
             //update to AD
             $data_arr1 = [
@@ -512,11 +545,32 @@ class C_database extends Globalclass {
 
             $url = URLAD.'__api/Edit';
             $token = $this->jwt->encode($dataAD,"UAP)(*");
-            $update = $this->m_master->apiservertoserver($url,$token);
+            $update = $this->m_master->apiservertoserver_Response($url,$token,true);
             $adMessage = $update; 
         }else{$adMessage="Windows active directory server not connected";}
-        echo "s:";
-        var_dump($adMessage);
+        
+    }
+
+    private function pingAddress($url=null) {
+        if(!empty($url)){
+            $getProtocol = ((preg_match('/\bhttp\b/', $url)) ? "http://": ((strpos($url, 'https') !== false) ? "https://":"") );
+            if(!empty($getProtocol)){
+                $explode = explode($getProtocol, $url);
+                $splitColon = explode(":", $explode[1]);
+                $ipAddress = $splitColon[0];
+                echo $ipAddress;
+                $pingresult = exec("ping ".$ipAddress, $outcome, $status);
+                var_dump($pingresult);
+                if (0 == $status) {
+                    $status = "alive";
+                } else {
+                    $status = "dead";
+                }      
+                return $status;
+            }else return false;
+        }else return false;
+        /*
+        return $status;*/
     }
 
     /*END ADDED BY FEBRI @ NOV 2019*/
