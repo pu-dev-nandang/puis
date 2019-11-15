@@ -3,11 +3,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_master extends CI_Model {
-
+    public $passApiKey = '';
 
     function __construct()
     {
         parent::__construct();
+        $pas = md5('Uap)(*&^%');
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+        $this->passApiKey =  $pass;
     }
     public function get_departement()
     {
@@ -3667,6 +3670,186 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         }
         return $rs;
+    }
+
+    public function UploadOneFilesToNas($headerOrigin,$filename='',$varFiles='userfile',$pathAdd=null,$return='string')
+    {
+        $filename = ($filename == '') ? uniqid() : $filename;
+        /*
+            $headerOrigin = Host Origin ex: http://localhost
+                path berdasarkan Host Origin
+            $filename = filename
+            $varFiles = variable key pada $_FILES
+            $pathAdd = pathAdd ex admission/temp => no slash in last word
+            $return = 'string/json'
+
+            ex : 
+                 $uploadNas = $this->m_master->UploadOneFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
+        */
+
+        $rs = array();
+        // $header[] = 'Content-Type: application/json';
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'filename' => $filename,
+        );
+        if (isset($pathAdd) && $pathAdd != '' && $pathAdd != null) {
+            $data['pathAdd'] = $pathAdd;
+        }
+
+        $url = url_files.'__uploadFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+
+        $Input = $token;
+        $ch = curl_init();
+        // $file_name_with_full_path = './images/logo.jpg';
+        // $cfile = new CURLFile($file_name_with_full_path, 'image/jpeg','logo.jpg');
+        $cfile = new CURLFile($_FILES[$varFiles]['tmp_name'], $_FILES[$varFiles]['type'],$_FILES[$varFiles]['name']);
+        $post = array('token' => $Input,'file_contents[]'=>$cfile);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        if ($return == 'string') {
+            return (count($rs)>0) ? $rs[0] : '';
+        }
+        else
+        {
+            return json_encode($rs);
+        }
+    }
+
+
+    public function UploadManyFilesToNas($headerOrigin,$filename='',$varFiles='userfile',$pathAdd=null,$return='json')
+    {
+        $filename = ($filename == '') ? uniqid() : $filename;
+        /*
+            $headerOrigin = Host Origin ex: http://localhost
+                path berdasarkan Host Origin
+            $filename = filename
+            $varFiles = variable key pada $_FILES
+            $pathAdd = pathAdd ex admission/temp => no slash in last word
+            $return = 'array/json'
+
+            ex : 
+                 $uploadNas = $this->m_master->UploadManyFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
+        */
+
+        $rs = array();
+        // $header[] = 'Content-Type: application/json';
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'filename' => $filename,
+        );
+        if (isset($pathAdd) && $pathAdd != '' && $pathAdd != null) {
+            $data['pathAdd'] = $pathAdd;
+        }
+
+        $url = url_files.'__uploadFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+
+        $Input = $token;
+        $ch = curl_init();
+        
+        $countfiles = count($_FILES[$varFiles ]['name']);
+        $arr_files = [];
+        for($i=0;$i<$countfiles;$i++){
+            $cfile = new CURLFile($_FILES[$varFiles]['tmp_name'][$i], $_FILES[$varFiles]['type'][$i],$_FILES[$varFiles]['name'][$i]);
+            $arr_files['file_contents['.$i.']'] = $cfile;
+        }
+        $new_post_array  = ['token' => $Input];
+        $post = $new_post_array + $arr_files;   
+        // $post = array('token' => $Input,'file_contents[]'=>$cfile);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        if ($return == 'array') {
+            return $rs;
+        }
+        else
+        {
+            return json_encode($rs);
+        }
+    }
+
+    public function DeleteFileToNas($headerOrigin,$path='')
+    {
+
+        /*
+            $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
+            callback  : 
+                [
+                    {
+                    Status: "1",
+                    msg: "Delete file success"
+                    }
+                ]   
+        */
+        if ($path != '') {
+            $rs = array();
+            $header[] = "Content-type: multipart/form-data";
+            $header[] = "Origin: ".$headerOrigin."";
+            $header[] = "Cache-Control: max-age=0";
+            $header[] = "Connection: keep-alive";
+            $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+            $data = array(
+                'auth' => 's3Cr3T-G4N',
+                'path' => $path,
+            );
+
+            $url = url_files.'__deleteFile?apikey='.$this->passApiKey;
+            $token = $this->jwt->encode($data,"UAP)(*");
+            $Input = $token;
+            $ch = curl_init();
+            $new_post_array  = ['token' => $Input];
+            $post = $new_post_array;
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
+            curl_setopt($ch, CURLOPT_URL,$url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $pr = curl_exec($ch);
+            $rs = (array) json_decode($pr,true);
+            curl_close ($ch);
+            return $rs;   
+        }
+        else
+        {
+            return 'No path added';
+        }
     }
   
 }
