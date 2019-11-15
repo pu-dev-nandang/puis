@@ -522,35 +522,6 @@ class C_database extends Globalclass {
         echo json_encode($json);
     }
 
-
-    public function testAD(){
-        $urlAD = URLAD.'__api/Create';
-        echo "URL:".$urlAD;
-        $adMessage = "";
-        $data_arr['NPM'] = 11140005;
-        $Access_Card_Number = 111111;
-        $is_url_exist = $this->m_master->is_url_exist($urlAD);
-        
-        if ($is_url_exist) {
-            //update to AD
-            $data_arr1 = [
-                'pager' => $Access_Card_Number ,
-            ];
-            $dataAD = array(
-                'auth' => 's3Cr3T-G4N',
-                'Type' => 'Student',
-                'UserID' => $data_arr['NPM'],
-                'data_arr' => $data_arr1,
-            );
-
-            $url = URLAD.'__api/Edit';
-            $token = $this->jwt->encode($dataAD,"UAP)(*");
-            $update = $this->m_master->apiservertoserver_Response($url,$token,true);
-            $adMessage = $update; 
-        }else{$adMessage="Windows active directory server not connected";}
-        
-    }
-
     private function pingAddress($url=null) {
         if(!empty($url)){
             $getProtocol = ((preg_match('/\bhttp\b/', $url)) ? "http://": ((strpos($url, 'https') !== false) ? "https://":"") );
