@@ -148,8 +148,8 @@
                 '        </tr>' +
                 '        <tr>' +
                 '            <td class="td-parent">Education</td>' +
-                '            <td>'+data.AddressFather+'</td>' +
-                '            <td>'+data.AddressMother+'</td>' +
+                '            <td>'+data.EducationFather+'</td>' +
+                '            <td>'+data.EducationMother+'</td>' +
                 '        </tr>' +
                 '        <tr>' +
                 '            <td class="td-parent">Occupation</td>' +

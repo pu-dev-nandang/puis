@@ -480,26 +480,28 @@ class C_database extends Globalclass {
                         if($updateTempStd && $updateAuthStd){
                             if(!empty($Access_Card_Number)){
                                 if($Access_Card_Number != $isExistAuth->Access_Card_Number){ //check if different number of card
-                                    $urlAD = URLAD.'__api/Create';
-                                    $is_url_exist = $this->m_master->is_url_exist($urlAD);
-                                    if ($is_url_exist) {
-                                        //update to AD
-                                        $data_arr1 = [
-                                            'pager' => $Access_Card_Number ,
-                                        ];
-                                        $dataAD = array(
-                                            'auth' => 's3Cr3T-G4N',
-                                            'Type' => 'Student',
-                                            'UserID' => $data_arr['NPM'],
-                                            'data_arr' => $data_arr1,
-                                        );
+                                    if($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id'){
+                                        $urlAD = URLAD.'__api/Create';
+                                        $is_url_exist = $this->m_master->is_url_exist($urlAD);
+                                        if ($is_url_exist) {
+                                            //update to AD
+                                            $data_arr1 = [
+                                                'pager' => $Access_Card_Number ,
+                                            ];
+                                            $dataAD = array(
+                                                'auth' => 's3Cr3T-G4N',
+                                                'Type' => 'Student',
+                                                'UserID' => $data_arr['NPM'],
+                                                'data_arr' => $data_arr1,
+                                            );
 
-                                        $url = URLAD.'__api/Edit';
-                                        $token = $this->jwt->encode($dataAD,"UAP)(*");
-                                        //$this->m_master->apiservertoserver_NotWaitResponse($url,$token);                                    
-                                        $updateAD = $this->m_master->apiservertoserver_Response($url,$token,true);
-                                        $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
-                                    }else{$adMessage="Windows active directory server not connected";}
+                                            $url = URLAD.'__api/Edit';
+                                            $token = $this->jwt->encode($dataAD,"UAP)(*");
+                                            //$this->m_master->apiservertoserver_NotWaitResponse($url,$token);                                    
+                                            $updateAD = $this->m_master->apiservertoserver_Response($url,$token,true);
+                                            $adMessage = ($updateAD[0] != 1) ? "Failed update Access Card to Windows Active Directory.!":"";
+                                        }else{$adMessage="Windows active directory server not connected";}
+                                    }
                                 }
                             }
                             
