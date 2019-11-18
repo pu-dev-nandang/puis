@@ -2718,6 +2718,28 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         curl_close ($ch);
         return $data;
     }
+    
+    public function apiservertoserver_Response($url,$token = '',$return=false)
+    {
+        $Input = $token;
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $return);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+        $data = curl_exec($ch);
+        curl_close ($ch);
+        return $data;
+    }
+
 
     public function UserQNA($IDDivision = '')
     {

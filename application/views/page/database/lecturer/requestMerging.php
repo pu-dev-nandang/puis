@@ -23,9 +23,13 @@
 								</td>
 							</tr>
 							<tr>
-								<th>ID Card</th>
+								<th>Access Card Number</th>
 								<td><?=$detail_ori->Access_Card_Number?></td>
 							</tr>
+							<tr>
+								<th>KTP Number</th>
+								<td><?=$detail_ori->Access_Card_Number?></td>
+							</tr>							
 							<tr>
 								<th>Fullname</th>
 								<td><?=$detail_ori->Name?></td>
