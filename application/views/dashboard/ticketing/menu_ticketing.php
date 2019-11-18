@@ -32,6 +32,10 @@
 
 
 <script>
+    window.rest_setting = <?php echo json_encode($Authen) ?>;
+    window.DepartmentID = "<?php echo $DepartmentID ?>";
+    var Hjwtkey = rest_setting[0].Hjwtkey;
+    var Apikey = rest_setting[0].Apikey;
     $(document).ready(function() {
         $('.fixed-header').addClass('sidebar-closed');
     });

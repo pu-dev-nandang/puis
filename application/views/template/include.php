@@ -379,6 +379,8 @@
         maxView: 1,
         forceParse: 1};
 
+    <?php $PositionMain = $this->session->userdata('PositionMain'); ?>
+    window.PositionMain = <?php echo json_encode($PositionMain) ?>;
     $(document).ready(function(){
         // "use strict";
 
