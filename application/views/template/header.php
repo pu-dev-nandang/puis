@@ -91,12 +91,15 @@
                     <span>My Activities</span>
                 </a>
             </li>
-            <li class="hide <?php if($this->uri->segment(1)=='ticket'){echo 'current';} ?>">
-                <a href="<?php echo base_url('ticket'); ?>" id="btn_announcement">
+            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='ticket'){echo 'current';} ?>">
+                <a href="<?php echo base_url('ticket/ticket-today'); ?>" id="btn_announcement">
                     <i class="fa fa-ticket" aria-hidden="true"></i>
-                    <span>Ticket</span>
+                    <span>Ticketing</span>
                 </a>
             </li>
+
+
             <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>
