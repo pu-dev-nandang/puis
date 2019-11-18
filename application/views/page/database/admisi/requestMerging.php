@@ -10,7 +10,7 @@
       	<div class="row">
       		<div class="col-sm-6 col-md-6">
       			<div class="table-responsive">
-      				<h4>Original Data</h4>
+      				<h4>Original Datass</h4>
       				<?php if(!empty($detail_ori)){ ?>
       				<table class="table table-bordered">
       					<tbody>
