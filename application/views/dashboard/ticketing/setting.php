@@ -1,4 +1,16 @@
 <div class="row" style="margin-top: 30px;">
+    <div class="col-md-4 col-md-offset-4">
+        <div class="well">
+            <div class="row">
+                <div class="col-md-12">
+                    <label>Department</label>
+                    <select class ="select2-select-00 full-width-fix" id ="SelectDepartmentID"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" >
     <div class="container-fluid">
         <div class="col-md-8">
             <div class="widget box">
@@ -193,40 +205,19 @@
             if (validation) {
                 if (confirm('Are you sure ?')) {
                     loading_button2(selector);
-                    var url = base_url_js+"rest_ticketing/__CRUDCategory?apikey="+Apikey;
+                    var url = base_url_js+"rest_ticketing/__CRUDCategory";
                     var token = jwt_encode(dataform,'UAP)(*');
-                    var form_data = new FormData();
-                    form_data.append('token',token);
-                    $.ajax({
-                      type:"POST",
-                      url:url,
-                      data: form_data,
-                      contentType: false,       // The content type used when sending data to the server.
-                      cache: false,             // To unable request pages to be cached
-                      processData:false,
-                      dataType: "json",
-                      beforeSend: function (xhr)
-                      {
-                         xhr.setRequestHeader("Hjwtkey",Hjwtkey);
-                      },
-                      success:function(data)
-                      {
-                        if (data.status == 1) {
+                    AjaxSubmitRestTicketing(url,token).then(function(response){
+                        if (response.status == 1) {
                             end_loading_button2(selector);
                             oTable.ajax.reload( null, false );
                             $('#GlobalModalLarge').modal('hide');
                         }
                         else
                         {
-                            toastr.error(data.msg);
+                            toastr.error(response.msg);
                             end_loading_button2(selector);
                         }
-                        
-                      },  
-                      error: function (data) {
-                        toastr.error("Connection Error, Please try again", 'Error!!');
-                        end_loading_button2(selector); 
-                      }
                     })
                 }
             }
@@ -426,25 +417,10 @@
             if (validation) {
                 if (confirm('Are you sure ?')) {
                     loading_button2(selector);
-                    var url = base_url_js+"rest_ticketing/__CRUDAdmin?apikey="+Apikey;
+                    var url = base_url_js+"rest_ticketing/__CRUDAdmin";
                     var token = jwt_encode(dataform,'UAP)(*');
-                    var form_data = new FormData();
-                    form_data.append('token',token);
-                    $.ajax({
-                      type:"POST",
-                      url:url,
-                      data: form_data,
-                      contentType: false,       // The content type used when sending data to the server.
-                      cache: false,             // To unable request pages to be cached
-                      processData:false,
-                      dataType: "json",
-                      beforeSend: function (xhr)
-                      {
-                         xhr.setRequestHeader("Hjwtkey",Hjwtkey);
-                      },
-                      success:function(data)
-                      {
-                        if (data.status == 1) {
+                    AjaxSubmitRestTicketing(url,token).then(function(response){
+                        if (response.status == 1) {
                             end_loading_button2(selector);
                             oTable2.ajax.reload( null, false );
                             $('#GlobalModalLarge').modal('hide');
@@ -454,12 +430,6 @@
                             toastr.error(data.msg);
                             end_loading_button2(selector);
                         }
-                        
-                      },  
-                      error: function (data) {
-                        toastr.error("Connection Error, Please try again", 'Error!!');
-                        end_loading_button2(selector); 
-                      }
                     })
                 }
             }
@@ -505,9 +475,29 @@
     };
 
 $(document).ready(function(){
-    App_ticketing_setting_category.Loaded();
-    App_ticketing_setting_admin.Loaded();
+    var selectorDepartment = $('#SelectDepartmentID');
+    LoadSelectOptionDepartmentFiltered(selectorDepartment);
+    var firstLoad = setInterval(function () {
+        var SelectDepartmentID = $('#SelectDepartmentID').val();
+        if(SelectDepartmentID!='' && SelectDepartmentID!=null && SelectDepartmentID !='' && SelectDepartmentID!=null){
+            App_ticketing_setting_category.Loaded();
+            App_ticketing_setting_admin.Loaded();
+            clearInterval(firstLoad);
+        }
+    },1000);
+    setTimeout(function () {
+        clearInterval(firstLoad);
+    },5000);
 });
+
+$(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartmentID',function(e) {
+    var getValue = $(this).find('option:selected').val();
+    var setDepartment = UpdateVarDepartmentID(getValue);
+    if (setDepartment) {
+        oTable.ajax.reload( null, false );
+        oTable2.ajax.reload( null, false );
+    }
+})
 
 $(document).off('click', '.btn-add-category').on('click', '.btn-add-category',function(e) {
     App_ticketing_setting_category.ModalForm();

@@ -46,21 +46,38 @@ class M_general extends CI_Model {
                      break;
                    }
                 }
-
-                if (!$Bool) {
-                    $sql = 'select * from db_ticketing.admin_register where NIP = "'.$NIP.'" and DepartmentID = "'.$DepartmentID.'" ';
-                    $query = $this->db->query($sql,array())->result_array();
-                    if (count($query) > 0) {
-                        $Bool = true;
-                    }
-                }        
+                        
             break;
-            
+            case 'AC':
+                $ProdiID = $Explode[1];
+                $sql = 'select * from db_academic.program_study where ID = '.$ProdiID.'';
+                $query = $this->db->query($sql,array())->result_array();
+                if ($query[0]['NIP'] == $NIP) {
+                     $Bool = true;
+                }
+            break;
+            case 'FT':
+                $IDFaculty = $Explode[1];
+                $sql = 'select * from db_academic.faculty where ID = '.$IDFaculty.'';
+                $query = $this->db->query($sql,array())->result_array();
+                if ($query[0]['NIP'] == $NIP) {
+                     $Bool = true;
+                }
+            break;
             default:
                 # code...
                 break;
         }
 
+        if (!$Bool) {
+            $sql = 'select * from db_ticketing.admin_register where NIP = "'.$NIP.'" and DepartmentID = "'.$DepartmentID.'" ';
+            $query = $this->db->query($sql,array())->result_array();
+            if (count($query) > 0) {
+                $Bool = true;
+            }
+        }
+
+        /* For IT */
         $PositionMain = $this->session->userdata('PositionMain');
         if (!$Bool && $PositionMain['IDDivision'] == 12) { // IT all akses
             $Bool = true;
@@ -119,6 +136,28 @@ class M_general extends CI_Model {
             return array();
         }
         
+    }
+
+    public function getAuthDepartment(){
+        $rs = [];
+        $DepartmentID = $this->getDepartmentNow();
+        // ALL Department
+        $url = url_pas.'api/__getAllDepartementPU';
+        $GetDepartment = $this->m_master->apiservertoserver($url);
+        if ($DepartmentID == 'NA.12') {
+            $rs = $GetDepartment;
+        }
+        else
+        {
+            for ($i=0; $i < count($GetDepartment); $i++) { 
+                if ($GetDepartment[$i]['Code'] == $DepartmentID) {
+                    $rs[] = $GetDepartment[$i];
+                    break;
+                }
+            }
+        }
+
+        return $rs;
     }
   
 }
