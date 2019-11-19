@@ -7,6 +7,7 @@ class M_general extends CI_Model {
     function __construct()
     {
         parent::__construct();
+        $this->load->model('master/m_master');
     }
 
     public function getDepartmentNow(){
@@ -66,6 +67,58 @@ class M_general extends CI_Model {
         }
 
         return $Bool;
+    }
+
+    public function getAllUserAutoComplete($dataToken)
+    {
+        if (array_key_exists('search', $dataToken) && array_key_exists('DepartmentID', $dataToken)) {
+            $search = $dataToken['search'];
+            $DepartmentID = $dataToken['DepartmentID'];
+            $Explode = explode('.', $DepartmentID);
+            $AddWhere = '';
+            switch ($Explode[0]) {
+                case 'NA':
+                    $Division = $Explode[1];
+                    $AddWhere .= ' and SPLIT_STR(a.PositionMain, ".", 1) = '.$Division;
+                    break;
+                case 'AC':
+                    $ProdiID = $Explode[1];
+                    $AddWhere .= ' and a.ProdiID = '.$ProdiID;
+                    break;
+                case 'FT':
+                    $FacultyID = $Explode[1];
+                    $StrWhere = '';
+                    $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$FacultyID);
+                    if (count($G_prodi) > 0 ) {
+                        $StrWhere = 'and a.ProdiID IN (';
+                        $StrWhere .= $G_prodi[0]['ID'];
+                        for ($i=1; $i < count($G_prodi); $i++) { 
+                            $StrWhere .= ','.$G_prodi[$i]['ID'];
+                        }
+
+                        $StrWhere .= ')';
+                        $AddWhere .= $StrWhere;
+                    }
+                    
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+
+
+            $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
+              where (a.Name like "%'.$search.'%" or a.NIP like "%'.$search.'%" ) and a.StatusEmployeeID != -1
+              '.$AddWhere.'
+              ';
+            $query=$this->db->query($sql, array())->result_array();
+            return $query;
+        }
+        else
+        {
+            return array();
+        }
+        
     }
   
 }
