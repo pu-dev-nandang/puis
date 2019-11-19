@@ -2292,9 +2292,9 @@ class C_rest3 extends CI_Controller {
                 // get lulusan
                 $sql = 'select NPM,Name,Year from db_academic.auth_students where GraduationYear = '.$arr_year[$i].' AND ProdiID = '.$ProdiID;
                 $query=$this->db->query($sql, array())->result_array();
-                $token = $this->jwt->encode($query,"UAP)(*");
+                // $token = $this->jwt->encode($query,"UAP)(*");
 
-                $temp[] = ['Count'=> count($query),'token' => $token ];
+                
 
                 $temp2 = [];
                 for ($k=0; $k < count($query); $k++) { 
@@ -2313,9 +2313,11 @@ class C_rest3 extends CI_Controller {
                     }
 
                     $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                    $query[$k]['IPK']=$IPK;
                     $temp2[] = $IPK;
                 }
-
+                $token = $this->jwt->encode($query,"UAP)(*");
+                $temp[] = ['Count'=> count($query),'token' => $token ];
                 if (count($temp2) > 0) {
                     $temp[] = min($temp2);
                     $temp[] = array_sum($temp2)/count($temp2);
