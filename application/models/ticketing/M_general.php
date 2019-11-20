@@ -8,6 +8,7 @@ class M_general extends CI_Model {
     {
         parent::__construct();
         $this->load->model('master/m_master');
+        $this->load->library('JWT');
     }
 
     public function getDepartmentNow(){
@@ -158,6 +159,18 @@ class M_general extends CI_Model {
         }
 
         return $rs;
+    }
+
+    public function QueryDepartmentJoin($IDJoin){
+      $sql = ' left join (
+            select * from (
+            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.program_study
+            UNION
+            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND from db_employees.division  
+            UNION
+            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.faculty 
+        )qdj)qdj on '.$IDJoin.'=qdj.ID';
+      return $sql;
     }
   
 }

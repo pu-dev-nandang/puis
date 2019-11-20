@@ -9,6 +9,8 @@ class C_rest_ticketing extends CI_Controller {
         parent::__construct();
         $this->load->model('master/m_master');
         $this->load->model('ticketing/m_general');
+        $this->load->model('ticketing/m_setting');
+        $this->load->model('ticketing/m_ticketing');
         $this->load->library('JWT');
         try {
           $G_setting = $this->m_master->showData_array('db_ticketing.rest_setting');
@@ -67,98 +69,26 @@ class C_rest_ticketing extends CI_Controller {
         return $data_arr;
     }
 
-    private function QueryDepartmentJoin($IDJoin){
-      $sql = ' left join (
-            select * from (
-            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.program_study
-            UNION
-            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND from db_employees.division  
-            UNION
-            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.faculty 
-        )qdj)qdj on '.$IDJoin.'=qdj.ID';
-      return $sql;
-    }
-
     public function CRUDCategory(){
       try {
         $dataToken = $this->getInputToken();
         $action = $dataToken['action'];
         switch ($action) {
           case 'read':
-          $rs = [];
-            $DepartmentID = $dataToken['DepartmentID'];
-            $sql = 'select a.Descriptions,c.Name as NameEmployees,a.ID,a.DepartmentID,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND
-                    from db_ticketing.category as a '.$this->QueryDepartmentJoin('a.DepartmentID').'
-                    left join db_employees.employees as c on a.UpdatedBy = c.NIP
-                    where a.DepartmentID = "'.$DepartmentID.'"
-                    and a.Active = 1
-                    order by a.ID desc
-            ';
-            $query = $this->db->query($sql,array())->result_array();
-            $data = array();
-            for ($i=0; $i < count($query); $i++) {
-                $nestedData = array();
-                $row = $query[$i]; 
-                $nestedData[] = $i+1;
-                foreach ($row as $key => $value) {
-                  $nestedData[] = $value;
-                }
-                $token = $this->jwt->encode($row,"UAP)(*");
-                $nestedData[] = $token;
-                $data[] = $nestedData;
-            }
-
-            $rs = array(
-                "draw"            => intval( 0 ),
-                "recordsTotal"    => intval(count($query)),
-                "recordsFiltered" => intval( count($query) ),
-                "data"            => $data
-            );
+            $rs = $this->m_setting->LoadDataCategory($dataToken);
             echo json_encode($rs);
             break;
           case 'add':
-            $rs = ['status' => 0,'msg' => ''];
-            try {
-                $dataSave = json_decode(json_encode($dataToken['data']),true);
-                $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
-                $this->db->insert('db_ticketing.category',$dataSave);
-                $rs['status'] = 1;
-                echo json_encode($rs);
-            } catch (Exception $e) {
-              $rs['msg'] = $e;
-              echo json_encode($rs);
-            }
+            $rs = $this->m_setting->ActionTable('add',$dataToken,'db_ticketing.category');
+            echo json_encode($rs);
             break;
           case 'delete' : 
-             $rs = ['status' => 0,'msg' => ''];
-             try {
-                 $ID = $dataToken['ID'];
-                 $dataSave = ['Active' => 0,
-                              'UpdatedAt' => date('Y-m-d H:i:s'),
-                             ];
-                 $this->db->where('ID',$ID);
-                 $this->db->update('db_ticketing.category',$dataSave);
-                 $rs['status'] = 1;
-                 echo json_encode($rs);
-             } catch (Exception $e) {
-               $rs['msg'] = $e;
-               echo json_encode($rs);
-             }
+             $rs = $this->m_setting->ActionTable('delete',$dataToken,'db_ticketing.category');
+             echo json_encode($rs);
             break;
           case 'edit' : 
-             $rs = ['status' => 0,'msg' => ''];
-             try {
-                 $ID = $dataToken['ID'];
-                 $dataSave = json_decode(json_encode($dataToken['data']),true);
-                 $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
-                 $this->db->where('ID',$ID);
-                 $this->db->update('db_ticketing.category',$dataSave);
-                 $rs['status'] = 1;
-                 echo json_encode($rs);
-             } catch (Exception $e) {
-               $rs['msg'] = $e;
-               echo json_encode($rs);
-             }
+             $rs = $this->m_setting->ActionTable('edit',$dataToken,'db_ticketing.category');
+             echo json_encode($rs);
             break;
         }
         // end switch
@@ -193,77 +123,20 @@ class C_rest_ticketing extends CI_Controller {
         $action = $dataToken['action'];
         switch ($action) {
           case 'read':
-          $rs = [];
-            $DepartmentID = $dataToken['DepartmentID'];
-            $sql = 'select CONCAT(cc.Name," | ",a.NIP) as NameAdmin,a.ID,a.NIP,a.DepartmentID,c.Name as NameUpdatedBy,a.UpdatedBy,a.UpdatedAt,qdj.NameDepartment,qdj.NameDepartmentIND
-                    from db_ticketing.admin_register as a '.$this->QueryDepartmentJoin('a.DepartmentID').'
-                    left join db_employees.employees as c on a.UpdatedBy = c.NIP
-                    left join db_employees.employees as cc on a.NIP = cc.NIP
-                    where a.DepartmentID = "'.$DepartmentID.'"
-                    order by a.ID desc
-            ';
-            $query = $this->db->query($sql,array())->result_array();
-            $data = array();
-            for ($i=0; $i < count($query); $i++) {
-                $nestedData = array();
-                $row = $query[$i]; 
-                $nestedData[] = $i+1;
-                foreach ($row as $key => $value) {
-                  $nestedData[] = $value;
-                }
-                $token = $this->jwt->encode($row,"UAP)(*");
-                $nestedData[] = $token;
-                $data[] = $nestedData;
-            }
-
-            $rs = array(
-                "draw"            => intval( 0 ),
-                "recordsTotal"    => intval(count($query)),
-                "recordsFiltered" => intval( count($query) ),
-                "data"            => $data
-            );
+            $rs = $this->m_setting->LoadDataAdmin($dataToken);
             echo json_encode($rs);
             break;
           case 'add':
-            $rs = ['status' => 0,'msg' => ''];
-            try {
-                $dataSave = json_decode(json_encode($dataToken['data']),true);
-                $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
-                $this->db->insert('db_ticketing.admin_register',$dataSave);
-                $rs['status'] = 1;
-                echo json_encode($rs);
-            } catch (Exception $e) {
-              $rs['msg'] = $e;
-              echo json_encode($rs);
-            }
+            $rs = $this->m_setting->ActionTable('add',$dataToken,'db_ticketing.admin_register');
+            echo json_encode($rs);
             break;
           case 'delete' : 
-             $rs = ['status' => 0,'msg' => ''];
-             try {
-                 $ID = $dataToken['ID'];
-                 $this->db->where('ID',$ID);
-                 $this->db->delete('db_ticketing.admin_register');
-                 $rs['status'] = 1;
-                 echo json_encode($rs);
-             } catch (Exception $e) {
-               $rs['msg'] = $e;
-               echo json_encode($rs);
-             }
+             $rs = $this->m_setting->ActionTable('remove',$dataToken,'db_ticketing.admin_register');
+             echo json_encode($rs);
             break;
           case 'edit' : 
-             $rs = ['status' => 0,'msg' => ''];
-             try {
-                 $ID = $dataToken['ID'];
-                 $dataSave = json_decode(json_encode($dataToken['data']),true);
-                 $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
-                 $this->db->where('ID',$ID);
-                 $this->db->update('db_ticketing.admin_register',$dataSave);
-                 $rs['status'] = 1;
-                 echo json_encode($rs);
-             } catch (Exception $e) {
-               $rs['msg'] = $e;
-               echo json_encode($rs);
-             }
+             $rs = $this->m_setting->ActionTable('edit',$dataToken,'db_ticketing.admin_register');
+             echo json_encode($rs);
             break;
         }
         // end switch
@@ -272,5 +145,65 @@ class C_rest_ticketing extends CI_Controller {
         echo json_encode($e);
       }
     }
+
+    public function event_ticketing(){
+      try {
+        $dataToken = $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'create':
+            $rs = [];
+            $rs = $this->m_ticketing->create_ticketing($dataToken);
+            $CategoryID = $rs['callback']['CategoryID'];
+            $getAdminTicketing = $this->m_ticketing->getAdminTicketing($CategoryID);
+            if (count($getAdminTicketing)>0) {
+              // send notification
+              $array_send_notification=[
+                'NameRequested' => $rs['callback']['NameRequested'],
+                'Description' => 'Number Ticket '.$rs['callback']['NoTicket'],
+                'URLDirect' => 'ticket/ticket-get/'.$rs['callback']['NoTicket'],
+                'CreatedBy' => $rs['callback']['RequestedBy'],
+                'To' => $getAdminTicketing,
+                'NeedEmail' => 'No',
+              ];
+
+              $this->m_ticketing->send_notification_ticketing($array_send_notification);
+
+            }
+
+            echo json_encode($rs);
+            break;
+          
+          default:
+            # code...
+            break;
+        }
+      } catch (Exception $e) {
+          echo json_encode($e);
+      }
+    }
+
+    public function load_ticketing_dashboard()
+    {
+      try {
+        $rs = [];
+        $dataToken = $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'open_ticket':
+            $rs = $this->m_ticketing->rest_open_ticket();
+            echo json_encode($rs);
+            break;
+          
+          default:
+            # code...
+            break;
+        }
+      } catch (Exception $e) {
+        echo json_encode($e);
+      }
+    }
+
+
 
 }

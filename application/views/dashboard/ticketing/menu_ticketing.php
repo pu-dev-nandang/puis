@@ -80,7 +80,7 @@
             def.resolve(data);
            },  
            error: function (data) {
-             toastr.info('No Result Data'); 
+             // toastr.info('No Result Data'); 
              def.reject();
            }
          })
@@ -93,7 +93,6 @@
         var dataform = {
             action : 'read',
             auth : 's3Cr3T-G4N',
-            DepartmentID : DepartmentID,
         };
         var token = jwt_encode(dataform,'UAP)(*');
         AjaxLoadRestTicketing(url,token).then(function(response){
@@ -150,10 +149,53 @@
             def.resolve(data);
            },  
            error: function (data) {
-             toastr.info('No Result Data'); 
+             // toastr.info('No Result Data'); 
              def.reject();
            }
          })
          return def.promise();
+    }
+
+    function file_validation_ticketing(ev,TheName = '')
+    {
+        var files = ev[0].files;
+        var error = '';
+        var msgStr = '';
+        var max_upload_per_file = 4;
+        if (files.length > 0) {
+          if (files.length > max_upload_per_file) {
+            msgStr += 'Upload File '+TheName + ' 1 Document should not be more than 4 Files<br>';
+
+          }
+          else
+          {
+            for(var count = 0; count<files.length; count++)
+            {
+             var no = parseInt(count) + 1;
+             var name = files[count].name;
+             var extension = name.split('.').pop().toLowerCase();
+             if(jQuery.inArray(extension, ['jpg' ,'png','jpeg','pdf','doc','docx']) == -1)
+             {
+              msgStr += 'Upload File '+TheName + ' Invalid Type File<br>';
+             }
+
+             var oFReader = new FileReader();
+             oFReader.readAsDataURL(files[count]);
+             var f = files[count];
+             var fsize = f.size||f.fileSize;
+
+             if(fsize > 2000000) // 2mb
+             {
+              msgStr += 'Upload File '+TheName +  ' Image File Size is very big<br>';
+             }
+             
+            }
+          }
+        }
+        else
+        {
+          msgStr += 'Upload File '+TheName + ' Required';
+        }
+        return msgStr;
     }
 </script>
