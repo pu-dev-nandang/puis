@@ -17,8 +17,8 @@ class C_ticketing extends Globalclass {
     public function menu_ticket($page){
         $data['Authen'] = $this->m_master->showData_array('db_ticketing.rest_setting');
         $data['DepartmentID'] = $this->m_general->getDepartmentNow();
+        $data['DepartmentAbbr'] = $this->m_general->DepartmentAbbr($data['DepartmentID']);
         $data['ArrSelectOptionDepartment'] = $this->m_general->getAuthDepartment();
-        $data['department'] = parent::__getDepartement();
         $data['page'] = $page;
         $content = $this->load->view('dashboard/ticketing/menu_ticketing',$data,true);
         parent::template($content);

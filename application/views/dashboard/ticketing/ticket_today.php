@@ -14,8 +14,8 @@
                     </div>
                 </div>
                 <div class="col-md-4" style="text-align: right;">
-                    <button class="btn btn-default" id="btnCreateNewTicket">Create new ticket</button> |
-                    <button class="btn btn-default">Check my ticket</button>
+                    <button class="btn btn-default" id="btnCreateNewTicket">Create new ticket</button>
+                    <!-- <button class="btn btn-default">Check my ticket</button> -->
                 </div>
             </div>
             <div class="row bg-ticket">
@@ -351,11 +351,13 @@ var App_ticket_ticket_today = {
             data[field] = $(this).val();
         })
         data['RequestedBy'] = sessionNIP;
+        data['DepartmentTicketID'] = DepartmentID;
         var dataform = {
             action : action,
             data : data,
             ID : ID,
             auth : 's3Cr3T-G4N',
+            DepartmentAbbr : DepartmentAbbr,
         };
 
         var ArrUploadFilesSelector = [];
@@ -447,6 +449,7 @@ var App_ticket_ticket_today = {
             action : 'open_ticket',
             auth : 's3Cr3T-G4N',
             DepartmentID : DepartmentID,
+            NIP : sessionNIP,
         }
         var token = jwt_encode(dataform,'UAP)(*');
         
@@ -467,8 +470,8 @@ var App_ticket_ticket_today = {
                                         '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
                                     '</div>'+
                                     '<div class="timeline-label">'+
-                                        '<div class="ticket-division">'+row.NameDepartment+'</div>'+
-                                        '<h2><a href="#">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
+                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
@@ -496,6 +499,7 @@ var App_ticket_ticket_today = {
             action : 'pending_ticket',
             auth : 's3Cr3T-G4N',
             DepartmentID : DepartmentID,
+            NIP : sessionNIP,
         }
         var token = jwt_encode(dataform,'UAP)(*');
         
@@ -516,8 +520,8 @@ var App_ticket_ticket_today = {
                                         '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
                                     '</div>'+
                                     '<div class="timeline-label">'+
-                                        '<div class="ticket-division">'+row.NameDepartment+'</div>'+
-                                        '<h2><a href="#">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
+                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
@@ -545,7 +549,8 @@ $(document).ready(function() {
 
 $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartmentID',function(e) {
     var getValue = $(this).find('option:selected').val();
-    var setDepartment = UpdateVarDepartmentID(getValue);
+    var getAbbr = $(this).find('option:selected').attr('abbr');
+    var setDepartment = UpdateVarDepartmentID(getValue,getAbbr);
     if (setDepartment) {
         /*
             LoadAction
@@ -554,7 +559,7 @@ $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartment
         App_ticket_ticket_today.PendingTicketRest();
     }
 })
-$(document).off('change', '.input[name="CategoryID"]').on('change', '.input[name="CategoryID"]',function(e) {
+$(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input_form[name="CategoryID"]',function(e) {
     var ToDepartmentSelected = $(this).find('option:selected').attr('department');
     $('.lblDepartment').html(ToDepartmentSelected);
 })

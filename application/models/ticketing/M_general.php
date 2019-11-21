@@ -25,12 +25,27 @@ class M_general extends CI_Model {
         return $str;
     }
 
-    public function auth() // kabag dan IT Administrator
+    public function DepartmentAbbr($DepartmentID)
+    {
+        $sql = 'select * from (
+            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
+            UNION
+            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
+            UNION
+            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
+        )qdj
+        where ID = "'.$DepartmentID.'"
+        ';
+        $query = $this->db->query($sql,array())->result_array();
+        return $query[0]['Abbr'];
+    }
+
+    public function auth($DepartmentID = null,$NIP = null) // kabag dan IT serta Admin
     {
         $Bool = false;
-        $DepartmentID = $this->getDepartmentNow();
+        $DepartmentID = ($DepartmentID != null && $DepartmentID != '') ? $DepartmentID : $this->getDepartmentNow();
         $Explode = explode('.', $DepartmentID);
-        $NIP = $this->session->userdata('NIP');
+        $NIP = ($NIP != null && $NIP != '') ? $NIP : $this->session->userdata('NIP');
         switch ($Explode[0]) {
             case 'NA':
                 // get kabag
@@ -53,17 +68,19 @@ class M_general extends CI_Model {
                 $ProdiID = $Explode[1];
                 $sql = 'select * from db_academic.program_study where ID = '.$ProdiID.'';
                 $query = $this->db->query($sql,array())->result_array();
-                if ($query[0]['NIP'] == $NIP) {
-                     $Bool = true;
+                if (count($query) >0 && $query[0]['KaprodiID'] == $NIP) {
+                    $Bool = true;
                 }
+                
             break;
             case 'FT':
                 $IDFaculty = $Explode[1];
                 $sql = 'select * from db_academic.faculty where ID = '.$IDFaculty.'';
                 $query = $this->db->query($sql,array())->result_array();
-                if ($query[0]['NIP'] == $NIP) {
-                     $Bool = true;
+                if (count($query) >0 && $query[0]['NIP'] == $NIP) {
+                    $Bool = true;
                 }
+                
             break;
             default:
                 # code...
@@ -80,8 +97,18 @@ class M_general extends CI_Model {
 
         /* For IT */
         $PositionMain = $this->session->userdata('PositionMain');
-        if (!$Bool && $PositionMain['IDDivision'] == 12) { // IT all akses
-            $Bool = true;
+        if (!$Bool && ($PositionMain['IDDivision'] == 12 || $DepartmentID == 'NA.12' ) ) { // IT all akses
+            $Division = $Explode[1];
+            $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as Division,
+               SPLIT_STR(a.PositionMain, ".", 2) as Position,
+                     a.StatusEmployeeID
+                    FROM   db_employees.employees as a
+                    where SPLIT_STR(a.PositionMain, ".", 1) = '.$Division.' and a.StatusEmployeeID != -1 and a.NIP = "'.$NIP.'" '; // kabag dan kasubag
+            $query = $this->db->query($sql,array())->result_array();
+            if (count($query)>0) {
+                 $Bool = true;
+            }
+           
         }
 
         return $Bool;
@@ -164,11 +191,11 @@ class M_general extends CI_Model {
     public function QueryDepartmentJoin($IDJoin){
       $sql = ' left join (
             select * from (
-            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.program_study
+            select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
             UNION
-            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND from db_employees.division  
+            select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
             UNION
-            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND from db_academic.faculty 
+            select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
         )qdj)qdj on '.$IDJoin.'=qdj.ID';
       return $sql;
     }

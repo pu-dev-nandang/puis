@@ -34,6 +34,7 @@
 <script>
     window.rest_setting = <?php echo json_encode($Authen) ?>;
     window.DepartmentID = "<?php echo $DepartmentID ?>";
+    window.DepartmentAbbr = "<?php echo $DepartmentAbbr ?>";
     var Hjwtkey = rest_setting[0].Hjwtkey;
     var Apikey = rest_setting[0].Apikey;
     window.ArrSelectOptionDepartment = <?php echo json_encode($ArrSelectOptionDepartment) ?>;
@@ -46,7 +47,7 @@
         for (var i = 0; i < ArrSelectOptionDepartment.length; i++) {
            var selected = (ArrSelectOptionDepartment[i].Code == DepartmentID) ? 'selected' : '';
            selector.append(
-                '<option value = "'+ArrSelectOptionDepartment[i].Code+'" '+selected+' >'+ArrSelectOptionDepartment[i].Name2+'</option>'
+                '<option value = "'+ArrSelectOptionDepartment[i].Code+'" '+selected+' abbr = "'+ArrSelectOptionDepartment[i].Abbr+'" >'+ArrSelectOptionDepartment[i].Name2+'</option>'
             );
            selector.select2({
 
@@ -54,8 +55,9 @@
         }
     }
 
-    function UpdateVarDepartmentID(getValue){
+    function UpdateVarDepartmentID(getValue,getAbbr){
          window.DepartmentID = getValue;
+         window.DepartmentAbbr = getAbbr;
          return true;
     }
 
@@ -105,7 +107,7 @@
                     selected = (i==0) ? 'selected' : '';
                    }
                    selector.append(
-                        '<option value = "'+dataresponse[i][3]+'" '+selected+' department = "'+dataresponse[i][8]+'" >'+dataresponse[i][1]+' - '+dataresponse[i][8]+'</option>'
+                        '<option value = "'+dataresponse[i][3]+'" '+selected+' department = "'+dataresponse[i][7]+'" >'+dataresponse[i][7]+' - '+dataresponse[i][1]+'</option>'
                     );
                 }
 
