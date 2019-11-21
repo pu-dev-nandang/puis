@@ -100,7 +100,7 @@ class M_ticketing extends CI_Model {
         $Code = '';
         $Year = date('Y');
         $YearSubStr = substr($Year, 2,2);
-        $MaxLengthINC = 7;
+        $MaxLengthINC = 5;
 
         $sql = 'select * from db_ticketing.ticket
                 where Year(RequestedAt) = '.$Year.'
@@ -110,14 +110,14 @@ class M_ticketing extends CI_Model {
         if (count($query) == 1) {
            $LastCode = $query[0]['NoTicket']; 
            $explode = explode('-', $LastCode);
-           $CodeNumber = (int) $explode[1];
+           $CodeNumber = (int) substr($explode[1], 2,(strlen($explode[1])-2) );
            $CodeNumber = $CodeNumber + 1;
            $strlen = strlen($CodeNumber);
            $strINC = $CodeNumber;
            for ($i=0; $i < $MaxLengthINC - $strlen; $i++) { 
                $strINC = '0'.$strINC;
            }
-
+           $strINC = $YearSubStr.$strINC;
            $Code = $Abbr.'-'.$strINC;
         }
         else
@@ -128,6 +128,7 @@ class M_ticketing extends CI_Model {
             for ($i=0; $i < $MaxLengthINC - $strlen; $i++) { 
                 $strINC = '0'.$strINC;
             }
+            $strINC = $YearSubStr.$strINC;
 
             $Code = $Abbr.'-'.$strINC;
         }
@@ -151,15 +152,63 @@ class M_ticketing extends CI_Model {
         return $rs;
     }
 
-    public function rest_open_ticket()
+    public function rest_open_ticket($dataToken)
     {
         $rs = [];
+        $Addwhere = '';
+        if (array_key_exists('DepartmentID', $dataToken)) {
+           $Addwhere .= ' and ca.DepartmentID = "'.$dataToken['DepartmentID'].'" ';
+        }
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,a.ID
+                b.Photo,qdj.NameDepartment,a.ID
                 from db_ticketing.ticket as a 
+                join db_ticketing.category as ca on a.CategoryID = ca.ID
+                '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
-                where TicketStatus = 1
+                where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") = CURDATE()
+                '.$Addwhere.'
+                order by a.ID desc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        $rs['count'] = count($query);
+        for ($i=0; $i < $rs['count']; $i++) { 
+            if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+                $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                $url = url_files."fileGetAnyToken/".$token;
+                $query[$i]['Files'] = $url;
+            }
+
+            // add foto
+            if ($query[$i]['Photo'] != '' && $query[$i]['Photo'] != null) {
+                $url = url_pas."uploads/employees/".$query[$i]['Photo'];
+                $query[$i]['Photo'] = $url;
+            }
+
+            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
+            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
+            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
+        }
+        $rs['data'] = $query;
+        return $rs;
+    }
+
+    public function rest_pending_ticket($dataToken)
+    {
+        $rs = [];
+        $Addwhere = '';
+        if (array_key_exists('DepartmentID', $dataToken)) {
+           $Addwhere .= ' and ca.DepartmentID = "'.$dataToken['DepartmentID'].'" ';
+        }
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo,qdj.NameDepartment,a.ID
+                from db_ticketing.ticket as a 
+                join db_ticketing.category as ca on a.CategoryID = ca.ID
+                '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                join db_employees.employees as b on a.RequestedBy = b.NIP
+                where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") < CURDATE()
+                '.$Addwhere.'
                 order by a.ID desc
                 ';
         $query = $this->db->query($sql,array())->result_array();

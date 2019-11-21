@@ -191,10 +191,13 @@ class C_rest_ticketing extends CI_Controller {
         $action = $dataToken['action'];
         switch ($action) {
           case 'open_ticket':
-            $rs = $this->m_ticketing->rest_open_ticket();
+            $rs = $this->m_ticketing->rest_open_ticket($dataToken);
             echo json_encode($rs);
             break;
-          
+          case 'pending_ticket':
+            $rs = $this->m_ticketing->rest_pending_ticket($dataToken);
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;

@@ -19,69 +19,7 @@
                 </div>
             </div>
             <div class="row bg-ticket">
-                <div class="col-md-3 panel-ticket">
-                    <h3 class="pending-ticket">Pending Ticket <span>7</span></h3>
-                    <hr/>
-                    <div class="timeline-centered">
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2016065.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-                                <div class="timeline-label">
-                                    <div class="ticket-division">Academic</div>
-                                    <h2><a href="javascript:void(0);" class="showTicket">Art RamadaniArt RamadaniArt Ramadani</a></h2>
-                                    <div class="ticket-submited">Nandang Mulyadi | 29 Jan 2019 08:00</div>
-                                    <p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial two promise. Greatly who affixed suppose but enquire compact prepare all put. Added forth chief trees but rooms think may.</p>
-                                </div>
-                            </div>
-                        </article>
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2016064.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-                                <div class="timeline-label">
-                                    <div class="ticket-division">IT</div>
-                                    <h2><a href="javascript:void(0);" class="showTicket">Job Meeting</a></h2>
-                                    <div class="ticket-submited">Nandang Mulyadi | 29 Feb 2019 08:00</div>
-                                    <p>You have a meeting at Laborator Office Today.</p>
-                                </div>
-                            </div>
-                        </article>
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2114002.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-                                <div class="timeline-label">
-                                    <div class="ticket-division">Finance</div>
-                                    <h2><a href="javascript:void(0);" class="showTicket">Job Meeting Lantai basah</a></h2>
-                                    <div class="ticket-submited">Nandang Mulyadi | 29 Feb 2019 08:00</div>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                                    <div style="margin-top: 5px;">
-                                        <img src="https://i.pinimg.com/originals/36/ab/81/36ab81cd8d63cf7c4a08f39403698c77.jpg" style="max-width: 150px;">
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2014047.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-                                <div class="timeline-label">
-                                    <div class="ticket-division">General Affair</div>
-                                    <h2><a href="javascript:void(0);" class="showTicket">Arber Nushi changed his Profile Picture</a></h2>
-                                    <div class="ticket-submited">Nandang Mulyadi | 29 Feb 2019 08:00</div>
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                                    <div style="margin-top: 5px;">
-                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4os91YBiXqwxbfL0abTIcQOy7jDSEsjIGwLUILG6T5gWjVGeqSQ&s" style="max-width: 150px;"  class="img-responsive img-rounded full-width">
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
+                <div class="col-md-3 panel-ticket" id="PanelPendingTicket">
                 </div>
                 <div class="col-md-3 panel-ticket" id="PanelOpenTicket">
                 </div>
@@ -305,6 +243,7 @@
 var App_ticket_ticket_today = {
     Loaded : function(){
         loading_page('#PanelOpenTicket');
+        loading_page('#PanelPendingTicket');
         var selectorDepartment = $('#SelectDepartmentID');
         LoadSelectOptionDepartmentFiltered(selectorDepartment);
         var firstLoad = setInterval(function () {
@@ -314,6 +253,7 @@ var App_ticket_ticket_today = {
                     LoadAction
                 */
                 App_ticket_ticket_today.OpenTicketRest();
+                App_ticket_ticket_today.PendingTicketRest();
                 clearInterval(firstLoad);
             }
         },1000);
@@ -445,6 +385,7 @@ var App_ticket_ticket_today = {
                         $('#tr_ticket_number').removeClass('hide');
                         $('.input_form,#UploadFile').prop('disabled',true);
                         toastr.success('Ticket Created');
+                        App_ticket_ticket_today.OpenTicketRest();
                     }
                     else
                     {
@@ -498,10 +439,14 @@ var App_ticket_ticket_today = {
     },
 
     OpenTicketRest : function(){
+        if (!$('#PanelOpenTicket').find('.flipInX').length) {
+            loading_page('#PanelOpenTicket');
+        }
         var url = base_url_js+"rest_ticketing/__ticketing_dashboard";
         var dataform = {
             action : 'open_ticket',
             auth : 's3Cr3T-G4N',
+            DepartmentID : DepartmentID,
         }
         var token = jwt_encode(dataform,'UAP)(*');
         
@@ -512,23 +457,81 @@ var App_ticket_ticket_today = {
             html += '<h3 class="open-ticket">Open Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
-            for (var i = 0; i < data.length; i++) {
-                var row = data[i];
-                html += '<article class="timeline-entry">'+
-                            ' <div class="timeline-entry-inner">'+
-                                '<div class="timeline-icon">'+
-                                    '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
-                                '</div>'+
-                                '<div class="timeline-label">'+
-                                    '<h2><a href="#">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
-                                    '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                    '<p>'+nl2br(row.Message)+'</p>'+
-                                '</div>'+
-                        '</article>';
+            if (data.length >0) {
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    html += '<article class="timeline-entry">'+
+                                ' <div class="timeline-entry-inner">'+
+                                    '<div class="timeline-icon">'+
+                                        '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                    '</div>'+
+                                    '<div class="timeline-label">'+
+                                        '<div class="ticket-division">'+row.NameDepartment+'</div>'+
+                                        '<h2><a href="#">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
+                                        '<p>'+nl2br(row.Message)+'</p>'+
+                                        pfiles+
+                                    '</div>'+
+                            '</article>';
+                }
+            }
+            else
+            {
+                html += '<label>No data found in server</label>';
             }
 
             html += '</div>';
             $('#PanelOpenTicket').html(html);
+        }).fail(function(response){
+           toastr.error('Error open ticket');
+        })
+    },
+    PendingTicketRest : function(){
+        if (!$('#PanelPendingTicket').find('.flipInX').length) {
+            loading_page('#PanelPendingTicket');
+        }
+        var url = base_url_js+"rest_ticketing/__ticketing_dashboard";
+        var dataform = {
+            action : 'pending_ticket',
+            auth : 's3Cr3T-G4N',
+            DepartmentID : DepartmentID,
+        }
+        var token = jwt_encode(dataform,'UAP)(*');
+        
+        AjaxLoadRestTicketing(url,token).then(function(response){
+            var html = '';
+            var count = response.count;
+            var data = response.data;
+            html += '<h3 class="pending-ticket">Pending Ticket <span>'+count+'</span></h3>'+
+                        '<hr/>'+
+                        '<div class="timeline-centered">';
+            if (data.length >0) {
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    html += '<article class="timeline-entry">'+
+                                ' <div class="timeline-entry-inner">'+
+                                    '<div class="timeline-icon">'+
+                                        '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                    '</div>'+
+                                    '<div class="timeline-label">'+
+                                        '<div class="ticket-division">'+row.NameDepartment+'</div>'+
+                                        '<h2><a href="#">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
+                                        '<p>'+nl2br(row.Message)+'</p>'+
+                                        pfiles+
+                                    '</div>'+
+                            '</article>';
+                }
+            }
+            else
+            {
+                html += '<label>No data found in server</label>';
+            }
+
+            html += '</div>';
+            $('#PanelPendingTicket').html(html);
         }).fail(function(response){
            toastr.error('Error open ticket');
         })
@@ -547,6 +550,8 @@ $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartment
         /*
             LoadAction
         */
+        App_ticket_ticket_today.OpenTicketRest();
+        App_ticket_ticket_today.PendingTicketRest();
     }
 })
 $(document).off('change', '.input[name="CategoryID"]').on('change', '.input[name="CategoryID"]',function(e) {
