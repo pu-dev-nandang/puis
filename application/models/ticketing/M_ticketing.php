@@ -195,6 +195,9 @@ class M_ticketing extends CI_Model {
             $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
             $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
             $query[$i]['setTicket'] = ($this->m_general->auth($query[$i]['DepartmentIDDestination'],$NIP)) ? 'write' : '';
+
+            $token = $this->jwt->encode($query[$i],"UAP)(*");
+            $query[$i]['token'] =  $token;
         }
         $rs['data'] = $query;
         return $rs;
@@ -205,7 +208,7 @@ class M_ticketing extends CI_Model {
         $rs = [];
         $Addwhere = '';
         if (array_key_exists('DepartmentID', $dataToken)) {
-           $Addwhere .= ' and ca.DepartmentID = "'.$dataToken['DepartmentID'].'" ';
+           $Addwhere .= ' and (ca.DepartmentID = "'.$dataToken['DepartmentID'].'" or a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'" )';
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
@@ -239,6 +242,8 @@ class M_ticketing extends CI_Model {
             $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
 
             $query[$i]['setTicket'] = ($this->m_general->auth($query[$i]['DepartmentIDDestination'],$NIP)) ? 'write' : '';
+            $token = $this->jwt->encode($query[$i],"UAP)(*");
+            $query[$i]['token'] =  $token;
         }
         $rs['data'] = $query;
         return $rs;

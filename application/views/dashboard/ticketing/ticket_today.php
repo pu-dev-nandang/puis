@@ -471,7 +471,7 @@ var App_ticket_ticket_today = {
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
@@ -521,7 +521,7 @@ var App_ticket_ticket_today = {
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
@@ -574,65 +574,13 @@ $(document).off('click', '#btnsave_ticket').on('click', '#btnsave_ticket',functi
     App_ticket_ticket_today.ActionCreateNewTicket(selector);
 })
 
-    $(document).on('click','.showTicket',function () {
-
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Detail Ticket</h4>');
-
-        var htmlss = '<table class="table" id="tableDetailTicket">' +
-            '    <tr>' +
-            '        <td style="width: 25%;">Title</td>' +
-            '        <td>:</td>' +
-            '        <td>Pindah ruangan</td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td>Message</td>' +
-            '        <td>:</td>' +
-            '        <td>Tolong bantu untuk pindah ruangan yaa</td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td>Requested by</td>' +
-            '        <td>:</td>' +
-            '        <td>Nandang Mulyadi</td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td>Requested on</td>' +
-            '        <td>:</td>' +
-            '        <td>Thustday 29 Januari 2019</td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td colspan="3" style="background: lightyellow;text-align: center;">Action</td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td>Assign to</td>' +
-            '        <td>:</td>' +
-            '        <td>' +
-            '            <input class="form-control" />' +
-            '        </td>' +
-            '    </tr>' +
-            '    <tr>' +
-            '        <td>Transfer to</td>' +
-            '        <td>:</td>' +
-            '        <td>' +
-            '            <input class="form-control" />' +
-            '        </td>' +
-            '    </tr>' +
-            '</table>';
-
-        $('#GlobalModal .modal-body').html(htmlss);
-
-        $('#GlobalModal .modal-footer').html('' +
-            '<button type="button" class="btn btn-success" data-dismiss="modal">Submit</button> ' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '');
-
-
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-
-    });
+$(document).off('click', '.ModalDetailTicket').on('click', '.ModalDetailTicket',function(e) {
+    var selector = $(this);
+    var setTicket = selector.attr('setticket');
+    var ID = selector.attr('data-id');
+    var token = selector.attr('token');
+    AppModalDetailTicket.ModalDetailTicket(ID,setTicket,token);
+})
 
     $(document).on('click','.showReadMoreTicket',function () {
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
