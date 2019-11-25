@@ -719,7 +719,7 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
         $datawarek1 = $this->db->get_where('db_employees.employees',
-        array('PositionMain' => '2.2','StatusEmployeeID'=>'3' ))
+        array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
         ->result_array();
 
 
@@ -6120,7 +6120,7 @@ Phone: (021) 29200456';
 
 
             // Get PHR -> 2.2
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 1))->result_array();
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
