@@ -253,4 +253,45 @@ class M_ticketing extends CI_Model {
     {
 
     }
+
+    public function getDataTicketBy($arr){
+        // array by ID or NoTicket
+
+        $strWhere = '';
+        foreach ($arr as $key => $value) {
+            $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
+            $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
+        }
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo as PhotoRequested,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.CategoryID,ca.Descriptions as CategoryDescriptions,a.ID
+                from db_ticketing.ticket as a 
+                join db_ticketing.category as ca on a.CategoryID = ca.ID
+                '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                join db_employees.employees as b on a.RequestedBy = b.NIP
+                '.$strWhere.'
+                order by a.ID desc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+           $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
+           $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
+           $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
+        }
+        return $query;
+    }
+
+    public function auth_action_tickets($NoTicket,$NIP){
+        $G_dt = $this->getDataTicketBy(['NoTicket' => $NoTicket]);
+        if (count($G_dt) == 0) {
+            return false;
+        }
+
+        $DepartmentIDDestination = $G_dt[0]['DepartmentIDDestination'];
+        if (!$this->m_general->auth($DepartmentIDDestination,$NIP)) {
+            return false;
+        }
+        return true;
+
+    }
 }

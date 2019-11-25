@@ -69,8 +69,6 @@ abstract class Globalclass extends MyAbstract{
 
     }
 
-
-
     public function template($content)
     {
 
@@ -735,4 +733,30 @@ class Cooperation_Controler extends Globalclass{
     {
         parent::template($content);
     }
+}
+
+abstract class Ticket_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('ticketing/m_general');
+    }
+
+    public function temp($content)
+    {
+        parent::template($content);
+    }
+
+    public function menu_ticket($page){
+        $data['Authen'] = $this->m_master->showData_array('db_ticketing.rest_setting');
+        $data['DepartmentID'] = $this->m_general->getDepartmentNow();
+        $data['DepartmentAbbr'] = $this->m_general->DepartmentAbbr($data['DepartmentID']);
+        $data['ArrSelectOptionDepartment'] = $this->m_general->getAuthDepartment();
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/ticketing/menu_ticketing',$data,true);
+        parent::template($content);
+    }
+
+
 }

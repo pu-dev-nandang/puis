@@ -209,63 +209,6 @@
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Detail Ticket</h4>');
 
-        var Action = '';
-        var btnSubmit = '';
-        if (setTicket == 'write') {
-           Action = '<table class="table" id="tableDetailTicketAction">'+
-                        '<tr>'+
-                          '<td colspan = "2" style="background: lightyellow;text-align: center;">Action</td>'+
-                        '</tr>'+
-                        '<tr>'+
-                          '<td>'+
-                                '<div class = "well">'+
-                                  '<div style = "text-align:center;"><h4>Assign to</h4></div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Category</label>'+
-                                    '<select class="select2-select-00 full-width-fix input_form_disposition_assign_to" name = "CategoryDispositionID"></select>'+
-                                  '</div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Message</label>'+
-                                     '<textarea class="form-control input_form_disposition_assign_to" rows="3" name="MessageDisposition"></textarea>' +
-                                  '</div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Due Date</label>'+
-                                        '<div class="input-group input-append date datetimepicker">'+
-                                                 '<input data-format="yyyy-MM-dd" class="form-control input_form_disposition_assign_to" type=" text" readonly="" value = "'+"<?php echo date('Y-m-d') ?>"+'" name = "DueDate">'+
-                                                 '<span class="input-group-addon add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></i></span>'+
-                                        '</div>'+
-                                  '</div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Worker</label>'+
-                                     '<select class="select2-select-00 full-width-fix input_form_disposition_assign_to" multiple size="5" name="NIP">'+
-                                     '</select>'+
-                                  '</div>'+
-                                  '<div align = "right">'+
-                                    '<button type="button" class="btn btn-success" id = "btnSubmitAssignTo">Submit</button>'+
-                                  '</div>'+  
-                                '</div>'+
-                          '</td>'+
-                          '<td>'+
-                               '<div class = "well">'+
-                                 '<div style = "text-align:center;"><h4>Transfer to</h4></div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Category</label>'+
-                                    '<select class="select2-select-00 full-width-fix input_form_disposition_assign_to" name = "CategoryDispositionID"></select>'+
-                                  '</div>'+
-                                  '<div class = "form-group">'+
-                                    '<label>Message</label>'+
-                                     '<textarea class="form-control input_form_disposition_assign_to" rows="3" name="MessageDisposition"></textarea>' +
-                                  '</div>'+
-                                  '<div align = "right">'+
-                                    '<button type="button" class="btn btn-success" id = "btnSubmitTransferTo">Submit</button>'+
-                                  '</div>'+ 
-                                '</div>'+
-                          '</td>'+
-                        '</tr>'+
-                      '</table>';    
-            btnSubmit = '<button type="button" class="btn btn-primary" id = "btnSubmitDisposition">Save</button> ';
-        }
-
         var htmlss = '<div class="row"><div class = "col-md-12"><table class="table" id="tableDetailTicket">' +
             '    <tr>' +
             '        <td style="width: 25%;">Title</td>' +
@@ -287,13 +230,11 @@
             '        <td>:</td>' +
             '        <td>'+data.RequestedAt+'</td>' +
             '    </tr>' +
-            '</table></div></div>'+
-            '<div class="row" id = "ContentDispositionAction"><div class = "col-md-12">'+Action+'</div></div>';
+            '</table></div></div>';
 
         $('#GlobalModal .modal-body').html(htmlss);
 
         $('#GlobalModal .modal-footer').html('' +
-           btnSubmit +
             '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
             '');
 
@@ -301,11 +242,6 @@
             'show' : true,
             'backdrop' : 'static'
         });
-
-        /*    
-            action html
-        */  
-        $('.input_form_disposition_assign_to[name="NIP"]').select2({allowClear: true});
       },
     };
 </script>

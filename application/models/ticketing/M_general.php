@@ -199,5 +199,30 @@ class M_general extends CI_Model {
         )qdj)qdj on '.$IDJoin.'=qdj.ID';
       return $sql;
     }
+
+    public function ApiTicketing($url,$dataPass){
+        $Authen = $this->m_master->showData_array('db_ticketing.rest_setting');
+        $Apikey = $Authen[0]['Apikey'];
+        $Hjwtkey = $Authen[0]['Hjwtkey'];
+        $dataPass['auth'] = 's3Cr3T-G4N';
+        $header[] = "Hjwtkey: ".$Hjwtkey."";
+        $url = $url.'?apikey='.$Apikey;
+        $token = $this->jwt->encode($dataPass,"UAP)(*");
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$token);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        return $rs;
+    }
   
 }

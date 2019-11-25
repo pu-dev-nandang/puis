@@ -464,6 +464,7 @@ var App_ticket_ticket_today = {
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/action/'+row.NoTicket : '#';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -471,10 +472,13 @@ var App_ticket_ticket_today = {
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<h2><a href="'+hrefActionTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
+                                        '<div style="text-align: center;margin-top: 10px;">'+
+                                            '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                        '</div>'+
                                     '</div>'+
                             '</article>';
                 }
@@ -514,6 +518,7 @@ var App_ticket_ticket_today = {
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/action/'+row.NoTicket : '#';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -521,10 +526,13 @@ var App_ticket_ticket_today = {
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="javascript:void(0)" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<h2><a href="'+hrefActionTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
+                                        '<div style="text-align: center;margin-top: 10px;">'+
+                                            '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                        '</div>'+
                                     '</div>'+
                             '</article>';
                 }
