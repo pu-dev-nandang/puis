@@ -24,10 +24,13 @@ class C_action extends Ticket_Controler {
         return $rs['data'];
     }
 
+
     public function set_ticket($NoTicket){
        $this->auth($NoTicket);
        $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]);
        $data['DataCategory'] = $this->getCategory();
+       $data['DataDisposition'] = $this->m_ticketing->getDispositionBy(['TicketID' => $data['DataTicket'][0]['ID'] ]);
+       $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $data['DataTicket'][0]['DepartmentIDDestination'] ]);
        $page = $this->load->view('dashboard/ticketing/set_ticket',$data,true);
        $this->menu_ticket($page);
     }

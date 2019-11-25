@@ -208,12 +208,22 @@
         var data = jwt_decode(token);
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Detail Ticket</h4>');
-
+        // console.log(data);
         var htmlss = '<div class="row"><div class = "col-md-12"><table class="table" id="tableDetailTicket">' +
+           ' <tr>'+
+              '<td style="width: 25%;">NoTicket</td>'+
+              '<td>:</td>'+
+             ' <td>'+data.NoTicket+'</td>'+
+            '</tr>'+
             '    <tr>' +
             '        <td style="width: 25%;">Title</td>' +
             '        <td>:</td>' +
             '        <td>'+data.Title+'</td>' +
+            '    </tr>' +
+            '    <tr>' +
+            '        <td style="width: 25%;">Category</td>' +
+            '        <td>:</td>' +
+            '        <td>'+data.NameDepartmentDestination+' - '+data.CategoryDescriptions+'</td>' +
             '    </tr>' +
             '    <tr>' +
             '        <td>Message</td>' +

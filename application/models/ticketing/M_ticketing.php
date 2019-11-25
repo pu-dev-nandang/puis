@@ -166,7 +166,7 @@ class M_ticketing extends CI_Model {
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -213,7 +213,7 @@ class M_ticketing extends CI_Model {
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -293,5 +293,65 @@ class M_ticketing extends CI_Model {
         }
         return true;
 
+    }
+
+    public function getDispositionBy($arr){
+        $rs = [];
+        $strWhere = '';
+        foreach ($arr as $key => $value) {
+            $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
+            $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
+        }
+
+        $sql = 'select a.ID as DispositionID,a.TicketID,b.NoTicket,a.DepartmentDispositionID,qdj.NameDepartment as NameDepartmentDispositionID,
+                a.CategoryDispositionID,c.Descriptions as DescriptionsDispositionID,qdf.NameDepartment as NameDepartmentDestination,
+                a.MessageDisposition, a.DispositionStatus,a.DispositionType,a.DispositionBy,empdis.Name as NameDispositionBy,a.DispositionAt
+                from db_ticketing.disposition as a 
+                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentDispositionID','qdj').' 
+                 left join db_ticketing.ticket as b on a.TicketID = b.ID
+                 left join db_ticketing.category as c on c.ID = a.CategoryDispositionID
+                 '.$this->m_general->QueryDepartmentJoin('c.DepartmentID','qdf').'
+                 left join db_employees.employees as  empdis  on empdis.NIP = a.DispositionBy
+                 '.$strWhere.'
+                 order by a.ID asc
+         ';
+
+         $query = $this->db->query($sql,array())->result_array();
+         for ($i=0; $i < count($query); $i++) { 
+             $DataAssignTo = $this->getDispositionDetailsBy(['DispositionID' => $query[$i]['DispositionID'] ]);
+             $query[$i]['DataAssignTo'] = $DataAssignTo;
+         }
+
+         $rs = $query;
+         return $rs;
+
+    }
+
+    public function getDispositionDetailsBy($arr){
+        $rs = [];
+        $strWhere = '';
+        foreach ($arr as $key => $value) {
+            $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
+            $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
+        }
+
+        $sql = 'select a.*,b.Name as NameDepositedBy from db_ticketing.disposition_details as a
+                join db_employees.employees as emp on emp.NIP = a.DepositedBy
+                '.$strWhere.'
+        ';
+
+        $query = $this->db->query($sql,array())->result_array();
+        for ($i=0; $i < count($query); $i++) { 
+            // get worker
+            $sql2 = 'select a.*,b.Name as NameWorker from db_ticketing.disposition_details_worker as a
+                    join db_employees.employees as emp on emp.NIP = a.NIP
+                    where Disposition_detailsID = "'.$query[$i]['ID'].'"
+             ';
+             $query2 = $this->db->query($sql2,array())->result_array();
+             $query[$i]['DataWorker'] = $query2;
+        }
+
+        $rs = $query;
+        return $rs;
     }
 }

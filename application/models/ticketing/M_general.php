@@ -166,6 +166,57 @@ class M_general extends CI_Model {
         
     }
 
+    public function getAllUserByDepartment($dataToken)
+    {
+        if (array_key_exists('DepartmentID', $dataToken)) {
+            $DepartmentID = $dataToken['DepartmentID'];
+            $Explode = explode('.', $DepartmentID);
+            $AddWhere = '';
+            switch ($Explode[0]) {
+                case 'NA':
+                    $Division = $Explode[1];
+                    $AddWhere .= ' and SPLIT_STR(a.PositionMain, ".", 1) = '.$Division;
+                    break;
+                case 'AC':
+                    $ProdiID = $Explode[1];
+                    $AddWhere .= ' and a.ProdiID = '.$ProdiID;
+                    break;
+                case 'FT':
+                    $FacultyID = $Explode[1];
+                    $StrWhere = '';
+                    $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$FacultyID);
+                    if (count($G_prodi) > 0 ) {
+                        $StrWhere = 'and a.ProdiID IN (';
+                        $StrWhere .= $G_prodi[0]['ID'];
+                        for ($i=1; $i < count($G_prodi); $i++) { 
+                            $StrWhere .= ','.$G_prodi[$i]['ID'];
+                        }
+
+                        $StrWhere .= ')';
+                        $AddWhere .= $StrWhere;
+                    }
+                    
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+
+
+            $sql = 'select CONCAT(a.Name," | ",a.NIP) as Name, a.NIP from db_employees.employees as a
+              where a.StatusEmployeeID != -1
+              '.$AddWhere.'
+              ';
+            $query=$this->db->query($sql, array())->result_array();
+            return $query;
+        }
+        else
+        {
+            return array();
+        }
+        
+    }
+
     public function getAuthDepartment(){
         $rs = [];
         $DepartmentID = $this->getDepartmentNow();
@@ -188,7 +239,7 @@ class M_general extends CI_Model {
         return $rs;
     }
 
-    public function QueryDepartmentJoin($IDJoin){
+    public function QueryDepartmentJoin($IDJoin,$aliasTable = 'qdj'){
       $sql = ' left join (
             select * from (
             select CONCAT("AC.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Code as Abbr from db_academic.program_study
@@ -196,7 +247,7 @@ class M_general extends CI_Model {
             select CONCAT("NA.",ID) as ID, Division as NameDepartment,Description as NameDepartmentIND,Abbreviation as Abbr from db_employees.division  
             UNION
             select CONCAT("FT.",ID) as ID, NameEng as NameDepartment,Name as NameDepartmentIND,Abbr from db_academic.faculty 
-        )qdj)qdj on '.$IDJoin.'=qdj.ID';
+        )'.$aliasTable.')'.$aliasTable.' on '.$IDJoin.'='.$aliasTable.'.ID';
       return $sql;
     }
 
