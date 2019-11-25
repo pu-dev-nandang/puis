@@ -2763,12 +2763,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function userKB($IDDivision = '')
     {
         $arr_result = array();
-        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
-        $sql = 'select * from db_employees.knowledge_base '.$Q_add;
+        $Q_add = ($IDDivision == '') ? '' : ' where SPLIT_STR(emp.PositionMain, ".", 1) = "'.$IDDivision.'" order by IDType asc';
+        $sql = 'select kb.*,kt.Type as TypeName from db_employees.knowledge_base as kb
+        inner join  db_employees.employees as emp on kb.EntredBy=emp.NIP
+        inner join db_employees.kb_type as kt on kb.IDType=kt.ID
+         '.$Q_add;
+
+    // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
+        //print_r($query);die();
         for ($i=0; $i < count($query); $i++) {
-            $Type1 = $query[$i]['Type'];
-            $temp = array('Type' => $Type1);
+            $Type1 = $query[$i]['IDType'];
+            $temp = array('Type' => $query[$i]['TypeName']);
             $datatemp = array();
             $datatemp[] = array(
                 'Desc' => $query[$i]['Desc'],
@@ -2776,7 +2782,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             );
 
             for ($j=$i+1; $j < count($query); $j++) {
-                $Type2 = $query[$j]['Type'];
+                $Type2 = $query[$j]['IDType'];
                 if ($Type1 == $Type2) {
                   $datatemp[] = array(
                       'Desc' => $query[$j]['Desc'],
@@ -2797,8 +2803,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         }
 
-
+//print_r($arr_result);die;
         return $arr_result;
+
     }
 
 
@@ -3455,7 +3462,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function encode_auth_access_aps_rs($input,$view,$ProdiID){
         // get value ProdiID
         $arr_Prodi = [];
-        for ($i=0; $i < count($ProdiID); $i++) { 
+        for ($i=0; $i < count($ProdiID); $i++) {
            // $ex = explode('.', $ProdiID[$i]);
            $arr_Prodi[] = $ProdiID[$i];
         }
@@ -3489,25 +3496,25 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    }
 
                    $dd = $this->m_master->caribasedprimary('db_academic.program_study','KaprodiID',$NIP);
-                   for ($i=0; $i < count($dd); $i++) { 
+                   for ($i=0; $i < count($dd); $i++) {
                         $ProdiID[] = $dd[$i]['ID'];
                    }
 
                    $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
-                   for ($i=0; $i < count($dd); $i++) { 
+                   for ($i=0; $i < count($dd); $i++) {
                         $ID = $dd[$i]['ID'];
                         $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
-                        for ($j=0; $j < count($get); $j++) { 
+                        for ($j=0; $j < count($get); $j++) {
                            $ProdiID[] = $get[$j]['ID'];
                         }
                    }
                    // print_r($ProdiID);die();
                    $input = true;
-                   
+
                 }
                 elseif ($IDDivision == 15) { // prodi
                    $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$NIP);
-                   for ($i=0; $i < count($gg); $i++) { 
+                   for ($i=0; $i < count($gg); $i++) {
                       $ProdiID[] = $gg[$i]['ID'];
                    }
 
@@ -3515,10 +3522,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
                 elseif ($IDDivision == 34) { // faculty
                     $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
-                    for ($i=0; $i < count($dd); $i++) { 
+                    for ($i=0; $i < count($dd); $i++) {
                          $ID = $dd[$i]['ID'];
                          $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
-                         for ($j=0; $j < count($get); $j++) { 
+                         for ($j=0; $j < count($get); $j++) {
                             $ProdiID[] = $get[$j]['ID'];
                          }
                     }
@@ -3542,7 +3549,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $Pos[] = $PositionOther2;
             $Pos[] = $PositionOther3;
             // print_r($Pos);die();
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $input = $Pos[$i]['input'];
                 if ($input) {
                     $rsSub['input'] = $input;
@@ -3550,7 +3557,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
 
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $view = $Pos[$i]['view'];
                 if ($view == 'all') {
                     $rsSub['view'] = $view;
@@ -3559,14 +3566,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
 
             $Gel_AllProdi = [];
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $ProdiID = $Pos[$i]['ProdiID'];
 
                 if (count($ProdiID) > 0 ) {
-                    for ($j=0; $j < count($ProdiID); $j++) { 
+                    for ($j=0; $j < count($ProdiID); $j++) {
                         $Gel_AllProdi[] = $ProdiID[$j];
                     }
-                    
+
                 }
             }
 
@@ -3614,7 +3621,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $G_dt = $this->caribasedprimary($tabledt,$field,$ID);
             if (count($G_dt) > 0) {
                 $strFind = 'Reject';
-                for ($i=0; $i < count($G_dt); $i++) { 
+                for ($i=0; $i < count($G_dt); $i++) {
                     $Desc = $G_dt[$i]['Desc'];
                     if (preg_match("/^".$strFind."/i", $Desc)) {
                         // echo "Matches!";
@@ -3629,7 +3636,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
     public function __Previleges_aps_apt_user($NIP,$URI,$Type){
-        $sql = 'select a.* from db_agregator.agregator_menu as a 
+        $sql = 'select a.* from db_agregator.agregator_menu as a
                 join db_agregator.agregator_menu_header as b on a.MHID = b.ID
                 where b.Type = "'.$Type.'" and a.URL = "'.$URI.'"
         ';
@@ -3644,9 +3651,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $Table1 = 'agregator_user_member';
             $Table2 = 'agregator_user';
         }
-        $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.'.$Table1.' aum 
+        $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.'.$Table1.' aum
                                             LEFT JOIN db_agregator.'.$Table2.' au ON (aum.AUPID = au.ID)
-                                            WHERE aum.NIP = "'.$NIP.'" 
+                                            WHERE aum.NIP = "'.$NIP.'"
                                             LIMIT 1')->result_array();
         $MyMenu = (count($checkMenu)>0) ? $checkMenu[0]['Menu'] : "[]" ;
         $MyMenu = json_decode($MyMenu);
@@ -3662,11 +3669,11 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 //     $rs['RuleAccess'] = $checkMenu[0]['Access'];
                 // }
                 $rs['RuleAccess'] = $checkMenu[0]['Access'];
-                
+
             }
 
         }
         return $rs;
     }
-  
+
 }
