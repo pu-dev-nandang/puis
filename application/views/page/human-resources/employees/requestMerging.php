@@ -23,9 +23,14 @@
 								</td>
 							</tr>
 							<tr>
-								<th>ID Card</th>
+								<th>Access Card Number</th>
 								<td><?=$detail_ori->Access_Card_Number?></td>
 							</tr>
+							<tr>
+								<th>KTP Number</th>
+								<td><?=$detail_ori->KTP?></td>
+							</tr>
+
 							<tr>
 								<th>Fullname</th>
 								<td><?=$detail_ori->Name?></td>
@@ -93,10 +98,15 @@
 			                      	<?php } ?>
 								</td>
 							</tr>
-							<tr>
-								<th>ID Card</th>
+							<tr class="<?=($detail_ori->Access_Card_Number != $detail_req->Access_Card_Number) ? 'different':''?>">
+								<th>Access Card Number</th>
 								<td><?=$detail_req->Access_Card_Number?></td>
 							</tr>
+							<tr class="<?=($detail_ori->KTP != $detail_req->KTP) ? 'different':''?>">
+								<th>KTP Number</th>
+								<td><?=$detail_req->KTP?></td>
+							</tr>
+
 							<tr class="<?=($detail_req->Name != $detail_ori->Name) ? 'different':''?>">
 								<th>Fullname</th>
 								<td><?=$detail_req->Name?></td>
@@ -212,6 +222,8 @@
 		              dataType : 'json',
 		              beforeSend:function(){
 		                itsme.prop("disabled",true);
+		                itsme.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+                		$("#form-approval-req button").prop("disabled",true);
 		              },error : function(jqXHR){
 		              	$("#modal-merge-req").modal("hide");
 		                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
@@ -225,8 +237,7 @@
 		              }
 		          });
 			    }
-			}
-			
+			}			
 		});
 	});
 </script>

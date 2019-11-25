@@ -115,8 +115,9 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
     var v = parseInt($(this).html());
     if (v > 0) {
         var dt = $(this).attr('data');
-        // console.log(dt);
+        
         dt = jwt_decode(dt);
+        // console.log(dt);
         var html =  '<div class = "row">'+
                         '<div class = "col-md-12">'+
                             '<table class = "table">'+
@@ -125,6 +126,7 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
                                         '<td>No</td>'+
                                         '<td>NPM</td>'+
                                         '<td>NAMA</td>'+
+                                        '<td>IPK</td>'+
                                     '</tr>'+
                                 '</thead>'+
                                 '<tbody>';
@@ -133,6 +135,8 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
                                 '<td>'+ (parseInt(i)+1) + '</td>'+
                                 '<td>'+ dt[i].NPM + '</td>'+
                                 '<td>'+ dt[i].Name + '</td>'+
+                                '<td>'+getCustomtoFixed(dt[i].IPK,2)+ '</td>'+
+
                             '</tr>';    
                 }
 

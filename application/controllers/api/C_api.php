@@ -98,20 +98,23 @@ class C_api extends CI_Controller {
     public function getLecturer(){
         $requestData= $_REQUEST;
 
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
 
-        /*UPDATED BY FEBRI @  NOV 2019*/
-        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        $whereDef = 'em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7"
+        OR em.PositionOther1 = "14.7" OR em.PositionOther2 = "14.7" OR em.PositionOther3 = "14.7"';
+
+        $totalData = $this->db->query('SELECT * FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+      
+      
+      $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP) /*UPDATED BY FEBRI @ NOV 2019*/
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")'; 
+                        WHERE ('.$whereDef.')'; 
         
         if($requestData['isappv'] === 'true'){
             $sql .= " AND (te.isApproval = 1) ";
         }
-
         if( !empty($requestData['search']['value']) ) {
             $sql .= ' AND ( '; //UPDATED BY FEBRI @ NOV 2019
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
@@ -121,9 +124,6 @@ class C_api extends CI_Controller {
         }else {
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
         }
-
-        
-        /*END UPDDATED BY FEBRI @  NOV 2019*/
 
         $query = $this->db->query($sql)->result_array();
 

@@ -1,4 +1,4 @@
-<style type="text/css">.different{background: #65b96891;color: #000}.error{border:1px solid red;}.message-error{color:red;}</style>
+<style type="text/css">.different{background: #65b96891;color: #000}.error{border:1px solid red;}.message-error{color:red;}.im-pp{width: 100%;height: auto}</style>
 <div class="modal fade" id="modal-merge-req" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document" style="width:100%">
     <div class="modal-content animated jackInTheBox">
@@ -10,7 +10,7 @@
       	<div class="row">
       		<div class="col-sm-6 col-md-6">
       			<div class="table-responsive">
-      				<h4>Original Data</h4>
+      				<h4>Original Datass</h4>
       				<?php if(!empty($detail_ori)){ ?>
       				<table class="table table-bordered">
       					<tbody>
@@ -19,24 +19,35 @@
       							<th width="20%">NPM</th>
       							<td><?=$detail_ori->NPM?></td>
       							<td rowspan="5" align="center">
-      								<img width="100px" height="150px" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
+      								<img class="im-pp" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
       							</td>
       						</tr>
       						<tr>
-      							<th>Name</th>
-      							<td><?=$detail_ori->Name?></td>
+                    <th>Name</th>
+                    <td><?=$detail_ori->Name?></td>
+                  </tr>
+                  
+                  <tr>
+                    <th>KTP Number</th>
+                    <td><?=$detail_auth_ori->KTPNumber?></td>
+                  </tr>
+                  
+                  <tr>
+      							<th>Access Card Number</th>
+      							<td><?=$detail_auth_ori->Access_Card_Number?></td>
       						</tr>
+
       						<tr>
       							<th>Gender</th>
       							<td><?=($detail_ori->Gender == "L") ? "Male":"Female"?></td>
       						</tr>
       						<tr>
       							<th>Place/ Birth of date</th>
-      							<td><?=$detail_ori->PlaceOfBirth.", ".date("m F Y",strtotime($detail_ori->DateOfBirth))?></td>
+      							<td colspan="2"><?=$detail_ori->PlaceOfBirth.", ".date("m F Y",strtotime($detail_ori->DateOfBirth))?></td>
       						</tr>
       						<tr>
       							<th>Phone</th>
-      							<td><?=$detail_ori->Phone?></td>
+      							<td colspan="2"><?=$detail_ori->Phone?></td>
       						</tr>
       						<tr>
       							<th>Mobile Phone</th>
@@ -94,27 +105,38 @@
       							<td><?=$detail_req->NPM?></td>
       							<td rowspan="5" align="center">
       								<?php if(!empty($detail_req->Photo)){ ?>
-      								<img width="100px" height="150px" src="<?=$detail_req->pathPhoto.'uploads/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
+      								<img class="im-pp" src="<?=$detail_req->pathPhoto.'uploads/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
       								<?php }else{ ?>
-                      <img width="100px" height="150px" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
+                      <img class="im-pp" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
                       <?php } ?>
       							</td>
       						</tr>
       						<tr class="<?=($detail_req->Name != $detail_ori->Name) ? 'different':'' ?>" >
-      							<th>Name</th>
-      							<td><?=$detail_req->Name?></td>
+                    <th>Name</th>
+                    <td><?=$detail_req->Name?></td>
+                  </tr>
+                  
+                  <tr class="<?=($detail_auth_ori->KTPNumber != $detail_req->KTPNumber) ? 'different':'' ?>" >
+                    <th>KTP Number</th>
+                    <td><?=$detail_req->KTPNumber?></td>
+                  </tr>
+                  
+                  <tr class="<?=($detail_auth_ori->Access_Card_Number != $detail_req->Access_Card_Number) ? 'different':'' ?>" >
+      							<th>Access Card Number</th>
+      							<td><?=$detail_req->Access_Card_Number?></td>
       						</tr>
+
       						<tr class="<?=($detail_req->Gender != $detail_ori->Gender) ? 'different':'' ?>">
       							<th>Gender</th>
       							<td><?=($detail_req->Gender == "L") ? "Male":"Female"?></td>
       						</tr>
       						<tr class="<?=(($detail_req->PlaceOfBirth != $detail_ori->PlaceOfBirth) || ($detail_req->DateOfBirth != $detail_ori->DateOfBirth) ) ? 'different':'' ?>">
       							<th>Place/ Birth of date</th>
-      							<td><?=$detail_req->PlaceOfBirth.", ".date("m F Y",strtotime($detail_req->DateOfBirth))?></td>
+      							<td colspan="2"><?=$detail_req->PlaceOfBirth.", ".date("m F Y",strtotime($detail_req->DateOfBirth))?></td>
       						</tr>
       						<tr class="<?=($detail_req->Phone != $detail_ori->Phone) ? 'different':'' ?>">
       							<th>Phone</th>
-      							<td><?=$detail_req->Phone?></td>
+      							<td colspan="2"><?=$detail_req->Phone?></td>
       						</tr>
       						<tr class="<?=($detail_req->HP != $detail_ori->HP) ? 'different':'' ?>">
       							<th>Mobile Phone</th>
@@ -192,53 +214,58 @@
 			var name = itsme.text();
 			var ACT = itsme.data("act");
 
-                  var NPM = itsme.data("npm");
-                  var TA = itsme.data("ta");
-                  var NOTE = $("#form-approval-req textarea[name=note]").val();
-                  var isvalid = false;
-                  if(ACT == 3){
-                        console.log("reject");
-                        if($.trim(NOTE) == ''){
-                              console.log("isi:"+$(this).val());
-                              $("#form-approval-req textarea[name=note]").addClass("error");
-                              $("#form-approval-req textarea[name=note]").parent().find(".message-error").text("Please fill this field");
-                              isvalid = false;
-                        }else{
-                              isvalid=true;
-                              $("#form-approval-req textarea[name=note]").removeClass("error");
-                              $("#form-approval-req textarea[name=note]").parent().find(".message-error").text("");
-                        }
-                  }else if(ACT == 1){
-                        isvalid = true;
-                  }     
+      var NPM = itsme.data("npm");
+      var TA = itsme.data("ta");
+      var NOTE = $("#form-approval-req textarea[name=note]").val();
+      var isvalid = false;
+      if(ACT == 3){
+            console.log("reject");
+            if($.trim(NOTE) == ''){
+                  console.log("isi:"+$(this).val());
+                  $("#form-approval-req textarea[name=note]").addClass("error");
+                  $("#form-approval-req textarea[name=note]").parent().find(".message-error").text("Please fill this field");
+                  isvalid = false;
+            }else{
+                  isvalid=true;
+                  $("#form-approval-req textarea[name=note]").removeClass("error");
+                  $("#form-approval-req textarea[name=note]").parent().find(".message-error").text("");
+            }
+      }else if(ACT == 1){
+            isvalid = true;
+      }     
 
-                  if(isvalid){
-                        if(confirm("Are you sure wants to "+name.toUpperCase()+" this data ?")){
-                              var data = {
-                                  NPM : NPM,
-                                  TA : TA,
-                                  ACT : ACT,
-                                  NOTE : NOTE
-                              };
-                              var token = jwt_encode(data,'UAP)(*');
-                              $.ajax({
-                                  type : 'POST',
-                                  url : base_url_js+"database/student/req-appv",
-                                  data: {token:token},
-                                  dataType : 'json',
-                                  beforeSend:function(){
-                                    itsme.prop("disabled",true);
-                                  },error : function(jqXHR){
-                                      alert("Error info:\n"+jqXHR.responseText);
-                                  },success : function(response){
-                                    loadStudent();
-                                    $("#form-approval-req").empty();
-                                    toastr.success(response.message,'Info!'); 
-                                    $("#modal-merge-req").modal("hide");
-                                  }
-                              });
-                        }
-                  }
+      if(isvalid){
+        if(confirm("Are you sure wants to "+name.toUpperCase()+" this data ?")){
+          var data = {
+              NPM : NPM,
+              TA : TA,
+              ACT : ACT,
+              NOTE : NOTE
+          };
+          var token = jwt_encode(data,'UAP)(*');
+          $.ajax({
+              type : 'POST',
+              url : base_url_js+"database/student/req-appv",
+              data: {token:token},
+              dataType : 'json',
+              beforeSend:function(){
+                itsme.prop("disabled",true);
+                itsme.html('<i class="fa fa-refresh fa-spin fa-fw right-margin"></i> Loading...');
+                $("#form-approval-req button").prop("disabled",true);
+              },error : function(jqXHR){
+                console.log(jqXHR);
+                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+                $("body #GlobalModal").modal("show");
+              },success : function(response){
+                loadStudent();
+                $("#form-approval-req").empty();
+                toastr.success(response.message,'Info!'); 
+                $("#modal-merge-req").modal("hide");
+              }
+          });
+        }
+      }
 			
 		});
 	});

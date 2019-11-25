@@ -44,15 +44,6 @@
 	                         'orderable': false,
 	                         'className': 'dt-body-center',
 	                      },
-	                      {
-	                         'targets': 4,
-	                         'searchable': false,
-	                         'orderable': false,
-	                         'className': 'dt-body-center',
-	                         'render': function (data, type, full, meta){
-	                         	return full[5];
-	                         }
-	                      },
 	                      <?php if (isset($action)): ?>
 	                      <?php if ($action == 'write'): ?>
 	                      	{
