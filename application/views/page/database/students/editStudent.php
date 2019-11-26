@@ -538,7 +538,7 @@
         var url = base_url_js+'api/__crudStudent';
 
         $.post(url,{token:token},function (jsonResult) {
-            // console.log(jsonResult);
+            console.log(jsonResult);
             if(jsonResult.length>0){
                 var d = jsonResult[0];
                 $('#formNPM').val(d.NPM);
@@ -621,6 +621,7 @@
 
                 if (d.Tgl_msk != '' && d.Tgl_msk != null) {
                     $('#formTglMasuk').datepicker('setDate',new Date(d.Tgl_msk));
+                    $('#formTglMasukValue').val(d.Tgl_msk);
                 }
 
 
@@ -645,9 +646,11 @@
                         }
                     });
 
+
                 if (d.GraduationDate != '' && d.GraduationDate != null) {
                     $('#formDateOfGraduation').datepicker('setDate',new Date(d.GraduationDate));
-                }
+                    $('#formDateOfGraduationValue').val(d.GraduationDate);
+                } 
 
                 $( "#formDateOfYudisium" )
                     .datepicker({
@@ -672,8 +675,9 @@
 
                 if (d.YudisiumDate != '' && d.YudisiumDate != null) {
                     $('#formDateOfYudisium').datepicker('setDate',new Date(d.YudisiumDate));
+                  
+                    $('#formDateOfYudisiumValue').val(d.YudisiumDate);
                 }
-
 
 
                 $('#viewImage').attr('data-src',base_url_js+'uploads/students/'+DB_Student+'/'+d.Photo);
