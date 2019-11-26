@@ -7,7 +7,10 @@
 <div class="row" style="margin-top: 10px;">
 	<div class="col-md-4 col-md-offset-4">
 		<div class="well">
-			<div style="text-align: center;"><h4><b>Ticket Data</b></h4></div>
+			<div style="text-align: center;">
+				<img data-src="<?php echo base_url('uploads/employees/'.$DataTicket[0]['PhotoRequested']); ?>" style="margin-top: -3px;" class="img-circle img-fitter" width="100">
+				<h4><b>Ticket Data</b></h4>
+			</div>
 			<table class="table" id="tableDetailTicket">
 				<tr>
 					<td style="width: 25%;">NoTicket</td>
@@ -73,7 +76,7 @@
 </div>
 <br/>
 <div class="pull-right">
-	<button class="btn btn-success">Save</button>
+	<button class="btn btn-success" id = "btnSetAction">Save</button>
 </div>
 
 <script type="text/javascript">
@@ -233,8 +236,15 @@
 			}
 			else
 			{
+				// get value Category
+				var arr_selected_category2 = [];
+				$('.input_transfer_to[name = "CategoryDispositionID"]').each(function(){
+					var v = $(this).find('option:selected').val();
+					arr_selected_category2.push(v);
+				})
 				for (var i = 0; i < DataCategory.length; i++) {
-					if (DataCategory[i][4] != DepartmentID) {
+					var check = App_set_ticket.excludeOptionCategory(DataCategory[i][3],arr_selected_category2);
+					if (DataCategory[i][4] != DepartmentID && check) {
 						var selected = (CategorySelected == DataCategory[i][3]) ? 'selected' : '';
 						selector.append(
 						     '<option value = "'+DataCategory[i][3]+'" '+selected+' department = "'+DataCategory[i][7]+'" >'+DataCategory[i][7]+' - '+DataCategory[i][1]+'</option>'
@@ -268,11 +278,169 @@
 				selector.append('<option value="'+data.NIP+'">'+data.Name+'</option>')
 			}
 			selector.select2({allowClear: true});
+		},
+
+		CategoryChangeEvent  : function(selector,value,type="assign_to"){
+			if (type =='assign_to') {
+				var Index = $('.input_assign_to[name="CategoryDispositionID"]').index(selector);
+				var bool = true;
+				$('.input_assign_to[name="CategoryDispositionID"]:not(":eq('+Index+')")').each(function(){
+					var v = $(this).val();
+					if (value == v) {
+						bool = false;
+						return;
+					}
+				})
+
+				if (!bool) {
+					toastr.info('Category is exist, please check your value');
+					App_set_ticket.LoadSelectOptionCategory(selector);
+				}
+			}
+			else
+			{
+				var Index = $('.input_transfer_to[name="CategoryDispositionID"]').index(selector);
+				var bool = true;
+				$('.input_transfer_to[name="CategoryDispositionID"]:not(":eq('+Index+')")').each(function(){
+					var v = $(this).val();
+					if (value == v) {
+						bool = false;
+						return;
+					}
+				})
+
+				if (!bool) {
+					toastr.info('Category is exist, please check your value');
+					App_set_ticket.LoadSelectOptionCategory(selector,'transfer_to');
+				}
+			}	
+					
+		},
+
+		SubmitSetActionCreate :function(selector){
+			var disposition = [];
+			var disposition_details = [];
+			var disposition_details_worker = [];
+			var validation = App_set_ticket.validation();
+			if (validation) {
+				$('.form-assign-to').each(function(){
+					var itsme = $(this);
+					var action = (itsme.attr('data-id') == null || itsme.attr('data-id') == undefined ) ? 'create' :  'edit';
+					var CategoryDispositionID =  itsme.find('.input_assign_to[name="CategoryDispositionID"] option:selected').val();
+					var MessageDisposition =  itsme.find('.input_assign_to[name="MessageDisposition"]').val();
+					var DueDate =  itsme.find('.input_assign_to[name="DueDate"]').val();
+					var NIP =  itsme.find('.input_assign_to[name="NIP"]').val();
+					var tempdisposition = {
+						TicketID : DataTicket[0].ID,
+						DepartmentDispositionID : DepartmentID,
+						CategoryDispositionID : CategoryDispositionID,
+						MessageDisposition : MessageDisposition,
+						DispositionStatus : "0",
+						DispositionType : "1",
+						DispositionBy : sessionNIP,
+					};
+
+					disposition.push(tempdisposition);
+
+					var tempdisposition_details = {
+						DueDate : DueDate,
+						Status : 1,
+						DepositedBy : sessionNIP
+					}
+
+					disposition_details.push(tempdisposition_details);
+
+					for (var i = 0; i < NIP.length; i++) {
+						var tempdisposition_details_worker = {
+							NIP : NIP[i],
+						};
+
+						disposition_details_worker.push(tempdisposition_details_worker);
+					}
+
+				})
+				
+				
+
+				$('.form-transfer-to').each(function(){
+					var Index = $('.form-transfer-to').index(this);
+					var Index = parseInt(Index)+1;
+					var itsme = $(this);
+					var CategoryDispositionID =  itsme.find('.input_assign_to[name="CategoryDispositionID"] option:selected').val();
+					var MessageDisposition =  itsme.find('.input_assign_to[name="MessageDisposition"]').val();
+					var tempdisposition = {
+						TicketID : DataTicket[0].ID,
+						DepartmentDispositionID : DepartmentID,
+						CategoryDispositionID : CategoryDispositionID,
+						MessageDisposition : MessageDisposition,
+						DispositionStatus : "-1",
+						DispositionType : "-1",
+						DispositionBy : sessionNIP,
+					};
+				})
+			}
+			
+
+		},
+
+		validation : function(){
+			var bool = true;
+			$('.form-assign-to').each(function(){
+				var Index = $('.form-assign-to').index(this);
+				var Index = parseInt(Index)+1;
+				var itsme = $(this);
+				var CategoryDispositionID =  itsme.find('.input_assign_to[name="CategoryDispositionID"] option:selected').val();
+				var MessageDisposition =  itsme.find('.input_assign_to[name="MessageDisposition"]').val();
+				var DueDate =  itsme.find('.input_assign_to[name="DueDate"]').val();
+				var NIP =  itsme.find('.input_assign_to[name="NIP"]').val();
+				if (MessageDisposition == '' ||  MessageDisposition == undefined || NIP.length == 0 ) {
+					toastr.info('Please check input Assign To on index of '+Index);
+					bool = false;
+					return;
+				}
+			})
+
+			if (bool) {
+				$('.form-transfer-to').each(function(){
+					var Index = $('.form-transfer-to').index(this);
+					var Index = parseInt(Index)+1;
+					var itsme = $(this);
+					var CategoryDispositionID =  itsme.find('.input_assign_to[name="CategoryDispositionID"] option:selected').val();
+					var MessageDisposition =  itsme.find('.input_assign_to[name="MessageDisposition"]').val();
+					if (MessageDisposition == '' ||  MessageDisposition == undefined) {
+						toastr.info('Please check input Transfer To on index of '+Index);
+						bool = false;
+						return;
+					}
+				})
+			}
+
+			return bool;
+			
+		},
+
+		Loaded : function(){
+			this.Styleimgfitter();
+		},
+
+		Styleimgfitter : function(){
+			$('.img-fitter').imgFitter({
+			    // CSS background position
+			    backgroundPosition: 'center center',
+			    // for image loading effect
+			    fadeinDelay: 400,
+			    fadeinTime: 1200
+			});
 		},	
 	};
 
 	$(document).ready(function(){
+		App_set_ticket.Loaded();
+	})
 
+	$(document).off('click', '#btnSetAction').on('click', '#btnSetAction',function(e) {
+	   var selector = $(this);
+	   App_set_ticket.SubmitSetActionCreate(selector);
 	})
 
 	$(document).off('click', '.btn-add-assign_to').on('click', '.btn-add-assign_to',function(e) {
@@ -294,5 +462,17 @@
 	   var selector = $(this);
 	   App_transfer_to.DomContentRemove(selector);
 	})
-		
+	
+
+	$(document).off('change', '.input_assign_to[name="CategoryDispositionID"]').on('change', '.input_assign_to[name="CategoryDispositionID"]',function(e) {
+	  var selector = $(this);
+	  var value = $(this).val();
+	  App_set_ticket.CategoryChangeEvent(selector,value);
+	})	
+
+	$(document).off('change', '.input_transfer_to[name="CategoryDispositionID"]').on('change', '.input_transfer_to[name="CategoryDispositionID"]',function(e) {
+	  var selector = $(this);
+	  var value = $(this).val();
+	  App_set_ticket.CategoryChangeEvent(selector,value,'transfer_to');
+	})	
 </script>

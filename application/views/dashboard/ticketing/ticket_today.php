@@ -468,7 +468,7 @@ var App_ticket_ticket_today = {
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
-                                        '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
@@ -490,6 +490,15 @@ var App_ticket_ticket_today = {
 
             html += '</div>';
             $('#PanelOpenTicket').html(html);
+
+            $('.img-fitter').imgFitter({
+                // CSS background position
+                backgroundPosition: 'center center',
+                // for image loading effect
+                fadeinDelay: 400,
+                fadeinTime: 1200
+            });
+            
         }).fail(function(response){
            toastr.error('Error open ticket');
         })
@@ -522,7 +531,7 @@ var App_ticket_ticket_today = {
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
-                                        '<img src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
@@ -544,6 +553,16 @@ var App_ticket_ticket_today = {
 
             html += '</div>';
             $('#PanelPendingTicket').html(html);
+
+
+            $('.img-fitter').imgFitter({
+                // CSS background position
+                backgroundPosition: 'center center',
+                // for image loading effect
+                fadeinDelay: 400,
+                fadeinTime: 1200
+            });
+
         }).fail(function(response){
            toastr.error('Error open ticket');
         })
