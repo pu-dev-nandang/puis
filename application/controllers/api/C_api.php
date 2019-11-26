@@ -9085,6 +9085,61 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+
+            else if($data_arr['action']=='readStudentFromSKPI'){
+
+                $requestData= $_REQUEST;
+                $ClassOf = $data_arr['ClassOf'];
+                $StatusStudentID = $data_arr['StatusStudentID'];
+                $WhereProdiID = ($data_arr['ProdiID']!='') ? ' AND ats.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" )';
+                }
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, ps.Name AS ProdiName, ss.Description FROM db_academic.auth_students ats 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                                WHERE ats.Year = "'.$ClassOf.'" AND ats.StatusStudentID = "'.$StatusStudentID.'" '.$WhereProdiID.' '.$dataSearch.' ORDER BY ats.NPM ';
+
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++) {
+
+                    $nestedData = array();
+                    $row = $query[$i];
+
+                    $nestedData[] = '<div>'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$row['ProdiName'].'</div>';
+                    $nestedData[] = '<div>'.$row['Description'].'</div>';
+                    $nestedData[] = '<div><a href="'.base_url('').'" class="btn btn-sm btn-default btn-default-primary">Show SKPI</a></div>';
+                    $nestedData[] = '<div><button class="btn btn-sm btn-default">Clearance</button></div>';
+
+                    $data[] = $nestedData;
+                    $no++;
+
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+
+            }
         }
     }
 
@@ -9670,13 +9725,6 @@ class C_api extends CI_Controller {
                 $GraduationDate = $dataUpdtAuth['GraduationDate'];
                 if ($GraduationDate != '' && $GraduationDate != null) {
                     $GraduationYear = date('Y', strtotime($GraduationDate));
-                    $dataUpdate->StatusStudentID = 1;
-                    $dataUpdtAuth['StatusStudentID'] = 1;
-                }
-                else
-                {
-                    $dataUpdate->StatusStudentID = 3;
-                    $dataUpdtAuth['StatusStudentID'] = 3;
                 }
                 $dataUpdate->GraduationYear = $GraduationYear;
 
