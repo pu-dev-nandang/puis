@@ -984,7 +984,7 @@ class C_api2 extends CI_Controller {
                 $formInsert = (array) $data_arr['formInsert'];
 
                 $typerequest = $formInsert['typerequest'];
-                $to_event = $formInsert['to_event'];
+                $to_event = ucfirst($formInsert['to_event']);
                 $startDate = $formInsert['startDate'];
                 $endDate = $formInsert['endDate'];
                 $DescriptionVenue = $formInsert['DescriptionVenue'];
