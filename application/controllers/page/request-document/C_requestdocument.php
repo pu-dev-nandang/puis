@@ -50,19 +50,31 @@ class C_requestdocument extends Globalclass {
         // get token
         $NIP = $this->session->userdata('NIP');
 
-        $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as Division,
-                SPLIT_STR(a.PositionMain, '.', 2) as Position, a.StatusEmployeeID
+        
+        $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as DivisiMain, 
+                                SPLIT_STR(a.PositionOther1, '.', 1) as DivisiOther1,
+                                SPLIT_STR(a.PositionOther2, '.', 1) as DivisiOther2,
+                                SPLIT_STR(a.PositionOther3, '.', 1) as DivisiOther3,
+                                SPLIT_STR(a.PositionMain, '.', 2) as PosisiMain,
+                                SPLIT_STR(a.PositionOther1, '.', 2)as PosisiOther1,
+                                SPLIT_STR(a.PositionOther2, '.', 2)as PosisiOther2,
+                                SPLIT_STR(a.PositionOther3, '.', 2) as PosisiOther3
                 FROM  db_employees.employees as a
-                where SPLIT_STR(a.PositionMain, '.', 2) in (5,6,7) and a.StatusEmployeeID != -1 and a.NIP = '".$NIP."'  ";
-
-
-        $data_arr=$this->db->query($sql, array())->result_array();   
-
-        if(count($data_arr)>0){
+                WHERE a.NIP = '".$NIP."' AND a.StatusEmployeeID != -1 AND (SPLIT_STR(a.PositionMain, '.', 1) = 14 
+                                     OR SPLIT_STR(a.PositionOther1, '.', 1) = 14 
+                                     OR SPLIT_STR(a.PositionOther2, '.',1) = 14 
+                                     OR SPLIT_STR(a.PositionOther3, '.',1) = 14 
+                                     OR SPLIT_STR(a.PositionMain, '.', 2) in (5,6,7) 
+                                     OR SPLIT_STR(a.PositionOther1, '.', 2) in (5,6,7)
+                                     OR SPLIT_STR(a.PositionOther2, '.', 2) in (5,6,7)
+                                     OR SPLIT_STR(a.PositionOther3, '.', 2) in (5,6,7) )
+                                      ";
+        $query=$this->db->query($sql, array())->result_array();   
+       
+        if (count($query) > 0  ) {
 
             $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$this->session->userdata('NIP'));
             $token = $G_emp[0]['Password'];
-
 
             $dataEmployees = $this->db->select('Name,NIP,TitleAhead,TitleBehind')->get_where('db_employees.employees',array(
                 'Password' => $token
@@ -74,7 +86,6 @@ class C_requestdocument extends Globalclass {
         } 
         else {
 
-            //$data['dataEmp'] = $dataEmployees;
             $data['dataEmp'] = "0";
             $content =$this->load->view('global/form/formtugasnull',$data,true);
             $this->temp($content);
