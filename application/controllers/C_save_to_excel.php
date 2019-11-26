@@ -1804,6 +1804,14 @@ class C_save_to_excel extends CI_Controller
 
     public function export_PenjualanFormulirData()
     {
+        /*
+            Offline
+                Admission berdasarkan DateSale
+                Fin berdasarkan DateFin
+            Online
+                Admission & Fin sama ambil dari  VerificationAT dari table register_verified      
+
+        */
         $this->load->model('admission/m_admission');
         $token = $this->input->post('token');
         $key = "UAP)(*";

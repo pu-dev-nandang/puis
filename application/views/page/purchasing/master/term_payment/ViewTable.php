@@ -1,9 +1,8 @@
-<table class="table" id = "TBLCredit_type_courses">
+<table class="table" id = "TBLTerm_Payment">
 	<thead>
 		<tr>
 			<th>No</th>
-			<th>Nama Type</th>
-			<th>SKS/Menit</th>
+			<th>Term Payment</th>
 			<th>Updated_at</th>
 			<th>Updated_by</th>
 			<?php if (isset($action)): ?>
@@ -16,16 +15,16 @@
 	<tbody></tbody>
 </table>
 <script type="text/javascript">
-	var AppData_Credit_Type_Courses =  {
+	var AppData_Term_Payment =  {
 		loaded : function(){
-		    AppData_Credit_Type_Courses.LoadAjaxData();
+		    AppData_Term_Payment.LoadAjaxData();
 		},
 		LoadAjaxData : function(){
-		         var recordTable = $('#TBLCredit_type_courses').DataTable({
+		         var recordTable = $('#TBLTerm_Payment').DataTable({
 		             "processing": true,
 		             "serverSide": false,
 		             "ajax":{
-		                 url : base_url_js+"rectorat/master_data/crud_credit_type_courses", // json datasource
+		                 url : base_url_js+"purchasing/master/crud_term_payment", // json datasource
 		                 ordering : false,
 		                 type: "post",  // method  , by default get
 		                 data : function(token){
@@ -44,10 +43,19 @@
 	                         'orderable': false,
 	                         'className': 'dt-body-center',
 	                      },
+	                      // {
+	                      //    'targets': 5,
+	                      //    'searchable': false,
+	                      //    'orderable': false,
+	                      //    'className': 'dt-body-center',
+	                      //    'render': function (data, type, full, meta){
+	                      //    	return full[5];
+	                      //    }
+	                      // },
 	                      <?php if (isset($action)): ?>
 	                      <?php if ($action == 'write'): ?>
 	                      	{
-	                      	   'targets': 5,
+	                      	   'targets': 4,
 	                      	   'searchable': false,
 	                      	   'orderable': false,
 	                      	   'className': 'dt-body-center',
@@ -57,9 +65,9 @@
 	                      	           '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
 	                      	           '  </button>' +
 	                      	           '  <ul class="dropdown-menu">' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[7]+'" data = "'+full[6]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[5]+'" data = "'+full[4]+'"><i class="fa fa fa-edit"></i> Edit</a></li>' +
 	                      	           '    <li role="separator" class="divider"></li>' +
-	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+	                      	           '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[5]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
 	                      	           '  </ul>' +
 	                      	           '</div>';
 	                      	       return btnAction;
@@ -89,14 +97,14 @@
 	};
 
 	$(document).ready(function() {
-	    AppData_Credit_Type_Courses.loaded();
+	    AppData_Term_Payment.loaded();
 	})
 	<?php if (isset($action)): ?>
 	<?php if ($action == 'write'): ?>
 		$(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
 			var ID = $(this).attr('data-id');
 			var selector = $(this);
-			AppForm_Credit_Type_Courses.ActionData(selector,'delete',ID);
+			AppForm_Term_Payment.ActionData(selector,'delete',ID);
 		})
 
 		$(document).off('click', '.btnEdit').on('click', '.btnEdit',function(e) {

@@ -169,7 +169,7 @@ class C_rest3 extends CI_Controller {
                 $rs['body'] = $body;
                 echo json_encode($rs);
                 break;
-            case 'RekognisiDosenKaryaIlmiah':
+            case 'RekognisiDosenKaryaIlmiah_old':
                 $rs = ['header' => [],'body' => [] ];
                 $header = [];
                 $header[] = ['Name' => 'No','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
@@ -253,6 +253,150 @@ class C_rest3 extends CI_Controller {
                                 break;
                         }
                     }
+
+                    $body[] = $temp;
+                }
+
+                $rs['header'] = $header;
+                $rs['body'] = $body;
+                echo json_encode($rs);    
+                break;
+            case 'RekognisiDosenKaryaIlmiah':
+                $rs = ['header' => [],'body' => [] ];
+                $header = [];
+                $header[] = ['Name' => 'No','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Nama Dosen','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Rekognisi dan Bukti Pendukung','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Tingkat','rowspan' => 1,'Sub' => ['Wilayah','Nasional','Internasional'],'colspan' => 3 ];
+                $header[] = ['Name' => 'Tahun Rekognisi (YYYY)','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Judul Artikel yang Disitasi (Jurnal, Volume, Tahun, Nomor, Halaman)','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+                $header[] = ['Name' => 'Jumlah Sitasi','rowspan' => 2,'Sub' => [],'colspan' => 1 ];
+
+                $body = [];
+                $ProdiID = $dataToken['ProdiID'];
+                $filterTahun = $dataToken['filterTahun'];
+                $sql = 'select * from (
+                        select a.NIP,b.Name,a.EntredAt from db_agregator.rekognisi_dosen as a
+                                join db_employees.employees as b on a.NIP = b.NIP
+                                where b.ProdiID = ? and a.Tahun = ?
+                        UNION
+                        select sk.NIP_penulis,b.Name,sk.EntredAt from db_agregator.sitasi_karya as sk
+                        join db_employees.employees as b on sk.NIP_penulis = b.NIP
+                        where b.ProdiID = ? and sk.Tahun = ?
+                        ) xx
+                        GROUP BY NIP
+                        order by EntredAt desc limit 1000
+                        ';
+                $query=$this->db->query($sql, array($ProdiID,$filterTahun,$ProdiID,$filterTahun))->result_array();
+                for ($i=0; $i < count($query); $i++) { 
+                  $temp = [];
+                    // check rowspan
+                    $sql_rekognisi = 'select * from db_agregator.rekognisi_dosen
+                                      where NIP = "'.$query[$i]['NIP'].'" and Tahun = '.$filterTahun.'
+                                    ';
+                    $queryRekognisi = $this->db->query($sql_rekognisi,array())->result_array();
+                    $rowspan = (count($queryRekognisi) == 0) ? 1 : count($queryRekognisi);
+                    $temp = [ 
+                      [
+                      'rowspan' => $rowspan,
+                      'value' => $i+1,
+                      ],
+                      [
+                      'rowspan' => $rowspan,
+                      'value' => $query[$i]['Name'],
+                      ],
+                    ];
+
+                    // Rekognisi , BuktiPendukungName , BuktiPendukungUpload
+                      $arr_rekog = [];
+                      for ($j=0; $j < count($queryRekognisi); $j++) { 
+                        $Rekognisi = $queryRekognisi[$j]['Rekognisi'];
+                        $BuktiName = $queryRekognisi[$j]['BuktiPendukungName'];
+                        $BuktiPendukungUpload = $queryRekognisi[$j]['BuktiPendukungUpload'];
+                        $arr_file = (array) json_decode($BuktiPendukungUpload,true);
+                        $wr = $Rekognisi;
+                        if ($BuktiName != '' && count($arr_file) > 0 ) {
+                            $wr .= '<br/>'.$BuktiName.'<br/>'.'<a href="'.base_url().'fileGetAny/Agregator-Aps-'.$arr_file[0].'" target="_blank" class="Fileexist">Attachment</a>';
+                        }
+
+                        $arr_rekog[] = $wr;
+                      }
+
+                    $temp[] = $arr_rekog;
+
+                    // Wilayah
+                    $arr_rekog = [];
+                    for ($j=0; $j < count($queryRekognisi); $j++) {
+                      $wr = ''; 
+                      if ('Wilayah' == $queryRekognisi[$j]['Tingkat']) {
+                          $wr = 'V'; 
+                      }
+                      $arr_rekog[] = $wr;
+                    }
+
+                    $temp[] = $arr_rekog;  
+                    
+                    // Nasional
+                    $arr_rekog = [];
+                    for ($j=0; $j < count($queryRekognisi); $j++) {
+                      $wr = ''; 
+                      if ('Nasional' == $queryRekognisi[$j]['Tingkat']) {
+                          $wr = 'V'; 
+                      }
+                      $arr_rekog[] = $wr;
+                    }
+
+                    $temp[] = $arr_rekog;
+
+                    // Internasional
+                    $arr_rekog = [];
+                    for ($j=0; $j < count($queryRekognisi); $j++) {
+                      $wr = ''; 
+                      if ('Internasional' == $queryRekognisi[$j]['Tingkat']) {
+                          $wr = 'V'; 
+                      }
+                      $arr_rekog[] = $wr;
+                    }
+
+                    $temp[] = $arr_rekog;
+
+                    $temp[] = [
+                      'rowspan' => $rowspan,
+                      'value' => $filterTahun,
+                    ];
+
+                    $sql_dt_artikel = 'select * from db_agregator.sitasi_karya where NIP_penulis = "'.$query[$i]['NIP'].'" and Tahun = '.$filterTahun.' ';
+                    $G_dt_artikel = $this->db->query($sql_dt_artikel,array())->result_array();
+
+                    // Judul Artikel
+                    $wr = '';
+                    if (count($G_dt_artikel) > 0) {
+                      $wr = '<ul style = "margin-left:-20px;">';
+                      for ($l=0; $l < count($G_dt_artikel); $l++) { 
+                         $wr .= '<li>'.$G_dt_artikel[$l]['Judul_artikel'].'</li>';
+                      }
+                      $wr .= '</ul>';
+                    }
+
+                    $temp[] = [
+                      'rowspan' => $rowspan,
+                      'value' => $wr,
+                    ];
+
+                    // Jumlah sitasi
+                    $wr = '';
+                    if (count($G_dt_artikel) > 0) {
+                      $wr = '<ul style = "margin-left:-20px;">';
+                      for ($l=0; $l < count($G_dt_artikel); $l++) { 
+                         $wr .= '<li>'.$G_dt_artikel[$l]['Banyak_artikel'].'</li>';
+                      }
+                      $wr .= '</ul>';
+                    }
+                    
+                    $temp[] = [
+                      'rowspan' => $rowspan,
+                      'value' => $wr,
+                    ];
 
                     $body[] = $temp;
                 }
@@ -2148,9 +2292,9 @@ class C_rest3 extends CI_Controller {
                 // get lulusan
                 $sql = 'select NPM,Name,Year from db_academic.auth_students where GraduationYear = '.$arr_year[$i].' AND ProdiID = '.$ProdiID;
                 $query=$this->db->query($sql, array())->result_array();
-                $token = $this->jwt->encode($query,"UAP)(*");
+                // $token = $this->jwt->encode($query,"UAP)(*");
 
-                $temp[] = ['Count'=> count($query),'token' => $token ];
+                
 
                 $temp2 = [];
                 for ($k=0; $k < count($query); $k++) { 
@@ -2169,9 +2313,11 @@ class C_rest3 extends CI_Controller {
                     }
 
                     $IPK = ($Credit == 0) ? 0 : $GradeValueCredit / $Credit;
+                    $query[$k]['IPK']=$IPK;
                     $temp2[] = $IPK;
                 }
-
+                $token = $this->jwt->encode($query,"UAP)(*");
+                $temp[] = ['Count'=> count($query),'token' => $token ];
                 if (count($temp2) > 0) {
                     $temp[] = min($temp2);
                     $temp[] = array_sum($temp2)/count($temp2);

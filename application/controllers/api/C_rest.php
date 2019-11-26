@@ -3046,6 +3046,7 @@ class C_rest extends CI_Controller {
                 $Departement = $Input['Departement'];
                 $Detail = $Input['Detail'];
                 $user = $Input['user'];
+                $Satuan = $Input['Satuan'];
                 $Detail = json_encode($Detail);
                 
                 if (array_key_exists('ID_category_catalog', $Input)) {
@@ -3082,6 +3083,7 @@ class C_rest extends CI_Controller {
                                    'Photo' => $uploadFile,
                                    'Departement' => $Departement,
                                    'DetailCatalog' => $Detail,
+                                   'Satuan'=>$Satuan,
                                    'CreatedBy' => $user,
                                    'CreatedAt' => date('Y-m-d'),
                                    'Approval' => ($chk) ? 1 : 0,
@@ -3131,6 +3133,7 @@ class C_rest extends CI_Controller {
                                 'Photo' => '',
                                 'Departement' => $Departement,
                                 'DetailCatalog' => $Detail,
+                                'Satuan'=>$Satuan,
                                 'CreatedBy' => $user,
                                'CreatedAt' => date('Y-m-d'),
                                'Approval' => ($chk) ? 1 : 0,
@@ -3191,6 +3194,7 @@ class C_rest extends CI_Controller {
                                        'Photo' => $uploadFile,
                                        'Departement' => $Departement,
                                        'DetailCatalog' => $Detail,
+                                       'Satuan'=>$Satuan,
                                        // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                        'Approval' => ($chk) ? 1 : 0,
                                        'LastUpdateBy' => $user,
@@ -3240,6 +3244,7 @@ class C_rest extends CI_Controller {
                                     'ID_category_catalog' => $ID_category_catalog,
                                     'Departement' => $Departement,
                                     'DetailCatalog' => $Detail,
+                                    'Satuan'=>$Satuan,
                                     // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                     'Approval' => ($chk) ? 1 : 0,
                                     'LastUpdateBy' => $user,

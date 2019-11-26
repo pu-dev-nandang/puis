@@ -393,9 +393,9 @@
         </div>
     </div>
 </div>
-<?php 
+<?php
     // echo date('Y', strtotime('2017-09-10'));
-    
+
  ?>
 <script>
     var Arr_nationality = <?php echo $Arr_nationality; ?>;
@@ -412,7 +412,7 @@
             selector.append(
                 '<option value = "'+Arr_nationality[i].ctr_code+'" '+selected+' >'+Arr_nationality[i].ctr_name+'</option>'
                 );
-        } 
+        }
     }
 
     $(document).off('click', '.setGraduationDateToNull').on('click', '.setGraduationDateToNull',function(e) {
@@ -441,7 +441,7 @@
             && formName!='' && formName!=null
             && formEmailPU!='' && formEmailPU!=null){
 
-            formName = ucwords(formName);
+            formName =(formName);
 
             loading_buttonSm('#btnSaveBiodata');
             $('.formBiodata').prop('disabled',true);
@@ -675,9 +675,9 @@
 
                 if (d.YudisiumDate != '' && d.YudisiumDate != null) {
                     $('#formDateOfYudisium').datepicker('setDate',new Date(d.YudisiumDate));
+                  
                     $('#formDateOfYudisiumValue').val(d.YudisiumDate);
                 }
-                
 
 
                 $('#viewImage').attr('data-src',base_url_js+'uploads/students/'+DB_Student+'/'+d.Photo);
