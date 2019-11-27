@@ -273,7 +273,58 @@ class M_ticketing extends CI_Model {
 
     public function rest_progress_ticket($dataToken)
     {
+        $rs = [];
+        $Addwhere = '';
+        if (array_key_exists('DepartmentID', $dataToken)) {
+           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                or a.ID in (
+                                    select a.TicketID from db_ticketing.received as a
+                                    join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                                    '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
+                                    where SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'"  
+                                )   
+            )';
+        }
+        $NIP = $dataToken['NIP'];
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo,a.ID,ca.Descriptions as CategoryDescriptions
+                from db_ticketing.ticket as a 
+                join db_ticketing.category as ca on a.CategoryID = ca.ID
+                join db_employees.employees as b on a.RequestedBy = b.NIP
+                where TicketStatus = 2
+                '.$Addwhere.'
+                order by a.ID desc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        $rs['count'] = count($query);
+        for ($i=0; $i < $rs['count']; $i++) {
+            $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'],'SetAction' => 1 ]);
 
+            $query[$i]['data_received'] = $data_received;
+
+            if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+                $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                $url = url_files."fileGetAnyToken/".$token;
+                $query[$i]['Files'] = $url;
+            }
+
+            // add foto
+            if ($query[$i]['Photo'] != '' && $query[$i]['Photo'] != null) {
+                $url = url_pas."uploads/employees/".$query[$i]['Photo'];
+                $query[$i]['Photo'] = $url;
+            }
+
+            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
+            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
+            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
+
+            // $query[$i]['setTicket'] = ($this->m_general->auth($query[$i]['DepartmentIDDestinationFirst'],$NIP)) ? 'write' : '';
+            $token = $this->jwt->encode($query[$i],"UAP)(*");
+            $query[$i]['token'] =  $token;
+        }
+        $rs['data'] = $query;
+        return $rs;
     }
 
     public function getDataTicketBy($arr){
@@ -370,9 +421,114 @@ class M_ticketing extends CI_Model {
             $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
         }
 
-        $sql = 'select a.*,b.Descriptions as CategoryDescriptions,b.DepartmentID as DepartmentIDDestination,qdj.NameDepartment as NameDepartmentDestination
-                from db_ticketing.received as a join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+        $sql = 'select a.*,b.Descriptions as CategoryDescriptions,b.DepartmentID as DepartmentIDDestination,qdj.NameDepartment as NameDepartmentDestination,
+                emp.Name as NameReceivedBy
+                from db_ticketing.received as a left join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                left join db_employees.employees as emp on a.ReceivedBy = emp.NIP
                 '.$this->m_general->QueryDepartmentJoin('b.DepartmentID').'
+                '.$strWhere.'
+        ';
+
+        $query = $this->db->query($sql,array())->result_array();
+        return $query;
+    }
+
+    public function TableReceivedAction($data_arr){
+        if (array_key_exists('action', $data_arr)) {
+            $action = $data_arr['action'];
+            switch ($action) {
+                case 'insert':
+                    $dataSave = $data_arr['data'];
+                    $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
+                    $this->db->insert('db_ticketing.received',$dataSave);
+                    break;
+                case 'update':
+                    $dataSave = $data_arr['data'];
+                    $ID = $data_arr['ID'];
+                    $this->db->where('ID',$ID);
+                    $this->db->update('db_ticketing.received',$dataSave);
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+        
+    }
+
+    public function TableReceived_DetailsAction($data_arr){
+        if (array_key_exists('action', $data_arr)) {
+            $action = $data_arr['action'];
+            switch ($action) {
+                case 'insert':
+                    $data = $data_arr['data'];
+                    if (array_key_exists(0, $data)) {
+                        for ($i=0; $i <count($data) ; $i++) { 
+                            $dataSave = $data[$i];
+                            $dataSave['At'] = date('Y-m-d H:i:s');
+                            $this->db->insert('db_ticketing.received_details',$dataSave);
+                        }
+                    }
+                    else
+                    {
+                        $dataSave = $data;
+                        $dataSave['At'] = date('Y-m-d H:i:s');
+                        $this->db->insert('db_ticketing.received_details',$dataSave);
+                    }
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
+        }
+    }
+
+    public function ProcessTransferTo($data_arr){
+        if (count($data_arr) > 0) {
+            for ($i=0; $i < count($data_arr); $i++) { 
+               $data_arr_index =$data_arr[$i];
+               $action = $data_arr_index['action'];
+               $this->TableReceivedAction($data_arr_index);
+            }
+        }
+    }
+
+    public function process_ticket($data_arr){
+        $action = $data_arr['action'];
+        switch ($action) {
+            case 'update':
+                $ID = $data_arr['ID'];
+                $dataSave = $data_arr['data'];
+                $this->db->where('ID',$ID);
+                $this->db->update('db_ticketing.ticket',$dataSave);
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function getDataReceived_worker($arr){
+         $data_received = $this->getDataReceived($arr);
+         for ($i=0; $i < count($data_received); $i++) { 
+              $DataReceived_Details = $this->getDataReceived_DetailsBy(['ReceivedID' => $data_received[$i]['ID'] ]);
+              $data_received[$i]['DataReceived_Details'] = $DataReceived_Details;
+         }
+
+         return $data_received; 
+    }
+
+    public function getDataReceived_DetailsBy($arr){
+        $strWhere = '';
+        foreach ($arr as $key => $value) {
+            $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
+            $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
+        }
+
+        $sql = 'select a.*,b.Name as NameWorker from db_ticketing.received_details as a
+                join db_employees.employees as b on a.NIP = b.NIP
                 '.$strWhere.'
         ';
 

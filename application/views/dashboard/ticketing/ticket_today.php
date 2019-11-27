@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-md-3 panel-ticket" id="PanelOpenTicket">
                 </div>
-                <div class="col-md-3 panel-ticket">
+                <div class="col-md-3 panel-ticket" id = "PanelProgressTicket">
                     <h3 class="progres-ticket">Progres Ticket <span>7</span></h3>
                     <hr/>
                     <div class="timeline-centered">
@@ -244,6 +244,7 @@ var App_ticket_ticket_today = {
     Loaded : function(){
         loading_page('#PanelOpenTicket');
         loading_page('#PanelPendingTicket');
+        loading_page('#PanelProgressTicket');
         var selectorDepartment = $('#SelectDepartmentID');
         LoadSelectOptionDepartmentFiltered(selectorDepartment);
         var firstLoad = setInterval(function () {
@@ -254,6 +255,7 @@ var App_ticket_ticket_today = {
                 */
                 App_ticket_ticket_today.OpenTicketRest();
                 App_ticket_ticket_today.PendingTicketRest();
+                App_ticket_ticket_today.ProgressTicketRest();
                 clearInterval(firstLoad);
             }
         },1000);
@@ -570,6 +572,89 @@ var App_ticket_ticket_today = {
         }).fail(function(response){
            toastr.error('Error open ticket');
         })
+    },
+
+    ProgressTicketRest : function(){
+        if (!$('#PanelProgressTicket').find('.flipInX').length) {
+            loading_page('#PanelProgressTicket');
+        }
+
+        var url = base_url_js+"rest_ticketing/__ticketing_dashboard";
+        var dataform = {
+            action : 'progress_ticket',
+            auth : 's3Cr3T-G4N',
+            DepartmentID : DepartmentID,
+            NIP : sessionNIP,
+        }
+        var token = jwt_encode(dataform,'UAP)(*');
+        
+        AjaxLoadRestTicketing(url,token).then(function(response){
+            var html = '';
+            var count = response.count;
+            var data = response.data;
+            html += '<h3 class="pending-ticket">Progres Ticket <span>'+count+'</span></h3>'+
+                        '<hr/>'+
+                        '<div class="timeline-centered">';
+            if (data.length >0) {
+                var EncodeDepartment = jwt_encode(DepartmentID,'UAP)(*');
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_progress/'+row.NoTicket+'/'+EncodeDepartment : '#';
+                    var department_handle = '';
+                    var data_received = row.data_received;
+                    for (var j = 0; j < data_received.length; j++) {
+                        if (data_received[j].SetAction == "1") {
+                            if (department_handle == '') {
+                                department_handle += data_received[j].NameDepartmentDestination;
+                            }
+                            else
+                            {
+                                department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                            }
+                        }
+                    }
+                    html += '<article class="timeline-entry">'+
+                                ' <div class="timeline-entry-inner">'+
+                                    '<div class="timeline-icon">'+
+                                        '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                    '</div>'+
+                                    '<div class="timeline-label">'+
+                                       '<div class="ticket-division">'+department_handle+'</div>'+
+                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                       '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
+                                       '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
+                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       pfiles+
+                                       '<div style="text-align: center;margin-top: 10px;">'+
+                                           '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                       '</div>'+
+                                   '</div>'+
+                            '</article>';
+                }
+            }
+            else
+            {
+                html += '<label>No data found in server</label>';
+            }
+
+            html += '</div>';
+            $('#PanelProgressTicket').html(html);
+
+
+            $('.img-fitter').imgFitter({
+                // CSS background position
+                backgroundPosition: 'center center',
+                // for image loading effect
+                fadeinDelay: 400,
+                fadeinTime: 1200
+            });
+
+        }).fail(function(response){
+           toastr.error('Error open ticket');
+        })
+
+
     },
 
 };

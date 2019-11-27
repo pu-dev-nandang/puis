@@ -173,7 +173,22 @@ class C_rest_ticketing extends CI_Controller {
 
             echo json_encode($rs);
             break;
-          
+          case 'received':
+            $rs = [];
+            try {
+              $dataToken = json_decode(json_encode($dataToken),true);
+              $data = $dataToken['data'];
+              $TableReceived = $this->m_ticketing->TableReceivedAction($data['received']);
+              $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details']);
+              $ProcessTransferTo = $this->m_ticketing->ProcessTransferTo($data['transfer_to']);
+              $update_ticket = $this->m_ticketing->process_ticket($data['update_ticket']);
+              $rs = ['status' => 1,'msg' => ''];
+            } catch (Exception $e) {
+              $rs = ['status' => 0,'msg' => $e];
+            }
+            
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;
@@ -196,6 +211,10 @@ class C_rest_ticketing extends CI_Controller {
             break;
           case 'pending_ticket':
             $rs = $this->m_ticketing->rest_pending_ticket($dataToken);
+            echo json_encode($rs);
+            break;
+          case 'progress_ticket':
+            $rs = $this->m_ticketing->rest_progress_ticket($dataToken);
             echo json_encode($rs);
             break;
           default:

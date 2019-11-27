@@ -4,6 +4,7 @@
 	    margin-left: 0px;
 	}
 </style>
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 10px;">
 	<div class="col-md-4 col-md-offset-4">
 		<div class="well">
@@ -314,9 +315,15 @@
 			var received = [];
 			var received_details = [];
 			var transfer_to = [];
-			var update_ticket = {
-				TicketStatus : 2,
+			var postupdate_ticket = {
+				ID : DataTicket[0].ID,
+				action : 'update',
+				data : {
+						TicketStatus : 2,
+						},
 			};
+
+			var update_ticket = postupdate_ticket;
 			var validation = App_set_ticket.validation();
 			if (validation) {
 				$('.form-assign-to').each(function(){
@@ -345,7 +352,7 @@
 						var tempreceived_details = {
 							ReceivedID : DataReceived[0].ID,
 							DueDate : DueDate,
-							Status : 1,
+							Status : '1',
 							NIP : NIP[i],
 						}
 						tempreceived_details_arr.push(tempreceived_details);
