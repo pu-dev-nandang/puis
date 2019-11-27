@@ -31,6 +31,8 @@ class M_ticketing extends CI_Model {
             $dataSave['UpdatedBy'] = $dataSave['RequestedBy'];
             $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
             $this->db->insert('db_ticketing.ticket',$dataSave);
+            $insert_id = $this->db->insert_id();
+            $this->__after_create_ticketing($insert_id,$dataSave);
             // get name employees
             $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$dataSave['RequestedBy']);
             $dataSave['NameRequested'] = $G_emp[0]['Name'];
@@ -40,6 +42,24 @@ class M_ticketing extends CI_Model {
             $rs['msg'] = $e;
         }
         return $rs;
+    }
+
+    private function __after_create_ticketing($TicketID,$dataSaveTicket){
+        $G_category = $this->m_master->caribasedprimary('db_ticketing.category','ID',$dataSaveTicket['CategoryID']);
+        $DepartmentReceivedID = $G_category[0]['DepartmentID'];
+        $MessageReceived = $dataSaveTicket['Message'];
+        $Flag = '0';
+        $ReceivedStatus = '0';
+        $dataSave = [
+           'DepartmentReceivedID' => $G_category[0]['DepartmentID'],
+           'MessageReceived' => $dataSaveTicket['Message'],
+           'CategoryReceivedID' => $dataSaveTicket['CategoryID'],
+           'Flag' => '0',
+           'ReceivedStatus' => '0',
+           'TicketID' => $TicketID,
+        ];
+
+        $this->db->insert('db_ticketing.received',$dataSave);
     }
 
     private function Ticketing_uploadNas($filename)
@@ -163,6 +183,7 @@ class M_ticketing extends CI_Model {
         if (array_key_exists('DepartmentID', $dataToken)) {
            $Addwhere .= ' and (ca.DepartmentID = "'.$dataToken['DepartmentID'].'" or a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'" )';
         }
+
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
@@ -172,10 +193,10 @@ class M_ticketing extends CI_Model {
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") = CURDATE()
-                '.$Addwhere.'
+                '.$Addwhere.' 
+                and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                 order by a.ID desc
                 ';
-
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
         for ($i=0; $i < $rs['count']; $i++) { 
@@ -220,6 +241,7 @@ class M_ticketing extends CI_Model {
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") < CURDATE()
                 '.$Addwhere.'
+                and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                 order by a.ID desc
                 ';
         $query = $this->db->query($sql,array())->result_array();
@@ -281,77 +303,81 @@ class M_ticketing extends CI_Model {
         return $query;
     }
 
-    public function auth_action_tickets($NoTicket,$NIP){
+    public function auth_action_tickets($NoTicket,$NIP,$DepartmentID,$first){
+        $rs = ['bool'=>false,'callback' => [] ];
         $G_dt = $this->getDataTicketBy(['NoTicket' => $NoTicket]);
-        if (count($G_dt) == 0) {
-            return false;
+        if (count($G_dt) > 0) {
+            $DepartmentIDDestination = $this->__get_department_auth_action($G_dt[0]['ID'],$DepartmentID,$first);
+            if (array_key_exists('Status', $DepartmentIDDestination)) {
+                if ($this->m_general->auth($DepartmentID,$NIP)) {
+                    $rs['bool'] = true;
+                    $rs['callback'] = $DepartmentIDDestination;
+                }
+            }
+           
         }
-
-        $DepartmentIDDestination = $G_dt[0]['DepartmentIDDestination'];
-        if (!$this->m_general->auth($DepartmentIDDestination,$NIP)) {
-            return false;
-        }
-        return true;
-
+        return $rs;
     }
 
-    public function getDispositionBy($arr){
+    private function __get_department_auth_action($TicketID,$DepartmentID,$first){
         $rs = [];
+        $sql = 'select rcv.*,ca.DepartmentID from db_ticketing.received as rcv
+                join db_ticketing.category as ca on rcv.CategoryReceivedID = ca.ID
+                where rcv.TicketID = '.$TicketID.'
+                order by rcv.ID asc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        if ($first =='yes') {
+           if (count($query) == 1) {
+              for ($i=0; $i < count($query); $i++) {
+                  if ($DepartmentID == $query[$i]['DepartmentID']) {
+                      $temp = [
+                          'Status' => ($query[$i]['ReceivedStatus'] == 1) ? 'closed' : 'open',
+                          'DepartmentID' => $query[$i]['DepartmentID'],
+                          'SetAction' => ($query[$i]['SetAction'] == 0) ? 'View' : 'Action',
+                      ];
+
+                      $rs = $temp;
+                      break;
+                  }
+              }
+           }
+        }
+        else
+        {
+            for ($i=0; $i < count($query); $i++) {
+                if ($DepartmentID == $query[$i]['DepartmentID']) {
+                    $temp = [
+                        'Status' => ($query[$i]['ReceivedStatus'] == 1) ? 'closed' : 'open',
+                        'DepartmentID' => $query[$i]['DepartmentID'],
+                        'SetAction' => ($query[$i]['SetAction'] == 0) ? 'View' : 'Action',
+                    ];
+
+                    $rs = $temp;
+                    break;
+                }
+            }
+        }
+
+        return $rs;
+    }
+
+    public function getDataReceived($arr)
+    {
         $strWhere = '';
         foreach ($arr as $key => $value) {
             $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
             $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
         }
 
-        $sql = 'select a.ID as DispositionID,a.TicketID,b.NoTicket,a.DepartmentDispositionID,qdj.NameDepartment as NameDepartmentDispositionID,
-                a.CategoryDispositionID,c.Descriptions as DescriptionsDispositionID,qdf.NameDepartment as NameDepartmentDestination,
-                a.MessageDisposition, a.DispositionStatus,a.DispositionType,a.DispositionBy,empdis.Name as NameDispositionBy,a.DispositionAt
-                from db_ticketing.disposition as a 
-                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentDispositionID','qdj').' 
-                 left join db_ticketing.ticket as b on a.TicketID = b.ID
-                 left join db_ticketing.category as c on c.ID = a.CategoryDispositionID
-                 '.$this->m_general->QueryDepartmentJoin('c.DepartmentID','qdf').'
-                 left join db_employees.employees as  empdis  on empdis.NIP = a.DispositionBy
-                 '.$strWhere.'
-                 order by a.ID asc
-         ';
-
-         $query = $this->db->query($sql,array())->result_array();
-         for ($i=0; $i < count($query); $i++) { 
-             $DataAssignTo = $this->getDispositionDetailsBy(['DispositionID' => $query[$i]['DispositionID'] ]);
-             $query[$i]['DataAssignTo'] = $DataAssignTo;
-         }
-
-         $rs = $query;
-         return $rs;
-
-    }
-
-    public function getDispositionDetailsBy($arr){
-        $rs = [];
-        $strWhere = '';
-        foreach ($arr as $key => $value) {
-            $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
-            $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
-        }
-
-        $sql = 'select a.*,b.Name as NameDepositedBy from db_ticketing.disposition_details as a
-                join db_employees.employees as emp on emp.NIP = a.DepositedBy
+        $sql = 'select a.*,b.Descriptions as CategoryDescriptions,b.DepartmentID as DepartmentIDDestination,qdj.NameDepartment as NameDepartmentDestination
+                from db_ticketing.received as a join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                '.$this->m_general->QueryDepartmentJoin('b.DepartmentID').'
                 '.$strWhere.'
         ';
 
         $query = $this->db->query($sql,array())->result_array();
-        for ($i=0; $i < count($query); $i++) { 
-            // get worker
-            $sql2 = 'select a.*,b.Name as NameWorker from db_ticketing.disposition_details_worker as a
-                    join db_employees.employees as emp on emp.NIP = a.NIP
-                    where Disposition_detailsID = "'.$query[$i]['ID'].'"
-             ';
-             $query2 = $this->db->query($sql2,array())->result_array();
-             $query[$i]['DataWorker'] = $query2;
-        }
-
-        $rs = $query;
-        return $rs;
+        return $query;
     }
+
 }

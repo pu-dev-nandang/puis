@@ -461,10 +461,11 @@ var App_ticket_ticket_today = {
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
+                var EncodeDepartment = jwt_encode(DepartmentID,'UAP)(*');
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
-                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/action/'+row.NoTicket : '#';
+                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -472,7 +473,8 @@ var App_ticket_ticket_today = {
                                     '</div>'+
                                     '<div class="timeline-label">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="'+hrefActionTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
+                                        '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
@@ -524,25 +526,27 @@ var App_ticket_ticket_today = {
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
+                var EncodeDepartment = jwt_encode(DepartmentID,'UAP)(*');
                 for (var i = 0; i < data.length; i++) {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
-                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/action/'+row.NoTicket : '#';
+                    var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
                                     '</div>'+
                                     '<div class="timeline-label">'+
-                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<h2><a href="'+hrefActionTicket+'">'+row.NoTicket+'</a> <span>'+row.Title+'</span></h2>'+
-                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
-                                        '<p>'+nl2br(row.Message)+'</p>'+
-                                        pfiles+
-                                        '<div style="text-align: center;margin-top: 10px;">'+
-                                            '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
-                                        '</div>'+
-                                    '</div>'+
+                                       '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
+                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                       '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
+                                       '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
+                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       pfiles+
+                                       '<div style="text-align: center;margin-top: 10px;">'+
+                                           '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                       '</div>'+
+                                   '</div>'+
                             '</article>';
                 }
             }

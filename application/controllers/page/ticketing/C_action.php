@@ -8,12 +8,15 @@ class C_action extends Ticket_Controler {
         $this->load->model('ticketing/m_ticketing');
     }
 
-    private function auth($NoTicket){
+    private function auth($NoTicket,$DepartmentID,$first='no'){
         $NIP = $this->session->userdata('NIP');
-        $auth = $this->m_ticketing->auth_action_tickets($NoTicket,$NIP);
-        if (!$auth) {
+        $auth = $this->m_ticketing->auth_action_tickets($NoTicket,$NIP,$DepartmentID,$first);
+        if (!$auth['bool']) {
             show_404($log_error = TRUE); 
             die();
+        }
+        else{
+          return $auth;
         }
     }
 
@@ -25,13 +28,14 @@ class C_action extends Ticket_Controler {
     }
 
 
-    public function set_ticket($NoTicket){
-       $this->auth($NoTicket);
+    public function set_action_first($NoTicket,$EncodeDepartment){
+       $DepartmentID = $this->m_general->jwt_decode_department($EncodeDepartment);
+       $data['Authent'] = $this->auth($NoTicket,$DepartmentID,'yes');
        $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]);
        $data['DataCategory'] = $this->getCategory();
-       $data['DataDisposition'] = $this->m_ticketing->getDispositionBy(['TicketID' => $data['DataTicket'][0]['ID'] ]);
-       $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $data['DataTicket'][0]['DepartmentIDDestination'] ]);
-       $page = $this->load->view('dashboard/ticketing/set_ticket',$data,true);
+       $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $DepartmentID ]);
+       $data['DataReceived'] = $this->m_ticketing->getDataReceived(['ID' => $data['DataTicket'][0]['ID'] ]);
+       $page = $this->load->view('dashboard/ticketing/set_action_first',$data,true);
        $this->menu_ticket($page);
     }
 

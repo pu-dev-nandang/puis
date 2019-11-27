@@ -330,6 +330,19 @@
         border-bottom-left-radius: 7px;
         border-top-left-radius: 7px;
     }
+
+    .ticket-number {
+        position: absolute;
+        top: 20px;
+        right: 0px;
+        background: #607D8B;
+        padding: 0px 10px 1px 10px;
+        color: #fff;
+        font-size: 11px;
+        border-bottom-left-radius: 7px;
+        border-top-left-radius: 7px;
+    }
+
     .ticket-accepted {
         margin-top: 0px;
         padding-top: 0px;

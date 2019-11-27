@@ -11,6 +11,17 @@ class M_general extends CI_Model {
         $this->load->library('JWT');
     }
 
+    public function jwt_decode_department($EncodeDepartment){
+        try {
+            $key = "UAP)(*";
+            $DepartmentID =  (string) $this->jwt->decode($EncodeDepartment,$key);
+            return $DepartmentID;
+        } catch (Exception $e) {
+            echo json_encode($e);
+            die();
+        }
+    }
+
     public function getDepartmentNow(){
         $str = '';
         $Department= 'NA.'.$this->session->userdata('IDdepartementNavigation');
