@@ -592,7 +592,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="pending-ticket">Progres Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="progres-ticket">Progres Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -603,6 +603,10 @@ var App_ticket_ticket_today = {
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_progress/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     var department_handle = '';
                     var data_received = row.data_received;
+                    var Received = App_ticket_ticket_today.getLastReceived(data_received);
+                    var Worker = App_ticket_ticket_today.getWorker(data_received);
+                    var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
+
                     for (var j = 0; j < data_received.length; j++) {
                         if (data_received[j].SetAction == "1") {
                             if (department_handle == '') {
@@ -626,6 +630,19 @@ var App_ticket_ticket_today = {
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
                                        pfiles+
+                                       '<div class="ticket-accepted">'+
+                                        '<div class="separator"><b>Received</b></div>'+
+                                            Received['NameReceivedBy']+' | '+ Received['ReceivedAt']+
+                                            '<div style="margin-top: 10px;">'+
+                                                '<p>'+
+                                                    'From : '+row.NameDepartmentTicket+
+                                                    '<br/>'+
+                                                    'Assign to : '+Worker+
+                                                    '<br/>'+
+                                                    'Transfer to : '+TransferTo+
+                                                '</p>'+    
+                                            '</div>'+
+                                       '</div>'+
                                        '<div style="text-align: center;margin-top: 10px;">'+
                                            '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
                                        '</div>'+
@@ -655,6 +672,65 @@ var App_ticket_ticket_today = {
         })
 
 
+    },
+
+    getLastReceived : function(data){
+        var rs = [];
+        var count = data.length;
+        var NameReceivedBy = '';
+        var ReceivedAt = '';
+        for (var i = 0; i < count; i++) {
+            if (data[i].SetAction == "1" && data[i].DataReceived_Details.length > 0) {
+                NameReceivedBy = data[i].NameReceivedBy;
+                ReceivedAt = data[i].ReceivedAt;
+            }
+        }
+
+        rs = {
+            NameReceivedBy : NameReceivedBy,
+            ReceivedAt : ReceivedAt,
+        };
+        return rs;
+    },
+
+    getWorker : function(data){
+        var rs = '';
+        var count = data.length;
+        for (var i = 0; i < count; i++) {
+            if (data[i].SetAction == "1" && data[i].DataReceived_Details.length > 0) {
+                var details = data[i].DataReceived_Details;
+                for (var j = 0; j < details.length; j++) {
+                    if (rs == '') {
+                        rs += details[j].NameWorker;
+                    }
+                    else
+                    {
+                        rs += ','+details[j].NameWorker;
+                    }
+                }
+            }
+        }
+
+        return rs;
+    },
+
+    getTransferTo : function(data){
+        var rs = '';
+        var count = data.length;
+        for (var i = 0; i < count; i++) {
+            if (data[i].Flag == "1") {
+                if (rs == '') {
+                    rs += data[i].NameDepartmentDestination;
+                }
+                else
+                {
+                     rs += ','+data[i].NameDepartmentDestination;
+                }
+                
+            }
+        }
+
+        return rs;
     },
 
 };

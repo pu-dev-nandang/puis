@@ -288,10 +288,11 @@ class M_ticketing extends CI_Model {
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,a.ID,ca.Descriptions as CategoryDescriptions
+                b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
+                '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                 where TicketStatus = 2
                 '.$Addwhere.'
                 order by a.ID desc
@@ -427,6 +428,7 @@ class M_ticketing extends CI_Model {
                 left join db_employees.employees as emp on a.ReceivedBy = emp.NIP
                 '.$this->m_general->QueryDepartmentJoin('b.DepartmentID').'
                 '.$strWhere.'
+                order by a.ID asc
         ';
 
         $query = $this->db->query($sql,array())->result_array();
@@ -444,6 +446,7 @@ class M_ticketing extends CI_Model {
                     break;
                 case 'update':
                     $dataSave = $data_arr['data'];
+                     $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
                     $ID = $data_arr['ID'];
                     $this->db->where('ID',$ID);
                     $this->db->update('db_ticketing.received',$dataSave);
