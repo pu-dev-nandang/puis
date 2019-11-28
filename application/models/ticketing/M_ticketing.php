@@ -303,6 +303,7 @@ class M_ticketing extends CI_Model {
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';
+        
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
         for ($i=0; $i < $rs['count']; $i++) {
@@ -399,31 +400,60 @@ class M_ticketing extends CI_Model {
         if (count($G_dt) > 0) {
             $DepartmentIDDestination = $this->__get_department_auth_action($G_dt[0]['ID'],$DepartmentID,$first);
             if (array_key_exists('Status', $DepartmentIDDestination)) {
-                if ($this->m_general->auth($DepartmentID,$NIP)) {
+                if ($first =='yes') {
+                    if ($this->m_general->auth($DepartmentID,$NIP)) {
+                        $rs['bool'] = true;
+                        $rs['callback'] = $DepartmentIDDestination;
+                    }
+                }
+                else
+                {
+                    $auth_action_progress = $this->auth_action_progress($DepartmentIDDestination,$NIP);
+                    $DepartmentIDDestination['Detail'] = $auth_action_progress;
                     $rs['bool'] = true;
                     $rs['callback'] = $DepartmentIDDestination;
                 }
+                
             }
            
         }
         return $rs;
     }
 
+    private function auth_action_progress($DataReceived_auth_action,$NIP)
+    {   
+        $rs = [
+            'Admin' => false,
+            'Worker' => false,
+        ];
+
+        $DepartmentID = $DataReceived_auth_action['DepartmentID'];
+        $rs['Admin'] = $this->m_general->auth($DepartmentID,$NIP);
+        $DataReceived_Details = $DataReceived_auth_action['Detail']['DataReceived_Details'];
+        $bool = false;
+        for ($i=0; $i < count($DataReceived_Details); $i++) { 
+            if ($NIP == $DataReceived_Details[$i]['NIP']) {
+              $bool = true;
+              break;
+            }
+        }
+        $rs['Worker'] = $bool;
+        return $rs;
+    }
+
     private function __get_department_auth_action($TicketID,$DepartmentID,$first){
         $rs = [];
-        $sql = 'select rcv.*,ca.DepartmentID from db_ticketing.received as rcv
-                join db_ticketing.category as ca on rcv.CategoryReceivedID = ca.ID
-                where rcv.TicketID = '.$TicketID.'
-                order by rcv.ID asc
-                ';
-        $query = $this->db->query($sql,array())->result_array();
+        $arr_where = [
+            'TicketID' => $TicketID,
+        ];
+        $query = $this->getDataReceived_worker($arr_where);
         if ($first =='yes') {
            if (count($query) == 1) {
               for ($i=0; $i < count($query); $i++) {
-                  if ($DepartmentID == $query[$i]['DepartmentID']) {
+                  if ($DepartmentID == $query[$i]['DepartmentIDDestination']) {
                       $temp = [
                           'Status' => ($query[$i]['ReceivedStatus'] == 1) ? 'closed' : 'open',
-                          'DepartmentID' => $query[$i]['DepartmentID'],
+                          'DepartmentID' => $query[$i]['DepartmentIDDestination'],
                           'SetAction' => ($query[$i]['SetAction'] == 0) ? 'View' : 'Action',
                       ];
 
@@ -436,11 +466,12 @@ class M_ticketing extends CI_Model {
         else
         {
             for ($i=0; $i < count($query); $i++) {
-                if ($DepartmentID == $query[$i]['DepartmentID']) {
+                if ($DepartmentID == $query[$i]['DepartmentIDDestination']) {
                     $temp = [
                         'Status' => ($query[$i]['ReceivedStatus'] == 1) ? 'closed' : 'open',
-                        'DepartmentID' => $query[$i]['DepartmentID'],
+                        'DepartmentID' => $query[$i]['DepartmentIDDestination'],
                         'SetAction' => ($query[$i]['SetAction'] == 0) ? 'View' : 'Action',
+                        'Detail' => $query[$i],
                     ];
 
                     $rs = $temp;
@@ -484,8 +515,18 @@ class M_ticketing extends CI_Model {
                     break;
                 case 'update':
                     $dataSave = $data_arr['data'];
-                     $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
                     $ID = $data_arr['ID'];
+                    $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
+                    if ($G_dt[0]['ReceivedAt'] == null  || $G_dt[0]['ReceivedAt'] == '' || $G_dt[0]['ReceivedAt'] == '0000-00-00 00:00:00') {
+                        $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
+                    }
+
+                    if ($G_dt[0]['ReceivedBy'] != null  && $G_dt[0]['ReceivedBy'] != '') {
+                        if (array_key_exists('ReceivedBy', $dataSave)) {
+                            unset($dataSave['ReceivedBy']);
+                        }
+                    }
+                    
                     $this->db->where('ID',$ID);
                     $this->db->update('db_ticketing.received',$dataSave);
                     break;
@@ -517,7 +558,15 @@ class M_ticketing extends CI_Model {
                         $this->db->insert('db_ticketing.received_details',$dataSave);
                     }
                     break;
-                
+                case 'update':
+                    if (!array_key_exists(0, $data_arr)) { // not array
+                        $data = $data_arr['data'];
+                        $ID = $data_arr['ID'];
+                        $dataSave = $data;
+                        $dataSave['At'] = date('Y-m-d H:i:s');
+                        $this->db->where('ID',$ID);
+                        $this->db->update('db_ticketing.received_details',$dataSave);
+                    }
                 default:
                     # code...
                     break;

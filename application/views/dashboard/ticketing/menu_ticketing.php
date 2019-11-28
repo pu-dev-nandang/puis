@@ -217,7 +217,7 @@
                                   '<td style="padding:4px;">Worker</td>'+
                                   '<td style="padding:4px;">DueDate</td>'+
                                   '<td style="padding:4px;">Status</td>'+
-                              '</tr>'    
+                              '</tr>';   
               for (var j = 0; j < DataReceived_Details.length; j++) {
                 var r = DataReceived_Details[j];
                 var st = '';

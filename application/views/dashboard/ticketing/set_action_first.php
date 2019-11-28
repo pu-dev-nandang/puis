@@ -5,7 +5,7 @@
 	}
 </style>
 <div class="row" style="margin-top: 10px;">
-	<div class="col-md-4 col-md-offset-4">
+	<div class="col-md-4">
 		<div class="well">
 			<div style="text-align: center;">
 				<img data-src="<?php echo base_url('uploads/employees/'.$DataTicket[0]['PhotoRequested']); ?>" style="margin-top: -3px;" class="img-circle img-fitter" width="100">
@@ -45,9 +45,7 @@
 			</table>
 		</div>
 	</div>
-</div>
-<div class="row">
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 			    <h4 class="panel-title">Assign To</h4>
@@ -60,7 +58,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 			    <h4 class="panel-title">Transfer To</h4>
@@ -74,9 +72,10 @@
 		</div>
 	</div>
 </div>
+
 <br/>
-<div class="pull-right">
-	<button class="btn btn-success" id = "btnSetAction">Save</button>
+<div style="padding: 5px;">
+	<button class="btn btn-block btn-success" id = "btnSetAction">Save</button>
 </div>
 
 <script type="text/javascript">
@@ -370,16 +369,17 @@
 					var Index = $('.form-transfer-to').index(this);
 					var Index = parseInt(Index)+1;
 					var itsme = $(this);
-					var CategoryReceivedID =  itsme.find('.input_assign_to[name="CategoryReceivedID"] option:selected').val();
-					var DepartmentReceivedID =  itsme.find('.input_assign_to[name="CategoryReceivedID"] option:selected').attr('code');
-					var MessageReceived =  itsme.find('.input_assign_to[name="MessageReceived"]').val();
+					var CategoryReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').val();
+					var DepartmentReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').attr('code');
+					var MessageReceived =  itsme.find('.input_transfer_to[name="MessageReceived"]').val();
 					var tempreceived = {
 						TicketID : DataTicket[0].ID,
 						DepartmentReceivedID : DepartmentReceivedID,
 						CategoryReceivedID : CategoryReceivedID,
 						MessageReceived : MessageReceived,
-						ReceivedBy : sessionNIP,
-						SetAction : '0',
+						// ReceivedBy : sessionNIP,
+						SetAction : '1',
+						Flag : '1',
 					};
 
 					if (received.length == 0) {
@@ -420,7 +420,7 @@
 				        	update_ticket : update_ticket,
 				        }
 				    };
-
+				    // console.log(dataform);return;
 				    var token = jwt_encode(dataform,'UAP)(*');
 				    AjaxSubmitRestTicketing(url,token).then(function(response){
 				        if (response.status == 1) {
@@ -469,8 +469,8 @@
 					var Index = $('.form-transfer-to').index(this);
 					var Index = parseInt(Index)+1;
 					var itsme = $(this);
-					var CategoryReceivedID =  itsme.find('.input_assign_to[name="CategoryReceivedID"] option:selected').val();
-					var MessageReceived =  itsme.find('.input_assign_to[name="MessageReceived"]').val();
+					var CategoryReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').val();
+					var MessageReceived =  itsme.find('.input_transfer_to[name="MessageReceived"]').val();
 					if (MessageReceived == '' ||  MessageReceived == undefined) {
 						toastr.info('Please check input Transfer To on index of '+Index);
 						bool = false;

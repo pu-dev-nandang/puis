@@ -189,6 +189,76 @@ class C_rest_ticketing extends CI_Controller {
             
             echo json_encode($rs);
             break;
+          case 'update_received':
+            $rs = [];
+            $dataToken = json_decode(json_encode($dataToken),true);
+            $dataToken['action'] = 'update';
+            $this->m_ticketing->TableReceivedAction($dataToken);
+            $rs = ['status' => 1,'msg' => ''];
+            echo json_encode($rs);
+            break;
+          case 'update_worker':
+            $rs = [];
+            $dataToken = json_decode(json_encode($dataToken),true);
+            $action = $dataToken['action'];
+            $ac = explode('_', $action);
+            $dataToken['action'] = (count($ac)>0) ? $ac[0]  :'update';
+            $this->m_ticketing->TableReceived_DetailsAction($dataToken);
+            $rs = ['status' => 1,'msg' => ''];
+            // callback
+            if (array_key_exists('datacallback', $dataToken)) {
+              $datacallback = $dataToken['datacallback'];
+              $NoTicket = $datacallback['NoTicket'];
+              $DepartmentID = $datacallback['DepartmentID'];
+              $NIP = $datacallback['NIP'];
+              $data['Authent'] =$this->m_ticketing->auth_action_tickets($NoTicket,$NIP,$DepartmentID,'no');
+              $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
+              $dataToken2 = [
+                'NIP' => $NIP,
+                'DepartmentID' => $DepartmentID,
+              ];
+              $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken2,' and a.NoTicket = "'.$NoTicket.'" ')['data']; // get data all ticket
+              $data['DataReceivedSelected'] = $this->m_ticketing->DataReceivedSelected($data['DataTicket'][0]['ID'],$DepartmentID); // receive selected
+              $rs['callback'] = $data;
+            }
+            echo json_encode($rs);
+            break;
+          case 'insert_worker':
+            $rs = [];
+            $dataToken = json_decode(json_encode($dataToken),true);
+            $action = $dataToken['action'];
+            $ac = explode('_', $action);
+            $dataToken['action'] = (count($ac)>0) ? $ac[0]  :'insert';
+            $this->m_ticketing->TableReceived_DetailsAction($dataToken);
+            $rs = ['status' => 1,'msg' => ''];
+            // callback
+            if (array_key_exists('datacallback', $dataToken)) {
+              $datacallback = $dataToken['datacallback'];
+              $NoTicket = $datacallback['NoTicket'];
+              $DepartmentID = $datacallback['DepartmentID'];
+              $NIP = $datacallback['NIP'];
+              $data['Authent'] =$this->m_ticketing->auth_action_tickets($NoTicket,$NIP,$DepartmentID,'no');
+              $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
+              $dataToken2 = [
+                'NIP' => $NIP,
+                'DepartmentID' => $DepartmentID,
+              ];
+              $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken2,' and a.NoTicket = "'.$NoTicket.'" ')['data']; // get data all ticket
+              $data['DataReceivedSelected'] = $this->m_ticketing->DataReceivedSelected($data['DataTicket'][0]['ID'],$DepartmentID); // receive selected
+              $rs['callback'] = $data;
+
+              // updated received if null
+              $dataSave2 = [
+                'action' =>'update',
+                'ID' => $dataToken['data']['ReceivedID'],
+                'data' => [
+                  'ReceivedBy' => $NIP
+                ],
+              ];
+              $this->m_ticketing->TableReceivedAction($dataSave2);
+            }
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;
