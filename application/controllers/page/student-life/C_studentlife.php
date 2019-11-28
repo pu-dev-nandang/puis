@@ -50,7 +50,10 @@ class C_studentlife extends Student_Life {
     {
 
         $ID = $this->input->get('id');
-
+        /*ADDED BY FEBRI @ NOV 2019 */
+        $this->load->model("General_model");
+        $data['categories'] = $this->General_model->fetchData("db_studentlife.categories_achievement",array("isActive"=>1))->result();
+        /*END ADDED BY FEBRI @ NOV 2019 */
         $data['department'] = parent::__getDepartement();
         $data['ID'] = ($ID!='' && $ID!=null && isset($ID)) ? $ID : '';
         $page = $this->load->view('page/'.$data['department'].'/student-achievement/update_data_achievement',$data,true);

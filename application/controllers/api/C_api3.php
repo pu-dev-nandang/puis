@@ -2033,6 +2033,8 @@ class C_api3 extends CI_Controller {
                 $this->db->delete('db_studentlife.student_achievement_student');
 
             } else {
+                $dataForm['isApproved'] = 2;
+                $dataForm['approvedBy'] = "BACKEND-PCAM/".$this->session->userdata('NIP');
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
                 $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
 //                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
@@ -2061,7 +2063,7 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='viewDataPAM'){
 
-            $data = $this->db->query('SELECT * FROM db_studentlife.student_achievement ORDER BY Year, StartDate DESC')->result_array();
+            $data = $this->db->query('SELECT a.*,b.Name as categName FROM db_studentlife.student_achievement  a left join db_studentlife.categories_achievement b on b.ID = a.CategID ORDER BY Year, StartDate DESC')->result_array();
 
             if(count($data)>0){
                 for($i=0;$i<count($data);$i++){

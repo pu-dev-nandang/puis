@@ -15,8 +15,19 @@
 
         <div class="well" style="padding: 15px;min-height: 300px;">
 
+            <!-- ADDED BY FEBRI @ NOV 2019 -->
             <div class="form-group">
-
+                <label>Category</label>
+                <select class="form-control form-update-data" id="CategID">
+                    <option value="">-Choose One-</option>
+                    <?php if(!empty($categories)){ 
+                    foreach ($categories as $c) { ?>                            
+                    <option value="<?=$c->ID?>" ><?=$c->Name?></option>
+                    <?php } } ?>
+                </select>
+            </div>    
+            <!-- END ADDED -->
+            <div class="form-group">
                 <div class="row">
                     <div class="col-xs-9">
                         <label>Event Name</label>

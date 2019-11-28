@@ -416,7 +416,7 @@ class C_database extends Globalclass {
 
     public function students_req_approval(){
         $data = $this->input->post();
-        $myName = $this->session->userdata('name');
+        $myName = $this->session->userdata('Name');
         $json = array();
         if($data){
             $key = "UAP)(*";
@@ -460,6 +460,7 @@ class C_database extends Globalclass {
                     $Access_Card_Number = $getTempStudentReq->Access_Card_Number;
                     unset($getTempStudentReq->KTPNumber);
                     unset($getTempStudentReq->Access_Card_Number);
+                    unset($getTempStudentReq->approvedBy);
 
                     $updateTA = $this->General_model->updateData("ta_".$data_arr['TA'].".students",$getTempStudentReq,$conditions);
                     if($updateTA){
@@ -473,6 +474,8 @@ class C_database extends Globalclass {
                         $dataAppv['isApproval'] = 2;
                         $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
                         $dataAppv['editedby'] = $myName;
+                        $dataAppv['approvedBy'] = $myName;
+                        
                         $updateTempStd = $this->General_model->updateData("db_academic.tmp_students",$dataAppv,$conditions);
                         //update to table auth student on dbaccademic
                         $updateAuthStd = $this->General_model->updateData("db_academic.auth_students",array("KTPNumber"=>$KTPNumber,"Access_Card_Number"=>$Access_Card_Number),$conditions);
