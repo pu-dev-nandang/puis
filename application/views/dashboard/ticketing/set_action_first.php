@@ -4,7 +4,6 @@
 	    margin-left: 0px;
 	}
 </style>
-<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 10px;">
 	<div class="col-md-4 col-md-offset-4">
 		<div class="well">

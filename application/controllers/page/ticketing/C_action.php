@@ -39,4 +39,20 @@ class C_action extends Ticket_Controler {
        $this->menu_ticket($page);
     }
 
+    public function set_action_progress($NoTicket,$EncodeDepartment){
+      $DepartmentID = $this->m_general->jwt_decode_department($EncodeDepartment);
+      $data['Authent'] = $this->auth($NoTicket,$DepartmentID);
+      $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]);
+      $dataToken = [
+        'NIP' => $this->session->userdata('NIP'),
+        'DepartmentID' => $DepartmentID,
+      ];
+      $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken,' and a.NoTicket = "'.$NoTicket.'" ')['data'];
+      $data['DataReceivedSelected'] = $this->m_ticketing->DataReceivedSelected($data['DataTicket'][0]['ID'],$DepartmentID);
+      $data['DataCategory'] = $this->getCategory();
+      $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $DepartmentID ]);
+      $page = $this->load->view('dashboard/ticketing/set_action_progress',$data,true);
+      $this->menu_ticket($page);
+    }
+
 }

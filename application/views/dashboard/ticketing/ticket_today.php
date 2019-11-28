@@ -481,7 +481,7 @@ var App_ticket_ticket_today = {
                                         '<p>'+nl2br(row.Message)+'</p>'+
                                         pfiles+
                                         '<div style="text-align: center;margin-top: 10px;">'+
-                                            '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                            '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
                                         '</div>'+
                                     '</div>'+
                             '</article>';
@@ -546,7 +546,7 @@ var App_ticket_ticket_today = {
                                        '<p>'+nl2br(row.Message)+'</p>'+
                                        pfiles+
                                        '<div style="text-align: center;margin-top: 10px;">'+
-                                           '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                           '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
                                        '</div>'+
                                    '</div>'+
                             '</article>';
@@ -644,7 +644,7 @@ var App_ticket_ticket_today = {
                                             '</div>'+
                                        '</div>'+
                                        '<div style="text-align: center;margin-top: 10px;">'+
-                                           '<a href="javascript:void(0);" class="ModalDetailTicket" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                           '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
                                        '</div>'+
                                    '</div>'+
                             '</article>';
@@ -749,6 +749,7 @@ $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartment
         */
         App_ticket_ticket_today.OpenTicketRest();
         App_ticket_ticket_today.PendingTicketRest();
+        App_ticket_ticket_today.ProgressTicketRest();
     }
 })
 $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input_form[name="CategoryID"]',function(e) {
@@ -766,12 +767,12 @@ $(document).off('click', '#btnsave_ticket').on('click', '#btnsave_ticket',functi
     App_ticket_ticket_today.ActionCreateNewTicket(selector);
 })
 
-$(document).off('click', '.ModalDetailTicket').on('click', '.ModalDetailTicket',function(e) {
+$(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function(e) {
     var selector = $(this);
     var setTicket = selector.attr('setticket');
     var ID = selector.attr('data-id');
     var token = selector.attr('token');
-    AppModalDetailTicket.ModalDetailTicket(ID,setTicket,token);
+    AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
 })
 
     $(document).on('click','.showReadMoreTicket',function () {
