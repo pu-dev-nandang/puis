@@ -744,8 +744,6 @@ class C_save_to_pdf extends CI_Controller {
         $this->header_monitoringAttendanceByRangeDate($pdf,$data_arr);
 
 
-
-
         $h_body = 5;
         if(count($data_arr['Details'])>0){
             $no = 1;
@@ -757,22 +755,36 @@ class C_save_to_pdf extends CI_Controller {
                 $pdf->Cell(15,$h_body * count($d['Course']),$d['NIP'],1,0,'C');
 
                 $LecName = (strlen($d['Name'])>34) ? substr($d['Name'],0,34).'_' : $d['Name'];
-                $pdf->Cell(41,$h_body * count($d['Course']),$LecName,1,0,'L');
+
+                $pdf->Cell(35,$h_body * count($d['Course']),$LecName,1,0,'L');
+
+                //---- menghitung total sks per Dosen---
+                $sumCredit = 0;
+                for($c2=0;$c2<count($d['Course']);$c2++){
+                  $cObj = (array) $d['Course'];
+                  $c = (array) $cObj[$c2];
+                  $sumCredit = $sumCredit + $c['Credit'];
+                }
+                $pdf->Cell(15,$h_body * count($d['Course']),$sumCredit,1,0,'C');
+
 
                 // Cek Group
                 for($r=0;$r<count($d['Course']);$r++){
 
                     if($r!=0){
-                        $pdf->Cell(63,$h_body,'',0,0,'C');
+                        $pdf->Cell(57+15,$h_body,'',0,0,'C');
                     }
+
 
                     $cObj = (array) $d['Course'];
                     $c = (array) $cObj[$r];
 
+
+                    $pdf->Cell(10,$h_body,$c['Credit'],1,0,'C');
                     $CNameCourse = (strlen($c['NameEng'])>46) ? substr($c['NameEng'],0,46).'_' : $c['NameEng'];
                     $pdf->Cell(15,$h_body,$c['ClassGroup'],1,0,'C');
-                    $pdf->Cell(53,$h_body,$CNameCourse,1,0,'L');
-                    $pdf->Cell(8,$h_body,$c['Credit'],1,0,'C');
+                    $pdf->Cell(40,$h_body,$CNameCourse,1,0,'L');
+
 
                     $AttdObj = (array) $c['Attendance'];
 
@@ -808,7 +820,7 @@ class C_save_to_pdf extends CI_Controller {
                     $pdf->SetFillColor(255, 255, 204);
                     $pdf->Cell(10,$h_body,$totalSesi,1,0,'C',true);
                     $totalCredit = ($totalSesi!=0) ? $totalSesi * (int) $c['Credit'] : 0;
-                    $pdf->Cell(10,$h_body,$totalCredit,1,1,'C',true);
+                    $pdf->Cell(15,$h_body,$totalCredit,1,1,'C',true);
                     $pdf->SetFont('Times','',7);
 
 
@@ -885,23 +897,26 @@ class C_save_to_pdf extends CI_Controller {
         // 287
         $pdf->Cell(7,$h_header,'No','TRL',0,'C',true);
         $pdf->Cell(15,$h_header,'NIP','TRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(35,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Total','TRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Credit','TRL',0,'C',true);
         $pdf->Cell(15,$h_header,'Group','TRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'Course','TRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'Credit','TRL',0,'C',true);
+        $pdf->Cell(40,$h_header,'Course','TRL',0,'C',true);
+
 
 
         $pdf->Cell(($wTgl * $totalTgl),$h_header,$data_arr['RangeDate'],1,0,'C',true);
         $pdf->Cell(10,$h_header,'Total','TRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Total','TRL',1,'C',true);
+        $pdf->Cell(15,$h_header,'','TRL',1,'C',true);
 
 
         $pdf->Cell(7,$h_header,'','BRL',0,'C',true);
         $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(35,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Credit','BRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'','BRL',0,'C',true);
         $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(40,$h_header,'','BRL',0,'C',true);
 
 
         for($i=0;$i<$totalTgl;$i++){
@@ -915,7 +930,7 @@ class C_save_to_pdf extends CI_Controller {
         }
 
         $pdf->Cell(10,$h_header,'Sesi','BRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Credit','BRL',1,'C',true);
+        $pdf->Cell(15,$h_header,'Sesi x Credit','BRL',1,'C',true);
 
         $pdf->SetFont('Times','',7);
     }
@@ -6327,7 +6342,7 @@ Phone: (021) 29200456';
             $Name = (count($dataEmploy)>0) ? $Name_a.''.trim($dataEmploy[0]['Name']).''.$Name_b : '';
             $NIP = (count($dataEmploy)>0) ? $dataEmploy[0]['NIP'] : '';
 
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 1))->result_array();
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
