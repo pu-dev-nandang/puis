@@ -5,7 +5,7 @@
             <a href="<?php echo base_url('library/yudisium/final-project'); ?>">Final Project</a>
         </li>
         <li>
-            <a href="<?php echo base_url('library/yudisium/monitoring-yudisium'); ?>">Monitoring Yudisium</a>
+            <a href="<?php echo base_url('library/yudisium/monitoring-yudisium'); ?>">Judiciums Monitoring</a>
         </li>
     </ul>
     <div style="border-top: 1px solid #cccccc">

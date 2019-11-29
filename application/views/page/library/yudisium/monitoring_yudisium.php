@@ -38,6 +38,10 @@
                             <option value="f.0">Waiting Clearance</option>
                             <option value="f.1">Clearance</option>
                         </optgroup>
+                        <optgroup label="Student Life">
+                            <option value="s.0">Waiting Clearance</option>
+                            <option value="s.1">Clearance</option>
+                        </optgroup>
                         <optgroup label="Kaprodi">
                             <option value="k.0">Waiting Approval</option>
                             <option value="k.1">Approved</option>
@@ -94,16 +98,19 @@
             $('#viewData').html('<table class="table table-striped table-bordered" id="tableData">' +
                 '            <thead>' +
                 '            <tr>' +
-                '                <th style="width: 2%;">No</th>' +
-                '                <th style="width: 15%;">Student</th>' +
-                '                <th>Course</th>' +
-                '                <th style="width: 15%;">Information</th>' +
-                '                <th style="width: 10%;">Ijazah SMA / SKHUN</th>' +
-                '                <th style="width: 10%;">Academic Clearance</th>' +
-                '                <th style="width: 10%;">Library Clearance</th>' +
-                '                <th style="width: 10%;">Finance Clearance</th>' +
-                '                <th style="width: 10%;">Kaprodi</th>' +
+                '                <th rowspan="2" style="width: 1%;">No</th>' +
+                '                <th rowspan="2" style="width: 15%;">Student</th>' +
+                '                <th rowspan="2">Course</th>' +
+                '                <th rowspan="2" style="width: 10%;">Ijazah SMA / SKHUN</th>' +
+                '                <th colspan="5">Clearance</th>'+
                 '            </tr>' +
+                '           <tr>' +
+                '               <th style="width: 10%;">Academic</th>' +
+                '               <th style="width: 10%;">Library</th>' +
+                '               <th style="width: 10%;">Finance</th>' +
+                '               <th style="width: 10%;">Student Life</th>' +
+                '               <th style="width: 10%;">Kaprodi</th>' +
+                '           </tr>' +
                 '            </thead>' +
                 '        </table>');
 
@@ -153,48 +160,5 @@
 
     });
 
-    $(document).on('change','.uploadIjazahStudentFile',function () {
-        var ID = $(this).attr('data-id');
-        var NPM = $(this).attr('data-npm');
-        var FileNameOld = $(this).attr('data-old');
-        UploadFile(ID,NPM,FileNameOld);
-    });
-
-
-    function UploadFile(ID,NPM,FileNameOld) {
-
-        var input = $('#upload_files_'+ID);
-        console.log(input);
-        var files = input[0].files[0];
-
-        var sz = parseFloat(files.size) / 1000000; // ukuran MB
-        var ext = files.type.split('/')[1];
-
-        if(Math.floor(sz)<=8){
-
-            var fileName = moment().unix()+'_'+NPM+'.'+ext;
-            var formData = new FormData( $("#formupload_files_"+ID)[0]);
-            var url = base_url_js+'academic/final-project/uploadIjazahStudent?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
-
-            $.ajax({
-                url : url,  // Controller URL
-                type : 'POST',
-                data : formData,
-                async : false,
-                cache : false,
-                contentType : false,
-                processData : false,
-                success : function(data) {
-                    toastr.success('Upload Success','Saved');
-                    setTimeout(function () {
-                        loadData();
-                    },500);
-
-                }
-            });
-
-        }
-
-    }
 
 </script>

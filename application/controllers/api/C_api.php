@@ -9140,7 +9140,6 @@ class C_api extends CI_Controller {
                     $nestedData[] = '<div style="text-align: left;">'.$row['ProdiName'].'</div>';
                     $nestedData[] = '<div>'.$row['Description'].'</div>';
                     $nestedData[] = '<div><a href="'.base_url('').'" class="btn btn-sm btn-default btn-default-primary">Show SKPI</a></div>';
-                    $nestedData[] = '<div><button class="btn btn-sm btn-default">Clearance</button></div>';
 
                     $data[] = $nestedData;
                     $no++;

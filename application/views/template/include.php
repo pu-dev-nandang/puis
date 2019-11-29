@@ -641,7 +641,7 @@
     }
     
     function loadSelectOptionJudiciumsYear(element,selected) {
-        var url = base_url+'api3/__crudYudisium';
+        var url = base_url_js+'api3/__crudYudisium';
         var token = jwt_encode({action:'getJudiciumsYear'},'UAP)(*');
 
         $.post(url,{token:token},function (jsonResult) {
@@ -797,8 +797,20 @@
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
-                var selected = (data_json[i].ID==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].Year+'</option>');
+                var sc = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionClassOf_Year(element,selected) {
+
+        var url = base_url_js+"api/__getKurikulumSelectOptionASC";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var sc = (data_json[i].Year==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
             }
         });
     }
