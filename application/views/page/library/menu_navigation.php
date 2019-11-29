@@ -6,7 +6,7 @@
             <li class="<?php if($this->uri->segment(2)=='yudisium'){echo "current";} ?>">
                 <a href="<?php echo base_url('library/yudisium/final-project'); ?>">
                     <i class="fa fa-graduation-cap"></i>
-                    Monitoring Yudisium
+                    Judiciums Monitoring
                 </a>
             </li>
         </ul>

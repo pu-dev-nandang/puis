@@ -2919,7 +2919,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetAutoPageBreak(true, 0);
 
         // Logo
-        $pdf->Image('./images/logo_tr.png',5,5,50);
+        $pdf->Image('./images/new_logo_pu.png',5,5,50);
 
         $pdf->SetFont('Arial','',17);
         $pdf->Cell(200, 0, 'Tanda Terima Pembayaran Mahasiswa', 0, 1, 'C', 0);
@@ -5622,7 +5622,7 @@ Phone: (021) 29200456';
           $rect_h = 20;
 
           // Logo
-          $fpdf->Image('./images/logo_tr.png',10,10,50);
+          $fpdf->Image('./images/new_logo_pu.png',10,10,50);
 
           // note from finance
           $fpdf->Rect($x,$y,130,$rect_h);
@@ -6686,7 +6686,7 @@ Phone: (021) 29200456';
 
                 // total width : 189
 
-                $pdf->Image('./images/logo_tr.png',20,15,50);
+                $pdf->Image('./images/new_logo_pu.png',20,15,50);
                 $pdf->SetFont('Arial','',9);
                 $pdf->Cell(0,$h,'FM-UAP/LIB-10-02',$border,1,'R');
 
@@ -6863,7 +6863,7 @@ Phone: (021) 29200456';
                 $h = 10;
                 $border = 0;
 
-                $pdf->Image('./images/logo_tr.png',10,10,50);
+                $pdf->Image('./images/new_logo_pu.png',10,10,50);
                 $pdf->Ln(15);
 
                 $pdf->SetFont('Arial','B',12);
@@ -6957,11 +6957,418 @@ Phone: (021) 29200456';
             echo 'No NIM';
         }
 
+    }
+
+    public function cetakSKPI(){
+
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->AddFont('dinpromedium','','dinpromedium.php');
+        $pdf->AddFont('dinpromediumitalic','','dinpromediumitalic.php');
+        $pdf->AddFont('dinprolight','','dinprolight.php');
+        $pdf->AddFont('dinlightitalic','','dinlightitalic.php');
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+        $h = 5.5;
+        $h_1 = 4;
+        $h_2 = 5;
+        $border = 0;
+        $fontHeader = 13;
+        $fontHeader_1 = 11;
+        $fontBody = 10;
+        $fontBody_1 = 9;
+        $fontBodyNote = 7;
+        $fullWidth = 190;
+
+        $midWidth = 90;
+        $midWidth_space = 10;
+        $rowSpace = 2;
+
+        // Background Cell
+        $R = 226;
+        $G = 226;
+        $B = 226;
+
+        $pdf->Image('./images/new_logo_pu.png',10,10,50);
+        $pdf->Image('./images/SKPI/frame2.png',180,12,20);
+        $pdf->Ln(17);
+
+        $pdf->SetFont('dinpromedium','',$fontHeader);
+        $pdf->Cell(0,$h,'SURAT KETERANGAN PENDAMPING IJAZAH',$border,1,'C');
+        $pdf->SetFont('dinpromediumitalic','',$fontHeader);
+        $pdf->Cell(0,$h,'DIPLOMA SUPLEMENT',$border,1,'C');
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell(0,$h,'Nomor : 032/UAP/SKPI-933022018000097/X/2018',$border,1,'C');
+
+        $pdf->Ln(5);
+        $pdf->MultiCell($fullWidth,$h,"Surat Keterangan Pendamping Ijazah ini sebagai pelengkap ijazah yang menerangkan capaian pembelajaran dan prestasi dari pemegang ijazah selama masa studi.",0);
+        $pdf->Ln(3);
+        $pdf->SetFont('dinlightitalic','',$fontBody);
+        $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
+
+
+        // ====== BAGIAN 1 ========
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/user.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Informasi Tentang Identitas Dari Pemegang SKPI',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Information Identufying Diploma Supplement Holder',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nama Lengkap',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Tahun Lulus',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Full Name',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Graduation Year',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Nandang Mulyadi',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'2019',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Tempat, Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Nomor Ijazah',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Place, Date of Birth',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Diploma Number',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Jakarta, 09 Januari 1997',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'933022018000097',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nomor Induk Mahasiswa',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Gelar',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Student Identification Number',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Degree',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'2017090',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Sarjana Terapan Pariwisata (S.Tr.Par.)',$border,1,'L',true);
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth_space+$midWidth,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Bachelor of Apllied Science (B.App.Sc.)',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ====== BAGIAN 2 ========
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/gradu.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Informasi Tentang Identitas Penyelenggara Program',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Information Identufying the Awarding Institution',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'SK Pendirian Perguruan Tinggi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Bahasa Pengantar Kuliah',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Awarding Institution's Licence",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Graduation Year',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'No. 271/E/O/2013',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Indonesia dan Inggris',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Indonesia dan Inggris',$border,1,'L',true);
+
+
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nama Perguruan Tinggi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Sistem Penilaian',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Higher Education Institution's Name",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Grading System',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Universitas Agung Podomoro',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Sesuai Ijazah',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Podomoro University',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'According to Degree Certificate',$border,1,'L',true);
+
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Program Studi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Lama Studi Reguler',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Major",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Regular Length of Study',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Bisnis Perhotelan',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'8 Semester / 4 Tahun',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Hotel Business',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'8 Semester / 4 Years',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Jenis dan Jenjang Pendidikan',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Persyaratan Penerimaan',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Type and Level of Education",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Entry Requirements',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Diploma Empat (4) Terapan',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Lulus Pendidikan Menengah Atas / Sederajat',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Diploma Four (4) Applied Sciences',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Graduate from High School of Similar Level of Education',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Jenjang Kualifikasi Sesuai KKNI',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Akses Studi Lanjut',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Level of Qualification in the National Qualification Framework",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Access to Further Study',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Jenjang Enam (6)',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Magister',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Level Six (6)',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Master Degree',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ====== BAGIAN 3 ========
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+        $pdf->Image('./images/new_logo_pu.png',10,10,50);
+        $pdf->Ln(20);
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/diamon.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Aktivitas, Prestasi dan Penghargaan Dengan Predikat : B',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Activities, Achievements and Awards with Predicate : B',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+        $widthLabelAch = 60;
+        $widthLabelAchEng = 95;
+        $widthLabelAchVal = $widthLabelAchEng - $widthLabelAch;
 
 
 
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($widthLabelAch,$h_1,'Prestasi dan Penghargaan',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,0,'L');
+        $pdf->Cell($widthLabelAch,$h_1,'Keikutsertaan dalam Organisasi',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($widthLabelAchEng,$h_1,'Achievement and Awards',$border,0,'L');
+        $pdf->Cell($widthLabelAchEng,$h_1,'Participation in Organization',$border,1,'L');
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($widthLabelAch,$h_1,'Pelatihan / Seminar / Workshop',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,0,'L');
+        $pdf->Cell($widthLabelAch,$h_1,'Kerja Praktek / Magang',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($widthLabelAchEng,$h_1,'Training / Seminar / Workshop',$border,0,'L');
+        $pdf->Cell($widthLabelAchEng,$h_1,'Internship',$border,1,'L');
+        $pdf->Ln($rowSpace * 3);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Tugas Akhir',$border,1,'L');
+        $pdf->MultiCell($fullWidth,$h_1,'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type speci (Hasil A)',0);
+        $pdf->Ln($rowSpace);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Final Project',$border,1,'L');
+        $pdf->MultiCell($fullWidth,$h_1,'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type speci (Result : A)',0);
+
+        $pdf->Ln($rowSpace);
 
 
+        // ====== BAGIAN Pengesahan ========
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,0,'','T',1,'L');
+        $pdf->Ln(3);
+
+        $pdf->SetFont('dinprolight','',$fontHeader);
+        $pdf->Cell($fullWidth,$h_1,'Jakarta, 20 Desember 2019',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Jakarta, December 20 2019',$border,1,'L');
+
+        $pdf->Ln(25);
+
+
+        $pdf->SetFont('dinpromedium','',$fontHeader);
+        $pdf->Cell($fullWidth,$h_1,'Dea Prasetyawan, M.M.',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Dekan Fakultas Sosial',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Dean of Faculty Social',$border,1,'L');
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Nomor Induk Pegawai : 3114016',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Employee ID Number',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,0,'','T',1,'L');
+
+
+        $pdf->Ln(3);
+        $Y_alamat = $pdf->GetY();
+
+        $fullWidthNote = 110;
+        $border = 0;
+        $pdf->SetFont('dinprolight','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Catatan Resmi',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinprolight','',$fontBodyNote);
+        $pdf->MultiCell($fullWidthNote,$h_1,"1. SKPI dikeluarkan oleh istitusi pendidikan yang berwenang mengeluarkan ijazah sesuai dengan\n    peraturan undang - undang yang berlaku",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"2. SKPI hanya diterbitkan setelah mahasiswa dinyatakan lulus dari suatu program studi secara\n    resmi oleh Perguruan Tinggi",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"3. SKPI diterbitkan dalam Bahasa Indonesia dan Bahasa Inggris",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"4. SKPI yang asli diterbitkan menggunakan kertas khusu berlogo Perguruan Tinggi, yang\n    diterbitkan secara khusus oleh Perguruan Tinggi",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"5. Peneriam SKPI dicantumkan dalam situs resmi Perguruan Tinggi",0);
+
+        $pdf->Ln(2);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidthNote,$h_1,'Official Notes',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinlightitalic','',$fontBodyNote);
+        $pdf->MultiCell($fullWidthNote,$h_1,"1. This Diploma Supplement is issued by Podomoro University, a higher education institution to issue\n    diplomas in accordance with applicable Laws",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"2. This Diploma Supplement is issued after the student is official declared a graduate of a study program\n    by the Podomoro University",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"3. This Diploma Supplement is written in both Indonesian and English",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"4. The original copy of this Diploma Supplement is on sealed with the higher educaion institution's logo,\n    and issued exclusive by University",0);
+
+
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat);
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Alamat',0);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*1));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Contact Details',0);
+
+
+        $pdf->SetFont('dinpromedium','',$fontBody);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*3));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Universitas Agung Podomoro',0);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*4));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Podomoro University',0);
+
+        $pdf->SetFont('dinprolight','',9);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*6));
+        $pdf->MultiCell(180 - $fullWidthNote,$h,"Jl. Letjen S. Parman No.28, RT.12/RW.6, Tj. Duren Sel., Kec. Grogol petamburan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11470",0);
+
+
+        $StudentName = 'nandang mulyadi';
+        $nameF = str_replace(' ','_',$StudentName);
+        $pdf->Output('SKPI__'.$nameF.'.pdf','I');
 
     }
 

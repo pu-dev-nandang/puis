@@ -4372,6 +4372,10 @@ class C_api3 extends CI_Controller {
                     $WhereStatusTA = ($stbStsVal=='0')
                         ? ' AND ( fpc.Cl_Finance = "'.$stbStsVal.'" OR fpc.Cl_Finance  IS NULL OR fpc.Cl_Finance  = "")'
                         : ' AND fpc.Cl_Finance = "'.$stbStsVal.'" ';
+                } else if($stbSts=='s'){
+                    $WhereStatusTA = ($stbStsVal=='0')
+                        ? ' AND ( fpc.Cl_StdLife = "'.$stbStsVal.'" OR fpc.Cl_StdLife  IS NULL OR fpc.Cl_StdLife  = "")'
+                        : ' AND fpc.Cl_StdLife = "'.$stbStsVal.'" ';
                 } else if($stbSts=='k'){
                     $WhereStatusTA = ($stbStsVal=='0')
                         ? ' AND ( fpc.Cl_Kaprodi = "'.$stbStsVal.'" OR fpc.Cl_Kaprodi  IS NULL OR fpc.Cl_Kaprodi  = "")'
@@ -4405,6 +4409,7 @@ class C_api3 extends CI_Controller {
                                         mk.NameEng AS CourseEng, sc.ClassGroup,
                                         fpc.Cl_Library, fpc.Cl_Library_By, fpc.Cl_Library_At, em1.Name AS Cl_Library_Name,
                                         fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, em2.Name AS Cl_Finance_Name,
+                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, em7.Name AS Cl_StdLife_Name,
                                         fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, em3.Name AS Cl_Kaprodi_Name,
                                         fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, em6.Name AS Cl_Academic_Name,
                                         ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
@@ -4423,6 +4428,7 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em2 ON (fpc.Cl_Finance_By = em2.NIP)
                                         LEFT JOIN db_employees.employees em3 ON (fpc.Cl_Kaprodi_By = em3.NIP)
                                         LEFT JOIN db_employees.employees em6 ON (fpc.Cl_Academic_By = em6.NIP)
+                                        LEFT JOIN db_employees.employees em7 ON (fpc.Cl_StdLife_By = em7.NIP)
                                         
                                         LEFT JOIN db_admission.doc_mhs dm ON (dm.NPM = ats.NPM AND dm.ID_reg_doc_checklist = 3)
                                         
@@ -4480,9 +4486,11 @@ class C_api3 extends CI_Controller {
                 $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
                 $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
 
-                $btnCrudPembimbing = ($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)) ? '<button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
+                $btnCrudPembimbing = ($AS!='Prodi' && ($DeptID=='6' || $DeptID==6))
+                    ? '<div style="margin-bottom: 10px;">
+                    <button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
                 data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
-                data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button>' : '';
+                data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button></div>' : '';
 
 
                 // Academic
@@ -4527,6 +4535,20 @@ class C_api3 extends CI_Controller {
                 }
 
 
+
+                // Student Life
+                $dateTm = ($row['Cl_StdLife_At']!='' && $row['Cl_StdLife_At']!=null) ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_StdLife_At'])).'</div>' : '';
+                if($AS!='Prodi' && ($DeptID=='16' || $DeptID==16)){
+                    $c_StdLife = ($row['Cl_StdLife']!=null && $row['Cl_StdLife']!='' && $row['Cl_StdLife']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_StdLife_Name'].''.$dateTm
+                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_StdLife">Clearance</button>';
+                } else {
+                    $c_StdLife = ($row['Cl_StdLife']!=null && $row['Cl_StdLife']!='' && $row['Cl_StdLife']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
+                        <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_StdLife_Name'].''.$dateTm
+                        : 'Waiting Student Life Clearance';
+                }
+
+
                 // kaprodi
                 $dateTm = ($row['Cl_Kaprodi_At']!='' && $row['Cl_Kaprodi_At']!=null)
                     ? ' <div style="color: #9e9e9e;">'.date('d M Y H:i',strtotime($row['Cl_Kaprodi_At'])).'</div>'
@@ -4537,7 +4559,8 @@ class C_api3 extends CI_Controller {
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
                         : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Clearance</button>';
 
-                } else {
+                }
+                else {
                     $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
                         : 'Waiting Approval Kaprodi';
@@ -4547,10 +4570,11 @@ class C_api3 extends CI_Controller {
 
                 $c_Kaprodi = (
                     $row['Cl_Academic']!='0' && $row['Cl_Academic']!=null && $row['Cl_Academic']!='' &&
+                    $row['Cl_StdLife']!='0' && $row['Cl_StdLife']!=null && $row['Cl_StdLife']!='' &&
                     $row['Cl_Finance']!='0' && $row['Cl_Finance']!=null && $row['Cl_Finance']!='' &&
                     $row['Cl_Library']!='0' && $row['Cl_Library']!=null && $row['Cl_Library']!='' &&
                     $row['IjazahSMA']!=null && $row['IjazahSMA']!='')
-                    ? $c_Kaprodi : '<span style="font-size: 12px;">Waiting Ijazah Uploaded and Clearance (Academic ,Library & Finance)</span>';
+                    ? $c_Kaprodi : '<span style="font-size: 11px;">Waiting Ijazah Uploaded and Clearance (Academic, Library, Finance & Student Life)</span>';
 
 
 
@@ -4558,16 +4582,19 @@ class C_api3 extends CI_Controller {
                 $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div style="color: royalblue;">'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
                 $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div style="color: royalblue;">'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
 
-                $nestedData[] = '<div>'.$no.'</div>';
-                $nestedData[] = '<div style="text-align:left;"><b>'.$StudentName.'</b><br/>'.$row['NPM'].'<br/>'.$btnCrudPembimbing.'</div> ';
-                $nestedData[] = '<div style="text-align:left;font-size: 12px;"">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'<div id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div></div>';
-                $nestedData[] = '<div style="text-align: left;font-size: 12px;">Total Credit : '.$TotalSKS.
+                $dataInformation = '<div style="text-align: left;font-size: 12px;border-top: 1px solid #cccccc;margin-top: 10px;padding-top: 10px;">Total Credit : '.$TotalSKS.
                     '<br/>Course "D" : '.$data_mkD.
                     '<br/>Credit Course Req. : '.$arr_mkWajib_SKS.'</div>';
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$StudentName.'</b><br/>'.$row['NPM'].'</div>'.$dataInformation;
+                $nestedData[] = '<div style="text-align:left;font-size: 12px;border-bottom: 1px solid #cccccc;padding-bottom: 10px;margin-bottom: 10px;">'.$row['CourseEng'].'<br/>'.$row['MKCode'].' | Group : '.$row['ClassGroup'].'</div>
+                                        '.$btnCrudPembimbing.'<div style="text-align:left;" id="viewMentor_'.$row['AUTHID'].'">'.$m1Name.''.$m2Name.'</div>';
                 $nestedData[] = '<div>'.$ijazah.'</div>';
                 $nestedData[] = '<div>'.$c_Academic.'</div>';
                 $nestedData[] = '<div>'.$c_Library.'</div>';
                 $nestedData[] = '<div>'.$c_Finance.'</div>';
+                $nestedData[] = '<div>'.$c_StdLife.'</div>';
                 $nestedData[] = '<div>'.$c_Kaprodi.'</div>';
 
                 $data[] = $nestedData;
@@ -5110,8 +5137,8 @@ class C_api3 extends CI_Controller {
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE  ls.Questions LIKE "%'.$search.'%"
-            OR qna.Answers "%'.$search.'%" ';
+                $dataSearch = ' AND ( ats.Name LIKE "%'.$search.'%"
+                                    OR ats.NPM LIKE "%'.$search.'%" )';
             }
 
             $queryDefault = 'SELECT ats.* FROM db_academic.auth_students ats WHERE ats.StatusStudentID = "1" '.$WhereY.'  '.$dataSearch;
