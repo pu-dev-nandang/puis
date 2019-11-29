@@ -388,8 +388,23 @@
 							action : 'update',
 							data : {
 								SetAction : '0',
+								ReceivedStatus : "1",
 								ReceivedBy : sessionNIP,
-								CategoryReceivedID : CategoryReceivedID,
+								DepartmentTransferToID : DepartmentReceivedID,
+								// CategoryReceivedID : CategoryReceivedID,
+							},
+						}
+
+						transfer_to.push(postreceived);
+					}
+					else
+					{
+						var postreceived = {
+							ID : DataReceived[0].ID,
+							action : 'update',
+							data : {
+								DepartmentTransferToID : DepartmentReceivedID,
+								// CategoryReceivedID : CategoryReceivedID,
 							},
 						}
 
@@ -400,6 +415,7 @@
 						ID : '',
 						action : 'insert',
 						data : tempreceived,
+						CreatedBy : sessionNIP,
 					}
 
 					transfer_to.push(postreceived);

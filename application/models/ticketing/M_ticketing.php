@@ -57,6 +57,8 @@ class M_ticketing extends CI_Model {
            'Flag' => '0',
            'ReceivedStatus' => '0',
            'TicketID' => $TicketID,
+           'CreatedBy' => $dataSaveTicket['RequestedBy'],
+           'CreatedAt' => date('Y-m-d H:i:s'),
         ];
 
         $this->db->insert('db_ticketing.received',$dataSave);
@@ -285,7 +287,8 @@ class M_ticketing extends CI_Model {
                                     select a.TicketID from db_ticketing.received as a
                                     join db_ticketing.category as b on a.CategoryReceivedID = b.ID
                                     '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
-                                    where SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'"  
+                                    where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                    and a.ReceivedStatus = "0"
                                 )   
             )';
         }
@@ -307,7 +310,7 @@ class M_ticketing extends CI_Model {
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
         for ($i=0; $i < $rs['count']; $i++) {
-            $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'],'SetAction' => 1 ]);
+            $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'] ]);
 
             $query[$i]['data_received'] = $data_received;
 
@@ -499,7 +502,6 @@ class M_ticketing extends CI_Model {
                 '.$strWhere.'
                 order by a.ID asc
         ';
-
         $query = $this->db->query($sql,array())->result_array();
         return $query;
     }
@@ -510,18 +512,18 @@ class M_ticketing extends CI_Model {
             switch ($action) {
                 case 'insert':
                     $dataSave = $data_arr['data'];
-                    $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
+                    $dataSave['CreatedAt'] = date('Y-m-d H:i:s');
                     $this->db->insert('db_ticketing.received',$dataSave);
                     break;
                 case 'update':
                     $dataSave = $data_arr['data'];
                     $ID = $data_arr['ID'];
                     $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
-                    if ($G_dt[0]['ReceivedAt'] == null  || $G_dt[0]['ReceivedAt'] == '' || $G_dt[0]['ReceivedAt'] == '0000-00-00 00:00:00') {
+                    if ($G_dt[0]['ReceivedAt'] == null  || $G_dt[0]['ReceivedAt'] == '' || $G_dt[0]['ReceivedAt'] == '0000-00-00 00:00:00') { // for first time
                         $dataSave['ReceivedAt'] = date('Y-m-d H:i:s');
                     }
 
-                    if ($G_dt[0]['ReceivedBy'] != null  && $G_dt[0]['ReceivedBy'] != '') {
+                    if ($G_dt[0]['ReceivedBy'] != null  && $G_dt[0]['ReceivedBy'] != '') { // for first time
                         if (array_key_exists('ReceivedBy', $dataSave)) {
                             unset($dataSave['ReceivedBy']);
                         }
@@ -606,7 +608,7 @@ class M_ticketing extends CI_Model {
               $DataReceived_Details = $this->getDataReceived_DetailsBy(['ReceivedID' => $data_received[$i]['ID'] ]);
               $data_received[$i]['DataReceived_Details'] = $DataReceived_Details;
               $data_received[$i]['ReceivedAt'] = $this->__set_tgl_ticket($data_received[$i]['ReceivedAt']);
-              $data_received[$i]['ReceivedAtTracking'] = $this->__set_datetime_modal_tracking($data_received[$i]['ReceivedAt']);
+              $data_received[$i]['ReceivedAtTracking'] = $this->__set_datetime_modal_tracking($data_received[$i]['CreatedAt']);
          }
 
          return $data_received; 
@@ -651,6 +653,20 @@ class M_ticketing extends CI_Model {
         }
 
         return $rs;
+    }
+
+    public function trigger_close_ticket($TicketID){
+        $sql = 'select count(*) as total from db_ticketing.received where ReceivedStatus = "0" and TicketID = "'.$TicketID.'" ';
+        $query = $this->db->query($sql,array())->result_array();
+        if ($query[0]['total'] == 0) {
+          $dataSave = [
+            'TicketStatus' => 3,
+            'TicketClosedAt' => date('Y-m-d H:i:s'),
+          ];  
+
+          $this->db->where('ID',$TicketID);
+          $this->db->update('db_ticketing.ticket',$dataSave);
+        }
     }
 
 }

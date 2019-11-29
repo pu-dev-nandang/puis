@@ -24,128 +24,6 @@
                 <div class="col-md-3 panel-ticket" id="PanelOpenTicket">
                 </div>
                 <div class="col-md-3 panel-ticket" id = "PanelProgressTicket">
-                    <h3 class="progres-ticket">Progres Ticket <span>7</span></h3>
-                    <hr/>
-                    <div class="timeline-centered">
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/1014081.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-                                <div class="timeline-label">
-                                    <div class="ticket-division">Academic</div>
-                                    <h2><a href="javascript:void(0);" class="showTicket">Art RamadaniArt RamadaniArt Ramadani</a></h2>
-                                    <div class="ticket-submited">Nandang Mulyadi | 29 Jan 2019 08:00</div>
-                                    <p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial two promise. Greatly who affixed suppose but enquire compact prepare all put. Added forth chief trees but rooms think may.</p>
-                                    <div class="ticket-accepted">
-                                        <div class="separator"><b>Accepted</b></div>
-                                        Nandang Mulyadi |
-                                        29 Januari 2019 09:00
-                                        <div style="margin-top: 10px;">
-                                            <p>
-                                                From : Academic
-                                                <br/>
-                                                Assign to : Wanto, Nandang
-                                                <br/>
-                                                Transfer to : IT, Adum</p>
-                                        </div>
-                                        <div style="text-align: center;margin-top: 10px;">
-                                            <a href="javascript:void(0);" class="showReadMoreTicket">Read more <i class="fa fa-angle-double-right"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2017090.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Job Meeting</a></h2>
-                                    <p>You have a meeting at <strong>Laborator Office</strong> Today.</p>
-
-                                    <div class="ticket-accepted">
-                                        <div class="separator"><b>Accepted</b></div>
-                                        Nandang Mulyadi |
-                                        29 Januari 2019 09:00
-                                        <div style="margin-top: 10px;">
-                                            <p>
-                                                From : Academic
-                                                <br/>
-                                                Assign to : Wanto, Nandang
-                                                <br/>
-                                                Transfer to : IT, Adum</p>
-                                        </div>
-                                        <div style="text-align: center;margin-top: 10px;">
-                                            <a href="javascript:void(0);" class="showReadMoreTicket">Read more <i class="fa fa-angle-double-right"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2018018.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Arlind Nushi</a> <span>checked in at</span> <a href="#">Laborator</a></h2>
-
-                                    <p>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, rem</p>
-
-                                    <div class="ticket-accepted">
-                                        <div class="separator"><b>Accepted</b></div>
-                                        Nandang Mulyadi |
-                                        29 Januari 2019 09:00
-                                        <div style="margin-top: 10px;">
-                                            <p>
-                                                From : Academic
-                                                <br/>
-                                                Assign to : Wanto, Nandang
-                                                <br/>
-                                                Transfer to : IT, Adum</p>
-                                        </div>
-                                        <div style="text-align: center;margin-top: 10px;">
-                                            <a href="javascript:void(0);" class="showReadMoreTicket">Read more <i class="fa fa-angle-double-right"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/1016011.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Arber Nushi</a> <span>changed his</span> <a href="#">Profile Picture</a></h2>
-
-                                    <blockquote>Pianoforte principles our unaffected not for astonished travelling are particular.</blockquote>
-
-                                    <img src="http://themes.laborator.co/neon/assets/images/timeline-image-3.png" class="img-responsive img-rounded full-width">
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                    </div>
                 </div>
 
                 <div class="col-md-3 panel-ticket">
@@ -606,15 +484,26 @@ var App_ticket_ticket_today = {
                     var Received = App_ticket_ticket_today.getLastReceived(data_received);
                     var Worker = App_ticket_ticket_today.getWorker(data_received);
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
-
+                    var arr_filter_depart = [];
                     for (var j = 0; j < data_received.length; j++) {
                         if (data_received[j].SetAction == "1") {
                             if (department_handle == '') {
                                 department_handle += data_received[j].NameDepartmentDestination;
+                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
                             }
                             else
                             {
-                                department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                                var booldepart = true;
+                                for (var k = 0; k < arr_filter_depart.length; k++) {
+                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                                       booldepart = false; 
+                                       break;
+                                    }
+                                }
+                                if (booldepart) {
+                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                                }
+                                
                             }
                         }
                     }

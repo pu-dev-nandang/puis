@@ -34,7 +34,7 @@ class C_action extends Ticket_Controler {
        $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
        $data['DataCategory'] = $this->getCategory();
        $data['DataEmployees'] = $this->m_general->getAllUserByDepartment(['DepartmentID' => $DepartmentID ]);
-       $data['DataReceived'] = $this->m_ticketing->getDataReceived(['ID' => $data['DataTicket'][0]['ID'] ]); // get data received
+       $data['DataReceived'] = $this->m_ticketing->getDataReceived(['TicketID' => $data['DataTicket'][0]['ID'] ]); // get data received
        $page = $this->load->view('dashboard/ticketing/set_action_first',$data,true);
        $this->menu_ticket($page);
     }

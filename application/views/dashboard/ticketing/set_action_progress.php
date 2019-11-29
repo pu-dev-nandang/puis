@@ -70,6 +70,8 @@
                     <i class="icon-plus"></i> Add
                 </span>
                 <div id="FormTransferTo" style="margin-top: 10px;"></div>
+                <br/>
+                <button class="btn btn-success hide" id = "SbmtTransferTo">Save</button>
 			</div>
 		</div>
 	</div>
@@ -143,7 +145,7 @@
 			
 		},
 
-		ActionClosedTicket : function(selector){
+		ActionClosedProject : function(selector){
 			var arr_worker = DataReceivedSelected[0].DataReceived_Details;
 			var bool = true;
 			if (arr_worker.length > 0) {
@@ -160,9 +162,49 @@
 			}
 			
 			if (!bool) {
-				toastr.info('You can\' close this project before all worker is done');
+				toastr.info('You can\'t close this project before all worker is done');
 				return;
 			}
+			else
+			{
+				// DataReceivedSelected
+				if (confirm('Are you sure ?')) {
+					loadingStart();
+				    loading_button2(selector);
+				    var url = base_url_js+"rest_ticketing/__event_ticketing";
+				    var dataform = {
+				        action : 'close_project',
+				        auth : 's3Cr3T-G4N',
+				        ID : DataReceivedSelected[0].ID,
+				        data : {
+				        	SetAction : "0",
+				        	ReceivedStatus : "1",
+				        }
+				    };
+
+					var token = jwt_encode(dataform,'UAP)(*');
+					AjaxSubmitRestTicketing(url,token).then(function(response){
+					    if (response.status == 1) {
+					    	toastr.success('Success');
+					    	setInterval(function(){
+					    	 window.location.href = base_url_js+'ticket/ticket-today'; 
+					    	}, 3000);
+					        
+					    }
+					    else
+					    {
+					        toastr.error(response.msg);
+					        end_loading_button2(selector,'Close Project');
+					    }
+					}).fail(function(response){
+					   toastr.error('Connection error,please try again');
+					   end_loading_button2(selector,'Close Project');
+					   loadingEnd(1000); 
+					})    
+					
+				}
+			}
+
 		},
 
 		CategoryChangeEvent  : function(selector,value,type="assign_to"){
@@ -594,6 +636,142 @@
 			var selector_closest = selector.closest('.form-transfer-to');
 			selector_closest.remove();
 		},
+
+		SubmitSetActionTransferTo : function(selector){
+			var bool = true;
+			$('.form-transfer-to').each(function(){
+				var Index = $('.form-transfer-to').index(this);
+				var Index = parseInt(Index)+1;
+				var itsme = $(this);
+				var CategoryReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').val();
+				var MessageReceived =  itsme.find('.input_transfer_to[name="MessageReceived"]').val();
+				if (MessageReceived == '' ||  MessageReceived == undefined) {
+					toastr.info('Please check input Transfer To on index of '+Index);
+					bool = false;
+					return;
+				}
+			})
+
+			if (bool) {
+				var transfer_to = [];
+				$('.form-transfer-to').each(function(){
+					var Index = $('.form-transfer-to').index(this);
+					var Index = parseInt(Index)+1;
+					var itsme = $(this);
+					var CategoryReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').val();
+					var DepartmentReceivedID =  itsme.find('.input_transfer_to[name="CategoryReceivedID"] option:selected').attr('code');
+					var MessageReceived =  itsme.find('.input_transfer_to[name="MessageReceived"]').val();
+					var tempreceived = {
+						TicketID : DataTicket[0].ID,
+						DepartmentReceivedID : DepartmentReceivedID,
+						CategoryReceivedID : CategoryReceivedID,
+						MessageReceived : MessageReceived,
+						// ReceivedBy : sessionNIP,
+						SetAction : '1',
+						Flag : '1',
+					};
+					var received = DataReceivedSelected[0].DataReceived_Details;
+					if (received.length == 0) {
+						var postreceived = {
+							ID : DataReceivedSelected[0].ID,
+							action : 'update',
+							data : {
+								SetAction : '0',
+								ReceivedStatus : "1",
+								ReceivedBy : sessionNIP,
+								DepartmentTransferToID : DepartmentReceivedID,
+								// CategoryReceivedID : CategoryReceivedID,
+							},
+						}
+
+						transfer_to.push(postreceived);
+					}
+					else
+					{
+						var postreceived = {
+							ID : DataReceivedSelected[0].ID,
+							action : 'update',
+							data : {
+								DepartmentTransferToID : DepartmentReceivedID,
+								// CategoryReceivedID : CategoryReceivedID,
+							},
+						}
+
+						transfer_to.push(postreceived);
+					}
+
+					var postreceived = {
+						ID : '',
+						action : 'insert',
+						data : tempreceived,
+						CreatedBy : sessionNIP,
+					}
+
+					transfer_to.push(postreceived);
+
+				})
+
+				if (confirm('Are you sure ?')) {
+					loadingStart();
+					loading_button2(selector);
+					var url = base_url_js+"rest_ticketing/__event_ticketing";
+					var dataform = {
+					    action : 'received',
+					    auth : 's3Cr3T-G4N',
+					    data : {
+					    	transfer_to : transfer_to,
+					    },
+					    datacallback : {
+					    	NoTicket : DataTicket[0].NoTicket,
+					    	DepartmentID : DataReceivedSelected[0].DepartmentReceivedID,
+					    	NIP : sessionNIP,
+					    },
+					};
+
+					var token = jwt_encode(dataform,'UAP)(*');
+					AjaxSubmitRestTicketing(url,token).then(function(response){
+					    if (response.status == 1) {
+		    		    	var callback = response.callback;
+		    		    	DataTicket = callback.DataTicket;
+		    		    	DataAll = callback.DataAll;
+		    		    	DataReceivedSelected = callback.DataReceivedSelected;
+		    		    	Authent = callback.Authent;
+		    		    	var Auth = Authent.callback.Detail;
+		    	    		var AdminAuth =Auth.Admin 
+		    	    		var WorkerAuth =Auth.Worker
+		    	    		App_set_action_progress.Loaded();
+					    	toastr.success('Success');
+					    	setInterval(function(){
+					    	 end_loading_button2(selector);
+					    	 loadingEnd(100); 
+					    	}, 3000);
+					    }
+					    else
+					    {
+					        toastr.error(response.msg);
+					        end_loading_button2(selector);
+					        loadingEnd(100);
+					    }
+					}).fail(function(response){
+					   toastr.error('Connection error,please try again');
+					   end_loading_button2(selector);  
+					   loadingEnd(1000); 
+					})
+
+				}
+
+			} 
+		},
+
+		ActionBTNShowHide : function(){
+			if ($('.form-transfer-to').length) {
+				$('#SbmtTransferTo').removeClass('hide');
+			}
+			else
+			{
+				$('#SbmtTransferTo').addClass('hide');
+			}
+		}
 	};
 
 
@@ -633,14 +811,30 @@
 	$(document).off('click', '.btn-add-transfer_to').on('click', '.btn-add-transfer_to',function(e) {
 	   var selector = $('#FormTransferTo');
 	   App_transfer_to.DomContentForm(selector);
+	   App_transfer_to.ActionBTNShowHide();
 	})
+
 	$(document).off('click', '.removeRowtransferTo').on('click', '.removeRowtransferTo',function(e) {
 	   var selector = $(this);
 	   App_transfer_to.DomContentRemove(selector);
+	   App_transfer_to.ActionBTNShowHide();
 	})
+
 	$(document).off('change', '.input_transfer_to[name="CategoryReceivedID"]').on('change', '.input_transfer_to[name="CategoryReceivedID"]',function(e) {
 	  var selector = $(this);
 	  var value = $(this).val();
 	  App_set_action_progress.CategoryChangeEvent(selector,value,'transfer_to');
-	})	
+	})
+
+	$(document).off('click', '#SbmtTransferTo').on('click', '#SbmtTransferTo',function(e) {
+		var selector = $(this);
+		App_transfer_to.SubmitSetActionTransferTo(selector);
+	})
+
+	$(document).off('click', '.btnCloseReceived').on('click', '.btnCloseReceived',function(e) {
+		var selector = $(this);
+		App_set_action_progress.ActionClosedProject(selector);
+	})
+
+	
 </script>

@@ -146,6 +146,13 @@ class C_rest_ticketing extends CI_Controller {
       }
     }
 
+    private function jwt_url_action($CategoryID){
+      $G_category = $this->m_master->caribasedprimary('db_ticketing.category','ID',$CategoryID);
+      $DepartmentID = $G_category[0]['DepartmentID'];
+      $token = $this->jwt->encode($DepartmentID,"UAP)(*");
+      return $token;
+    }
+
     public function event_ticketing(){
       try {
         $dataToken = $this->getInputToken();
@@ -155,13 +162,14 @@ class C_rest_ticketing extends CI_Controller {
             $rs = [];
             $rs = $this->m_ticketing->create_ticketing($dataToken);
             $CategoryID = $rs['callback']['CategoryID'];
+            $url_action = $this->jwt_url_action($CategoryID);
             $getAdminTicketing = $this->m_ticketing->getAdminTicketing($CategoryID);
             if (count($getAdminTicketing)>0) {
               // send notification
               $array_send_notification=[
                 'NameRequested' => $rs['callback']['NameRequested'],
                 'Description' => 'Number Ticket '.$rs['callback']['NoTicket'],
-                'URLDirect' => 'ticket/ticket-get/'.$rs['callback']['NoTicket'],
+                'URLDirect' => 'ticket/set_action_first/'.$rs['callback']['NoTicket'].'/'.$url_action,
                 'CreatedBy' => $rs['callback']['RequestedBy'],
                 'To' => $getAdminTicketing,
                 'NeedEmail' => 'No',
@@ -178,11 +186,39 @@ class C_rest_ticketing extends CI_Controller {
             try {
               $dataToken = json_decode(json_encode($dataToken),true);
               $data = $dataToken['data'];
-              $TableReceived = $this->m_ticketing->TableReceivedAction($data['received']);
-              $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details']);
-              $ProcessTransferTo = $this->m_ticketing->ProcessTransferTo($data['transfer_to']);
-              $update_ticket = $this->m_ticketing->process_ticket($data['update_ticket']);
+              if (array_key_exists('received', $data)) {
+                $TableReceived = $this->m_ticketing->TableReceivedAction($data['received']);
+              }
+
+              if (array_key_exists('received_details', $data)) {
+                $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details']);
+              }
+              
+              if (array_key_exists('transfer_to', $data)) {
+                $ProcessTransferTo = $this->m_ticketing->ProcessTransferTo($data['transfer_to']);
+              }
+              
+              if (array_key_exists('update_ticket', $data)) {
+                $update_ticket = $this->m_ticketing->process_ticket($data['update_ticket']);
+              }
+              
               $rs = ['status' => 1,'msg' => ''];
+              // callback
+              if (array_key_exists('datacallback', $dataToken)) {
+                $datacallback = $dataToken['datacallback'];
+                $NoTicket = $datacallback['NoTicket'];
+                $DepartmentID = $datacallback['DepartmentID'];
+                $NIP = $datacallback['NIP'];
+                $data['Authent'] =$this->m_ticketing->auth_action_tickets($NoTicket,$NIP,$DepartmentID,'no');
+                $data['DataTicket'] = $this->m_ticketing->getDataTicketBy(['NoTicket' => $NoTicket]); // get just data ticket
+                $dataToken2 = [
+                  'NIP' => $NIP,
+                  'DepartmentID' => $DepartmentID,
+                ];
+                $data['DataAll'] = $this->m_ticketing->rest_progress_ticket($dataToken2,' and a.NoTicket = "'.$NoTicket.'" ')['data']; // get data all ticket
+                $data['DataReceivedSelected'] = $this->m_ticketing->DataReceivedSelected($data['DataTicket'][0]['ID'],$DepartmentID); // receive selected
+                $rs['callback'] = $data;
+              }
             } catch (Exception $e) {
               $rs = ['status' => 0,'msg' => $e];
             }
@@ -259,6 +295,15 @@ class C_rest_ticketing extends CI_Controller {
             }
             echo json_encode($rs);
             break;
+          case 'close_project':
+            $rs = [];
+            $dataToken = json_decode(json_encode($dataToken),true);
+            $dataToken['action'] = 'update';
+            $this->m_ticketing->TableReceivedAction($dataToken);
+            $this->__trigger_close_ticket($dataToken);
+            $rs = ['status' => 1,'msg' => ''];
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;
@@ -266,6 +311,13 @@ class C_rest_ticketing extends CI_Controller {
       } catch (Exception $e) {
           echo json_encode($e);
       }
+    }
+
+    private function __trigger_close_ticket($dataToken){
+        $ID = $dataToken['ID'];
+        $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
+        $TicketID = $G_dt[0]['TicketID'];
+        $this->m_ticketing->trigger_close_ticket($TicketID);
     }
 
     public function load_ticketing_dashboard()
