@@ -352,6 +352,28 @@ class C_rest_ticketing extends CI_Controller {
       }
     }
 
+    public function CRUDStatusTicket()
+    {
+      try {
+        $dataToken = $this->getInputToken();
+        $action = $dataToken['action'];
+        switch ($action) {
+          case 'read':
+            $rs = $this->m_ticketing->LoadDataTicketStatus($dataToken);
+            echo json_encode($rs);
+            break;
+        }
+        // end switch
 
+      } catch (Exception $e) {
+        echo json_encode($e);
+      }
+    }
+
+    public function LoadTicketList(){
+      $dataToken = $this->getInputToken();
+      $rs =  $this->m_ticketing->LoadTicketListServerSide($dataToken);
+      echo json_encode($rs);
+    }
 
 }

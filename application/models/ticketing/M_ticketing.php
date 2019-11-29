@@ -725,4 +725,228 @@ class M_ticketing extends CI_Model {
         }
     }
 
+    public function LoadDataTicketStatus($dataToken){
+        $rs = [];
+        $AddWhere = '';
+        $sql = 'select * from db_ticketing.ticket_status
+        ';
+        $query = $this->db->query($sql,array())->result_array();
+
+        $data = array();
+        for ($i=0; $i < count($query); $i++) {
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $i+1;
+            foreach ($row as $key => $value) {
+              $nestedData[] = $value;
+            }
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+
+        return $rs;
+    }
+
+    public function LoadTicketListServerSide($dataToken){
+        $requestData = $_REQUEST;
+        $TicketStatus = $dataToken['TicketStatus'];
+        $DepartmentID = $dataToken['DepartmentID'];
+        $NIP = $dataToken['NIP'];
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+        $AuthAdmin = ($this->m_general->auth($DepartmentID,$NIP)) ? 'admin' : 'worker';
+
+        $totalData = 100;
+        switch ($TicketStatus) {
+            case '1':
+            case 1:
+                $Addwhere = ' and (ca.DepartmentID = "'.$dataToken['DepartmentID'].'" or a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'" )';
+                $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                        b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        where a.TicketStatus = 1
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                        and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
+                        ';
+                $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
+                $sqlTotalData = 'select count(*) as total from (
+                        select a.NoTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        where a.TicketStatus = 1
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                        and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
+                    )xx';
+                break;
+            case '2':
+            case 2:
+                $Addwhere = ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                     or a.ID in (
+                                         select a.TicketID from db_ticketing.received as a
+                                         join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                                         '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
+                                         where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                         and a.ReceivedStatus = "0"
+                                     )   
+                 )';
+                $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                        b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        where a.TicketStatus = 2
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                        ';
+                $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+
+                $sqlTotalData = 'select count(*) as total from (
+                        select a.NoTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        where a.TicketStatus = 2
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                    )xx';
+                break;
+            case '3':
+            case 3:
+            case '4':
+            case 4:
+                $Addwhere = ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                     or a.ID in (
+                                         select a.TicketID from db_ticketing.received as a
+                                         join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                                         '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
+                                         where qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                     )   
+                 )';
+                $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                        b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
+                        qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        where a.TicketStatus = 3
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                        ';
+                $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
+                $sqlTotalData = 'select count(*) as total from (
+                        select a.NoTicket
+                        from db_ticketing.ticket as a 
+                        join db_ticketing.category as ca on a.CategoryID = ca.ID
+                        join db_employees.employees as b on a.RequestedBy = b.NIP
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                        '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                        where a.TicketStatus = 3
+                        '.$Addwhere.'
+                        and (
+                             b.Name LIKE "'.$requestData['search']['value'].'%"
+                        )
+                    )xx';
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        $query = $this->db->query($sql)->result_array();
+        $queryTotal = $this->db->query($sqlTotalData)->result_array();
+        $totalData = $queryTotal[0]['total'];
+        // set data
+        $query = $this->__ticket_list_set_data($query);
+        $No = $requestData['start'] + 1;
+        $data = array();
+        for ($i=0; $i < count($query); $i++) { 
+            $nestedData=array();
+            $row = $query[$i];
+            $nestedData[] = $No;
+            $nestedData[] = $row['NoTicket'];
+            $nestedData[] = $row['NameRequested'];
+            $nestedData[] = $row['Title'];
+            $nestedData[] = $row['Message'];
+            $nestedData[] = $row['NameStatusTicket'];
+            $nestedData[] = $row['RequestedAt'];
+            $nestedData[] = $row['NameStatusTicket'];
+            $nestedData[] = $row['token'];
+            $data[] = $nestedData;
+            $No++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData ),
+            "data"            => $data,
+        );
+
+        return $json_data;
+    }
+
+    private function __ticket_list_set_data($query)
+    {
+        for ($i=0; $i < count($query); $i++) {
+            $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'] ]);
+
+            $query[$i]['data_received'] = $data_received;
+
+            if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+                $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                $url = url_files."fileGetAnyToken/".$token;
+                $query[$i]['Files'] = $url;
+            }
+
+            // add foto
+            if ($query[$i]['Photo'] != '' && $query[$i]['Photo'] != null) {
+                $url = url_pas."uploads/employees/".$query[$i]['Photo'];
+                $query[$i]['Photo'] = $url;
+            }
+
+            $query[$i]['RequestedAt'] = $this->__set_tgl_ticket($query[$i]['RequestedAt']);
+            $token = $this->jwt->encode($query[$i],"UAP)(*");
+            $query[$i]['token'] =  $token;
+        }
+
+        return $query;
+    }
+
 }

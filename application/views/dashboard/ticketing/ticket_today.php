@@ -45,7 +45,7 @@ var App_ticket_ticket_today = {
         LoadSelectOptionDepartmentFiltered(selectorDepartment);
         var firstLoad = setInterval(function () {
             var SelectDepartmentID = $('#SelectDepartmentID').val();
-            if(SelectDepartmentID!='' && SelectDepartmentID!=null && SelectDepartmentID !='' && SelectDepartmentID!=null){
+            if(SelectDepartmentID!='' && SelectDepartmentID!=null ){
                 /*
                     LoadAction
                 */

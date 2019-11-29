@@ -55,6 +55,25 @@
         }
     }
 
+    function LoadSelectOptionStatusTicket(selector,selectedata=2){
+        var url =base_url_js+"rest_ticketing/__CRUDStatusTicket";
+        var dataform = {
+            action : 'read',
+            auth : 's3Cr3T-G4N',
+        };
+        var token = jwt_encode(dataform,'UAP)(*');
+        AjaxLoadRestTicketing(url,token).then(function(response){
+          selector.empty();
+          response =  response.data;
+          for (var i = 0; i < response.length; i++) {
+             var selected = (response[i][1] == selectedata) ? 'selected' : '';
+             selector.append(
+                  '<option value = "'+response[i][1]+'" '+selected+' >'+response[i][2]+'</option>'
+              );
+          }
+        })
+    }
+
     function UpdateVarDepartmentID(getValue,getAbbr){
          window.DepartmentID = getValue;
          window.DepartmentAbbr = getAbbr;
