@@ -3206,6 +3206,16 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
        return $rs;
     }
 
+    public function SearchEmployeesByNIP($NIP){
+        $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID from db_employees.employees as emp
+            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID 
+            join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
+            where emp.NIP = "'.$NIP.'"
+                ';
+        $query=$this->db->query($sql, array())->result_array();
+        return $query;
+    }
+
     public function NonDiv($IDDivSelected,$NIP)
     {
         $sql = "SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, '.', 1) as Division,
