@@ -1809,7 +1809,7 @@ class C_save_to_excel extends CI_Controller
                 Admission berdasarkan DateSale
                 Fin berdasarkan DateFin
             Online
-                Admission & Fin sama ambil dari  VerificationAT dari table register_verified      
+                Admission & Fin sama ambil dari  VerificationAT dari table register_verified
 
         */
         $this->load->model('admission/m_admission');
@@ -2088,7 +2088,7 @@ class C_save_to_excel extends CI_Controller
                $len = strlen($NoKwitansi);
                $Max = 4;
                $WrKwitansi = $NoKwitansi;
-               for ($z=0; $z < $Max - $len; $z++) { 
+               for ($z=0; $z < $Max - $len; $z++) {
                   $WrKwitansi = '0'.$WrKwitansi;
                }
 
@@ -3152,8 +3152,29 @@ class C_save_to_excel extends CI_Controller
                }
                $TotalAll = $TotalAll + $output[$j]['Invoice'];
 
-               $excel3->setCellValue($keyM[$keyI].$a, $tt);
-               $excel3->setCellValue($keyM[$as].$a, $byr);
+               // $excel3->setCellValue($keyM[$keyI].$a, $tt);
+               // $excel3->setCellValue($keyM[$as].$a, $byr);
+
+
+              //---  felxible header report tuition fee---
+               if ($keyI > 25) {
+                   $huruf = $this->m_master->HurufColExcelNumber($keyI);
+                   // print_r($huruf);die();
+                   $excel3->setCellValue($huruf.$a, $tt);
+               }
+               else
+               {
+                $excel3->setCellValue($keyM[$keyI].$a, $tt);
+               }
+
+               if ($as > 25) {
+                   $huruf = $this->m_master->HurufColExcelNumber($keyI);
+                   $excel3->setCellValue($huruf.$a, $byr);
+               }
+               else
+               {
+                 $excel3->setCellValue($keyM[$as].$a, $byr);
+               }
                $keyI = $keyI + 2;
             }
 
