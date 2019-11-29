@@ -390,8 +390,8 @@ class C_rest extends CI_Controller {
                         <i class="fa fa-edit"></i> <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a href="'.base_url('student/details-student-scores/'.$token).'">Details Score</a></li>
-                        <li><a href="'.base_url('student/student-transcript/'.$token).'">Transcript</a></li>
+                        <li><a href="'.url_sign_in_lecturers.'student/details-student-scores/'.$token.'">Details Score</a></li>
+                        <li><a href="'.url_sign_in_lecturers.'student/student-transcript/'.$token.'">Transcript</a></li>
                       </ul>
                     </div>';
 
