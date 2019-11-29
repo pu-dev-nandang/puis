@@ -16,6 +16,9 @@
         <li class="<?php if($this->uri->segment(3)=='monitoring-schedule-exchange') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/monitoring-schedule-exchange'); ?>">Monitoring Schedule Exchange</a>
         </li>
+        <li class="<?php if($this->uri->segment(3)=='teach-load') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('academic/attendance/teach-load'); ?>">Lecturer Teaching Recap</a>
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
 
@@ -27,6 +30,3 @@
 
     </div>
 </div>
-
-
-

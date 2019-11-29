@@ -37,6 +37,7 @@
 						<th>Photo</th>
 						<th>Department</th>
 						<th>DetailCatalog</th>
+						<th>Unit</th>
 						<th>CreatedBy</th>
 						<th>Status</th>
 						<th style="min-width: 120px !important;">Action</th>
@@ -85,7 +86,7 @@
 		        },
 		    },
 		    'createdRow': function( row, data, dataIndex ) {
-		    	var st_de = data[11];
+		    	var st_de = data[12];
 		    	console.log(st_de);
 		    	if (st_de.length > 0) {
 		    		$(row).attr('style','background-color: #8ED6EA;')

@@ -20,13 +20,15 @@ class C_master extends Purchasing_Controler {
         $content = $this->load->view('page/'.$this->data['department'].'/master/catalog',$this->data,true);
         $this->temp($content);
     }
-    public function type_payment()
+    public function term_payment()
     {
-      $this->data['data']= $this->m_master->showData_array('db_purchasing.pay_type');
-        $content = $this->load->view('page/'.$this->data['department'].'/master/type_payment',$this->data,true);
-        $this->temp($content);
+        $data['InputForm'] = $this->load->view('page/'.$this->data['department'].'/master/term_payment/InputForm','',true);
+        $data2['action'] = 'write';
+        $data['ViewTable'] = $this->load->view('page/'.$this->data['department'].'/master/term_payment/ViewTable',$data2,true);
+        $page = $this->load->view('page/'.$this->data['department'].'/master/term_payment',$data,true);
+        $this->temp($page);
     }
-
+    
     public function supplier()
     {
         $content = $this->load->view('page/'.$this->data['department'].'/master/supplier',$this->data,true);
@@ -40,14 +42,6 @@ class C_master extends Purchasing_Controler {
         $arr_result['html'] = $this->load->view('page/'.$this->data['department'].'/master/catalog/InputCategory',$this->data,true);
         echo json_encode($arr_result);
     }
-     public function SaveFormType()
-    {
-        $Name=$this->input->post('Type');
-        $arr=array('Name' => $Name, );
-        $this->db->insert('db_purchasing.pay_type',$arr);
-        redirect(base_url().'purchasing/master/type_payment');
-    }
-
     public function InputCategory_FormInput()
     {
         $this->auth_ajax();
@@ -146,6 +140,7 @@ class C_master extends Purchasing_Controler {
         $Item = $Input['Item'];
         $Desc = $Input['Desc'];
         $EstimaValue = $Input['EstimaValue'];
+        $Satuan = $Input['Satuan'];
         $Departement = $Input['Departement'];
         $Detail = $Input['Detail'];
         $Detail = json_encode($Detail);
@@ -171,6 +166,7 @@ class C_master extends Purchasing_Controler {
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
+                           'Satuan'=>$Satuan,
                            'CreatedBy' => $this->session->userdata('NIP'),
                            'CreatedAt' => date('Y-m-d'),
                            'Approval' => 1,
@@ -208,6 +204,7 @@ class C_master extends Purchasing_Controler {
                         'Photo' => '',
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
+                        'Satuan'=>$Satuan,
                         'CreatedBy' => $this->session->userdata('NIP'),
                         'CreatedAt' => date('Y-m-d'),
                         'Approval' => 1,
@@ -253,6 +250,7 @@ class C_master extends Purchasing_Controler {
                            'Photo' => $uploadFile,
                            'Departement' => $Departement,
                            'DetailCatalog' => $Detail,
+                           'Satuan'=>$Satuan,
                            'LastUpdateBy' => $this->session->userdata('NIP'),
                            'LastUpdateAt' => date('Y-m-d H:i:s'),
                        );
@@ -289,6 +287,7 @@ class C_master extends Purchasing_Controler {
                         'ID_category_catalog' => $ID_category_catalog,
                         'Departement' => $Departement,
                         'DetailCatalog' => $Detail,
+                        'Satuan'=>$Satuan,
                         'LastUpdateBy' => $this->session->userdata('NIP'),
                         'LastUpdateAt' => date('Y-m-d H:i:s'),
                     );
@@ -687,6 +686,7 @@ class C_master extends Purchasing_Controler {
             }
             
             $nestedData[] = $temp;
+            $nestedData[] = $row['Satuan'];
             $nestedData[] = $row['NameCreated'].'<br><span style = "color : red;">Last Updated<br>'.$row['LastUpdateAt'].'</span>';
             $st = '';
             switch ($row['Approval']) {
@@ -1074,6 +1074,7 @@ class C_master extends Purchasing_Controler {
           }
           $DetailCatalog = $objWorksheet->getCellByColumnAndRow(4, $i)->getCalculatedValue();
           $ID_category_catalog = $objWorksheet->getCellByColumnAndRow(5, $i)->getCalculatedValue();
+          $Satuan = $objWorksheet->getCellByColumnAndRow(6, $i)->getCalculatedValue();
 
           $dataSave = array(
             'Item' => $Item,
@@ -1082,6 +1083,7 @@ class C_master extends Purchasing_Controler {
             'Departement' => $Departement,
             'DetailCatalog' => $DetailCatalog,
             'ID_category_catalog' => $ID_category_catalog,
+            'Satuan'=> $Satuan,
             'Approval' => 1,
             'ApprovalAt' => date("Y-m-d H:i:s"),
             'ApprovalBy' => $this->session->userdata("NIP"),
@@ -1143,6 +1145,77 @@ class C_master extends Purchasing_Controler {
         }
         echo json_encode($rs);
       }
+    }
+    
+    public function crud_term_payment()
+    {
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type: application/json');
+        $Input = $this->getInputToken();
+        $action = $Input['action'];
+        if ($action == 'read') {
+            $sql = 'select a.*,b.Name as NameEmloyess from db_purchasing.pay_type as a 
+                    left join db_employees.employees as b on a.Updated_by = b.NIP
+                    where a.Active = 1
+                    ';
+            $query = $this->db->query($sql,array())->result_array();
+            $data = array();
+            for ($i=0; $i < count($query); $i++) {
+                $nestedData = array();
+                $row = $query[$i]; 
+                $nestedData[] = $i+1;
+                $nestedData[] = $row['Name'];
+                $nestedData[] = $row['Updated_at'];
+                $nestedData[] = $row['NameEmloyess'];
+                $token = $this->jwt->encode($row,"UAP)(*");
+                $nestedData[] = $token;
+                $nestedData[] = $row['ID'];
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( 0 ),
+                "recordsTotal"    => intval(count($query)),
+                "recordsFiltered" => intval( count($query) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);   
+        }
+        elseif ($action =='add') {
+            $dataSave = json_decode(json_encode($Input['data']),true);
+            $arr_add = [
+                'Updated_at' => date('Y-m-d H:i:s'),
+                'Updated_by' => $this->session->userdata('NIP'),
+            ];
+            $dataSave = $dataSave  + $arr_add;
+            $this->db->insert('db_purchasing.pay_type',$dataSave);
+            echo json_encode(1);
+        }
+        elseif ($action =='delete') {
+            $ID = $Input['ID'];
+            $status = [
+                'Active' => 0,
+            ];
+            $this->db->where('ID',$ID);
+            $this->db->update('db_purchasing.pay_type',$status);
+            echo json_encode(1);
+        }
+        elseif ($action = 'edit') {
+            $ID = $Input['ID'];
+            $dataSave = json_decode(json_encode($Input['data']),true);
+            $arr_add = [
+                'Updated_at' => date('Y-m-d H:i:s'),
+                'Updated_by' => $this->session->userdata('NIP'),
+            ];
+            $dataSave = $dataSave  + $arr_add;
+            $this->db->where('ID',$ID);
+            $this->db->update('db_purchasing.pay_type',$dataSave);
+            echo json_encode(1);
+        }
+        else
+        {
+            echo '{"status":"999","message":"Not Authorize"}'; 
+        }
     }
 
 }

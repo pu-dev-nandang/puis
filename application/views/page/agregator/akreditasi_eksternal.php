@@ -35,10 +35,10 @@
                 <div class="form-group">
                     <label>Lingkup</label>
                     <select class="form-control" id="formAE_Scope">
-                        <option value="Nasional">PT</option>
-                        <option value="Internasional">Fakultas</option>
-                        <option value="Internasional">Program Studi</option>
-                        <option value="Internasional">Unit</option>
+                        <option value="PT">PT</option>
+                        <option value="Fakultas">Fakultas</option>
+                        <option value="Program Studi">Program Studi</option>
+                        <option value="Unit">Unit</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -94,12 +94,12 @@
                 loadDataTable();
                 clearInterval(firstLoad);
             }
-            
+
         },1000);
         setTimeout(function () {
             clearInterval(firstLoad);
         },5000);
-        
+
     });
 
     $("#btndownloaadExcel").click(function(){

@@ -1421,7 +1421,7 @@ class M_api extends CI_Model {
     public function __getStudentByNPM($ta,$NPM){
 
         $db = 'ta_'.$ta;
-        $data = $this->db->query('SELECT s.*, au.EmailPU, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
+        $data = $this->db->query('SELECT s.*, au.EmailPU, au.KTPNumber, au.Access_Card_Number, p.Name AS ProdiName, p.NameEng AS ProdiNameEng,
                                       ss.Description AS StatusStudentDesc,"'.$db.'" as ta_student,
                                       em.Name AS Mentor, em.NIP, em.EmailPU AS MentorEmailPU
                                       FROM '.$db.'.students s

@@ -3,11 +3,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_master extends CI_Model {
-
+    public $passApiKey = '';
 
     function __construct()
     {
         parent::__construct();
+        $pas = md5('Uap)(*&^%');
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+        $this->passApiKey =  $pass;
     }
     public function get_departement()
     {
@@ -2715,6 +2718,28 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         curl_close ($ch);
         return $data;
     }
+    
+    public function apiservertoserver_Response($url,$token = '',$return=false)
+    {
+        $Input = $token;
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS,
+                    "token=".$Input);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $return);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+        $data = curl_exec($ch);
+        curl_close ($ch);
+        return $data;
+    }
+
 
     public function UserQNA($IDDivision = '')
     {
@@ -2763,12 +2788,18 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function userKB($IDDivision = '')
     {
         $arr_result = array();
-        $Q_add = ($IDDivision == '') ? '' : ' where Division_ID = "'.$IDDivision.'" order by Division_ID asc,Type asc';
-        $sql = 'select * from db_employees.knowledge_base '.$Q_add;
+        $Q_add = ($IDDivision == '') ? '' : ' where SPLIT_STR(emp.PositionMain, ".", 1) = "'.$IDDivision.'" order by IDType asc';
+        $sql = 'select kb.*,kt.Type as TypeName from db_employees.knowledge_base as kb
+        inner join  db_employees.employees as emp on kb.EntredBy=emp.NIP
+        inner join db_employees.kb_type as kt on kb.IDType=kt.ID
+         '.$Q_add;
+
+    // print_r($sql);die();
         $query=$this->db->query($sql, array())->result_array();
+        //print_r($query);die();
         for ($i=0; $i < count($query); $i++) {
-            $Type1 = $query[$i]['Type'];
-            $temp = array('Type' => $Type1);
+            $Type1 = $query[$i]['IDType'];
+            $temp = array('Type' => $query[$i]['TypeName']);
             $datatemp = array();
             $datatemp[] = array(
                 'Desc' => $query[$i]['Desc'],
@@ -2776,7 +2807,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             );
 
             for ($j=$i+1; $j < count($query); $j++) {
-                $Type2 = $query[$j]['Type'];
+                $Type2 = $query[$j]['IDType'];
                 if ($Type1 == $Type2) {
                   $datatemp[] = array(
                       'Desc' => $query[$j]['Desc'],
@@ -2797,8 +2828,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         }
 
-
+//print_r($arr_result);die;
         return $arr_result;
+
     }
 
 
@@ -3455,7 +3487,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     public function encode_auth_access_aps_rs($input,$view,$ProdiID){
         // get value ProdiID
         $arr_Prodi = [];
-        for ($i=0; $i < count($ProdiID); $i++) { 
+        for ($i=0; $i < count($ProdiID); $i++) {
            // $ex = explode('.', $ProdiID[$i]);
            $arr_Prodi[] = $ProdiID[$i];
         }
@@ -3489,25 +3521,25 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    }
 
                    $dd = $this->m_master->caribasedprimary('db_academic.program_study','KaprodiID',$NIP);
-                   for ($i=0; $i < count($dd); $i++) { 
+                   for ($i=0; $i < count($dd); $i++) {
                         $ProdiID[] = $dd[$i]['ID'];
                    }
 
                    $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
-                   for ($i=0; $i < count($dd); $i++) { 
+                   for ($i=0; $i < count($dd); $i++) {
                         $ID = $dd[$i]['ID'];
                         $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
-                        for ($j=0; $j < count($get); $j++) { 
+                        for ($j=0; $j < count($get); $j++) {
                            $ProdiID[] = $get[$j]['ID'];
                         }
                    }
                    // print_r($ProdiID);die();
                    $input = true;
-                   
+
                 }
                 elseif ($IDDivision == 15) { // prodi
                    $gg = $this->m_master->caribasedprimary('db_academic.program_study','AdminID',$NIP);
-                   for ($i=0; $i < count($gg); $i++) { 
+                   for ($i=0; $i < count($gg); $i++) {
                       $ProdiID[] = $gg[$i]['ID'];
                    }
 
@@ -3515,10 +3547,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
                 elseif ($IDDivision == 34) { // faculty
                     $dd = $this->m_master->caribasedprimary('db_academic.faculty','NIP',$NIP);
-                    for ($i=0; $i < count($dd); $i++) { 
+                    for ($i=0; $i < count($dd); $i++) {
                          $ID = $dd[$i]['ID'];
                          $get = $this->m_master->caribasedprimary('db_academic.program_study','FacultyID',$ID);
-                         for ($j=0; $j < count($get); $j++) { 
+                         for ($j=0; $j < count($get); $j++) {
                             $ProdiID[] = $get[$j]['ID'];
                          }
                     }
@@ -3542,7 +3574,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $Pos[] = $PositionOther2;
             $Pos[] = $PositionOther3;
             // print_r($Pos);die();
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $input = $Pos[$i]['input'];
                 if ($input) {
                     $rsSub['input'] = $input;
@@ -3550,7 +3582,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 }
             }
 
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $view = $Pos[$i]['view'];
                 if ($view == 'all') {
                     $rsSub['view'] = $view;
@@ -3559,14 +3591,14 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             }
 
             $Gel_AllProdi = [];
-            for ($i=0; $i < count($Pos); $i++) { 
+            for ($i=0; $i < count($Pos); $i++) {
                 $ProdiID = $Pos[$i]['ProdiID'];
 
                 if (count($ProdiID) > 0 ) {
-                    for ($j=0; $j < count($ProdiID); $j++) { 
+                    for ($j=0; $j < count($ProdiID); $j++) {
                         $Gel_AllProdi[] = $ProdiID[$j];
                     }
-                    
+
                 }
             }
 
@@ -3614,7 +3646,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $G_dt = $this->caribasedprimary($tabledt,$field,$ID);
             if (count($G_dt) > 0) {
                 $strFind = 'Reject';
-                for ($i=0; $i < count($G_dt); $i++) { 
+                for ($i=0; $i < count($G_dt); $i++) {
                     $Desc = $G_dt[$i]['Desc'];
                     if (preg_match("/^".$strFind."/i", $Desc)) {
                         // echo "Matches!";
@@ -3629,7 +3661,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
     }
 
     public function __Previleges_aps_apt_user($NIP,$URI,$Type){
-        $sql = 'select a.* from db_agregator.agregator_menu as a 
+        $sql = 'select a.* from db_agregator.agregator_menu as a
                 join db_agregator.agregator_menu_header as b on a.MHID = b.ID
                 where b.Type = "'.$Type.'" and a.URL = "'.$URI.'"
         ';
@@ -3644,9 +3676,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $Table1 = 'agregator_user_member';
             $Table2 = 'agregator_user';
         }
-        $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.'.$Table1.' aum 
+        $checkMenu = $this->db->query('SELECT au.* FROM db_agregator.'.$Table1.' aum
                                             LEFT JOIN db_agregator.'.$Table2.' au ON (aum.AUPID = au.ID)
-                                            WHERE aum.NIP = "'.$NIP.'" 
+                                            WHERE aum.NIP = "'.$NIP.'"
                                             LIMIT 1')->result_array();
         $MyMenu = (count($checkMenu)>0) ? $checkMenu[0]['Menu'] : "[]" ;
         $MyMenu = json_decode($MyMenu);
@@ -3662,11 +3694,193 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 //     $rs['RuleAccess'] = $checkMenu[0]['Access'];
                 // }
                 $rs['RuleAccess'] = $checkMenu[0]['Access'];
-                
+
             }
 
         }
         return $rs;
     }
+
+
+    public function UploadOneFilesToNas($headerOrigin,$filename='',$varFiles='userfile',$pathAdd=null,$return='string')
+    {
+        $filename = ($filename == '') ? uniqid() : $filename;
+        /*
+            $headerOrigin = Host Origin ex: http://localhost
+                path berdasarkan Host Origin
+            $filename = filename
+            $varFiles = variable key pada $_FILES
+            $pathAdd = pathAdd ex admission/temp => no slash in last word
+            $return = 'string/json'
+
+            ex : 
+                 $uploadNas = $this->m_master->UploadOneFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
+        */
+
+        $rs = array();
+        // $header[] = 'Content-Type: application/json';
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'filename' => $filename,
+        );
+        if (isset($pathAdd) && $pathAdd != '' && $pathAdd != null) {
+            $data['pathAdd'] = $pathAdd;
+        }
+
+        $url = url_files.'__uploadFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+
+        $Input = $token;
+        $ch = curl_init();
+        // $file_name_with_full_path = './images/logo.jpg';
+        // $cfile = new CURLFile($file_name_with_full_path, 'image/jpeg','logo.jpg');
+        $cfile = new CURLFile($_FILES[$varFiles]['tmp_name'], $_FILES[$varFiles]['type'],$_FILES[$varFiles]['name']);
+        $post = array('token' => $Input,'file_contents[]'=>$cfile);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        if ($return == 'string') {
+            return (count($rs)>0) ? $rs[0] : '';
+        }
+        else
+        {
+            return json_encode($rs);
+        }
+    }
+
+
+    public function UploadManyFilesToNas($headerOrigin,$filename='',$varFiles='userfile',$pathAdd=null,$return='json')
+    {
+        $filename = ($filename == '') ? uniqid() : $filename;
+        /*
+            $headerOrigin = Host Origin ex: http://localhost
+                path berdasarkan Host Origin
+            $filename = filename
+            $varFiles = variable key pada $_FILES
+            $pathAdd = pathAdd ex admission/temp => no slash in last word
+            $return = 'array/json'
+
+            ex : 
+                 $uploadNas = $this->m_master->UploadManyFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
+        */
+
+        $rs = array();
+        // $header[] = 'Content-Type: application/json';
+        $header[] = "Content-type: multipart/form-data";
+        $header[] = "Origin: ".$headerOrigin."";
+        $header[] = "Cache-Control: max-age=0";
+        $header[] = "Connection: keep-alive";
+        $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'filename' => $filename,
+        );
+        if (isset($pathAdd) && $pathAdd != '' && $pathAdd != null) {
+            $data['pathAdd'] = $pathAdd;
+        }
+
+        $url = url_files.'__uploadFile?apikey='.$this->passApiKey;
+        $token = $this->jwt->encode($data,"UAP)(*");
+
+        $Input = $token;
+        $ch = curl_init();
+        
+        $countfiles = count($_FILES[$varFiles ]['name']);
+        $arr_files = [];
+        for($i=0;$i<$countfiles;$i++){
+            $cfile = new CURLFile($_FILES[$varFiles]['tmp_name'][$i], $_FILES[$varFiles]['type'][$i],$_FILES[$varFiles]['name'][$i]);
+            $arr_files['file_contents['.$i.']'] = $cfile;
+        }
+        $new_post_array  = ['token' => $Input];
+        $post = $new_post_array + $arr_files;   
+        // $post = array('token' => $Input,'file_contents[]'=>$cfile);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $pr = curl_exec($ch);
+        // print_r($pr);die();
+        $rs = (array) json_decode($pr,true);
+        curl_close ($ch);
+        if ($return == 'array') {
+            return $rs;
+        }
+        else
+        {
+            return json_encode($rs);
+        }
+    }
+
+    public function DeleteFileToNas($headerOrigin,$path='')
+    {
+
+        /*
+            $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
+            callback  : 
+                [
+                    {
+                    Status: "1",
+                    msg: "Delete file success"
+                    }
+                ]   
+        */
+        if ($path != '') {
+            $rs = array();
+            $header[] = "Content-type: multipart/form-data";
+            $header[] = "Origin: ".$headerOrigin."";
+            $header[] = "Cache-Control: max-age=0";
+            $header[] = "Connection: keep-alive";
+            $header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+            $data = array(
+                'auth' => 's3Cr3T-G4N',
+                'path' => $path,
+            );
+
+            $url = url_files.'__deleteFile?apikey='.$this->passApiKey;
+            $token = $this->jwt->encode($data,"UAP)(*");
+            $Input = $token;
+            $ch = curl_init();
+            $new_post_array  = ['token' => $Input];
+            $post = $new_post_array;
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
+            curl_setopt($ch, CURLOPT_URL,$url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $pr = curl_exec($ch);
+            $rs = (array) json_decode($pr,true);
+            curl_close ($ch);
+            return $rs;   
+        }
+        else
+        {
+            return 'No path added';
+        }
+    }
   
+
 }

@@ -4469,7 +4469,7 @@ class M_finance extends CI_Model {
               (
                              select a.No_Ref,c.Name as Sales,b.PIC,b.DateFin,b.FullName,b.NoKwitansi,"Off" as FormulirType
                              from db_admission.formulir_number_offline_m as a
-                             join db_admission.sale_formulir_offline as b
+                             left join db_admission.sale_formulir_offline as b
                              on a.FormulirCode = b.FormulirCodeOffline
                              left join db_employees.employees as c
                              on c.NIP = b.PIC

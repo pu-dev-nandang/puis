@@ -51,7 +51,6 @@ class C_credit_type_courses extends Globalclass {
                 $nestedData[] = $row['NamaType'];
                 $nestedData[] = $row['SKSPerMinutes'];
                 $nestedData[] = $row['Updated_at'];
-                $nestedData[] = $row['Updated_by'];
                 $nestedData[] = $row['Name'];
                 $token = $this->jwt->encode($row,"UAP)(*");
                 $nestedData[] = $token;
