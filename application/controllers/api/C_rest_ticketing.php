@@ -339,6 +339,10 @@ class C_rest_ticketing extends CI_Controller {
             $rs = $this->m_ticketing->rest_progress_ticket($dataToken);
             echo json_encode($rs);
             break;
+          case 'close_ticket':
+            $rs = $this->m_ticketing->rest_close_ticket($dataToken);
+            echo json_encode($rs);
+            break;
           default:
             # code...
             break;

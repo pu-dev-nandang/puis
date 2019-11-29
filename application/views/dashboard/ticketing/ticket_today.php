@@ -25,90 +25,7 @@
                 </div>
                 <div class="col-md-3 panel-ticket" id = "PanelProgressTicket">
                 </div>
-
-                <div class="col-md-3 panel-ticket">
-
-                    <h3 class="close-ticket">Close Ticket <span>7</span></h3>
-
-                    <hr/>
-
-                    <div class="timeline-centered">
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2017090.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Art Ramadani</a> <span>posted a status update</span></h2>
-                                    <p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial two promise. Greatly who affixed suppose but enquire compact prepare all put. Added forth chief trees but rooms think may.</p>
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2017090.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Job Meeting</a></h2>
-                                    <p>You have a meeting at <strong>Laborator Office</strong> Today.</p>
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2017090.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Arlind Nushi</a> <span>checked in at</span> <a href="#">Laborator</a></h2>
-
-                                    <blockquote>Great place, feeling like in home.</blockquote>
-
-                                    ''
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                        <article class="timeline-entry">
-
-                            <div class="timeline-entry-inner">
-
-                                <div class="timeline-icon">
-                                    <img data-src="http://localhost:8080/siak3/uploads/employees/2017090.JPG" style="margin-top: -3px;" class="img-circle img-fitter" width="57">
-                                </div>
-
-                                <div class="timeline-label">
-                                    <h2><a href="#">Arber Nushi</a> <span>changed his</span> <a href="#">Profile Picture</a></h2>
-
-                                    <blockquote>Pianoforte principles our unaffected not for astonished travelling are particular.</blockquote>
-
-                                    <img src="http://themes.laborator.co/neon/assets/images/timeline-image-3.png" class="img-responsive img-rounded full-width">
-                                </div>
-                            </div>
-
-                        </article>
-
-
-                    </div>
+                <div class="col-md-3 panel-ticket" id = "PanelCloseTicket">
                 </div>
             </div>
         </div>
@@ -123,6 +40,7 @@ var App_ticket_ticket_today = {
         loading_page('#PanelOpenTicket');
         loading_page('#PanelPendingTicket');
         loading_page('#PanelProgressTicket');
+        loading_page('#PanelCloseTicket');
         var selectorDepartment = $('#SelectDepartmentID');
         LoadSelectOptionDepartmentFiltered(selectorDepartment);
         var firstLoad = setInterval(function () {
@@ -134,6 +52,7 @@ var App_ticket_ticket_today = {
                 App_ticket_ticket_today.OpenTicketRest();
                 App_ticket_ticket_today.PendingTicketRest();
                 App_ticket_ticket_today.ProgressTicketRest();
+                App_ticket_ticket_today.ProgressCloseRest();
                 clearInterval(firstLoad);
             }
         },1000);
@@ -563,13 +482,122 @@ var App_ticket_ticket_today = {
 
     },
 
-    getLastReceived : function(data){
+    ProgressCloseRest : function(){
+        if (!$('#PanelCloseTicket').find('.flipInX').length) {
+            loading_page('#PanelCloseTicket');
+        }
+
+        var url = base_url_js+"rest_ticketing/__ticketing_dashboard";
+        var dataform = {
+            action : 'close_ticket',
+            auth : 's3Cr3T-G4N',
+            DepartmentID : DepartmentID,
+            NIP : sessionNIP,
+        }
+        var token = jwt_encode(dataform,'UAP)(*');
+        
+        AjaxLoadRestTicketing(url,token).then(function(response){
+            var html = '';
+            var count = response.count;
+            var data = response.data;
+            html += '<h3 class="close-ticket">Close Ticket <span>'+count+'</span></h3>'+
+                        '<hr/>'+
+                        '<div class="timeline-centered">';
+            if (data.length >0) {
+                var EncodeDepartment = jwt_encode(DepartmentID,'UAP)(*');
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
+                    var hrefActionTicket = '#';
+                    var department_handle = '';
+                    var data_received = row.data_received;
+                    var Received = App_ticket_ticket_today.getLastReceived(data_received,"0");
+                    var Worker = App_ticket_ticket_today.getWorker(data_received,"0");
+                    var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
+                    var arr_filter_depart = [];
+                    for (var j = 0; j < data_received.length; j++) {
+                        if (data_received[j].SetAction == "1") {
+                            if (department_handle == '') {
+                                department_handle += data_received[j].NameDepartmentDestination;
+                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
+                            }
+                            else
+                            {
+                                var booldepart = true;
+                                for (var k = 0; k < arr_filter_depart.length; k++) {
+                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                                       booldepart = false; 
+                                       break;
+                                    }
+                                }
+                                if (booldepart) {
+                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                                }
+                                
+                            }
+                        }
+                    }
+                    html += '<article class="timeline-entry">'+
+                                ' <div class="timeline-entry-inner">'+
+                                    '<div class="timeline-icon">'+
+                                        '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                    '</div>'+
+                                    '<div class="timeline-label">'+
+                                       '<div class="ticket-division">'+department_handle+'</div>'+
+                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                       '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
+                                       '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
+                                       '<p>'+nl2br(row.Message)+'</p>'+
+                                       pfiles+
+                                       '<div class="ticket-accepted">'+
+                                        '<div class="separator"><b>Received</b></div>'+
+                                            Received['NameReceivedBy']+' | '+ Received['ReceivedAt']+
+                                            '<div style="margin-top: 10px;">'+
+                                                '<p>'+
+                                                    'From : '+row.NameDepartmentTicket+
+                                                    '<br/>'+
+                                                    'Assign to : '+Worker+
+                                                    '<br/>'+
+                                                    'Transfer to : '+TransferTo+
+                                                '</p>'+    
+                                            '</div>'+
+                                       '</div>'+
+                                       '<div style="text-align: center;margin-top: 10px;">'+
+                                           '<a href="javascript:void(0);" class="ModalReadMore" setTicket ="'+row.setTicket+'" token = "'+row.token+'" data-id ="'+row.ID+'">Read more <i class="fa fa-angle-double-right"></i></a>'+
+                                       '</div>'+
+                                   '</div>'+
+                            '</article>';
+                }
+            }
+            else
+            {
+                html += '<label>No data found in server</label>';
+            }
+
+            html += '</div>';
+            $('#PanelCloseTicket').html(html);
+
+
+            $('.img-fitter').imgFitter({
+                // CSS background position
+                backgroundPosition: 'center center',
+                // for image loading effect
+                fadeinDelay: 400,
+                fadeinTime: 1200
+            });
+
+        }).fail(function(response){
+           toastr.error('Error open ticket');
+        })
+    },
+
+    getLastReceived : function(data,SetAction = "1"){
         var rs = [];
         var count = data.length;
         var NameReceivedBy = '';
         var ReceivedAt = '';
         for (var i = 0; i < count; i++) {
-            if (data[i].SetAction == "1" && data[i].DataReceived_Details.length > 0) {
+            if (data[i].SetAction == SetAction && data[i].DataReceived_Details.length > 0) {
                 NameReceivedBy = data[i].NameReceivedBy;
                 ReceivedAt = data[i].ReceivedAt;
             }
@@ -582,11 +610,11 @@ var App_ticket_ticket_today = {
         return rs;
     },
 
-    getWorker : function(data){
+    getWorker : function(data,SetAction = "1"){
         var rs = '';
         var count = data.length;
         for (var i = 0; i < count; i++) {
-            if (data[i].SetAction == "1" && data[i].DataReceived_Details.length > 0) {
+            if (data[i].SetAction == SetAction && data[i].DataReceived_Details.length > 0) {
                 var details = data[i].DataReceived_Details;
                 for (var j = 0; j < details.length; j++) {
                     if (rs == '') {
@@ -639,6 +667,7 @@ $(document).off('change', '#SelectDepartmentID').on('change', '#SelectDepartment
         App_ticket_ticket_today.OpenTicketRest();
         App_ticket_ticket_today.PendingTicketRest();
         App_ticket_ticket_today.ProgressTicketRest();
+        App_ticket_ticket_today.ProgressCloseRest();
     }
 })
 $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input_form[name="CategoryID"]',function(e) {

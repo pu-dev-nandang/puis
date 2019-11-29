@@ -194,7 +194,7 @@ class M_ticketing extends CI_Model {
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
-                where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") = CURDATE()
+                where a.TicketStatus = 1 and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = CURDATE()
                 '.$Addwhere.' 
                 and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                 order by a.ID asc
@@ -243,7 +243,7 @@ class M_ticketing extends CI_Model {
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
-                where TicketStatus = 1 and DATE_FORMAT(RequestedAt,"%Y-%m-%d") < CURDATE()
+                where a.TicketStatus = 1 and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") < CURDATE()
                 '.$Addwhere.'
                 and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                 order by a.ID asc
@@ -302,7 +302,63 @@ class M_ticketing extends CI_Model {
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                where TicketStatus = 2
+                where a.TicketStatus = 2
+                '.$Addwhere.$customwhere.'
+                order by a.ID asc
+                ';
+        
+        $query = $this->db->query($sql,array())->result_array();
+        $rs['count'] = count($query);
+        for ($i=0; $i < $rs['count']; $i++) {
+            $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'] ]);
+
+            $query[$i]['data_received'] = $data_received;
+
+            if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+                $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+                $url = url_files."fileGetAnyToken/".$token;
+                $query[$i]['Files'] = $url;
+            }
+
+            // add foto
+            if ($query[$i]['Photo'] != '' && $query[$i]['Photo'] != null) {
+                $url = url_pas."uploads/employees/".$query[$i]['Photo'];
+                $query[$i]['Photo'] = $url;
+            }
+
+            $query[$i]['RequestedAt'] = $this->__set_tgl_ticket($query[$i]['RequestedAt']);
+            $query[$i]['setTicket'] = $this->__setTicket_action_progress($query[$i]['NoTicket'],$NIP,$dataToken['DepartmentID'],$data_received,$query[$i]['TicketStatus']);
+            $token = $this->jwt->encode($query[$i],"UAP)(*");
+            $query[$i]['token'] =  $token;
+        }
+        $rs['data'] = $query;
+        return $rs;
+    }
+
+    public function rest_close_ticket($dataToken,$customwhere = ''){
+        $rs = [];
+        $Addwhere = '';
+        if (array_key_exists('DepartmentID', $dataToken)) {
+           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                or a.ID in (
+                                    select a.TicketID from db_ticketing.received as a
+                                    join db_ticketing.category as b on a.CategoryReceivedID = b.ID
+                                    '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
+                                    where qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                )   
+            )';
+        }
+        $NIP = $dataToken['NIP'];
+        $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
+        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
+                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
+                from db_ticketing.ticket as a 
+                join db_ticketing.category as ca on a.CategoryID = ca.ID
+                join db_employees.employees as b on a.RequestedBy = b.NIP
+                '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
+                '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
+                where a.TicketStatus = 3 and DATE_FORMAT(a.TicketClosedAt,"%Y-%m-%d") = CURDATE()
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';

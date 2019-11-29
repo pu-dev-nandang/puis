@@ -1,4 +1,8 @@
 <?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
+<?php 
+	$hide = ($Authent['callback']['Detail']['Admin']) ? '' : 'hide';
+
+ ?>
 <style type="text/css">
 	.row {
 	    margin-right: 0px;
@@ -60,7 +64,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="col-md-4">
+	<div class="col-md-4 <?php echo $hide ?>">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 			    <h4 class="panel-title">Transfer To</h4>
@@ -158,7 +162,8 @@
 			}
 			else
 			{
-				bool = false;
+				// bool = false;
+				bool = true;
 			}
 			
 			if (!bool) {
