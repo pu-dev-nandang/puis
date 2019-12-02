@@ -3559,43 +3559,45 @@ class C_api3 extends CI_Controller {
 
     public function getLuaran_lainnya(){  //Buku ber-ISBN, Book Chapter
 
-        $status = $this->input->get('s');
-        $requestData= $_REQUEST;
+        $statusx = $this->input->get('s');
 
-        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+        if($statusx == "0") {
+            $status = "";
+        } else {
+            $status = $statusx;
+        }
+
+        $requestData= $_REQUEST;
+        $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
         $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 4 AND ID_thn_laks = "'.$status.'" ')->result_array();
+                    WHERE ID_kat_capaian = 4 '.$whereStatus.' ')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
 
             $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-                        FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'"
-                        UNION
-                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                        FROM db_research.pengabdian_masyarakat
-                        WHERE ID_kat_capaian = 4 '.$whereStatus.' AND ( ';
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
-            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
-
         }
         else {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            if($status == "") {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 4 AND ID_thn_laks = "'.$status.'" ';
-            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                    WHERE ID_kat_capaian = 4 ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            } 
+            else {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            }  
 
         }
 
@@ -3630,43 +3632,47 @@ class C_api3 extends CI_Controller {
 
     public function getLuaranTekno_produk(){  //Teknologi Tepat Guna, Produk, Karya Seni, Rekayasa
 
-        $status = $this->input->get('s');
-        $requestData= $_REQUEST;
+        $statusx = $this->input->get('s');
 
-        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+        if($statusx == "0") {
+            $status = "";
+        } else {
+            $status = $statusx;
+        }
+
+        $requestData= $_REQUEST;
+        $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
         $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 1 AND ID_thn_laks = "'.$status.'" ')->result_array();
+                    WHERE ID_kat_capaian = 1 '.$whereStatus.' ')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
 
             $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-                        FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'"
-                        UNION
-                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                        FROM db_research.pengabdian_masyarakat
-                        WHERE ID_kat_capaian = 1 '.$whereStatus.' AND ( ';
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
-            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
 
         }
         else {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            if($status == "") {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 1 AND ID_thn_laks = "'.$status.'" ';
-            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                    WHERE ID_kat_capaian = 1 ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            } 
+            else {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'" ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }  
 
         }
 
@@ -3701,43 +3707,47 @@ class C_api3 extends CI_Controller {
 
     public function getLuaranHkiproduk(){   //HKI (Hak Cipta, Desain Produk Industri, dan lainnya)
 
-        $status = $this->input->get('s');
+        $statusx = $this->input->get('s');
+
+        if($statusx == "0") {
+            $status = "";
+        } else {
+            $status = $statusx;
+        }
         $requestData= $_REQUEST;
 
-        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
+        $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
         $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 7 AND ID_thn_laks = "'.$status.'" ')->result_array();
+                    WHERE ID_kat_capaian = 7 '.$whereStatus.' ')->result_array();
 
-        if( !empty($requestData['search']['value']) ) {
+        if(!empty($requestData['search']['value']) ) {
 
             $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-                        FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'"
-                        UNION
-                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                        FROM db_research.pengabdian_masyarakat
-                        WHERE ID_kat_capaian = 7 '.$whereStatus.' AND ( ';
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$whereStatus.'" AND ( ';
 
             $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
 
-        }
+        } 
         else {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            if($status == "") {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 7 AND ID_thn_laks = "'.$status.'" ';
-            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                    WHERE ID_kat_capaian = 7 ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            } 
+            else {
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }  
 
         }
 
@@ -3775,46 +3785,56 @@ class C_api3 extends CI_Controller {
     }
 
 
-    public function getLuaranHkipaten() {
+    public function getLuaranHkipaten() {   // 5.h.1. HKI (Paten, Paten Sederhana)
 
-        $status = $this->input->get('s');
+        $statusx = $this->input->get('s');
+
+        if($statusx == "0") {
+            $status = "";
+        } else {
+            $status = $statusx;
+        }
+
         $requestData= $_REQUEST;
+        $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $whereStatus = ($status!='') ? ' AND ID_thn_laks = "'.$status.'" ' : '';
-
-        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 3
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 3')->result_array();
+                    WHERE ID_kat_capaian = 3 '.$whereStatus.' ';
+        $totalData = $this->db->query($squery, array())->result_array();        
+
+        $totalDaddta = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3 '.$whereStatus.' ')->result_array();
+        //print($sql); exit();
 
         if( !empty($requestData['search']['value']) ) {
 
             $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                         FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'"
-                        UNION
-                        SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                        FROM db_research.pengabdian_masyarakat
-                        WHERE ID_kat_capaian = 3 '.$whereStatus.' AND ( ';
+                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
-            $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
+            $sql.= 'NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
 
         }
         else {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            if($status == "") {
+                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
-                    WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'"
-                    UNION
-                    SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-                    FROM db_research.pengabdian_masyarakat
-                    WHERE ID_kat_capaian = 3 AND ID_thn_laks = "'.$status.'" ';
-            $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                    WHERE ID_kat_capaian = 3 ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+               
+            } 
+            else {
 
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" ';
+                $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }  
         }
 
         $query = $this->db->query($sql)->result_array();

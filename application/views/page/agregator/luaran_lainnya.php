@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-md-12">
                 <div class="col-md-3 col-md-offset-4">
-                    <select class="form-control" id="filterTahun"><option value="" selected> Semua Tahun</option></select>
+                    <select class="form-control" id="filterTahun"><option id="0" selected> Semua Tahun</option></select>
                 </div>
 
                 <div style="text-align: right;margin-bottom: 20px;">
@@ -25,13 +25,13 @@
                 </div>
 
             <div class="">
-                <table class="table dataTable2Excel" id="tableLuaran"  data-name="tableLuaran">
+                <table class="table table-striped table-bordered  dataTable2Excel" id="tableLuaran"  data-name="tableLuaran">
                     <thead>
                     <tr style="background: #20485A;color: #FFFFFF;">
                         <th style="text-align: center; width: 5%;">No</th>
-                        <th style="text-align: center;">Luaran Penelitian dan PkM</th>
-                        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th> 
-                        <th style="text-align: center;">Keterangan</th>
+                        <th style="text-align: center; width: 20%;">Luaran Penelitian dan PkM</th>
+                        <th style="text-align: center; width: 10%;">Tahun Perolehan (YYYY)</th> 
+                        <th style="text-align: center; width: 15%;">Keterangan</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -50,17 +50,18 @@
 
     $(document).ready(function () {
         loadSelectOptionClassOf_DSC('#filterTahun');
-        loadDataLuaran('');
+        loadDataLuaran();
     });
 
     $('#filterTahun').change(function () {
-        var status = $(this).val();
+        var status = $('#filterTahun option:selected').attr('id');
         loadDataLuaran(status);
     });
 
 
     function loadDataLuaran(status) {
 
+        var status = $('#filterTahun option:selected').attr('id');
         var dataTable = $('#tableLuaran').DataTable({
             "processing": true,
             "destroy": true,
