@@ -68,12 +68,12 @@
                                 Vision dan Mission
                                 </a>
                         </li>
-                        <li class="<?php if($this->uri->segment(3)=='struktur'){echo "current";} ?>">
+                        <!-- <li class="<?php if($this->uri->segment(3)=='struktur'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/about/sambutan'); ?>">
                                 <i class="icon-angle-right"></i>
                                 Organizational Structure
                                 </a>
-                        </li>
+                        </li> -->
                         <li class="<?php if($this->uri->segment(3)=='lecturer'){echo "current";} ?>">
                                 <a href="<?php echo base_url('prodi/about/lecturer'); ?>">
                                 <i class="icon-angle-right"></i>

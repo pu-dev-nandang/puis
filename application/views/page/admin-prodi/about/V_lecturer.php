@@ -196,13 +196,14 @@ $('#btnSave').click(function () {
 // Fungsi ini akan dipanggil ketika tombol hapus diklik
 $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
   id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
+ 
   $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
 })
 
 // DELETE
 $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) { // Ketika tombol hapus di klik
     var ID = $(this).attr('data-id');
-
+   
     var thisbtn = $(this);
     loading_button('#btn-hapus'); // Munculkan loading hapus
     var data = {
