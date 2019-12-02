@@ -988,7 +988,7 @@ class C_master extends Admission_Controler {
     private function showFile($file)
     {
         header("Content-type: application/pdf");
-        header("Content-disposition: inline;     
+        header("Content-disposition: inline;
         filename=".basename('document/'.$file));
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -1014,7 +1014,7 @@ class C_master extends Admission_Controler {
             $this->mypdf->SetAutoPageBreak(true, 0);
             $this->mypdf->AddPage();
             // Logo
-            $this->mypdf->Image('./images/logo_tr.png',10,10,50);
+            $this->mypdf->Image('./images/logo_tr2.png',10,10,50);
             $this->mypdf->SetFont('Arial','B',10);
             $this->mypdf->Text(150, 15, 'Formulir Number : '.$input['formulir_code']);
             // Line break
@@ -1437,7 +1437,7 @@ class C_master extends Admission_Controler {
                 $a = $this->m_master->caribasedprimary('db_admission.register','SchoolID',$input['CDID']);
                 if (count($a) > 0) {
                     $text = 'Dear Team,<br><br>
-                                    Mohon koreksi data calon mahasiswa karena data master sekolah telah di hapus oleh, <br> Nama : 
+                                    Mohon koreksi data calon mahasiswa karena data master sekolah telah di hapus oleh, <br> Nama :
                                     '. $this->session->userdata('Name').
                         '<br>Divisi : '.$this->session->userdata('PositionMain')['Division'];
                     $to = $this->m_sendemail->getToEmail('Admisi');
@@ -1467,7 +1467,7 @@ class C_master extends Admission_Controler {
         {
             $generate = $this->m_master->getDataWithoutSuperAdmin();
         }
-        
+
         echo json_encode($generate);
     }
 
@@ -1629,7 +1629,7 @@ class C_master extends Admission_Controler {
             $nestedData[] = $row['Name'];
 
             $combo = '<select class="full-width-fix select grouPAuth btn-edit" NIP = "'.$row['NIP'].'">';
-            for ($j=0; $j < count($getGroupUser); $j++) { 
+            for ($j=0; $j < count($getGroupUser); $j++) {
                 if ($getGroupUser[$j]['ID'] == $row['G_user']) {
                      $combo .= '<option value = "'.$getGroupUser[$j]['ID'].'" selected>'.$getGroupUser[$j]['GroupAuth'].'</option>';
                 }
@@ -1643,7 +1643,7 @@ class C_master extends Admission_Controler {
 
             $nestedData[] = $combo;
 
-            $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';  
+            $btn = '<button class="btn btn-danger btn-sm btn-delete btn-delete-group" NIP = "'.$row['NIP'].'"><i class="fa fa-trash" aria-hidden="true"></i></button>';
 
             $nestedData[] = $btn;
             $data[] = $nestedData;
@@ -1665,24 +1665,24 @@ class C_master extends Admission_Controler {
         // upload file
         $filename = 'Announcenment.pdf';
         $config['upload_path']   = path_register_online.'/upload/';
-        $config['overwrite'] = TRUE; 
-        $config['allowed_types'] = '*'; 
+        $config['overwrite'] = TRUE;
+        $config['allowed_types'] = '*';
         $config['file_name'] = $filename;
-        //$config['max_size']      = 100; 
-        //$config['max_width']     = 300; 
-        //$config['max_height']    = 300;  
+        //$config['max_size']      = 100;
+        //$config['max_width']     = 300;
+        //$config['max_height']    = 300;
         $this->load->library('upload', $config);
-           
+
         if ( ! $this->upload->do_upload('fileData')) {
-           // return $error = $this->upload->display_errors(); 
+           // return $error = $this->upload->display_errors();
            echo json_encode(array('msg' => 'The file did not upload successfully','status' => 0));
-           //$this->load->view('upload_form', $error); 
+           //$this->load->view('upload_form', $error);
         }
-           
-        else { 
-          // return $data =  $this->upload->data(); 
+
+        else {
+          // return $data =  $this->upload->data();
           echo json_encode(array('msg' => 'The file has been successfully uploaded','status' => 1));
-           //$this->load->view('upload_success', $data); 
+           //$this->load->view('upload_success', $data);
         }
     }
 
@@ -1694,7 +1694,7 @@ class C_master extends Admission_Controler {
         if (count($t) > 0) {
            $this->data['tahun'] = $t[0]['Ta'];
         }
-        
+
         $content = $this->load->view('page/'.$this->data['department'].'/master/set_tahun_ajaran2',$this->data,true);
         $this->temp($content);
     }
@@ -1714,7 +1714,7 @@ class C_master extends Admission_Controler {
         $sql = "select VA from db_admission.va_generate where VA_Status != 1";
         $query=$this->db->query($sql, array())->result_array();
         if (count($query) > 0) {
-            for ($i=0; $i < count($query); $i++) { 
+            for ($i=0; $i < count($query); $i++) {
                 $VA = $query[$i]['VA'];
                 try{
                     $va_log = $this->m_finance->cari_va($VA);
@@ -1733,7 +1733,7 @@ class C_master extends Admission_Controler {
                        // else
                        // {
                        //   echo 'Error';
-                       // } 
+                       // }
                     }
                     else
                     {
@@ -1750,8 +1750,8 @@ class C_master extends Admission_Controler {
                     continue;
                 }
             }
-            
-            
+
+
         }
     }
 
@@ -1765,11 +1765,11 @@ class C_master extends Admission_Controler {
     {
         $input = $this->getInputToken();
         $prefix = substr($input['Angkatan'], 2,4);
-        for ($i=$input['Start']; $i <= $input['End']; $i++) { 
+        for ($i=$input['Start']; $i <= $input['End']; $i++) {
            // check length max 4
             $code = $i;
             $c = strlen($i);
-            for ($j=0; $j < 4-$c; $j++) { 
+            for ($j=0; $j < 4-$c; $j++) {
                 $code = '0'.$code;
             }
             $code = $prefix.$code;
@@ -1821,10 +1821,10 @@ class C_master extends Admission_Controler {
           $excel2 = $excel2->load($path); // Empty Sheet
           $objWorksheet = $excel2->setActiveSheetIndex(0);
           $CountRow = $objWorksheet->getHighestRow();
-            
+
            $arr_bulan = array(
                'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Des'
-           ); 
+           );
 
            $arr_temp = array();
            $No_Ref = '';
@@ -1849,7 +1849,7 @@ class C_master extends Admission_Controler {
     }
 
     public function capacity_tahun_ajaran($tokenID_crm_period)
-    {   
+    {
         $key = "UAP)(*";
         $ID_crm_period =$this->jwt->decode($tokenID_crm_period,$key);
         $this->m_master->__fillTA_Capacity($ID_crm_period);
@@ -1867,7 +1867,7 @@ class C_master extends Admission_Controler {
     {
         $Input = $this->getInputToken();
         $dt = json_decode(json_encode($Input),true);
-        for ($i=0; $i < count($dt); $i++) { 
+        for ($i=0; $i < count($dt); $i++) {
             $Capacity = $dt[$i]['Capacity'];
             $ID = $dt[$i]['ID'];
             $this->db->where('ID',$ID);
