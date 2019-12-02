@@ -20,7 +20,7 @@
 
             <div>
                 <div class="col-md-3 col-md-offset-4">
-                    <select class="form-control" id="filterTahun"><option value="" selected> Semua Tahun</option></select>
+                    <select class="form-control" id="filterTahun"><option id="0" selected> Semua Tahun</option></select>
                 </div>
                 <div style="text-align: right;margin-bottom: 0px;">
                     <button id="saveToExcel" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
@@ -30,14 +30,13 @@
             <br/>
 
             <div class="">
-                <table class="table dataTable2Excel" id="tableHKIPaten"  data-name="tableHKIPaten">
+                <table class="table table-striped table-bordered dataTable2Excel" id="tableHKIPaten"  data-name="tableHKIPaten">
                     <thead>
                     <tr style="background: #20485A;color: #FFFFFF;">
-
                         <th style="text-align: center; width: 5%;">No</th>
-                        <th style="text-align: center;">Luaran Penelitian dan PkM</th>
-                        <th style="text-align: center; width: 15%;">Tahun Perolehan (YYYY)</th> 
-                        <th style="text-align: center;">Keterangan</th>
+                        <th style="text-align: center; width: 20%;">Luaran Penelitian dan PkM</th>
+                        <th style="text-align: center; width: 10%;">Tahun Perolehan (YYYY)</th> 
+                        <th style="text-align: center; width: 15%;">Keterangan</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -57,16 +56,18 @@
 
     $(document).ready(function () {
         loadSelectOptionClassOf_DSC('#filterTahun');
-        loadDataHKI_paten('');
+        loadDataHKI_paten();
     });
 
     $('#filterTahun').change(function () {
-        var status = $(this).val();
+        
+        var status = $('#filterTahun option:selected').attr('id');
         loadDataHKI_paten(status);
     });
 
 
     function loadDataHKI_paten(status) {
+        var status = $('#filterTahun option:selected').attr('id');
 
         var dataTable = $('#tableHKIPaten').DataTable({
             "processing": true,
