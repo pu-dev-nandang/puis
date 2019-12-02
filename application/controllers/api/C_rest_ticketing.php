@@ -376,4 +376,10 @@ class C_rest_ticketing extends CI_Controller {
       echo json_encode($rs);
     }
 
+    public function ticketing_GiveRatingCheck(){
+      $dataToken = $this->getInputToken();
+      $rs =  $this->m_ticketing->ticketing_GiveRatingCheck($dataToken);
+      echo json_encode($rs);
+    }
+
 }
