@@ -670,7 +670,7 @@ var App_ticket_ticket_today = {
                     action fill rating
                 */
 
-                console.log(response);
+                // console.log(response);
                 App_ticket_ticket_today.setModalFormRating(response);
             }
         }).fail(function(response){
@@ -700,6 +700,16 @@ var App_ticket_ticket_today = {
             'show' : true,
             'backdrop' : 'static'
         });
+
+        /*
+            remove data yg tidak memiliki class input_form
+        */
+        $('#GlobalModalLarge').find('.well').each(function(e){
+            var itsme = $(this);
+            if (!itsme.find('.input_form').length) {
+                itsme.remove();
+            }
+        })
     },
 
     __show_html_show_more : function(token){
@@ -766,7 +776,7 @@ var App_ticket_ticket_today = {
           html +=  '<div class="tracking-list">';
           for (var i = 0; i < data_received.length; i++) {
             var row = data_received[i];
-            console.log(row);
+            // console.log(row);
             var tokenData =jwt_encode(row,'UAP)(*');
             var GetWorker = '';
             var DataReceived_Details = row.DataReceived_Details;
@@ -860,8 +870,53 @@ var App_ticket_ticket_today = {
 
     },
 
-    SaveRating : function(selector_input_form){
+    SaveRating : function(selector){
         /* closest tracking-item */
+        var selector_input_form = selector.closest('.input_form');
+        var selector_tracking_item = selector.closest('.tracking-item');
+        var tokendata = selector_input_form.attr('tokendata');
+        var getData = jwt_decode(tokendata);
+        var Rate = selector_input_form.find('.fieldInput[name="Rate"] option:selected').val();
+        var Comment = selector_input_form.find('.fieldInput[name="Comment"]').val();
+        if (Rate != '' && Rate != undefined && Rate != null && Comment != '' && Comment != undefined && Comment != null) {
+            var data = {
+                ReceivedID : getData.ID,
+                Rate : Rate,
+                Comment : Comment,
+                EntredBy : sessionNIP,
+            };
+            var dataform = {
+                action : 'rating',
+                data : data,
+                auth : 's3Cr3T-G4N',
+                TicketID :  getData.TicketID,
+            };
+            
+            loading_button2(selector);
+            var url = base_url_js+"rest_ticketing/__event_ticketing";
+            var token = jwt_encode(dataform,'UAP)(*');
+            AjaxSubmitRestTicketing(url,token).then(function(response){
+                if (response.status == 1) {
+                    selector_input_form.remove();
+                    if (!selector_tracking_item.closest('.well').find('.input_form').length) {
+                        selector_tracking_item.closest('.well').remove();
+                    }
+                    toastr.success('Thanks you');
+                }
+                else
+                {
+                    toastr.error(response.msg);
+                    end_loading_button2(selector);
+                }
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+               end_loading_button2(selector);     
+            })
+        }
+        else
+        {
+            toastr.info('Rate and Comment are required');
+        }
         
     },
 
@@ -895,6 +950,12 @@ $('#btnCreateNewTicket').click(function () {
     App_ticket_ticket_today.GiveRatingCheck();
 });
 
+$(document).off('click', '#BtnSubmitRating').on('click', '#BtnSubmitRating',function(e) {
+    $('#GlobalModalLarge').find('#ModalbtnCancleForm').trigger('click');
+    App_ticket_ticket_today.GiveRatingCheck();
+})
+
+
 $(document).off('click', '#btnsave_ticket').on('click', '#btnsave_ticket',function(e) {
     var selector = $(this);
     App_ticket_ticket_today.ActionCreateNewTicket(selector);
@@ -909,8 +970,8 @@ $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function
 })
 
 $(document).off('click', '.btnSaveRating').on('click', '.btnSaveRating',function(e) {
-    var selector_input_form = $(this).closest('.input_form');
-    App_ticket_ticket_today.SaveRating(selector_input_form);
+    var selector = $(this);
+    App_ticket_ticket_today.SaveRating(selector);
 })
 
 

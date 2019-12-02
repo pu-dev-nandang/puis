@@ -1026,4 +1026,32 @@ class M_ticketing extends CI_Model {
         return $rs;
     }
 
+    public function __create_rating($dataToken){
+        $dataSave = $dataToken['data'];
+        $dataSave['EntredAt'] = date('Y-m-d H:i:s');
+        $this->db->insert('db_ticketing.rating',$dataSave);
+        $this->trigger_after_create_ticketing($dataToken['TicketID']);
+    }
+
+    private function trigger_after_create_ticketing($TicketID){
+        $data_received = $this->getDataReceived_worker([ 'TicketID' => $TicketID ]);
+        $bool = true;
+        for ($i=0; $i < count($data_received); $i++) { 
+            $DataRating = $data_received[$i]['DataRating'];
+            $DataReceived_Details = $data_received[$i]['DataReceived_Details'];
+            if (count($DataRating) == 0 && count($DataReceived_Details) > 0 ) {
+                $bool = false;
+                break;
+            }
+        }
+
+        if ($bool) {
+            $this->db->where('ID',$TicketID);
+            $dataSave = [
+                'TicketStatus' => 4,
+            ];
+            $this->db->update('db_ticketing.ticket',$dataSave);  
+        }
+    }
+
 }

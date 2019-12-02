@@ -304,6 +304,12 @@ class C_rest_ticketing extends CI_Controller {
             $rs = ['status' => 1,'msg' => ''];
             echo json_encode($rs);
             break;
+          case 'rating':
+          $rs = [];
+          $dataToken = json_decode(json_encode($dataToken),true);
+          $this->m_ticketing->__create_rating($dataToken);
+          $rs = ['status' => 1,'msg' => ''];
+          echo json_encode($rs);
           default:
             # code...
             break;
