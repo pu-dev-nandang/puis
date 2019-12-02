@@ -445,6 +445,11 @@ class M_ticketing extends CI_Model {
            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
+           if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+               $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+               $url = url_files."fileGetAnyToken/".$token;
+               $query[$i]['Files'] = $url;
+           }
         }
         return $query;
     }
@@ -632,12 +637,59 @@ class M_ticketing extends CI_Model {
         }
     }
 
+    private function send_notification_ticketing_transfer_to($data_arr_index){
+       $CreatedBy = $data_arr_index['CreatedBy'];
+       $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+       $NoTicket = $data_arr_index['NoTicket'];
+       $DepartmentID = $data_arr_index['data']['DepartmentTransferToID'];
+       $url_action = $this->jwt->encode($DepartmentID,"UAP)(*");
+       $getAllUserByDepartment = function($DepartmentID){
+        $dataToken = ['DepartmentID' => $DepartmentID];
+        $get_data  = $this->m_general->getAllUserByDepartment($dataToken);
+        $rs = [];
+        for ($i=0; $i < count($get_data); $i++) { 
+            $rs[] = $get_data[$i]['NIP'];
+        }
+        return $rs;
+       };
+       $array_send_notification=[
+         'NameRequested' => $G_emp[0]['Name'],
+         'Description' => 'Number Ticket '.$NoTicket,
+         'URLDirect' => 'ticket/set_action_progress/'.$NoTicket.'/'.$url_action,
+         'CreatedBy' => $CreatedBy,
+         'To' => $getAllUserByDepartment($DepartmentID),
+         'NeedEmail' => 'No',
+       ];
+
+       $data = array(
+           'auth' => 's3Cr3T-G4N',
+           'Logging' => array(
+                           'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>E-ticketing Transfer to by '.$array_send_notification['NameRequested'],
+                           'Description' => $array_send_notification['Description'],
+                           'URLDirect' => $array_send_notification['URLDirect'],
+                           'CreatedBy' => $array_send_notification['CreatedBy'],
+                         ),
+           'To' => array(
+                     'NIP' => $array_send_notification['To'],
+                   ),
+           'Email' => $array_send_notification['NeedEmail'], 
+       );
+
+       $url = url_pas.'rest2/__send_notif_browser';
+       $token = $this->jwt->encode($data,"UAP)(*");
+       $this->m_master->apiservertoserver($url,$token); 
+    }
+
     public function ProcessTransferTo($data_arr){
         if (count($data_arr) > 0) {
             for ($i=0; $i < count($data_arr); $i++) { 
                $data_arr_index =$data_arr[$i];
                $action = $data_arr_index['action'];
                $this->TableReceivedAction($data_arr_index);
+               // send notification
+               if ($action == 'update' && array_key_exists('DepartmentTransferToID', $data_arr_index['data']) ) {
+                   $this->send_notification_ticketing_transfer_to($data_arr_index);
+               }
             }
         }
     }
@@ -907,7 +959,9 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $row['NameStatusTicket'];
             $nestedData[] = $row['RequestedAt'];
             $nestedData[] = $row['NameStatusTicket'];
+            $nestedData[] = $row['TicketStatus'];
             $nestedData[] = $row['token'];
+            $nestedData[] = $row['Files'];
             $data[] = $nestedData;
             $No++;
         }
