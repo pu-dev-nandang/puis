@@ -88,7 +88,7 @@ var App_ticket_ticket_today = {
             '        <td>Message</td>' +
             '        <td>:</td>' +
             '        <td>' +
-            '            <textarea class="form-control input_form" rows="3" name="Message"></textarea>' +
+            '            <textarea class="form-control input_form" rows="7" name="Message"></textarea>' +
             '        </td>' +
             '    </tr>' +
             '    <tr>' +
@@ -516,7 +516,8 @@ var App_ticket_ticket_today = {
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
                     for (var j = 0; j < data_received.length; j++) {
-                        if (data_received[j].SetAction == "1") {
+                        console.log(data_received[j]);
+                        if (data_received[j].DataReceived_Details.length > 0) {
                             if (department_handle == '') {
                                 department_handle += data_received[j].NameDepartmentDestination;
                                 arr_filter_depart.push(data_received[j].DepartmentReceivedID);
@@ -536,6 +537,7 @@ var App_ticket_ticket_today = {
                                 
                             }
                         }
+                        
                     }
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+

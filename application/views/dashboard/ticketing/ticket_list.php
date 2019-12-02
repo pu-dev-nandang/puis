@@ -113,9 +113,12 @@
                     }
                 },
                 'createdRow': function( row, data, dataIndex ) {
+                    var htmlRequestedBy = '';
+                    htmlRequestedBy = '<b><i class="fa fa-user margin-right"></i> '+data[2]+'</b>';
+                    $( row ).find('td:eq(2)').html(htmlRequestedBy);
                     var htmlTicket = '';
-                    htmlTicket += '<h3>'+data[3]+'</h3>'+
-                                    '<p>'+data[4]+'</p>'
+                    htmlTicket += '<h3 style = "margin-top:0px;">'+'<b>'+data[3]+'</b>'+'</h3>'+
+                                    '<p>'+nl2br(data[4])+'</p>'
                                         ;
                      $( row ).find('td:eq(3)').html(htmlTicket);
                      var htmlAction = '';

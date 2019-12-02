@@ -30,7 +30,7 @@
 				<tr>
 					<td style="width: 25%;">Message</td>
 					<td>:</td>
-					<td><?php echo $DataTicket[0]['Message'] ?></td>
+					<td><?php echo nl2br($DataTicket[0]['Message']) ?></td>
 				</tr>
 				<tr>
 					<td style="width: 25%;">Requested by</td>
@@ -107,7 +107,7 @@
 										'<label>'+'Message'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_assign_to" rows="3" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -181,7 +181,7 @@
 										'<label>'+'Message'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_transfer_to" rows="3" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
