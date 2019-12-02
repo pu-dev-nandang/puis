@@ -113,6 +113,17 @@
                 </div>
             </div>
 
+            <!-- ADDED BY FEBRI @ DEC 2019 -->
+            <div class="form-group">
+                <label>Does this achievement include SKPI ?</label>
+                <select class="form-control form-update-data" name="isSKPI" id="isSKPI">
+                    <option value="">-Choose one-</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            <!-- END ADDED BY FEBRI @ DEC 2019 -->
+
             <div class="form-group" style="text-align: right;">
                 <button class="btn btn-success" id="saveAchievement">Save</button>
             </div>

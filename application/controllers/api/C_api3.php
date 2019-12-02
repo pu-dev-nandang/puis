@@ -2019,11 +2019,13 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
 
             $dataForm = (array) $data_arr['dataForm'];
-
+            
             if($ID!=''){
                 // Update
+                /*ADDED BY FEBRI @ NOV 2019*/
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                /*END ADDED BY FEBRI @ NOV 2019*/
                 $this->db->where('ID', $ID);
                 $this->db->update('db_studentlife.student_achievement',$dataForm);
 
@@ -2033,10 +2035,12 @@ class C_api3 extends CI_Controller {
                 $this->db->delete('db_studentlife.student_achievement_student');
 
             } else {
+                /*ADDED BY FEBRI @ NOV 2019*/
                 $dataForm['isApproved'] = 2;
-                $dataForm['approvedBy'] = "BACKEND-PCAM/".$this->session->userdata('NIP');
+                $dataForm['approvedBy'] = "STAFF/".$this->session->userdata('NIP').'/'.$this->session->userdata('Name');
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                /*END ADDED BY FEBRI @ NOV 2019*/
+                //$dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
 //                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
                 $this->db->insert('db_studentlife.student_achievement',$dataForm);
                 $ID = $this->db->insert_id();
@@ -2062,8 +2066,13 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode(array('ID' => $ID,'FileName' => $FileName)));
         }
         else if($data_arr['action']=='viewDataPAM'){
+            //UPDATED BY FEBRI @ DEC 2019
+            $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "STAFF%" and c.ID = a.ID) as isAbble
+                                      FROM db_studentlife.student_achievement  a 
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID 
+                                      ORDER BY Year, StartDate DESC')->result_array();
+            //END UPDATED BY FEBRI
 
-            $data = $this->db->query('SELECT a.*,b.Name as categName FROM db_studentlife.student_achievement  a left join db_studentlife.categories_achievement b on b.ID = a.CategID ORDER BY Year, StartDate DESC')->result_array();
 
             if(count($data)>0){
                 for($i=0;$i<count($data);$i++){
