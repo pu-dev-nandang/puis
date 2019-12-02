@@ -1,4 +1,3 @@
-
 <style>
     #dataTableAc tr th, #dataTableAc tr td {
         text-align: center;
@@ -21,9 +20,11 @@
                     <th style="width: 1%;">No</th>
                     <th>Event Name</th>
                     <th style="width: 15%;">Event Date</th>
+                    <th style="width: 5%;">Category</th>
                     <th style="width: 5%;">Level</th>
                     <th style="width: 5%;">Type</th>
                     <th style="width: 10%;">Achievement</th>
+                    <th style="width: 10%;">Status Approval</th>
                     <th style="width: 5%;"><i class="fa fa-cog"></i></th>
                     <th style="width: 25%;">Member</th>
                 </tr>
@@ -70,12 +71,15 @@
                         });
                     }
 
+                    var disabled = (!v.isAbble) ? 'disabled':'';
+                    var link = (v.isAbble) ? base_url_js+'student-life/student-achievement/update-data-achievement?id='+v.ID:'#';
+
                     var btnAct = '<div class="btn-group">' +
                         '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
                         '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
-                        '    <li><a href="'+base_url_js+'student-life/student-achievement/update-data-achievement?id='+v.ID+'">Edit</a></li>' +
+                        '    <li class="'+disabled+'"><a href="'+link+'" >Edit</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
                         '    <li><a href="javascript:void(0);" class="actRemove" data-id="'+v.ID+'">Remove</a></li>' +
                         '  </ul>' +
@@ -86,14 +90,22 @@
                         : '<span class="label label-default">Non Academic</span>';
 
                     var viewEvent = '<a><b>'+v.Event+'</b></a>';
-
+                    var labelStatusApv = "";
+                    if(v.isApproved == 1) {labelStatusApv="<span class='label label-info'>Wait approval</span>";}
+                    else if(v.isApproved == 2) {labelStatusApv="<span class='label label-primary'>Approved</span>";}
+                    else if(v.isApproved == 3) {labelStatusApv="<span class='label label-danger'>Rejected</span>";}
+                    else{labelStatusApv="UNKNOW";}
+                    var labelApvBy = "";
+                    if(v.approvedBy != "" || v.approvedBy){labelApvBy = "<br><small>Approved by "+v.approvedBy+"</small>";}
                     $('#dataStdList').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
-                        '<td style="text-align: left;">'+viewEvent+'</td>' +
+                        '<td style="text-align: left;">'+viewEvent+"<br>"+((v.isSKPI == 1) ? '<span class="label label-warning">SKPI</span>':'')+'</td>' +
                         '<td>'+StartDate+'<br/>'+EndDate+'</td>' +
+                        '<td>'+v.categName+'</td>' +
                         '<td>'+v.Level+'</td>' +
                         '<td>'+lbl+'</td>' +
-                        '<td style="border-right: 1px solid #ccc;">'+v.Achievement+'</td>' +
+                        '<td>'+v.Achievement+'</td>' +
+                        '<td style="border-right: 1px solid #ccc;">'+labelStatusApv+labelApvBy+'</td>' +
                         '<td>'+btnAct+'</td>' +
                         '<td style="text-align: left;">'+member+'</td>' +
                         '</tr>');
