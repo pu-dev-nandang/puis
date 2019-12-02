@@ -516,7 +516,7 @@ var App_ticket_ticket_today = {
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
                     for (var j = 0; j < data_received.length; j++) {
-                        console.log(data_received[j]);
+                        // console.log(data_received[j]);
                         if (data_received[j].DataReceived_Details.length > 0) {
                             if (department_handle == '') {
                                 department_handle += data_received[j].NameDepartmentDestination;
@@ -694,81 +694,6 @@ $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function
     var token = selector.attr('token');
     AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
 })
-
-    $(document).on('click','.showReadMoreTicket',function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Read More Ticket</h4>');
-
-        var htmlss = '<div class="row">' +
-            '' +
-            '        <div class="col-md-12 col-lg-12">' +
-            '            <div id="tracking-pre"></div>' +
-            '            <div id="tracking">' +
-            '' +
-            '                <div class="thumbnail" style="border-radius: 0px;border-bottom: none;padding: 15px;">' +
-            '                    <h3 style="margin-top: 0px;margin-bottom: 3px;"><b>Lorem Ipsum is simply dummy text of the printing</b></h3>' +
-            '                    <div style="margin-bottom: 10px;color: cornflowerblue;">Nandang Mulyadi | 19 Januari 2019 09:00</div>' +
-            '                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letrase' +
-            '                </div>' +
-            '' +
-            '                <div class="tracking-list">' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Aug 10, 2018<span>05:01 PM</span></div>' +
-            '                        <div class="tracking-content">DESTROYEDPER SHIPPER INSTRUCTION<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA </span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Aug 10, 2018<span>11:19 AM</span></div>' +
-            '                        <div class="tracking-content">SHIPMENT DELAYSHIPPER INSTRUCTION TO DESTROY<span>SHENZHEN, CHINA, PEOPLE\'S REPUBLIC</span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Jul 27, 2018<span>04:08 PM</span></div>' +
-            '                        <div class="tracking-content">DELIVERY ADVICERequest Instruction from ORIGIN<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA</span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Jul 20, 2018<span>05:25 PM</span></div>' +
-            '                        <div class="tracking-content">Delivery InfoCLOSED-OFFICE/HOUSE CLOSED<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA</span></div>' +
-            '                    </div>' +
-            '' +
-            '                </div>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>';
-
-        $('#GlobalModal .modal-body').html(htmlss);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '');
-
-
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-    });
 
 </script>
 

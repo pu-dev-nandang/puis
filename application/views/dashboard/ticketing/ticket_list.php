@@ -5,8 +5,18 @@
     #tableTicket td:nth-child(3), #tableTicket td:nth-child(4){
         text-align: left;
     }
-</style>
 
+    .ticket-number-table {
+        right: 0px;
+        background: #607D8B;
+        padding: 0px 10px 1px 10px;
+        color: #fff;
+        font-size: 11px;
+        border-bottom-left-radius: 7px;
+        border-top-left-radius: 7px;
+    }
+</style>
+<?php $this->load->view('dashboard/ticketing/LoadCssTicketToday') ?>
 <div class="row" style="margin-top: 30px;">
     <div class="container-fluid">
         <div class="col-md-6 col-md-offset-3">
@@ -113,28 +123,55 @@
                     }
                 },
                 'createdRow': function( row, data, dataIndex ) {
+                    var htmlNoticket = '<div class = "ticket-number-table">'+data[1]+'</div>';
+                    $( row ).find('td:eq(1)').html(htmlNoticket);
+
                     var htmlRequestedBy = '';
                     htmlRequestedBy = '<b><i class="fa fa-user margin-right"></i> '+data[2]+'</b>';
                     $( row ).find('td:eq(2)').html(htmlRequestedBy);
+
                     var htmlTicket = '';
+                    console.log(data[10]);
+                    var FileUpload = (data[10] != null && data[10] != undefined && data[10] != '') ? '<p><a href= "'+data[10]+'" target="_blank">Files Upload<a></p>' : ''; 
                     htmlTicket += '<h3 style = "margin-top:0px;">'+'<b>'+data[3]+'</b>'+'</h3>'+
-                                    '<p>'+nl2br(data[4])+'</p>'
+                                    '<p>'+nl2br(data[4])+'</p>'+
+                                    FileUpload
                                         ;
                      $( row ).find('td:eq(3)').html(htmlTicket);
+
                      var htmlAction = '';
+                     var DetailAction = '<a href="javascript:void(0)" class ="ModalReadMore" token = "'+data[9]+'" >Detail</a>';
+                     var setAction = '';
+                     var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
+                     var EncodeDepartment = jwt_encode(SelectDepartmentID,'UAP)(*');
+                     if (data[8] == 1) {
+                        var hrefActionTicket =  base_url_js+'ticket'+'/set_action_first/'+data[1]+'/'+EncodeDepartment;
+                        setAction = '<a href="'+hrefActionTicket+'">Set Action</a>';
+                     }
+                     else if(data[8] == 2)
+                     {
+                       var hrefActionTicket =   base_url_js+'ticket'+'/set_action_progress/'+data[1]+'/'+EncodeDepartment
+                       setAction = '<a href="'+hrefActionTicket+'">Set Action</a>';
+                     }
                      htmlAction += '<div class="btn-group">'+
                         '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
                             '<i class="fa fa-edit"></i> <span class="caret"></span>'+
                         '</button>'+
                         '<ul class="dropdown-menu">'+
-                            '<li><a href="#">Detail</a></li>'+
+                            '<li>'+DetailAction+'</li>'+
                             '<li role="separator" class="divider"></li>'+
-                           ' <li><a href="#">Print</a></li>'+
+                           ' <li>'+setAction+'</li>'+
                         '</ul>'+
                     '</div>';
                      $( row ).find('td:eq(4)').html(htmlAction);
-                     $( row ).find('td:eq(5)').html(data[6]);
-                     $( row ).find('td:eq(6)').html(data[7]);
+
+                     $( row ).find('td:eq(5)').html('<label class="text-primary">'+data[6]+'</label>');
+
+                     var styleSt ='';
+                     if (data[7] == 'Close' || data[7] == 'Has Given Rate' ) {
+                        styleSt = 'style = "color:green;"';
+                     }
+                     $( row ).find('td:eq(6)').html('<span '+styleSt+'>'+data[7]+'</span>');
                 },
                 dom: 'l<"toolbar">frtip',
                 "initComplete": function(settings, json) {
@@ -152,5 +189,10 @@
 
     $(document).off('change', '#SelectDepartmentID,#SelectStatusTicketID').on('change', '#SelectDepartmentID,#SelectStatusTicketID',function(e) {
        oTable.ajax.reload( null, false );
+    })
+
+    $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function(e) {
+        var token = $(this).attr('token');
+        AppModalDetailTicket.ModalReadMore('','',token);
     })
 </script>

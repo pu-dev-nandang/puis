@@ -290,10 +290,18 @@
       { 
         // $('.modal-dialog').attr('style','width:100%;');
         var data = jwt_decode(token);
-
+        // console.log(data);
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Read More</h4>');
         var tracking_list_html  = this.tracking_list_html(data);
+        var pFiles = '';
+        if (data.Files != null && data.Files != '') {
+          pFiles =  '    <tr>' +
+           '        <td>Files Upload</td>' +
+           '        <td>:</td>' +
+           '        <td>'+'<a href= "'+data.Files+'" target="_blank">Files Upload<a>'+'</td>' +
+           '    </tr>' ;
+        }
         var htmlss = '<div class="row">'+
                         '<div class = "col-md-12">'+
                           '<div id = "tracking">'+
@@ -329,6 +337,7 @@
                                       '        <td>:</td>' +
                                       '        <td>'+data.RequestedAt+'</td>' +
                                       '    </tr>' +
+                                      pFiles+
                                 '</table>'+
                               '</div>'+
                               tracking_list_html+

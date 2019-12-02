@@ -42,6 +42,13 @@
 					<td>:</td>
 					<td><?php echo $DataTicket[0]['RequestedAt'] ?></td>
 				</tr>
+				<?php if ($DataTicket[0]['Files'] != null && $DataTicket[0]['Files'] != ""): ?>
+				 <tr>
+		          <td>Files Upload</td>
+		          <td>:</td>
+		          <td><a href= "<?php echo $DataTicket[0]['Files'] ?>" target="_blank">Files Upload<a></td>
+		         </tr>'
+				<?php endif ?>
 			</table>
 		</div>
 	</div>
@@ -81,6 +88,7 @@
 <script type="text/javascript">
 	var Authent = <?php echo json_encode($Authent) ?>;
 	var DataTicket = <?php echo json_encode($DataTicket) ?>;
+	// console.log(DataTicket);
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
 	var DataEmployees = <?php echo json_encode($DataEmployees) ?>;
 	var DataReceived = <?php echo json_encode($DataReceived) ?>;
@@ -393,6 +401,8 @@
 								DepartmentTransferToID : DepartmentReceivedID,
 								// CategoryReceivedID : CategoryReceivedID,
 							},
+							CreatedBy : sessionNIP,
+							NoTicket : DataTicket[0].NoTicket,
 						}
 
 						transfer_to.push(postreceived);
@@ -406,6 +416,8 @@
 								DepartmentTransferToID : DepartmentReceivedID,
 								// CategoryReceivedID : CategoryReceivedID,
 							},
+							CreatedBy : sessionNIP,
+							NoTicket : DataTicket[0].NoTicket,
 						}
 
 						transfer_to.push(postreceived);

@@ -47,6 +47,13 @@
 					<td>:</td>
 					<td><?php echo $DataTicket[0]['RequestedAt'] ?></td>
 				</tr>
+				<?php if ($DataTicket[0]['Files'] != null && $DataTicket[0]['Files'] != ""): ?>
+				 <tr>
+		          <td>Files Upload</td>
+		          <td>:</td>
+		          <td><a href= "<?php echo $DataTicket[0]['Files'] ?>" target="_blank">Files Upload<a></td>
+		         </tr>'
+				<?php endif ?>
 			</table>
 			<br/>
 			<div id ="ShowProgressList">
@@ -687,6 +694,8 @@
 								DepartmentTransferToID : DepartmentReceivedID,
 								// CategoryReceivedID : CategoryReceivedID,
 							},
+							CreatedBy : sessionNIP,
+							NoTicket : DataTicket[0].NoTicket,
 						}
 
 						transfer_to.push(postreceived);
@@ -700,6 +709,8 @@
 								DepartmentTransferToID : DepartmentReceivedID,
 								// CategoryReceivedID : CategoryReceivedID,
 							},
+							CreatedBy : sessionNIP,
+							NoTicket : DataTicket[0].NoTicket,
 						}
 
 						transfer_to.push(postreceived);
