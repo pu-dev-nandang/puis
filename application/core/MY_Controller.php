@@ -745,7 +745,7 @@ abstract class Ticket_Controler extends Globalclass{
 
     public function temp($content)
     {
-        parent::template($content);
+        $this->template($content);
     }
 
     public function menu_ticket($page){
@@ -755,7 +755,21 @@ abstract class Ticket_Controler extends Globalclass{
         $data['ArrSelectOptionDepartment'] = $this->m_general->getAuthDepartment();
         $data['page'] = $page;
         $content = $this->load->view('dashboard/ticketing/menu_ticketing',$data,true);
-        parent::template($content);
+        $this->template($content);
+    }
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+        $data['ClassContainer'] = 'sidebar-closed';
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
     }
 
 

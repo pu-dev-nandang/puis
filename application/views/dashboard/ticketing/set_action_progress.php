@@ -35,7 +35,7 @@
 				<tr>
 					<td style="width: 25%;">Message</td>
 					<td>:</td>
-					<td><?php echo $DataTicket[0]['Message'] ?></td>
+					<td><?php echo nl2br($DataTicket[0]['Message']) ?></td>
 				</tr>
 				<tr>
 					<td style="width: 25%;">Requested by</td>
@@ -82,17 +82,17 @@
 </div>
 <script type="text/javascript">
 	var DataTicket = <?php echo json_encode($DataTicket) ?>;
-	console.log(DataTicket);
+	// console.log(DataTicket);
 	var DataAll = <?php echo json_encode($DataAll) ?>;
 	var DataReceivedSelected = <?php echo json_encode($DataReceivedSelected) ?>;
-	console.log(DataReceivedSelected);
+	// console.log(DataReceivedSelected);
 	var Authent = <?php echo json_encode($Authent) ?>;
 	var DataCategory = <?php echo json_encode($DataCategory) ?>;
 	var DataEmployees = <?php echo json_encode($DataEmployees) ?>;
 	var Auth = Authent.callback.Detail;
 	var AdminAuth =Auth.Admin 
 	var WorkerAuth =Auth.Worker 
-	console.log(Authent);
+	// console.log(Authent);
 	var App_set_action_progress = {
 		Loaded : function(){
 			var DataGet = DataAll[0];
@@ -264,7 +264,7 @@
 
 	var App_AssignTo = {
 		DomWorkerHtml : function(dataworker){
-			console.log(dataworker);
+			// console.log(dataworker);
 			var hide = (AdminAuth) ? '' : 'hide';
 			var html = '<span class="btn btn btn-add-worker '+hide+' ">'+
                     '<i class="icon-plus"></i> Worker'+
@@ -284,17 +284,17 @@
 				var token = jwt_encode(row,'UAP)(*');
 				var st = '';
 				if (row.Status == "-1") {
-				  st = 'withdrawn';
+				  st = '<span style="color: red;"><i class="fa fa-minus-circle" aria-hidden="true"></i> '+'withdrawn'+'</span>';
 				}
 				else if(row.Status == "1"){
-				  st = 'working';
+				  st = '<span style="color: #2196F3;"><i class="fa fa-user-circle-o" aria-hidden="true"></i> '+'working'+'</span>';
 				}
 				else{
-				  st = 'done';
+				  st = '<span style="color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i> '+'done'+'</span>';
 				}
 
 				var hide = 'hide';
-				if ( (sessionNIP == row.NIP  || AdminAuth ) ) {
+				if ( (sessionNIP == row.NIP  || AdminAuth ) && ( ( (!AdminAuth) && row.Status != "-1" ) || AdminAuth  )    ) {
 					hide = '';
 				}
 
@@ -302,7 +302,7 @@
             					'<td style="padding:4px;">'+row.NameWorker+'</td>'+
             					'<td style="padding:4px;">'+row.DueDateShow+'</td>'+
             					'<td style="padding:4px;">'+st+'</td>'+
-            					'<td style="padding:4px;"><button class = "btn btn-default btnActionWorker '+hide+' " data-id = "'+row.ID+'" token = "'+token+'">Action</button></td>'+
+            					'<td style="padding:4px;"><span class = "btn btn-xs btn-primary btnActionWorker '+hide+' " data-id = "'+row.ID+'" token = "'+token+'"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> </span></td>'+
             			'</tr>';		
             }
 
@@ -315,7 +315,7 @@
 			var html = '';
 			var valTextArea = DataReceivedSelected[0].MessageReceived;
 			var DomWorkerHtml = this.DomWorkerHtml(DataReceivedSelected[0].DataReceived_Details);
-			console.log(DataReceivedSelected[0]);
+			// console.log(DataReceivedSelected[0]);
 			var hide = (AdminAuth) ? '' : 'hide';
 			var dis = (AdminAuth) ? '' : 'disabled';
 			html += '<div class = "row form-assign-to">'+
@@ -336,7 +336,7 @@
 										'<label>'+'Message'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-9">'+
-										 '<textarea class="form-control input_assign_to" rows="3" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_assign_to" rows="8" name="MessageReceived" '+dis+' >'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -621,7 +621,7 @@
 										'<label>'+'Message'+'</label>'+
 									'</div>'+
 									'<div class = "col-xs-6">'+
-										 '<textarea class="form-control input_transfer_to" rows="3" name="MessageReceived">'+valTextArea+'</textarea>'+
+										 '<textarea class="form-control input_transfer_to" rows="8" name="MessageReceived">'+valTextArea+'</textarea>'+
 									'</div>'+
 								'</div>'+
 							'</div>'+
@@ -745,6 +745,7 @@
 		    	    		var AdminAuth =Auth.Admin 
 		    	    		var WorkerAuth =Auth.Worker
 		    	    		App_set_action_progress.Loaded();
+		    	    		$('.form-transfer-to').remove();
 					    	toastr.success('Success');
 					    	setInterval(function(){
 					    	 end_loading_button2(selector);

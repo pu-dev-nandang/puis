@@ -29,5 +29,4 @@ class C_ticketing extends Ticket_Controler {
         $this->menu_ticket($page);
     }
 
-
 }
