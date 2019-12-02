@@ -82,7 +82,7 @@ function loadDataLecture() {
         if(jsonResult.length>0){
 
             $.each(jsonResult,function (i,v) {
-                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  width="800vw">'+
+                $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <img src="'+locimg+''+v.Photo+'"  >'+
                       '<p><b>'+v.NIP+'||'+v.Name+'</b></p>'+
                        '<p>'+
                         // ' <a href="#" data-toggle="modal" data-target="#form-modal" data-id="'+v.ID+'" token = "'+v.token+'" class="btn-form-ubah"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
@@ -196,7 +196,7 @@ $('#btnSave').click(function () {
 // Fungsi ini akan dipanggil ketika tombol hapus diklik
 $(document).on('click', '.btn-alert-hapus', function(){ // Ketika tombol dengan class btn-alert-hapus pada div view di klik
   id = $(this).data('id') // Set variabel id dengan id yang kita set pada atribut data-id pada tag button edit
- 
+
   $('#btn-hapus').attr('data-id',id); // Set variabel id dengan id yang kita set pada atribut data-id pada tag button hapus
 })
 
