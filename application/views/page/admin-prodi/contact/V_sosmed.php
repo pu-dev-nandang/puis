@@ -3,13 +3,25 @@
     <div class="col-md-6">
         <table class="table">
             <tr>
+                <td style="width: 15%;">Sosial Media</td>
+                <td style="width: 1%;">:</td>
+                <td>
+                    <select style="max-width: 150px;" id="sosmed" class="form-control input" name="Icon">
+                      <option value="fa-facebook">Facebook</option>
+                      <option value="fa-instagram">Instagram</option>
+                      <option value="fa-twitter">Twitter</option>
+                      <option value="fa-youtube">Youtube</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
                 <td style="width: 15%;">http://</td>
                 <td style="width: 1%;">:</td>
                 <td>
                     <input type="text" id="Link" class="form-control required input" placeholder="ex: http://example.com" name="Link">
                 </td>
             </tr>
-           <tr>
+           <!-- <tr>
                 <td style="width: 15%;">Icon Sosmed</td>
                 <td style="width: 1%;">:</td>
                 <td>
@@ -17,7 +29,7 @@
                   <span class="red">* Size weight x height 36px x 36px</span>
                 
                 </td>
-            </tr>
+            </tr> -->
             <tr>
                 <td colspan="3" style="text-align: right;">
                     <button class="btn btn-success" id="btnSave">Save</button>
@@ -69,10 +81,11 @@
                data[field] = $(this).val(); 
           })
         // var ID = $(this).attr('data-id');  
+        // alert(ID);
         var form_data = new FormData();
         var find = true;
         var thisbtn = $(this);
-            // upload file
+            
             $('input[type="file"]').each(function(){
                 var IDFile = $(this).attr('id');
                 var ev = $(this);
@@ -92,7 +105,7 @@
                         }
                       }
                      
-                var validation =  (action == 'deleteDatasosmed') ? true : App_V_sosmed.validation(data);
+                var validation =  (action == 'deleteDatasosmed') ? true : App_V_sosmed.validation(dataform);
                 if (validation) {
                     if (confirm('Are you sure ?')) {
                         var dataform = {
@@ -161,14 +174,16 @@
             if(jsonResult.length>0){
 
                 $.each(jsonResult,function (i,v) {
-                    $('#viewDataDesc').append('<div class="col-lg-4 col-md-6"><div class="thumbnail" style="text-align: center; padding: 15px;"> <span><img src="'+locimg+''+v.Icon+'"  width="50%"></span>'+
-                      '<div class="caption"><p class="card-text">'+v.Link+'</p>'+
-                       '<p>'+
-                        // ' <a href="#" data-toggle="modal" data-target="#form-modal" data-id="'+v.ID+'" token = "'+v.token+'" class="btn-form-ubah"><span class="glyphicon glyphicon-pencil"></span> Edit</a>'+ 
-                        ' <a href="javascript:void(0);" data-id="'+v.ID+'" class="btn-alert-hapus" id="btn-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
+                    $('#viewDataDesc').append('<div class="col-lg-4 col-md-6">'+
+                      '<div class="card" style="text-align: center; padding: 15px;">'+
+                      '<div class="card-body">'+
+                        '<h5 class="card-title"><i class="fa '+v.Icon+'" style="line-height: 1;  width: 50px; height: 50px; background: #083f88; padding: 10px; border-radius: 50%; font-size: 2em; color: #fff;"> </i></h5>'+
                         
-                        '</p></div>'+
-                      '</div></div>');
+                        '<p class="card-text"><a target="_blank" href="'+v.Link+'">'+v.Link+'</a></p>'+
+                        '<a href="javascript:void(0);" data-id="'+v.ID+'" class="btn-alert-hapus" id="btn-hapus"><span class="glyphicon glyphicon-trash"></span> Hapus</a>'+
+                        
+                      '</div>'+
+                    '</div>');
                 });
 
             } else {
@@ -205,6 +220,7 @@
    $(document).off('click', '#btn-hapus').on('click', '#btn-hapus',function(e) {
    
     var ID = $(this).attr('data-id');
+    // alert(ID);
     // console.log(ID);return;
     var selector = $(this);
     var action = 'deleteDatasosmed'
