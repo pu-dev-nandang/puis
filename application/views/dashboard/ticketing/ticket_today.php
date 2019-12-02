@@ -652,6 +652,274 @@ var App_ticket_ticket_today = {
         return rs;
     },
 
+    GiveRatingCheck : function(){
+        var url = base_url_js+"rest_ticketing/__ticketing_GiveRatingCheck";
+        var dataform = {
+            NIP : sessionNIP,
+            auth : 's3Cr3T-G4N',
+        }
+        var token = jwt_encode(dataform,'UAP)(*');
+                
+        AjaxLoadRestTicketing(url,token).then(function(response){
+            if (response.length == 0) {
+                App_ticket_ticket_today.ModalFormCreateNewTicket();
+            }
+            else
+            {
+                /*
+                    action fill rating
+                */
+
+                // console.log(response);
+                App_ticket_ticket_today.setModalFormRating(response);
+            }
+        }).fail(function(response){
+           toastr.error('Error connection to server');
+        })
+    },
+
+    setModalFormRating : function(data){
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            var tokenData = jwt_encode(data[i],'UAP)(*');
+            var htmlInfo = App_ticket_ticket_today.__show_html_show_more(tokenData);
+            html += '<div class ="row">'+
+                        '<div class = "well">'+
+                            '<div class  = "col-md-12">'+
+                                htmlInfo+
+                            '</div>'+ 
+                        '</div>'+
+                    '</div>';      
+
+        }
+
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Form Rating'+'</h4>');
+        $('#GlobalModalLarge .modal-body').html(html);
+        $('#GlobalModalLarge .modal-footer').html('<button class = "btn btn-success" id = "BtnSubmitRating">Submit </button> <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        /*
+            remove data yg tidak memiliki class input_form
+        */
+        $('#GlobalModalLarge').find('.well').each(function(e){
+            var itsme = $(this);
+            if (!itsme.find('.input_form').length) {
+                itsme.remove();
+            }
+        })
+    },
+
+    __show_html_show_more : function(token){
+        var data = jwt_decode(token);
+        var tracking_list_html  = App_ticket_ticket_today.tracking_list_html(data);
+        var pFiles = '';
+        if (data.Files != null && data.Files != '') {
+          pFiles =  '    <tr>' +
+           '        <td>Files Upload</td>' +
+           '        <td>:</td>' +
+           '        <td>'+'<a href= "'+data.Files+'" target="_blank">Files Upload<a>'+'</td>' +
+           '    </tr>' ;
+        }
+        var htmlss = '<div class="row">'+
+                        '<div class = "col-md-4">'+
+                            '<table class="table" id="tableDetailTicket">' +
+                                 ' <tr style = "color:green;">'+
+                                    '<td style="width: 25%;">NoTicket</td>'+
+                                    '<td>:</td>'+
+                                   ' <td>'+data.NoTicket+'</td>'+
+                                  '</tr>'+
+                                  '    <tr>' +
+                                  '        <td style="width: 25%;">Title</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.Title+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td style="width: 25%;">Category</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.NameDepartmentDestination+' - '+data.CategoryDescriptions+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Message</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+nl2br(data.Message)+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Requested by</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.NameRequested+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Requested on</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.RequestedAt+'</td>' +
+                                  '    </tr>' +
+                                  pFiles+
+                            '</table>'+
+                        '</div>'+
+                        '<div class = "col-md-8">'+
+                           '<div id = "tracking">'+
+                                tracking_list_html+
+                           '</div>'+ 
+                        '</div>'+
+                      '</div>';
+        return htmlss;
+    },
+
+    tracking_list_html : function(data){
+        var data_received = data.data_received;
+        var html =  '<b>Status : </b><i class="fa fa-circle" style="color:#d0af0c;"></i> Transfer To | <i class="fa fa-circle" style="color:lightgreen;"></i> Done '+
+                    '<br/>';
+        if (data_received.length > 0) {
+          html +=  '<div class="tracking-list">';
+          for (var i = 0; i < data_received.length; i++) {
+            var row = data_received[i];
+            // console.log(row);
+            var tokenData =jwt_encode(row,'UAP)(*');
+            var GetWorker = '';
+            var DataReceived_Details = row.DataReceived_Details;
+            var DataRating = row.DataRating;
+            if (DataReceived_Details.length >  0) {
+              GetWorker += '<table class = "table" style ="margin-top:15px;">'+
+                              '<tr>'+
+                                  '<td style="padding:4px;">Worker</td>'+
+                                  '<td style="padding:4px;">DueDate</td>'+
+                                  '<td style="padding:4px;">Status</td>'+
+                              '</tr>';   
+              for (var j = 0; j < DataReceived_Details.length; j++) {
+                var r = DataReceived_Details[j];
+                var st = '';
+                if (r.Status == "-1") {
+                  st = '<span style="color: red;"><i class="fa fa-minus-circle" aria-hidden="true"></i> '+'withdrawn'+'</span>';
+                }
+                else if(r.Status == "1"){
+                  st = '<span style="color: #2196F3;"><i class="fa fa-user-circle-o" aria-hidden="true"></i> '+'working'+'</span>';
+                }
+                else{
+                  st = '<span style="color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i> '+'done'+'</span>';
+                }
+                GetWorker += '<tr>'+
+                                '<td style="padding:4px;">'+r.NameWorker+'</td>'+
+                                '<td style="padding:4px;">'+'<span>'+r.DueDateShow+'</span>'+'</td>'+
+                                '<td style="padding:4px;">'+st+'</td>'+
+                             '</tr>';
+              }
+
+              GetWorker += '</table>';
+              if (DataRating.length == 0) {
+                GetWorker += '<div class = "thumbnail input_form" tokenData = "'+tokenData+'">'+
+                                  '<div class = "form-group">'+
+                                      '<label>Rate</label>'+
+                                      App_ticket_ticket_today.LoadSelectOptionRate()+
+                                  '</div>'+
+                                  '<div class = "form-group">'+
+                                      '<label>Comment</label>'+
+                                     '<textarea class="form-control fieldInput" rows="3" name="Comment"></textarea>'+
+                                  '</div>'+
+                                  '<div style = "text-align:right">'+
+                                      '<button class = "btn btn-success btnSaveRating">Save</button>'+  
+                                  '</div>'+
+                              '</div>';   
+              }
+               
+            }
+            
+            var SvgColor = '';
+            if (row.Flag == "1") {
+              SvgColor = 'style = "color:#d0af0c;" ';
+            }
+            if(row.ReceivedStatus == "1"){
+              SvgColor = 'style = "color:lightgreen;" ';
+            }
+            
+            html +=  '<div class="tracking-item">'+
+                        '<div class="tracking-icon status-intransit">'+
+                          '<svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" '+SvgColor+'>' +
+                          '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
+                          '</svg>' +
+                        '</div>'+
+                        '<div class="tracking-date">'+row.ReceivedAtTracking+'</div>'+
+                        '<div class="tracking-content">'+
+                          row.CategoryDescriptions+'<span>'+row.NameDepartmentDestination+' </span>'+
+                        '</div>'+
+                        GetWorker+
+                      '</div>';  
+          }
+
+          html +=  '</div>';
+        }
+
+        return html;
+    },
+
+    LoadSelectOptionRate : function(){
+        var html = '<select class = "form-control fieldInput" name = "Rate">'+
+                    '<option value = "" selected disabled>--Choose Rate--</option>';
+        for (var i = 1; i <= 5; i++) {
+            var bintang = '';
+            for (var j = 0; j < i; j++) {
+                bintang += '*';
+            }
+            html += '<option value = "'+i+'">'+bintang+'</option>';
+        }
+
+        html += '</select>';
+        return html;
+
+    },
+
+    SaveRating : function(selector){
+        /* closest tracking-item */
+        var selector_input_form = selector.closest('.input_form');
+        var selector_tracking_item = selector.closest('.tracking-item');
+        var tokendata = selector_input_form.attr('tokendata');
+        var getData = jwt_decode(tokendata);
+        var Rate = selector_input_form.find('.fieldInput[name="Rate"] option:selected').val();
+        var Comment = selector_input_form.find('.fieldInput[name="Comment"]').val();
+        if (Rate != '' && Rate != undefined && Rate != null && Comment != '' && Comment != undefined && Comment != null) {
+            var data = {
+                ReceivedID : getData.ID,
+                Rate : Rate,
+                Comment : Comment,
+                EntredBy : sessionNIP,
+            };
+            var dataform = {
+                action : 'rating',
+                data : data,
+                auth : 's3Cr3T-G4N',
+                TicketID :  getData.TicketID,
+            };
+            
+            loading_button2(selector);
+            var url = base_url_js+"rest_ticketing/__event_ticketing";
+            var token = jwt_encode(dataform,'UAP)(*');
+            AjaxSubmitRestTicketing(url,token).then(function(response){
+                if (response.status == 1) {
+                    selector_input_form.remove();
+                    if (!selector_tracking_item.closest('.well').find('.input_form').length) {
+                        selector_tracking_item.closest('.well').remove();
+                    }
+                    toastr.success('Thanks you');
+                }
+                else
+                {
+                    toastr.error(response.msg);
+                    end_loading_button2(selector);
+                }
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+               end_loading_button2(selector);     
+            })
+        }
+        else
+        {
+            toastr.info('Rate and Comment are required');
+        }
+        
+    },
+
 };
 
 $(document).ready(function() {
@@ -679,8 +947,14 @@ $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input
 
 
 $('#btnCreateNewTicket').click(function () {
-    App_ticket_ticket_today.ModalFormCreateNewTicket();
+    App_ticket_ticket_today.GiveRatingCheck();
 });
+
+$(document).off('click', '#BtnSubmitRating').on('click', '#BtnSubmitRating',function(e) {
+    $('#GlobalModalLarge').find('#ModalbtnCancleForm').trigger('click');
+    App_ticket_ticket_today.GiveRatingCheck();
+})
+
 
 $(document).off('click', '#btnsave_ticket').on('click', '#btnsave_ticket',function(e) {
     var selector = $(this);
@@ -694,6 +968,12 @@ $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function
     var token = selector.attr('token');
     AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
 })
+
+$(document).off('click', '.btnSaveRating').on('click', '.btnSaveRating',function(e) {
+    var selector = $(this);
+    App_ticket_ticket_today.SaveRating(selector);
+})
+
 
 </script>
 

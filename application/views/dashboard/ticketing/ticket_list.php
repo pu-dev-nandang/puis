@@ -144,11 +144,11 @@
                      var setAction = '';
                      var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
                      var EncodeDepartment = jwt_encode(SelectDepartmentID,'UAP)(*');
-                     if (data[8] == 1) {
+                     if (data[8] == 1 && data[11] == 'write') {
                         var hrefActionTicket =  base_url_js+'ticket'+'/set_action_first/'+data[1]+'/'+EncodeDepartment;
                         setAction = '<a href="'+hrefActionTicket+'">Set Action</a>';
                      }
-                     else if(data[8] == 2)
+                     else if(data[8] == 2 && data[11] == 'write')
                      {
                        var hrefActionTicket =   base_url_js+'ticket'+'/set_action_progress/'+data[1]+'/'+EncodeDepartment
                        setAction = '<a href="'+hrefActionTicket+'">Set Action</a>';
