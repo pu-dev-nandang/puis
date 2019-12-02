@@ -21,7 +21,6 @@ class C_home extends Prodi_Controler {
 // ===== Slide ======
     function slide()
     {
-        
         $data['department'] = parent::__getDepartement();
         $content = $this->load->view('page/'.$data['department'].'/beranda/V_slider',$data,true);
         parent::template($content);

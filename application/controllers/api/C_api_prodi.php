@@ -718,27 +718,39 @@ class C_api_prodi extends CI_Controller {
                 return print_r(1);
         }
         else if($data_arr['action']=='readContactSosmed'){
-           
-            $data = $this->db->get_where('db_prodi.sosmed')->result_array();
+            
+            $data = $this->db->get_where('db_prodi.sosmed',array(
+                'ProdiID' => $prodi_active_id,
+                
+            ))->result_array();
+
             return print_r(json_encode($data));
 
         }
         else if($data_arr['action']=='saveContactSosmed'){
-                if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
-                    $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/icon');
-                    $upload = json_encode($upload); 
-                    // convert file
-                    $upload = json_decode($upload,true);
-                    $upload = $upload[0];
+                // if (array_key_exists('uploadFile', $_FILES)) { // jika file di upload
+                //     $upload = $this->m_master->uploadDokumenMultiple(uniqid(),'uploadFile',$path = './images/icon');
+                //     $upload = json_encode($upload); 
+                //     // convert file
+                //     $upload = json_decode($upload,true);
+                //     $upload = $upload[0];
 
                     $dataform = (array) $data_arr['data'];
-                    
+                    $Icon = $dataform['Icon'];
                     $dataform['ProdiID'] = $prodi_active_id;
                     $dataform['CreateAT'] = $this->m_rest->getDateTimeNow();
                     $dataform['CreateBY'] = $this->session->userdata('NIP');
-                    $dataform['Icon']= $upload;
-                    $this->db->insert('db_prodi.sosmed',$dataform);
-                }
+                    // $dataform['Icon']= $upload;
+                     $dataCk = $this->db->get_where('db_prodi.sosmed',array(
+                    'ProdiID' => $prodi_active_id,'Icon' => $Icon,))->result_array();
+                    if(count($dataCk)>0){
+                        $this->db->where('Icon', $dataCk[0]['Icon']);
+                        $this->db->update('db_prodi.sosmed',$dataform);
+                    } else {
+                        $this->db->insert('db_prodi.sosmed',$dataform);
+                    }
+                    
+                // }
                     
             return print_r(1);
         }
@@ -752,10 +764,10 @@ class C_api_prodi extends CI_Controller {
             $query = $this->db->query($sql, array($ID))->result_array();
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.sosmed'); 
-            $arr_file =  $query[0]['Icon'];
+            // $arr_file =  $query[0]['Icon'];
             
-            $path = './images/icon/'. $arr_file;
-            unlink($path);
+            // $path = './images/icon/'. $arr_file;
+            // unlink($path);
             return print_r(1);
         }
 
@@ -895,22 +907,30 @@ class C_api_prodi extends CI_Controller {
         return print_r(json_encode($data));
     }
 
-    
-    function getCategoryClassroom(){
+    function getAllCategory(){
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "classroom"')->result_array();
-        
-        
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities  WHERE ProdiID = '.$ProdiID.'  order by RAND() LIMIT 50')->result_array();
         return print_r(json_encode($data));
     }
+    function getCategoryClassroom(){
+        $data_arr = $this->getInputToken2();
+        $ProdiID = $data_arr['ProdiID'];
+        $filter = $data_arr['filter'];
+       $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND Category LIKE  "%'.$filter.'%"')->result_array();
+        // $sql =  'SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND Category LIKE 
+        // "%'.$filter.'%"';
+        // print_r($sql);
+        return print_r(json_encode($data));
+    }
+    
     function getCategoryLaboratory(){
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Laboratory"')->result_array();
-        
+        // $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Laboratory"')->result_array();
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities  WHERE ProdiID = '.$ProdiID.'  order by RAND() LIMIT 50')->result_array();
         
         return print_r(json_encode($data));
     }
@@ -918,7 +938,7 @@ class C_api_prodi extends CI_Controller {
         $data_arr = $this->getInputToken2();
         $ProdiID = $data_arr['ProdiID'];
 
-        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.' AND category = "Facilities"')->result_array();
+        $data = $this->db->query('SELECT * FROM db_prodi.facilities WHERE ProdiID = '.$ProdiID.'')->result_array();
         
         
         return print_r(json_encode($data));
