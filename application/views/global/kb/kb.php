@@ -153,7 +153,7 @@ $('#saveFormKB').click(function () {
     var input = $('#upload_files');
     var files = input[0].files[0];
 
-    var sz = parseFloat(files.size) / 8000; // ukuran MB
+    var sz = parseFloat(files.size) / 8000000; // ukuran MB
     var ext = files.type.split('/')[1];
     var uploadFile = (Math.floor(sz)<=2) ? true : false ;
 
@@ -402,7 +402,7 @@ $('#saveFormKB').click(function () {
       var input = $('#upload_files');
       var files = input[0].files[0];
 
-      var sz = parseFloat(files.size) / 1000000; // ukuran MB
+      var sz = parseFloat(files.size) / 8000000; // ukuran MB
       var ext = files.type.split('/')[1];
 
       if(Math.floor(sz)<=2){
