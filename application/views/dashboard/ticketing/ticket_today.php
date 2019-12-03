@@ -122,16 +122,20 @@ var App_ticket_ticket_today = {
             var firstLoad = setInterval(function () {
                 var SelectCategoryID = $('.input_form[name="CategoryID"]').find('option:selected').val();
                 if(SelectCategoryID!='' && SelectCategoryID!=null && SelectCategoryID !='' && SelectCategoryID!=null){
-                    $('#GlobalModal').modal({
-                        'show' : true,
-                        'backdrop' : 'static'
-                    });
-                    $('.input_form[name="CategoryID"]').trigger('change');
+                    loadingEnd(1);
+                    setTimeout(function () {
+                        $('#GlobalModal').modal({
+                            'show' : true,
+                            'backdrop' : 'static'
+                        });
+                        $('.input_form[name="CategoryID"]').trigger('change');
+                    },500);
                     clearInterval(firstLoad);
                 }
             },1000);
             setTimeout(function () {
                 clearInterval(firstLoad);
+                loadingEnd(500);
             },5000);
         }
         else
@@ -653,6 +657,7 @@ var App_ticket_ticket_today = {
     },
 
     GiveRatingCheck : function(){
+        loadingStart();
         var url = base_url_js+"rest_ticketing/__ticketing_GiveRatingCheck";
         var dataform = {
             NIP : sessionNIP,
@@ -669,9 +674,11 @@ var App_ticket_ticket_today = {
                 /*
                     action fill rating
                 */
-
-                // console.log(response);
-                App_ticket_ticket_today.setModalFormRating(response);
+                loadingEnd(500);
+                setTimeout(function () {
+                     App_ticket_ticket_today.setModalFormRating(response);
+                },1000);
+               
             }
         }).fail(function(response){
            toastr.error('Error connection to server');
@@ -878,6 +885,7 @@ var App_ticket_ticket_today = {
         var getData = jwt_decode(tokendata);
         var Rate = selector_input_form.find('.fieldInput[name="Rate"] option:selected').val();
         var Comment = selector_input_form.find('.fieldInput[name="Comment"]').val();
+        var ModalBody = selector_tracking_item.closest('.modal-body');
         if (Rate != '' && Rate != undefined && Rate != null && Comment != '' && Comment != undefined && Comment != null) {
             var data = {
                 ReceivedID : getData.ID,
@@ -901,7 +909,14 @@ var App_ticket_ticket_today = {
                     if (!selector_tracking_item.closest('.well').find('.input_form').length) {
                         selector_tracking_item.closest('.well').remove();
                     }
-                    toastr.success('Thanks you');
+                    toastr.success('Thank you');
+
+                    if ( !ModalBody.find('.well').length ) {
+                        ModalBody.find('.row').html('<p><h4 style = "color:green;"><b>Thank for your rating.</b></h4></p>'+
+                                                     '<p style = "color:Red;">Please Submit to Create Ticket</p>'
+                            );
+                    }
+                    
                 }
                 else
                 {
