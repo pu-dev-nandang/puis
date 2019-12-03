@@ -73,7 +73,7 @@
                     <th rowspan="2" style="vertical-align : middle;text-align:center;width: 7%;">Daya Tampung</th>
                     <th colspan="2">Jumlah Calon Mahasiswa</th>
                     <th colspan="2">Jumlah Mahasiswa Baru</th>
-                    <th colspan="2">Jumlah Mahasiswa</th>
+                    <th colspan="2">Jumlah Mahasiswa Aktif</th>
                     <th rowspan="2" style="width: 5%;"><i class="fa fa-cog"></i></th>
 
                 </tr>
@@ -106,7 +106,7 @@
                $('#formYear').trigger('change');
                clearInterval(firstLoad2);
             }
-            
+
         },1000);
         setTimeout(function () {
             clearInterval(firstLoad2);
