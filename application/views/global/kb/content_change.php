@@ -12,7 +12,9 @@
             </a>
 						<div id="<?php echo $i ?>" class="collapse detailKB">
 								<ul class="list-group">
-										<?php $data = $G_data[$i]['data'] ?>
+										<?php $data = $G_data[$i]['data'];
+
+										?>
 										<?php for($j = 0; $j < count($data); $j++): ?>
 												<li class="list-group-item"><a href="javascript:void(0)" data-toggle="collapse" data-target="#<?php echo $i.'__'.$j ?>">
 																<?php echo $data[$j]['Desc'] ?>
@@ -20,8 +22,7 @@
 														<div id="<?php echo $i.'__'.$j ?>" class="collapse">
 																<div style="margin-top: 15px;margin-bottom: 15px;">
 																		<a class="btn btn-default <?php if($data[$j]['File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> PDF File</a>
-																			<!-- <td><button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'" data-j="'+v.Desc+'"><i class="fa fa-edit"></i></button></td>
-																			<td><button class="btn btn-sm btn-default btnDelete" data-id="'+i.ID+'" data-j="'+i.IDType+'"><i class="fa fa-trash"></i></button></td> -->
+																		<a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
 																</div>
 														</div>
 

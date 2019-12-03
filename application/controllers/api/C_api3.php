@@ -3591,13 +3591,13 @@ class C_api3 extends CI_Controller {
                     WHERE ID_kat_capaian = 4 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            } 
+            }
             else {
                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-            }  
+            }
 
         }
 
@@ -3665,14 +3665,14 @@ class C_api3 extends CI_Controller {
                     WHERE ID_kat_capaian = 1 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            } 
+            }
             else {
                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 1 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            }  
+            }
 
         }
 
@@ -3731,7 +3731,7 @@ class C_api3 extends CI_Controller {
             $sql.= ' NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
 
-        } 
+        }
         else {
 
             if($status == "") {
@@ -3740,14 +3740,14 @@ class C_api3 extends CI_Controller {
                     WHERE ID_kat_capaian = 7 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            } 
+            }
             else {
                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            }  
+            }
 
         }
 
@@ -3801,7 +3801,7 @@ class C_api3 extends CI_Controller {
         $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 '.$whereStatus.' ';
-        $totalData = $this->db->query($squery, array())->result_array();        
+        $totalData = $this->db->query($squery, array())->result_array();
 
         $totalDaddta = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
                     FROM db_research.publikasi
@@ -3825,8 +3825,8 @@ class C_api3 extends CI_Controller {
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-               
-            } 
+
+            }
             else {
 
                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
@@ -3834,7 +3834,7 @@ class C_api3 extends CI_Controller {
                     WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
-            }  
+            }
         }
 
         $query = $this->db->query($sql)->result_array();
@@ -4448,7 +4448,7 @@ class C_api3 extends CI_Controller {
                                         LEFT JOIN db_employees.employees em2 ON (fpc.Cl_Finance_By = em2.NIP)
                                         LEFT JOIN db_employees.employees em3 ON (fpc.Cl_Kaprodi_By = em3.NIP)
                                         LEFT JOIN db_employees.employees em6 ON (fpc.Cl_Academic_By = em6.NIP)
-                                        LEFT JOIN db_employees.employees em7 ON (fpc.Cl_StdLife_By = em7.NIP)              
+                                        LEFT JOIN db_employees.employees em7 ON (fpc.Cl_StdLife_By = em7.NIP)
                                         LEFT JOIN db_admission.doc_mhs dm ON (dm.NPM = ats.NPM AND dm.ID_reg_doc_checklist = 3)
 
                                         WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$WhereStatusTA.$dataSearch;
@@ -4784,10 +4784,28 @@ class C_api3 extends CI_Controller {
             if($ID!=''){
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                // add bukti upload,buktiname dan tingkat
+                $BuktiUpload = json_encode('');
+                if (array_key_exists('upload_kb', $_FILES)) {
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'upload_kb',$path = './uploads/kb/');
+                    $Upload = json_encode($Upload);
+                    $BuktiUpload = $Upload;
+                }
+
+                $dataForm['File'] = $BuktiUpload;
                 $this->db->where('ID',$ID);
                 $this->db->update('db_employees.knowledge_base',$dataForm);
             } else {
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                // add bukti upload,buktiname dan tingkat
+                $BuktiUpload = json_encode('');
+                if (array_key_exists('upload_kb', $_FILES)) {
+                    $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'upload_kb',$path = './uploads/kb/');
+                    $Upload = json_encode($Upload);
+                    $BuktiUpload = $Upload;
+                }
+
+                $dataForm['File'] = $BuktiUpload;
                 $this->db->insert('db_employees.knowledge_base',$dataForm);
                 $ID = $this->db->insert_Id();
             }
@@ -4841,7 +4859,7 @@ class C_api3 extends CI_Controller {
             }
             else if($data_arr['action']=='viewTypeKB'){
 
-              $KBID = $data_arr['ID'];
+              $ID = $data_arr['ID'];
               $Type = $data_arr['IDType'];
 
 
@@ -4853,6 +4871,8 @@ class C_api3 extends CI_Controller {
             inner join  db_employees.employees as emp on kb.EntredBy=emp.NIP
             inner join db_employees.kb_type as kt on kb.IDType=kt.ID'.$dataSearch;
 
+            return print_r(json_encode($data));
+
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
             $query = $this->db->query($sql)->result_array();
@@ -4860,6 +4880,7 @@ class C_api3 extends CI_Controller {
 
             $no = $requestData['start'] + 1;
             $data = array();
+
 
             for($i=0;$i<count($query);$i++){
 
@@ -4897,49 +4918,27 @@ class C_api3 extends CI_Controller {
 
         }
       }
-      else if($data_arr['action']=='deleteListKB'){
-        $G_data_ = $this->caribasedprimary('db_employees.knowledge_base','ID',$ID);
-        if ($G_data_[0]['upload_file'] != '' && $G_data_[0]['upload_file'] != null) {
-            $arr_file = (array) json_decode($G_data_[0]['upload_file'],true);
-            $filePath = 'kb\\'.$arr_file[0]; // pasti ada file karena required
-            $path = FCPATH.'uploads\\'.$filePath;
-            if (file_exists($path)) {
-                unlink($path);
-            }
-        }
+      else if($data_arr['action']=='removeDataKB') {
+          $ID = $data_arr['ID'];
 
-        $this->db->where('ID',$ID);
-        $this->db->delete('db_employees.knowledge_base');
-        echo json_encode(1);
-    }
-    elseif ($action = 'UpdateListKB') {
-        $ID = $Input['ID'];
-        $dataSave = json_decode(json_encode($Input['data']),true);
-        $G_data_ = $this->caribasedprimary('db_employees.knowledge_base','ID',$ID);
-        if (array_key_exists('upload_file', $_FILES)) {
-            if ($G_data_[0]['upload_file'] != '' && $G_data_[0]['upload_file'] != null) {
-                $arr_file = (array) json_decode($G_data_[0]['upload_file'],true);
-                $filePath = 'kb\\'.$arr_file[0]; // pasti ada file karena required
-                $path = FCPATH.'uploads\\'.$filePath;
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-            }
 
-            // do upload file
-            $FileUpload = $this->uploadDokumenMultiple(uniqid(),'upload_file',$path = './uploads/kb');
-            $FileUpload = json_encode($FileUpload);
-            $dataSave['upload_file'] = $FileUpload;
-        }
-        $arr_add = [
-            'Updated_by' => $this->session->userdata('lecturer_NIP'),
-            'Updated_at' => date('Y-m-d H:i:s'),
-        ];
-        $dataSave = $dataSave  + $arr_add;
-        $this->db->where('ID',$ID);
-        $this->db->update('db_employees.knowledge_base',$dataSave);
-        echo json_encode(1);
-    }
+          // remove file is exist
+          $G_data = $this->m_master->caribasedprimary('db_employees.knowledge_base','ID',$ID);
+          // print_r($G_data);die();
+          if ($G_data[0]['File'] != '' && $G_data[0]['File'] != null) {
+              $arr_file = (array) json_decode($G_data[0]['File'],true);
+              if (count($arr_file) > 0) {
+                  $filePath = 'kb\\'.$arr_file[0];
+                  $path = FCPATH.'uploads\\'.$filePath;
+                  unlink($path);
+              }
+          }
+
+          $this->db->where('ID', $ID);
+          $this->db->delete('db_employees.knowledge_base');
+          return print_r(1);
+      }
+
     else
     {
         echo '{"status":"999","message":"Not Authorize"}';
