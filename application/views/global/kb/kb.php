@@ -108,9 +108,8 @@
                                           </a>
                               <div id="<?php echo $i.'__'.$j ?>" class="collapse">
                                 <div style="margin-top: 15px;margin-bottom: 15px;">
-                                  <a class="btn btn-default <?php if($data[$j]['=File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
-                                    <!-- <button type="button" class="btn btn-default btn-sm btn-default-success btnEdit">Edit</button>
-                                    <button type="button" class="btn btn-default btn-sm btn-default-danger btnDelete">Delete</button> -->
+                                  <a class="btn btn-default <?php if($data[$j]['=File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
+                                  <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
                                 </div>
                               </div>
                             </li>
@@ -370,16 +369,6 @@ $('#saveFormKB').click(function () {
               $('#listData,#formKBID').empty();
               if(jsonResult.length>0){
 
-                  $.each(jsonResult,function (i,v) {
-
-                      $('#listData').append('<tr>' +
-                          '<td>'+(i+1)+'</td>' +
-                          '<td>'+v.Desc+'</td>' +
-                          '<td><button class="btn btn-sm btn-default btnEdit" data-id="'+v.ID+'" data-j="'+v.Desc+'"><i class="fa fa-edit"></i></button></td>' +
-                          '</tr>');
-
-                      $('#formKBID').append('<option value="'+v.ID+'">'+v.Desc+'</option>');
-                  });
 
               }
 
@@ -410,6 +399,7 @@ $('#saveFormKB').click(function () {
           var fileName = moment().unix()+'_'+sessionNIP+'.'+ext;
           var formData = new FormData( $("#formupload_files")[0]);
 
+
           var url = base_url_js+'kb/upload_kb?fileName='+fileName+'&old='+FileNameOld+'&&id='+ID;
 
           $.ajax({
@@ -435,36 +425,28 @@ $('#saveFormKB').click(function () {
 
 
   $(document).ready(function() {
-      loadTypeKB();
+      loadDataKB();
   })
 
-  <?php if (isset($action)): ?>
-    <?php if ($action == 'write'): ?>
-    $(document).off('click', '.btnDelete').on('click', '.btnRemove',function(e) {
-      var ID = $(this).attr('data-id');
-      var selector = $(this);
-      UpdateListKB.ActionData(selector,'deleteListKB',ID);
-    })
+  $(document).on('click','.btnActRemove',function () {
+     if(confirm('Are you sure?')){
+         var ID = $(this).attr('data-id');
 
-    $(document).off('click', '.btnDelete').on('click', '.UpdateListKB',function(e) {
-        var ID = $(this).attr('data-id');
-        var Token = $(this).attr('data');
-        var data = jwt_decode(Token);
-        for(var key in data) {
-            $('.input[name="'+key+'"]').val(data[key]);
-          }
-          if (data.UploadBukti != null && data.UploadBukti != '') {
-               var FileJSon = jQuery.parseJSON(data.UploadBukti);
-               if (FileJSon.length > 0) {
-                  html = '<li style = "margin-top : 4px;"><a href = "'+base_url_js+'uploads/kb/'+FileJSon[0]+'" target="_blank" class = "Fileexist">File'+'</a></li>';
-                  $('.fileShow').html(html);
-               }
-          }
-        $('#btnSave').attr('action','UpdateListKB');
-        $('#btnSave').attr('data-id',ID);
-    })
-    <?php endif ?>
-  <?php endif ?>
+         var data = {
+             action : 'removeDataKB',
+             ID : ID
+         };
+
+         var token = jwt_encode(data,'UAP)(*');
+         var url = base_url_js+'api3/__crudkb';
+         $.post(url,{token:token},function (result) {
+             toastr.success('Data removed','Success');
+             loadDataKB();
+         });
+
+     }
+  });
+
 
 
 </script>

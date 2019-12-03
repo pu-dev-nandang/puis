@@ -2718,7 +2718,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         curl_close ($ch);
         return $data;
     }
-    
+
     public function apiservertoserver_Response($url,$token = '',$return=false)
     {
         $Input = $token;
@@ -2802,6 +2802,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $temp = array('Type' => $query[$i]['TypeName']);
             $datatemp = array();
             $datatemp[] = array(
+                'ID' => $query[$i]['ID'],
                 'Desc' => $query[$i]['Desc'],
                 'File' => $query[$i]['File'],
             );
@@ -2810,6 +2811,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                 $Type2 = $query[$j]['IDType'];
                 if ($Type1 == $Type2) {
                   $datatemp[] = array(
+                      'ID' => $query[$j]['ID'],
                       'Desc' => $query[$j]['Desc'],
                       'File' => $query[$j]['File'],
                   );
@@ -3208,7 +3210,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
     public function SearchEmployeesByNIP($NIP){
         $sql = 'select emp.*,divi.ID as DivisionID,divi.Division as DivisionName,divi.Description as DivisionNameDesc,divi.Abbreviation as DivAbbr,pos.Position as PositionName,pos.Description as PositionDescription,pos.ID as PositionID from db_employees.employees as emp
-            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID 
+            join db_employees.division as divi on SPLIT_STR(emp.PositionMain, ".", 1) = divi.ID
             join db_employees.position as pos on SPLIT_STR(emp.PositionMain, ".", 2) = pos.ID
             where emp.NIP = "'.$NIP.'"
                 ';
@@ -3723,7 +3725,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $pathAdd = pathAdd ex admission/temp => no slash in last word
             $return = 'string/json'
 
-            ex : 
+            ex :
                  $uploadNas = $this->m_master->UploadOneFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
         */
 
@@ -3785,7 +3787,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $pathAdd = pathAdd ex admission/temp => no slash in last word
             $return = 'array/json'
 
-            ex : 
+            ex :
                  $uploadNas = $this->m_master->UploadManyFilesToNas("http://localhost",'test.pdf','userfile',null,'json');
         */
 
@@ -3809,7 +3811,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         $Input = $token;
         $ch = curl_init();
-        
+
         $countfiles = count($_FILES[$varFiles ]['name']);
         $arr_files = [];
         for($i=0;$i<$countfiles;$i++){
@@ -3817,7 +3819,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $arr_files['file_contents['.$i.']'] = $cfile;
         }
         $new_post_array  = ['token' => $Input];
-        $post = $new_post_array + $arr_files;   
+        $post = $new_post_array + $arr_files;
         // $post = array('token' => $Input,'file_contents[]'=>$cfile);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -3846,13 +3848,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         /*
             $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
-            callback  : 
+            callback  :
                 [
                     {
                     Status: "1",
                     msg: "Delete file success"
                     }
-                ]   
+                ]
         */
         if ($path != '') {
             $rs = array();
@@ -3884,13 +3886,13 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $pr = curl_exec($ch);
             $rs = (array) json_decode($pr,true);
             curl_close ($ch);
-            return $rs;   
+            return $rs;
         }
         else
         {
             return 'No path added';
         }
     }
-  
+
 
 }
