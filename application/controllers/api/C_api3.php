@@ -5443,12 +5443,12 @@ class C_api3 extends CI_Controller {
 
             $now=date("Y-m-d");
 
-            $NPM = $data_arr['NPM'];
+            $member_id = $data_arr['member_id'];
             $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed 
                                                     FROM library.loan l 
                                                     LEFT JOIN library.item i ON (i.item_code = l.item_code) 
                                                     LEFT JOIN library.biblio b ON (b.biblio_id = i.biblio_id)
-                                                    WHERE l.member_id = "'.$NPM.'" ORDER BY  l.is_return ASC ,l.loan_date DESC, 
+                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC, 
                                                     l.due_date DESC, b.title ASC')->result_array();
 
             $dataHoliday = $dbLib->query('SELECT holiday_date FROM library.holiday ORDER BY holiday_id DESC')->result_array();
