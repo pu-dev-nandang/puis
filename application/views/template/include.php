@@ -1798,8 +1798,9 @@
     function loadingEnd(timeout)
     {
         setTimeout(function () {
-            // $('#NotificationModal').modal('hide');
             $('#NotificationModal').find('#ModalbtnCancleForm').trigger('click');
+            $('#NotificationModal').modal('hide');
+            
         },timeout);
     }
 
