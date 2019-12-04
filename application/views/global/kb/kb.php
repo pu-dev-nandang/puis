@@ -109,7 +109,9 @@
                               <div id="<?php echo $i.'__'.$j ?>" class="collapse">
                                 <div style="margin-top: 15px;margin-bottom: 15px;">
                                   <a class="btn btn-default <?php if($data[$j]['=File']==''||$data[$j]['File']==null || $data[$j]['File']=='unavailabe.jpg'){echo 'hide';} ?>" style="display: inline;" href="<?php echo serverRoot.'/fileGetAny/kb-'.$data[$j]['File'] ?>" target="_blank"><i class="fa fa-download margin-right"></i> File</a>
-                                  <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+                                    <?php if ($selected ==$this->session->userdata('PositionMain')['IDDivision']): ?>
+                                      <a href="javascript:void(0);" class="btnActRemove" data-id="<?= $data[$j]['ID']; ?>" data-no="'+i+'">Remove</a>
+                                    <?php endif; ?>
                                 </div>
                               </div>
                             </li>
@@ -442,6 +444,7 @@ $('#saveFormKB').click(function () {
          $.post(url,{token:token},function (result) {
              toastr.success('Data removed','Success');
              loadDataKB();
+             $('#Division').trigger('change');
          });
 
      }

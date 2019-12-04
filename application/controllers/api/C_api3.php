@@ -4938,10 +4938,11 @@ class C_api3 extends CI_Controller {
           // print_r($G_data);die();
           if ($G_data[0]['File'] != '' && $G_data[0]['File'] != null) {
               $arr_file = (array) json_decode($G_data[0]['File'],true);
-              if (count($arr_file) > 0) {
-                  $filePath = 'kb\\'.$arr_file[0];
-                  $path = FCPATH.'uploads\\'.$filePath;
-                  unlink($path);
+              if(count($G_data)>0){
+                $old = $G_data[0]['File'];
+                if($old!=''  && is_file('./uploads/kb/'.$old)){
+                    unlink('./uploads/kb/'.$old);
+                }
               }
           }
 
