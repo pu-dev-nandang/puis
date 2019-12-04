@@ -304,6 +304,12 @@ class C_rest_ticketing extends CI_Controller {
             $rs = ['status' => 1,'msg' => ''];
             echo json_encode($rs);
             break;
+          case 'rating':
+          $rs = [];
+          $dataToken = json_decode(json_encode($dataToken),true);
+          $this->m_ticketing->__create_rating($dataToken);
+          $rs = ['status' => 1,'msg' => ''];
+          echo json_encode($rs);
           default:
             # code...
             break;
@@ -373,6 +379,12 @@ class C_rest_ticketing extends CI_Controller {
     public function LoadTicketList(){
       $dataToken = $this->getInputToken();
       $rs =  $this->m_ticketing->LoadTicketListServerSide($dataToken);
+      echo json_encode($rs);
+    }
+
+    public function ticketing_GiveRatingCheck(){
+      $dataToken = $this->getInputToken();
+      $rs =  $this->m_ticketing->ticketing_GiveRatingCheck($dataToken);
       echo json_encode($rs);
     }
 

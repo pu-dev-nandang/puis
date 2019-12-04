@@ -2026,7 +2026,7 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
 
             $dataForm = (array) $data_arr['dataForm'];
-
+            
             if($ID!=''){
                 // Update
                 /*ADDED BY FEBRI @ NOV 2019*/
@@ -2075,8 +2075,8 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='viewDataPAM'){
             //UPDATED BY FEBRI @ DEC 2019
             $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "STAFF%" and c.ID = a.ID) as isAbble
-                                      FROM db_studentlife.student_achievement  a
-                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID
+                                      FROM db_studentlife.student_achievement  a 
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID 
                                       ORDER BY Year, StartDate DESC')->result_array();
             //END UPDATED BY FEBRI
 
@@ -5562,11 +5562,11 @@ class C_api3 extends CI_Controller {
             $now=date("Y-m-d");
 
             $member_id = $data_arr['member_id'];
-            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed
-                                                    FROM library.loan l
-                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code)
+            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed 
+                                                    FROM library.loan l 
+                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code) 
                                                     LEFT JOIN library.biblio b ON (b.biblio_id = i.biblio_id)
-                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC,
+                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC, 
                                                     l.due_date DESC, b.title ASC')->result_array();
 
             $dataHoliday = $dbLib->query('SELECT holiday_date FROM library.holiday ORDER BY holiday_id DESC')->result_array();

@@ -333,7 +333,7 @@
 
     .ticket-number {
         position: absolute;
-        top: 20px;
+        top: 45px;
         right: 0px;
         background: #607D8B;
         padding: 0px 10px 1px 10px;

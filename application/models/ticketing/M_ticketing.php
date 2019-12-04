@@ -445,6 +445,11 @@ class M_ticketing extends CI_Model {
            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
+           if ($query[$i]['Files'] != '' && $query[$i]['Files'] != null) {
+               $token = $this->jwt->encode($query[$i]['Files'],"UAP)(*");
+               $url = url_files."fileGetAnyToken/".$token;
+               $query[$i]['Files'] = $url;
+           }
         }
         return $query;
     }
@@ -632,12 +637,59 @@ class M_ticketing extends CI_Model {
         }
     }
 
+    private function send_notification_ticketing_transfer_to($data_arr_index){
+       $CreatedBy = $data_arr_index['CreatedBy'];
+       $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$CreatedBy);
+       $NoTicket = $data_arr_index['NoTicket'];
+       $DepartmentID = $data_arr_index['data']['DepartmentTransferToID'];
+       $url_action = $this->jwt->encode($DepartmentID,"UAP)(*");
+       $getAllUserByDepartment = function($DepartmentID){
+        $dataToken = ['DepartmentID' => $DepartmentID];
+        $get_data  = $this->m_general->getAllUserByDepartment($dataToken);
+        $rs = [];
+        for ($i=0; $i < count($get_data); $i++) { 
+            $rs[] = $get_data[$i]['NIP'];
+        }
+        return $rs;
+       };
+       $array_send_notification=[
+         'NameRequested' => $G_emp[0]['Name'],
+         'Description' => 'Number Ticket '.$NoTicket,
+         'URLDirect' => 'ticket/set_action_progress/'.$NoTicket.'/'.$url_action,
+         'CreatedBy' => $CreatedBy,
+         'To' => $getAllUserByDepartment($DepartmentID),
+         'NeedEmail' => 'No',
+       ];
+
+       $data = array(
+           'auth' => 's3Cr3T-G4N',
+           'Logging' => array(
+                           'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>E-ticketing Transfer to by '.$array_send_notification['NameRequested'],
+                           'Description' => $array_send_notification['Description'],
+                           'URLDirect' => $array_send_notification['URLDirect'],
+                           'CreatedBy' => $array_send_notification['CreatedBy'],
+                         ),
+           'To' => array(
+                     'NIP' => $array_send_notification['To'],
+                   ),
+           'Email' => $array_send_notification['NeedEmail'], 
+       );
+
+       $url = url_pas.'rest2/__send_notif_browser';
+       $token = $this->jwt->encode($data,"UAP)(*");
+       $this->m_master->apiservertoserver($url,$token); 
+    }
+
     public function ProcessTransferTo($data_arr){
         if (count($data_arr) > 0) {
             for ($i=0; $i < count($data_arr); $i++) { 
                $data_arr_index =$data_arr[$i];
                $action = $data_arr_index['action'];
                $this->TableReceivedAction($data_arr_index);
+               // send notification
+               if ($action == 'update' && array_key_exists('DepartmentTransferToID', $data_arr_index['data']) ) {
+                   $this->send_notification_ticketing_transfer_to($data_arr_index);
+               }
             }
         }
     }
@@ -665,6 +717,7 @@ class M_ticketing extends CI_Model {
               $data_received[$i]['DataReceived_Details'] = $DataReceived_Details;
               $data_received[$i]['ReceivedAt'] = $this->__set_tgl_ticket($data_received[$i]['ReceivedAt']);
               $data_received[$i]['ReceivedAtTracking'] = $this->__set_datetime_modal_tracking($data_received[$i]['CreatedAt']);
+              $data_received[$i]['DataRating'] = $this->m_master->caribasedprimary('db_ticketing.rating','ReceivedID',$data_received[$i]['ID']);
          }
 
          return $data_received; 
@@ -893,7 +946,7 @@ class M_ticketing extends CI_Model {
         $queryTotal = $this->db->query($sqlTotalData)->result_array();
         $totalData = $queryTotal[0]['total'];
         // set data
-        $query = $this->__ticket_list_set_data($query);
+        $query = $this->__ticket_list_set_data($query,$dataToken);
         $No = $requestData['start'] + 1;
         $data = array();
         for ($i=0; $i < count($query); $i++) { 
@@ -907,7 +960,10 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $row['NameStatusTicket'];
             $nestedData[] = $row['RequestedAt'];
             $nestedData[] = $row['NameStatusTicket'];
+            $nestedData[] = $row['TicketStatus'];
             $nestedData[] = $row['token'];
+            $nestedData[] = $row['Files'];
+            $nestedData[] = $row['setTicket'];
             $data[] = $nestedData;
             $No++;
         }
@@ -922,8 +978,9 @@ class M_ticketing extends CI_Model {
         return $json_data;
     }
 
-    private function __ticket_list_set_data($query)
+    private function __ticket_list_set_data($query,$dataToken)
     {
+        $NIP = $dataToken['NIP'];
         for ($i=0; $i < count($query); $i++) {
             $data_received = $this->getDataReceived_worker([ 'TicketID' => $query[$i]['ID'] ]);
 
@@ -942,11 +999,59 @@ class M_ticketing extends CI_Model {
             }
 
             $query[$i]['RequestedAt'] = $this->__set_tgl_ticket($query[$i]['RequestedAt']);
+            $query[$i]['setTicket'] = $this->__setTicket_action_progress($query[$i]['NoTicket'],$NIP,$dataToken['DepartmentID'],$data_received,$query[$i]['TicketStatus']);
             $token = $this->jwt->encode($query[$i],"UAP)(*");
             $query[$i]['token'] =  $token;
         }
 
         return $query;
+    }
+
+    public function ticketing_GiveRatingCheck($dataToken){
+        $rs = [];
+        $NIP = $dataToken['NIP'];
+        $arr_where = [
+            'RequestedBy' => $NIP,
+            'TicketStatus' => 3,
+        ];
+        $GetTicketData = $this->getDataTicketBy($arr_where);
+        if (count($GetTicketData) > 0) {
+            for ($i=0; $i < count($GetTicketData); $i++) { 
+                $data_received = $this->getDataReceived_worker([ 'TicketID' => $GetTicketData[$i]['ID'] ]);
+                $GetTicketData[$i]['data_received'] = $data_received;
+                $rs[] = $GetTicketData[$i];
+            }
+        }
+
+        return $rs;
+    }
+
+    public function __create_rating($dataToken){
+        $dataSave = $dataToken['data'];
+        $dataSave['EntredAt'] = date('Y-m-d H:i:s');
+        $this->db->insert('db_ticketing.rating',$dataSave);
+        $this->trigger_after_create_ticketing($dataToken['TicketID']);
+    }
+
+    private function trigger_after_create_ticketing($TicketID){
+        $data_received = $this->getDataReceived_worker([ 'TicketID' => $TicketID ]);
+        $bool = true;
+        for ($i=0; $i < count($data_received); $i++) { 
+            $DataRating = $data_received[$i]['DataRating'];
+            $DataReceived_Details = $data_received[$i]['DataReceived_Details'];
+            if (count($DataRating) == 0 && count($DataReceived_Details) > 0 ) {
+                $bool = false;
+                break;
+            }
+        }
+
+        if ($bool) {
+            $this->db->where('ID',$TicketID);
+            $dataSave = [
+                'TicketStatus' => 4,
+            ];
+            $this->db->update('db_ticketing.ticket',$dataSave);  
+        }
     }
 
 }

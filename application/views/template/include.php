@@ -1786,6 +1786,7 @@
               '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
               '                    <br/>' +
               '                    Loading Data . . .' +
+              '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default hide">Close</button>'+
               '                </center>');
           $('#NotificationModal .modal-footer').addClass('hide');
           $('#NotificationModal').modal({
@@ -1797,7 +1798,9 @@
     function loadingEnd(timeout)
     {
         setTimeout(function () {
+            $('#NotificationModal').find('#ModalbtnCancleForm').trigger('click');
             $('#NotificationModal').modal('hide');
+            
         },timeout);
     }
 

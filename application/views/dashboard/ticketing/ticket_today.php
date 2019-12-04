@@ -88,7 +88,7 @@ var App_ticket_ticket_today = {
             '        <td>Message</td>' +
             '        <td>:</td>' +
             '        <td>' +
-            '            <textarea class="form-control input_form" rows="3" name="Message"></textarea>' +
+            '            <textarea class="form-control input_form" rows="7" name="Message"></textarea>' +
             '        </td>' +
             '    </tr>' +
             '    <tr>' +
@@ -122,16 +122,20 @@ var App_ticket_ticket_today = {
             var firstLoad = setInterval(function () {
                 var SelectCategoryID = $('.input_form[name="CategoryID"]').find('option:selected').val();
                 if(SelectCategoryID!='' && SelectCategoryID!=null && SelectCategoryID !='' && SelectCategoryID!=null){
-                    $('#GlobalModal').modal({
-                        'show' : true,
-                        'backdrop' : 'static'
-                    });
-                    $('.input_form[name="CategoryID"]').trigger('change');
+                    loadingEnd(1);
+                    setTimeout(function () {
+                        $('#GlobalModal').modal({
+                            'show' : true,
+                            'backdrop' : 'static'
+                        });
+                        $('.input_form[name="CategoryID"]').trigger('change');
+                    },500);
                     clearInterval(firstLoad);
                 }
             },1000);
             setTimeout(function () {
                 clearInterval(firstLoad);
+                loadingEnd(500);
             },5000);
         }
         else
@@ -516,7 +520,8 @@ var App_ticket_ticket_today = {
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
                     for (var j = 0; j < data_received.length; j++) {
-                        if (data_received[j].SetAction == "1") {
+                        // console.log(data_received[j]);
+                        if (data_received[j].DataReceived_Details.length > 0) {
                             if (department_handle == '') {
                                 department_handle += data_received[j].NameDepartmentDestination;
                                 arr_filter_depart.push(data_received[j].DepartmentReceivedID);
@@ -536,6 +541,7 @@ var App_ticket_ticket_today = {
                                 
                             }
                         }
+                        
                     }
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -650,6 +656,285 @@ var App_ticket_ticket_today = {
         return rs;
     },
 
+    GiveRatingCheck : function(){
+        loadingStart();
+        var url = base_url_js+"rest_ticketing/__ticketing_GiveRatingCheck";
+        var dataform = {
+            NIP : sessionNIP,
+            auth : 's3Cr3T-G4N',
+        }
+        var token = jwt_encode(dataform,'UAP)(*');
+                
+        AjaxLoadRestTicketing(url,token).then(function(response){
+            if (response.length == 0) {
+                App_ticket_ticket_today.ModalFormCreateNewTicket();
+            }
+            else
+            {
+                /*
+                    action fill rating
+                */
+                loadingEnd(500);
+                setTimeout(function () {
+                     App_ticket_ticket_today.setModalFormRating(response);
+                },1000);
+               
+            }
+        }).fail(function(response){
+           toastr.error('Error connection to server');
+        })
+    },
+
+    setModalFormRating : function(data){
+        var html = '';
+        for (var i = 0; i < data.length; i++) {
+            var tokenData = jwt_encode(data[i],'UAP)(*');
+            var htmlInfo = App_ticket_ticket_today.__show_html_show_more(tokenData);
+            html += '<div class ="row">'+
+                        '<div class = "well">'+
+                            '<div class  = "col-md-12">'+
+                                htmlInfo+
+                            '</div>'+ 
+                        '</div>'+
+                    '</div>';      
+
+        }
+
+        $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Form Rating'+'</h4>');
+        $('#GlobalModalLarge .modal-body').html(html);
+        $('#GlobalModalLarge .modal-footer').html('<button class = "btn btn-success" id = "BtnSubmitRating">Submit </button> <button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+        $('#GlobalModalLarge').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        /*
+            remove data yg tidak memiliki class input_form
+        */
+        $('#GlobalModalLarge').find('.well').each(function(e){
+            var itsme = $(this);
+            if (!itsme.find('.input_form').length) {
+                itsme.remove();
+            }
+        })
+    },
+
+    __show_html_show_more : function(token){
+        var data = jwt_decode(token);
+        var tracking_list_html  = App_ticket_ticket_today.tracking_list_html(data);
+        var pFiles = '';
+        if (data.Files != null && data.Files != '') {
+          pFiles =  '    <tr>' +
+           '        <td>Files Upload</td>' +
+           '        <td>:</td>' +
+           '        <td>'+'<a href= "'+data.Files+'" target="_blank">Files Upload<a>'+'</td>' +
+           '    </tr>' ;
+        }
+        var htmlss = '<div class="row">'+
+                        '<div class = "col-md-4">'+
+                            '<table class="table" id="tableDetailTicket">' +
+                                 ' <tr style = "color:green;">'+
+                                    '<td style="width: 25%;">NoTicket</td>'+
+                                    '<td>:</td>'+
+                                   ' <td>'+data.NoTicket+'</td>'+
+                                  '</tr>'+
+                                  '    <tr>' +
+                                  '        <td style="width: 25%;">Title</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.Title+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td style="width: 25%;">Category</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.NameDepartmentDestination+' - '+data.CategoryDescriptions+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Message</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+nl2br(data.Message)+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Requested by</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.NameRequested+'</td>' +
+                                  '    </tr>' +
+                                  '    <tr>' +
+                                  '        <td>Requested on</td>' +
+                                  '        <td>:</td>' +
+                                  '        <td>'+data.RequestedAt+'</td>' +
+                                  '    </tr>' +
+                                  pFiles+
+                            '</table>'+
+                        '</div>'+
+                        '<div class = "col-md-8">'+
+                           '<div id = "tracking">'+
+                                tracking_list_html+
+                           '</div>'+ 
+                        '</div>'+
+                      '</div>';
+        return htmlss;
+    },
+
+    tracking_list_html : function(data){
+        var data_received = data.data_received;
+        var html =  '<b>Status : </b><i class="fa fa-circle" style="color:#d0af0c;"></i> Transfer To | <i class="fa fa-circle" style="color:lightgreen;"></i> Done '+
+                    '<br/>';
+        if (data_received.length > 0) {
+          html +=  '<div class="tracking-list">';
+          for (var i = 0; i < data_received.length; i++) {
+            var row = data_received[i];
+            // console.log(row);
+            var tokenData =jwt_encode(row,'UAP)(*');
+            var GetWorker = '';
+            var DataReceived_Details = row.DataReceived_Details;
+            var DataRating = row.DataRating;
+            if (DataReceived_Details.length >  0) {
+              GetWorker += '<table class = "table" style ="margin-top:15px;">'+
+                              '<tr>'+
+                                  '<td style="padding:4px;">Worker</td>'+
+                                  '<td style="padding:4px;">DueDate</td>'+
+                                  '<td style="padding:4px;">Status</td>'+
+                              '</tr>';   
+              for (var j = 0; j < DataReceived_Details.length; j++) {
+                var r = DataReceived_Details[j];
+                var st = '';
+                if (r.Status == "-1") {
+                  st = '<span style="color: red;"><i class="fa fa-minus-circle" aria-hidden="true"></i> '+'withdrawn'+'</span>';
+                }
+                else if(r.Status == "1"){
+                  st = '<span style="color: #2196F3;"><i class="fa fa-user-circle-o" aria-hidden="true"></i> '+'working'+'</span>';
+                }
+                else{
+                  st = '<span style="color: green;"><i class="fa fa-check-circle" aria-hidden="true"></i> '+'done'+'</span>';
+                }
+                GetWorker += '<tr>'+
+                                '<td style="padding:4px;">'+r.NameWorker+'</td>'+
+                                '<td style="padding:4px;">'+'<span>'+r.DueDateShow+'</span>'+'</td>'+
+                                '<td style="padding:4px;">'+st+'</td>'+
+                             '</tr>';
+              }
+
+              GetWorker += '</table>';
+              if (DataRating.length == 0) {
+                GetWorker += '<div class = "thumbnail input_form" tokenData = "'+tokenData+'">'+
+                                  '<div class = "form-group">'+
+                                      '<label>Rate</label>'+
+                                      App_ticket_ticket_today.LoadSelectOptionRate()+
+                                  '</div>'+
+                                  '<div class = "form-group">'+
+                                      '<label>Comment</label>'+
+                                     '<textarea class="form-control fieldInput" rows="3" name="Comment"></textarea>'+
+                                  '</div>'+
+                                  '<div style = "text-align:right">'+
+                                      '<button class = "btn btn-success btnSaveRating">Save</button>'+  
+                                  '</div>'+
+                              '</div>';   
+              }
+               
+            }
+            
+            var SvgColor = '';
+            if (row.Flag == "1") {
+              SvgColor = 'style = "color:#d0af0c;" ';
+            }
+            if(row.ReceivedStatus == "1"){
+              SvgColor = 'style = "color:lightgreen;" ';
+            }
+            
+            html +=  '<div class="tracking-item">'+
+                        '<div class="tracking-icon status-intransit">'+
+                          '<svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" '+SvgColor+'>' +
+                          '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
+                          '</svg>' +
+                        '</div>'+
+                        '<div class="tracking-date">'+row.ReceivedAtTracking+'</div>'+
+                        '<div class="tracking-content">'+
+                          row.CategoryDescriptions+'<span>'+row.NameDepartmentDestination+' </span>'+
+                        '</div>'+
+                        GetWorker+
+                      '</div>';  
+          }
+
+          html +=  '</div>';
+        }
+
+        return html;
+    },
+
+    LoadSelectOptionRate : function(){
+        var html = '<select class = "form-control fieldInput" name = "Rate">'+
+                    '<option value = "" selected disabled>--Choose Rate--</option>';
+        for (var i = 1; i <= 5; i++) {
+            var bintang = '';
+            for (var j = 0; j < i; j++) {
+                bintang += '*';
+            }
+            html += '<option value = "'+i+'">'+bintang+'</option>';
+        }
+
+        html += '</select>';
+        return html;
+
+    },
+
+    SaveRating : function(selector){
+        /* closest tracking-item */
+        var selector_input_form = selector.closest('.input_form');
+        var selector_tracking_item = selector.closest('.tracking-item');
+        var tokendata = selector_input_form.attr('tokendata');
+        var getData = jwt_decode(tokendata);
+        var Rate = selector_input_form.find('.fieldInput[name="Rate"] option:selected').val();
+        var Comment = selector_input_form.find('.fieldInput[name="Comment"]').val();
+        var ModalBody = selector_tracking_item.closest('.modal-body');
+        if (Rate != '' && Rate != undefined && Rate != null && Comment != '' && Comment != undefined && Comment != null) {
+            var data = {
+                ReceivedID : getData.ID,
+                Rate : Rate,
+                Comment : Comment,
+                EntredBy : sessionNIP,
+            };
+            var dataform = {
+                action : 'rating',
+                data : data,
+                auth : 's3Cr3T-G4N',
+                TicketID :  getData.TicketID,
+            };
+            
+            loading_button2(selector);
+            var url = base_url_js+"rest_ticketing/__event_ticketing";
+            var token = jwt_encode(dataform,'UAP)(*');
+            AjaxSubmitRestTicketing(url,token).then(function(response){
+                if (response.status == 1) {
+                    selector_input_form.remove();
+                    if (!selector_tracking_item.closest('.well').find('.input_form').length) {
+                        selector_tracking_item.closest('.well').remove();
+                    }
+                    toastr.success('Thank you');
+
+                    if ( !ModalBody.find('.well').length ) {
+                        ModalBody.find('.row').html('<p><h4 style = "color:green;"><b>Thank for your rating.</b></h4></p>'+
+                                                     '<p style = "color:Red;">Please Submit to Create Ticket</p>'
+                            );
+                    }
+                    
+                }
+                else
+                {
+                    toastr.error(response.msg);
+                    end_loading_button2(selector);
+                }
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+               end_loading_button2(selector);     
+            })
+        }
+        else
+        {
+            toastr.info('Rate and Comment are required');
+        }
+        
+    },
+
 };
 
 $(document).ready(function() {
@@ -677,8 +962,14 @@ $(document).off('change', '.input_form[name="CategoryID"]').on('change', '.input
 
 
 $('#btnCreateNewTicket').click(function () {
-    App_ticket_ticket_today.ModalFormCreateNewTicket();
+    App_ticket_ticket_today.GiveRatingCheck();
 });
+
+$(document).off('click', '#BtnSubmitRating').on('click', '#BtnSubmitRating',function(e) {
+    $('#GlobalModalLarge').find('#ModalbtnCancleForm').trigger('click');
+    App_ticket_ticket_today.GiveRatingCheck();
+})
+
 
 $(document).off('click', '#btnsave_ticket').on('click', '#btnsave_ticket',function(e) {
     var selector = $(this);
@@ -693,80 +984,11 @@ $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore',function
     AppModalDetailTicket.ModalReadMore(ID,setTicket,token);
 })
 
-    $(document).on('click','.showReadMoreTicket',function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-            '<h4 class="modal-title">Read More Ticket</h4>');
+$(document).off('click', '.btnSaveRating').on('click', '.btnSaveRating',function(e) {
+    var selector = $(this);
+    App_ticket_ticket_today.SaveRating(selector);
+})
 
-        var htmlss = '<div class="row">' +
-            '' +
-            '        <div class="col-md-12 col-lg-12">' +
-            '            <div id="tracking-pre"></div>' +
-            '            <div id="tracking">' +
-            '' +
-            '                <div class="thumbnail" style="border-radius: 0px;border-bottom: none;padding: 15px;">' +
-            '                    <h3 style="margin-top: 0px;margin-bottom: 3px;"><b>Lorem Ipsum is simply dummy text of the printing</b></h3>' +
-            '                    <div style="margin-bottom: 10px;color: cornflowerblue;">Nandang Mulyadi | 19 Januari 2019 09:00</div>' +
-            '                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letrase' +
-            '                </div>' +
-            '' +
-            '                <div class="tracking-list">' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Aug 10, 2018<span>05:01 PM</span></div>' +
-            '                        <div class="tracking-content">DESTROYEDPER SHIPPER INSTRUCTION<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA </span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Aug 10, 2018<span>11:19 AM</span></div>' +
-            '                        <div class="tracking-content">SHIPMENT DELAYSHIPPER INSTRUCTION TO DESTROY<span>SHENZHEN, CHINA, PEOPLE\'S REPUBLIC</span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Jul 27, 2018<span>04:08 PM</span></div>' +
-            '                        <div class="tracking-content">DELIVERY ADVICERequest Instruction from ORIGIN<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA</span></div>' +
-            '                    </div>' +
-            '                    <div class="tracking-item">' +
-            '                        <div class="tracking-icon status-intransit">' +
-            '                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">' +
-            '                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>' +
-            '                            </svg>' +
-            '                            <!-- <i class="fas fa-circle"></i> -->' +
-            '                        </div>' +
-            '                        <div class="tracking-date">Jul 20, 2018<span>05:25 PM</span></div>' +
-            '                        <div class="tracking-content">Delivery InfoCLOSED-OFFICE/HOUSE CLOSED<span>KUALA LUMPUR (LOGISTICS HUB), MALAYSIA, MALAYSIA</span></div>' +
-            '                    </div>' +
-            '' +
-            '                </div>' +
-            '            </div>' +
-            '        </div>' +
-            '    </div>';
-
-        $('#GlobalModal .modal-body').html(htmlss);
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-            '');
-
-
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-    });
 
 </script>
 
