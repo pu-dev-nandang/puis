@@ -280,9 +280,9 @@ class C_rest3 extends CI_Controller {
                                 join db_employees.employees as b on a.NIP = b.NIP
                                 where b.ProdiID = ? and a.Tahun = ?
                         UNION
-                        select sk.NIP_penulis,b.Name,sk.EntredAt from db_agregator.sitasi_karya as sk
-                        join db_employees.employees as b on sk.NIP_penulis = b.NIP
-                        where b.ProdiID = ? and sk.Tahun = ?
+                        select sk.Updated_by,b.Name,sk.Updated_by from db_agregator.sitasi_karya as sk
+                        join db_employees.employees as b on sk.Updated_by = b.NIP
+                        where b.ProdiID = ? and sk.year = ?
                         ) xx
                         GROUP BY NIP
                         order by EntredAt desc limit 1000
@@ -365,7 +365,7 @@ class C_rest3 extends CI_Controller {
                       'value' => $filterTahun,
                     ];
 
-                    $sql_dt_artikel = 'select * from db_agregator.sitasi_karya where NIP_penulis = "'.$query[$i]['NIP'].'" and Tahun = '.$filterTahun.' ';
+                    $sql_dt_artikel = 'select * from db_agregator.sitasi_karya where Updated_by = "'.$query[$i]['NIP'].'" and year = '.$filterTahun.' ';
                     $G_dt_artikel = $this->db->query($sql_dt_artikel,array())->result_array();
 
                     // Judul Artikel
@@ -373,7 +373,7 @@ class C_rest3 extends CI_Controller {
                     if (count($G_dt_artikel) > 0) {
                       $wr = '<ul style = "margin-left:-20px;">';
                       for ($l=0; $l < count($G_dt_artikel); $l++) { 
-                         $wr .= '<li>'.$G_dt_artikel[$l]['Judul_artikel'].'</li>';
+                         $wr .= '<li>'.$G_dt_artikel[$l]['judul_sitasi'].'</li>';
                       }
                       $wr .= '</ul>';
                     }
@@ -388,7 +388,7 @@ class C_rest3 extends CI_Controller {
                     if (count($G_dt_artikel) > 0) {
                       $wr = '<ul style = "margin-left:-20px;">';
                       for ($l=0; $l < count($G_dt_artikel); $l++) { 
-                         $wr .= '<li>'.$G_dt_artikel[$l]['Banyak_artikel'].'</li>';
+                         $wr .= '<li>'.$G_dt_artikel[$l]['jumlah_sitasi'].'</li>';
                       }
                       $wr .= '</ul>';
                     }
