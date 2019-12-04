@@ -2029,8 +2029,10 @@ class C_api3 extends CI_Controller {
 
             if($ID!=''){
                 // Update
+                /*ADDED BY FEBRI @ NOV 2019*/
                 $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                /*END ADDED BY FEBRI @ NOV 2019*/
                 $this->db->where('ID', $ID);
                 $this->db->update('db_studentlife.student_achievement',$dataForm);
 
@@ -2040,8 +2042,12 @@ class C_api3 extends CI_Controller {
                 $this->db->delete('db_studentlife.student_achievement_student');
 
             } else {
+                /*ADDED BY FEBRI @ NOV 2019*/
+                $dataForm['isApproved'] = 2;
+                $dataForm['approvedBy'] = "STAFF/".$this->session->userdata('NIP').'/'.$this->session->userdata('Name');
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                /*END ADDED BY FEBRI @ NOV 2019*/
+                //$dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
 //                $this->db->insert('db_agregator.prestasi_mahasiswa',$dataForm);
                 $this->db->insert('db_studentlife.student_achievement',$dataForm);
                 $ID = $this->db->insert_id();
@@ -2067,8 +2073,13 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode(array('ID' => $ID,'FileName' => $FileName)));
         }
         else if($data_arr['action']=='viewDataPAM'){
+            //UPDATED BY FEBRI @ DEC 2019
+            $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "STAFF%" and c.ID = a.ID) as isAbble
+                                      FROM db_studentlife.student_achievement  a
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID
+                                      ORDER BY Year, StartDate DESC')->result_array();
+            //END UPDATED BY FEBRI
 
-            $data = $this->db->query('SELECT * FROM db_studentlife.student_achievement ORDER BY Year, StartDate DESC')->result_array();
 
             if(count($data)>0){
                 for($i=0;$i<count($data);$i++){
@@ -4927,10 +4938,11 @@ class C_api3 extends CI_Controller {
           // print_r($G_data);die();
           if ($G_data[0]['File'] != '' && $G_data[0]['File'] != null) {
               $arr_file = (array) json_decode($G_data[0]['File'],true);
-              if (count($arr_file) > 0) {
-                  $filePath = 'kb\\'.$arr_file[0];
-                  $path = FCPATH.'uploads\\'.$filePath;
-                  unlink($path);
+              if(count($G_data)>0){
+                $old = $G_data[0]['File'];
+                if($old!=''  && is_file('./uploads/kb/'.$old)){
+                    unlink('./uploads/kb/'.$old);
+                }
               }
           }
 
@@ -5536,6 +5548,132 @@ class C_api3 extends CI_Controller {
             }
 
         }
+    }
+
+    public function crudMembersLibrary(){
+
+
+        $data_arr = $this->getInputToken();
+
+        if($data_arr['action']=='readLoans'){
+
+            $dbLib = $this->load->database('server22', TRUE);
+
+            $now=date("Y-m-d");
+
+            $member_id = $data_arr['member_id'];
+            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed
+                                                    FROM library.loan l
+                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code)
+                                                    LEFT JOIN library.biblio b ON (b.biblio_id = i.biblio_id)
+                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC,
+                                                    l.due_date DESC, b.title ASC')->result_array();
+
+            $dataHoliday = $dbLib->query('SELECT holiday_date FROM library.holiday ORDER BY holiday_id DESC')->result_array();
+
+            $dataHolidayArr = [];
+            if(count($dataHoliday)>0){
+                for($h=0;$h<count($dataHoliday);$h++){
+                    array_push($dataHolidayArr,$dataHoliday[$h]['holiday_date']);
+                }
+            }
+
+//            print_r($dataHoliday);
+//            exit;
+
+            // Cek dendan
+
+            if(count($data)>0){
+                for($i=0;$i<count($data);$i++){
+                    $sumDueDate = 0;
+                    $d = $data[$i];
+                    if($d['is_return']=='0' || $d['is_return']==0){
+
+                        // Cek apakah sudah lewat hari ini atau tidak
+                        if($d['due_date'] < $now){
+                            $ckDate = date('Y-m-d', strtotime($d['due_date'] . ' +1 day'));
+                            $rageDate = $this->dateRange($ckDate,$now);
+                            $sumDueDate = count($rageDate);
+                            if(count($rageDate)>0){
+                                for($h=0;$h<count($rageDate);$h++){
+
+                                    $dt =  date('N',strtotime($rageDate[$h]));
+                                    if(in_array($rageDate[$h],$dataHolidayArr) || $dt=='6' || $dt=='7'){
+                                        $sumDueDate = $sumDueDate - 1;
+                                    }
+                                }
+                            }
+
+
+                        }
+
+
+                    }
+
+
+                    $data[$i]['SumOfLate'] = $sumDueDate;
+                }
+            }
+
+            return print_r(json_encode($data));
+
+        }
+        else if($data_arr['action']=='PerpanjangMandiri'){
+
+            $id = $data_arr['NPM'];
+            $loan_id = $data_arr['loan_id'];
+
+            $dbLib = $this->load->database('server22', TRUE);
+            $vardate=date("Y-m-d");
+
+            $q = $dbLib->get_where('library.member',array('member_id' => $id))->result_array()[0];
+            $q2 = $dbLib->get_where('library.mst_member_type',array('member_type_id' => $q['member_type_id']))->result_array()[0];
+
+            $tot=$q2['loan_periode'];
+
+            $newdate2 = strtotime ( '+'.$tot.' day' , strtotime ( $vardate ) ) ;
+            $newdate = date ( 'Y-m-j' , $newdate2 );
+
+            $a1= $dbLib->query("SELECT COUNT(*) AS jum FROM library.holiday WHERE holiday_date BETWEEN '$vardate' AND '$newdate' ")->result_array();
+//        $q1=mysql_fetch_array($a1);
+
+//            print_r($a1);exit;
+            $libur=$a1[0]['jum'];
+
+            $lm_pinjam1 = strtotime ( '+'.$libur.' day' , strtotime ( $newdate ) ) ;
+            $lm_pinjam = date ( 'Y-m-j' , $lm_pinjam1 );
+
+            print_r($lm_pinjam);
+
+            // mysql_query("UPDATE `loan` SET `due_date` = '$day',`renewed` = '1', return_date = '$now' WHERE `loan_id` = '$loan_id';");
+
+            $now=date("Y-m-d");
+
+            $this->db->where('loan_id', $loan_id);
+            $dbLib->update('library.loan',array(
+                'due_date' => $lm_pinjam,
+                'renewed' => '1',
+                'return_date' => $now
+            ));
+        }
+
+
+    }
+
+
+    function dateRange( $first, $last, $step = '+1 day', $format = 'Y-m-d' ) {
+
+        $dates = array();
+        $current = strtotime( $first );
+        $last = strtotime( $last );
+
+        while( $current <= $last ) {
+
+            $dates[] = date( $format, $current );
+            $current = strtotime( $step, $current );
+        }
+
+        return $dates;
     }
 
 }
