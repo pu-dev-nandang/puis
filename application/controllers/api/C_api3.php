@@ -2044,7 +2044,7 @@ class C_api3 extends CI_Controller {
             } else {
                 /*ADDED BY FEBRI @ NOV 2019*/
                 $dataForm['isApproved'] = 2;
-                $dataForm['approvedBy'] = "STAFF/".$this->session->userdata('NIP').'/'.$this->session->userdata('Name');
+                $dataForm['approvedBy'] = $this->session->userdata('NIP').'/'.$this->session->userdata('Name');
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
                 /*END ADDED BY FEBRI @ NOV 2019*/
                 //$dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
@@ -2074,7 +2074,7 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='viewDataPAM'){
             //UPDATED BY FEBRI @ DEC 2019
-            $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "STAFF%" and c.ID = a.ID) as isAbble
+            $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$this->session->userdata('NIP').'%" and c.ID = a.ID) as isAbble
                                       FROM db_studentlife.student_achievement  a 
                                       left join db_studentlife.categories_achievement b on b.ID = a.CategID 
                                       ORDER BY Year, StartDate DESC')->result_array();
