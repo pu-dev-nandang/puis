@@ -28,6 +28,26 @@ class C_studentlife extends Student_Life {
         $this->menu_diploma_supplement($page);
     }
 
+    // ===== SKPI ====
+    private function menu_skpi($page){
+        $data['page'] = $page;
+        $data['department'] = parent::__getDepartement();
+        $content = $this->load->view('page/'.$data['department'].'/skpi/menu_skpi',$data,true);
+        $this->temp($content);
+    }
+
+    public function skpi(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/skpi/list_student',$data,true);
+        $this->menu_skpi($page);
+    }
+
+    public function judiciums_monitoring(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/skpi/monitoring_yudisium',$data,true);
+        $this->menu_skpi($page);
+    }
+
 
     // ===== student_achievement ====
 
@@ -50,7 +70,10 @@ class C_studentlife extends Student_Life {
     {
 
         $ID = $this->input->get('id');
-
+        /*ADDED BY FEBRI @ NOV 2019 */
+        $this->load->model("General_model");
+        $data['categories'] = $this->General_model->fetchData("db_studentlife.categories_achievement",array("isActive"=>1))->result();
+        /*END ADDED BY FEBRI @ NOV 2019 */
         $data['department'] = parent::__getDepartement();
         $data['ID'] = ($ID!='' && $ID!=null && isset($ID)) ? $ID : '';
         $page = $this->load->view('page/'.$data['department'].'/student-achievement/update_data_achievement',$data,true);

@@ -14,7 +14,7 @@
 </style>
 
 <div class="row">
-    <div class="col-md-4 form-data-edit">
+    <div class="col-md-4 form-data-edit" id="inputForm">
         <div class="well" style="min-height: 100px;">
             <table class="table" id="tablePerolehanDana">
                 <thead>
@@ -248,7 +248,7 @@
         </div>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-md-8" id="ViewData">
         <div class="row">
             <div class="col-md-4 col-md-offset-4">
                 <div class="well">
@@ -258,7 +258,7 @@
         </div>
         <div class="row">
             <div class="col-md-12" style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-default form-data-edit" id="btnEditSumberDana"><i class="fa fa-edit"></i> Edit</button>
+                <button class="btn btn-default form-data-edit inputBtn" id="btnEditSumberDana"><i class="fa fa-edit"></i> Edit</button>
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
 

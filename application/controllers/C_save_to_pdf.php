@@ -9,10 +9,12 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->library('JWT');
         $this->load->library('pdf');
         $this->load->library('pdf_mc_table');
+        $this->load->library('Qrcode/qrlib');
 
         $this->load->model('m_rest');
         $this->load->model('master/m_master');
         $this->load->model('report/m_save_to_pdf');
+
 
         date_default_timezone_set("Asia/Jakarta");
         setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
@@ -30,6 +32,7 @@ class C_save_to_pdf extends CI_Controller {
         $data = strftime($e." %B %Y",strtotime($date));
 
         $result = str_replace('Pebruari', 'Februari', $data);
+        $result = str_replace('Nopember', 'November', $result);
 
         return $result;
 
@@ -718,7 +721,7 @@ class C_save_to_pdf extends CI_Controller {
         $token = $this->input->post('token');
         $data_arr = $this->getInputToken($token);
         $datawarek1 = $this->db->get_where('db_employees.employees',
-        array('PositionMain' => '2.2','StatusEmployeeID'=>'3' ))
+        array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
         ->result_array();
 
 
@@ -743,8 +746,6 @@ class C_save_to_pdf extends CI_Controller {
         $this->header_monitoringAttendanceByRangeDate($pdf,$data_arr);
 
 
-
-
         $h_body = 5;
         if(count($data_arr['Details'])>0){
             $no = 1;
@@ -756,22 +757,36 @@ class C_save_to_pdf extends CI_Controller {
                 $pdf->Cell(15,$h_body * count($d['Course']),$d['NIP'],1,0,'C');
 
                 $LecName = (strlen($d['Name'])>34) ? substr($d['Name'],0,34).'_' : $d['Name'];
-                $pdf->Cell(41,$h_body * count($d['Course']),$LecName,1,0,'L');
+
+                $pdf->Cell(35,$h_body * count($d['Course']),$LecName,1,0,'L');
+
+                //---- menghitung total sks per Dosen---
+                $sumCredit = 0;
+                for($c2=0;$c2<count($d['Course']);$c2++){
+                  $cObj = (array) $d['Course'];
+                  $c = (array) $cObj[$c2];
+                  $sumCredit = $sumCredit + $c['Credit'];
+                }
+                $pdf->Cell(15,$h_body * count($d['Course']),$sumCredit,1,0,'C');
+
 
                 // Cek Group
                 for($r=0;$r<count($d['Course']);$r++){
 
                     if($r!=0){
-                        $pdf->Cell(63,$h_body,'',0,0,'C');
+                        $pdf->Cell(57+15,$h_body,'',0,0,'C');
                     }
+
 
                     $cObj = (array) $d['Course'];
                     $c = (array) $cObj[$r];
 
+
+                    $pdf->Cell(10,$h_body,$c['Credit'],1,0,'C');
                     $CNameCourse = (strlen($c['NameEng'])>46) ? substr($c['NameEng'],0,46).'_' : $c['NameEng'];
                     $pdf->Cell(15,$h_body,$c['ClassGroup'],1,0,'C');
-                    $pdf->Cell(53,$h_body,$CNameCourse,1,0,'L');
-                    $pdf->Cell(8,$h_body,$c['Credit'],1,0,'C');
+                    $pdf->Cell(40,$h_body,$CNameCourse,1,0,'L');
+
 
                     $AttdObj = (array) $c['Attendance'];
 
@@ -807,7 +822,7 @@ class C_save_to_pdf extends CI_Controller {
                     $pdf->SetFillColor(255, 255, 204);
                     $pdf->Cell(10,$h_body,$totalSesi,1,0,'C',true);
                     $totalCredit = ($totalSesi!=0) ? $totalSesi * (int) $c['Credit'] : 0;
-                    $pdf->Cell(10,$h_body,$totalCredit,1,1,'C',true);
+                    $pdf->Cell(15,$h_body,$totalCredit,1,1,'C',true);
                     $pdf->SetFont('Times','',7);
 
 
@@ -884,23 +899,26 @@ class C_save_to_pdf extends CI_Controller {
         // 287
         $pdf->Cell(7,$h_header,'No','TRL',0,'C',true);
         $pdf->Cell(15,$h_header,'NIP','TRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(35,$h_header,'Name','TRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Total','TRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'Credit','TRL',0,'C',true);
         $pdf->Cell(15,$h_header,'Group','TRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'Course','TRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'Credit','TRL',0,'C',true);
+        $pdf->Cell(40,$h_header,'Course','TRL',0,'C',true);
+
 
 
         $pdf->Cell(($wTgl * $totalTgl),$h_header,$data_arr['RangeDate'],1,0,'C',true);
         $pdf->Cell(10,$h_header,'Total','TRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Total','TRL',1,'C',true);
+        $pdf->Cell(15,$h_header,'','TRL',1,'C',true);
 
 
         $pdf->Cell(7,$h_header,'','BRL',0,'C',true);
         $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(41,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(35,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(15,$h_header,'Credit','BRL',0,'C',true);
+        $pdf->Cell(10,$h_header,'','BRL',0,'C',true);
         $pdf->Cell(15,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(53,$h_header,'','BRL',0,'C',true);
-        $pdf->Cell(8,$h_header,'','BRL',0,'C',true);
+        $pdf->Cell(40,$h_header,'','BRL',0,'C',true);
 
 
         for($i=0;$i<$totalTgl;$i++){
@@ -914,7 +932,7 @@ class C_save_to_pdf extends CI_Controller {
         }
 
         $pdf->Cell(10,$h_header,'Sesi','BRL',0,'C',true);
-        $pdf->Cell(10,$h_header,'Credit','BRL',1,'C',true);
+        $pdf->Cell(15,$h_header,'Sesi x Credit','BRL',1,'C',true);
 
         $pdf->SetFont('Times','',7);
     }
@@ -2918,7 +2936,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetAutoPageBreak(true, 0);
 
         // Logo
-        $pdf->Image('./images/logo_tr.png',5,5,50);
+        $pdf->Image('./images/new_logo_pu.png',5,5,50);
 
         $pdf->SetFont('Arial','',17);
         $pdf->Cell(200, 0, 'Tanda Terima Pembayaran Mahasiswa', 0, 1, 'C', 0);
@@ -3058,6 +3076,8 @@ class C_save_to_pdf extends CI_Controller {
         $data_arr = $this->getInputToken($token);
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
+        $dataStudent['DetailCourse'] = $this->m_rest->getTranscript(substr($data_arr['DBStudent'],3,4),$data_arr['NPM'],'ASC');
+
         $Student = $dataStudent['Student'][0];
         $dataTempTr = $dataStudent['TempTranscript'][0];
 
@@ -3094,7 +3114,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Cell($l_left,$h,'Nama',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
-        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($fill_left,$h,($Student['Name']),$border,0,'L');
         $pdf->Cell($l_right,$h,'Fakultas',$border,0,'L');
         $pdf->Cell($sp_right,$h,':',$border,0,'C');
         $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
@@ -3113,6 +3133,9 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Ln(2);
 
         $this->headerTable('ind',$pdf);
+
+//        print_r($dataStudent);exit;
+
         $this->body_temp_transcript('ind',$pdf,$dataStudent,$dataTempTr);
 
 
@@ -3142,7 +3165,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $pdf->Cell($l_left,$h,'Name',$border,0,'L');
         $pdf->Cell($sp_left,$h,':',$border,0,'C');
-        $pdf->Cell($fill_left,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($fill_left,$h,($Student['Name']),$border,0,'L');
         $pdf->Cell($l_right,$h,'Faculty',$border,0,'L');
         $pdf->Cell($sp_right,$h,':',$border,0,'C');
         $pdf->Cell($fill_right,$h,$Student['FacultyName'],$border,1,'L');
@@ -3167,7 +3190,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
 
-        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $nameF = str_replace(' ','_',($Student['Name']));
         $pdf->Output('TEMP_TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
@@ -3222,8 +3245,8 @@ class C_save_to_pdf extends CI_Controller {
 
         $Student = $dataStudent['Student'][0];
         $Transcript = $dataStudent['Transcript'][0];
-        $DetailCourse = $dataStudent['DetailCourse'];
-        $Result = $dataStudent['Result'];
+        $DetailCourse = $dataStudent['DetailCourse']['dataCourse'];
+        $Result = $dataStudent['DetailCourse']['dataIPK'];
         $Warek1 = $dataStudent['WaRek1'][0];
 
         $border = 1;
@@ -3243,7 +3266,7 @@ class C_save_to_pdf extends CI_Controller {
             $pdf->Cell($w_no,$h,($no++),$border,0,'C');
 //            $pdf->Cell($w_smt,$h,'1',$border,0,'C');
             $pdf->Cell($w_kode,$h,$d['MKCode'],$border,0,'C');
-            $pdf->Cell($w_mk+$w_smt,$h,$d['MKName'.$mk],$border,0,'L');
+            $pdf->Cell($w_mk+$w_smt,$h,$d['Course'.$mk],$border,0,'L');
             $pdf->Cell($w_f,$h,$d['Credit'],$border,0,'C');
             $pdf->Cell($w_f,$h,$d['Grade'],$border,0,'C');
 //            $pdf->Cell($w_f,$h, (is_int($d['GradeValue'])) ? $d['GradeValue'] : number_format($d['GradeValue'],2),$border,0,'C');
@@ -3269,12 +3292,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_f,$h,$Result['TotalSKS'],$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
         $pdf->Cell($w_f,$h,'-',$border,0,'C',true);
-        $pdf->Cell($w_fv,$h,number_format($Result['TotalGradeValue'],2),$border,1,'C',true);
+        $pdf->Cell($w_fv,$h,$Result['TotalPoint'],$border,1,'C',true);
 
         $ipkLabel = ($lang=='ind')? 'Indeks Prestasi Kumulatif' : 'Cummulative Grade Point Average';
         $h = 6;
 
-        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.number_format($Result['IPK'],2),$border,1,'C',true);
+        $pdf->Cell($w_smt+$w_no+$w_kode+$w_mk+(3*$w_f)+$w_fv,$h,$ipkLabel.' : '.$Result['IPK'],$border,1,'C',true);
 
 
         $h = 3.5;
@@ -3307,12 +3330,10 @@ class C_save_to_pdf extends CI_Controller {
 
         $dataStudent = $this->m_save_to_pdf->getTranscript($data_arr['DBStudent'],$data_arr['NPM']);
 
+        $dataStudent['DetailCourse'] = $this->m_rest->getTranscript(substr($data_arr['DBStudent'],3,4),$data_arr['NPM'],'ASC');
+
+
         $dataTranscript = $this->db->get('db_academic.setting_transcript')->result_array();
-
-//        print_r($dataStudent);
-//        exit;
-
-        $dtsmtr = $dataTranscript[0]['DateOfYudisium'];
 
         $Student = $dataStudent['Student'][0];
         $Transcript = $dataStudent['Transcript'][0];
@@ -3340,14 +3361,14 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',7);
         $pdf->SetXY(10,7);
         $pdf->Cell(120,7,'',0,0,'L');
-        $pdf->Cell(32,7,'Nomor Transkrip Akademik/ ',0,0,'L');
+        $pdf->Cell(32,7,'Nomor Transkrip Akademik / ',0,0,'L');
         $pdf->SetFont('dinlightitalic','',7);
-        $pdf->Cell(20,7,'Transcript Number',0,0,'L');
+        $pdf->Cell(20,7,' Transcript Number',0,0,'L');
         $pdf->SetFont('dinpromedium','',7);
         $pdf->Cell(5,7,' : ',0,0,'C');
         $pdf->Cell(20,7,$Student['CSN'],0,1,'R');
 
-        $pdf->SetXY($margin_left,35); // novie
+        $pdf->SetXY($margin_left,40); // novie
 
         $label_l = 35;
         $sparator_l = 1;
@@ -3365,7 +3386,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetFont('dinpromedium','',$f_title);
         $pdf->Cell($label_l,$h,'Nama',$border,0,'L');
         $pdf->Cell($sparator_l,$h,':',$border,0,'C');
-        $pdf->Cell($fill_l,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($fill_l,$h,($Student['Name']),$border,0,'L');
         $pdf->Cell($label_r,$h,'Program Pendidikan',$border,0,'L');
         $pdf->Cell($sparator_r,$h,':',$border,0,'C');
         $pdf->Cell($fill_r,$h,$Student['GradeDesc'],$border,1,'L');
@@ -3445,7 +3466,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $this->header_transcript_table($pdf);
 
-        $DetailStudent = $dataStudent['DetailCourse'];
+        $DetailStudent = $dataStudent['DetailCourse']['dataCourse'];
         $no=1;
         for($i=0;$i<count($DetailStudent);$i++){
 
@@ -3459,7 +3480,7 @@ class C_save_to_pdf extends CI_Controller {
             $x_ = ($i<9) ? 21 : 20;
             $pdf->Text($x_,$ytext,($no++));
             $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
-            $pdf->Cell($w_course,$h,$ds['MKName'],$border_fill,0,'L');
+            $pdf->Cell($w_course,$h,$ds['Course'],$border_fill,0,'L');
 
             $ytext = $pdf->GetY()+3.5;
             $xtext = $pdf->GetX()+7;
@@ -3473,17 +3494,17 @@ class C_save_to_pdf extends CI_Controller {
 
             $ytext = $pdf->GetY()+3.5;
             $xtext = $pdf->GetX()+6.3;
-            $pdf->Text($xtext,$ytext,$ds['GradeValue']);
+            $pdf->Text($xtext,$ytext,str_replace(',','.',$ds['GradeValue']));
             $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
 
             $ytext = $pdf->GetY()+3.5;
             $xtext = $pdf->GetX()+9.5;
-            $pdf->Text($xtext,$ytext,$ds['Point']);
+            $pdf->Text($xtext,$ytext,str_replace(',','.',$ds['Point']));
             $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
 
             $pdf->SetFont('dinlightitalic','',$font_medium_i);
             $pdf->Cell($w_no,$h,'',$border_fill,0,'C');
-            $pdf->Cell($w_course,$h,$ds['MKNameEng'],$border_fill,0,'L');
+            $pdf->Cell($w_course,$h,$ds['CourseEng'],$border_fill,0,'L');
             $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
             $pdf->Cell($w_grade,$h,'',$border_fill,0,'C');
             $pdf->Cell($w_score,$h,'',$border_fill,0,'C');
@@ -3500,14 +3521,17 @@ class C_save_to_pdf extends CI_Controller {
             }
         }
 
-        $Result = $dataStudent['Result'];
+
+        $dataIPK = $dataStudent['DetailCourse']['dataIPK'];
+
+        $DataGraduation = $this->m_save_to_pdf->getGraduation(number_format($dataIPK['IPK'],2,'.',''));
 
         $this->spasi_transcript_table($pdf,'TR');
         $pdf->SetFont('dinproExpBold','',$font_medium);
         $pdf->Cell($w_course+$w_no,$h,'Jumlah',$border_fill,0,'R');
         $ytext = $pdf->GetY()+3.5;
         $xtext = $pdf->GetX()+5.5;
-        $pdf->Text($xtext,$ytext,$Result['TotalSKS']);
+        $pdf->Text($xtext,$ytext,$dataIPK['TotalSKS']);
         $pdf->Cell($w_credit,$h,'',$border_fill,0,'C');
 
         $ytext = $pdf->GetY()+3.5;
@@ -3521,7 +3545,7 @@ class C_save_to_pdf extends CI_Controller {
 
         $ytext = $pdf->GetY()+3.5;
         $xtext = $pdf->GetX()+7.5;
-        $pdf->Text($xtext,$ytext,$Result['TotalGradeValue']);
+        $pdf->Text($xtext,$ytext,$dataIPK['TotalPoint']);
         $pdf->Cell($w_point,$h,'',$border_fill,1,'C');
 
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
@@ -3544,7 +3568,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_Div,$h,'','LRT',1,'L');
 
         //$IPKFinal = $Result['IPK'];
-        $IPKFinal = number_format($Result['IPK'],2);
+        $IPKFinal = $dataIPK['IPK'];
         // if(strlen($Result['IPK'])==2) {
         //     $IPKFinal = $Result['IPK'].'00';
         // } else if(strlen($Result['IPK'])==3){
@@ -3558,7 +3582,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_R_fill,$h,$IPKFinal,'R',0,'L');
         $pdf->Cell($w_R_label,$h,' Predikat Kelulusan','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['Description'],'R',1,'L');
+        $pdf->Cell($w_R_fill,$h,$DataGraduation[0]['Description'],'R',1,'L');
 
         $h=3;
         $pdf->SetFont('dinlightitalic','',$font_medium_i);
@@ -3567,12 +3591,12 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($w_R_fill,$h,'','R',0,'L');
         $pdf->Cell($w_R_label,$h,' Graduation Honor','L',0,'L');
         $pdf->Cell($w_R_sparator,$h,':',0,0,'C');
-        $pdf->Cell($w_R_fill,$h,$Result['Grading'][0]['DescriptionEng'],'R',1,'L');
+        $pdf->Cell($w_R_fill,$h,$DataGraduation[0]['DescriptionEng'],'R',1,'L');
 
         $h = 1.5;
         $pdf->Cell($w_Div,$h,'','LRB',0,'L');
         $pdf->Cell($w_Div,$h,'','LRB',1,'L');
-        $h=3;
+
 
         $pdf->SetFont('dinpromedium','',$font_medium);
         $h = 1.5;
@@ -3714,7 +3738,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
 
-        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $nameF = str_replace(' ','_',($Student['Name']));
         $pdf->Output('TRNSCPT_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
@@ -3842,7 +3866,7 @@ class C_save_to_pdf extends CI_Controller {
         $x = 60;
         $h = 4;
         $full_width = 212;
-        $pdf->SetXY($x,36.5);
+        $pdf->SetXY($x,40.5); //novie
         $pdf->SetFont('dinpromedium','',$fn_b);
         $pdf->Cell($full_width,$h,'Memberikan Ijazah Kepada',$border,1,'C');
         $pdf->SetX($x);
@@ -3851,7 +3875,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetX($x);
 //        $pdf->SetFont('dinpromedium','',20);
         $pdf->SetFont('dinproExpBold','',20);
-        $pdf->Cell($full_width,13,ucwords(strtolower($Student['Name'])),$border,1,'C');
+        $pdf->Cell($full_width,13,($Student['Name']),$border,1,'C');
         $pdf->Ln(1.5);
         $x = 67;
         $ln = 1.5;
@@ -4060,7 +4084,7 @@ class C_save_to_pdf extends CI_Controller {
 
 
 
-        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $nameF = str_replace(' ','_',($Student['Name']));
         $pdf->Output('IJAZAH_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 
@@ -4079,7 +4103,7 @@ class C_save_to_pdf extends CI_Controller {
         $dataSmt = $this->db->query('SELECT * FROM db_academic.semester WHERE ID = "'.$filterSemester.'" ')->result_array();
 
         $datawarek1 = $this->db->get_where('db_employees.employees',
-        array('PositionMain' => '2.2','StatusEmployeeID'=>'3' ))
+        array('PositionMain' => '2.2','StatusEmployeeID'=>'1' ))
         ->result_array();
         //print_r($dataSmt); exit;
 
@@ -4172,7 +4196,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->Cell($sp,$h,':',$border,0,'C');
         // $pdf->Cell($fill,$h,$Student['Name'],$border,0,'L');
         // $pdf->SetX(65);
-        $pdf->Cell($fill,$h,ucwords(strtolower($Student['Name'])),$border,0,'L');
+        $pdf->Cell($fill,$h,($Student['Name']),$border,0,'L');
 
         $pdf->SetX(5);
         $pdf->SetFont('Arial','I',$fn_e);
@@ -4443,6 +4467,7 @@ class C_save_to_pdf extends CI_Controller {
         $pdf->SetX($x);
         $pdf->SetFont('Arial','BU',$fn_b);
 
+
         $warek1 = $datawarek1[0]['TitleAhead'].' '.$datawarek1[0]['Name'].' '.$datawarek1[0]['TitleBehind'];
         $pdf->Cell($fillFull,$h,$warek1,$border,1,'L');
         //================ hormat kami ========================
@@ -4458,7 +4483,7 @@ class C_save_to_pdf extends CI_Controller {
         //================ hormat kami ========================
 
 
-        $nameF = str_replace(' ','_',strtoupper($Student['Name']));
+        $nameF = str_replace(' ','_',($Student['Name']));
         $pdf->Output('SKLS_'.$Student['NPM'].'_'.$nameF.'.pdf','I');
     }
 //===================================================================
@@ -5614,7 +5639,7 @@ Phone: (021) 29200456';
           $rect_h = 20;
 
           // Logo
-          $fpdf->Image('./images/logo_tr.png',10,10,50);
+          $fpdf->Image('./images/new_logo_pu.png',10,10,50);
 
           // note from finance
           $fpdf->Rect($x,$y,130,$rect_h);
@@ -6112,7 +6137,7 @@ Phone: (021) 29200456';
 
 
             // Get PHR -> 2.2
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 1))->result_array();
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
@@ -6319,7 +6344,7 @@ Phone: (021) 29200456';
             $Name = (count($dataEmploy)>0) ? $Name_a.''.trim($dataEmploy[0]['Name']).''.$Name_b : '';
             $NIP = (count($dataEmploy)>0) ? $dataEmploy[0]['NIP'] : '';
 
-            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 3))->result_array();
+            $dataPHR = $this->db->limit(1)->select('NIP, Name, TitleAhead, TitleBehind')->get_where('db_employees.employees',array('PositionMain'=>'2.2', 'StatusEmployeeID' => 1))->result_array();
 
             $NamePHR_a = (count($dataPHR)>0) ? trim($dataPHR[0]['TitleAhead']).' ' : '';
             $NamePHR_b = (count($dataPHR)>0) ? ' '.trim($dataPHR[0]['TitleBehind']) : '';
@@ -6395,9 +6420,9 @@ Phone: (021) 29200456';
         $pdf->Cell(145,$h,$d['ProdiName'],0,1,'L');
 
         //$pdf->SetFont('Arial','B',10);
-        //$pdf->Ln(3);
+        $pdf->Ln(3);
         //$pdf->MultiCell(145,5,$h,'Untuk menghadiri '.$nametask.' pada :',0,1,'L');
-        $pdf->MultiCell(185, $h,'Untuk menghadiri '.$nametask.' pada :', 0, 'L',false);
+        $pdf->MultiCell(185, $h,$nametask.' pada :', 0, 'L',false);
 
         $pdf->Ln(3);
         $pdf->Cell(10,$h,'',0,0,'L');
@@ -6409,7 +6434,7 @@ Phone: (021) 29200456';
         $pdf->Cell(30,$h,'Tanggal',0,0,'L');
         $pdf->Cell(5,$h,':',0,0,'C');
         //$pdf->Cell(145,$h,$this->getDateIndonesian($dataRequest[0]['StartDate']).' s/d '.$this->getDateIndonesian($dataRequest[0]['EndDate']),0,1,'L');
-        $pdf->Cell(145,$h,$tanggalx,0,1,'L'); 
+        $pdf->Cell(145,$h,$tanggalx,0,1,'L');
 
         $pdf->Cell(10,$h,'',0,0,'L');
         $pdf->Cell(30,$h,'Waktu',0,0,'L');
@@ -6475,7 +6500,6 @@ Phone: (021) 29200456';
         }
 
     }
-
 
     public function export_kwitansi_formulironline()
     {
@@ -6607,6 +6631,1124 @@ Phone: (021) 29200456';
         $fpdf->Output('receipt.pdf','I');
     }
 
+
+    // Surat Keterangan bebas perpus
+    public function skbp($token){
+
+        $data = $this->getInputToken($token);
+
+        if(isset($data['NPM'])){
+
+            // Cek udah ada apa blm
+            $dataCekNomor = $this->db->get_where('db_academic.final_project_proof',array(
+                'Type' => 'lib',
+                'NPM' => $data['NPM']
+            ))->result_array();
+
+            if(count($dataCekNomor)>0){
+                $DownloadCount = $dataCekNomor[0]['DownloadCount'] + 1;
+                $this->db->where('ID', $dataCekNomor[0]['ID']);
+                $this->db->update('db_academic.final_project_proof',array(
+                    'DownloadCount' => $DownloadCount,
+                    'DownloadAt' => $this->m_rest->getDateTimeNow()
+                ));
+                $this->db->reset_query();
+
+                $noSurat = $dataCekNomor[0]['NoSurat'];
+                $noSurat_Month = $dataCekNomor[0]['Month'];
+                $noSurat_Year = $dataCekNomor[0]['Year'];
+            } else {
+
+                $countNomor = $this->db->get_where('db_academic.final_project_proof',array(
+                    'Type' => 'lib',
+                    'Year' => date("Y")
+                ))->result_array();
+
+                $DownloadCount = 1;
+                $noSurat = (count($countNomor)>0) ? count($countNomor) + 1 : 1;
+                $noSurat_Month = date("n");
+                $noSurat_Year = date("Y");
+
+                $this->db->insert('db_academic.final_project_proof',array(
+                    'NPM' => $data['NPM'],
+                    'Type' => 'lib',
+                    'NoSurat' => $noSurat,
+                    'Month' => $noSurat_Month,
+                    'Year' => $noSurat_Year,
+                    'DownloadCount' => $DownloadCount,
+                    'DownloadAt' => $this->m_rest->getDateTimeNow()
+                ));
+
+            }
+
+
+            $dataCk = $this->db->query('SELECT ats.Name, ats.NPM, ats.EmailPU, ats.Year, fpc.Cl_Library_At, ps.Name AS Prodi FROM db_academic.auth_students ats
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                                WHERE ats.NPM = "'.$data['NPM'].'" AND fpc.Cl_Library = "1"')->result_array();
+
+            if(count($dataCk)>0){
+                $d = $dataCk[0];
+
+                $DB = 'ta_'.$d['Year'];
+                $d2 = $this->db->get_where($DB.'.students',array(
+                    'NPM' => $data['NPM']
+                ))->result_array()[0];
+
+                $pdf = new FPDF('P','mm','A4');
+                $pdf->SetMargins(20.5,15,20.5);
+                $pdf->AddPage();
+                $h = 5;
+                $border = 0;
+
+                // total width : 189
+
+                $pdf->Image('./images/new_logo_pu.png',20,15,50);
+                $pdf->SetFont('Arial','',9);
+                $pdf->Cell(0,$h,'FM-UAP/LIB-10-02',$border,1,'R');
+
+                $pdf->Ln(15);
+                $pdf->Cell(0,$h,'PERPUSTAKAAN',$border,1,'L');
+                $pdf->Cell(0,$h,'PODOMORO UNIVERSITY',$border,1,'L');
+
+                $pdf->Ln(5);
+                $pdf->SetFont('Arial','BU',12);
+                $pdf->Cell(0,$h,'SURAT KETERANGAN BEBAS PUSTAKA',$border,1,'C');
+
+                $pdf->SetFont('Arial','',10);
+                $pdf->Cell(0,$h,'Nomor : '.$noSurat.'/UAP/PERPUS-SKBP/'.$noSurat_Month.'/'.$noSurat_Year,$border,1,'C');
+
+                $pdf->Ln(9);
+                $pdf->SetFont('Arial','',9);
+                $pdf->Cell(0,$h,'Perpustakaan PodomoroUniversity dengan ini menerangkan bahwa : ',$border,1,'L');
+
+                $pdf->Ln(5);
+
+                $StudentName = ucwords(strtolower($d['Name']));
+                $pdf->Cell(40,$h,'Nama',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$StudentName,$border,1,'L');
+
+                $pdf->Cell(40,$h,'NIM',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d['NPM'],$border,1,'L');
+
+                $pdf->Cell(40,$h,'Prodi / Unit',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d['Prodi'],$border,1,'L');
+
+                $pdf->Cell(40,$h,'Email PU',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d['EmailPU'],$border,1,'L');
+
+                $pdf->Cell(40,$h,'Email Lain',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d2['Email'],$border,1,'L');
+
+                $pdf->Cell(40,$h,'Telepon',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d2['Phone'],$border,1,'L');
+
+                $pdf->Cell(40,$h,'HP',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(125,$h,$d2['HP'],$border,1,'L');
+
+
+                $pdf->Ln(5);
+                $pdf->MultiCell(169, $h, 'Terhitung tanggal :  '.$this->getDateIndonesian($d['Cl_Library_At']).' dinyatakan telah bebas dari seluruh kewajiban yang berkenaan dengan perpustakaan dan telah memenuhi syarat bebas pustaka yakni :', 0, 'J',false);
+
+                $pdf->Ln(3);
+                $pdf->Cell(9,$h,'',$border,0,'C');
+                $pdf->Cell(160,$h,'- Telah mengembalikan seluruh pinjaman buku perpustakaan',$border,1,'L');
+                $pdf->Cell(9,$h,'',$border,0,'C');
+                $pdf->Cell(160,$h,'- Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*',$border,1,'L');
+
+                $pdf->Ln(3);
+                $pdf->MultiCell(169, $h, 'Demikian surat keterangan ini untuk dipergunakan sebagaimana mestinya. ', 0, 'J',false);
+
+
+//        $border = 1;
+                $pdf->Ln(5);
+                $pdf->Cell(110,$h,'',$border,0,'L');
+                $pdf->Cell(60,$h,'Jakarta, '.$this->getDateIndonesian($d['Cl_Library_At']),$border,1,'L');
+                $pdf->Cell(110,$h,'',$border,0,'L');
+                $pdf->Cell(60,$h,'Kepala Perpustakaan',$border,1,'L');
+
+                $pdf->Ln(25);
+
+                // Get kabag Library
+                $dataKabagLib = $this->db->get_where('db_employees.employees',array(
+                    'PositionMain' => '11.11',
+                    'StatusEmployeeID' => '1',
+                ))->result_array();
+
+                $kabagLib = '';
+                if(count($dataKabagLib)>0){
+                    $title_h = ($dataKabagLib[0]['TitleAhead']!='' && $dataKabagLib[0]['TitleAhead']!=null)
+                        ? $dataKabagLib[0]['TitleAhead'].' ' : '';
+
+                    $title_b = ($dataKabagLib[0]['TitleBehind']!='' && $dataKabagLib[0]['TitleBehind']!=null)
+                        ? ' '.$dataKabagLib[0]['TitleBehind'] : '';
+
+                    $kabagLib = $title_h.$dataKabagLib[0]['Name'].$title_b;
+                }
+
+
+
+                $pdf->Cell(110,$h,'',$border,0,'L');
+                $pdf->Cell(60,$h,$kabagLib,$border,1,'L');
+
+
+                $pdf->Ln(25);
+                $pdf->Cell(0,$h,'*) Untuk mahasiswa yang telah sidang skripsi/tesis/disertasi',$border,1,'L');
+
+
+                $pdf->SetFont('Arial','I',7);
+                $pdf->Ln(10);
+                $h = 3;
+                $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+                $pdf->Cell(0,$h,'Jumlah Download : '.$DownloadCount,$border,1,'R');
+
+                $nameF = str_replace(' ','_',$StudentName);
+                $pdf->Output('SKBP__'.$nameF.'.pdf','I');
+
+
+            }
+
+        }
+
+
+
+
+
+    }
+
+    // clearance form
+    public function clearance_form($token){
+//        $pdf = new FPDF('P','mm','A4');
+        $data = $this->getInputToken($token);
+
+        if(isset($data['NPM'])){
+
+            $NPM = $data['NPM'];
+
+            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, s.Name AS SemesterName,
+                                                        fpc.TrialDate,
+                                                        em1.Name AS Cl_Academic_Name,
+                                                        em2.Name AS Cl_Library_Name,
+                                                        em3.Name AS Cl_Finance_Name,
+                                                        em4.Name AS Cl_Kaprodi_Name,
+                                                        fp.TitleInd, fp.TitleEng
+                                                        FROM db_academic.auth_students ats
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                        LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID)
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
+                                                        LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                                        LEFT JOIN db_academic.semester s ON (s.ID = fpc.SemesterID)
+
+                                                        LEFT JOIN db_employees.employees em1 ON (em1.NIP = fpc.Cl_Academic_By)
+                                                        LEFT JOIN db_employees.employees em2 ON (em2.NIP = fpc.Cl_Library_By)
+                                                        LEFT JOIN db_employees.employees em3 ON (em3.NIP = fpc.Cl_Finance_By)
+                                                        LEFT JOIN db_employees.employees em4 ON (em4.NIP = fpc.Cl_Kaprodi_By)
+
+                                                        WHERE ats.NPM = "'.$NPM.'"')->result_array();
+
+            if(count($dataStudent)>0){
+
+
+                $d = $dataStudent[0];
+
+                // Get tanggal ujian
+                $dataUjian = $this->db->query('SELECT fps.Date FROM db_academic.final_project_schedule_student fpss
+                                                          LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                          WHERE fpss.NPM = "'.$NPM.'" ORDER BY fps.ID DESC LIMIT 1 ')->result_array();
+
+                $TrialDate = (count($dataUjian)>0)
+                    ? $this->getDateIndonesian($dataUjian[0]['Date'])
+                    : '';
+
+                $dataTranscript = $this->m_rest->getTranscript($d['Year'],$NPM,'ASC');
+
+                $dataIPK = $dataTranscript['dataIPK'];
+                $arr_mkD = $dataIPK['MK_D'];
+                $arr_mkWajib_SKS = $dataIPK['MK_Wajib_SKS'];
+
+
+                $pdf = new Pdf_mc_table('P', 'mm', 'A4');
+                $pdf->SetMargins(10.5,10,20.5); // w = 179
+                $pdf->AddPage();
+                $h = 10;
+                $border = 0;
+
+                $pdf->Image('./images/new_logo_pu.png',10,10,50);
+                $pdf->Ln(15);
+
+                $pdf->SetFont('Arial','B',12);
+                $pdf->Cell(0,$h,'Judicium Clearance Form','B',1,'C');
+
+                $pdf->Ln(7);
+                $h = 5;
+                $pdf->SetFont('Arial','',9);
+
+                // 94.5 - 20 = 74.5
+                $pdf->Cell(35,$h,'Name',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,ucwords(strtolower($d['Name'])),$border,1,'L');
+
+
+                $pdf->Cell(35,$h,'NIM',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['NPM'],$border,1,'L');
+
+
+                $pdf->Cell(35,$h,'Study Program',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['ProdiEng'],$border,1,'L');
+
+                $pdf->Cell(35,$h,'Educational Program',$border,0,'L');
+                $pdf->Cell(4,$h,':',$border,0,'C');
+                $pdf->Cell(140,$h,$d['DescriptionEng'],$border,1,'L');
+
+
+                $pdf->Ln(7);
+                $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : '.$d['SemesterName'],$border,1,'L');
+                $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+
+                $pdf->Ln(7);
+
+
+                $pdf->SetWidths(Array(10,140,29));
+                $pdf->SetLineHeight(5);
+                $pdf->SetAligns(array('C','L','C'));
+
+
+                $pdf->Row(Array(
+                    '1',
+                    "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro
+            Total SKS : ".$dataIPK['TotalSKS']."
+            Maka Kuliah Nilai D : ".count($arr_mkD)."
+            SKS Mata Kuliah Wajib : ".$arr_mkWajib_SKS,
+                    "Approved By ".$d['Cl_Academic_Name']
+                ));
+
+                $pdf->Row(Array(
+                    '2',
+                    'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
+            Pada Hari / Tanngal sidang : '.$TrialDate,
+                    "Approved By ".$d['Cl_Kaprodi_Name']
+                ));
+
+                $pdf->Row(Array(
+                    '3',
+                    "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : ".$d['TitleInd']." \nJudul dalam Bahasa Inggris : ".$d['TitleEng'],
+                    "Approved By ".$d['Cl_Kaprodi_Name']
+                ));
+
+                $pdf->Row(Array(
+                    '4',
+                    " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
+                    "Approved By ".$d['Cl_Library_Name']
+                ));
+
+                $pdf->Row(Array(
+                    '5',
+                    "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
+                    "Approved By ".$d['Cl_Finance_Name']
+                ));
+
+
+
+                $pdf->SetFont('Arial','I',7);
+                $pdf->Ln(10);
+                $h = 3;
+                $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
+
+
+                $nameF = str_replace(' ','_',ucwords(strtolower($d['Name'])));
+                $pdf->Output('Judicium_Clearance_Form_'.$nameF.'.pdf','I');
+            } else {
+                echo 'No NIM';
+            }
+
+        } else {
+            echo 'No NIM';
+        }
+
+    }
+
+    public function cetakSKPI2(){
+
+        $pdf = new FPDF('P','mm','A4');
+        $pdf->AddFont('dinpromedium','','dinpromedium.php');
+        $pdf->AddFont('dinpromediumitalic','','dinpromediumitalic.php');
+        $pdf->AddFont('dinprolight','','dinprolight.php');
+        $pdf->AddFont('dinlightitalic','','dinlightitalic.php');
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+        $h = 5.5;
+        $h_1 = 4;
+        $h_2 = 5;
+        $border = 0;
+        $fontHeader = 13;
+        $fontHeader_1 = 11;
+        $fontBody = 10;
+        $fontBody_1 = 9;
+        $fontBodyNote = 7;
+        $fullWidth = 190;
+
+        $midWidth = 90;
+        $midWidth_space = 10;
+        $rowSpace = 2;
+
+        // Background Cell
+        $R = 226;
+        $G = 226;
+        $B = 226;
+
+        $pdf->Image('./images/new_logo_pu.png',10,10,50);
+        $pdf->Image('./images/SKPI/frame2.png',180,12,20);
+        $pdf->Ln(17);
+
+        $pdf->SetFont('dinpromedium','',$fontHeader);
+        $pdf->Cell(0,$h,'SURAT KETERANGAN PENDAMPING IJAZAH',$border,1,'C');
+        $pdf->SetFont('dinpromediumitalic','',$fontHeader);
+        $pdf->Cell(0,$h,'DIPLOMA SUPLEMENT',$border,1,'C');
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell(0,$h,'Nomor : 032/UAP/SKPI-933022018000097/X/2018',$border,1,'C');
+
+        $pdf->Ln(5);
+        $pdf->MultiCell($fullWidth,$h,"Surat Keterangan Pendamping Ijazah ini sebagai pelengkap ijazah yang menerangkan capaian pembelajaran dan prestasi dari pemegang ijazah selama masa studi.",0);
+        $pdf->Ln(3);
+        $pdf->SetFont('dinlightitalic','',$fontBody);
+        $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
+
+
+        // ====== BAGIAN 1 ========
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/user.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Informasi Tentang Identitas Dari Pemegang SKPI',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Information Identifying Diploma Supplement Holder',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nama Lengkap',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Tahun Lulus',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Full Name',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Graduation Year',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Nandang Mulyadi',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'2019',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Tempat, Tanggal Lahir',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Nomor Ijazah',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Place, Date of Birth',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Diploma Number',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Jakarta, 09 Januari 1997',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'933022018000097',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nomor Induk Mahasiswa',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Gelar',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,'Student Identification Number',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Degree',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'2017090',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Sarjana Terapan Pariwisata (S.Tr.Par.)',$border,1,'L',true);
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth_space+$midWidth,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Bachelor of Apllied Science (B.App.Sc.)',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ====== BAGIAN 2 ========
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/gradu.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Informasi Tentang Identitas Penyelenggara Program',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Information Identifying the Awarding Institution',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'SK Pendirian Perguruan Tinggi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Bahasa Pengantar Kuliah',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Awarding Institution's Licence",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Graduation Year',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'No. 271/E/O/2013',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Indonesia dan Inggris',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Indonesia dan Inggris',$border,1,'L',true);
+
+
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Nama Perguruan Tinggi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Sistem Penilaian',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Higher Education Institution's Name",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Grading System',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Universitas Agung Podomoro',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Sesuai Ijazah',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Podomoro University',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'According to Degree Certificate',$border,1,'L',true);
+
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Program Studi',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Lama Studi Reguler',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Major",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Regular Length of Study',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Bisnis Perhotelan',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'8 Semester / 4 Tahun',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Hotel Business',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'8 Semester / 4 Years',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Jenis dan Jenjang Pendidikan',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Persyaratan Penerimaan',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Type and Level of Education",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Entry Requirements',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Diploma Empat (4) Terapan',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Lulus Pendidikan Menengah Atas / Sederajat',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Diploma Four (4) Applied Sciences',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Graduate from High School of Similar Level of Education',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($midWidth,$h_1,'Jenjang Kualifikasi Sesuai KKNI',$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Akses Studi Lanjut',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_1,"Level of Qualification in the National Qualification Framework",$border,0,'L');
+        $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_1,'Access to Further Study',$border,1,'L');
+
+        $pdf->SetFillColor($R, $G, $B);
+        $pdf->SetFont('dinpromedium','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Jenjang Enam (6)',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Magister',$border,1,'L',true);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($midWidth,$h_2,'Level Six (6)',$border,0,'L',true);
+        $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+        $pdf->Cell($midWidth,$h_2,'Master Degree',$border,1,'L',true);
+        $pdf->Ln($rowSpace);
+
+        // ====== BAGIAN 3 ========
+        $pdf->SetMargins(10,10,10);
+        $pdf->AddPage();
+        $pdf->Image('./images/new_logo_pu.png',10,10,50);
+        $pdf->Ln(20);
+
+        $h = 5;
+        $pdf->Ln(4);
+        $pdf->SetLineWidth(0.1);
+        $pdf->SetDash(2,2);
+        $pdf->Cell($fullWidth,3,'','T',1,'L');
+        $pdf->SetFont('dinpromedium','',$fontHeader_1);
+        $pdf->Image('./images/SKPI/diamon.png',10,$pdf->GetY(),10);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Aktivitas, Prestasi dan Penghargaan Dengan Predikat : B',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontHeader_1);
+        $pdf->Cell(13,$h,'',$border,0,'L');
+        $pdf->Cell(177,$h,'Activities, Achievements and Awards with Predicate : B',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+        // ======
+        $widthLabelAch = 60;
+        $widthLabelAchEng = 95;
+        $widthLabelAchVal = $widthLabelAchEng - $widthLabelAch;
+
+
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($widthLabelAch,$h_1,'Prestasi dan Penghargaan',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,0,'L');
+        $pdf->Cell($widthLabelAch,$h_1,'Keikutsertaan dalam Organisasi',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($widthLabelAchEng,$h_1,'Achievement and Awards',$border,0,'L');
+        $pdf->Cell($widthLabelAchEng,$h_1,'Participation in Organization',$border,1,'L');
+        $pdf->Ln($rowSpace);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($widthLabelAch,$h_1,'Pelatihan / Seminar / Workshop',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,0,'L');
+        $pdf->Cell($widthLabelAch,$h_1,'Kerja Praktek / Magang',$border,0,'L');
+        $pdf->Cell($widthLabelAchVal,$h_1,': 10',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($widthLabelAchEng,$h_1,'Training / Seminar / Workshop',$border,0,'L');
+        $pdf->Cell($widthLabelAchEng,$h_1,'Internship',$border,1,'L');
+        $pdf->Ln($rowSpace * 3);
+
+        // ======
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Tugas Akhir',$border,1,'L');
+        $pdf->MultiCell($fullWidth,$h_1,'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type speci (Hasil A)',0);
+        $pdf->Ln($rowSpace);
+
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Final Project',$border,1,'L');
+        $pdf->MultiCell($fullWidth,$h_1,'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type speci (Result : A)',0);
+
+        $pdf->Ln($rowSpace);
+
+
+        // ====== BAGIAN Pengesahan ========
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,0,'','T',1,'L');
+        $pdf->Ln(3);
+
+        $pdf->SetFont('dinprolight','',$fontHeader);
+        $pdf->Cell($fullWidth,$h_1,'Jakarta, 20 Desember 2019',$border,1,'L');
+
+        $pdf->SetFont('dinlightitalic','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Jakarta, December 20 2019',$border,1,'L');
+
+        $pdf->Ln(25);
+
+
+        $pdf->SetFont('dinpromedium','',$fontHeader);
+        $pdf->Cell($fullWidth,$h_1,'Dea Prasetyawan, M.M.',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Dekan Fakultas Sosial',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Dean of Faculty Social',$border,1,'L');
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->Cell($fullWidth,$h_1,'Nomor Induk Pegawai : 3114016',$border,1,'L');
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Employee ID Number',$border,1,'L');
+        $pdf->Ln(3);
+        $pdf->Cell($fullWidth,0,'','T',1,'L');
+
+
+        $pdf->Ln(3);
+        $Y_alamat = $pdf->GetY();
+
+        $fullWidthNote = 110;
+        $border = 0;
+        $pdf->SetFont('dinprolight','',$fontBody_1);
+        $pdf->Cell($fullWidth,$h_1,'Catatan Resmi',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinprolight','',$fontBodyNote);
+        $pdf->MultiCell($fullWidthNote,$h_1,"1. SKPI dikeluarkan oleh istitusi pendidikan yang berwenang mengeluarkan ijazah sesuai dengan\n    peraturan undang - undang yang berlaku",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"2. SKPI hanya diterbitkan setelah mahasiswa dinyatakan lulus dari suatu program studi secara\n    resmi oleh Perguruan Tinggi",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"3. SKPI diterbitkan dalam Bahasa Indonesia dan Bahasa Inggris",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"4. SKPI yang asli diterbitkan menggunakan kertas khusu berlogo Perguruan Tinggi, yang\n    diterbitkan secara khusus oleh Perguruan Tinggi",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"5. Peneriam SKPI dicantumkan dalam situs resmi Perguruan Tinggi",0);
+
+        $pdf->Ln(2);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->Cell($fullWidthNote,$h_1,'Official Notes',$border,1,'L');
+        $pdf->Ln(2);
+        $pdf->SetFont('dinlightitalic','',$fontBodyNote);
+        $pdf->MultiCell($fullWidthNote,$h_1,"1. This Diploma Supplement is issued by Podomoro University, a higher education institution to issue\n    diplomas in accordance with applicable Laws",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"2. This Diploma Supplement is issued after the student is official declared a graduate of a study program\n    by the Podomoro University",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"3. This Diploma Supplement is written in both Indonesian and English",0);
+        $pdf->MultiCell($fullWidthNote,$h_1,"4. The original copy of this Diploma Supplement is on sealed with the higher educaion institution's logo,\n    and issued exclusive by University",0);
+
+
+
+        $pdf->SetFont('dinprolight','',$fontBody);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat);
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Alamat',0);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*1));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Contact Details',0);
+
+
+        $pdf->SetFont('dinpromedium','',$fontBody);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*3));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Universitas Agung Podomoro',0);
+        $pdf->SetFont('dinlightitalic','',$fontBody_1);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*4));
+        $pdf->MultiCell(180 - $fullWidthNote,$h_1,'Podomoro University',0);
+
+        $pdf->SetFont('dinprolight','',9);
+        $pdf->SetXY($fullWidthNote+20,$Y_alamat + ($h_1*6));
+        $pdf->MultiCell(180 - $fullWidthNote,$h,"Jl. Letjen S. Parman No.28, RT.12/RW.6, Tj. Duren Sel., Kec. Grogol petamburan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11470",0);
+
+
+        $StudentName = 'nandang mulyadi';
+        $nameF = str_replace(' ','_',$StudentName);
+        $pdf->Output('SKPI__'.$nameF.'.pdf','I');
+
+    }
+
+    public function cetakSKPI($token){
+
+        $data = $this->getInputToken($token);
+
+        if(isset($data['NPM'])){
+
+            $NPM = $data['NPM'];
+
+            $dataStd = $this->db->query('SELECT ats.*, 
+                                                ps.NameEng AS ProdiEng, ps.Degree, ps.TitleDegree,
+                                                ps.DegreeEng, ps.TitleDegreeEng, el.DescriptionEng AS ProdiLevelEng,
+                                                em.NIP AS DekanNIP,em.Name AS DekanName, em.TitleAhead, em.TitleBehind, em.Signatures, f.NameEng AS FacultyName,
+                                                el.MasaStudi, el2.DescriptionEng AS ProdiLevelFutureEng
+                                                FROM db_academic.auth_students ats 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
+                                                LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
+                                                LEFT JOIN db_academic.education_level el ON (el.ID = ps.EducationLevelID)
+                                                LEFT JOIN db_academic.education_level el2 ON (el2.ID = ps.EducationLevelIDFuture)
+                                                WHERE ats.NPM = "'.$NPM.'" ')->result_array();
+            $d = $dataStd[0];
+
+            $db = 'ta_'.$d['Year'];
+            $dataTableTa = $this->db->query('SELECT * FROM '.$db.'.students s WHERE s.NPM = "'.$NPM.'" ')->result_array();
+            $d2 = $dataTableTa[0];
+
+            $dataPT = $this->db->limit(1)
+                ->get('db_academic.identitas')->result_array()[0];
+
+
+
+            $pdf = new FPDF('P','mm','A4');
+            $pdf->AddFont('dinpromedium','','dinpromedium.php');
+            $pdf->AddFont('dinpromediumitalic','','dinpromediumitalic.php');
+            $pdf->AddFont('dinprolight','','dinprolight.php');
+            $pdf->AddFont('dinlightitalic','','dinlightitalic.php');
+            $pdf->SetMargins(10,10,10);
+            $pdf->AddPage();
+            $h = 5.5;
+            $h_1 = 4;
+            $h_2 = 5;
+            $border = 0;
+            $fontHeader = 13;
+            $fontHeader_1 = 11;
+            $fontBody = 10;
+            $fontBody_1 = 9;
+            $fullWidth = 190;
+
+            $midWidth = 90;
+            $midWidth_space = 10;
+            $rowSpace = 2;
+
+            // Background Cell
+            $R = 226;
+            $G = 226;
+            $B = 226;
+
+            $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
+            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
+            $pdf->Image('./images/new_logo_pu.png',10,10,50);
+            $pdf->Image('./images/SKPI/frame.png',176,12.5,17);
+            $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
+
+            $pdf->Ln(17);
+
+            $pdf->SetFont('dinpromedium','',$fontHeader);
+            $pdf->Cell(0,$h,'DIPLOMA SUPLEMENT',$border,1,'C');
+
+            $InputDate = explode('-', $d['GraduationDate']);
+            $bulanRomawi = ($d['GraduationDate']!='' && $d['GraduationDate']!=null) ? $this->m_master->romawiNumber($InputDate[1]) : '';
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell(0,$h,'Number : 032/UAP/SKPI-'.$d['CertificateSerialNumber'].'/'.$bulanRomawi.'/'.$d['GraduationYear'],$border,1,'C');
+
+            $pdf->SetFont('dinprolight','',7);
+            $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
+            $pdf->Ln(4);
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
+
+
+            // ====== BAGIAN 1 Dengan Foto ========
+
+
+            $b_spasi1 = 30;
+
+            $h = 5;
+            $pdf->Ln(4);
+            $pdf->SetLineWidth(0.1);
+            $pdf->SetDash(2,2);
+            $pdf->Cell($fullWidth,3,'','T',1,'L');
+            $pdf->Image('./images/SKPI/user.png',10,$pdf->GetY(),5);
+            $pdf->SetFont('dinpromedium','',$fontHeader_1);
+            $pdf->Cell(7,$h,'',$border,0,'L');
+            $pdf->Cell(183,$h,'Information Identifying Diploma Supplement Holder',$border,1,'L');
+            $pdf->Ln(3);
+            $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+            // ======
+
+            $pdf->Image('./uploads/students/'.$db.'/'.$d2['Photo'],10,$pdf->GetY(),25);
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_1,'Full Name',$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Graduation Year',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_2,$d['Name'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['GraduationYear'],$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_1,'Place, Date of Birth',$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Diploma Number',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_2,$d2['PlaceOfBirth'].', '.date('F d, Y',strtotime($d2['DateOfBirth'])),$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['CertificateSerialNumber'],$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_1,'Student Identification Number',$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Degree',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth - $b_spasi1,$h_2,$d2['NPM'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['Degree'].' ('.$d['TitleDegree'].')',$border,1,'L',true);
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinlightitalic','',$fontBody_1);
+            $pdf->Cell($midWidth_space+$midWidth,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['DegreeEng'].' ('.$d['TitleDegreeEng'].')',$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ====== BAGIAN 2 ========
+
+            $h = 5;
+            $pdf->Ln(4);
+            $pdf->SetLineWidth(0.1);
+            $pdf->SetDash(2,2);
+            $pdf->Cell($fullWidth,3,'','T',1,'L');
+            $pdf->Image('./images/SKPI/gradu.png',10,$pdf->GetY(),5);
+            $pdf->SetFont('dinpromedium','',$fontHeader_1);
+            $pdf->Cell(7,$h,'',$border,0,'L');
+            $pdf->Cell(183,$h,'Information Identifying the Awarding Institution',$border,1,'L');
+            $pdf->Ln(3);
+            $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth,$h_1,"Awarding Institution's Licence",$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Language of Instruction',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($midWidth,$h_2,$dataPT['NoSK'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,'Indonesian and English',$border,1,'L',true);
+
+
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth,$h_1,"Higher Education Institution's Name",$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Grading System',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($midWidth,$h_2,$dataPT['NamaEng'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,'According to Degree Certificate',$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth,$h_1,"Major",$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Regular Length of Study',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($midWidth,$h_2,$d['ProdiEng'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['MasaStudi'].' Years',$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth,$h_1,"Type and Level of Education",$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Entry Requirements',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($midWidth,$h_2,$d['ProdiLevelEng'],$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,'Graduate from High School of Similar Level of Education',$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth,$h_1,"Level of Qualification in the KKNI",$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_1,'Access to Further Study',$border,1,'L');
+
+            $pdf->SetFillColor($R, $G, $B);
+            $pdf->SetFont('dinpromedium','',$fontBody_1);
+            $pdf->Cell($midWidth,$h_2,'Level Six (6)',$border,0,'L',true);
+            $pdf->Cell($midWidth_space,$h_2,'',$border,0,'L');
+            $pdf->Cell($midWidth,$h_2,$d['ProdiLevelFutureEng'],$border,1,'L',true);
+            $pdf->Ln($rowSpace);
+
+            // ====== BAGIAN 3 ========
+
+            $h = 5;
+            $pdf->Ln(4);
+            $pdf->SetLineWidth(0.1);
+            $pdf->SetDash(2,2);
+            $pdf->Cell($fullWidth,3,'','T',1,'L');
+            $pdf->Image('./images/SKPI/diamon.png',10,$pdf->GetY(),5);
+            $pdf->SetFont('dinpromedium','',$fontHeader_1);
+            $pdf->Cell(7,$h,'',$border,0,'L');
+            $pdf->Cell(183,$h,'Activities, Achievements and Awards with Predicate : B',$border,1,'L');
+            $pdf->Ln(3);
+            $pdf->Cell($fullWidth,$h,'','T',1,'L');
+
+            // ======
+
+
+            $dataAch_1 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+                                                              LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
+                                                              WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND (sa.CategID = 1 OR sa.CategID = 5) ')
+                ->result_array();
+
+            $dataAch_2 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+                                                              LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
+                                                              WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 2 ')
+                ->result_array();
+
+            $dataAch_3 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+                                                              LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
+                                                              WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 3 ')
+                ->result_array();
+
+
+            $dataAch_4 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+                                                              LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
+                                                              WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 6 ')
+                ->result_array();
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth-30,$h_1,'Achievement and Awards',$border,0,'L');
+            $pdf->Cell($midWidth-60,$h_1,': '.$dataAch_1[0]['Total'],$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth-30,$h_1,'Participation in Organization',$border,0,'L');
+            $pdf->Cell($midWidth-60,$h_1,': '.$dataAch_3[0]['Total'],$border,1,'L');
+            $pdf->Ln($rowSpace);
+
+            // ======
+
+            $pdf->SetFont('dinprolight','',$fontBody);
+            $pdf->Cell($midWidth-30,$h_1,'Training / Seminar / Workshop',$border,0,'L');
+            $pdf->Cell($midWidth-60,$h_1,': '.$dataAch_2[0]['Total'],$border,0,'L');
+            $pdf->Cell($midWidth_space,$h_1,'',$border,0,'L');
+            $pdf->Cell($midWidth-30,$h_1,'Internship',$border,0,'L');
+            $pdf->Cell($midWidth-60,$h_1,': '.$dataAch_4[0]['Total'],$border,1,'L');
+            $pdf->Ln($rowSpace * 3);
+
+            // ======
+
+            $spasiTdd = 120;
+            $pdf->Ln(11);
+
+
+
+            if($d['DekanName']!='' && $d['DekanName']!=null){
+                $t_a = ($d['TitleAhead']!='' && $d['TitleAhead']!=null) ? $d['TitleAhead'].' ' : '';
+                $t_b = ($d['TitleBehind']!='' && $d['TitleBehind']!=null) ? ' '.$d['TitleBehind'] : '';
+                $t_name = $d['DekanName'];
+                $ttd_jabatan = 'Dean of '.$d['FacultyName'];
+                $ttd_NIP = $d['DekanNIP'];
+                $ttd_Signatures = $d['Signatures'];
+            } else {
+                $dataWarek = $this->db->limit(1)->get_where('db_employees.employees',array(
+                    'StatusEmployeeID' => 1,
+                    'PositionMain' => '2.2'
+                ))->result_array()[0];
+
+                $t_a = ($dataWarek['TitleAhead']!='' && $dataWarek['TitleAhead']!=null)
+                    ? $dataWarek['TitleAhead'].' ' : '';
+                $t_b = ($dataWarek['TitleBehind']!='' && $dataWarek['TitleBehind']!=null)
+                    ? ' '.$dataWarek['TitleBehind'] : '';
+                $t_name = $dataWarek['Name'];
+                $ttd_jabatan = 'Vice Rector of Academic';
+                $ttd_NIP = $dataWarek['NIP'];
+                $ttd_Signatures = $dataWarek['Signatures'];
+
+            }
+
+            $ttd_name = $t_a.$t_name.$t_b;
+
+
+            $pdf->Image('./images/cap.png',$spasiTdd+20,$pdf->GetY()-2,40);
+            $pdf->Image('./uploads/signature/'.$ttd_Signatures,$spasiTdd + 10,$pdf->GetY(),40);
+
+            $pdf->SetFont('dinpromedium','',$fontBody);
+            $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');
+            $pdf->Cell($fullWidth - $spasiTdd,$h_1,'Jakarta, '.date('F d, Y',strtotime($d['GraduationDate'])),$border,1,'L');
+
+
+            $pdf->Ln(24.5);
+
+
+
+            $pdf->SetFont('dinpromedium','',$fontHeader_1);
+            $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');
+            $pdf->Cell($fullWidth - $spasiTdd,$h_1,$ttd_name,$border,1,'L');
+            $pdf->Ln(1);
+            $pdf->SetFont('dinprolight','',$fontBody_1);
+            $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');
+            $pdf->Cell($fullWidth - $spasiTdd,$h_1,$ttd_jabatan,$border,1,'L');
+            $pdf->SetFont('dinprolight','',$fontBody_1);
+            $pdf->Cell($spasiTdd,$h_1,'',$border,0,'L');
+            $pdf->Cell($fullWidth - $spasiTdd,$h_1,'Employee ID Number : '.$ttd_NIP,$border,1,'L');
+
+
+            $StudentName = 'nandang mulyadi';
+            $nameF = str_replace(' ','_',$StudentName);
+            $pdf->Output('SKPI__'.$nameF.'.pdf','I');
+
+        }
+
+    }
 
 
 }

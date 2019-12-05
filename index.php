@@ -60,6 +60,17 @@
 		08 Okt 2019
 
 	*/
+	if (!function_exists('getallheaders')) {
+	    function getallheaders() {
+	    $headers = [];
+	    foreach ($_SERVER as $name => $value) {
+	        if (substr($name, 0, 5) == 'HTTP_') {
+	            $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+	        }
+	    }
+	    return $headers;
+	    }
+	}
 
 	function is_https_chek()
 	{
@@ -92,6 +103,8 @@
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
 	define("URLAD","http://10.1.30.2:8076/", true);
+	define("url_files","http://files.podomorouniversity.ac.id/", true);
+	// define("url_files","http://localhost/filespu/", true);
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':
 		    define("url_registration",$HostPath."admission.podomorouniversity.ac.id/", true);

@@ -12,7 +12,7 @@
     <div class="well">
         <div class="row">
 
-            <div class="col-md-3">
+            <div class="col-md-3" id = "inputForm">
 
                 <div class="form-group">
                     <label>Jenis Penggunaan</label>
@@ -41,10 +41,8 @@
                 <div class="form-group" style="text-align: right;">
                     <button class="btn btn-primary" id="btnSave">Save</button>
                 </div>
-
             </div>
-            <div class="col-md-9">
-
+            <div class="col-md-9" id = "ViewData">
                 <div class="row">
                     <div class="col-md-4 col-md-offset-4">
                         <div class="well">

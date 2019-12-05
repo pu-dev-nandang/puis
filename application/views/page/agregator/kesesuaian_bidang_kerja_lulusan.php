@@ -10,8 +10,11 @@
 
 <div class="row">
     <div class="col-md-12">
+        <div style="text-align: right;">
+            <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
+        </div>
         <div class="well">
-            <table class="table table-striped table-centre">
+            <table class="table table-striped table-centre dataTable2Excel" data-name="Kesesuaian-bidang-kerja">
                 <thead>
                 <tr>
                     <th rowspan="2" style="width: 1%;">No</th>
@@ -49,7 +52,7 @@
 
 
     });
-    
+
     function loadData() {
         var filterYear = $('#filterYear').val();
         var Year = filterYear.split('.')[1];
@@ -59,7 +62,7 @@
             Year : Year
         };
         var token = jwt_encode(data,'UAP)(*');
-        
+
         $.post(url,{token:token},function (jsonResult) {
 
             var Y1 = Year;
@@ -95,7 +98,7 @@
                         '</tr>');
                 });
             }
-            
+
         });
     }
 
@@ -122,7 +125,7 @@
 
                 var viewKesesuaian = '-';
                 if(v.Kesesuaian==2 || v.Kesesuaian=='2'){
-                    viewKesesuaian = '<b style="color: green;">Height</b>';
+                    viewKesesuaian = '<b style="color: green;">High</b>';
                 } else if(v.Kesesuaian==1 || v.Kesesuaian=='1'){
                     viewKesesuaian = '<b style="color: royalblue;">Medium</b>';
                 } else if(v.Kesesuaian==0 || v.Kesesuaian=='0') {
@@ -154,6 +157,6 @@
         });
 
     });
-    
+
 
 </script>

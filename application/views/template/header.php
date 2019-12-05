@@ -91,19 +91,22 @@
                     <span>My Activities</span>
                 </a>
             </li>
-            <li class="hide <?php if($this->uri->segment(1)=='ticket'){echo 'current';} ?>">
-                <a href="<?php echo base_url('ticket'); ?>" id="btn_announcement">
+            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='ticket'){echo 'current';} ?>">
+                <a href="<?php echo base_url('ticket/ticket-today'); ?>" id="btn_announcement">
                     <i class="fa fa-ticket" aria-hidden="true"></i>
-                    <span>Ticket</span>
+                    <span>Ticketing</span>
                 </a>
             </li>
-            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation'); 
+
+
+            <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>
                 <?php if (count($this->session->userdata('prodi_get')) > 1 && $DepartmentNav == 15): ?>
                     <li>
                         <a href="<?php echo base_url('dashboard'); ?>">
-                            <i class="icon-home"></i>
+                            <i class="glyphicon glyphicon-transfer"></i>
                             <span>Change Prodi</span>
                         </a>
                     </li>
@@ -113,7 +116,7 @@
                 <?php if (count($this->session->userdata('faculty_get')) > 1 && $DepartmentNav == 34): ?>
                     <li>
                         <a href="<?php echo base_url('dashboard'); ?>">
-                            <i class="icon-home"></i>
+                            <i class="glyphicon glyphicon-transfer"></i>
                             <span>Change Faculty</span>
                         </a>
                     </li>
@@ -260,6 +263,9 @@
                     <li><a href="<?php echo base_url('help'); ?>">
                             <i class="fa fa-bookmark"></i>
                             Help</a></li>
+                    <li><a href="<?php echo base_url('kb'); ?>">
+                                    <i class="fa fa-file"></i>
+                                    Knowledge Base</a></li>
                     <li class="divider"></li>
                     <li><a href="javascript:void(0)" id="useLogOut"><i class="fa fa-power-off"></i> Log Out</a></li>
                 </ul>
@@ -298,7 +304,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!-- Global Modal Large -->
+<!-- Global Modal Small -->
 <div class="modal fade" id="GlobalModalSmall" role="dialog">
     <div class="modal-dialog" role="document" style="width:355px;">
         <div class="modal-content animated jackInTheBox">
@@ -481,6 +487,61 @@
 
     $(document).on('click','.ViewAllLogNotification',function () {
         window.location.href = base_url_js+'ShowLoggingNotification';
+    });
+
+    $(document).on('click','.btnFinalProject_ViewDetailMK',function () {
+
+        var token = $(this).attr('data-token');
+        var title = $(this).attr('data-title');
+        var dataToken = jwt_decode(token,'UAP)(*');
+
+        var tr = '';
+        if(dataToken.length>0){
+            $.each(dataToken,function (i,v) {
+
+                var mkt = (v.MKType=='1') ? '<br/><span class="label label-primary">Required</span>' : '';
+
+                tr = tr + '<tr>' +
+                    '<td style="border-right: 1px solid #CCCCCC;">'+(i+1)+'</td>' +
+                    '<td>'+v.MKCode+''+mkt+'</td>' +
+                    '<td style="text-align: left;"><b>'+v.Course+'</b><br/><i>'+v.CourseEng+'</i></td>' +
+                    '<td>'+v.Credit+'</td>' +
+                    '<td>'+v.Grade+'</td>' +
+                    '</tr>'
+            });
+        }
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Detail Course | '+title+'</h4>');
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <table class="table table-centre table-striped">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th style="width: 17%;">MKCode</th>' +
+            '                <th>Course</th>' +
+            '                <th style="width: 7%;">Credit</th>' +
+            '                <th style="width: 7%;">Grade</th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '           <tbody>'+tr+'</tbody>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+
     });
 
     $('.departement').click(function () {

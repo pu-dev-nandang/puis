@@ -270,6 +270,158 @@ class C_rest extends CI_Controller {
         }
     }
 
+    public function getListStudentScores(){
+        $requestData= $_REQUEST;
+
+        $data_arr = $this->getInputToken();
+
+
+        $w_ClassOf = ($data_arr['ClassOf']!='' && $data_arr['ClassOf']!=null) ? ' AND ast.Year = "'.$data_arr['ClassOf'].'"' : '';
+        $w_ProdiGroupID = ($data_arr['ProdiGroupID']!='' && $data_arr['ProdiGroupID']!=null) ? ' AND ast.ProdiGroupID = "'.$data_arr['ProdiGroupID'].'"' : '';
+        $w_StatusStudent = ($data_arr['StatusStudent']!='' && $data_arr['StatusStudent']!=null) ? ' AND ast.StatusStudentID = "'.$data_arr['StatusStudent'].'"' : '';
+        $dataWhere = $w_ClassOf.' '.$w_ProdiGroupID.' '.$w_StatusStudent;
+
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = 'AND ( ast.Name LIKE "%'.$search.'%" OR ast.NPM LIKE "%'.$search.'%"
+                           OR ss.Description LIKE "%'.$search.'%" OR em.Name LIKE "%'.$search.'%"
+                             OR em.NIP LIKE "%'.$search.'%")';
+        }
+
+        $queryDefault = 'SELECT ast.*, ss.Description AS StatusDescription, em.Name AS Mentor, em.NIP
+                                                          FROM db_academic.auth_students ast
+                                                          LEFT JOIN db_academic.status_student ss ON (ast.StatusStudentID = ss.ID)
+                                                          LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = ast.NPM)
+                                                          LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
+                                                          WHERE ( ast.ProdiID = "'.$data_arr['ProdiID'].'" '.$dataWhere.' ) '.$dataSearch.'
+                                                          ORDER BY ast.Year DESC, ast.NPM ASC';
+
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $db_ = 'ta_'.$row['Year'];
+            $dataDetailStd = $this->db->select('Photo')->get_where($db_.'.students',array('NPM' => $row['NPM']),1)->result_array();
+
+            // Get Photo
+            $exp_photo = explode(' ',$dataDetailStd[0]['Photo']);
+            if($dataDetailStd[0]['Photo']!='' && $dataDetailStd[0]['Photo']!=null && count($exp_photo)==1){
+                $url_photo = base_url().'uploads/students/'.$db_.'/'.$dataDetailStd[0]['Photo'];
+            } else {
+                $url_photo = base_url().'images/icon/userfalse.png';
+            }
+
+            // Get Semester
+            $dataSemester = $this->db->order_by('ID','ASC')->get_where('db_academic.semester',
+                array('Year >=' => $row['Year']))->result_array();
+
+            $listSemester = '';
+            $Semester = 1;
+            if(count($dataSemester)>0){
+                for($s=0;$s<count($dataSemester);$s++){
+                    $d_s = $dataSemester[$s];
+
+
+
+
+                    $dataScore = $this->db->query('SELECT * FROM '.$db_.'.study_planning sr
+                                                                    WHERE sr.SemesterID = "'.$d_s['ID'].'"
+                                                                    AND sr.NPM = "'.$row['NPM'].'" ')->result_array();
+
+                    $koma = ($s!=0) ? '' : '';
+                    if(count($dataScore)>0){
+
+                        $IPS_totalCredit = 0;
+                        $IPS_totalGradeValue = 0;
+
+                        for($c=0;$c<count($dataScore);$c++){
+                            $d_sc = $dataScore[$c];
+                            $IPS_totalCredit = $IPS_totalCredit + $d_sc['Credit'];
+                            $IPS_totalGradeValue = $IPS_totalGradeValue + ($d_sc['Credit'] * $d_sc['GradeValue']);
+                        }
+
+                        $IPS = ($IPS_totalGradeValue>0) ? $IPS_totalGradeValue/$IPS_totalCredit : 0.00;
+
+
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : '.number_format(round($IPS, 2),2).'</span> ';
+
+
+                    } else {
+                        if($d_s['Status']==1){
+                            break;
+                        }
+                        $listSemester = $listSemester.''.$koma.' <span class="label label-default"> Smt '.$Semester.' : -</span> ';
+                    }
+
+                    if($d_s['Status']==1){
+                        break;
+                    }
+
+                    $Semester+=1;
+
+
+
+
+
+                }
+            }
+
+            $dataNewTr = $this->m_rest->getTranscript($row['Year'],$row['NPM'],'ASC');
+            $IPK = $dataNewTr['dataIPK']['IPK'];
+
+
+
+            $token = $this->jwt->encode(array('NPM' => $row['NPM'],'ClassOf' => $row['Year'],'Name' => $row['Name'],
+                    'URL_Photo' => $url_photo, 'URL_Back' => base_url('student/list-student-scores-as-head'))
+                ,'UAP)(*');
+            $student = '<span style="color: #2b6886;">'.$row['Name'].'</span><br/><span style="font-size: 12px;color: #808080;">'.$row['NPM'].'</span>';
+
+            $btnAct = '<div class="btn-group">
+                      <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-edit"></i> <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a href="'.url_sign_in_lecturers.'student/details-student-scores/'.$token.'">Details Score</a></li>
+                        <li><a href="'.url_sign_in_lecturers.'student/student-transcript/'.$token.'">Transcript</a></li>
+                      </ul>
+                    </div>';
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:center;"><img class="img-rounded" src="'.$url_photo.'" style="max-width: 33px;border: 1px solid #CCCCCC;padding: 1.5px;" /></div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$student.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Mentor'].'<br/><span style="font-size: 12px;color: #808080;">'.$row['NIP'].'</span></div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$listSemester.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$IPK.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
+            $nestedData[] = '<div  style="text-align:center;">'.ucwords(strtolower($row['StatusDescription'])).'</div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+
+
+    }
+
     // Nandang - Get Student digunakan khusus untuk selec2.js
     public function getStudent_ServerSide(){
 
@@ -1047,6 +1199,10 @@ class C_rest extends CI_Controller {
                        $q_add = ($where == '') ? ' where ' : ' and ';
                        $where .= $q_add.' a.Years = '.$Ta;
                    }
+                }
+                if (array_key_exists('TypeFormulir', $dataToken)) {
+                    $q_add = ($where == '') ? ' where ' : ' and ';
+                    $where .= $q_add.' a.TypeFormulir = "'.$dataToken['TypeFormulir'].'"';
                 }
                 $sql = 'SELECT a.* from db_admission.formulir_number_global as a '.$where.' group by a.FormulirCodeGlobal';
                 $query=$this->db->query($sql, array())->result_array();
@@ -2309,6 +2465,9 @@ class C_rest extends CI_Controller {
                             else
                             {
                                 // Notif to next step approval & User
+                                    // send revisi or not
+                                    $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($PRCode,'db_budgeting.pr_circulation_sheet','PRCode');
+
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     $IDdiv = $G_data[0]['Departement'];
                                     $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
@@ -2318,8 +2477,8 @@ class C_rest extends CI_Controller {
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PR '.$PRCode.' of '.$Code,
-                                                            'Description' => 'Please approve PR '.$PRCode.' of '.$Code,
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  '.$RevisiOrNotNotif.'Approval PR '.$PRCode.' of '.$Code,
+                                                            'Description' => 'Please approve '.$RevisiOrNotNotif.' PR '.$PRCode.' of '.$Code,
                                                             'URLDirect' => $URLDirect,
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -2757,12 +2916,16 @@ class C_rest extends CI_Controller {
                             $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                             // $NameDepartement = $G_div[0]['NameDepartement'];
                             $Code = $G_div[0]['Code'];
+
+                            // send revisi or not
+                            $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($id_creator_budget_approval,'db_budgeting.log_budget','ID_creator_budget_approval');
+
                             // Send Notif for next approval
                                 $data = array(
                                     'auth' => 's3Cr3T-G4N',
                                     'Logging' => array(
-                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval Budget of '.$Code,
-                                                    'Description' => 'Please approve budget '.$Code,
+                                                    'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  '.$RevisiOrNotNotif.'Approval Budget of '.$Code,
+                                                    'Description' => 'Please approve '.$RevisiOrNotNotif.' budget '.$Code,
                                                     'URLDirect' => 'budgeting_entry',
                                                     'CreatedBy' => $NIP,
                                                   ),
@@ -3035,6 +3198,7 @@ class C_rest extends CI_Controller {
                 $Departement = $Input['Departement'];
                 $Detail = $Input['Detail'];
                 $user = $Input['user'];
+                $Satuan = $Input['Satuan'];
                 $Detail = json_encode($Detail);
                 
                 if (array_key_exists('ID_category_catalog', $Input)) {
@@ -3071,6 +3235,7 @@ class C_rest extends CI_Controller {
                                    'Photo' => $uploadFile,
                                    'Departement' => $Departement,
                                    'DetailCatalog' => $Detail,
+                                   'Satuan'=>$Satuan,
                                    'CreatedBy' => $user,
                                    'CreatedAt' => date('Y-m-d'),
                                    'Approval' => ($chk) ? 1 : 0,
@@ -3120,6 +3285,7 @@ class C_rest extends CI_Controller {
                                 'Photo' => '',
                                 'Departement' => $Departement,
                                 'DetailCatalog' => $Detail,
+                                'Satuan'=>$Satuan,
                                 'CreatedBy' => $user,
                                'CreatedAt' => date('Y-m-d'),
                                'Approval' => ($chk) ? 1 : 0,
@@ -3180,6 +3346,7 @@ class C_rest extends CI_Controller {
                                        'Photo' => $uploadFile,
                                        'Departement' => $Departement,
                                        'DetailCatalog' => $Detail,
+                                       'Satuan'=>$Satuan,
                                        // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                        'Approval' => ($chk) ? 1 : 0,
                                        'LastUpdateBy' => $user,
@@ -3229,6 +3396,7 @@ class C_rest extends CI_Controller {
                                     'ID_category_catalog' => $ID_category_catalog,
                                     'Departement' => $Departement,
                                     'DetailCatalog' => $Detail,
+                                    'Satuan'=>$Satuan,
                                     // 'Approval' => ($ApprovalGet == -1) ? 0 : $ApprovalGet,
                                     'Approval' => ($chk) ? 1 : 0,
                                     'LastUpdateBy' => $user,

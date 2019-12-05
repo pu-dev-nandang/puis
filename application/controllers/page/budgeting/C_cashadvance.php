@@ -394,11 +394,13 @@ class C_cashadvance extends Budgeting_Controler {
                     $token = $this->jwt->encode($ID_payment,$key);
                     $CodeUrl = $token;
                     // Send Notif for next approval
+                        // send revisi or not
+                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                         $data = array(
                             'auth' => 's3Cr3T-G4N',
                             'Logging' => array(
-                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$Type.' after edited',
-                                            'Description' => 'Please approve '.$Type.' after edited',
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Created '.$RevisiOrNotNotif.$Type.' after edited',
+                                            'Description' => 'Please approve '.$RevisiOrNotNotif.$Type.' after edited',
                                             'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
                                             'CreatedBy' => $NIP,
                                           ),
@@ -924,6 +926,7 @@ class C_cashadvance extends Budgeting_Controler {
                          $CodeUrl = $token;    
 
                          // send notifikasi
+                             $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                              $IDdiv = $Departement;
                              $G_div = $this->m_budgeting->SearchDepartementBudgeting($IDdiv);
                              // $NameDepartement = $G_div[0]['NameDepartement'];
@@ -931,8 +934,8 @@ class C_cashadvance extends Budgeting_Controler {
                              $data = array(
                                  'auth' => 's3Cr3T-G4N',
                                  'Logging' => array(
-                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> Cash Advance has been Revised by '.$Code,
-                                                 'Description' => 'Cash Advance has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
+                                                 'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i> '.$RevisiOrNotNotif.' Cash Advance has been Revised by '.$Code,
+                                                 'Description' => $RevisiOrNotNotif.'Cash Advance has been Revised by '.$Code.'('.$this->session->userdata('Name').')',
                                                  'URLDirect' => 'budgeting_menu/pembayaran/cashadvance/'.$CodeUrl,
                                                  'CreatedBy' => $this->session->userdata('NIP'),
                                                ),

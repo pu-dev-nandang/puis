@@ -81,12 +81,12 @@ function loadSelectOptionSemesterByload(element,selected) {
                $(element).append('<option value="'+dt.ID+'.'+dt.Name+'" '+sc+'>'+dt.Name+'</option>');
            }
        }
-       loadSelectOptionStatusStudent('#filterStatus','','');
+       loadSelectOptionStatusStudent_ID('#filterStatus','','');
     });
 
 }
 
-function loadSelectOptionStatusStudent(element,selected,load = "loadData") {
+function loadSelectOptionStatusStudent_ID(element,selected,load = "loadData") {
 
     var url = base_url_js+'api/__crudStatusStudents';
     var data = {

@@ -19,6 +19,41 @@ class C_dashboard extends Globalclass {
 
     public function index()
     {
+        // $G_dt = $this->m_master->showData_array('db_prodi.cfg_sub_menu');
+        // for ($i=0; $i < count($G_dt); $i++) { 
+        //     $dataSave = [
+        //         'cfg_group_user' => 1,
+        //         'ID_cfg_sub_menu' => $G_dt[$i]['ID'],
+        //         'read' => 1,
+        //         'write' => 1,
+        //         'update' => 1,
+        //         'delete' => 1,
+        //     ];
+
+        //     $this->db->insert('db_prodi.cfg_rule_g_user',$dataSave);
+        // }
+        // die();
+
+        // $G_prodi = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        // $G_it = $this->m_master->getEmployeeByDepartment(12);
+        // for ($i=0; $i < count($G_prodi); $i++) { 
+        //     $ProdiID = $G_prodi[$i]['ID'];
+        //     for ($k=0; $k < count($G_it); $k++) { 
+        //         $NIPIT = $G_it[$k]['NIP'];
+        //         $dataSave = [
+        //             'NIP' => $NIPIT,
+        //             'G_user' => 1,
+        //             'ProdiID' => $ProdiID,
+        //         ];
+
+        //         $this->db->insert('db_prodi.previleges_guser',$dataSave);
+        //     }
+        // }
+        // die();
+        // $rs = $this->m_master->DeleteFileToNas("http://localhost",'admission/45.png');
+        // print_r($rs);
+        // die();
+
         $data['department'] = parent::__getDepartement();
         $dpt = $this->session->userdata('IDdepartementNavigation');
 
@@ -65,6 +100,10 @@ class C_dashboard extends Globalclass {
                                 $get = $this->m_master->caribasedprimary('db_academic.program_study','ID',$prodi_active_id);
                                 $this->session->set_userdata('prodi_active',$get[0]['Name']);
                                 $this->session->set_userdata('prodi_active_id',$get[0]['ID']);
+
+                                $this->session->unset_userdata(array('prodi_sess', 'auth_prodi_sess', 'menu_prodi_sess', 'menu_prodi_grouping'));
+                                $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
+                                
                                 $data['NameProdi'] = $get[0]['Name'];
                                 $data['NameProdi'] = strtolower($data['NameProdi'] );
                                 $data['NameProdi']  = str_replace(" ", "-", $data['NameProdi'] );
@@ -81,6 +120,7 @@ class C_dashboard extends Globalclass {
                         }
                         else
                         {
+                            $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                             $data['NameProdi'] = $this->session->userdata('prodi_active');
                             if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
                                 $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
@@ -96,6 +136,7 @@ class C_dashboard extends Globalclass {
                     else
                     {
                         $this->m_prodi->auth(); // get session
+                        $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                         // check multiple akses
                         if (count($this->session->userdata('prodi_get')) > 1) {
                             $content = $this->load->view('global/switch_prodi',$data,true);
@@ -104,6 +145,7 @@ class C_dashboard extends Globalclass {
                         else
                         {
                             $data['NameProdi']  = $this->session->userdata('prodi_active');
+                            $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
                             if (file_exists(APPPATH.'views/page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard.php')) {
                                 $content = $this->load->view('page/'.$data['department'].'/'.$data['NameProdi'].'/dashboard',$data,true);
                             }
@@ -858,6 +900,60 @@ class C_dashboard extends Globalclass {
             // Update DB
             $this->db->where('ID', $ID);
             $this->db->update('db_employees.user_qna',array(
+                'File' => $fileName
+            ));
+
+            $success = array('success' => $this->upload->data());
+            $success['success']['formGrade'] = 0;
+
+            return print_r(json_encode($success));
+        }
+
+    }
+    public function kb()
+    {
+        $post = $_POST;
+        if (count($post) > 0) {
+            $data['selected'] = $post['Division'];
+            $data['G_data'] = $this->m_master->userKB($data['selected']);
+            echo $this->load->view('global/kb/content_change',$data,true);
+        }
+        else
+        {
+            $data['G_division'] = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
+            $data['selected'] = 6;
+            $data['G_data'] = $this->m_master->userKB($data['selected']);
+            $content = $this->load->view('global/kb/kb',$data,true);
+            $this->temp($content);
+        }
+
+    }
+
+    public function upload_kb(){
+
+        $fileName = $this->input->get('fileName');
+        $old = $this->input->get('old');
+        $ID = $this->input->get('id');
+
+        $config['upload_path']          = './uploads/kb/';
+        $config['allowed_types']        = '*';
+        $config['max_size']             = 8000; // 8 mb
+        $config['file_name']            = $fileName;
+
+        if($old!=''  && is_file('./uploads/kb/'.$old)){
+            unlink('./uploads/kb/'.$old);
+        }
+
+        $this->load->library('upload', $config);
+        if ( ! $this->upload->do_upload('userfile')){
+            $error = array('error' => $this->upload->display_errors());
+            return print_r(json_encode($error));
+        }
+        else {
+
+            // Update DB
+            $this->db->where('ID', $ID);
+            $this->db->update('db_employees.knowledge_base',array(
                 'File' => $fileName
             ));
 

@@ -4,10 +4,16 @@
         <!--=== Navigation ===-->
 
         <ul id="nav">
-            <li class="<?php if($this->uri->segment(2)=='diploma-supplement'){echo"current";}?>">
-                <a href="<?php echo base_url('student-life/diploma-supplement/list-student');?>">
-                    <i class="fa fa-paperclip"></i>
-                    Diploma Supplement
+<!--            <li class="--><?php //if($this->uri->segment(2)=='diploma-supplement'){echo"current";}?><!--">-->
+<!--                <a href="--><?php //echo base_url('student-life/diploma-supplement/list-student');?><!--">-->
+<!--                    <i class="fa fa-paperclip"></i>-->
+<!--                    Diploma Supplement-->
+<!--                </a>-->
+<!--            </li>-->
+            <li class="<?php if($this->uri->segment(2)=='skpi'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/skpi');?>">
+                    <i class="fa fa-file"></i>
+                    SKPI & Judiciums
                 </a>
             </li>
             <li class="<?php if($this->uri->segment(2)=='student-achievement'){echo"current";}?>">

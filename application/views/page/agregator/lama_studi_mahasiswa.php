@@ -76,7 +76,7 @@
                     for (var j = 0; j < arr_body.length; j++) {
                         if(j < 4){
                             if (j == 0) {
-                                htmlBody += '<td style = "text-align: center">'+arr_body[j].show+'</td>';
+                                htmlBody += '<td style = "text-align: left">'+arr_body[j].show+'</td>';
                             }
                             else
                             {

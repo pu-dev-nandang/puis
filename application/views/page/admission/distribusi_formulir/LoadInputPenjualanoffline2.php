@@ -246,6 +246,7 @@
                 auth : 's3Cr3T-G4N',
                 division : division,
                 action : 'add',
+                TypeFormulir : 'Off',
             };
             var token = jwt_encode(data,"UAP)(*");
             $.post(url,{token:token},function (data_json) {
@@ -599,7 +600,7 @@
             }
             else
             {
-                loading_button('#btn-proses');
+                // loading_button('#btn-proses');
                 var selectFormulirCode = $("#selectFormulirCode").val();
                 var selectProgramStudy = $("#selectProgramStudy").val();
                 var selectProgramStudy2 = $("#selectProgramStudy2").val();
@@ -625,6 +626,10 @@
                 var priceFormulir = $("#priceFormulir").val();
                 var tanggal = $("#tanggal").val();
                 var No_Ref = $("#No_Ref").val();
+                if (No_Ref == undefined || No_Ref == null || No_Ref == '') {
+                    toastr.error('Mohon Periksa No ref','!Failed');
+                    return;
+                }
                 var ChkFromCrm = $('.FromCrm:checked').val();
 
                 var ID_Crm = $("#ID_Crm").attr('idtable');
@@ -659,6 +664,20 @@
                 if (validationInput = validation2(data) && ID_Crm!=null && ID_Crm!='') {
 
                     var token = jwt_encode(data,"UAP)(*");
+                    var urlToken = jwt_encode(url,"UAP)(*");
+                    var htmlNotification = '<div class="alert alert-warning" role="alert">'+
+                                            '<p><h2><b>Mohon pastikan No Ref yang diinputkan adalah : <insertstyle style="color:red;">'+No_Ref+'</insertstyle></b></h2></p>'+
+                                            '</div>'
+                                                ;
+                    // $('#GlobalModalLarge').attr('style','margin-top: 400px;display: block;')
+                    $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Konfirmasi No Ref'+'</h4>');
+                    $('#GlobalModalLarge .modal-body').html(htmlNotification);
+                    $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button><button type="button" id="ModalbtnSaveForm_Offline" class="btn btn-success" token="'+token+'" urlToken = "'+urlToken+'">Submit</button>');
+                    $('#GlobalModalLarge').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });                            
+                    return; // dialihkan ke Modal Konfirmasi Submit                            
                     $.post(url,{token:token},function (data_json) {
 
                         data_json = JSON.parse(data_json);
@@ -921,4 +940,33 @@
 
         return true;
     }
+
+
+    $(document).off('click', '#ModalbtnSaveForm_Offline').on('click', '#ModalbtnSaveForm_Offline',function(e) {
+        $('#ModalbtnCancleForm').addClass('hide');
+        var token  = $(this).attr('token');
+        var urlToken = $(this).attr('urltoken');
+        var url = jwt_decode(urlToken);
+        var selector = $(this);
+        loading_button2(selector);
+        $.post(url,{token:token},function (data_json) {
+
+            data_json = JSON.parse(data_json);
+
+            if(parseInt(data_json.Status)<=0) {
+                toastr.error(data_json.msg, 'Error');
+                end_loading_button2(selector,'Submit');
+                $('#ModalbtnCancleForm').removeClass('hide');
+
+            } else {
+                setTimeout(function () {
+                    $('.pageAnchor[page = "ListPenjualan"]').trigger('click');
+                    toastr.options.fadeOut = 10000;
+                    toastr.success('Data berhasil disimpan', 'Success!');
+                    $('#GlobalModalLarge').modal('hide');
+                },2000);
+            }
+
+        });
+    })
 </script>

@@ -1,13 +1,13 @@
-<?php 
+<!-- <?php 
 
 $d = $dataEmp[0];
 // print_r($dataEmp); 
 
-?>
+?> -->
 
 
 <style>
-    .btn-circle.btn-xl {
+.btn-circle.btn-xl {
     width: 70px;
     height: 70px;
     padding: 10px 16px;
@@ -21,13 +21,10 @@ $d = $dataEmp[0];
     height: 30px;
     padding: 6px 0px;
     border-radius: 15px;
+    margin-top: -6px;
     text-align: center;
     font-size: 12px;
     line-height: 1.42857;
-}
-
-.btn-round{
-    border-radius: 17px;
 }
 
 #tableList tr td, #tableList tr th {
@@ -52,6 +49,16 @@ $d = $dataEmp[0];
 .checkbox.checkbox-circle label::before {
   border-radius: 50%;
 }
+
+.btn-round{
+    border-radius: 17px;
+    text-align: center;
+}
+
+.btn-group > .btn:first-child, .btn-group > .btn:last-child {
+     border-radius: 17px;
+}
+
 </style> 
 
 <style>
@@ -66,9 +73,11 @@ $d = $dataEmp[0];
 			<div class="thumbnail" style="min-height: 100px;">
 					<!-- <h3>Form Tugas Keluar</h3> -->
 					<div class="panel panel-default">
-					    <div class="panel-heading panel-heading-custom">Document Request Form</div>
-					    	<div class="panel-body">
+					    <div class="panel-heading panel-heading-custom">Document Request Form
+                            <span class="pull-right clickable"><button class="btn btn-default btn-sm btn-circle"><i class="glyphicon glyphicon-chevron-up"></i> </button> </span> 
 
+                        </div>
+					    	<div class="panel-body">
                                 <div class="row">
                                     <div class="col-xs-6">
                                         <div class="form-group">
@@ -86,11 +95,10 @@ $d = $dataEmp[0];
 				                    </div>
 				                </div>
 
-
 					    		<div class="row">
 				                    <div class="col-xs-12">
 				                        <div class="form-group">
-				                            <label>For Request</label>
+				                            <label>Description Request</label>
                                                 <textarea rows="2" cols="5" name="to_event" id="to_event" class="form-control"></textarea>
 				                        </div>
 				                    </div>
@@ -143,7 +151,7 @@ $d = $dataEmp[0];
 
 				                <div class="row">
 				                	<div class="col-xs-12">
-				                		<label>Description Request Location </label>
+				                		<label>Description Location </label>
 				                		<textarea rows="4" cols="5" name="DescriptionVenue" id="DescriptionVenue" class="form-control"></textarea>
 				                	</div>
 				                </div>
@@ -152,8 +160,8 @@ $d = $dataEmp[0];
 				                <div class="row">
 				                	<div class="col-xs-12 form-group" style="text-align: right;">
 
-				                		<button type="button" class="btn btn-success btn-round btnsaverequest" dataid="'+response[i]['IDVersion']+'">
-                                            <span class="glyphicon glyphicon-floppy-disk"></span>  Request
+				                		<button type="button" class="btn btn-success btn-round btnsaverequest">
+                                            <span class="glyphicon glyphicon-floppy-disk"></span>  Save Request
 				                		</button>
 						            </div>
 						        </div>
@@ -171,28 +179,25 @@ $d = $dataEmp[0];
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-12">
         <div class="widget box">
-            <div class="widget-header">
-                <h4 class=""><i class="icon-reorder"></i> List Data Request</h4>
+            <div class="widget-header" style="background: #20485A;color: #FFFFFF;">
+                <h4 style="color: #FFFFFF;"><i class="icon-reorder"></i> List Data Request</h4>
                 <div class="toolbar no-padding">
-                    <div class="btn-group">
-                        
-                    </div>
+                    <div class="btn-group"></div>
                 </div>
             </div>
             <div class="widget-content col-md-12">
-                <div class="">
+                <div class="table table-responsive">
                     <table class="table table-bordered table-striped" id="tablemodule">
                         <thead>
                         <tr style="background: #3968c6;color: #FFFFFF;">
-                            <th style="width: 5%;text-align: center;">No</th>
-                            <th style="width: 11%;text-align: center;">Name/ NIP</th>
-                            <th style="width: 8%;text-align: center;">Type</th>
-                            <th style="width: 20%;text-align: center;">For Request</th>
-                            <th style="width: 11%;text-align: center;">Start Date</th>
-                            <th style="width: 11%;text-align: center;">End Date</th>
-                            <th style="width: 22%;text-align: center;">Description Request</th>
-                            <th style="width: 10%;text-align: center;">Date Confirm</th>
-                            <th style="width: 5%;text-align: center;">Action</th>
+                            <th style="width: 3%;text-align: center;">No</th>
+                            <th style="width: 10%;text-align: center;">Name/ NIP</th>
+                            <th style="width: 20%;text-align: center;">Description Request</th>
+                            <th style="width: 15%;text-align: center;">Start & End Date</th>
+                            <th style="width: 12%;text-align: center;">Description Location</th>
+                            <th style="width: 8%;text-align: center;">Date Confirm</th>
+                            <th style="width: 8%;text-align: center;">Status</th>
+                            <th style="width: 8%;text-align: center;">Action</th>
                         </tr>
                         </thead>
                     </table>
@@ -202,6 +207,26 @@ $d = $dataEmp[0];
         </div>
     </div>
 </div>
+
+
+<script>
+    $(document).on('click', '.panel-heading span.clickable', function(e){
+       var $this = $(this);
+        if(!$this.hasClass('panel-collapsed')) {
+            $this.parents('.panel').find('.panel-body').slideUp();
+            $this.addClass('panel-collapsed');
+            $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        } else {
+            $this.parents('.panel').find('.panel-body').slideDown();
+            $this.removeClass('panel-collapsed');
+            $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+        }
+})
+</script>
+
+<script>
+    
+</script>
 
 <script>
     $(document).ready(function () {
@@ -220,7 +245,8 @@ $d = $dataEmp[0];
             "iDisplayLength" : 10,
             "ordering" : false,
             "ajax":{
-                url : base_url_js+"api/__getrequestnip?s="+status, // json datasource group
+                //url : base_url_js+"api/__getrequestnip?s="+status, // json datasource group
+                url : base_url_js+"api/__getrequestnip", // json datasource'
                 ordering : false,
                 type: "post",  // method  , by default get
                 error: function(){  // error handling
@@ -236,8 +262,160 @@ $d = $dataEmp[0];
 
 <script>
     
+    $(document).on('click','.btndetailrequest', function () {
+
+        var requestid = $(this).attr('requestid');
+        var url = base_url_js+'api2/__crudrequestdoc?s='+requestid;                         
+        var token = jwt_encode({
+                action:'get_detailrequest'
+            },'UAP)(*');
+
+        $.post(url,{token:token},function (resultJson) {
+            console.log(resultJson); 
+            var response = resultJson;
+                if(response.length>0){
+                    var no = 1;
+                    for (var i = 0; i < response.length; i++) {
+
+                    var awal = response[i]['StartDate'];
+                    var akhir = response[i]['EndDate'];
+                    var datereq = response[i]['EndDate'];
+                    var datecom = response[i]['DateConfirm'];
+
+                    var startdatex = moment(awal).format('DD MMM YYYY HH:mm');
+                    var enddatex = moment(akhir).format('DD MMM YYYY HH:mm');
+                    var daterequest = moment(datereq).format('DD MMM YYYY HH:mm');
+
+                    var dayawal = moment(awal).format('dddd');
+                    var dayakhir = moment(akhir).format('dddd');
+
+
+                    if(response[i]['ConfirmStatus'] == 0) {
+                        var confirmx = "Waiting Confirmation";
+
+                    } else if(response[i]['ConfirmStatus'] == 1) {
+                        var confirmx = "Approved";
+
+                    } else {
+                        var confirmx = "Rejected";
+                    }
+
+                    if(response[i]['namaconfirm'] == null) {
+                        var namcomfirm = "-";
+                    } 
+                    else {
+                        var namcomfirm = response[i]['namaconfirm'];
+                    }
+
+                    if(response[i]['DateConfirm'] == "0000-00-00 00:00:00") {
+                        var daterconfirm = "-";
+                    } 
+                    else {
+                        var daterconfirm = moment(datecom).format('DD MMM YYYY HH:mm');
+                    }
+
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+                        ' <span aria-hidden="true">&times;</span></button> '+
+                        ' <h4 class="modal-title">Detail Data Request</h4>');
+                    $('#GlobalModal .modal-body').html('<span><b>Data Request</b></span>' +
+                        '<table class="table table-striped">'+
+                        '<tr>' +
+                        '   <td style="width: 40%;">Type </td>' +
+                        '   <td><b>'+response[i]['NameFiles']+' <b></td>' +
+                        '</tr>' +
+                        '</tr>' +
+                        '   <td style="width: 40%;">Date Request</td>' +
+                        '   <td><b>'+daterequest+'<b></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '   <td style="width: 40%;">Description Request</td>' +
+                        '   <td><b>'+response[i]['ForTask']+'<b></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '   <td style="width: 40%;">Start Date</td>' +
+                        '   <td><b>'+dayawal+', '+startdatex+' <b></td>' +
+                        '</tr>' +
+                         '<tr>' +
+                        '   <td style="width: 40%;">End Date</td>' +
+                        '   <td><b>'+dayakhir+', '+enddatex+'<b></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '   <td style="width: 40%;">Description Location</td>' +
+                        '   <td><b>'+response[i]['DescriptionAddress']+' <b></td>' +
+                        '<tr>' +
+                        '<br/>' +
+                        '</table> '+
+                        '<span><b>Detail Confirmation</b></span>' +
+                        '<table class="table table-striped">'+
+                        '<tr>' +
+                        '   <td style="width: 40%;">Status Confirmation</td>' +
+                        '   <td style="color:blue;"><b>'+confirmx+' </b></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '   <td style="width: 40%;">User Confirmation</td>' +
+                        '   <td style="color:blue;">'+namcomfirm+'</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                        '   <td style="width: 40%;">Date Confirmation</td>' +
+                        '   <td style="color:blue;">'+daterconfirm+'</td>' +
+                        '</tr>' +
+                        '</table> ');
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-danger btn-round" data-dismiss="modal"><i class="fa fa-remove"></i> Close</button>');
+                
+                    $('#GlobalModal').modal({
+                        'backdrop' : 'static',
+                        'show' : true
+                    }); 
+                        
+                    } //end for
+                } //end if
+            }); //end json  
+         //END IF
+    });
+
+
     $(document).on('click','.btnsaverequest',function () {
-        loading_button('.btnsaverequest');
+        $('#NotificationModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+                                ' <span aria-hidden="true">&times;</span></button> '+
+                                ' <h4 class="modal-title">Confirmation All Approved </h4>');
+        $('#NotificationModal .modal-body').html('<center><p><b>Apa Anda Yakin untuk simpan Permintaan Surat Tugas Keluar ini? Periksa kembali data Anda sebelum disimpan.</b></p>'+
+            '<div class="btn-group"><button class="btn btn-sm btn-success btn-round btn-action saverequest_data"> <i class="glyphicon glyphicon-ok-sign"></i> Save </button> <button class="btn btn-sm btn-danger btn-round btn-addgroup" data-dismiss="modal"><i class="glyphicon glyphicon-remove-sign"></i> Cancel</button></center></div></div>');
+
+        $('#NotificationModal').modal({
+                'backdrop' : 'static',
+                'show' : true
+        }); 
+     });
+
+
+    $(document).on('click','.btndeleterequest',function () {
+
+        var requestID = $(this).attr('requestid');
+
+        $('#NotificationModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"> '+
+                                ' <span aria-hidden="true">&times;</span></button> '+
+                                ' <h4 class="modal-title">Confirmation Delete </h4>');
+        $('#NotificationModal .modal-body').html('<center><p><b>Apa Anda Yakin untuk Hapus Permintaan Surat Tugas Keluar ini? </b></p>'+
+            '<div class="btn-group "><button class="btn btn-sm btn-success btn-round btn-action reqdeleted" idrequestdel= "'+requestID+'"> <i class="glyphicon glyphicon-ok-sign"></i> Delete </button> <button class="btn btn-sm btn-danger btn-round btn-addgroup" data-dismiss="modal"><i class="glyphicon glyphicon-remove-sign"></i> Cancel</button></center></div></div>');
+
+        $('#NotificationModal').modal({
+                'backdrop' : 'static',
+                'show' : true
+        }); 
+     });
+
+
+    $(document).on('click','.reqdeleted',function () {
+        var requestID = $(this).attr('idrequestdel');
+        loading_button('.reqdeleted');
+        $('.reqdeleted').prop('disabled',true);
+        requestdeleted(requestID);
+    });
+    
+    
+    $(document).on('click','.saverequest_data',function () {
+        loading_button('.saverequest_data');
+        $('.saverequest_data').prop('disabled',true);
         savedatarequestdoc();
     });
 
@@ -250,8 +428,44 @@ $d = $dataEmp[0];
         }
     });
 
-    function savedatarequestdoc() {
+    function requestdeleted(requestID) {
+        $('#NotificationModal').modal('hide');
+        var data = {
+                action : 'delete_request',
+                requestID : requestID
+            };
 
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api2/__crudrequestdoc';
+            $.post(url,{token:token},function (result) {
+
+                 if(result==0 || result=='0'){
+                        //$('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                    } else {  
+                        toastr.success('Success Delete Data!','Success');
+
+                        $('#GlobalModal .modal-header').addClass('hide');
+                        $('#GlobalModal .modal-footer').addClass('hide');
+                        $('#GlobalModal .modal-dialog').removeClass('modal-sm modal-lg');
+                        $('#GlobalModal .modal-dialog').addClass('modal-sm');
+                        $('#GlobalModal .modal-body').html('<div class="container"> '+
+                                ' <center>Mohon Menunggu... <br/><span class="fa fa-spinner fa-spin fa-3x"></span> </center> '+
+                                '</div>');
+                        $('#GlobalModal').modal({
+                            'backdrop' : 'static',
+                            'show' : true
+                        });
+                        
+                        setTimeout(function () {
+                            window.location.href = '';
+                        },5000);
+                   }
+            });
+    }
+
+
+    function savedatarequestdoc() {
+        $('#NotificationModal').modal('hide');
         var typerequest = $('.filtertypedocument option:selected').attr('id');
         var to_event = $('#to_event').val();
 
@@ -260,7 +474,7 @@ $d = $dataEmp[0];
         var stardatetime = startDate+' '+startTime;
 
         var endDate = $('#endDate').val();
-        //var endTime = $('#endTime').val();
+        
         if($('#checkselesai').is(':checked')){
             var endTime = "00:00";
         } else {
@@ -293,19 +507,31 @@ $d = $dataEmp[0];
                 $.post(url,{token:token},function (result) {
                         
                     if(result==0 || result=='0'){
-                        $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+                        //$('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
                     } else {  
+                        $('#GlobalModal .modal-header').addClass('hide');
+                        $('#GlobalModal .modal-footer').addClass('hide');
+                        $('#GlobalModal .modal-dialog').removeClass('modal-sm modal-lg');
+                        $('#GlobalModal .modal-dialog').addClass('modal-sm');
+                        $('#GlobalModal .modal-body').html('<div class="container"> '+
+                                ' <center>Mohon Menunggu... <br/><span class="fa fa-spinner fa-spin fa-3x"></span> </center> '+
+                                '</div>');
+                        $('#GlobalModal').modal({
+                            'backdrop' : 'static',
+                            'show' : true
+                        });
+
                         toastr.success('Request Document Saved','Success');
                         setTimeout(function () {
-                            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
                             window.location.href = '';
-                        },1000);
+                        },3000);
                     }
                 });
         }
         else {
             toastr.error('The form is still empty!','Error');
-            $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
+            $('#NotificationModal').modal('hide');
+           // $('.btnsaverequest').prop('disabled',false).html('<span class="glyphicon glyphicon-floppy-disk"></span> Save');
             return;
         }
      }
@@ -327,7 +553,7 @@ $d = $dataEmp[0];
 
 <script>
 $(document).ready(function () {
-        loadlistrequestdocument();
+        //loadlistrequestdocument();
         loadfilterdocument();
     });
 
@@ -403,30 +629,6 @@ function loadlistrequestdocument() {
                 }
         });
    };
-</script>
-
-<script>
-    $(document).on('click','.btnviewlistsrata',function () {
-        var filesub = $(this).attr('filesub');
-       
-            $('#NotificationModal .modal-header').addClass('hide');
-            $('#NotificationModal .modal-body').html('<center> '+
-                '<iframe src="'+base_url_js+'uploads/files/'+filesub+'" frameborder="0" style="width:745px; height:550px;"></iframe> '+
-                '<br/><br/><button type="button" id="btnRemoveNoEditSc" class="btn btn-primary btn-round" data-dismiss="modal"><span class="fa fa-remove"></span> Close</button><button type="button" filesublix ="'+filesub+'" class="btn btn-primary btn-circle pull-right filesublink" data-toggle="tooltip" data-placement="top" title="Full Review"><span class="fa fa-external-link"></span></button>' +
-            '</center>');
-            $('#NotificationModal .modal-footer').addClass('hide');
-            $('#NotificationModal').modal({
-                'backdrop' : 'static',
-                'show' : true
-            });
-    });
-
-    $(document).on('click','.filesublink',function () {
-        var filesubx = $(this).attr('filesublix');
-        var url = base_url_js+'uploads/files/'+filesubx;
-        window.open(url, '_blank',);
-    });
-
 </script>
 
 <script>

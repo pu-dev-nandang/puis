@@ -379,6 +379,8 @@
         maxView: 1,
         forceParse: 1};
 
+    <?php $PositionMain = $this->session->userdata('PositionMain'); ?>
+    window.PositionMain = <?php echo json_encode($PositionMain) ?>;
     $(document).ready(function(){
         // "use strict";
 
@@ -609,14 +611,76 @@
         });
     }
 
-    function loadSelectOptionBaseProdi(element,selected) {
+    function loadSelectOptionBaseProdi(element,selected,filtered=[],show=1) {
         var url = base_url_js+"api/__getBaseProdiSelectOption";
         $.get(url,function (data) {
             for(var i=0;i<data.length;i++){
                 var selc = (data[i].ID==selected) ? 'selected' : '';
-                $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                if (filtered.length == 0) {
+                    if (show == 1) {
+                        $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                    }
+                    else
+                    {
+                        /*
+                            for auth APS
+                        */
+                    }
+                    
+                }
+                else
+                {
+                    for (var k = 0; k < filtered.length; k++) {
+                        var ex = filtered[k].split('.');
+                        if (ex[0] == data[i].ID) {
+                            $(''+element).append('<option value="'+data[i].ID+'.'+data[i].Code+'" '+selc+'>'+data[i].Level+' - '+data[i].NameEng+'</option>');
+                        }
+                    }
+                }
+                
             }
         });
+    }
+    
+    function loadSelectOptionJudiciumsYear(element,selected) {
+        var url = base_url_js+'api3/__crudYudisium';
+        var token = jwt_encode({action:'getJudiciumsYear'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+                    var sc = (v.GraduationYear==selected) ? 'selected' : '';
+                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+
+                });
+            }
+
+        });
+
+    }
+
+    function loadSelectOptionLecturerStatus(element,selected) {
+
+        var url = base_url_js+'api/__crudLecturer';
+        var token = jwt_encode({action : 'getLecturerStatus'},'UAP)(*');
+        
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                $.each(jsonResult,function (i,v) {
+
+                    var sc = (selected==v.IDStatus) ? 'selected' : '';
+                    var color = (parseInt(v.IDStatus)<0)
+                        ? 'style="color:red;"'
+                        : '';
+                    $(element).append('<option value="'+v.IDStatus+'" '+color+' '+sc+'>'+v.Description+'</option>');
+
+                });
+            }
+
+        });
+
     }
 
     function loadSelectOptionLevelEducation(element,selected) {
@@ -735,8 +799,20 @@
         $.get(url,function (data_json) {
             // console.log(data_json);
             for(var i=0;i<data_json.length;i++){
-                var selected = (data_json[i].ID==selected) ? 'selected' : '';
-                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+selected+'>'+data_json[i].Year+'</option>');
+                var sc = (data_json[i].ID==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].ID+'.'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
+            }
+        });
+    }
+
+    function loadSelectOptionClassOf_Year(element,selected) {
+
+        var url = base_url_js+"api/__getKurikulumSelectOptionASC";
+        $.get(url,function (data_json) {
+            // console.log(data_json);
+            for(var i=0;i<data_json.length;i++){
+                var sc = (data_json[i].Year==selected) ? 'selected' : '';
+                $(element).append('<option value="'+data_json[i].Year+'" '+sc+'>Class of - '+data_json[i].Year+'</option>');
             }
         });
     }
@@ -1268,9 +1344,17 @@
                 $.each(jsonResult,function (i,v) {
 
                     var mentor1 = (v.Mentor1!=null && v.Mentor1!='') ? '('+v.Mentor1 : '';
-                    var mentor = (v.Mentor2!=null && v.Mentor2!='') ? mentor1+', '+v.Mentor2+')' : mentor1+')';
 
-                    $(element).append('<option value="'+v.NPM+'">'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
+                    var mentor = '';
+                    if(v.Mentor2!=null && v.Mentor2!='' && v.Mentor1!=null && v.Mentor1!=''){
+                        mentor = mentor1+', '+v.Mentor2+')';
+                    } else if(v.Mentor2!=null && v.Mentor2!='' && mentor1==''){
+                        mentor =  mentor1+')';
+                    }
+
+                    var disabledrow =  (mentor=='') ? 'disabled ' : '';
+
+                    $(element).append('<option value="'+v.NPM+'" '+disabledrow+'>'+v.NPM+' - '+v.Name+' '+mentor+'</option>')
                         .val(selected).trigger('change');
 
                 });
@@ -1622,6 +1706,25 @@
         }
         return result;
     }
+    function Validation_decimal(string,theName)
+    {
+        var result = {status:1, messages:""};
+        var regexx =  /^\d*\.?\d*$/;
+        if (!string.match(regexx)) {
+            result = {status : 0,messages: theName + " only decimal! "};
+        }
+        return result;
+    }
+
+    function number_comma_dot(string,theName)
+    {
+        var result = {status:1, messages:""};
+        var regexx =  /^(\d+(\.\d{0,2})?|\.?\d{1,2})$/;
+        if (!string.match(regexx)) {
+            result = {status : 0,messages: theName + " only number,comma and dot! "};
+        }
+        return result;
+    }
 
     function LoaddataTable(element) {
         var table = $(element).DataTable({
@@ -1683,6 +1786,7 @@
               '                    <i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>' +
               '                    <br/>' +
               '                    Loading Data . . .' +
+              '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default hide">Close</button>'+
               '                </center>');
           $('#NotificationModal .modal-footer').addClass('hide');
           $('#NotificationModal').modal({
@@ -1694,7 +1798,9 @@
     function loadingEnd(timeout)
     {
         setTimeout(function () {
+            $('#NotificationModal').find('#ModalbtnCancleForm').trigger('click');
             $('#NotificationModal').modal('hide');
+            
         },timeout);
     }
 
@@ -1948,7 +2054,7 @@
 
             reader.onload = function(e) {
                 $(el_View).attr('src', e.target.result);
-            }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }

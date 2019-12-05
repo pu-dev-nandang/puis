@@ -743,6 +743,51 @@ class C_global extends CI_Controller {
 
     public function approve_venue($token)
     {
+        $key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($token,$key);
+        $this->load->model('vreservation/m_reservation');
+        $checkRuleDivisioOrNot = $this->m_reservation->checkRuleDivisioOrNot($data_arr['approvalNo'],$data_arr['ID_t_booking']);
+        if ($checkRuleDivisioOrNot) {
+            // division
+            if (array_key_exists('tokendata', $_POST)) {
+                // cek Username dan Password  serta divisinya
+                $Username = $_POST['Username'];
+                $Password = $_POST['Password'];
+                $tokendata = $_POST['tokendata'];
+                $DivisionID = $data_arr['Code'];
+                $checkAuth = $this->m_reservation->auth_approval($Username,$Password,$DivisionID);
+                if ($checkAuth) {
+                    $data['Notification'] = 1;
+                    $data_arr['Code'] = $Username;
+                    $token = $this->jwt->encode($data_arr,"UAP)(*");
+                    $this->submit_approve_venue($token);
+                    // echo 'autorize good';
+                }
+                else
+                {
+                    $data['Notification'] = 1;
+                    $data['tokendata'] = $token;
+                    $data['include'] = $this->load->view('template/include','',true);
+                    $this->load->view('template/auth_approve_venue',$data);
+                }
+            }
+            else
+            {
+                $data['Notification'] = 0;
+                $data['tokendata'] = $token;
+                $data['include'] = $this->load->view('template/include','',true);
+                $this->load->view('template/auth_approve_venue',$data);
+            }
+        }
+        else
+        {
+            // echo 'not division';
+            $this->submit_approve_venue($token);
+        }
+    }
+
+    public function submit_approve_venue($token)
+    {
         //error_reporting(0);
         try 
         {
@@ -1241,6 +1286,7 @@ class C_global extends CI_Controller {
         catch(Exception $e) {
           // handling orang iseng
           echo '{"status":"999","message":"Not Authorize"}';
+          // echo $e;
         }
     }
 

@@ -19,8 +19,9 @@
         </table>
     </div>
     <div class="panel-footer" style="text-align: right;">
-
-        <button class="btn btn-danger" id="btnMigrateLive">Migrate to Server Local</button>
+        <?php if ($_SERVER['SERVER_NAME'] != 'pcam.podomorouniversity.ac.id'): ?>
+            <button class="btn btn-danger" id="btnMigrateLive">Migrate to Server Local</button>
+        <?php endif ?>
     </div>
     <p style="color: red;">* Mohon Migrate data ke server local jika data local telah di migrate ke server live, dengan klik tombol Migrate to Server Local</p>
     <p style="color: red;">* Jika data local masih ada dan tombol Migrate to Server Local telah diklik maka data routes local akan digantikan oleh data server live</p>
@@ -158,6 +159,7 @@
                 var html = '';
                     html += '<div class = "row">'+
                                 '<div class = "col-md-12">'+
+                                    '<div class="table-responsive">'+
                                     '<table class="table table-striped table-bordered table-hover table-checkable tableData" id = "TblModal2">'+
                                           '<thead>'+
                                               '<tr>'+
@@ -182,7 +184,7 @@
                     }
 
                     html += '</tbody></table>';
-                    html += '</div></div>'; 
+                    html += '</div></div></div>'; 
 
                      var footer = '<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Cancel</button>'+
                          '<button type="button" id="ModalbtnSaveForm2" class="btn btn-success">Procces</button>';
@@ -202,7 +204,7 @@
             oTable2.rows().every(function(index, element) {
               var row = $(this.node());
               var No = row.find('td').eq(0).html();
-              row.find('td').eq(0).html('<input type = "checkbox" class = "select_migrate2"> '+No );
+              row.find('td').eq(0).html('<input type = "checkbox" class = "select_migrate2" checked> '+No );
             });
         }
     })

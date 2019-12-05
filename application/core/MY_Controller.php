@@ -69,8 +69,6 @@ abstract class Globalclass extends MyAbstract{
 
     }
 
-
-
     public function template($content)
     {
 
@@ -701,7 +699,7 @@ abstract class Prodi_Controler extends Globalclass{
         if (!$this->session->userdata('prodi_get')) {
           $this->m_prodi->auth();  
         }
-        
+        $this->m_menu2->set_model('prodi_sess','auth_prodi_sess','menu_prodi_sess','menu_prodi_grouping','db_prodi');
     }
 
 }
@@ -735,4 +733,44 @@ class Cooperation_Controler extends Globalclass{
     {
         parent::template($content);
     }
+}
+
+abstract class Ticket_Controler extends Globalclass{
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('ticketing/m_general');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    public function menu_ticket($page){
+        $data['Authen'] = $this->m_master->showData_array('db_ticketing.rest_setting');
+        $data['DepartmentID'] = $this->m_general->getDepartmentNow();
+        $data['DepartmentAbbr'] = $this->m_general->DepartmentAbbr($data['DepartmentID']);
+        $data['ArrSelectOptionDepartment'] = $this->m_general->getAuthDepartment();
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/ticketing/menu_ticketing',$data,true);
+        $this->template($content);
+    }
+
+    // overide function
+    public function template($content)
+    {
+
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+        $data['ClassContainer'] = 'sidebar-closed';
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+
+    }
+
+
 }

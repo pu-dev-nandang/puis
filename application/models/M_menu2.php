@@ -83,6 +83,10 @@ class M_menu2 extends CI_Model {
   {
     $NIP = $this->session->userdata('NIP');
     $db = $this->dbAuth;
+    $AddWhere = '';
+    if ($db == 'db_prodi') {
+      $AddWhere  = ' and d.ProdiID = '.$this->session->userdata('prodi_active_id');
+    }
       $sql = 'SELECT b.ID as ID_menu,b.Icon,c.ID,b.Menu,c.SubMenu1,c.SubMenu2,x.`read`,x.`update`,x.`write`,x.`delete`,c.Slug,c.Controller 
               from db_employees.employees as a
               join '.$db.'.previleges_guser as d
@@ -92,7 +96,7 @@ class M_menu2 extends CI_Model {
               join '.$db.'.cfg_sub_menu as c
               on x.ID_cfg_sub_menu = c.ID
               join '.$db.'.cfg_menu as b
-              on b.ID = c.ID_Menu where a.NIP = ? GROUP by b.id order by b.Sort asc';
+              on b.ID = c.ID_Menu where a.NIP = ? '.$AddWhere.' GROUP by b.id order by b.Sort asc';
       $query=$this->db->query($sql, array($NIP))->result_array();
       return $query;
   }
@@ -123,12 +127,12 @@ class M_menu2 extends CI_Model {
                   'Submenu' => $submenu2,
               );
           }
-          if ($i == 0) {
-              // SORTING ASC
-                  usort($arr2, function($a, $b) {
-                      return $a['SubMenu1'] - $b['SubMenu1'];
-                  });
-          }
+          // if ($i == 0) {
+          //     // SORTING ASC
+          //         usort($arr2, function($a, $b) {
+          //             return $a['SubMenu1'] - $b['SubMenu1'];
+          //         });
+          // }
           
 
           $arr[] =array(
@@ -145,20 +149,29 @@ class M_menu2 extends CI_Model {
 
   public function getSubmenu1BaseMenu_grouping($ID_Menu,$db='db_it')
   {
+    $AddWhere = '';
+    if ($db == 'db_prodi') {
+      $AddWhere  = ' and c.ProdiID = '.$this->session->userdata('prodi_active_id');
+    }
       $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
       from '.$db.'.cfg_sub_menu as a join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
-      join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user  where a.ID_Menu = ? and c.NIP = ? group by a.SubMenu1 order by a.Sort1 asc';
+      join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user  where a.ID_Menu = ? and c.NIP = ? '.$AddWhere.' group by a.SubMenu1 order by a.Sort1 asc';
       $query=$this->db->query($sql, array($ID_Menu,$this->session->userdata('NIP')))->result_array();
       return $query;
   }
 
   public function getSubmenu2BaseSubmenu1_grouping($submenu1,$db='db_it',$IDmenu = null)
   {
+    $AddWhere = '';
+    if ($db == 'db_prodi') {
+      $AddWhere  = ' and c.ProdiID = '.$this->session->userdata('prodi_active_id');
+    }
+
       if ($IDmenu != null) {
           $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
           from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-           where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ? order by a.Sort2 asc';
+           where a.SubMenu1 = ? and c.NIP = ? and a.ID_Menu = ? '.$AddWhere.' order by a.Sort2 asc';
           $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP'),$IDmenu))->result_array();
       }
       else
@@ -166,7 +179,7 @@ class M_menu2 extends CI_Model {
           $sql = 'SELECT a.ID,a.ID_Menu,a.SubMenu1,a.SubMenu2,a.Slug,a.Controller,b.read,b.write,b.update,b.delete 
           from '.$db.'.cfg_sub_menu as a  join '.$db.'.cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join '.$db.'.previleges_guser as c on b.cfg_group_user = c.G_user
-           where a.SubMenu1 = ? and c.NIP = ? order by a.Sort2 asc';
+           where a.SubMenu1 = ? and c.NIP = ? '.$AddWhere.' order by a.Sort2 asc';
           $query=$this->db->query($sql, array($submenu1,$this->session->userdata('NIP')))->result_array();
       }
       
@@ -175,6 +188,11 @@ class M_menu2 extends CI_Model {
 
   private function chkAuthDB_Base_URL($URL,$db = 'db_it')
   {
+    $AddWhere = '';
+    if ($db == 'db_prodi') {
+      $AddWhere  = ' and c.ProdiID = '.$this->session->userdata('prodi_active_id');
+    }
+
       $a = explode('/', $URL);
       $b = count($a) - 1;
       $URISlug = 'and a.Slug = "'.$URL.'"';
@@ -193,7 +211,7 @@ class M_menu2 extends CI_Model {
       }
       $sql = "select b.read,b.write,b.update,b.delete from ".$db.".cfg_sub_menu as a join ".$db.".cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
       join ".$db.".previleges_guser as c on c.G_user = b.cfg_group_user
-      where c.NIP = ? ".$URISlug;
+      where c.NIP = ? ".$URISlug.$AddWhere;
       $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
       if (count($query) == 0) { // digunakan untuk horizontal URL
         /*
@@ -216,7 +234,7 @@ class M_menu2 extends CI_Model {
           $URISlug = 'and a.Slug = "'.$URISlug.'"';
           $sql = "select b.read,b.write,b.update,b.delete from ".$db.".cfg_sub_menu as a join ".$db.".cfg_rule_g_user as b on a.ID = b.ID_cfg_sub_menu
           join ".$db.".previleges_guser as c on c.G_user = b.cfg_group_user
-          where c.NIP = ? ".$URISlug;
+          where c.NIP = ? ".$URISlug.$AddWhere;
           $query=$this->db->query($sql, array($this->session->userdata('NIP')))->result_array();
       }
       return $query;
@@ -246,14 +264,17 @@ class M_menu2 extends CI_Model {
           );
       }
 
-      $html = '';
+      $html = '<script type="text/javascript">
+        var MyVarEbombAccess;
+      </script>
+      ';
       if ($access['read'] == 0) {
           $html .= '<script type="text/javascript">
                var waitForEl = function(selector, callback) {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -269,6 +290,9 @@ class M_menu2 extends CI_Model {
                        $(".btn-read").remove();
                    });
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -280,7 +304,7 @@ class M_menu2 extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -302,6 +326,9 @@ class M_menu2 extends CI_Model {
                       $(".btn-write").remove();
                    });
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -312,7 +339,7 @@ class M_menu2 extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -328,6 +355,9 @@ class M_menu2 extends CI_Model {
                             $(".btn-edit").remove();
                    });
                });
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -338,7 +368,7 @@ class M_menu2 extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -361,7 +391,9 @@ class M_menu2 extends CI_Model {
                   });
                    
                });
-               
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;
@@ -383,7 +415,7 @@ class M_menu2 extends CI_Model {
                  if (jQuery(selector).length) {
                    callback();
                  } else {
-                   setTimeout(function() {
+                   MyVarEbombAccess = setTimeout(function() {
                      waitForEl(selector, callback);
                    }, 100);
                  }
@@ -408,7 +440,9 @@ class M_menu2 extends CI_Model {
                waitForEl(".btn-delete-menu-auth", function() {
                  $(".btn-delete-menu-auth").remove();
                });
-               
+               setTimeout(function () {
+                   clearTimeout(MyVarEbombAccess);
+               },20000);
                </script>
           ';
           echo $html;

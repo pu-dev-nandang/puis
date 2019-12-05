@@ -795,11 +795,14 @@ class C_rest2 extends CI_Controller {
                                     // Notif to next step approval & User
                                         $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                         // Send Notif for next approval
+                                            // send revisi or not
+                                            $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($Code,'db_purchasing.po_circulation_sheet','Code');
+
                                             $data = array(
                                                 'auth' => 's3Cr3T-G4N',
                                                 'Logging' => array(
-                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval PO/SPK : '.$Code,
-                                                                'Description' => 'Please approve PO/SPK '.$Code,
+                                                                'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.' PO/SPK : '.$Code,
+                                                                'Description' => 'Please approve '.$RevisiOrNotNotif.' PO/SPK '.$Code,
                                                                 'URLDirect' => 'global/purchasing/transaction/'.$urlS.'/list/'.$CodeUrl,
                                                                 'CreatedBy' => $NIP,
                                                               ),
@@ -3366,11 +3369,12 @@ class C_rest2 extends CI_Controller {
                                 // Notif to next step approval & User
                                     $NIPApprovalNext = $JsonStatus[($keyJson+1)]['NIP'];
                                     // Send Notif for next approval
+                                        $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                         $data = array(
                                             'auth' => 's3Cr3T-G4N',
                                             'Logging' => array(
-                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$G_data[0]['Type'],
-                                                            'Description' => 'Please approve '.$G_data[0]['Type'],
+                                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Approval '.$RevisiOrNotNotif.$G_data[0]['Type'],
+                                                            'Description' => 'Please approve '.$RevisiOrNotNotif.$G_data[0]['Type'],
                                                             'URLDirect' => 'global/purchasing/transaction/'.$urlType.'/list/'.$CodeUrl,
                                                             'CreatedBy' => $NIP,
                                                           ),
@@ -3981,6 +3985,8 @@ class C_rest2 extends CI_Controller {
                                             $CodeDept = $G_div[0]['Code'];
                                            
                                             // Send Notif for next approval
+                                                // send revisi or not
+                                                $RevisiOrNotNotif = $this->m_master->__RevisiOrNotNotif($ID_payment,'db_payment.payment_circulation_sheet','ID_payment');
                                                 $data = array(
                                                     'auth' => 's3Cr3T-G4N',
                                                     'Logging' => array(
@@ -4758,7 +4764,7 @@ class C_rest2 extends CI_Controller {
 
                          $sqltotalData = '
                             select count(*) as total from(
-                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan from db_cooperation.kegiatan as z
+                                select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Kategori_kegiatan,z.FileLain from db_cooperation.kegiatan as z
                                 join (
                                     select a.ID from db_cooperation.kerjasama as a
                                      join db_cooperation.k_perjanjian as b on a.ID = b.KerjasamaID
@@ -4781,7 +4787,7 @@ class C_rest2 extends CI_Controller {
 
                          $sql = '
                                     select z.ID,z.JudulKegiatan,z.BentukKegiatan,z.ManfaatKegiatan,z.StartDate,z.EndDate,z.Desc,z.KerjasamaID,z.SemesterID,
-                                    z.Kategori_kegiatan,
+                                    z.Kategori_kegiatan,z.FileLain,
                                     x.Lembaga, x.Kategori,x.Tingkat,
                                     (
                                     select GROUP_CONCAT( CONCAT(zz.Departement,"--",x.Code) ) from db_cooperation.keg_department as zz
@@ -4861,6 +4867,7 @@ class C_rest2 extends CI_Controller {
                                       'ID' => $row['ID'],
                                       'SemesterID' => $row['SemesterID'],
                                       'Kategori_kegiatan' => $row['Kategori_kegiatan'],
+                                      'FileLain' => $row['FileLain'],
                                  ];
                                  // encode data
                                  $tokenEdit = $this->jwt->encode($tokenEdit,"UAP)(*");
@@ -5015,8 +5022,11 @@ class C_rest2 extends CI_Controller {
     	$dataToken = $this->getInputToken2();
     	$Status = $dataToken['Status'];
     	$Year = $dataToken['Year'];
-    
-    	$sql = 'select * from db_admission.formulir_number_global  where Status = ? and Years = ?';
+        $AndWhere = '';
+        if (array_key_exists('TypeFormulir', $dataToken)) {
+           $AndWhere .= ' and TypeFormulir = "'.$dataToken['TypeFormulir'].'" ';
+        }
+    	$sql = 'select * from db_admission.formulir_number_global  where Status = ? and Years = ?'.$AndWhere;
     	$query=$this->db->query($sql, array($Status,$Year))->result_array();
 
     	echo json_encode($query);

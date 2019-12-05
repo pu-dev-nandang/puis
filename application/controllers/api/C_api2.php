@@ -984,7 +984,7 @@ class C_api2 extends CI_Controller {
                 $formInsert = (array) $data_arr['formInsert'];
 
                 $typerequest = $formInsert['typerequest'];
-                $to_event = $formInsert['to_event'];
+                $to_event = ucfirst($formInsert['to_event']);
                 $startDate = $formInsert['startDate'];
                 $endDate = $formInsert['endDate'];
                 $DescriptionVenue = $formInsert['DescriptionVenue'];
@@ -1000,6 +1000,64 @@ class C_api2 extends CI_Controller {
                 );
                 $this->db->insert('db_employees.request_document',$dataSave);
                 return print_r(1);
+        }
+
+        if($data_arr['action']=='approved_all') {
+
+                $formInsert = (array) $data_arr['formInsert'];
+                $typerequest = $formInsert['typerequest'];
+                $IDuser = $this->session->userdata('NIP');
+                $datimes = date("Y-m-d H:i:s");;
+
+                $sql = 'SELECT * FROM db_employees.request_document WHERE ConfirmStatus = "0" ';
+                $data=$this->db->query($sql, array())->result_array();
+
+                if(count($data)>0) {
+                    for($d=0;$d<count($data);$d++) {
+
+                        $IDRequest = $data[$d]['IDRequest'];
+
+                        $this->db->set('ConfirmStatus', "1");
+                        $this->db->set('UserConfirm', $IDuser);
+                        $this->db->set('DateConfirm', $datimes);
+                        $this->db->where('IDRequest', $IDRequest);
+                        $this->db->update('db_employees.request_document');
+                        $this->db->reset_query();
+                    }
+                    return print_r(1);
+                }
+                else {
+                    return print_r(0);
+                }
+        }
+
+        if($data_arr['action']=='get_editrequest') {
+
+            $idrequest = $this->input->get('s');
+            $details = $this->db->query('SELECT a.*, b.Name, c.NameFiles
+                    FROM db_employees.request_document a
+                    LEFT JOIN db_employees.employees AS b ON (b.NIP = a.UserConfirm)
+                    LEFT JOIN db_employees.master_files AS c ON (a.IDTypeFiles = c.ID) WHERE a.IDRequest = "'.$idrequest.'" AND a.NIP = "'.$IDuser.'" ')->result_array();
+            echo json_encode($details);
+        }
+
+        if($data_arr['action']=='get_detailrequest') {
+
+            $idrequest = $this->input->get('s');
+            $details = $this->db->query('SELECT a.*, b.Name AS namaconfirm, c.NameFiles
+                    FROM db_employees.request_document a
+                    LEFT JOIN db_employees.employees AS b ON (b.NIP = a.UserConfirm)
+                    LEFT JOIN db_employees.master_files AS c ON (a.IDTypeFiles = c.ID) WHERE a.IDRequest = "'.$idrequest.'" AND a.NIP = "'.$IDuser.'" ')->result_array();
+            echo json_encode($details);
+        }
+
+        if($data_arr['action']=='delete_request') {
+
+            $dataid = $data_arr['requestID'];
+
+            $this->db->where('IDRequest', $dataid);
+            $this->db->delete('db_employees.request_document');
+            return print_r(1);
         }
 
     }
@@ -1327,6 +1385,7 @@ class C_api2 extends CI_Controller {
                 $Meet = $data_arr['Meet'];
                 $NIP = $data_arr['NIP'];
 
+
                 // Cek apakah data sudah ada
                 // 1. Jika ada maka data akan terupdate
                 // 2. Jika tidak ada maka insert
@@ -1341,7 +1400,9 @@ class C_api2 extends CI_Controller {
                     'Meet' => $Meet,
                     'Date' => $data_arr['Date'],
                     'In' => $data_arr['In'],
-                    'Out' => $data_arr['Out']
+                    'Out' => $data_arr['Out'],
+                    'ModifyBy' => $this->session->userdata('NIP'),
+                    'ModifyAt' => $this->m_rest->getDateTimeNow()
                 );
 
                 if(count($dataAttd)>0){
@@ -1362,7 +1423,8 @@ class C_api2 extends CI_Controller {
                 // Update Attendance
                 $dataUpAt = array(
                     'Meet'.$Meet => '1',
-                    'Date'.$Meet => $data_arr['Date']
+                    'Date'.$Meet => $data_arr['Date'],
+
                 );
                 $this->db->where('ID', $ID_Attd);
                 $this->db->update('db_academic.attendance',$dataUpAt);

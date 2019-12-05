@@ -7,6 +7,7 @@ class C_final_project extends Academic_Controler {
     {
         parent::__construct();
 //        $this->load->model('akademik/m_tahun_akademik');
+        $this->load->model('m_rest');
     }
 
 
@@ -35,6 +36,12 @@ class C_final_project extends Academic_Controler {
         $this->menu_transcript($page);
     }
 
+    public function mentor_final_project(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/finalproject/mentor_final_project',$data,true);
+        $this->menu_transcript($page);
+    }
+
     public function seminar_schedule(){
         $data['department'] = parent::__getDepartement();
         $page = $this->load->view('page/'.$data['department'].'/finalproject/seminar_schedule',$data,true);
@@ -60,15 +67,20 @@ class C_final_project extends Academic_Controler {
 
         $fileName = $this->input->get('fileName');
         $old = $this->input->get('old');
-        $id = $this->input->get('id');
+        $NPM = $this->input->get('NPM');
 
-        $config['upload_path']          = './uploads/ijazah_student/';
+        $pathStudent = './uploads/document/'.$NPM;
+        if (!file_exists($pathStudent)) {
+            mkdir($pathStudent, 0777, true);
+        }
+
+        $config['upload_path']          = $pathStudent.'/';
         $config['allowed_types']        = '*';
         $config['max_size']             = 8000; // 8 mb
         $config['file_name']            = $fileName;
 
-        if($old!='' && is_file('./uploads/ijazah_student/'.$old)){
-            unlink('./uploads/ijazah_student/'.$old);
+        if($old!='' && is_file($pathStudent.'/'.$old)){
+            unlink($pathStudent.'/'.$old);
         }
 
 
@@ -80,9 +92,34 @@ class C_final_project extends Academic_Controler {
         }
         else {
             // Sukses
-            $this->db->set('IjazahSMA', $fileName);
-            $this->db->where('ID', $id);
-            $this->db->update('db_academic.auth_students');
+
+            // Cek apakah sudah ada atau blm
+            $arrWhere = array(
+                'NPM' => $NPM,
+                'ID_reg_doc_checklist' => 3
+            );
+            $dataCK = $this->db->get_where('db_admission.doc_mhs',$arrWhere)->result_array();
+            $dataInsrt = array(
+                'NPM' => $NPM,
+                'ID_reg_doc_checklist' => 3,
+                'Status' => 'Done',
+                'Description' => 'Ijazah / SKHUN SMA from Academic',
+                'VerificationBy' => $this->session->userdata('NIP'),
+                'VerificationAT' => $this->m_rest->getDateTimeNow(),
+                'Attachment' => $fileName
+            );
+
+            print_r($dataInsrt);
+            print_r($dataCK);
+
+            if(count($dataCK)>0){
+                $this->db->where('ID' , $dataCK[0]['ID']);
+                $this->db->update('db_admission.doc_mhs',$dataInsrt);
+            } else {
+                $this->db->insert('db_admission.doc_mhs',$dataInsrt);
+            }
+
+
             return print_r(1);
         }
     }

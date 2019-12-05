@@ -12,7 +12,7 @@
 <div class="well">
     <div class="row">
 
-        <div class="col-md-3 form-data-edit">
+        <div class="col-md-3 form-data-edit" id="inputForm">
 
             <div class="form-group">
                 <label>Jenis Penggunaan</label>
@@ -36,7 +36,7 @@
             </div>
 
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9" id="ViewData">
 
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">

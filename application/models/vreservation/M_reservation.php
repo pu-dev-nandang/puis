@@ -387,10 +387,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
             $SemesterID = $SemesterID[0]['ID'];
 
             $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
-            $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+            $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array(); // dalam ujian
 
             $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
-            $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+            $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array(); // dalam ujian
             if (count($queryWaktu) == 0) {
                 if (count($queryWaktu2) > 0) {
                     $sql = "select a.ExamClassroomID,a.ID as ID_exam,a.ExamDate,a.ExamStart as StartSessions,a.ExamEnd as EndSessions,TIMEDIFF(CONCAT(curdate(),' ',a.ExamEnd), CONCAT(curdate(),' ',a.ExamStart)) as time,
@@ -430,7 +430,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                             where '".$date2."' >= (select z.kuliahStart from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1) 
                             and '".$date2."' <= (select z.kuliahEnd from db_academic.academic_years as z,db_academic.semester as x where z.SemesterID = x.ID and x.Status = 1 LIMIT 1)
                             and b.NameEng = ? and d.SemesterID = '".$SemesterID."'
-                            and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                            and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                             on a.ID = b.ID_Attd where b.Status = '2' and b.DateOriginal = '".$date2."')
                             order by a.Room";
                 }
@@ -713,10 +713,10 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     $SemesterID = $SemesterID[0]['ID'];
 
                     $sqlWaktu = 'select * from db_academic.academic_years where SemesterID = ? and (utsStart <="'.$date2.'" and utsEnd >= "'.$date2.'")';
-                    $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array();
+                    $queryWaktu=$this->db->query($sqlWaktu, array($SemesterID))->result_array(); // dalam ujian
 
                     $sqlWaktu2 = 'select * from db_academic.academic_years where SemesterID = ? and (uasStart <="'.$date2.'" and uasEnd >= "'.$date2.'")';
-                    $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array();
+                    $queryWaktu2=$this->db->query($sqlWaktu2, array($SemesterID))->result_array(); // dalam ujian
 
                 if (count($queryWaktu) == 0) {
                     if (count($queryWaktu2) > 0) {
@@ -765,8 +765,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                     or (
                                             c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
                                          )
-                                ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                                ) and a.Room = "'.$Room.'" and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                         on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
+                        // print_r($sql);die();
                     }
                 }
                 else
@@ -855,7 +856,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                                             or (
                                                 c.StartSessions <= "'.$TimeStart.'" and c.EndSessions >= "'.$TimeEnd.'"
                                             )
-                                        ) and a.Room = "'.$Room.'" and c.ID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
+                                        ) and a.Room = "'.$Room.'" and c.ScheduleID not in (select a.ScheduleID from db_academic.attendance as a join db_academic.schedule_exchange as b
                                 on a.ID = b.ID_Attd where b.Status = "2" and b.DateOriginal = "'.$date2.'")';
                                 $query=$this->db->query($sql, array())->result_array();
                                 if ($query[0]['total'] > 0) {
@@ -2437,14 +2438,69 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         break;
                     case 3:
                     case 4:
-                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(1,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover1 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
+                        
+                        // $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
                         $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
                         $StatusBooking = 'Awaiting<li><span style = "color:#0968b3;"> App 1 : '.$NameApprover1.'</span></li><li><span style = "color:red;"> App 2 : '.$NameApprover2.'</span></li>';
                         break;
                     case 5:
                         // $StatusBooking = 'Approved';
-                        $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
-                        $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(1,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover1 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
+                        // $NameApprover1 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        // $NameApprover2 = $this->Get_Approver(2,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        $checkRuleDivisioOrNot = $this->checkRuleDivisioOrNot(2,$query[$i]['ID']);
+                        if ($checkRuleDivisioOrNot) {
+                            // division
+                            $ApprovedBy1 =  $query[$i]['ApprovedBy1'];
+
+                            if (strlen($ApprovedBy1) > 3) {
+                                $Get_Em = $this->m_master->caribasedprimary('db_employees.employees','NIP',$ApprovedBy1);
+                                $NameApprover2 = $Get_Em[0]['Name'];
+                            }
+                            else
+                            {
+                                $NameApprover2 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                            }
+                        }
+                        else
+                        {
+                            $NameApprover2 = $this->Get_Approver(1,$getRoom[0]['ID_CategoryRoom'],$query[$i]['CreatedBy']);
+                        }
                         $StatusBooking = 'Approved<li><span style = "color:#0968b3;">App 1 : '.$NameApprover1.'</span></li><li><span style = "color:#0968b3;">App 2 : '.$NameApprover2.'</span></li>';
                         break;    
                     default:
@@ -2900,14 +2956,17 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
 
         // print_r($access);die();
 
-        $html = '';
+        $html = '<script type="text/javascript">
+          var MyVarEbombAccess2;
+        </script>
+        ';
         if ($access['read'] == 0) {
             $html .= '<script type="text/javascript">
                  var waitForEl = function(selector, callback) {
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -2924,6 +2983,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                          $(".btn-read").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -2935,7 +2997,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -2951,6 +3013,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                         $(".btn-add").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -2961,7 +3026,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -2977,6 +3042,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                               $(".btn-edit").remove();
                      });
                  });
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -2987,7 +3055,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3010,7 +3078,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                     });
                      
                  });
-                 
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -3032,7 +3102,7 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                    if (jQuery(selector).length) {
                      callback();
                    } else {
-                     setTimeout(function() {
+                     MyVarEbombAccess2 = setTimeout(function() {
                        waitForEl(selector, callback);
                      }, 100);
                    }
@@ -3057,7 +3127,9 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
                  waitForEl(".btn-delete-menu-auth", function() {
                    $(".btn-delete-menu-auth").remove();
                  });
-                 
+                 setTimeout(function () {
+                     clearTimeout(MyVarEbombAccess2);
+                 },20000);
                  </script>
             ';
             echo $html;
@@ -3865,5 +3937,67 @@ a.`delete`,c.`read` as readMenu,c.`update` as updateMenu,c.`write` as writeMenu,
         }
         
         return $Name;
+    }
+
+    public function checkRuleDivisioOrNot($ApprverNumber,$ID_t_booking)
+    {
+        $this->load->model('master/m_master');
+        $Bool = false; // selain division
+        $query = $this->m_master->caribasedprimary('db_reservation.t_booking','ID',$ID_t_booking);
+        $Room = $query[0]['Room'];
+        $getRoom = $this->m_master->caribasedprimary('db_academic.classroom','Room',$Room);
+        $CategoryRoomByRoom = $getRoom[0]['ID_CategoryRoom'];
+        $getDataCategoryRoom = $this->m_master->caribasedprimary('db_reservation.category_room','ID',$CategoryRoomByRoom);
+        $Approver1 = $getDataCategoryRoom[0]['Approver1'];
+        $Approver1 = json_decode($Approver1);
+        $CreatedBy = $query[0]['CreatedBy'];
+        $ID_group_user = $this->m_master->caribasedprimary('db_reservation.previleges_guser','NIP',$CreatedBy);
+        $ID_group_user = $ID_group_user[0]['G_user'];
+        if ($ApprverNumber == 1) {
+            for ($l=0; $l < count($Approver1); $l++) {
+                // find by ID_group_user
+                    if ($ID_group_user == $Approver1[$l]->UserType) {
+                        // get TypeApprover
+                        $TypeApprover = $Approver1[$l]->TypeApprover;
+                        if ($TypeApprover == 'Division') {
+                            $Bool = true;
+                            break;
+                        }
+                    }
+            } // end loop for
+        }
+        else
+        {
+            $Approver2Div = $getDataCategoryRoom[0]['Approver2'];
+            $Approver2Div = json_decode($Approver2Div);
+            for ($zz=0; $zz < count($Approver2Div); $zz++) { 
+                $rdata = $Approver2Div[$zz];
+                $TypeApprover = $rdata->TypeApprover;
+                if ($TypeApprover == 'Division') {
+                    $Bool = true;
+                    break;
+                }
+            }
+        }
+        return $Bool;
+    }
+
+    public function auth_approval($Username,$Password,$DivisionID){
+        $plan_password = $Username.''.$Password;
+        $pas = md5($plan_password);
+        $pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+        $sql = 'select count(*) as total
+                from db_employees.employees
+                where SPLIT_STR(PositionMain, ".", 1) = "'.$DivisionID.'" and NIP = "'.$Username.'"
+                and Password = "'.$pass.'"
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        if ($query[0]['total'] == 1) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

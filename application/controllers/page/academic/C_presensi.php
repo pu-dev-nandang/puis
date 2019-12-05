@@ -66,6 +66,13 @@ class C_presensi extends Academic_Controler {
         $this->menu_presensi($content);
     }
 
+    public function teaching_load()
+    {
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/presensi/teaching_load',$data,true);
+        $this->menu_presensi($page);
+    }
+
 
     //========================
 

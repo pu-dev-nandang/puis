@@ -13,19 +13,19 @@
     #dataTablesDataDosen tbody {
         display:block;
         height:520px;
-        width:2200px;
+        width:2800px;
         overflow:auto;
     }
     #dataTablesDataDosen thead,#dataTablesDataDosen tbody tr {
         display:table;
-        width:2200px;
+        width:2800px;
         table-layout:fixed; /* even columns width , fix width of table too*/
     }
     #dataTablesDataDosen thead {
         width: calc( 100% - 1em ) scrollbar is average 1em/16px width, remove it from thead width 
     }
     #dataTablesDataDosen table {
-        width:2200px;
+        width:2800px;
     }
 </style>
 Prodi : <span id="viewProdiID"></span> | <span id="viewProdiName"></span>
@@ -194,6 +194,18 @@ function LoadTableData(filterProdi)
                   if (key == 'rata2BimBingan' || key == 'rata2BimBinganAll') {
                     html_tbody += '<td>'+getCustomtoFixed(arr[key],1)+'</td>';
                   }
+                  else if(key == 'BobotKredit_lain'){
+                    var d = arr[key]; 
+                    var vv = d.value;
+                    if (vv == 0) {
+                         html_tbody += '<td>'+vv+'</td>';
+                    }
+                    else
+                    {
+                        html_tbody += '<td>'+'<a href = "javascript:void(0);" class = "datadetailCredit" data = "'+d.data+'">'+vv+'</a>'+'</td>';
+                    }
+                   
+                  }
                   else if(key == 'JMLDibimbingBy_PS')
                   {
                    var d = arr[key];
@@ -279,5 +291,44 @@ $(document).off('click', '.datadetail').on('click', '.datadetail',function(e) {
             'backdrop' : 'static'
         });
     }
-})    
+})
+
+$(document).off('click', '.datadetailCredit').on('click', '.datadetailCredit',function(e) {
+    var v = parseInt($(this).html());
+    if (v > 0) {
+        var dt = $(this).attr('data');
+        // console.log(dt);
+        dt = jwt_decode(dt);
+        var html =  '<div class = "row">'+
+                        '<div class = "col-md-12">'+
+                            '<table class = "table">'+
+                                '<thead>'+
+                                    '<tr>'+
+                                        '<td>No</td>'+
+                                        '<td>Mata Kuliah</td>'+
+                                        '<td>SKS</td>'+
+                                    '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                for (var i = 0; i < dt.length; i++) {
+                    html += '<tr>'+
+                                '<td>'+ (parseInt(i)+1) + '</td>'+
+                                '<td>'+ dt[i].data + '</td>'+
+                                '<td>'+ dt[i].SKS + '</td>'+
+                            '</tr>';    
+                }
+
+                html  += '</tbody></table></div></div>';                
+
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Detail</h4>');
+        $('#GlobalModal .modal-body').html(html);
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    }
+})
+    
 </script>

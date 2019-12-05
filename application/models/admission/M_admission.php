@@ -3175,8 +3175,13 @@ class M_admission extends CI_Model {
 
     }
 
-    public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun)
+    public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
+      $AddWhere = '';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") ';
+      if ($FormulirType != '%') {
+         $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
+      }
       $sql = 'select count(*) as total from (
               select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
               xq.DiscountType,
@@ -3214,23 +3219,32 @@ class M_admission extends CI_Model {
               on xq.ID = xy.TypeBeasiswa
               left join db_admission.formulir_number_offline_m as px
               on px.FormulirCode = c.FormulirCode
-              where a.SetTa = "'.$reqTahun.'"
+              where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
             ) ccc
           ';
-
+      if ($StatusPayment != '%') {
+         $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+      }
+         
       $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              #or chklunas LIKE "'.$requestData['search']['value'].'%" 
+              or DiscountType LIKE "'.$requestData['search']['value'].'%"
               or NameSales LIKE "'.$requestData['search']['value'].'%"
               or No_Ref LIKE "'.$requestData['search']['value'].'%"
                 )
-             and chklunas in ("Lunas","Belum Lunas") and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
+             and '.$AddWhere2.' and FormulirCode not in (select FormulirCode from db_admission.to_be_mhs)';
       $query=$this->db->query($sql, array())->result_array();
       return $query[0]['total'];
     }
 
-    public function getCountAllDataPersonal_Candidate($requestData,$reqTahun)
+    public function getCountAllDataPersonal_Candidate($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
+      $AddWhere = '';
+      $AddWhere2 = '';
+      if ($FormulirType != '%') {
+         $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
+      }
       $sql = 'select count(*) as total from (
                 select a.ID as RegisterID,a.Name,a.SchoolID,b.SchoolName,a.Email,a.VA_number,c.FormulirCode,e.ID_program_study,d.NameEng,d.Name as NamePrody, e.ID as ID_register_formulir,e.UploadFoto,
                 xq.DiscountType,
@@ -3244,7 +3258,8 @@ class M_admission extends CI_Model {
                         "Belum Lunas"
                   ) as chklunas,
                 (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-                ,xx.Name as NameSales
+                ,xx.Name as NameSales,
+                if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
                 from db_admission.register as a
                 join db_admission.school as b
                 on a.SchoolID = b.ID
@@ -3266,12 +3281,28 @@ class M_admission extends CI_Model {
                 on e.ID = xy.ID_register_formulir
                 LEFT JOIN db_admission.register_dsn_type_m as xq
                 on xq.ID = xy.TypeBeasiswa
-                where a.SetTa = "'.$reqTahun.'"
+                where a.SetTa = "'.$reqTahun.'" '.$AddWhere.'
               ) ccc';
-
-      $sql.= ' where Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
+      if ($StatusPayment != '%') {
+        if ($StatusPayment == '-100') {
+          
+          $AddWhere2 .= ' and (FormulirCode = "" or FormulirCode is NULL ) ';
+        }
+        elseif ($StatusPayment == '100') {
+           $AddWhere2 .= ' and FormulirCode != "" or FormulirCode is not NULL  ';
+        }
+        else{
+          $AddWhere2 .= ' and chklunas = "'.$StatusPayment.'" ';
+        }
+      }
+      $sql.= ' where (Name LIKE "'.$requestData['search']['value'].'%" or NamePrody LIKE "%'.$requestData['search']['value'].'%"
               or FormulirCode LIKE "'.$requestData['search']['value'].'%" or SchoolName LIKE "%'.$requestData['search']['value'].'%"
-              or chklunas LIKE "'.$requestData['search']['value'].'%" or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              #or chklunas LIKE "'.$requestData['search']['value'].'%" 
+              or DiscountType LIKE "'.$requestData['search']['value'].'%"
+              or NameSales LIKE "'.$requestData['search']['value'].'%"
+              or No_Ref LIKE "'.$requestData['search']['value'].'%"
+              )
+              '.$AddWhere2.'
               ';
 
       $query=$this->db->query($sql, array())->result_array();
@@ -3280,13 +3311,15 @@ class M_admission extends CI_Model {
 
     public function getSaleFormulirOfflineBetwwen($date1,$date2,$SelectSetTa,$SelectSortBy)
     {
-      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+      // print_r($SelectSortBy);die();
+      $sql = 'select * from (
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
                 b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
                 y.Name as NameProdi1,b.Channel,
                 if(b.ID_ProgramStudy2 = 0,"", (select Name from db_academic.program_study where ID = b.ID_ProgramStudy2 limit 1) ) as NameProdi2
                 from db_admission.formulir_number_offline_m as a
-                join db_admission.sale_formulir_offline as b
+                left join db_admission.sale_formulir_offline as b
                 on a.FormulirCode = b.FormulirCodeOffline
                 left join db_employees.employees as c
                 on c.NIP = b.PIC
@@ -3294,7 +3327,25 @@ class M_admission extends CI_Model {
                 on z.ID = b.SchoolID
                 left join db_academic.program_study as y
                 on b.ID_ProgramStudy = y.ID
-                where b.DateSale >= "'.$date1.'" and b.DateSale <= "'.$date2.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                where b.DateSale >= "'.$date1.'" and b.DateSale <= "'.$date2.'" and a.Years = ? 
+                UNION
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,1,c.Name as FullName,c.Phone as HomeNumber,c.Phone as PhoneNumber,DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") as DateSale,
+                                c.Email,"Online" as Sales,"Online" as PIC,"" as ID,c.PriceFormulir as Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,rf.Gender,
+                                "Online" as src_name,rf.ID_program_study,
+                                y.Name as NameProdi1,"Online" as Channel,
+                                "" as NameProdi2
+                                from db_admission.formulir_number_online_m as a
+                                left join db_admission.register_verified as b on a.FormulirCode = b.FormulirCode
+                                left join db_admission.register_formulir as rf on b.ID = rf.ID_register_verified
+                                left join db_admission.register_verification as d on d.ID =  b.RegVerificationID
+                                left join db_admission.register as c on c.ID = d.RegisterID
+                                left join db_admission.school as z
+                                on z.ID = c.SchoolID
+                                left join db_academic.program_study as y
+                                on rf.ID_program_study = y.ID
+                                where DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") >= "'.$date1.'" and DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") <= "'.$date2.'" and a.Years = '.$SelectSetTa.'
+              ) as a
+                order by '.$SelectSortBy.' asc
                 ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
       return $query;
@@ -3302,7 +3353,8 @@ class M_admission extends CI_Model {
 
     public function getSaleFormulirOfflinePerMonth($SelectMonth,$SelectYear,$SelectSetTa,$SelectSortBy)
     {
-      $sql = 'select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
+      $sql = 'select * from (
+              select a.FormulirCode,a.No_Ref,a.Years,a.Status,a.StatusJual,b.FullName,b.HomeNumber,b.PhoneNumber,b.DateSale,
                 b.Email,c.Name as Sales,b.PIC,b.ID,b.Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,b.Gender,
                 if(b.source_from_event_ID = 0,"", (select src_name from db_admission.source_from_event where ID = b.source_from_event_ID and Active = 1 limit 1) ) as src_name,b.ID_ProgramStudy,
                 y.Name as NameProdi1,b.Channel,
@@ -3316,7 +3368,26 @@ class M_admission extends CI_Model {
                 on z.ID = b.SchoolID
                 left join db_academic.program_study as y
                 on b.ID_ProgramStudy = y.ID
-                where YEAR(b.DateSale) = "'.$SelectYear.'" AND MONTH(b.DateSale) = "'.$SelectMonth.'" and a.Years = ? order by '.$SelectSortBy.' asc
+                where YEAR(b.DateSale) = "'.$SelectYear.'" AND MONTH(b.DateSale) = "'.$SelectMonth.'" and a.Years = ? 
+                UNION
+                select a.FormulirCode,a.No_Ref,a.Years,a.Status,1,c.Name as FullName,c.Phone as HomeNumber,c.Phone as PhoneNumber,DATE_FORMAT(b.VerificationAT, "%Y-%m-%d") as DateSale,
+                                c.Email,"Online" as Sales,"Online" as PIC,"" as ID,c.PriceFormulir as Price_Form,z.SchoolName as SchoolNameFormulir,z.CityName as  CityNameFormulir,z.DistrictName as DistrictNameFormulir,rf.Gender,
+                                "Online" as src_name,rf.ID_program_study,
+                                y.Name as NameProdi1,"Online" as Channel,
+                                "" as NameProdi2
+                                from db_admission.formulir_number_online_m as a
+                                left join db_admission.register_verified as b on a.FormulirCode = b.FormulirCode
+                                left join db_admission.register_formulir as rf on b.ID = rf.ID_register_verified
+                                left join db_admission.register_verification as d on d.ID =  b.RegVerificationID
+                                left join db_admission.register as c on c.ID = d.RegisterID
+                                left join db_admission.school as z
+                                on z.ID = c.SchoolID
+                                left join db_academic.program_study as y
+                                on rf.ID_program_study = y.ID
+                                where YEAR(b.VerificationAT) = "'.$SelectYear.'" and MONTH(b.VerificationAT) = "'.$SelectMonth.'" and a.Years = '.$SelectSetTa.'
+
+                ) as a
+                order by '.$SelectSortBy.' asc
                 ';
       $query=$this->db->query($sql, array($SelectSetTa))->result_array();
       return $query;
@@ -3677,7 +3748,7 @@ class M_admission extends CI_Model {
              n.ProvinceName as SchoolProvince,n.CityName as SchoolRegion,n.SchoolAddress,a.YearGraduate,a.UploadFoto,
              if((select count(*) as total from db_admission.register_nilai where Status = "Verified" and ID_register_formulir = a.ID limit 1) > 0,"Rapor","Ujian")
              as status1,p.CreateAT,p.CreateBY,b.FormulirCode,p.TypeBeasiswa,p.FileBeasiswa,p.Desc,
-             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,""  ) as No_Ref,p.RevID,n.CityName as CitySchool
+             if(d.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = b.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = b.FormulirCode limit 1)  ) as No_Ref,p.RevID,n.CityName as CitySchool
              from db_admission.register_formulir as a
              left JOIN db_admission.register_verified as b
              ON a.ID_register_verified = b.ID

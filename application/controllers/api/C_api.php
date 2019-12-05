@@ -11,15 +11,10 @@ class C_api extends CI_Controller {
         parent::__construct();
         header('Access-Control-Allow-Origin: *');
         header('Content-Type: application/json');
-        $this->load->model('m_api');
-        $this->load->model('m_rest');
-        $this->load->model('master/m_master');
-        $this->load->model('hr/m_hr');
-        $this->load->model('vreservation/m_reservation');
-        $this->load->model('akademik/m_tahun_akademik');
-        $this->load->model('notification/m_log');
-        $this->load->library('JWT');
-        $this->load->library('google');
+        /*UPDATED BY FEBRI @ NOV 2019*/
+        $this->load->model(array('m_api','m_rest','master/m_master','hr/m_hr','vreservation/m_reservation','akademik/m_tahun_akademik','notification/m_log','General_model'));
+        $this->load->library(array('JWT','google'));
+        /*END UPDATED BY FEBRI @ NOV 2019*/
 
 //        if($this->session->userdata('loggedIn')==false){
 //            $data = array(
@@ -103,29 +98,31 @@ class C_api extends CI_Controller {
     public function getLecturer(){
         $requestData= $_REQUEST;
 
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
 
-        if( !empty($requestData['search']['value']) ) {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        $whereDef = 'em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7"
+        OR em.PositionOther1 = "14.7" OR em.PositionOther2 = "14.7" OR em.PositionOther3 = "14.7"';
+
+        $totalData = $this->db->query('SELECT * FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
+      
+      
+      $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")  AND ( ';
-
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP) /*UPDATED BY FEBRI @ NOV 2019*/
+                        WHERE ('.$whereDef.')'; 
+        
+        if($requestData['isappv'] === 'true'){
+            $sql .= " AND (te.isApproval = 1) ";
+        }
+        if( !empty($requestData['search']['value']) ) {
+            $sql .= ' AND ( '; //UPDATED BY FEBRI @ NOV 2019
             $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY em.PositionMain, NIP ASC';
-
-        }
-        else {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng
-                        FROM db_employees.employees em
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        WHERE (em.PositionMain = "14.5" OR em.PositionMain = "14.6" OR em.PositionMain = "14.7")';
+        }else {
             $sql.= 'ORDER BY em.PositionMain, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
         }
 
         $query = $this->db->query($sql)->result_array();
@@ -148,7 +145,17 @@ class C_api extends CI_Controller {
 
             $imgEmp = url_img_employees.''.$row["Photo"];
 
-            $nestedData[] = $row["NIP"];
+            /*ADEDD BY FEBRI @ NOV 2019*/
+            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            $needAppv = "";
+            if(!empty($isRequested)){
+                if($this->session->userdata('IDdepartementNavigation') == 13){
+                    $needAppv = '<button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button>';
+                }
+            }
+            /*END ADEDD BY FEBRI @ NOV 2019*/
+
+            $nestedData[] = $row["NIP"].$needAppv;
             $nestedData[] = $row["NIDN"];
             $nestedData[] = '<div style="text-align: center;"><img src="'.$imgEmp.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
             $nestedData[] = '<a href="'.base_url('database/lecturer-details/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>';
@@ -254,17 +261,19 @@ class C_api extends CI_Controller {
     public function getreqdocument(){
         $requestData= $_REQUEST;
 
-        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+        $totalData = $this->db->query('SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                 FROM db_employees.request_document AS a
                 LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                 LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                 WHERE b.RequestDocument = 1 ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
-                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP) AND (a.UserConfirm = c.NIP)
+                    LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                     WHERE b.RequestDocument = 1  AND ( ';
 
             $sql.= ' c.Name LIKE "'.$requestData['search']['value'].'%" ';
@@ -274,10 +283,11 @@ class C_api extends CI_Controller {
 
         }
         else {
-            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind
+            $sql = 'SELECT a.*, b.ID, b.TypeFiles, b.NameFiles, c.Name, c.TitleAhead, c.TitleBehind, d.Name AS Namaconfirm
                     FROM db_employees.request_document AS a
                     LEFT JOIN db_employees.master_files AS b ON (a.IDTypeFiles = b.ID)
                     LEFT JOIN db_employees.employees AS c ON (a.NIP = c.NIP)
+                    LEFT JOIN db_employees.employees AS d ON (a.UserConfirm = d.NIP)
                     WHERE b.RequestDocument = 1 ';
             $sql.= 'ORDER BY a.IDRequest DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
@@ -300,7 +310,7 @@ class C_api extends CI_Controller {
             }else {
                 $endtimesz = '<div style="text-align:center;">'.date('d M Y H:i',strtotime($row['EndDate'])).'</div>';
             }
-            //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
+            
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NIP"].' - '.$row["Name"];
             $nestedData[] = $row["NameFiles"];
@@ -316,16 +326,16 @@ class C_api extends CI_Controller {
             $tokenPDF = $this->jwt->encode(array('NIP' => $NIP, 'IDRequest' => $IDRequest),'UAP)(*');
 
             if($row['ConfirmStatus'] == 0){
-                $status = '<button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button>';
+                $status = '<div class="btn-group"><button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button> <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div>';
             } else if($row['ConfirmStatus'] == 1) {
-                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> ';
+                $status = '<a target="_blank" href="'.base_url('save2pdf/suratTugasKeluar/'.$tokenPDF).'" type="button" class="btn btn-sm btn-success btn-round btn-action"> <i class="fa fa-download"></i> Download </a> <div> <p style="color:blue;font-size:11px;"> Approved By '.$row["Namaconfirm"].'</p> </div>';
             } else {
 
-                $status = '<label class="text-danger"> Rejected</label>';
+                $status = '<label class="text-danger"> Rejected <div> <p style="color:blue;font-size:11px;"> Rejected By '.$row["Namaconfirm"].'</p> </div></label>';
             }
 
 
-            $nestedData[] = '<center><div class="btn-group">'.$status.'</div></center>';
+            $nestedData[] = '<center>'.$status.' </center>';
             //$nestedData[] = '<center><div class="btn-group">
             //  <button type="button" class="btn btn-sm btn-success btn-round btn-action btnapproved" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-ok-sign"></i> Approved </button>
             //  <button type="button" class="btn btn-sm btn-danger btn-round btn-addgroup btnrejected" requestid="'.$row["IDRequest"].'"> <i class="glyphicon glyphicon-remove-sign"></i> Rejected</button></div></center>';
@@ -432,30 +442,28 @@ class C_api extends CI_Controller {
 
         $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
-        if( !empty($requestData['search']['value']) ) {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        
+        /*UPDATED BY FEBRI @ NOV 2019*/
+        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
                         LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                        WHERE em.StatusEmployeeID != -2 '.$whereStatus.' AND ( ';
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+        if($requestData['isappv'] === 'true'){
+            $sql .= " AND (te.isApproval = 1) ";
+        }
 
-            $sql.= ' em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+        if( !empty($requestData['search']['value']) ) {
+            $sql.= ' AND ( em.NIP LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
             $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
             $sql.= ') ORDER BY NIP  ASC';
-
-        }
-        else {
-            $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                        FROM db_employees.employees em
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+        }else {
             $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-
         }
+        /*END UPDATED BY FEBRI @ NOV 2019*/
 
         $query = $this->db->query($sql)->result_array();
         $data = array();
@@ -483,10 +491,20 @@ class C_api extends CI_Controller {
 
             $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
             $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
+            
+
+            $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            $needAppv = "";
+            if(!empty($isRequested)){
+                if($this->session->userdata('IDdepartementNavigation') == 13){
+                    $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
+                }
+            }
+
             $nestedData[] = '<a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row["Name"].'</a>
                                 '.$emailPU.'
                                 <br/>NIK : '.$row["NIP"].'
-                                '.$nidn;
+                                '.$nidn.$needAppv;
 //            $nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = $Division.'<br/>'.$Position;
             $nestedData[] = $row["Address"];
@@ -2628,7 +2646,7 @@ class C_api extends CI_Controller {
 
     public function getdatarequestdocument(){
 
-        $status = $this->input->get('s');
+        //$status = $this->input->get('s');
         $requestData= $_REQUEST;
         $NIP = $this->session->userdata('NIP');
 
@@ -2669,7 +2687,7 @@ class C_api extends CI_Controller {
             $stats = ($row["Active"]=='1') ? 'Active' : 'Non Active';
 
             $StartDate = date('d M Y H:i',strtotime($row['StartDate']));
-            $EndDate = date(' d M Y H:i',strtotime($row['EndDate']));
+            $EndDate = date('d M Y H:i',strtotime($row['EndDate']));
 
             if($row['ConfirmStatus'] == 1) {
 
@@ -2678,30 +2696,33 @@ class C_api extends CI_Controller {
                     'IDRequest' => $row['IDRequest']
                 ),'UAP)(*');
                 $linksurat = base_url('save2pdf/suratTugasKeluar/'.$token);
-                $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank"><i class="fa fa-download"></i></a> ';
+                $buttonlink = '<a href="'.$linksurat.'" class="btn btn-success btn-circle" target="_blank" data-toggle="tooltip" data-placement="top" title="Download"><i class="fa fa-download"></i></a> ';
+
             } else if($row['ConfirmStatus'] == -1) {
-                $buttonlink = '<p class="text-danger"> Rejected </p>';
+                $buttonlink = '<p style="color:red;"> Rejected </p>';
             } else {
-                $buttonlink = '<p class="text-primary"> Waiting Approved </p>';
+                $buttonlink = '<p style="color:blue;"> Waiting Confirmation </p>';
             }
 
             if($row['DateConfirm'] == '0000-00-00 00:00:00' ) {
                 $dateconfirms = '';
             } else {
                 $datex = $row['DateConfirm'];
-                $dateconfirms = date("d M Y h:i",strtotime($row['DateConfirm']));
+                $dateconfirms = date("d M Y H:i",strtotime($row['DateConfirm']));
             }
 
             //$nestedData[] = ($row["Gender"]=='P') ? 'Female' : 'Male';
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$row["NIP"].' - '.$row["Name"].'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
+            //$nestedData[] = '<div style="text-align: center;">'.$row["TypeFiles"].'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["ForTask"].'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$StartDate.'</div>';
-            $nestedData[] = '<div style="text-align: center;">'.$EndDate.'</div>';
+            $nestedData[] = '<div style="text-align: center;">'.$StartDate.'  -  '.$EndDate.'</div>';
             $nestedData[] = '<div style="text-align: left;">'.$row["DescriptionAddress"].'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$dateconfirms.'</div>';
             $nestedData[] = '<div style="text-align: center;">'.$buttonlink.'</div>';
+            $nestedData[] = '<div style="text-align: center;">
+            <button class="btn btn-sm btn-circle btn-primary btndetailrequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Detail"><i class="icon-list icon-large"></i> </button> 
+            <button class="btn btn-sm btn-circle btn-danger btndeleterequest" requestid ="'.$row["IDRequest"].'" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i> </button></div>';
             $no++;
             $data[] = $nestedData;
         }
@@ -2715,8 +2736,6 @@ class C_api extends CI_Controller {
         echo json_encode($json_data);
 
     }
-
-
 
 
     public function getversiondetail(){
@@ -3924,6 +3943,14 @@ class C_api extends CI_Controller {
                 $NIP = $data_arr['NIP'];
                 $data = $this->m_api->__getLecturerDetail($NIP);
                 return print_r(json_encode($data));
+            }
+
+            else if($data_arr['action']=='getLecturerStatus'){
+
+                $data = $this->db->query('SELECT * FROM db_employees.employees_status WHERE Type = "lec" OR Type = "both" ORDER BY IDStatus DESC ')->result_array();
+
+                return print_r(json_encode($data));
+
             }
 
             else if($data_arr['action']=='readMini'){
@@ -5812,6 +5839,35 @@ class C_api extends CI_Controller {
                             }
                         }
                     }
+
+                    // send email to IT
+                        $DescriptionWr = '<p>Dear Team,<br/> Berikut dibawah ini Create Employee  by '.$this->session->userdata('Name').', <br/>
+                                         <p>Username PC : '.$arr_callback['UsernamePC'].'</p>
+                                         <p>Username Aplikasi PCAM : '.$arr_callback['UsernamePCam'].'</p>
+                                         <p>Password : '.$arr_callback['Password'].'</p>
+                                         <p>Email PU : '.$arr_callback['EmailPU'].'</p>
+                                        ';
+                        $ToEmail = ($_SERVER['SERVER_NAME']=='pcam.podomorouniversity.ac.id') ? array(
+                                      'Div' => array(12,13),
+                                    ) : array(
+                                          'NIP' => array('2018018'),
+                                        );  
+                        $data = array(
+                            'auth' => 's3Cr3T-G4N',
+                            'Logging' => array(
+                                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>  Create Employee '.$Name.' by '.$this->session->userdata('Name'),
+                                            'Description' => $DescriptionWr,
+                                            'URLDirect' => 'ShowLoggingNotification',
+                                            'CreatedBy' => $this->session->userdata('NIP'),
+                                          ),
+                            'To' => $ToEmail,
+                            'Email' => 'Yes', 
+                        );
+
+                        $url = url_pas.'rest2/__send_notif_browser';
+                        $token = $this->jwt->encode($data,"UAP)(*");
+                        $this->m_master->apiservertoserver($url,$token);
+                    // send email to IT
 
                     // insert to db venue for user access
                     $dataSave = array(
@@ -8511,37 +8567,84 @@ class C_api extends CI_Controller {
                 $data = $this->db->query('SELECT ats.*,    
                                         em1.Name AS MentorFP1Name, em1.TitleAhead AS TitleAhead1, em1.TitleBehind AS TitleBehind1, 
                                         em2.Name AS MentorFP2Name, em2.TitleAhead AS TitleAhead2, em2.TitleBehind AS TitleBehind2,
-                                        fp.TitleInd, fp.TitleEng
+                                        fp.TitleInd, fp.TitleEng, fpc.Cl_Library, fpc.Cl_Library_By, fpc.Cl_Library_At, emp1.Name AS Cl_Library_Name,
+                                        fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, emp2.Name AS Cl_Finance_Name,
+                                        fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, emp3.Name AS Cl_Kaprodi_Name,
+                                        fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name
+                                        
                                         FROM db_academic.auth_students ats
                                         LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
                                         LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2) 
                                         LEFT JOIN db_academic.final_project fp ON (ats.NPM = fp.NPM)
+                                        LEFT JOIN db_academic.final_project_clearance fpc ON (fpc.NPM = ats.NPM)
+                                        
+                                        LEFT JOIN db_employees.employees emp1 ON (fpc.Cl_Library_By = emp1.NIP)
+                                        LEFT JOIN db_employees.employees emp2 ON (fpc.Cl_Finance_By = emp2.NIP)
+                                        LEFT JOIN db_employees.employees emp3 ON (fpc.Cl_Kaprodi_By = emp3.NIP)
+                                        LEFT JOIN db_employees.employees emp6 ON (fpc.Cl_Academic_By = emp6.NIP)
+                                        
                                         WHERE ats.NPM = "'.$data_arr['NPM'].'" ')->result_array();
 
                 return print_r(json_encode($data));
             }
-            else if($data_arr['action']=='viewRegistrationSchedule'){
 
-                $SemesterID = $data_arr['SemesterID'];
+            else if($data_arr['action']=='viewMyScheduleSeminar'){
 
-                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
-                    'SemesterID' => $SemesterID
-                ))->result_array();
+                $NPM = $data_arr['NPM'];
 
-                // Check
-                $getDateNow = $this->m_rest->getDateNow();
+                $data = $this->db->query('SELECT fps.*, cl.Room, em1.Name AS Mentor1, em2.Name AS Mentor2 FROM db_academic.final_project_schedule_student fpss 
+                                                      LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                      LEFT JOIN db_academic.classroom cl ON (cl.ID = fps.ClassroomID)
+                                                      
+                                                      LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                      LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+                                                      LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+                                                      
+                                                      WHERE fpss.NPM = "'.$NPM.'" ORDER BY fps.ID ASC ')->result_array();
 
-                $TARegStart = $data[0]['TARegStart'];
-                $TARegEnd = $data[0]['TARegEnd'];
+                if(count($data)>0){
+                    for($i=0;$i<count($data);$i++){
 
-                $sw = 0;
-                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
-                    $sw = 1;
+                        // Get Pengawas
+                        $data[$i]['Examiner'] = $this->db->query('SELECT em.Name, em.NIP, fpsl.Type FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                                                LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                                                WHERE fpsl.FPSID = "'.$data[$i]['ID'].'" ORDER BY fpsl.Type DESC ')->result_array();
+
+                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.final_project_schedule_student fpss 
+                                                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM) 
+                                                                                WHERE fpss.FPSID = "'.$data[$i]['ID'].'"')->result_array();
+
+                    }
                 }
 
-                $data[0]['Show'] = $sw;
-
                 return print_r(json_encode($data));
+
+            }
+
+            else if($data_arr['action']=='viewRegistrationSchedule'){
+
+//
+//
+//                $SemesterID = $data_arr['SemesterID'];
+//
+//                $data = $this->db->select('TARegStart,TARegEnd')->get_where('db_academic.academic_years',array(
+//                    'SemesterID' => $SemesterID
+//                ))->result_array();
+//
+//                // Check
+//                $getDateNow = $this->m_rest->getDateNow();
+//
+//                $TARegStart = $data[0]['TARegStart'];
+//                $TARegEnd = $data[0]['TARegEnd'];
+//
+//                $sw = 0;
+//                if(strtotime($TARegStart) <= strtotime($getDateNow) && strtotime($TARegEnd) >= strtotime($getDateNow)){
+//                    $sw = 1;
+//                }
+//
+//                $data[0]['Show'] = $sw;
+//
+//                return print_r(json_encode($data));
 
             }
             else if($data_arr['action']=='viewDocumentSkripsi'){
@@ -8702,13 +8805,29 @@ class C_api extends CI_Controller {
             }
             else if($data_arr['action']=='getAllStdReg'){
 
-                $Status = $data_arr['Status'];
-                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2  
-                                                    FROM db_academic.final_project fp
-                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
-                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
-                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
-                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
+                $SemesterID = '15';
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, em4.Name AS Mentor1, em5.Name AS Mentor2
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        
+                                        LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
+                                        
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" ORDER BY ats.NPM';
+
+                $data = $this->db->query($queryDefault)->result_array();
+
+
+
+//                $Status = $data_arr['Status'];
+//                $data = $this->db->query('SELECT ats.Name, ats.NPM, em1.Name AS Mentor1, em2.Name AS Mentor2
+//                                                    FROM db_academic.final_project fp
+//                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fp.NPM)
+//                                                    LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
+//                                                    LEFT JOIN db_employees.employees em2 ON (em2.NIP = ats.MentorFP2)
+//                                                    WHERE fp.Status = "'.$Status.'" ')->result_array();
 
                 return print_r(json_encode($data));
 
@@ -8904,9 +9023,12 @@ class C_api extends CI_Controller {
         $arr_result = array();
         $NA = $this->m_master->caribasedprimary('db_employees.division','StatusDiv',1);
         if (isset($_POST)) {
-            if ($_POST['Show'] == 'all') {
-                $NA = $this->m_master->showData_array('db_employees.division');
+            if (array_key_exists('Show', $_POST)) {
+                if ($_POST['Show'] == 'all') {
+                    $NA = $this->m_master->showData_array('db_employees.division');
+                }
             }
+            
         }
         $AC = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
         $FT = $this->m_master->caribasedprimary('db_academic.faculty','StBudgeting',1);
@@ -8979,6 +9101,62 @@ class C_api extends CI_Controller {
                 return print_r(1);
 
             }
+
+            else if($data_arr['action']=='readStudentFromSKPI'){
+
+                $requestData= $_REQUEST;
+                $ClassOf = $data_arr['ClassOf'];
+                $StatusStudentID = $data_arr['StatusStudentID'];
+                $WhereProdiID = ($data_arr['ProdiID']!='') ? ' AND ats.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" )';
+                }
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, ps.Name AS ProdiName, ss.Description FROM db_academic.auth_students ats 
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                                WHERE ats.Year = "'.$ClassOf.'" AND ats.StatusStudentID = "'.$StatusStudentID.'" '.$WhereProdiID.' '.$dataSearch.' ORDER BY ats.NPM ';
+
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++) {
+
+                    $nestedData = array();
+                    $row = $query[$i];
+
+                    $token = $this->jwt->encode(array('NPM' => $row['NPM']),"UAP)(*");;
+
+                    $nestedData[] = '<div>'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$row['ProdiName'].'</div>';
+                    $nestedData[] = '<div>'.$row['Description'].'</div>';
+                    $nestedData[] = '<div><a href="'.base_url('save2pdf/cetakSKPI/'.$token).'" target="_blank" class="btn btn-sm btn-default btn-default-primary">Show SKPI</a></div>';
+
+                    $data[] = $nestedData;
+                    $no++;
+
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+
+            }
         }
     }
 
@@ -8988,13 +9166,16 @@ class C_api extends CI_Controller {
 
         $dataWhere = '';
 
-        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!=''){
+        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!='' 
+            || !empty($data_arr['approvalStudentReq'])  ){
             $w_Year = ($data_arr['Year']!='') ?  ' AND aut_s.Year = "'.$data_arr['Year'].'"' : '';
             $w_ProdiID = ($data_arr['ProdiID']!='') ?  ' AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
             $w_GroupProdiID = ($data_arr['GroupProdiID']!='') ?  ' AND aut_s.ProdiGroupID = "'.$data_arr['GroupProdiID'].'"' : '';
             $w_StatusStudents = ($data_arr['StatusStudents']!='') ?  ' AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'"' : '';
+            $w_NeedApprovalReq = ($data_arr['approvalStudentReq']!='') ?  ' AND (ts.ID is not null  and ts.isApproval = 1)' : '';
 
-            $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.')';
+
+            $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.''.$w_NeedApprovalReq.')';
 
             $exp_w = explode(' ',$dataWherePlan);
             if(count($exp_w)>0){
@@ -9039,6 +9220,7 @@ class C_api extends CI_Controller {
                                             select FormulirCode,No_Ref from db_admission.formulir_number_online_m
                                         ) dd on a.FormulirCode = dd.FormulirCode
                                       ) as fma on fma.NPM = aut_s.NPM
+        /*Added by Febri @ Nov 2019*/ LEFT JOIN db_academic.tmp_students ts on (ts.NPM = aut_s.NPM) /*End Added by Febri @ Nov 2019*/
                                       '.$dataWhere.' '.$dataSearch.' ORDER BY aut_s.NPM ASC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -9077,8 +9259,15 @@ class C_api extends CI_Controller {
                           </button>
                           <ul class="dropdown-menu">
                             <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
-                            <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>
-                            <li role="separator" class="divider"></li>
+                            <li><a href="'.base_url('database/students/edit-students/'.$db_.'/'.$row['NPM'].'/'.$nameS).'">Edit (Coming Soon)</a></li>';
+            
+            /*UPDATED BY FEBRI @ NOV 2019*/
+            $isRequested = $this->General_model->fetchData("db_academic.tmp_students",array("NPM"=>$row['NPM'],"isApproval"=>1))->row();
+            $requested = (!empty($isRequested) ? '':'disabled');
+            $btnAct .=      '<li class="'.$requested.'"><a  href="javascript:void(0);" class="show-request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'">Request Approval</a></li>';
+            /*END UPDATED BY FEBRI @ NOV 2019*/
+
+            $btnAct .=      '<li role="separator" class="divider"></li>
                             <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$row['EmailPU'].'"
                             data-year="'.$row['Year'].'" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'"
                             data-statusid="'.$row['StatusStudentID'].'">Change Status</a>
@@ -9086,8 +9275,6 @@ class C_api extends CI_Controller {
                             <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$row['NPM'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImage.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
                           </ul>
                         </div>';
-
-
 
             $fm = '<input id="formTypeImage'.$row['NPM'].'" class="hide" />
             <form id="fmPhoto'.$row['NPM'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
@@ -9116,7 +9303,12 @@ class C_api extends CI_Controller {
 
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].'</div>';
+            /*UPDATED BY FEBRI @ NOV 2019*/
+            if($DeptID==6 || $DeptID=='6'){
+                $needAppv = (!empty($isRequested) ? '<br><span class="btn btn-xs btn-info show-request" title="Need Accepting Request" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" > <i class="fa fa-warning"></i> Need Approval</span>':'');
+            }else{$needAppv="";}
+            $nestedData[] = '<div  style="text-align:center;">'.$row['NPM'].$needAppv   .'</div>';
+            /*END UPDATED BY FEBRI @ NOV 2019*/
             $nestedData[] = '<div  style="text-align:center;"><img id="imgThum'.$row['NPM'].'" src="'.$srcImage.'" style="max-width: 35px;" class="img-rounded"></div>';
             $nestedData[] = '<div  style="text-align:left;"><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-ta="'.$row['Year'].'" class="btnDetailStudent"><b>'.ucwords(strtolower($row['Name'])).'</b></a>
                                                             <br/><span style="color: #c77905;">'.$row['EmailPU'].'</span>'.$StrFM.'</div>
@@ -9548,13 +9740,6 @@ class C_api extends CI_Controller {
                 $GraduationDate = $dataUpdtAuth['GraduationDate'];
                 if ($GraduationDate != '' && $GraduationDate != null) {
                     $GraduationYear = date('Y', strtotime($GraduationDate));
-                    $dataUpdate->StatusStudentID = 1;
-                    $dataUpdtAuth['StatusStudentID'] = 1;
-                }
-                else
-                {
-                    $dataUpdate->StatusStudentID = 3;
-                    $dataUpdtAuth['StatusStudentID'] = 3;
                 }
                 $dataUpdate->GraduationYear = $GraduationYear;
 
