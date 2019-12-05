@@ -41,7 +41,7 @@
 	include $QR_BASEDIR."qrmask.php";
 	include $QR_BASEDIR."qrencode.php";
 
-class qrlib extends QRcode {
+class Qrlib extends QRcode {
 
 
 }
