@@ -9,10 +9,12 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->library('JWT');
         $this->load->library('pdf');
         $this->load->library('pdf_mc_table');
+        $this->load->library('Qrcode/qrlib');
 
         $this->load->model('m_rest');
         $this->load->model('master/m_master');
         $this->load->model('report/m_save_to_pdf');
+
 
         date_default_timezone_set("Asia/Jakarta");
         setlocale(LC_ALL, 'id_ID.UTF8', 'id_ID.UTF-8', 'id_ID.8859-1', 'id_ID', 'IND.UTF8', 'IND.UTF-8', 'IND.8859-1', 'IND', 'Indonesian.UTF8', 'Indonesian.UTF-8', 'Indonesian.8859-1', 'Indonesian', 'Indonesia', 'id', 'ID', 'en_US.UTF8', 'en_US.UTF-8', 'en_US.8859-1', 'en_US', 'American', 'ENG', 'English');
@@ -7444,8 +7446,11 @@ Phone: (021) 29200456';
             $G = 226;
             $B = 226;
 
+            $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
+            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
             $pdf->Image('./images/new_logo_pu.png',10,10,50);
-            $pdf->Image('./images/SKPI/frame2.png',174.5,11,20);
+            $pdf->Image('./images/SKPI/frame.png',176,12.5,17);
+            $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
 
             $pdf->Ln(17);
 
@@ -7459,7 +7464,7 @@ Phone: (021) 29200456';
             $pdf->Cell(0,$h,'Number : 032/UAP/SKPI-'.$d['CertificateSerialNumber'].'/'.$bulanRomawi.'/'.$d['GraduationYear'],$border,1,'C');
 
             $pdf->SetFont('dinprolight','',7);
-            $pdf->Cell(0,2,'https://uap.ac.id/ds/'.$NPM,$border,1,'R');
+            $pdf->Cell(0,2,$URLQrCode,$border,1,'R');
             $pdf->Ln(4);
             $pdf->SetFont('dinprolight','',$fontBody);
             $pdf->MultiCell($fullWidth,$h,"The Diploma Supplement accompanies a higher education certificate providing a standardized description oh the nature, level, context, content and status of the studies completed by its holder.",0);
