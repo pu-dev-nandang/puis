@@ -213,6 +213,9 @@
             '        <th style="width: 20%;">Keahlian</th>  '+
             '        <th style="width: 20%;">Rekognisi</th>  '+
             '        <th style="width: 10%;">Tahun</th>  '+
+            '        <th style="width: 10%;">Tingkat</th>  '+
+            '        <th style="width: 10%;">Sertifikat</th>  '+
+            '        <th style="width: 10%;">Status Approval</th>  '+
             '        <th class="noExl" style="width: 5%;"><i class="fa fa-cog"></i></th>  '+
             '    </tr>  '+
             '    </thead>  '+
@@ -245,14 +248,30 @@
                         '    <li><a href="javascript:void(0);" class="btnActRemove" data-id="'+v.ID+'" data-no="'+i+'">Remove</a></li>' +
                         '  </ul>' +
                         '</div>';
-
+                    var labelStatusApv = "";
+                    if(v.isApproved == 1) {labelStatusApv="<span class='label label-info'>Wait approval</span>";}
+                    else if(v.isApproved == 2) {labelStatusApv="<span class='label label-primary'>Approved</span>";}
+                    else if(v.isApproved == 3) {labelStatusApv="<span class='label label-danger'>Rejected</span>";}
+                    else{labelStatusApv="UNKNOW";}
+                    var labelApvBy = "";
+                    if(v.isApproved == 2 &&(v.approvedBy != "" || v.approvedBy)){labelApvBy = "<br><small>Approved by "+v.approvedBy+"</small>";}
+                    if(v.isApproved == 3) {labelApvBy = "<br><small>Rejected by "+v.UpdatedBy+"</small>";}
+                    var vBtnAct ="";
+                    if(v.approvedBy){
+                        var splitApproved = v.approvedBy.split("/");
+                        console.log(splitApproved);
+                        vBtnAct = ((splitApproved[0] == "<?=$this->session->userdata('NIP')?>") ? btnAct:'')
+                    }
                     $('#listData').append('<tr>' +
                         '   <td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                         '   <td style="text-align: left;">'+v.Name+'</td>' +
                         '   <td style="text-align: left;">'+v.Bidang_keahlian+'</td>' +
                          '   <td style="text-align: left;">'+v.Rekognisi+'</td>' +
-                        '   <td>'+v.Tahun+'</td>' +
-                        '   <td class="noExl" style="text-align: left;border-left: 1px solid #ccc;">'+btnAct+'</td>' +
+                         '   <td>'+v.Tahun+'</td>' +
+                         '   <td style="text-align: left;">'+v.Tingkat+'</td>' +
+                            '<td><a class="btn btn-xs btn-primary" target="_blank" href="'+base_url_js+'uploads/Agregator/Aps/'+v.BuktiPendukungUpload+'">View PDF</a></td>' +
+                         '   <td>'+labelStatusApv+labelApvBy+'</td>' +                            
+                        '   <td class="noExl" style="text-align: left;border-left: 1px solid #ccc;">'+vBtnAct+'</td>' +
                         '</tr>');
 
                     // var total = parseInt(jsonResult.length);
