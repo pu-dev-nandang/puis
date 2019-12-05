@@ -381,12 +381,12 @@ class C_api_prodi extends CI_Controller {
                         $this->db->update('db_prodi.prodi_sambutan',$dataupdate);
                         unlink($path);
                       }
-                      else{
-                        $ID = $query[0]['ID'];
-                        $dataupdate['Photo'] = $upload;
-                        $this->db->where('ID',$ID);
-                        $this->db->update('db_prodi.prodi_sambutan',$dataupdate);
-                      }
+                      // else{
+                      //   $ID = $query[0]['ID'];
+                      //   $dataupdate['Photo'] = $upload;
+                      //   $this->db->where('ID',$ID);
+                      //   $this->db->update('db_prodi.prodi_sambutan',$dataupdate);
+                      // }
                        
                 }
 
@@ -576,18 +576,21 @@ class C_api_prodi extends CI_Controller {
         }
         else if ($data_arr['action']=='deleteDataLecturer') 
         {
-            $sql = 'select * from db_prodi.lecturer  where ProdiID= ?';
+            $sql = 'select * from db_prodi.lecturer  where ID= ?';
             $ProdiID = $prodi_active_id;
-            $query = $this->db->query($sql, array($ProdiID))->result_array();
-
             $ID = $data_arr['ID'];
+            $query = $this->db->query($sql, array($ID))->result_array();
+
+            $ID = $query[0]['ID'];
+            $arr_file =  $query[0]['Photo'];
+            
             $this->db->where('ID', $ID);
             $this->db->delete('db_prodi.lecturer'); 
             //delete images
-            $arr_file =  $query[0]['Photo'];
+            
             $path = './images/Lecturer/'. $arr_file;
             unlink($path);
-            
+           
             return print_r(1);
         }
 

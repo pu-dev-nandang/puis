@@ -76,6 +76,7 @@
 
                     $temp[] = $temp2;
 
+
                 }
 
                 $open = (count($temp) > 0) ? 'open' : '';
