@@ -11,6 +11,8 @@
 /uploads/employees/*.jpg
 /uploads/employees/*.png
 
+/uploads/certificate/*.pdf
+
 /uploads/students/ta_2014/*.jpeg
 /uploads/students/ta_2014/*.jpg
 /uploads/students/ta_2014/*.png
