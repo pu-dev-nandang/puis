@@ -24,6 +24,7 @@
                     <th style="width: 5%;">Level</th>
                     <th style="width: 5%;">Type</th>
                     <th style="width: 10%;">Achievement</th>
+                    <th style="width: 5%;">Certificate</th>
                     <th style="width: 10%;">Status Approval</th>
                     <th style="width: 5%;"><i class="fa fa-cog"></i></th>
                     <th style="width: 25%;">Member</th>
@@ -79,9 +80,9 @@
                         '    <i class="fa fa-edit"></i> <span class="caret"></span>' +
                         '  </button>' +
                         '  <ul class="dropdown-menu">' +
-                        '    <li class="'+disabled+'"><a href="'+link+'" >Edit</a></li>' +
+                        '    <li><a href="'+base_url_js+'student-life/student-achievement/update-data-achievement?id='+v.ID+'" >Edit</a></li>' +
                         '    <li role="separator" class="divider"></li>' +
-                        '    <li><a href="javascript:void(0);" class="actRemove" data-id="'+v.ID+'">Remove</a></li>' +
+                        '    <li class="'+disabled+'"><a href="javascript:void(0);" class="actRemove" data-id="'+v.ID+'">Remove</a></li>' +
                         '  </ul>' +
                         '</div>';
 
@@ -105,6 +106,7 @@
                         '<td>'+v.Level+'</td>' +
                         '<td>'+lbl+'</td>' +
                         '<td>'+v.Achievement+'</td>' +
+                        '<td><a class="btn btn-xs btn-primary" target="_blank" href="'+base_url_js+'uploads/certificate/'+v.Certificate+'">View PDF</a></td>' +
                         '<td style="border-right: 1px solid #ccc;">'+labelStatusApv+labelApvBy+'</td>' +
                         '<td>'+btnAct+'</td>' +
                         '<td style="text-align: left;">'+member+'</td>' +
@@ -122,27 +124,28 @@
     }
 
     $(document).on('click','.actRemove',function () {
+        if( !$(this).parent().hasClass('disabled') ){
+            if(confirm('Are you sure?')){
+                loading_modal_show();
 
-        if(confirm('Are you sure?')){
-            loading_modal_show();
+                var ID = $(this).attr('data-id');
 
-            var ID = $(this).attr('data-id');
+                var data = {
+                    action : 'removePAM',
+                    ID : ID
+                };
 
-            var data = {
-                action : 'removePAM',
-                ID : ID
-            };
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api3/__crudAgregatorTB5';
 
-            var token = jwt_encode(data,'UAP)(*');
-            var url = base_url_js+'api3/__crudAgregatorTB5';
-
-            $.post(url,{token:token},function (result) {
-                toastr.success('Data removed','Success');
-                setTimeout(function () {
-                    loadDataachievement();
-                    loading_modal_hide();
-                },500);
-            });
+                $.post(url,{token:token},function (result) {
+                    toastr.success('Data removed','Success');
+                    setTimeout(function () {
+                        loadDataachievement();
+                        loading_modal_hide();
+                    },500);
+                });
+            }
         }
 
 

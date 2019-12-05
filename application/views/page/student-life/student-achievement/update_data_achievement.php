@@ -88,10 +88,12 @@
 
             <div class="form-group">
                 <label>Sertifikat (Kompetensi/Profesi/Industri)</label>
-                <p style="color: #673ab7;font-size: 12px;">*) File maksimum 8 Mb</p>
-                <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                    <input type="file" name="userfile" id="upload_files" accept="application/pdf">
-                </form>
+                <div class="grp-sertifikat">
+                    <p style="color: #673ab7;font-size: 12px;">*) File maksimum 8 Mb</p>
+                    <form id="formupload_files" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                        <input type="file" name="userfile" id="upload_files" accept="application/pdf">
+                    </form>
+                </div>
 
                 <div id="showFileUpload"></div>
 
@@ -411,6 +413,15 @@
                         $('#'+keyName[i]).val(dataAch[keyName[i]]);
                     }
 
+                    console.log(keyName[i] + "=" +dataAch[keyName[i]]);
+                    if(keyName[i] == "approvedBy"){
+                        var split = dataAch[keyName[i]].split("/");
+                        console.log("bahlul");
+                        console.log(split[0]);
+                        if(split[0] != sessionNIP){
+                            $("#saveAchievement,.grp-sertifikat").remove();
+                        }
+                    }
 
                 }
 
