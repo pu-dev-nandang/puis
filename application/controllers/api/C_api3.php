@@ -5649,7 +5649,7 @@ class C_api3 extends CI_Controller {
 
             $now=date("Y-m-d");
 
-            $this->db->where('loan_id', $loan_id);
+            $dbLib->where('loan_id', $loan_id);
             $dbLib->update('library.loan',array(
                 'due_date' => $lm_pinjam,
                 'renewed' => '1',
