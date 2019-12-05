@@ -1362,25 +1362,29 @@ class C_api3 extends CI_Controller {
                 $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
 
                 // add bukti upload,buktiname dan tingkat
-                $BuktiUpload = json_encode('');
+                $BuktiUpload = "";
                 if (array_key_exists('BuktiUpload', $_FILES)) {
                     $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/Agregator/Aps/');
-                    $Upload = json_encode($Upload);
+                    //$Upload = json_encode($Upload);
                     $BuktiUpload = $Upload;
                 }
-
                 $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->where('ID',$ID);
                 $this->db->update('db_agregator.rekognisi_dosen',$dataForm);
             } else {
+                /*ADDED BY FEBRI @ DEC 2019*/
+                $dataForm['isApproved'] = 2;
+                $dataForm['approvedBy'] = $this->session->userdata('NIP')."/".$this->session->userdata('Name');;
+                /*end ADDED BY FEBRI @ DEC 2019*/
                 $dataForm['EntredBy'] = $this->session->userdata('NIP');
                 // add bukti upload,buktiname dan tingkat
-                $BuktiUpload = json_encode(array());
+                $BuktiUpload = "";
                 if (array_key_exists('BuktiUpload', $_FILES)) {
                     $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/Agregator/Aps/');
-                    $Upload = json_encode($Upload);
-                    $BuktiUpload = $Upload;
+                    //$Upload = json_encode($Upload);
+                    $BuktiUpload = $Upload[0];
                 }
+                
                 $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
             }

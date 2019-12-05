@@ -97,7 +97,8 @@
                     else if(v.isApproved == 3) {labelStatusApv="<span class='label label-danger'>Rejected</span>";}
                     else{labelStatusApv="UNKNOW";}
                     var labelApvBy = "";
-                    if(v.approvedBy != "" || v.approvedBy){labelApvBy = "<br><small>Approved by "+v.approvedBy+"</small>";}
+                    if(v.isApproved == 2 &&(v.approvedBy != "" || v.approvedBy)){labelApvBy = "<br><small>Approved by "+v.approvedBy+"</small>";}
+                    
                     $('#dataStdList').append('<tr>' +
                         '<td style="border-right: 1px solid #ccc;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+viewEvent+"<br>"+((v.isSKPI == 1) ? '<span class="label label-warning">SKPI</span>':'')+'</td>' +
