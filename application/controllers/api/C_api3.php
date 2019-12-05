@@ -5502,7 +5502,7 @@ class C_api3 extends CI_Controller {
         }
         else if($data_arr['action']=='PerpanjangMandiri'){
 
-            $id = $data_arr['NPM'];
+            $id = $data_arr['member_id'];
             $loan_id = $data_arr['loan_id'];
 
             $dbLib = $this->load->database('server22', TRUE);
@@ -5525,7 +5525,7 @@ class C_api3 extends CI_Controller {
             $lm_pinjam1 = strtotime ( '+'.$libur.' day' , strtotime ( $newdate ) ) ;
             $lm_pinjam = date ( 'Y-m-j' , $lm_pinjam1 );
 
-            print_r($lm_pinjam);
+//            print_r($lm_pinjam);
 
             // mysql_query("UPDATE `loan` SET `due_date` = '$day',`renewed` = '1', return_date = '$now' WHERE `loan_id` = '$loan_id';");
 
@@ -5537,6 +5537,8 @@ class C_api3 extends CI_Controller {
                 'renewed' => '1',
                 'return_date' => $now
             ));
+
+            return print_r(1);
         }
 
 
