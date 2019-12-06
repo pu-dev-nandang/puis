@@ -6831,12 +6831,13 @@ Phone: (021) 29200456';
 
             $NPM = $data['NPM'];
 
-            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, s.Name AS SemesterName,
-                                                        fpc.TrialDate,
+            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, 
+                                                        s.Name AS SemesterName, fpc.TrialDate,
                                                         em1.Name AS Cl_Academic_Name,
                                                         em2.Name AS Cl_Library_Name,
                                                         em3.Name AS Cl_Finance_Name,
                                                         em4.Name AS Cl_Kaprodi_Name,
+                                                        em5.Name AS Cl_StdLife_Name,
                                                         fp.TitleInd, fp.TitleEng
                                                         FROM db_academic.auth_students ats
                                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
@@ -6849,6 +6850,7 @@ Phone: (021) 29200456';
                                                         LEFT JOIN db_employees.employees em2 ON (em2.NIP = fpc.Cl_Library_By)
                                                         LEFT JOIN db_employees.employees em3 ON (em3.NIP = fpc.Cl_Finance_By)
                                                         LEFT JOIN db_employees.employees em4 ON (em4.NIP = fpc.Cl_Kaprodi_By)
+                                                        LEFT JOIN db_employees.employees em5 ON (em5.NIP = fpc.Cl_StdLife_By)
 
                                                         WHERE ats.NPM = "'.$NPM.'"')->result_array();
 
@@ -6932,27 +6934,32 @@ Phone: (021) 29200456';
 
                 $pdf->Row(Array(
                     '2',
-                    'Kelulusan sidang Tugas Akhir / Skripsi / Proyek Akhir
-            Pada Hari / Tanngal sidang : '.$TrialDate,
+                    'Date of Final Exam : '.$TrialDate,
                     "Approved By ".$d['Cl_Kaprodi_Name']
                 ));
 
                 $pdf->Row(Array(
                     '3',
-                    "Pelaksanaan revisi tugas Akhir / Skripsi / Proyek Akhir \nJudul dalam Bahasa Indonesia : ".$d['TitleInd']." \nJudul dalam Bahasa Inggris : ".$d['TitleEng'],
+                    "Title of Final Project \nIndonesian : ".$d['TitleInd']." \nEnglish : ".$d['TitleEng'],
                     "Approved By ".$d['Cl_Kaprodi_Name']
                 ));
 
                 $pdf->Row(Array(
                     '4',
-                    " - Telah mengembalikan seluruh pinjaman buku perpustakaan \n - Telah menyerahkan laporan akhir/skripsi/tesis beserta CD soft copy*",
+                    " - The submission of Hardcopy / Softcopy of Final Project report book contribution, etc.\n - The submission of all necassary docoment to library : book loans, book loan pinalty*",
                     "Approved By ".$d['Cl_Library_Name']
                 ));
 
                 $pdf->Row(Array(
                     '5',
-                    "Penyelesaian semua kewajiban uang kuliah (BPP + SKS) dan tidak memiliki tunggakan keuangan kepada Universitas Agung Podomoro",
+                    "Fulfilment of payment obligation",
                     "Approved By ".$d['Cl_Finance_Name']
+                ));
+
+                $pdf->Row(Array(
+                    '6',
+                    "Fulfilment of student life",
+                    "Approved By ".$d['Cl_StdLife_Name']
                 ));
 
 
@@ -7448,7 +7455,7 @@ Phone: (021) 29200456';
             $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
 //            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
             $pdf->Image('./images/new_logo_pu.png',10,10,50);
-            $pdf->Image('http://files.podomorouniversity.ac.id/images/SKPI/SKPI-QRCode.png',176,12.5,17);
+            $pdf->Image(url_files.'images/SKPI/SKPI-QRCode.png',176,12.5,17);
             $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
 
             $pdf->Ln(17);

@@ -8570,7 +8570,8 @@ class C_api extends CI_Controller {
                                         fp.TitleInd, fp.TitleEng, fpc.Cl_Library, fpc.Cl_Library_By, fpc.Cl_Library_At, emp1.Name AS Cl_Library_Name,
                                         fpc.Cl_Finance, fpc.Cl_Finance_By, fpc.Cl_Finance_At, emp2.Name AS Cl_Finance_Name,
                                         fpc.Cl_Kaprodi, fpc.Cl_Kaprodi_By, fpc.Cl_Kaprodi_At, emp3.Name AS Cl_Kaprodi_Name,
-                                        fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name
+                                        fpc.Cl_Academic, fpc.Cl_Academic_By, fpc.Cl_Academic_At, emp6.Name AS Cl_Academic_Name,
+                                        fpc.Cl_StdLife, fpc.Cl_StdLife_By, fpc.Cl_StdLife_At, emp7.Name AS Cl_Academic_Name
                                         
                                         FROM db_academic.auth_students ats
                                         LEFT JOIN db_employees.employees em1 ON (em1.NIP = ats.MentorFP1)
@@ -8582,6 +8583,7 @@ class C_api extends CI_Controller {
                                         LEFT JOIN db_employees.employees emp2 ON (fpc.Cl_Finance_By = emp2.NIP)
                                         LEFT JOIN db_employees.employees emp3 ON (fpc.Cl_Kaprodi_By = emp3.NIP)
                                         LEFT JOIN db_employees.employees emp6 ON (fpc.Cl_Academic_By = emp6.NIP)
+                                        LEFT JOIN db_employees.employees emp7 ON (fpc.Cl_StdLife_By = emp7.NIP)
                                         
                                         WHERE ats.NPM = "'.$data_arr['NPM'].'" ')->result_array();
 

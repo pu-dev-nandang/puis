@@ -103,7 +103,7 @@
 	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 	$ServerName = $_SERVER['SERVER_NAME'];
 	define("URLAD","http://10.1.30.2:8076/", true);
-	define("url_files","http://files.podomorouniversity.ac.id/", true);
+	define("url_files",$HostPath."files.podomorouniversity.ac.id/", true);
 	// define("url_files","http://localhost/filespu/", true);
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':
