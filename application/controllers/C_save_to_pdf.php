@@ -6767,13 +6767,13 @@ Phone: (021) 29200456';
 
 
 //        $border = 1;
-                $pdf->Ln(5);
+                $pdf->Ln(15);
                 $pdf->Cell(110,$h,'',$border,0,'L');
                 $pdf->Cell(60,$h,'Jakarta, '.$this->getDateIndonesian($d['Cl_Library_At']),$border,1,'L');
                 $pdf->Cell(110,$h,'',$border,0,'L');
                 $pdf->Cell(60,$h,'Kepala Perpustakaan',$border,1,'L');
 
-                $pdf->Ln(25);
+
 
                 // Get kabag Library
                 $dataKabagLib = $this->db->get_where('db_employees.employees',array(
@@ -6782,6 +6782,7 @@ Phone: (021) 29200456';
                 ))->result_array();
 
                 $kabagLib = '';
+                $signature = '';
                 if(count($dataKabagLib)>0){
                     $title_h = ($dataKabagLib[0]['TitleAhead']!='' && $dataKabagLib[0]['TitleAhead']!=null)
                         ? $dataKabagLib[0]['TitleAhead'].' ' : '';
@@ -6790,9 +6791,12 @@ Phone: (021) 29200456';
                         ? ' '.$dataKabagLib[0]['TitleBehind'] : '';
 
                     $kabagLib = $title_h.$dataKabagLib[0]['Name'].$title_b;
+                    $signature = $dataKabagLib[0]['Signatures'];
                 }
 
+                $pdf->Image('./uploads/signature/'.$signature,$pdf->GetX()+110,$pdf->GetY(),20);
 
+                $pdf->Ln(15);
 
                 $pdf->Cell(110,$h,'',$border,0,'L');
                 $pdf->Cell(60,$h,$kabagLib,$border,1,'L');
