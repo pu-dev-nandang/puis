@@ -7750,7 +7750,7 @@ Phone: (021) 29200456';
 
             $StudentName = 'nandang mulyadi';
             $nameF = str_replace(' ','_',$StudentName);
-            $pdf->Output('SKPI__'.$nameF.'.pdf','I');
+            $pdf->Output('SKPI__'.$nameF.'.pdf','D');
 
         }
 
