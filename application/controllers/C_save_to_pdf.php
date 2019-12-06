@@ -7495,7 +7495,11 @@ Phone: (021) 29200456';
 
             // ======
 
-            $pdf->Image('./uploads/students/'.$db.'/'.$d2['Photo'],10,$pdf->GetY(),25);
+            $path = './uploads/students/'.$db.'/'.$d2['Photo'];
+            if(!file_exists($path)){
+                $path = './images/icon/userfalse.png';
+            }
+            $pdf->Image($path,10,$pdf->GetY(),25);
 
             $pdf->SetFont('dinprolight','',$fontBody);
             $pdf->Cell($b_spasi1,$h_1,'',$border,0,'L');
@@ -7748,7 +7752,7 @@ Phone: (021) 29200456';
             $pdf->Cell($fullWidth - $spasiTdd,$h_1,'Employee ID Number : '.$ttd_NIP,$border,1,'L');
 
 
-            $StudentName = 'nandang mulyadi';
+            $StudentName = $d['NPM'];
             $nameF = str_replace(' ','_',$StudentName);
             $pdf->Output('SKPI__'.$nameF.'.pdf','D');
 
