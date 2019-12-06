@@ -157,7 +157,7 @@ $(document).off('click', '.datadetailpublikasi').on('click', '.datadetailpublika
     if (v > 0) {
         var dt = $(this).attr('data');
         dt = jwt_decode(dt);
-        // console.log(dt);
+        console.log(dt);
         // console.log(dt);
         var html =  '<div class = "row">'+
                         '<div class = "col-md-12">'+
@@ -173,10 +173,22 @@ $(document).off('click', '.datadetailpublikasi').on('click', '.datadetailpublika
                                 '<tbody>';
                 if (dt.length > 0) {
                     for (var i = 0; i < dt.length; i++) {
+
+                        var dataAnggota = dt[i]["dataAnggota"];
+                        var htmldataAnggota = '';
+                        if (dataAnggota.length > 0) {
+                            htmldataAnggota += '<ul>';
+                            for (var j = 0; j < dataAnggota.length; j++) {
+                                htmldataAnggota += '<li style = "margin-left:-30px;">'+dataAnggota[j].Nama+'</li>';
+                            }
+
+                            htmldataAnggota += '</ul>';
+                        }
+
                         html += '<tr>'+
                                     '<td>'+ (parseInt(i)+1) + '</td>'+
                                     '<td>'+ dt[i].Judul + '</td>'+
-                                    '<td>'+ dt[i].Nama_Mahasiswa + '</td>'+
+                                    '<td>'+ htmldataAnggota + '</td>'+
                                     '<td>'+ dt[i].Tgl_terbit+ '</td>'+
                                 '</tr>';
                     }
