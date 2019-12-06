@@ -7018,7 +7018,7 @@ Phone: (021) 29200456';
         $pdf->SetFont('dinpromedium','',$fontHeader);
         $pdf->Cell(0,$h,'SURAT KETERANGAN PENDAMPING IJAZAH',$border,1,'C');
         $pdf->SetFont('dinpromediumitalic','',$fontHeader);
-        $pdf->Cell(0,$h,'DIPLOMA SUPLEMENT',$border,1,'C');
+        $pdf->Cell(0,$h,'DIPLOMA SUPPLEMENT',$border,1,'C');
 
         $pdf->SetFont('dinprolight','',$fontBody);
         $pdf->Cell(0,$h,'Nomor : 032/UAP/SKPI-933022018000097/X/2018',$border,1,'C');
@@ -7461,7 +7461,7 @@ Phone: (021) 29200456';
             $pdf->Ln(17);
 
             $pdf->SetFont('dinpromedium','',$fontHeader);
-            $pdf->Cell(0,$h,'DIPLOMA SUPLEMENT',$border,1,'C');
+            $pdf->Cell(0,$h,'DIPLOMA SUPPLEMENT',$border,1,'C');
 
             $InputDate = explode('-', $d['GraduationDate']);
             $bulanRomawi = ($d['GraduationDate']!='' && $d['GraduationDate']!=null) ? $this->m_master->romawiNumber($InputDate[1]) : '';
