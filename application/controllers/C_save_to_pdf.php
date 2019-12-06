@@ -7432,9 +7432,9 @@ Phone: (021) 29200456';
             $B = 226;
 
             $URLQrCode = 'https://uap.ac.id/ds/'.$NPM;
-            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
+//            QRcode::png($URLQrCode, './images/SKPI/frame.png', 'L', 10, 2);
             $pdf->Image('./images/new_logo_pu.png',10,10,50);
-            $pdf->Image('./images/SKPI/frame.png',176,12.5,17);
+            $pdf->Image('http://files.podomorouniversity.ac.id/images/SKPI/SKPI-QRCode.png',176,12.5,17);
             $pdf->Image('./images/SKPI/frame-qrcode.png',174.5,11,20);
 
             $pdf->Ln(17);

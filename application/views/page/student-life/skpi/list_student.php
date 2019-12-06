@@ -113,4 +113,18 @@
 
     }
 
+    $(document).on('click','.btnDownloadSKPI',function () {
+       var _href = $(this).attr('data-href');
+       var NPM = $(this).attr('data-npm');
+       var url = base_url_files+'__setSKPIQRCode';
+       var token = jwt_encode({
+           data : 'https://uap.ac.id/ds/'+NPM
+       },'UAP)(*');
+
+        $.post(url,{token:token},function (jseonResult) {
+            window.open(_href);
+       });
+
+    });
+
 </script>
