@@ -9141,7 +9141,7 @@ class C_api extends CI_Controller {
                     $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$row['ProdiName'].'</div>';
                     $nestedData[] = '<div>'.$row['Description'].'</div>';
-                    $nestedData[] = '<div><a href="'.base_url('save2pdf/cetakSKPI/'.$token).'" target="_blank" class="btn btn-sm btn-default btn-default-primary">Show SKPI</a></div>';
+                    $nestedData[] = '<div><a href="javascript:void(0);" data-npm="'.$row['NPM'].'" data-href="'.base_url('save2pdf/cetakSKPI/'.$token).'"  class="btn btn-sm btn-default btn-default-primary btnDownloadSKPI">Show SKPI</a></div>';
 
                     $data[] = $nestedData;
                     $no++;

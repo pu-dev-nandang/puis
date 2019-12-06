@@ -346,6 +346,7 @@
 <!-- Custom -->
 <script type="text/javascript">
     window.base_url_js = "<?php echo base_url(); ?>";
+    window.base_url_files = "http://files.podomorouniversity.ac.id/";
     //window.base_url_js = "<?php //echo 'http://10.1.10.27:8080/siak3/'; ?>//";
     window.base_url_img_employee = "<?php echo base_url('uploads/employees/'); ?>";
     window.base_url_img_student = "<?php echo base_url('uploads/students/'); ?>";
