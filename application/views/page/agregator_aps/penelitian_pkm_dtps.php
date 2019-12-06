@@ -135,8 +135,7 @@
         var v = parseInt($(this).html());
         if (v > 0) {
             var dt = $(this).attr('data');
-            dt = jwt_decode(dt);
-            // console.log(dt);
+            // dt = jwt_decode(dt);
             var html =  '<div class = "row">'+
                             '<div class = "col-md-12">'+
                                 '<table class = "table">'+
@@ -145,16 +144,28 @@
                                             '<td>No</td>'+
                                             '<td>Name</td>'+
                                             '<td>Judul</td>'+
+                                            '<td>Anggota</td>'+
                                         '</tr>'+
                                     '</thead>'+
                                     '<tbody>';
                     if (dt.length > 0) {
                         for (var i = 0; i < dt.length; i++) {
-                            var Judul = (dt[i]["Judul_litabmas"] !== undefined) ? dt[i]["Judul_litabmas"] : dt[i]["Judul_PKM"]
+                            var Judul = (dt[i]["Judul_litabmas"] !== undefined) ? dt[i]["Judul_litabmas"] : dt[i]["Judul_PKM"];
+                            var dataAnggota = dt[i]["dataAnggota"];
+                            var htmldataAnggota = '';
+                            if (dataAnggota.length > 0) {
+                                htmldataAnggota += '<ul>';
+                                for (var j = 0; j < dataAnggota.length; j++) {
+                                    htmldataAnggota += '<li style = "margin-left:-30px;">'+dataAnggota[j].Nama+'</li>';
+                                }
+
+                                htmldataAnggota += '</ul>';
+                            }
                             html += '<tr>'+
                                         '<td>'+ (parseInt(i)+1) + '</td>'+
                                         '<td>'+ dt[i].Name + '</td>'+
                                         '<td>'+ Judul + '</td>'+
+                                        '<td>'+ htmldataAnggota +'</td>'+
                                     '</tr>';
                         }
                     }

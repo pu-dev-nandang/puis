@@ -115,6 +115,14 @@ class C_rest3 extends CI_Controller {
                                                and b.ProdiID = ?     
                                                 ';
                                         $query=$this->db->query($sql, array($ID_sumberdana,$Y,$ProdiID))->result_array();
+                                        for ($lt=0; $lt < count($query); $lt++) { 
+                                          $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_penelitian as a
+                                                            join db_research.master_anggota_penelitian as b on a.ID_anggota = b.ID
+                                                            where a.ID_Litabmas = '.$query[$lt]['ID_litabmas'].'
+                                           ';
+                                           $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
+                                           $query[$lt]['dataAnggota'] = $dataAnggota;
+                                        }
                                         $tot = count($query);
                                         // encode token
                                         $token = $this->jwt->encode($query,"UAP)(*");
@@ -142,6 +150,14 @@ class C_rest3 extends CI_Controller {
                                               and b.ProdiID = ?     
                                                ';
                                        $query=$this->db->query($sql, array($ID_sumberdana,$Y,$ProdiID))->result_array();
+                                       for ($lt=0; $lt < count($query); $lt++) { 
+                                         $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_pkm as a
+                                                           join db_research.master_anggota_pkm as b on a.ID_anggota = b.ID
+                                                           where a.ID_PKM = '.$query[$lt]['ID_PKM'].'
+                                          ';
+                                          $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
+                                          $query[$lt]['dataAnggota'] = $dataAnggota;
+                                       }
                                        $tot = count($query);
                                        // encode token
                                        $token = $this->jwt->encode($query,"UAP)(*");
@@ -278,7 +294,7 @@ class C_rest3 extends CI_Controller {
                 $sql = 'select * from (
                         select a.NIP,b.Name,a.EntredAt from db_agregator.rekognisi_dosen as a
                                 join db_employees.employees as b on a.NIP = b.NIP
-                                where b.ProdiID = ? and a.Tahun = ?
+                                where b.ProdiID = ? and a.Tahun = ? and isApproved = 2
                         UNION
                         select sk.Updated_by,b.Name,sk.Updated_by from db_agregator.sitasi_karya as sk
                         join db_employees.employees as b on sk.Updated_by = b.NIP
@@ -445,10 +461,15 @@ class C_rest3 extends CI_Controller {
                 $sql = 'select a.*,b.Position as JabatanAkademik from db_employees.employees as a
                     left join db_employees.lecturer_academic_position as b on a.LecturerAcademicPositionID = b.ID  
                      where ( 
-                                SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
-                                SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
-                                SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
-                                SPLIT_STR(a.PositionOther3, ".", 2) = 7
+                                #SPLIT_STR(a.PositionMain, ".", 2) = 7 or 
+                                #SPLIT_STR(a.PositionOther1, ".", 2) = 7 or
+                                #SPLIT_STR(a.PositionOther2, ".", 2) = 7 or
+                                #SPLIT_STR(a.PositionOther3, ".", 2) = 7
+
+                                SPLIT_STR(a.PositionMain, ".", 1) = 14 or 
+                                SPLIT_STR(a.PositionOther1, ".", 1) = 14 or
+                                SPLIT_STR(a.PositionOther2, ".", 1) = 14 or
+                                SPLIT_STR(a.PositionOther3, ".", 1) = 14
                             ) and StatusForlap  is not null and ProdiID = ? and StatusForlap != "" '.$AndWhere;
                 $query=$this->db->query($sql, array($ProdiID))->result_array();
                 for ($i=0; $i < count($query); $i++) { 
@@ -1110,12 +1131,20 @@ class C_rest3 extends CI_Controller {
                   $jumlah = 0;
                   $ID_forlap_publikasi = $G_jns_forlap_publikasi[$i]['ID'];
                   for ($j=0; $j < count($arr_ts) ; $j++) { 
-                    $sql = 'select Judul,Tgl_terbit,a.NIP,b.Name as NameDosen from db_research.publikasi as a
+                    $sql = 'select a.ID_publikasi,Judul,Tgl_terbit,a.NIP,b.Name as NameDosen from db_research.publikasi as a
                     join db_employees.employees as b on a.NIP = b.NIP
                             where Year(a.Tgl_terbit) = '.$arr_ts[$j].' and a.ID_forlap_publikasi = "'.$ID_forlap_publikasi.'"
                             and b.ProdiID = '.$ProdiID.'
                       ';
                     $query = $this->db->query($sql,array())->result_array();
+                    for ($lt=0; $lt < count($query); $lt++) { 
+                      $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_publikasi as a
+                                        join db_research.master_anggota_publikasi as b on a.ID_anggota = b.ID
+                                        where a.ID_publikasi = '.$query[$lt]['ID_publikasi'].' and b.Type_anggota  != "MHS"
+                       ';
+                       $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
+                       $query[$lt]['dataAnggota'] = $dataAnggota;
+                    }
                     $tot = count($query);
                     $data[] =  array('token' => $this->jwt->encode($query,"UAP)(*"),'total' => $tot) ;
                     $jumlah += $tot;
@@ -1141,12 +1170,12 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select a.ID_PKM,b.Name as NamaDosen,"" as RoadMap,d.Nama as Name_mahasiswa,a.Judul_PKM,a.ID_thn_laks 
+          $sql = 'select a.ID_PKM,b.Name as NamaDosen,"" as RoadMap,a.Judul_PKM,a.ID_thn_laks 
                   from db_research.pengabdian_masyarakat as a
                   join db_employees.employees as b on a.NIP = b.NIP
-                  join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
-                  join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
-                  where b.ProdiID = '.$ProdiID.' and d.Type_anggota = "MHS"
+                  #join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
+                  #join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
+                  where b.ProdiID = '.$ProdiID.'
                   group by a.NIP, a.ID_PKM
                  ';
           $query = $this->db->query($sql,array())->result_array();
@@ -1157,13 +1186,10 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $sql_MHS = 'select b.Name as NamaDosen,"" as RoadMap,d.Nama as Name_mahasiswa,a.Judul_PKM,a.ID_thn_laks 
-                  from db_research.pengabdian_masyarakat as a
-                  join db_employees.employees as b on a.NIP = b.NIP
-                  join db_research.list_anggota_pkm as c on c.ID_PKM = a.ID_PKM
-                  join db_research.master_anggota_pkm as d on d.ID = c.ID_anggota
-                  where b.ProdiID = '.$ProdiID.' and d.Type_anggota = "MHS" and a.ID_PKM = "'.$row['ID_PKM'].'"
-                  ';
+            $sql_MHS = 'select b.Nama as Name_mahasiswa from db_research.list_anggota_pkm as a
+                         join db_research.master_anggota_pkm as b on a.ID_anggota = b.ID
+                         where a.ID_PKM = '.$query[$i]['ID_PKM'].' and b.Type_anggota = "MHS"
+                                          ';
             $q_MHS = $this->db->query($sql_MHS,array())->result_array();
             $MHSName = '<ul style = "margin-left:-20px;">';
             for ($j=0; $j < count($q_MHS); $j++) { 
@@ -1203,11 +1229,12 @@ class C_rest3 extends CI_Controller {
           $P = $dataToken['ProdiID'];
           $P = explode('.', $P);
           $ProdiID = $P[0];
-          $sql = 'select a.ID_litabmas, b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
+          $sql = 'select a.ID_litabmas, b.Name as NamaDosen,"" as RoadMap,a.Judul_litabmas,a.ID_thn_laks 
                   from db_research.litabmas as a
                   join db_employees.employees as b on a.NIP = b.NIP
-                  join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
-                  join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
+                  #join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
+                  #join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
+
                   where b.ProdiID = '.$ProdiID.'
                   group by a.NIP, a.ID_litabmas
                  ';
@@ -1219,12 +1246,9 @@ class C_rest3 extends CI_Controller {
             $nestedData[] = $i+1;
             $nestedData[] = $row['NamaDosen'];
             $nestedData[] = $row['RoadMap'];
-            $sql_MHS = 'select b.Name as NamaDosen,"" as RoadMap,d.Name_mahasiswa,a.Judul_litabmas,a.ID_thn_laks 
-                  from db_research.litabmas as a
-                  join db_employees.employees as b on a.NIP = b.NIP
-                  join db_research.litabmas_list_mahasiswa as c on c.ID_litabmas = a.ID_litabmas
-                  join db_research.anggota_panitia_mahasiswa as d on d.ID_ang_mahasiswa = c.ID_ang_mahasiswa
-                  where b.ProdiID = '.$ProdiID.' and a.ID_litabmas = "'.$row['ID_litabmas'].'"
+            $sql_MHS = 'select b.Nama as Name_mahasiswa from db_research.list_anggota_penelitian as a
+                        join db_research.master_anggota_penelitian as b on a.ID_anggota = b.ID
+                        where a.ID_Litabmas = '.$query[$i]['ID_litabmas'].' and b.Type_anggota = "MHS"
                   
                   ';
             $q_MHS = $this->db->query($sql_MHS,array())->result_array();
@@ -1718,14 +1742,29 @@ class C_rest3 extends CI_Controller {
             $jumlah = 0;
             $ID_forlap_publikasi = $G_jns_forlap_publikasi[$i]['ID'];
             for ($j=0; $j < count($arr_ts) ; $j++) { 
-              $sql = 'select Judul,Tgl_terbit,a.NIP,c.Nama_Mahasiswa from db_research.publikasi as a
-                      join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
-                      join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
+              $sql = 'select a.ID_publikasi,Judul,Tgl_terbit,a.NIP from db_research.publikasi as a
+                      #join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
+                      #join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
+                      join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
+                      #join db_research.master_anggota_publikasi as c on b.ID_anggota = c.ID
                       join db_employees.employees as d on a.NIP = d.NIP
                       where Year(a.Tgl_terbit) = '.$arr_ts[$j].' and a.ID_forlap_publikasi = "'.$ID_forlap_publikasi.'"
                       and d.ProdiID = '.$ProdiID.'
+                      and b.ID_anggota in (select ID from db_research.master_anggota_publikasi)
+                      group by a.ID_publikasi
                 ';
+
+
+
               $query = $this->db->query($sql,array())->result_array();
+              for ($lt=0; $lt < count($query); $lt++) { 
+                $sqlGetAnggota = 'select b.Nama from db_research.list_anggota_publikasi as a
+                                  join db_research.master_anggota_publikasi as b on a.ID_anggota = b.ID
+                                  where a.ID_publikasi = '.$query[$lt]['ID_publikasi'].' and b.Type_anggota = "MHS"
+                 ';
+                 $dataAnggota = $this->db->query($sqlGetAnggota,array())->result_array();
+                 $query[$lt]['dataAnggota'] = $dataAnggota;
+              }
               $tot = count($query);
               $data[] =  array('token' => $this->jwt->encode($query,"UAP)(*"),'total' => $tot) ;
               $jumlah += $tot;
