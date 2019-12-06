@@ -9,7 +9,6 @@ class C_save_to_pdf extends CI_Controller {
         $this->load->library('JWT');
         $this->load->library('pdf');
         $this->load->library('pdf_mc_table');
-        $this->load->library('Qrcode/qrlib');
 
         $this->load->model('m_rest');
         $this->load->model('master/m_master');
