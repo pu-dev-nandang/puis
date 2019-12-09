@@ -260,7 +260,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="open-ticket">Open Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="open-ticket">Today Open-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -325,7 +325,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="pending-ticket">Pending Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="pending-ticket">Pending-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -393,7 +393,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="progres-ticket">Progres Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="progres-ticket">Progres-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -504,7 +504,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="close-ticket">Close Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="close-ticket">Today Close-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
