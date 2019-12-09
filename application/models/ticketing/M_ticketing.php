@@ -589,9 +589,12 @@ class M_ticketing extends CI_Model {
                             unset($dataSave['ReceivedBy']);
                         }
                     }
+                  
+                    if (!empty($dataSave)) {
+                        $this->db->where('ID',$ID);
+                        $this->db->update('db_ticketing.received',$dataSave);
+                    }
                     
-                    $this->db->where('ID',$ID);
-                    $this->db->update('db_ticketing.received',$dataSave);
                     break;
                 default:
                     # code...
