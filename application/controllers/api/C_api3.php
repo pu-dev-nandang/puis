@@ -4781,6 +4781,33 @@ class C_api3 extends CI_Controller {
             return print_r(1);
         }
 
+        else if($data_arr['action']=='updateDataJudiciums'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            if($ID!='' && $ID!=null){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.judiciums',$dataForm);
+            } else {
+                // Insert
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.judiciums',$dataForm);
+            }
+
+            return print_r(1);
+
+        }
+
+        else if($data_arr['action']=='readDataJudiciums'){
+            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.ID DESC')->result_array();
+            return print_r(json_encode($data));
+        }
+
     }
 
 
