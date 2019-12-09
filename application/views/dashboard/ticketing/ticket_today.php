@@ -269,6 +269,10 @@ var App_ticket_ticket_today = {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
+                    
+                    // NANDANG
+                    var colorAsRequest = (DepartmentID == row.DepartmentTicketID) ? '#5ea243' : '#ce2c2c';
+
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -408,28 +412,31 @@ var App_ticket_ticket_today = {
                     var Worker = App_ticket_ticket_today.getWorker(data_received);
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
-                    for (var j = 0; j < data_received.length; j++) {
-                        if (data_received[j].SetAction == "1") {
-                            if (department_handle == '') {
-                                department_handle += data_received[j].NameDepartmentDestination;
-                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
-                            }
-                            else
-                            {
-                                var booldepart = true;
-                                for (var k = 0; k < arr_filter_depart.length; k++) {
-                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
-                                       booldepart = false; 
-                                       break;
-                                    }
-                                }
-                                if (booldepart) {
-                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
-                                }
+                    // for (var j = 0; j < data_received.length; j++) {
+                    //     if (data_received[j].SetAction == "1") {
+                    //         if (department_handle == '') {
+                    //             department_handle += data_received[j].NameDepartmentDestination;
+                    //             arr_filter_depart.push(data_received[j].DepartmentReceivedID);
+                    //         }
+                    //         else
+                    //         {
+                    //             var booldepart = true;
+                    //             for (var k = 0; k < arr_filter_depart.length; k++) {
+                    //                 if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                    //                    booldepart = false; 
+                    //                    break;
+                    //                 }
+                    //             }
+                    //             if (booldepart) {
+                    //                 department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                    //             }
                                 
-                            }
-                        }
-                    }
+                    //         }
+                    //     }
+                    // }
+
+                    department_handle = data_received[0].NameDepartmentDestination;
+
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -519,30 +526,33 @@ var App_ticket_ticket_today = {
                     var Worker = App_ticket_ticket_today.getWorker(data_received,"0");
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
-                    for (var j = 0; j < data_received.length; j++) {
-                        // console.log(data_received[j]);
-                        if (data_received[j].DataReceived_Details.length > 0) {
-                            if (department_handle == '') {
-                                department_handle += data_received[j].NameDepartmentDestination;
-                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
-                            }
-                            else
-                            {
-                                var booldepart = true;
-                                for (var k = 0; k < arr_filter_depart.length; k++) {
-                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
-                                       booldepart = false; 
-                                       break;
-                                    }
-                                }
-                                if (booldepart) {
-                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
-                                }
+                    // for (var j = 0; j < data_received.length; j++) {
+                    //     // console.log(data_received[j]);
+                    //     if (data_received[j].DataReceived_Details.length > 0) {
+                    //         if (department_handle == '') {
+                    //             department_handle += data_received[j].NameDepartmentDestination;
+                    //             arr_filter_depart.push(data_received[j].DepartmentReceivedID);
+                    //         }
+                    //         else
+                    //         {
+                    //             var booldepart = true;
+                    //             for (var k = 0; k < arr_filter_depart.length; k++) {
+                    //                 if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                    //                    booldepart = false; 
+                    //                    break;
+                    //                 }
+                    //             }
+                    //             if (booldepart) {
+                    //                 department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                    //             }
                                 
-                            }
-                        }
+                    //         }
+                    //     }
                         
-                    }
+                    // }
+
+                    department_handle = data_received[0].NameDepartmentDestination;
+                    
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
