@@ -528,6 +528,7 @@
 				    	toastr.success('Success');
 				    	$('#GlobalModal').modal('hide');
 				    	end_loading_button2(selector);
+
 				    }
 				    else
 				    {
@@ -760,6 +761,7 @@
 					    	toastr.success('Success');
 					    	setInterval(function(){
 					    	 end_loading_button2(selector);
+					    	 App_transfer_to.ActionBTNShowHide();
 					    	 loadingEnd(100); 
 					    	}, 3000);
 					    }

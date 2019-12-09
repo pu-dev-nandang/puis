@@ -188,7 +188,7 @@ class M_ticketing extends CI_Model {
 
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
@@ -237,7 +237,7 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
@@ -294,7 +294,7 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                 qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
                 from db_ticketing.ticket as a 
@@ -350,7 +350,7 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                 qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
                 from db_ticketing.ticket as a 
@@ -358,7 +358,7 @@ class M_ticketing extends CI_Model {
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                where a.TicketStatus = 3 and DATE_FORMAT(a.TicketClosedAt,"%Y-%m-%d") = CURDATE()
+                where a.TicketStatus IN(3,4) and DATE_FORMAT(a.TicketClosedAt,"%Y-%m-%d") = CURDATE()
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';
@@ -939,7 +939,7 @@ class M_ticketing extends CI_Model {
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                        where a.TicketStatus = 3
+                        where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
                              b.Name LIKE "'.$requestData['search']['value'].'%"
@@ -954,7 +954,7 @@ class M_ticketing extends CI_Model {
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                        where a.TicketStatus = 3
+                        where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
                              b.Name LIKE "'.$requestData['search']['value'].'%"
