@@ -12,6 +12,15 @@
         background: #607d8b;
         color: #FFFFFF;
     }
+
+    .btnNote {
+        padding: 1px 5px 1px 5px;
+    }
+
+    .popover-title {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
 </style>
 
 <div class="row">
@@ -120,6 +129,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script>
@@ -468,6 +478,12 @@
                 }
             }
         } );
+
+        setTimeout(function (args) {
+            $('[data-toggle="popover"]').popover();
+            $('.btnNote').prop('disabled',false);
+            $('.btnNote').html('View Note');
+        },3000);
     }
 
     $(document).on('click','.btnRemoveData',function () {
@@ -501,6 +517,81 @@
                 $('#NotificationModal').modal('hide');
             },500);
         });
+    });
+
+    $(document).on('click','.showModalNote',function () {
+
+        var Name = $(this).attr('data-name');
+        var Note = $(this).attr('data-note');
+        var TSID = $(this).attr('data-id');
+
+        $('#GlobalModalSmall .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Note for <span style="color: royalblue;">'+Name+'</span></h4>');
+
+        var htmlss = '<div class="row">' +
+            '    <div class="col-md-12">' +
+            '        <div class="form-group">' +
+            '            <label>Note</label>' +
+            '            <textarea class="form-control" id="formNote" rows="5">'+Note+'</textarea>' +
+            '        </div>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModalSmall .modal-body').html(htmlss);
+
+        $('#GlobalModalSmall .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> ' +
+            '<button type="button" class="btn btn-success" id="btnSaveNote">Save</button>');
+
+        $('#GlobalModalSmall').on('shown.bs.modal', function () {
+            $('#formNote').focus();
+        });
+
+        $('#GlobalModalSmall').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+
+        $('#btnSaveNote').click(function () {
+
+            var formNote = $('#formNote').val();
+
+            if(formNote!='' && formNote!=null){
+
+                loading_buttonSm('#btnSaveNote');
+
+                var data ={
+                    action : 'addNoteInTransferStd',
+                    TSID : TSID,
+                    dataUpdate : {
+                        Note : formNote,
+                        NotedBy : sessionNIP,
+                        NotedAt : dateTimeNow()
+                    }
+                };
+
+                var token = jwt_encode(data,'UAP)(*');
+                var url = base_url_js+'api/__crudTransferStudent';
+
+                $.post(url,{token:token},function (result) {
+
+                    getListStudentTransfer();
+
+                    toastr.success('Data saved','Success');
+                    setTimeout(function () {
+                        $('#btnSaveNote').prop('disabled',false).html('Save');
+                    },500);
+
+                });
+
+            } else {
+                toastr.warning('Form note is required','Warning');
+            }
+
+
+        });
+
+
+
     });
 
 </script>
