@@ -10706,6 +10706,17 @@ class C_api extends CI_Controller {
 
                 return print_r(json_encode($data));
             }
+            if($data_arr['action']=='addNoteInTransferStd'){
+
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+                $TSID = $data_arr['TSID'];
+
+                $this->db->where('ID', $TSID);
+                $this->db->update('db_academic.transfer_student',$dataUpdate);
+
+                return print_r(1);
+
+            }
             else if($data_arr['action'] == 'readReason'){
                 $data = $this->db->get('db_academic.transfer_type')->result_array();
                 return print_r(json_encode($data));
