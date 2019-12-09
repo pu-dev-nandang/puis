@@ -94,7 +94,7 @@ class C_transfer_student extends Academic_Controler {
 
             $noted = ($row['Note']!='' && $row['Note']!=null)
                 ?
-                '<div><hr style="margin-top: 5px; margin-bottom: 5px;"/><button disabled class="btn btn-sm btn-warning btnNote" data-toggle="popover" data-placement="bottom" title="By : '.$row['NotedBY'].' | '.date('D, d M Y',strtotime($row['NotedAt'])).'" data-content="'.$row['Note'].'"><i class="fa fa-refresh fa-spin fa-fw"></i></button></div>'
+                '<div><hr style="margin-top: 5px; margin-bottom: 5px;"/><button disabled class="btn btn-sm btn-warning btnNote" data-toggle="popover" data-trigger="focus" data-placement="bottom" title="By : '.$row['NotedBY'].' | '.date('D, d M Y',strtotime($row['NotedAt'])).'" data-content="'.$row['Note'].'"><i class="fa fa-refresh fa-spin fa-fw"></i></button></div>'
                 : '';
 
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
