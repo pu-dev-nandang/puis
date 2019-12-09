@@ -22,17 +22,26 @@
         <div class="col-md-6 col-md-offset-3">
             <div class="well">
                 <div class="row">
-                    <div class="col-md-7">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label>Department</label>
                             <select class ="select2-select-00 full-width-fix" id ="SelectDepartmentID"></select>
                         </div>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label>Status</label>
                             <select class="form-control" id ="SelectStatusTicketID"></select>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>For</label>
+                            <select class="form-control" id="FilterFor">
+                                <option selected value="%">--All--</option>
+                                <option value="1">--Worker--</option>
+                            </select>
+                        </div>    
                     </div>
                 </div>
             </div>
@@ -107,11 +116,13 @@
                            // Read values
                             var TicketStatus = $('#SelectStatusTicketID option:selected').val();
                             var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
+                            var FilterFor = $('#FilterFor option:selected').val();
                             var data = {
                                 auth : 's3Cr3T-G4N',
                                 TicketStatus : TicketStatus,
                                 DepartmentID : SelectDepartmentID,
                                 NIP : sessionNIP,
+                                FilterFor : FilterFor,
                             };
                             var get_token = jwt_encode(data,"UAP)(*");
                             token.token = get_token;
@@ -131,7 +142,6 @@
                     $( row ).find('td:eq(2)').html(htmlRequestedBy);
 
                     var htmlTicket = '';
-                    console.log(data[10]);
                     var FileUpload = (data[10] != null && data[10] != undefined && data[10] != '') ? '<p><a href= "'+data[10]+'" target="_blank">Files Upload<a></p>' : ''; 
                     htmlTicket += '<h3 style = "margin-top:0px;">'+'<b>'+data[3]+'</b>'+'</h3>'+
                                     '<p>'+nl2br(data[4])+'</p>'+
@@ -187,7 +197,7 @@
         App_ticket_tikcet_list.Loaded();
     })
 
-    $(document).off('change', '#SelectDepartmentID,#SelectStatusTicketID').on('change', '#SelectDepartmentID,#SelectStatusTicketID',function(e) {
+    $(document).off('change', '#SelectDepartmentID,#SelectStatusTicketID,#FilterFor').on('change', '#SelectDepartmentID,#SelectStatusTicketID,#FilterFor',function(e) {
        oTable.ajax.reload( null, false );
     })
 

@@ -43,6 +43,8 @@ class C_cooperation extends Cooperation_Controler {
                 $Upload = $this->m_master->uploadDokumenMultiple(uniqid(),'BuktiUpload',$path = './uploads/cooperation');
                 $Upload = json_encode($Upload);
                 $kerjasama['BuktiUpload'] = $Upload;
+                $kerjasama['UpdatedBy'] = $this->session->userdata('NIP');
+                $kerjasama['UpdatedAt'] = date('Y-m-d H:i:s');
                 // add upload bukti kerjasama
                 $this->db->insert('db_cooperation.kerjasama',$kerjasama);
                 $insert_id = $this->db->insert_id();
@@ -102,6 +104,7 @@ class C_cooperation extends Cooperation_Controler {
                     $kerjasama['BuktiUpload'] = $Upload;
                 }
 
+                $kerjasama['UpdatedBy'] = $this->session->userdata('NIP');
                 $this->db->where('ID',$ID);
                 $this->db->update('db_cooperation.kerjasama',$kerjasama);
 
@@ -278,6 +281,8 @@ class C_cooperation extends Cooperation_Controler {
                 }
                 
                 // add upload bukti kerjasama
+                $kegiatan['UpdatedBy'] = $this->session->userdata('NIP');
+                $kegiatan['UpdatedAt'] = date('Y-m-d H:i:s');
                 $this->db->insert('db_cooperation.kegiatan',$kegiatan);
                 $insert_id = $this->db->insert_id();
                 $ID = $insert_id;
@@ -312,6 +317,7 @@ class C_cooperation extends Cooperation_Controler {
                         $kegiatan['FileLain'] = $Upload;
                     }
                 }
+                $kegiatan['UpdatedBy'] = $this->session->userdata('NIP');
                 $this->db->where('ID',$ID);
                 $this->db->update('db_cooperation.kegiatan',$kegiatan);
 

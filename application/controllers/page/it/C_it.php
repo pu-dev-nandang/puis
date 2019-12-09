@@ -224,36 +224,63 @@ class C_it extends It_Controler {
     {
       header('Access-Control-Allow-Origin: *');
       header('Content-Type: application/json');
+      error_reporting(0);
       $Input = $this->getInputToken();
       $action = $Input['action'];
       if ($action == 'add') {
         /*
           hanya untuk local
         */
-          $dataSave = $Input['data'];
-          $dataSave = json_decode(json_encode($dataSave),true);
-          $dataSave['Status'] = $Input['server'];
-          $dataSave['Updated_at'] = date('Y-m-d H:i:s');
-          $dataSave['Updated_by'] = $this->session->userdata('NIP');
-          $this->db->insert('db_it.routes',$dataSave);
-          echo json_encode(1);
+          try {
+            $dataSave = $Input['data'];
+            $dataSave = json_decode(json_encode($dataSave),true);
+            $dataSave['Status'] = $Input['server'];
+            $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+            $dataSave['Updated_by'] = $this->session->userdata('NIP');
+
+            $this->db->db_debug = FALSE;
+            if (!$this->db->insert('db_it.routes',$dataSave)) {
+              echo json_encode('Duplicate URL');
+            }
+            else
+            {
+              echo json_encode(1);
+            }
+            
+          } catch (Exception $e) {
+            echo json_encode('something went wrong, caught yah! n');
+          }
+          
       }
       elseif ($action == 'edit') {
         /*
             local dan live
         */
-        $ID = $Input['ID'];
-        // deklarasi database
-            $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
+        try {
+          $ID = $Input['ID'];
+          // deklarasi database
+              $dbselected = ($Input['server'] == 'live') ? $this->load->database('server_live', TRUE) : $this->db;
 
-        $dataSave = $Input['data'];
-        $dataSave = json_decode(json_encode($dataSave),true);
-        $dataSave['Status'] = $Input['server'];
-        $dataSave['Updated_at'] = date('Y-m-d H:i:s');
-        $dataSave['Updated_by'] = $this->session->userdata('NIP');
-        $dbselected->where('ID',$ID);
-        $dbselected->update('db_it.routes',$dataSave);
-        echo json_encode(1);  
+          $dataSave = $Input['data'];
+          $dataSave = json_decode(json_encode($dataSave),true);
+          $dataSave['Status'] = $Input['server'];
+          $dataSave['Updated_at'] = date('Y-m-d H:i:s');
+          $dataSave['Updated_by'] = $this->session->userdata('NIP');
+
+          $dbselected->db_debug = FALSE;
+
+          $dbselected->where('ID',$ID);
+          if (!$dbselected->update('db_it.routes',$dataSave)) {
+           echo json_encode('Duplicate URL');
+          }
+          else
+          {
+            echo json_encode(1);
+          }
+        } catch (Exception $e) {
+          echo json_encode('something went wrong, caught yah! n');
+        }
+          
       }
       elseif ($action =='delete') {
          /*
@@ -315,33 +342,46 @@ class C_it extends It_Controler {
          $data = $Input['data'];
          $data = json_decode(json_encode($data),true);
          $dbselected =  $this->load->database('server_live', TRUE);
-         for ($i=0; $i <count($data) ; $i++) { 
-           // get data
-          $ID = $data[$i];
-          $G_dt = $this->m_master->caribasedprimary('db_it.routes','ID',$ID);
-          if (count($G_dt) > 0) {
-            $dataSave = [];
-            $r = $G_dt[0];
-            foreach ($r as $key => $value) {
-              if ($key != 'ID') {
-                if ($key == 'Status') {
-                  $dataSave[$key] = 'live';
+         $dbselected->db_debug = FALSE;
+         $msg = 1;
+         try {
+           for ($i=0; $i <count($data) ; $i++) { 
+             // get data
+            $ID = $data[$i];
+            $G_dt = $this->m_master->caribasedprimary('db_it.routes','ID',$ID);
+            if (count($G_dt) > 0) {
+              $dataSave = [];
+              $r = $G_dt[0];
+              foreach ($r as $key => $value) {
+                if ($key != 'ID') {
+                  if ($key == 'Status') {
+                    $dataSave[$key] = 'live';
+                  }
+                  else
+                  {
+                    $dataSave[$key] = $value;
+                  }
+                  
                 }
-                else
-                {
-                  $dataSave[$key] = $value;
-                }
-                
               }
-            }
-            $dbselected->insert('db_it.routes',$dataSave);
-            // update
-            $this->db->where('ID',$ID);
-            $this->db->update('db_it.routes',$dataSave);
+              if (!$dbselected->insert('db_it.routes',$dataSave)) {
+               $msg = 'Duplicate URL with '.$dataSave['Slug'];
+               break;
+              }
+              else
+              {
+                // update
+                $this->db->where('ID',$ID);
+                $this->db->update('db_it.routes',$dataSave);
+              }
 
-          }
+            }
+           }
+         } catch (Exception $e) {
+           $msg = 'Something wrong';
          }
-         echo json_encode(1); 
+         
+         echo json_encode($msg); 
       }
       elseif ($action == 'MigrateLive') {
 

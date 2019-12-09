@@ -231,11 +231,17 @@
         $.post(url,{ token:token },function (resultJson) {
                 
         }).done(function(resultJson) {
-            $('#GlobalModalLarge').modal('hide');
+            if (resultJson == 1) {
+                $('#GlobalModalLarge').modal('hide');
+                oTable.ajax.reload( null, false );
+                oTable2.ajax.reload( null, false );
+                toastr.success('Success');
+            }
+            else
+            {
+                toastr.error(resultJson, 'Error!!');
+            }
             end_loading_button2(selector);
-            oTable.ajax.reload( null, false );
-            oTable2.ajax.reload( null, false );
-            toastr.success('Success');
         }).fail(function() {
             toastr.error("Connection Error, Please try again", 'Error!!');
             end_loading_button2(selector); 

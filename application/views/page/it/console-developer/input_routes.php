@@ -74,7 +74,7 @@
             else
             {
                 if (field != undefined) {
-                    data[field] = $(this).val(); 
+                    data[field] = $(this).val().trim(); 
                 }
                
             }
@@ -96,16 +96,23 @@
                 $.post(url,{ token:token },function (resultJson) {
                         
                 }).done(function(resultJson) {
-                    App_input_routes.LoadSetDefault();
-                    end_loading_button2(selector);
-                    if (server == 'local') {
-                        oTable.ajax.reload( null, false );
+                    if (resultJson == 1) {
+                        App_input_routes.LoadSetDefault();
+                        if (server == 'local') {
+                            oTable.ajax.reload( null, false );
+                        }
+                        else
+                        {
+                            oTable2.ajax.reload( null, false );
+                        }
+                        toastr.success('Success');
                     }
                     else
                     {
-                        oTable2.ajax.reload( null, false );
+                        toastr.error(resultJson, 'Error!!');
                     }
-                    toastr.success('Success');
+
+                    end_loading_button2(selector);
                 }).fail(function() {
                     toastr.error("Connection Error, Please try again", 'Error!!');
                     end_loading_button2(selector); 
