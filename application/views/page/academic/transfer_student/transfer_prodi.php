@@ -530,6 +530,7 @@
 
         var htmlss = '<div class="row">' +
             '    <div class="col-md-12">' +
+            '       <div class="alert alert-info" role="alert">To <b>delete</b> a note, please clear the note and save it</div>' +
             '        <div class="form-group">' +
             '            <label>Note</label>' +
             '            <textarea class="form-control" id="formNote" rows="5">'+Note+'</textarea>' +
@@ -555,37 +556,31 @@
 
             var formNote = $('#formNote').val();
 
-            if(formNote!='' && formNote!=null){
+            loading_buttonSm('#btnSaveNote');
 
-                loading_buttonSm('#btnSaveNote');
+            var data ={
+                action : 'addNoteInTransferStd',
+                TSID : TSID,
+                dataUpdate : {
+                    Note : formNote,
+                    NotedBy : sessionNIP,
+                    NotedAt : dateTimeNow()
+                }
+            };
 
-                var data ={
-                    action : 'addNoteInTransferStd',
-                    TSID : TSID,
-                    dataUpdate : {
-                        Note : formNote,
-                        NotedBy : sessionNIP,
-                        NotedAt : dateTimeNow()
-                    }
-                };
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api/__crudTransferStudent';
 
-                var token = jwt_encode(data,'UAP)(*');
-                var url = base_url_js+'api/__crudTransferStudent';
+            $.post(url,{token:token},function (result) {
 
-                $.post(url,{token:token},function (result) {
+                getListStudentTransfer();
 
-                    getListStudentTransfer();
+                toastr.success('Data saved','Success');
+                setTimeout(function () {
+                    $('#btnSaveNote').prop('disabled',false).html('Save');
+                },500);
 
-                    toastr.success('Data saved','Success');
-                    setTimeout(function () {
-                        $('#btnSaveNote').prop('disabled',false).html('Save');
-                    },500);
-
-                });
-
-            } else {
-                toastr.warning('Form note is required','Warning');
-            }
+            });
 
 
         });
