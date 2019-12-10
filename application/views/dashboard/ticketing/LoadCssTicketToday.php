@@ -332,15 +332,30 @@
     }
 
     .ticket-number {
+            left: -72px;
         position: absolute;
-        top: 45px;
-        right: 0px;
-        background: #607D8B;
-        padding: 0px 10px 1px 10px;
+        top: 46px;
+        background: #009688;
+        padding: 2px 5px 1px 5px;
         color: #fff;
-        font-size: 11px;
-        border-bottom-left-radius: 7px;
-        border-top-left-radius: 7px;
+        font-size: 9px;
+        text-align: center;
+        border-radius: 10px;
+    }
+
+    .ticket-number2 {
+        background: #009688;
+        padding: 0px 0px 0px px;
+        color: #fff;
+        font-size: 9px;
+        text-align: center;
+        height: 14px;
+        margin-top: 10px;
+        line-height: normal;
+        padding: 2px 1px 1px 1px;
+        width: 69px;
+        margin-left: -15px;
+        border-radius: 5px;
     }
 
     .ticket-accepted {
@@ -374,11 +389,11 @@
     }
 
     .panel-ticket:first-child{
-        border-left: 1px solid #CCCCCC;
+        /*border-left: 1px solid #CCCCCC;*/
     }
 
     .panel-ticket {
-        border-right: 1px solid #CCCCCC;
+        /*border-right: 1px solid #CCCCCC;*/
     }
 
     #tableNewTicket td:nth-child(2), #tableDetailTicket td:nth-child(2) {

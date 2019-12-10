@@ -18,7 +18,7 @@
                     <!-- <button class="btn btn-default">Check my ticket</button> -->
                 </div>
             </div>
-            <div class="row bg-ticket">
+            <div class="row bg-ticket2">
                 <div class="col-md-3 panel-ticket" id="PanelPendingTicket">
                 </div>
                 <div class="col-md-3 panel-ticket" id="PanelOpenTicket">
@@ -271,16 +271,16 @@ var App_ticket_ticket_today = {
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     
                     // NANDANG
-                    var colorAsRequest = (DepartmentID == row.DepartmentTicketID) ? '#5ea243' : '#ce2c2c';
+                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
 
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                         '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
@@ -338,14 +338,16 @@ var App_ticket_ticket_today = {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
+
+                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
@@ -437,14 +439,17 @@ var App_ticket_ticket_today = {
 
                     department_handle = data_received[0].NameDepartmentDestination;
 
+                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+department_handle+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                       
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
@@ -552,15 +557,16 @@ var App_ticket_ticket_today = {
                     // }
 
                     department_handle = data_received[0].NameDepartmentDestination;
+                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
                     
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+department_handle+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
