@@ -446,7 +446,12 @@
 				        	received_details : received_details,
 				        	transfer_to : transfer_to,
 				        	update_ticket : update_ticket,
-				        }
+				        },
+				        notifParams : {
+				        	NoTicket : DataTicket[0].NoTicket,
+				        	DepartmentHandler : DepartmentID,
+				        	CreatedBy : sessionNIP,
+				        },
 				    };
 				    // console.log(dataform);return;
 				    var token = jwt_encode(dataform,'UAP)(*');

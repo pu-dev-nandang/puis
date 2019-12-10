@@ -511,6 +511,11 @@
 				    	DepartmentID : DataReceivedSelected[0].DepartmentReceivedID,
 				    	NIP : sessionNIP,
 				    },
+				    notifParams : {
+				    	NoTicket : DataTicket[0].NoTicket,
+				    	DepartmentHandler : DataReceivedSelected[0].DepartmentReceivedID,
+				    	CreatedBy : sessionNIP,
+				    },
 				};
 				// console.log(dataform);return;
 				var token = jwt_encode(dataform,'UAP)(*');

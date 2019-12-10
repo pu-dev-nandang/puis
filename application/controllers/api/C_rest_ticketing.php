@@ -191,7 +191,11 @@ class C_rest_ticketing extends CI_Controller {
               }
 
               if (array_key_exists('received_details', $data)) {
-                $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details']);
+                $notifParams = [];
+                if (array_key_exists('notifParams', $dataToken)) {
+                  $notifParams = $dataToken['notifParams'];
+                }
+                $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details'],$notifParams);
               }
               
               if (array_key_exists('transfer_to', $data)) {
@@ -265,7 +269,12 @@ class C_rest_ticketing extends CI_Controller {
             $action = $dataToken['action'];
             $ac = explode('_', $action);
             $dataToken['action'] = (count($ac)>0) ? $ac[0]  :'insert';
-            $this->m_ticketing->TableReceived_DetailsAction($dataToken);
+            $notifParams = [];
+            if (array_key_exists('notifParams', $dataToken) && $dataToken['action'] == 'insert') {
+              $notifParams = $dataToken['notifParams'];
+            }
+            $this->m_ticketing->TableReceived_DetailsAction($dataToken,$notifParams);
+
             $rs = ['status' => 1,'msg' => ''];
             // callback
             if (array_key_exists('datacallback', $dataToken)) {
