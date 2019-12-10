@@ -604,7 +604,54 @@ class M_ticketing extends CI_Model {
         
     }
 
-    public function TableReceived_DetailsAction($data_arr){
+    private function send_notification_ticketing_worker($arr_pass) {
+        /*
+            $arr_pass = [
+                'To' => 
+                'NoTicket' => 
+                'DepartmentHandler' => 
+                'CreatedBy' => 
+            ];
+
+        */
+
+        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$arr_pass['CreatedBy']);
+        $NameRequested = $G_emp[0]['Name'];
+        $NoTicket = $arr_pass['NoTicket'];
+        $DepartmentID = $arr_pass['DepartmentHandler'];
+        $url_action = $this->jwt->encode($DepartmentID,"UAP)(*");
+        $CreatedBy = $arr_pass['CreatedBy'];
+        $To = [$arr_pass['To']];
+
+        $array_send_notification=[
+          'NameRequested' => $NameRequested,
+          'Description' => 'Number Ticket '.$NoTicket,
+          'URLDirect' => 'ticket/set_action_progress/'.$NoTicket.'/'.$url_action,
+          'CreatedBy' => $CreatedBy,
+          'To' => $To,
+          'NeedEmail' => 'No',
+        ];
+        
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'Logging' => array(
+                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>E-ticketing Assign to by '.$array_send_notification['NameRequested'],
+                            'Description' => $array_send_notification['Description'],
+                            'URLDirect' => $array_send_notification['URLDirect'],
+                            'CreatedBy' => $array_send_notification['CreatedBy'],
+                          ),
+            'To' => array(
+                      'NIP' => $array_send_notification['To'],
+                    ),
+            'Email' => $array_send_notification['NeedEmail'], 
+        );
+
+        $url = url_pas.'rest2/__send_notif_browser';
+        $token = $this->jwt->encode($data,"UAP)(*");
+        $this->m_master->apiservertoserver($url,$token);     
+    }
+
+    public function TableReceived_DetailsAction($data_arr,$notifParams=[]){
         if (array_key_exists('action', $data_arr)) {
             $action = $data_arr['action'];
             switch ($action) {
@@ -615,6 +662,10 @@ class M_ticketing extends CI_Model {
                             $dataSave = $data[$i];
                             $dataSave['At'] = date('Y-m-d H:i:s');
                             $this->db->insert('db_ticketing.received_details',$dataSave);
+                            if (!empty($notifParams)) {
+                                $arr_pass =  ['To' => $dataSave['NIP'] ] + $notifParams;
+                                $this->send_notification_ticketing_worker($arr_pass);
+                            }
                         }
                     }
                     else
@@ -622,6 +673,10 @@ class M_ticketing extends CI_Model {
                         $dataSave = $data;
                         $dataSave['At'] = date('Y-m-d H:i:s');
                         $this->db->insert('db_ticketing.received_details',$dataSave);
+                        if (!empty($notifParams)) {
+                            $arr_pass =  ['To' => $dataSave['NIP'] ] + $notifParams;
+                            $this->send_notification_ticketing_worker($arr_pass);
+                        }
                     }
                     break;
                 case 'update':
