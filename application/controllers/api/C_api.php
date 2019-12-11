@@ -440,17 +440,17 @@ class C_api extends CI_Controller {
         $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
         //print_r($status);
 
-        $totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
+        //$totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
 
         
         /*UPDATED BY FEBRI @ NOV 2019*/
         $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                        ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                        FROM db_employees.employees em
-                        LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                        LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
-                        WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+                ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
+                FROM db_employees.employees em
+                LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
+                LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                WHERE em.StatusEmployeeID != -2 '.$whereStatus;
         if($requestData['isappv'] === 'true'){
             $sql .= " AND (te.isApproval = 1) ";
         }
@@ -466,6 +466,7 @@ class C_api extends CI_Controller {
         /*END UPDATED BY FEBRI @ NOV 2019*/
 
         $query = $this->db->query($sql)->result_array();
+        $totalData = count($query);
         $data = array();
 
         for($i=0;$i<count($query);$i++){
@@ -530,8 +531,8 @@ class C_api extends CI_Controller {
 
         $json_data = array(
             "draw"            => intval( $requestData['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalData),
             "data"            => $data
         );
         echo json_encode($json_data);
