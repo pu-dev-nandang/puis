@@ -14,9 +14,9 @@
                         <span class="btn btn-xs btn-th-action" data-action="add" id="btn_addTahunAkademik">
                             <i class="icon-plus"></i> Academic Year
                         </span>
-<!--                        <span class="btn btn-xs btn-th-action" data-action="add_db" id="btn_addDB">-->
-<!--                            <i class="fa fa-database"></i> Create Database-->
-<!--                        </span>-->
+                        <span class="btn btn-xs" id="btnAcademicCalendar">
+                            <i class="fa fa-calendar"></i> Academic Calendar
+                        </span>
                     </div>
                 </div>
             </div>
@@ -593,4 +593,143 @@
 
 
     });
+
+    // ==== Academic Calendar ===
+    $('#btnAcademicCalendar').click(function () {
+        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<h4 class="modal-title">Academic Calendar</h4>');
+
+        var ck = "<?= $_SERVER['SERVER_NAME']; ?>";
+
+
+        var htmlss = (ck!='localhost')
+            ? '<div style="text-align: center;margin-top: 50px;"><h2>This module is being developed by the IT team<br/><small>We made with <i style="color: indianred;" class="fa fa-heart"></i> & <i style="color: cornflowerblue;" class="fa fa-coffee"></i> for  a better system</small></h2></div>'
+            : '<div class="row">' +
+            '    <div class="col-md-4" style="border-right: 1px solid #ccc;">' +
+            '        <div class="form-group">' +
+            '            <label>Year</label>' +
+            '            <input class="form-control" type="number" id="Year" placeholder="Ex : 2018">' +
+            '        </div>' +
+            '        <div class="form-group">' +
+            '            <label>Year Name</label>' +
+            '            <input class="form-control" id="YearName" placeholder="Ex : 2018/2019">' +
+            '        </div>' +
+            '<form id="fileAnnouncement" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
+            '    <div class="form-group">' +
+            '            <label>File</label>' +
+            '        <label class="btn btn-sm btn-default btn-upload">' +
+            '            <i class="fa fa-upload margin-right"></i> .pdf | max 2 Mb' +
+            '            <input type="file" id="formFile" name="userfile" class="upload_files"' +
+            '                   style="display: none;" accept="application/pdf">' +
+            '        </label>' +
+            '        <p class="help-block" id="viewNameFile"></p>' +
+            '        <p class="help-block" id="viewZise"></p>' +
+            '    </div>' +
+            '</form>' +
+            '        <div class="form-group" style="text-align: right;">' +
+            '            <button class="btn btn-sm btn-success" id="btnSaveAcademicCalendar">Save</button>' +
+            '        </div>' +
+            '    </div>' +
+            '    <div class="col-md-8">' +
+            '        <table class="table table-striped">' +
+            '            <thead>' +
+            '            <tr>' +
+            '                <th style="width: 1%;">No</th>' +
+            '                <th style="width: 15%;">Year</th>' +
+            '                <th>File</th>' +
+            '                <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+            '            </tr>' +
+            '            </thead>' +
+            '        </table>' +
+            '    </div>' +
+            '</div>';
+
+        $('#GlobalModal .modal-body').html(htmlss);
+
+        $('.upload_files').change(function () {
+
+            var input = $('#formFileAnnc');
+            var file = input[0].files[0];
+
+            $('#btnSubmitAnnouncement').prop('disabled',true);
+
+            if(file.type != 'application/pdf'){
+                alert('The file must be PDF');
+            } else {
+                var fileNameOri = file.name;
+                var fileName = fileNameOri.split(' ').join('_');
+                var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
+                $('#viewNameFile').html(fileName);
+                $('#viewZise').html('Size : '+fileSize+' Mb');
+                $('#alertFile').html('');
+                if(fileSize>2){
+                    alert('File lebih dari 2 MB');
+                    $('#alertFile').html('<div class="alert alert-danger" role="alert">File lebih dari 2 MB, jika di submit maka file <b>tidak akan diunggah</b></div>');
+                }
+
+                $('#btnSubmitAnnouncement').prop('disabled',false);
+
+
+
+
+            }
+
+        });
+
+        $('#btnSaveAcademicCalendar').click(function () {
+
+            var Year = $('#Year').val();
+            var YearName = $('#YearName').val();
+            var input = $('#formFile');
+
+            if(input[0].files.length>0 && Year!='' && Year!=null && YearName!='' && YearName!=null){
+
+                var file = input[0].files[0];
+                // cek apakah file lebih dari 2 mb ?
+                var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
+
+                if(fileSize<=2){
+
+                    var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
+                    var formData = new FormData( $("#fileAnnouncement")[0]);
+
+                    var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;
+
+                    $.ajax({
+                        url : url,  // Controller URL
+                        type : 'POST',
+                        data : formData,
+                        async : false,
+                        cache : false,
+                        contentType : false,
+                        processData : false,
+                        success : function(data) {
+                            toastr.success('Announcement Created','Success');
+                            setTimeout(function () {
+                                window.location.href = '';
+                            },500);
+                        }
+                    });
+
+                } else {
+                    toastr.warning('File more then 2 Mb','Warning');
+                }
+
+            } else {
+                toastr.warning('All form are required','Warning');
+            }
+
+        });
+
+        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+
+        $('#GlobalModal').modal({
+            'show' : true,
+            'backdrop' : 'static'
+        });
+    });
+
+
+
+
 </script>
