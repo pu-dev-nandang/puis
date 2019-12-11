@@ -4520,11 +4520,11 @@ class C_api3 extends CI_Controller {
                 $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
                 $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
 
-                $btnCrudPembimbing = ($AS!='Prodi' && ($DeptID=='6' || $DeptID==6))
+                $btnCrudPembimbing = ($AS=='Prodi' || ($DeptID=='6' || $DeptID==6))
                     ? '<div style="margin-bottom: 10px;">
                     <button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
-                data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
-                data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button></div>' : '';
+                data-std="'.$row['NPM'].' - '.$row['StudentName'].'" data-id="'.$row['AUTHID'].'"
+                data-m1="'.$m1.'" data-m1-name="'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'" data-m2="'.$m2.'" data-m2-name="'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'">Edit Mentor Final Project</button></div>' : '';
 
 
                 // Academic
@@ -4591,7 +4591,7 @@ class C_api3 extends CI_Controller {
                 if($ProdiID!=''){
                     $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Clearance</button>';
+                        : '<div style="margin-bottom: 10px;">Register to be a judiciums participant</div><button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Register now</button>';
 
                 }
                 else {
@@ -4723,7 +4723,7 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='getJudiciumsYear'){
 
-            $data = $this->db->query('SELECT ats.GraduationYear FROM db_academic.auth_students ats GROUP BY ats.GraduationYear ORDER BY ats.GraduationYear DESC')->result_array();
+            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.Year DESC')->result_array();
 
             return print_r(json_encode($data));
 
@@ -4744,31 +4744,75 @@ class C_api3 extends CI_Controller {
                 $C.'_At' => $this->m_rest->getDateTimeNow()
             );
 
+
+            $lanjutInsert = false;
+            $result = array(
+                'Status' => 0
+            );
+
             if($C == 'Cl_Kaprodi'){
                 $SemesterActive = $this->m_rest->_getSemesterActive();
                 $SemesterID = $SemesterActive['SemesterID'];
                 $arr['SemesterID'] = $SemesterID;
-            }
 
-            // Cek ada apa tidak rownya
-
-            $dataCk = $this->db->get_where('db_academic.final_project_clearance',
-                array(
-                    'NPM' => $NPM
+                // Cek apakah ada Judicium active
+                $checkJudiciums = $this->db->limit(1)->order_by('ID','DESC')->get_where('db_academic.judiciums',array(
+                    'Publish' => '1'
                 ))->result_array();
 
-            if(count($dataCk)>0){
-                $this->db->where('ID', $dataCk[0]['ID']);
-                $this->db->update('db_academic.final_project_clearance',$arr);
+                if(count($checkJudiciums)>0){
+
+                    $d = $checkJudiciums[0];
+                    $result = array(
+                        'Status' => 1
+                    );
+                    $lanjutInsert = true;
+
+                    $this->db->insert('db_academic.judiciums_list',array(
+                        'JID' => $d['ID'],
+                        'NPM' => $NPM
+                    ));
+
+                } else {
+                    $result = array(
+                        'Status' => 0,
+                        'Message' => 'Active Judicium does not exist, please contact academic service'
+                    );
+                }
 
             } else {
-                $this->db->insert('db_academic.final_project_clearance',$arr);
+                $lanjutInsert = true;
+                $result = array(
+                    'Status' => 1
+                );
             }
 
 
+            if($lanjutInsert==true){
+                $dataCk = $this->db->get_where('db_academic.final_project_clearance',
+                    array(
+                        'NPM' => $NPM
+                    ))->result_array();
 
-            return print_r(1);
+                if(count($dataCk)>0){
+                    $this->db->where('ID', $dataCk[0]['ID']);
+                    $this->db->update('db_academic.final_project_clearance',$arr);
 
+                } else {
+                    $this->db->insert('db_academic.final_project_clearance',$arr);
+                }
+
+            }
+
+            return print_r(json_encode($result));
+
+
+
+        }
+
+        else if($data_arr['action']=='loadJudiciumsData'){
+            $data = $this->db->get_where('db_academic.judiciums',array('Publish' => '1'))->result_array();
+            return print_r(json_encode($data));
         }
 
         else if($data_arr['action']=='updateMentorFP'){
@@ -4806,6 +4850,31 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readDataJudiciums'){
             $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.ID DESC')->result_array();
             return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateStatusDataJudiciums'){
+            $ID = $data_arr['ID'];
+            $Publish = $data_arr['Publish'];
+
+            if($Publish=='1'){
+                $this->db->query('UPDATE db_academic.judiciums s SET s.Publish=IF(s.ID="'.$ID.'","1","0")');
+            } else {
+                $this->db->query('UPDATE db_academic.judiciums s SET s.Publish="'.$Publish.'"');
+            }
+            return print_r(1);
+        }
+        else if($data_arr['action']=='loadDataParticipantOfJudiciums'){
+            $ProdiID = $data_arr['ProdiID'];
+            $Year = $data_arr['Year'];
+
+            $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
+            $data = $this->db->query('SELECT ats.Name, ats.NPM, ps.NameEng AS ProdiEng FROM db_academic.judiciums_list jl 
+                                                LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = jl.NPM)
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                WHERE j.Year = "'.$Year.'" '.$WhereProdi)->result_array();
+
+            return print_r(json_encode($data));
+
         }
 
     }

@@ -266,16 +266,16 @@
 
                     $.post(url,{token:token},function (result) {
                         toastr.success('Data saved','Success');
-                        // loadData();
+                        loadData();
 
-                        $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
-                        if(formMentor2!='' && formMentor2!=null){
-                            $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
-                        }
-
-                        var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
-                        var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
-                        $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
+                        // $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
+                        // if(formMentor2!='' && formMentor2!=null){
+                        //     $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
+                        // }
+                        //
+                        // var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
+                        // var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
+                        // $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
 
                         setTimeout(function () {
                             $('#GlobalModal').modal('hide');

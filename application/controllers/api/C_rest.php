@@ -535,10 +535,10 @@ class C_rest extends CI_Controller {
 
         $term = $this->input->get('term');
 
-        $data = $this->db->query('SELECT * FROM db_employees.employees em WHERE (em.StatusEmployeeID = "3"  
-                                                  OR em.StatusEmployeeID = "4" 
-                                                  OR em.StatusEmployeeID = "5"
-                                                  OR em.StatusEmployeeID = "6" ) AND (
+        $data = $this->db->query('SELECT * FROM db_employees.employees em WHERE (em.StatusLecturerID = "3"  
+                                                  OR em.StatusLecturerID = "4" 
+                                                  OR em.StatusLecturerID = "5"
+                                                  OR em.StatusLecturerID = "6" ) AND (
                                                   em.NIP LIKE "%'.$term.'%" 
                                                   OR em.Name LIKE "%'.$term.'%" ) LIMIT 15 ')->result_array();
 

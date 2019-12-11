@@ -652,7 +652,7 @@
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
                     var sc = (v.GraduationYear==selected) ? 'selected' : '';
-                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+                    $(element).append('<option value="'+v.Year+'" '+sc+'>'+v.Title+'</option>');
 
                 });
             }
