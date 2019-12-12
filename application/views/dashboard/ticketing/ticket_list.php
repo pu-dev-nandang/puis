@@ -158,7 +158,8 @@ var App_ticket_tikcet_list = {
             },
             'createdRow': function(row, data, dataIndex) {
                 var TicketStatus = $('#SelectStatusTicketID option:selected').val();
-                var stylerow = (App_ticket_tikcet_list.cekCloseWorker(jwt_decode(data[9])) &&
+                var SelectDepartmentID = $('#SelectDepartmentID option:selected').val();
+                var stylerow = (App_ticket_tikcet_list.cekCloseWorker(jwt_decode(data[9]),SelectDepartmentID) &&
                     TicketStatus == '2') ? 'background-color: #d8ea8e;' : '';
                 $(row).attr('style', stylerow);
 
@@ -227,12 +228,14 @@ var App_ticket_tikcet_list = {
         oTable = table;
     },
 
-    cekCloseWorker: function(data) {
+    cekCloseWorker: function(data,SelectDepartmentID) {
         var data_received = data.data_received;
+
+        console.log(data_received);
         var bool = true;
         for (let index = 0; index < data_received.length; index++) {
             var DataReceived_Details = data_received[index].DataReceived_Details;
-            if (DataReceived_Details.length == 0) {
+            if (DataReceived_Details.length == 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
                 bool = false;
             }
             else
@@ -245,7 +248,7 @@ var App_ticket_tikcet_list = {
 
                 }
             }
-            
+
             if (!bool) {
                 break;
             }
