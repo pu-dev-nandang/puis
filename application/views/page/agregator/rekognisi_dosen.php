@@ -3,7 +3,7 @@
     #dataTablesLuaran tr th, #dataTablesLuaran tr td {
         text-align: center;
     }
-    
+
 </style>
 
 <div class="well">
@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <p style="color:#3968c6;"><b> Rekognisi Dosen</b></p>
             <div style="text-align: right;margin-bottom: 20px;" class="inputBtn">
-                <button class="btn btn-primary form-data-add" id="addRekognisiDosenMDL"><i class="fa fa-plus margin-right"></i> Rekognisi Dosen</button>
+                <!-- <button class="btn btn-primary form-data-add" id="addRekognisiDosenMDL"><i class="fa fa-plus margin-right"></i> Rekognisi Dosen</button> -->
             </div>
             <div style="text-align: right;">
 <!--                <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>-->
@@ -99,7 +99,7 @@
             var BuktiPendukungName = $('#BuktiPendukungName').val();
             var Tingkat = $('#Tingkat option:selected').val();
             var S_file = $('.input[name="BuktiPendukungUpload"]');
-            
+
             if(nip!='' && nip!=null &&
                 bidang_keahlian!='' && bidang_keahlian!=null &&
                 rekognisi!='' && rekognisi!=null &&
@@ -142,7 +142,7 @@
                   {
                     if(result==0 || result=='0'){
                         toastr.error('Maaf, Gagal simpan data !','Error');
-                    } 
+                    }
                     else {
                         loadRekognisiDosen();
                         $('#GlobalModal').modal('hide');
@@ -156,7 +156,7 @@
                     setTimeout(function () {
                         $('#GlobalModal').modal('hide');
                     },500);
-                 }, 
+                 },
                  error: function (data) {
                     toastr.error("Connection Error, Please try again", 'Error!!');
                     // $(el).prop('disabled',false).html('Save');
@@ -236,7 +236,7 @@
             if(jsonResult.length>0) {
 
                 for (var i = 0; i < jsonResult.length; i++) {
-                    var v = jsonResult[i]; 
+                    var v = jsonResult[i];
 
                     var btnAct = '<div class="btn-group inputBtn">' +
                         '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
@@ -270,7 +270,7 @@
                          '   <td>'+v.Tahun+'</td>' +
                          '   <td style="text-align: left;">'+v.Tingkat+'</td>' +
                             '<td><a class="btn btn-xs btn-primary" target="_blank" href="'+base_url_js+'uploads/Agregator/Aps/'+v.BuktiPendukungUpload+'">View PDF</a></td>' +
-                         '   <td>'+labelStatusApv+labelApvBy+'</td>' +                            
+                         '   <td>'+labelStatusApv+labelApvBy+'</td>' +
                         '   <td class="noExl" style="text-align: left;border-left: 1px solid #ccc;">'+vBtnAct+'</td>' +
                         '</tr>');
 
