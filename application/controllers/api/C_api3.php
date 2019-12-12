@@ -4830,20 +4830,37 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
             $dataForm = (array) $data_arr['dataForm'];
 
-            if($ID!='' && $ID!=null){
-                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
-                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
-                // Update
-                $this->db->where('ID', $ID);
-                $this->db->update('db_academic.judiciums',$dataForm);
-            } else {
-                // Insert
-                $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
-                $this->db->insert('db_academic.judiciums',$dataForm);
+            $Year = $dataForm['Year'];
+
+            $dataCheck = $this->db->query('SELECT * FROM judiciums j WHERE j.Year = '.$Year.' AND ID != '.$ID)->result_array();
+
+            $result = array(
+                'Status' => 0
+            );
+
+            if(count($dataCheck)<=0){
+
+                if($ID!='' && $ID!=null){
+                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                    $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+                    // Update
+                    $this->db->where('ID', $ID);
+                    $this->db->update('db_academic.judiciums',$dataForm);
+                } else {
+                    // Insert
+                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                    $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->insert('db_academic.judiciums',$dataForm);
+                }
+
+                $result = array(
+                    'Status' => 1
+                );
+
             }
 
-            return print_r(1);
+
+            return print_r(json_encode($result));
 
         }
 
@@ -4863,17 +4880,66 @@ class C_api3 extends CI_Controller {
             return print_r(1);
         }
         else if($data_arr['action']=='loadDataParticipantOfJudiciums'){
+
+            $requestData= $_REQUEST;
+
             $ProdiID = $data_arr['ProdiID'];
-            $Year = $data_arr['Year'];
 
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
-            $data = $this->db->query('SELECT ats.Name, ats.NPM, ps.NameEng AS ProdiEng FROM db_academic.judiciums_list jl 
-                                                LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
-                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = jl.NPM)
-                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                                WHERE j.Year = "'.$Year.'" '.$WhereProdi)->result_array();
 
-            return print_r(json_encode($data));
+            $Year = $data_arr['Year'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" 
+                                OR ps.NameEng LIKE "%'.$search.'%"
+                                OR ps.Name LIKE "%'.$search.'%"
+                                )';
+            }
+
+            $queryDefault = 'SELECT ats.Name, ats.NPM, ps.NameEng AS ProdiEng, fp.TitleInd, fp.TitleEng FROM db_academic.judiciums_list jl
+                                                        LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = jl.NPM)
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
+                                                        WHERE j.Year = "'.$Year.'" '.$WhereProdi.' '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $img = $this->m_api->getPhotoStudent($row['NPM']);
+                $urlImg = $img['URLImage'];
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div><img src="'.$urlImg.'" class="img-rounded" style="width: 100%;max-width: 150px;"></div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiEng'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['TitleInd'].'</b><br/><i>'.$row['TitleEng'].'</i></div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
 
         }
 

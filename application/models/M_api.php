@@ -17,7 +17,6 @@ class M_api extends CI_Model {
         return $data->result_array();
     }
 
-
     public function __getGradeByIDKurikulum($CurriculumID){
         $data = $this->db->query('SELECT * FROM db_academic.grade WHERE CurriculumID = "'.$CurriculumID.'" ');
         return $data->result_array();
@@ -4340,6 +4339,40 @@ class M_api extends CI_Model {
 
         return $data;
         ///return print_r(json_encode($data));
+    }
+
+    public function getPhotoStudent($NPM){
+
+        $data = $this->db->select('Year')->get_where('db_academic.auth_students',array(
+            'NPM' => $NPM
+        ))->result_array();
+
+        $result = array(
+            'Status' => 0,
+            'URLImage' => base_url('images/icon/userfalse.png')
+        );
+
+        if(count($data)>0){
+            $d = $data[0];
+            $db = 'ta_'.$d['Year'];
+
+            $dataStd = $this->db->select('Photo')->get_where($db.'.students',array(
+                'NPM' => $NPM
+            ))->result_array()[0];
+
+            $pathPhoto = './uploads/students/'.$db.'/'.$dataStd['Photo'];
+
+            if(file_exists($pathPhoto)){
+                $result = array(
+                    'Status' => 1,
+                    'URLImage' => base_url('uploads/students/'.$db.'/'.$dataStd['Photo'])
+                );
+            }
+
+        }
+
+        return $result;
+
     }
 
 }
