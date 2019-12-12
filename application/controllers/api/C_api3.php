@@ -5008,6 +5008,8 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
             $Publish = $data_arr['Publish'];
 
+            $NPM = ($data_arr['NPM']!='' && $data_arr['NPM']!=null && isset($data_arr['NPM'])) ? $data_arr['NPM'] : '';
+
             if($Publish=='1'){
                 $this->db->query('UPDATE db_academic.judiciums s SET s.Publish=IF(s.ID="'.$ID.'","1","0")');
             } else {
@@ -5020,6 +5022,7 @@ class C_api3 extends CI_Controller {
             $requestData= $_REQUEST;
 
             $ProdiID = $data_arr['ProdiID'];
+            $NPM = (isset($data_arr['NPM']) && $data_arr['NPM']!='' && $data_arr['NPM']!=null) ? $data_arr['NPM'] : '';
 
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
 
@@ -5058,10 +5061,17 @@ class C_api3 extends CI_Controller {
                 $img = $this->m_api->getPhotoStudent($row['NPM']);
                 $urlImg = $img['URLImage'];
 
+                $btnInvitation = '';
+                if($NPM!='' && $row['NPM']==$NPM){
+                    $btnInvitation = '<a href="'.base_url('images/icon/invitation.png').'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
+                } else if ($NPM=='') {
+                    $btnInvitation = '<a href="'.base_url('images/icon/invitation.png').'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
+                }
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div><img src="'.$urlImg.'" class="img-rounded" style="width: 100%;max-width: 150px;"></div>';
                 $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiEng'].'</div>';
                 $nestedData[] = '<div style="text-align: left;"><b>'.$row['TitleInd'].'</b><br/><i>'.$row['TitleEng'].'</i></div>';
+                $nestedData[] = '<div>'.$btnInvitation.'</div>';
 
                 $data[] = $nestedData;
                 $no++;
