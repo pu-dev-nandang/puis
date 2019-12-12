@@ -189,7 +189,8 @@ class M_ticketing extends CI_Model {
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
+                a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -238,7 +239,8 @@ class M_ticketing extends CI_Model {
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
+                a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -296,7 +298,7 @@ class M_ticketing extends CI_Model {
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
+                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -352,7 +354,7 @@ class M_ticketing extends CI_Model {
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
+                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -565,6 +567,38 @@ class M_ticketing extends CI_Model {
         ';
         $query = $this->db->query($sql,array())->result_array();
         return $query;
+    }
+
+    public function UpdateCategoryRequested($data_received){
+        $ID = $data_received['ID'];
+        $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
+        $TicketID = $G_dt[0]['TicketID'];
+        // find this receved isFirst ?
+        $G_received = $this->m_master->caribasedprimary('db_ticketing.received','TicketID',$TicketID);
+        $bool = false;
+        $cek = false;
+        for ($i=0; $i < count($G_received); $i++) {
+            $ReceivedID = $G_received[$i]['ID'];
+            $G_received_details = $this->m_master->caribasedprimary('db_ticketing.received_details','ReceivedID',$ReceivedID);
+            if (count($G_received_details) > 0) {
+                if (!$cek && $ReceivedID == $ID) {
+                    $bool = true;
+                    $cek = true;
+                    break;
+                }
+                $cek = true;
+            }
+        }
+
+        if ($bool) {
+           $CategoryID = $data_received['data']['CategoryReceivedID'];
+           $dataSave = [
+               'CategoryID' => $CategoryID,
+           ];
+           $this->db->where('ID',$TicketID);
+           $this->db->update('db_ticketing.ticket',$dataSave);
+        }
+
     }
 
     public function TableReceivedAction($data_arr){
@@ -1043,6 +1077,7 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $row['token'];
             $nestedData[] = $row['Files'];
             $nestedData[] = $row['setTicket'];
+            $nestedData[] = $row['NameDepartmentTicket'];
             $data[] = $nestedData;
             $No++;
         }
