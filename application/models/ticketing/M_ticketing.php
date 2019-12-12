@@ -570,33 +570,35 @@ class M_ticketing extends CI_Model {
     }
 
     public function UpdateCategoryRequested($data_received){
-        $ID = $data_received['ID'];
-        $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
-        $TicketID = $G_dt[0]['TicketID'];
-        // find this receved isFirst ?
-        $G_received = $this->m_master->caribasedprimary('db_ticketing.received','TicketID',$TicketID);
-        $bool = false;
-        $cek = false;
-        for ($i=0; $i < count($G_received); $i++) {
-            $ReceivedID = $G_received[$i]['ID'];
-            $G_received_details = $this->m_master->caribasedprimary('db_ticketing.received_details','ReceivedID',$ReceivedID);
-            if (count($G_received_details) > 0) {
-                if (!$cek && $ReceivedID == $ID) {
-                    $bool = true;
-                    $cek = true;
-                    break;
-                }
-                $cek = true;
-            }
-        }
+        if (array_key_exists('ID', $data_received)) {
+           $ID = $data_received['ID'];
+           $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
+           $TicketID = $G_dt[0]['TicketID'];
+           // find this receved isFirst ?
+           $G_received = $this->m_master->caribasedprimary('db_ticketing.received','TicketID',$TicketID);
+           $bool = false;
+           $cek = false;
+           for ($i=0; $i < count($G_received); $i++) {
+               $ReceivedID = $G_received[$i]['ID'];
+               $G_received_details = $this->m_master->caribasedprimary('db_ticketing.received_details','ReceivedID',$ReceivedID);
+               if (count($G_received_details) > 0) {
+                   if (!$cek && $ReceivedID == $ID) {
+                       $bool = true;
+                       $cek = true;
+                       break;
+                   }
+                   $cek = true;
+               }
+           }
 
-        if ($bool) {
-           $CategoryID = $data_received['data']['CategoryReceivedID'];
-           $dataSave = [
-               'CategoryID' => $CategoryID,
-           ];
-           $this->db->where('ID',$TicketID);
-           $this->db->update('db_ticketing.ticket',$dataSave);
+           if ($bool) {
+              $CategoryID = $data_received['data']['CategoryReceivedID'];
+              $dataSave = [
+                  'CategoryID' => $CategoryID,
+              ];
+              $this->db->where('ID',$TicketID);
+              $this->db->update('db_ticketing.ticket',$dataSave);
+           }
         }
 
     }
