@@ -28,7 +28,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label>To Department</label>
+                                <label>Department</label>
                                 <select class="select2-select-00 full-width-fix" id="SelectDepartmentID"></select>
                             </div>
                         </div>
@@ -44,6 +44,8 @@
                                 <select class="form-control" id="FilterFor">
                                     <option selected value="%">--All--</option>
                                     <option value="1">--Worker--</option>
+                                    <option value="99">--Incoming--</option>
+                                    <option value="-99">--Outgoing--</option>
                                 </select>
                             </div>
                         </div>

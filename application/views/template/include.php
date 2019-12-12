@@ -2196,7 +2196,7 @@
       return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, replaceStr);
     }
 
-    function br2nl (str, replaceMode) {
+    function br2nl (str, replaceMode) { // yg biasa digunakan
 
       var replaceStr = (replaceMode) ? "\n" : '';
       // Includes <br>, <BR>, <br />, </br>
