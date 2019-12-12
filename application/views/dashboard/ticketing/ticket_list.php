@@ -51,7 +51,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="thumbnail" style="padding: 10px;">
-                                <b>Status : </b><i class="fa fa-circle" style="color:#d8ea8e;"></i> Ticket Done By Worker
+                                <b>Status : </b><i class="fa fa-circle" style="color:#d8ea8e;"></i> All Worker have been done.
                             </div>
                         </div>
                     </div>
