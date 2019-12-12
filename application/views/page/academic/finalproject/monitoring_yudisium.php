@@ -5,20 +5,24 @@
         background-color: #fff;
         color: #333;
     }
+
+    td:nth-child(1) {
+        border-right: 1px solid #CCCCCC;
+    }
 </style>
 
 <div class="row" style="margin-top: 30px;">
     <div class="col-md-6 col-md-offset-3">
         <div class="well">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-7">
                     <label>Programme Study</label>
                     <select class="form-control" id="filterBaseProdi">
                         <option value="">-- All Programme Study --</option>
                         <option disabled>------------------------------------------</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <label>Periode Judiciums</label>
                     <select class="form-control" id="filterJudiciumsYear"></select>
                 </div>
@@ -33,19 +37,9 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <table class="table table-centre table-bordered">
-            <thead>
-            <tr>
-                <th style="width: 1%;">No</th>
-                <th style="width: 15%;">Student</th>
-                <th>Prodi</th>
-            </tr>
-            </thead>
-            <tbody id="dataProdi"></tbody>
-        </table>
-    </div>
+    <div class="col-md-12" id="divLoadTableData"></div>
 </div>
+
 
 <script>
 
@@ -62,12 +56,31 @@
         },1000);
     });
 
+    $('#filterBaseProdi,#filterJudiciumsYear').change(function () {
+        loadDataParticipant();
+    });
+
     function loadDataParticipant(){
         var filterJudiciumsYear = $('#filterJudiciumsYear').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         if(filterJudiciumsYear!='' && filterJudiciumsYear!=null){
 
             var ProdiID = (filterBaseProdi!=null && filterBaseProdi!='') ? filterBaseProdi.split('.')[0] : '';
+
+
+
+            $('#divLoadTableData').html('<table class="table table-centre table-striped" id="tableData">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th style="width: 1%;">No</th>' +
+                '                <th style="width: 5%;">Photo</th>' +
+                '                <th style="width: 20%;">Student</th>' +
+                '                <th>Final Project</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '            <tbody id="dataProdi"></tbody>' +
+                '        </table>');
+
 
             var data = {
                 action : 'loadDataParticipantOfJudiciums',
@@ -78,20 +91,23 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api3/__crudYudisium';
 
-            $.post(url,{token:token},function (jsonResult) {
-
-                if(jsonResult.length>0){
-                    $.each(jsonResult,function (i,v) {
-                        $('#dataProdi').append('<tr>' +
-                            '<td>'+(i+1)+'</td>' +
-                            '<td style="text-align: left;">'+v.Name+'<br/>'+v.NPM+'</td>' +
-                            '<td style="text-align: left;">'+v.ProdiEng+'</td>' +
-                            '</tr>');
-                    });
-                } else {
-                    $('#dataProdi').html('<tr><td colspan="3">Data not yet</td></tr>');
+            var dataTable = $('#tableData').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "iDisplayLength" : 10,
+                "ordering" : false,
+                "language": {"searchPlaceholder": "NIM, Name"},
+                "ajax":{
+                    url : url, // json datasource
+                    data : {token:token},
+                    ordering : false,
+                    type: "post",  // method  , by default get
+                    error: function(){  // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                        $("#employee-grid_processing").css("display","none");
+                    }
                 }
-
             });
 
         }
@@ -207,17 +223,25 @@
 
                 $.post(url,{token:token},function (jsonResult) {
 
-                    toastr.success('Data saved','Success');
+                    if(jsonResult.Status==1){
+                        toastr.success('Data saved','Success');
 
-                    $('#formTitle').val('');
-                    $('#formID').val('');
-                    $('#formYear').val('');
-                    $('#formJudiciumsDate').val('');
-                    $('#formGraduationDate').val('');
-                    loadDataJudiciums();
-                    setTimeout(function () {
+                        $('#formTitle').val('');
+                        $('#formID').val('');
+                        $('#formYear').val('');
+                        $('#formJudiciumsDate').val('');
+                        $('#formGraduationDate').val('');
+                        loadDataJudiciums();
+                        loadSelectOptionJudiciumsYear('#filterJudiciumsYear','');
+                        setTimeout(function () {
+                            $('#btnSaveJudiciums').html('Save').prop('disabled',false);
+                        },500);
+                    } else {
+                        toastr.warning('The year entered already exists','Warning');
                         $('#btnSaveJudiciums').html('Save').prop('disabled',false);
-                    },500);
+                    }
+
+
 
                 });
 
