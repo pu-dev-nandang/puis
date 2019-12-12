@@ -76,6 +76,7 @@
                 '                <th style="width: 5%;">Photo</th>' +
                 '                <th style="width: 20%;">Student</th>' +
                 '                <th>Final Project</th>' +
+                '                <th>Graduation Party Invitation</th>' +
                 '            </tr>' +
                 '            </thead>' +
                 '            <tbody id="dataProdi"></tbody>' +
