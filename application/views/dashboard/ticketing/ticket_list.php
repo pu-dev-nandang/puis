@@ -44,8 +44,8 @@
                                 <select class="form-control" id="FilterFor">
                                     <option selected value="%">--All--</option>
                                     <option value="1">--Worker--</option>
-                                    <option value="99">--Incoming--</option>
-                                    <option value="-99">--Outgoing--</option>
+                                    <option value="99">--Outgoing--</option>
+                                    <option value="-99">--Incoming--</option>
                                 </select>
                             </div>
                         </div>
