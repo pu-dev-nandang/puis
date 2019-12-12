@@ -4482,7 +4482,7 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-                $StudentName = ucwords(strtolower($row['StudentName']));
+                $StudentName = $row['StudentName'];
 
                 // ========== GET TRANSCRIPT =========
 
@@ -4643,6 +4643,142 @@ class C_api3 extends CI_Controller {
                 "data"            => $data
             );
             echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='viewYudisiumSchedule'){
+
+            $requestData= $_REQUEST;
+
+            $SemesterID = $data_arr['SemesterID'];
+
+            $ProdiID = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='') ? $data_arr['ProdiID'] : '';
+            $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, mk.MKCode,
+                                        mk.NameEng AS CourseEng, sc.ClassGroup,
+                                        ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
+                                        ats.ID AS AUTHID
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
+                                        LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+
+                $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div style="color: royalblue;">'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
+                $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div style="color: royalblue;">'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
+
+                $dataSchedule = $this->db->query('SELECT fps.ID, fps.Date, fps.Start, fps.End, cl.Room FROM db_academic.final_project_schedule_student fpss 
+                                                                 LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ClassroomID)
+                                                                 WHERE fpss.NPM = "'.$row['NPM'].'"')->result_array();
+
+                $rowSchedule = '';
+                if(count($dataSchedule)>0){
+                    for($s=0;$s<count($dataSchedule);$s++){
+                        $d = $dataSchedule[$s];
+
+                        // Get Examiner
+                        $dataEx = $this->db->query('SELECT em.Name FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                                            LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                                            WHERE fpsl.FPSID = '.$d['ID'].' 
+                                                                            ORDER BY fpsl.Type DESC, fpsl.NIP ASC ')->result_array();
+
+                        $ListEx = '';
+                        if(count($dataEx)>0){
+                            foreach ($dataEx AS $key => $item){
+                                $koma = ($key!=0) ? ', ' : '';
+                                $ListEx = $ListEx.''.$koma.$item['Name'];
+                            }
+                        } else {
+                            $ListEx = '<span style="color: darkred;">Not set</span>';
+                        }
+
+                        // Get Participant
+                        $dataPar = $this->db->query('SELECT ats.Name, ats.NPM FROM db_academic.final_project_schedule_student fpss
+                                                                   LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                                   WHERE fpss.FPSID = '.$d['ID'].' AND fpss.NPM != "'.$row['NPM'].'"
+                                                                    ORDER BY fpss.NPM ASC ' )->result_array();
+
+                        $ListPar = '';
+                        if(count($dataPar)>0){
+                            foreach ($dataPar AS $key => $item){
+                                $koma = ($key!=0) ? ', ' : '';
+                                $ListPar = $ListPar.''.$koma.$item['NPM'].' - '.$item['Name'];
+                            }
+                        } else {
+                            $ListPar = '-';
+                        }
+
+                        $date = date('l, d F Y',strtotime($d['Date']));
+                        $time = substr($d['Start'],0,5).' - '.substr($d['End'],0,5);
+                        $tbSch = '<table class="table table-left table-sch">
+                                <tr>
+                                    <td style="width: 20%;">Date</td>
+                                    <td style="width: 5%;">:</td>
+                                    <td>'.$date.' '.$time.'</td>
+                                </tr>
+                                <tr>
+                                    <td>Room</td>
+                                    <td>:</td>
+                                    <td>'.$d['Room'].'</td>
+                                </tr>
+                                <tr>
+                                    <td>Examiner</td>
+                                    <td>:</td>
+                                    <td>'.$ListEx.'</td>
+                                </tr>
+                                <tr>
+                                    <td>Participants</td>
+                                    <td>:</td>
+                                    <td>'.$ListPar.'</td>
+                                </tr>
+                            </table>';
+                        $rowSchedule = $rowSchedule.'<div class="div-sch">'.$tbSch.'</div>';
+                    }
+                }
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$m1Name.''.$m2Name.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$rowSchedule.'</div>';
+
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
 
         }
 
