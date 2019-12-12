@@ -232,14 +232,20 @@ var App_ticket_tikcet_list = {
         var bool = true;
         for (let index = 0; index < data_received.length; index++) {
             var DataReceived_Details = data_received[index].DataReceived_Details;
-            for (let j = 0; j < DataReceived_Details.length; j++) {
-                if (DataReceived_Details[j].Status == "1") {
-                    bool = false;
-                    break;
-                }
-
+            if (DataReceived_Details.length == 0) {
+                bool = false;
             }
+            else
+            {
+                for (let j = 0; j < DataReceived_Details.length; j++) {
+                    if (DataReceived_Details[j].Status == "1") {
+                        bool = false;
+                        break;
+                    }
 
+                }
+            }
+            
             if (!bool) {
                 break;
             }
