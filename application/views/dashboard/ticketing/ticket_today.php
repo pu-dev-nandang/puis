@@ -271,7 +271,7 @@ var App_ticket_ticket_today = {
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     
                     // NANDANG
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
 
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -339,7 +339,7 @@ var App_ticket_ticket_today = {
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
 
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -439,7 +439,7 @@ var App_ticket_ticket_today = {
 
                     department_handle = data_received[0].NameDepartmentDestination;
 
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
 
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -557,7 +557,7 @@ var App_ticket_ticket_today = {
                     // }
 
                     department_handle = data_received[0].NameDepartmentDestination;
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
                     
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+

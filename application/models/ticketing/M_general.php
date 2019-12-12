@@ -65,7 +65,13 @@ class M_general extends CI_Model {
                    SPLIT_STR(a.PositionMain, ".", 2) as Position,
                          a.StatusEmployeeID
                         FROM   db_employees.employees as a
-                        where SPLIT_STR(a.PositionMain, ".", 1) = '.$Division.' and a.StatusEmployeeID != -1 and SPLIT_STR(a.PositionMain, ".", 2) in(11,12)'; // kabag dan kasubag
+                        where (
+                                SPLIT_STR(a.PositionMain, ".", 1) = '.$Division.' or
+                                SPLIT_STR(a.PositionOther1, ".", 1) = '.$Division.' or
+                                SPLIT_STR(a.PositionOther2, ".", 1) = '.$Division.' or
+                                SPLIT_STR(a.PositionOther3, ".", 1) = '.$Division.'
+                                )
+                        and a.StatusEmployeeID != -1 and SPLIT_STR(a.PositionMain, ".", 2) in(11,12)'; // kabag dan kasubag
                 $query = $this->db->query($sql,array())->result_array();
                 for ($i=0; $i < count($query); $i++) { 
                    if ($query[$i]['NIP'] == $NIP) {
