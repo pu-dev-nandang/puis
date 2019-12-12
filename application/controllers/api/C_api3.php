@@ -1384,7 +1384,7 @@ class C_api3 extends CI_Controller {
                     //$Upload = json_encode($Upload);
                     $BuktiUpload = $Upload[0];
                 }
-                
+
                 $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
             }
@@ -2030,7 +2030,7 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
 
             $dataForm = (array) $data_arr['dataForm'];
-            
+
             if($ID!=''){
                 // Update
                 /*ADDED BY FEBRI @ NOV 2019*/
@@ -2079,8 +2079,8 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='viewDataPAM'){
             //UPDATED BY FEBRI @ DEC 2019
             $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$this->session->userdata('NIP').'%" and c.ID = a.ID) as isAbble
-                                      FROM db_studentlife.student_achievement  a 
-                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID 
+                                      FROM db_studentlife.student_achievement  a
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID
                                       ORDER BY Year, StartDate DESC')->result_array();
             //END UPDATED BY FEBRI
 
@@ -3961,9 +3961,9 @@ class C_api3 extends CI_Controller {
     public function getsitasikarya(){
 
         //$Status = $this->input->get('s');
-        $data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
+        $data = $this->db->query('SELECT a.Updated_by, a.Judul_Sitasi, a.jumlah_sitasi, a.year, b.Name
                     FROM db_agregator.sitasi_karya AS a
-                    LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
+                    LEFT JOIN db_employees.employees AS b ON (a.Updated_by = b.NIP)
                     ORDER BY a.ID DESC')->result_array();
         return print_r(json_encode($data));
 
@@ -5593,11 +5593,11 @@ class C_api3 extends CI_Controller {
             $now=date("Y-m-d");
 
             $member_id = $data_arr['member_id'];
-            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed 
-                                                    FROM library.loan l 
-                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code) 
+            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed
+                                                    FROM library.loan l
+                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code)
                                                     LEFT JOIN library.biblio b ON (b.biblio_id = i.biblio_id)
-                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC, 
+                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC,
                                                     l.due_date DESC, b.title ASC')->result_array();
 
             $dataHoliday = $dbLib->query('SELECT holiday_date FROM library.holiday ORDER BY holiday_id DESC')->result_array();
