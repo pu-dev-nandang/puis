@@ -5337,10 +5337,11 @@ class C_api3 extends CI_Controller {
                                  OR fpf.JudulEng LIKE "%'.$search.'%" )';
             }
 
-            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName FROM db_academic.final_project_files fpf
+            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName, em.Name AS EmUpdateByName FROM db_academic.final_project_files fpf
                                           LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                           '.$WhereStatus.$dataSearch;
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = fpf.EmUpdateBy)
+                                           '.$WhereStatus.$dataSearch.' ORDER BY fpf.UpdatedAt ASC';
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -5359,9 +5360,9 @@ class C_api3 extends CI_Controller {
 
 
                 // 0 = Plan, 1 = Send, 2 = Approve, -2 Rejected
-                $Status = 'Waiting for sending documents';
+                $Status = '<span style="color:#b3b2b2;font-size: 11px;">Waiting for sending documents</span>';
                 if($row['Status']==1 || $row['Status']=='1'){
-                    $Status = 'Need action';
+                    $Status = '<span style="color:blue;">Need action</span>';
                 }
                 else if($row['Status']==2 || $row['Status']=='2'){
                     $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved</span>';
@@ -5372,11 +5373,15 @@ class C_api3 extends CI_Controller {
 
                 $Noted = ($row['Noted']!='' && $row['Noted']!=null) ? $row['Noted'] : '';
 
+                $Updated = ($row['EmUpdateBy']!='' && $row['EmUpdateBy']!=null)
+                    ? '<div style="font-size: 10px;">'.$row['EmUpdateByName'].'<br/>'.date('d M Y H:i',strtotime($row['EmUpdateAt'])).'</div>' : '';
+
+
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;"><a href="'.base_url('library/yudisium/final-project/details/'.$row['NPM']).'" target="_blank"><b>'.$row['Name'].'</b></a><br/>'.$row['NPM'].'<br/>'.$row['ProdiName'].'</div>';
                 $nestedData[] = '<div style="text-align:left;"><b>'.$row['JudulInd'].'</b><br/><i>'.$row['JudulEng'].'</i></div>';
                 $nestedData[] = '<div>'.$Noted.'</div>';
-                $nestedData[] = '<div>'.$Status.'</div>';
+                $nestedData[] = '<div>'.$Status.$Updated.'</div>';
 
                 $no++;
 

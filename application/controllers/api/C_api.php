@@ -8614,7 +8614,7 @@ class C_api extends CI_Controller {
                                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
                                                                                 WHERE fpsl.FPSID = "'.$data[$i]['ID'].'" ORDER BY fpsl.Type DESC ')->result_array();
 
-                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.final_project_schedule_student fpss 
+                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name, fpss.Notes FROM db_academic.final_project_schedule_student fpss 
                                                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM) 
                                                                                 WHERE fpss.FPSID = "'.$data[$i]['ID'].'"')->result_array();
 
