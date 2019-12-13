@@ -4968,32 +4968,22 @@ class C_api3 extends CI_Controller {
 
             $Year = $dataForm['Year'];
 
-            $dataCheck = $this->db->query('SELECT * FROM judiciums j WHERE j.Year = '.$Year.' AND ID != '.$ID)->result_array();
+            if($ID!='' && $ID!=null){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.judiciums',$dataForm);
+            } else {
+                // Insert
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.judiciums',$dataForm);
+            }
 
             $result = array(
-                'Status' => 0
+                'Status' => 1
             );
-
-            if(count($dataCheck)<=0){
-
-                if($ID!='' && $ID!=null){
-                    $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
-                    $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
-                    // Update
-                    $this->db->where('ID', $ID);
-                    $this->db->update('db_academic.judiciums',$dataForm);
-                } else {
-                    // Insert
-                    $dataForm['EntredBy'] = $this->session->userdata('NIP');
-                    $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
-                    $this->db->insert('db_academic.judiciums',$dataForm);
-                }
-
-                $result = array(
-                    'Status' => 1
-                );
-
-            }
 
 
             return print_r(json_encode($result));
