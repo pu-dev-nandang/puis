@@ -4609,7 +4609,7 @@ class C_api3 extends CI_Controller {
                 if($ProdiID!=''){
                     $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
-                        : '<div style="margin-bottom: 10px;">Register to be a judiciums participant</div><button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Register now</button>';
+                        : '<div style="margin-bottom: 10px;">Register to be a judiciums participant</div><button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Register now</button>';
 
                 }
                 else {
@@ -5357,7 +5357,8 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-
+                $Updated = ($row['EmUpdateBy']!='' && $row['EmUpdateBy']!=null)
+                    ? '<div style="font-size: 10px;">'.$row['EmUpdateByName'].'<br/>'.date('d M Y H:i',strtotime($row['EmUpdateAt'])).'</div>' : '';
 
                 // 0 = Plan, 1 = Send, 2 = Approve, -2 Rejected
                 $Status = '<span style="color:#b3b2b2;font-size: 11px;">Waiting for sending documents</span>';
@@ -5365,23 +5366,22 @@ class C_api3 extends CI_Controller {
                     $Status = '<span style="color:blue;">Need action</span>';
                 }
                 else if($row['Status']==2 || $row['Status']=='2'){
-                    $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved</span>';
+                    $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved</span>'.$Updated;
                 }
                 else if($row['Status']==-2 || $row['Status']=='-2'){
-                    $Status = '<span style="color: red;"><i class="fa fa-times-circle"></i> Rejected</span>';
+                    $Status = '<span style="color: red;"><i class="fa fa-times-circle"></i> Rejected</span>'.$Updated;
                 }
 
                 $Noted = ($row['Noted']!='' && $row['Noted']!=null) ? $row['Noted'] : '';
 
-                $Updated = ($row['EmUpdateBy']!='' && $row['EmUpdateBy']!=null)
-                    ? '<div style="font-size: 10px;">'.$row['EmUpdateByName'].'<br/>'.date('d M Y H:i',strtotime($row['EmUpdateAt'])).'</div>' : '';
+
 
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;"><a href="'.base_url('library/yudisium/final-project/details/'.$row['NPM']).'" target="_blank"><b>'.$row['Name'].'</b></a><br/>'.$row['NPM'].'<br/>'.$row['ProdiName'].'</div>';
                 $nestedData[] = '<div style="text-align:left;"><b>'.$row['JudulInd'].'</b><br/><i>'.$row['JudulEng'].'</i></div>';
                 $nestedData[] = '<div>'.$Noted.'</div>';
-                $nestedData[] = '<div>'.$Status.$Updated.'</div>';
+                $nestedData[] = '<div>'.$Status.'</div>';
 
                 $no++;
 
