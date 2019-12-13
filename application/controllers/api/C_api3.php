@@ -4998,8 +4998,6 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
             $Publish = $data_arr['Publish'];
 
-            $NPM = ($data_arr['NPM']!='' && $data_arr['NPM']!=null && isset($data_arr['NPM'])) ? $data_arr['NPM'] : '';
-
             if($Publish=='1'){
                 $this->db->query('UPDATE db_academic.judiciums s SET s.Publish=IF(s.ID="'.$ID.'","1","0")');
             } else {
