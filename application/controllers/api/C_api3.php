@@ -4547,7 +4547,21 @@ class C_api3 extends CI_Controller {
                 if($AS!='Prodi' && ($DeptID=='11' || $DeptID==11)){
                     $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Library">Clearance</button>';
+                        : '<button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Library">Clearance</button>';
+
+                    $CheckDataFile = $this->db->get_where('db_academic.final_project_files',array('NPM' => $row['NPM']))->result_array();
+                    if(count($CheckDataFile)>0){
+                        if($CheckDataFile[0]['Status']=='0'){
+                            $c_Library = '<span style="color: #ff9800;">Not yet sending the final project document</span>';
+                        } else if($CheckDataFile[0]['Status']=='1'){
+                            $c_Library = '<span style="color: blue;">Awaiting action by library staff</span>';
+                        } else if($CheckDataFile[0]['Status']=='-2'){
+                            $c_Library = '<span style="color: darkred;">The final project document rejected</span>';
+                        }
+                    } else {
+                        $c_Library = '<span style="color: #ff9800;">Not yet sending the final project document</span>';
+                    }
+
                 } else {
                     $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
@@ -4859,7 +4873,7 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='getJudiciumsYear'){
 
-            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.Year DESC')->result_array();
+            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.ID DESC')->result_array();
 
             return print_r(json_encode($data));
 
@@ -5014,7 +5028,7 @@ class C_api3 extends CI_Controller {
 
             $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
 
-            $Year = $data_arr['Year'];
+            $JID = $data_arr['JID'];
 
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
@@ -5031,7 +5045,7 @@ class C_api3 extends CI_Controller {
                                                         LEFT JOIN db_academic.auth_students ats ON (ats.NPM = jl.NPM)
                                                         LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                         LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
-                                                        WHERE j.Year = "'.$Year.'" '.$WhereProdi.' '.$dataSearch;
+                                                        WHERE j.ID = "'.$JID.'" '.$WhereProdi.' '.$dataSearch;
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -5388,6 +5402,33 @@ class C_api3 extends CI_Controller {
 
             $this->db->where('NPM', $NPM);
             $this->db->update('db_academic.final_project_files',$dataForm);
+            $this->db->reset_query();
+
+            if($dataForm['Status']==2 || $dataForm['Status']=='2'){
+                // Update juga di final project
+
+                $dataFP = $this->db->get_where('db_academic.final_project_files',array('NPM' => $NPM))->result_array();
+
+                $dataCk = $this->db->get_where('db_academic.final_project',array('NPM' => $NPM))->result_array();
+
+                $dataFP = array(
+                    'NPM' => $NPM,
+                    'TitleInd' => $dataFP[0]['JudulInd'],
+                    'TitleEng' => $dataFP[0]['JudulEng'],
+                    'Status' => '2',
+                    'UpdatedBy' => $this->session->userdata('NIP')
+                );
+
+                if(count($dataCk)>0){
+                    // Update yang data
+                    $this->db->where('ID', $dataCk[0]['ID']);
+                    $this->db->update('db_academic.final_project',$dataFP);
+                } else {
+                    // Insert yang baru
+                    $this->db->insert('db_academic.final_project',$dataFP);
+                }
+
+            }
 
             return print_r(1);
 
