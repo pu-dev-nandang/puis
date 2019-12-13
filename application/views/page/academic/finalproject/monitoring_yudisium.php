@@ -86,7 +86,7 @@
             var data = {
                 action : 'loadDataParticipantOfJudiciums',
                 ProdiID : ProdiID,
-                Year : filterJudiciumsYear
+                JID : filterJudiciumsYear
             };
 
             var token = jwt_encode(data,'UAP)(*');
@@ -233,6 +233,8 @@
                         $('#formJudiciumsDate').val('');
                         $('#formGraduationDate').val('');
                         loadDataJudiciums();
+
+                        $('#filterJudiciumsYear').empty();
                         loadSelectOptionJudiciumsYear('#filterJudiciumsYear','');
                         setTimeout(function () {
                             $('#btnSaveJudiciums').html('Save').prop('disabled',false);

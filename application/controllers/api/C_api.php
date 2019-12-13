@@ -8661,7 +8661,7 @@ class C_api extends CI_Controller {
                                                                 WHERE fpf.NPM = "'.$NPM.'"')->result_array();
 
                 if(count($data)<=0){
-                    $this->db->update('db_academic.final_project_files',array('NPM' => $NPM));
+                    $this->db->insert('db_academic.final_project_files',array('NPM' => $NPM));
 
                     $data = $this->db->query('SELECT fpf.*, fp.Status AS StatusFinalProject 
                                                                 FROM db_academic.final_project_files fpf 
