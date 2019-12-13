@@ -4499,18 +4499,18 @@ class C_api3 extends CI_Controller {
 
                 // Ijazah
                 $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
-                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/document/'.$row['NPM'].'/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
-                    : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
+                    ? '<a href="'.base_url('uploads/document/'.$row['NPM'].'/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
+                    : 'Waiting Upload';
                 if($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)){
                     $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
 
                     $ijazah = '<form id="formupload_files_'.$row['AUTHID'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
-                                        <i class="fa fa-upload"></i>
+                                <div class="form-group"><label class="btn btn-sm btn-default btn-upload">
+                                        Upload Ijazah
                                         <input type="file" name="userfile" class="uploadIjazahStudentFile" data-old="'.$fileIjazahOld.'" data-npm="'.$row['NPM'].'" data-id="'.$row['AUTHID'].'" id="upload_files_'.$row['AUTHID'].'" accept="application/pdf" style="display: none;">
                                     </label>
                                 </div>
-                        </form>'.$ijazahBtnD;
+                        </form><hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$ijazahBtnD;
 
                 } else {
                     $ijazah = $ijazahBtnD;
@@ -4533,7 +4533,11 @@ class C_api3 extends CI_Controller {
 
                     $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Academic_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Academic">Clearance</button>';
+                        : '<button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Academic">Clearance</button>';
+
+                    $c_Academic = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
+                        ? $c_Academic
+                        : '<span style="color:#ff9800; ">Waiting Upload Ijazah</span>';
 
                 } else {
                     $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
@@ -5321,19 +5325,23 @@ class C_api3 extends CI_Controller {
         if($data_arr['action']=='viewFileFinalProject'){
             $requestData= $_REQUEST;
 
+            $WhereStatus = ($data_arr['Status']!='') ? 'WHERE fpf.Status = "'.$data_arr['Status'].'" ' : '';
+
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
 
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE fpf.NPM LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
+                $w = ($data_arr['Status']!='') ? ' AND ' : 'WHERE ';
+                $dataSearch = $w.' (fpf.NPM LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
                                 OR ps.Name LIKE "%'.$search.'%" OR fpf.JudulInd LIKE "%'.$search.'%"
-                                 OR fpf.JudulEng LIKE "%'.$search.'%" ';
+                                 OR fpf.JudulEng LIKE "%'.$search.'%" )';
             }
 
-            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName FROM db_academic.final_project_files fpf
+            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName, em.Name AS EmUpdateByName FROM db_academic.final_project_files fpf
                                           LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                          '.$dataSearch.' ';
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = fpf.EmUpdateBy)
+                                           '.$WhereStatus.$dataSearch.' ORDER BY fpf.UpdatedAt ASC';
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -5349,25 +5357,31 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
+
+
                 // 0 = Plan, 1 = Send, 2 = Approve, -2 Rejected
-                $Status = 'Plan';
+                $Status = '<span style="color:#b3b2b2;font-size: 11px;">Waiting for sending documents</span>';
                 if($row['Status']==1 || $row['Status']=='1'){
-                    $Status = 'Waiting approval';
+                    $Status = '<span style="color:blue;">Need action</span>';
                 }
                 else if($row['Status']==2 || $row['Status']=='2'){
-                    $Status = 'Approved';
+                    $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved</span>';
                 }
                 else if($row['Status']==-2 || $row['Status']=='-2'){
-                    $Status = 'Rejected';
+                    $Status = '<span style="color: red;"><i class="fa fa-times-circle"></i> Rejected</span>';
                 }
 
                 $Noted = ($row['Noted']!='' && $row['Noted']!=null) ? $row['Noted'] : '';
+
+                $Updated = ($row['EmUpdateBy']!='' && $row['EmUpdateBy']!=null)
+                    ? '<div style="font-size: 10px;">'.$row['EmUpdateByName'].'<br/>'.date('d M Y H:i',strtotime($row['EmUpdateAt'])).'</div>' : '';
+
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;"><a href="'.base_url('library/yudisium/final-project/details/'.$row['NPM']).'" target="_blank"><b>'.$row['Name'].'</b></a><br/>'.$row['NPM'].'<br/>'.$row['ProdiName'].'</div>';
                 $nestedData[] = '<div style="text-align:left;"><b>'.$row['JudulInd'].'</b><br/><i>'.$row['JudulEng'].'</i></div>';
                 $nestedData[] = '<div>'.$Noted.'</div>';
-                $nestedData[] = '<div>'.$Status.'</div>';
+                $nestedData[] = '<div>'.$Status.$Updated.'</div>';
 
                 $no++;
 
@@ -5399,6 +5413,9 @@ class C_api3 extends CI_Controller {
 
             $NPM = $data_arr['NPM'];
             $dataForm = (array) $data_arr['dataform'];
+
+            $dataForm['EmUpdateBy'] = $this->session->userdata('NIP');
+            $dataForm['EmUpdateAt'] = $this->m_rest->getDateTimeNow();
 
             $this->db->where('NPM', $NPM);
             $this->db->update('db_academic.final_project_files',$dataForm);

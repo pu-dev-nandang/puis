@@ -15,15 +15,33 @@
 </style>
 
 <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <div class="well">
+            <label>Filter Status</label>
+            <select class="form-control" id="filterStatus">
+                <option value="">-- All Status --</option>
+                <option value="0">Waiting for sending documents</option>
+                <option value="1">Need action</option>
+                <option value="2">Approved</option>
+                <option value="-2">Rejected</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-12">
         <div id="divLoadTable"></div>
-
     </div>
 </div>
 
 <script>
 
     $(document).ready(function () {
+        loadDataTable();
+    });
+
+    $('#filterStatus').change(function () {
         loadDataTable();
     });
 
@@ -41,8 +59,10 @@
             '            </thead>' +
             '        </table>');
 
+        var filterStatus = $('#filterStatus').val();
         var data = {
-            action : 'viewFileFinalProject'
+            action : 'viewFileFinalProject',
+            Status : (filterStatus!='' && filterStatus!=null) ? filterStatus : ''
         };
 
         var token = jwt_encode(data,'UAP)(*');
