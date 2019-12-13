@@ -1413,6 +1413,13 @@ $route['rectorat/master_data/crud_sk_mhs'] = 'page/rektorat/c_sk_masuk_mahasiswa
 $route['rectorat/master_data/credit_type_courses'] = 'page/rektorat/c_credit_type_courses/index';
 $route['rectorat/master_data/crud_credit_type_courses'] = 'page/rektorat/c_credit_type_courses/crud_credit_type_courses';
 
+//---Document Generator--//
+$route['rectorat/document-generator'] = 'page/rektorat/document_generator/c_document/document';
+$route['document-generator-action/__upload_template'] = 'page/rektorat/document_generator/c_action/upload_template';
+
+
+//--End Document Generator--//
+
 
 
 $route['add_request'] = 'page/request-document/c_requestdocument/frm_requestdocument/';

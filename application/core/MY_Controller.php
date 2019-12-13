@@ -774,3 +774,24 @@ abstract class Ticket_Controler extends Globalclass{
 
 
 }
+
+abstract class DocumentGenerator_Controler extends Globalclass{
+    public $data = array();
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('document-generator/m_doc');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    public function menu_document($page){
+        $data['page'] = $page;
+        $content = $this->load->view('page/rektorat/document-generator/menu_document',$data,true);
+        $this->temp($content);
+    }
+}
