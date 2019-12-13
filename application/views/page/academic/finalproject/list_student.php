@@ -3,6 +3,18 @@
     #tableData tr th, #tableData tr td {
         text-align: center;
     }
+    .btn-upload {
+        padding: 3px 5px 3px 5px;
+        font-size: 10px !important;
+        /*font-weight: bold;*/
+    }
+
+    #tableData td {
+        vertical-align: middle;
+    }
+    #tableData td:nth-child(1), #tableData td:nth-child(2), #tableData td:nth-child(3){
+        vertical-align: top !important;
+    }
 </style>
 
 <div class="row">

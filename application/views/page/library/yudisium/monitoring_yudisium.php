@@ -3,6 +3,12 @@
     #tableData tr th, #tableData tr td {
         text-align: center;
     }
+    #tableData td {
+        vertical-align: middle;
+    }
+    #tableData td:nth-child(1), #tableData td:nth-child(2), #tableData td:nth-child(3){
+        vertical-align: top !important;
+    }
 </style>
 
 <div class="row">
