@@ -6917,7 +6917,7 @@ Phone: (021) 29200456';
 
                 $pdf->Ln(7);
                 $pdf->Cell(0,$h,'Register to take part in the Judicium event for the semester : '.$d['SemesterName'],$border,1,'L');
-                $pdf->Cell(0,$h,'Has completed the Judicium registration requirements',$border,1,'L');
+                $pdf->Cell(0,$h,'Has completed the Judicium registration requirements :',$border,1,'L');
 
                 $pdf->Ln(7);
 
@@ -6929,7 +6929,7 @@ Phone: (021) 29200456';
 
                 $pdf->Row(Array(
                     '1',
-                    "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro
+                    "Academic Requirements Fulfilment.
             Total Credit Taken : ".$dataIPK['TotalSKS']."
             Number of Courses With D Score : ".count($arr_mkD)."
             Compulsory Courses : ".$arr_mkWajib_SKS,
@@ -6971,6 +6971,7 @@ Phone: (021) 29200456';
                 $pdf->SetFont('Arial','I',7);
                 $pdf->Ln(10);
                 $h = 3;
+                $pdf->Cell(35,$h,'*This is a computer generate letter, no signature is required.',$border,0,'L');
                 $pdf->Cell(0,$h,chr(169).' Podomoro University | Downloaded on '.date("d M Y H:i:s"),$border,1,'R');
 
 
