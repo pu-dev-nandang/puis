@@ -6835,7 +6835,7 @@ Phone: (021) 29200456';
 
             $NPM = $data['NPM'];
 
-            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng, 
+            $dataStudent = $this->db->query('SELECT ats.NPM, ats.Name, ats.Year, ps.NameEng AS ProdiEng, el.DescriptionEng,
                                                         s.Name AS SemesterName, fpc.TrialDate,
                                                         em1.Name AS Cl_Academic_Name,
                                                         em2.Name AS Cl_Library_Name,
@@ -6930,9 +6930,9 @@ Phone: (021) 29200456';
                 $pdf->Row(Array(
                     '1',
                     "Fulfilling Academic requirements while attending lectures at Universitas Agung Podomoro
-            Total SKS : ".$dataIPK['TotalSKS']."
-            Maka Kuliah Nilai D : ".count($arr_mkD)."
-            SKS Mata Kuliah Wajib : ".$arr_mkWajib_SKS,
+            Total Credit Taken : ".$dataIPK['TotalSKS']."
+            Number of Courses With D Score : ".count($arr_mkD)."
+            Compulsory Courses : ".$arr_mkWajib_SKS,
                     "Approved By ".$d['Cl_Academic_Name']
                 ));
 
@@ -6950,7 +6950,7 @@ Phone: (021) 29200456';
 
                 $pdf->Row(Array(
                     '4',
-                    " - The submission of Hardcopy / Softcopy of Final Project report book contribution, etc.\n - The submission of all necassary docoment to library : book loans, book loan pinalty*",
+                    " - The Submission of Hardcopy / Softcopy of Final Project Report.\n - Submission of all required documents to the Library: Book Loans, Book Contributions, Book Loan Penalties, etc.*",
                     "Approved By ".$d['Cl_Library_Name']
                 ));
 
@@ -7407,12 +7407,12 @@ Phone: (021) 29200456';
 
             $NPM = $data['NPM'];
 
-            $dataStd = $this->db->query('SELECT ats.*, 
+            $dataStd = $this->db->query('SELECT ats.*,
                                                 ps.NameEng AS ProdiEng, ps.Degree, ps.TitleDegree,
                                                 ps.DegreeEng, ps.TitleDegreeEng, el.DescriptionEng AS ProdiLevelEng,
                                                 em.NIP AS DekanNIP,em.Name AS DekanName, em.TitleAhead, em.TitleBehind, em.Signatures, f.NameEng AS FacultyName,
                                                 el.MasaStudi, el2.DescriptionEng AS ProdiLevelFutureEng
-                                                FROM db_academic.auth_students ats 
+                                                FROM db_academic.auth_students ats
                                                 LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                 LEFT JOIN db_academic.faculty f ON (f.ID = ps.FacultyID)
                                                 LEFT JOIN db_employees.employees em ON (em.NIP = f.NIP)
@@ -7659,23 +7659,23 @@ Phone: (021) 29200456';
             // ======
 
 
-            $dataAch_1 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+            $dataAch_1 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas
                                                               LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
                                                               WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND (sa.CategID = 1 OR sa.CategID = 5) ')
                 ->result_array();
 
-            $dataAch_2 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+            $dataAch_2 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas
                                                               LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
                                                               WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 2 ')
                 ->result_array();
 
-            $dataAch_3 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+            $dataAch_3 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas
                                                               LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
                                                               WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 3 ')
                 ->result_array();
 
 
-            $dataAch_4 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas  
+            $dataAch_4 = $this->db->query('SELECT COUNT(*) AS Total FROM db_studentlife.student_achievement_student sas
                                                               LEFT JOIN db_studentlife.student_achievement sa ON (sa.ID = sas.SAID)
                                                               WHERE sa.isSKPI = 1 AND sas.NPM = "'.$d['NPM'].'" AND sa.CategID = 6 ')
                 ->result_array();
