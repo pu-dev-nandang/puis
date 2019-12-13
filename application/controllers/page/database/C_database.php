@@ -522,7 +522,7 @@ class C_database extends Globalclass {
                 }
             }else{$message="Student data is not founded.";}
 
-            $json = array("message"=>$message,"finish"=>$isfinish);   
+            $json = array("message"=>$message,"finish"=>$isfinish);
         }
         echo json_encode($json);
     }
