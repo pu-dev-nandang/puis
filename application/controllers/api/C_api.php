@@ -105,7 +105,7 @@ class C_api extends CI_Controller {
         $totalData = $this->db->query('SELECT * FROM db_employees.employees WHERE PositionMain = "14.7"')->result_array();
       
       
-      $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
                         ps.NameEng AS ProdiNameEng
                         FROM db_employees.employees em
                         LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)

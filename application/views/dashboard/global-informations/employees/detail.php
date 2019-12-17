@@ -32,7 +32,7 @@
 							<div class="left">
 								<div class="info">
 									<img class="profile-pic" src="<?=$profilePIC?>">
-									<p class="status"><span class="btn btn-<?=($detail->StatusLecturerID == '-1' || empty($detail->StatusLecturerID)) ? 'danger':'info'?>"><?=(!empty($detail->StatusLecturerID) ? $detail->EmpStatus : "Non Active")?></span></p>
+									<p class="status"><span class="btn btn-<?=($detail->StatusLecturerID == '-1' || empty($detail->StatusEmployeeID)) ? 'danger':'info'?>"><?=(!empty($detail->StatusEmployeeID) ? $detail->EmpStatus : "Non Active")?></span></p>
 								</div>
 								<div class="middle"></div>
 							</div>	
@@ -41,9 +41,7 @@
 							<div class="right">
 								<div class="info">
 									<h2 class="name"><?=$detail->NIP."-".(!empty($detail->TitleAhead) ? $detail->TitleAhead." ":"").$detail->Name.(!empty($detail->TitleBehind) ? " ".$detail->TitleBehind:"")?></h2>
-									<?php if($detail->StatusLecturerID != '-1' || !empty($detail->StatusLecturerID) || !empty($detail->EmpStatus) || $detail->StatusLecturerID != ""){ ?>
-									<h3 class="prodi"><?=$detail->EmpStatus."(".$detail->ProdiNameEng.")"?></h3>
-									<?php } ?>
+									<h3 class="prodi"><?=$detail->EmpStatus?></h3>
 									<p class="email"><?=$detail->EmailPU?></p>
 								</div>
 								<div class="row">

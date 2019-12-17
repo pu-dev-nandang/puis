@@ -12,7 +12,7 @@
 	#table-list-data .detail-user > p.name{text-transform: uppercase;}
 	#table-list-data .detail-user > p.email{font-weight: 100;color: #000}
 </style>
-<div id="lecturer-list">
+<div id="employee-list">
 	<div class="row">
 		<div class="col-sm-12">
 			<div id="filter-form">
@@ -27,23 +27,24 @@
 								<input type="text" class="form-control" name="lecturer" placeholder="NIP or NIDN or Name">								
 							</div>
 							<div class="form-group">
+								<label>Division</label>								
+								<select class="form-control" name="division">
+									<option value="">-Choose one-</option>
+									<?php foreach ($division as $d) {
+									echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+									} ?>
+								</select>
+							</div>
+							<div class="form-group">
 								<label>Position</label>								
-								<select class="form-control" name="position">
+								<select class="form-control" name="position" disabled>
 									<option value="">-Choose one-</option>
 									<?php foreach ($position as $p) {
 									echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
 									} ?>
 								</select>								
 							</div>
-							<div class="form-group">
-								<label>Study Program</label>								
-								<select class="form-control" name="study_program">
-									<option value="">-Choose one-</option>
-									<?php foreach ($studyprogram as $s) { 
-									echo '<option value="'.$s->ID.'">'.$s->NameEng.'</option>';
-									} ?>
-								</select>								
-							</div>
+
 							<div class="form-group">
 								<label>Status</label>								
 								<select class="form-control" name="status">
@@ -69,7 +70,7 @@
 			<div id="fetch-data-tables">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h5 class="panel-title"><i class="fa fa-bars"></i> List of lecturers</h5>
+						<h5 class="panel-title"><i class="fa fa-bars"></i> List of employee</h5>
 					</div>
 					<div class="panel-body">
 						<div class="table-list">
@@ -79,7 +80,6 @@
 										<th width="2%">No</th>
 										<th width="30%">Lecturer</th>
 										<th width="20%">Position</th>
-										<th>Study Program</th>
 										<th width="20%">Status</th>
 									</tr>
 								</thead>
@@ -110,7 +110,7 @@
 				                "searchPlaceholder": "NIP, Name, Programme Study"
 				            },
 				            "ajax":{
-				                url : base_url_js+'global-informations/lecturersFetch', // json datasource
+				                url : base_url_js+'global-informations/employeesFetch', // json datasource
 				                ordering : false,
 				                data : {token:token},
 				                type: "post",  // method  , by default get
@@ -146,7 +146,7 @@
     		fetchingData();
     	});
 
-    	$("#lecturer-list").on("click","#table-list-data .detail-user",function(){
+    	$("#employee-list").on("click","#table-list-data .detail-user",function(){
     		var itsme = $(this);
     		var ID = itsme.data("user");
 			var data = {
@@ -155,7 +155,7 @@
           	var token = jwt_encode(data,'UAP)(*');
           	$.ajax({
 			    type : 'POST',
-			    url : base_url_js+"global-informations/lecturersDetail",
+			    url : base_url_js+"global-informations/employeesDetail",
 			    data : {token:token},
 			    dataType : 'html',
 			    beforeSend :function(){$('#ajax-loader').show();},
@@ -164,9 +164,23 @@
 	            	$("body #modalGlobal .modal-body").html(jqXHR.responseText);
 		      	  	$("body #modalGlobal").modal("show");
 			    },success : function(response){
-			    	$("#lecturer-list").html(response);
+			    	$("#employee-list").html(response);
 			    }
 			});
+    	});
+
+    	$("#form-filter select[name=division]").change(function(){
+    		var value = $(this).val();
+    		if($.trim(value) != ''){
+    			$("#form-filter select[name=position]").prop("disabled",false);
+    		}
+    	});
+    	$("#form-filter select[name=position]").change(function(){
+    		var division = $("#form-filter select[name=division]").val();
+    		if($.trim(division) == ''){
+    			division.addClass("required");
+    			alert("Please fill up field Division");
+    		}
     	});
     });
 </script>

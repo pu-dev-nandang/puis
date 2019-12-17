@@ -10,8 +10,8 @@
                         <li class="<?=($this->uri->segment(2)=='lecturers') ? 'active':''?>">
                             <a href="<?=site_url('global-informations/lecturers'); ?>">Lecturers</a>
                         </li>
-                        <li class="<?=($this->uri->segment(2)=='employee') ? 'active':''?>">
-                            <a href="<?=site_url('global-informations/employee'); ?>">Employee</a>
+                        <li class="<?=($this->uri->segment(2)=='employees') ? 'active':''?>">
+                            <a href="<?=site_url('global-informations/employees'); ?>">Employees</a>
                         </li>
                     </ul>
                 </div>

@@ -48,8 +48,6 @@ class Globalinformation_model extends CI_Model{
      	return $value;
     }
 
-
-
     public function detailStudent($tablename,$data){
     	$this->db->select("a.*,b.Nama as religionName, c.ctr_name as nationalityName, e.ProvinceName");
     	$this->db->from($tablename." a");
@@ -60,6 +58,78 @@ class Globalinformation_model extends CI_Model{
     	$this->db->where($data);
     	$query = $this->db->get();
     	return $query;
+    }
+
+
+    public function fetchLecturer($param='',$start='',$limit=''){
+        $where='';
+        if(!empty($param)){
+            $where = 'WHERE ';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($counter==0){
+                    $where = $where.$value['field']." ".$value['data'];
+                }
+                else{
+                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                }
+                $counter++;
+            }
+        }
+
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}";	
+        }
+
+        $string = "SELECT em.*, ps.NameEng AS ProdiNameEng, ps.DegreeEng as ProdiDegree, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName
+				   FROM db_employees.employees em
+				   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+				   LEFT JOIN db_employees.employees_status es ON (es.IDStatus = em.StatusLecturerID)
+				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
+				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
+				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
+                   {$where} ORDER BY em.NIP ASC {$lims} ";
+        
+        $value  = $this->db->query($string);
+     	//var_dump($this->db->last_query());
+     	return $value;
+    }
+
+
+    public function fetchEmployee($param='',$start='',$limit=''){
+        $where='';
+        if(!empty($param)){
+            $where = 'WHERE ';
+            $counter = 0;
+            foreach ($param as $key => $value) {
+                if($counter==0){
+                    $where = $where.$value['field']." ".$value['data'];
+                }
+                else{
+                    $where = $where.$value['filter']." ".$value['field']." ".$value['data'];
+                }
+                $counter++;
+            }
+        }
+
+        $lims="";
+        if($start!="" || $limit!=""){
+            $lims = " LIMIT {$start},{$limit}";	
+        }
+
+        $string = "SELECT em.*, ps.NameEng AS ProdiNameEng, ps.DegreeEng as ProdiDegree, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName
+				   FROM db_employees.employees em
+				   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+				   LEFT JOIN db_employees.employees_status es ON (es.IDStatus = em.StatusEmployeeID)
+				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
+				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
+				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
+                   {$where} ORDER BY em.NIP ASC {$lims} ";
+        
+        $value  = $this->db->query($string);
+     	
+     	return $value;
     }
 
 }

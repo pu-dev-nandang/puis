@@ -31,7 +31,7 @@
 						<div class="col-sm-2">
 							<div class="left">
 								<div class="info">
-									<img class="profile-pic" src="<?=base_url().(!empty($detail->detailTA->Photo) ? 'uploads/students/ta_'.$detail->Year.'/'.$detail->detailTA->Photo:"images/icon/userfalse.png")?>">
+									<img class="profile-pic" src="<?=$profilepic?>">
 									<p class="status"><span class="btn btn-<?=($detail->StatusStudentID != 1) ? (($detail->StatusStudentID == 3) ? 'info':'danger'):'primary'?>"><?=$detail->StatusStudent?></span></p>
 									<div class="detail">
 										<h5><?=$detail->Name." ",(($detail->StatusStudentID==1) ? $detail->ProdiTitle:"")?></h5>
@@ -50,9 +50,9 @@
 										</p>
 										<?php } ?>
 										<?php if(!empty($detail->detailTA->Phone)){ ?>
-										<p class="text"><i class="fa fa-phone"></i> <?=$detail->detailTA->Phone?></p>
+										<p class="text"><i class="fa fa-phone"></i> <?=substr($detail->detailTA->Phone, 0, -3) . 'xxx'?></p>
 										<?php } ?>
-										<p class="text"><i class="fa fa-mobile"></i> <?=$detail->detailTA->HP?></p>
+										<p class="text"><i class="fa fa-mobile"></i> <?=substr($detail->detailTA->HP, 0, -3) . 'xxx'?></p>
 										<?php if(!empty($detail->detailTA->Email)){ ?>
 										<p class="text"><i class="fa fa-envelope"></i> <?=$detail->detailTA->Email?></p>
 										<?php } ?>

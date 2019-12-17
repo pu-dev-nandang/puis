@@ -55,6 +55,7 @@
 							</div>
 							<div class="form-group" style="padding-top:22px">
 								<button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
+								<a class="btn btn-default" href="">Clear Filter</a>
 							</div>
 						</form>
 					</div>
