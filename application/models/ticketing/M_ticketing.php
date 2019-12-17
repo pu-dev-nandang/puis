@@ -1035,7 +1035,7 @@ class M_ticketing extends CI_Model {
                 $Addwhere3 = '';
                 if (array_key_exists('FilterFor', $dataToken) ) {
                     if ($dataToken['FilterFor'] == '1') {
-                        $AddwhereFor = 'where a.ID in (
+                        $AddwhereFor = 'and a.ID in (
                                                 select ReceivedID from db_ticketing.received_details where Status != "-1" AND NIP = "'.$NIP.'"
                                              )';
                         $AddwhereFor2 = '';
@@ -1043,13 +1043,13 @@ class M_ticketing extends CI_Model {
 
                     if ($dataToken['FilterFor'] == '99') {
                        $Addwhere3 .= ' or a.DepartmentTicketID = "'.$DepartmentID.'"';
-                       $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                       $AddwhereFor = '
                            and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""
                        ';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
                         // $Addwhere3 .= ' or a.DepartmentTicketID != "'.$DepartmentID.'"';
-                        $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                        $AddwhereFor = '
                             and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0
                         ';
                         $AddwhereFor2 = '';
@@ -1060,7 +1060,7 @@ class M_ticketing extends CI_Model {
 
                 $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
-                                         
+                                         where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
                                          '.$AddwhereFor.'
                                      )   
                  '.$Addwhere3.'
