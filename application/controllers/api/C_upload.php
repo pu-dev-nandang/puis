@@ -86,14 +86,16 @@ class C_upload extends CI_Controller {
             unlink($path);
 
             // Update DB
-            $this->db->where('NPM', $NPM);
-            $this->db->update('db_academic.final_project_files',array(
-                $column => ''
-            ));
 
-            $result = 1;
 
         }
+
+        $this->db->where('NPM', $NPM);
+        $this->db->update('db_academic.final_project_files',array(
+            $column => ''
+        ));
+
+        $result = 1;
 
         return print_r($result);
 

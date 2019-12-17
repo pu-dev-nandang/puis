@@ -196,6 +196,9 @@ class C_rest_ticketing extends CI_Controller {
                   $notifParams = $dataToken['notifParams'];
                 }
                 $TableReceived_Details = $this->m_ticketing->TableReceived_DetailsAction($data['received_details'],$notifParams);
+                if (array_key_exists('received', $data)) {
+                  $this->m_ticketing->UpdateCategoryRequested($data['received']);
+                }
               }
               
               if (array_key_exists('transfer_to', $data)) {
@@ -234,6 +237,7 @@ class C_rest_ticketing extends CI_Controller {
             $dataToken = json_decode(json_encode($dataToken),true);
             $dataToken['action'] = 'update';
             $this->m_ticketing->TableReceivedAction($dataToken);
+            $this->m_ticketing->UpdateCategoryRequested($dataToken);
             $rs = ['status' => 1,'msg' => ''];
             echo json_encode($rs);
             break;

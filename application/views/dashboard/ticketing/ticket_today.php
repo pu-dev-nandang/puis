@@ -96,6 +96,7 @@ var App_ticket_ticket_today = {
             '        <td>:</td>' +
             '        <td>' +
             '            <input type="file" name = "Files" id = "UploadFile">' +
+            '            <p style = "color:red">(jpg,png) Max 2mb                                                    ' +
             '        </td>' +
             '    </tr>' +
             '    <tr class="hide" id = "tr_ticket_number">' +
@@ -271,7 +272,7 @@ var App_ticket_ticket_today = {
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
                     
                     // NANDANG
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
 
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -339,7 +340,7 @@ var App_ticket_ticket_today = {
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
 
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
@@ -439,7 +440,7 @@ var App_ticket_ticket_today = {
 
                     department_handle = data_received[0].NameDepartmentDestination;
 
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
 
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -557,7 +558,7 @@ var App_ticket_ticket_today = {
                     // }
 
                     department_handle = data_received[0].NameDepartmentDestination;
-                    var styleAsRequest = (DepartmentID == row.DepartmentTicketID) ? 'background:#ffeb3b52' : '';
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
                     
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
@@ -831,10 +832,18 @@ var App_ticket_ticket_today = {
               }
 
               GetWorker += '</table>';
+
+              if (row.Comment != '' && row.Comment != null && row.Comment != undefined ) {
+                GetWorker += '<div class = "form-group" style="margin-top:5px;color:#0066ff;">'+
+                                '<label>Comment from Handler : </label>'+
+                                '<p>'+br2nl(row.Comment)+'</p>'+
+                              '</div>';  
+              }
+
               if (DataRating.length == 0) {
                 GetWorker += '<div class = "thumbnail input_form" tokenData = "'+tokenData+'">'+
                                   '<div class = "form-group">'+
-                                      '<label>Rate</label>'+
+                                      '<label>Giving Rate</label>'+
                                       App_ticket_ticket_today.LoadSelectOptionRate()+
                                   '</div>'+
                                   '<div class = "form-group">'+

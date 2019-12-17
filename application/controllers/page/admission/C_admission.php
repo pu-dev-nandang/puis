@@ -1207,7 +1207,7 @@ class C_admission extends Admission_Controler {
       $No = $requestData['start'] + 1;
       $totalData = $this->m_admission->getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType,$StatusPayment);
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -1226,7 +1226,10 @@ class C_admission extends Admission_Controler {
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
               ,xx.Name as NameSales,
-              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref
+              if(a.StatusReg = 1, (select No_Ref from db_admission.formulir_number_offline_m where FormulirCode = c.FormulirCode limit 1) ,(select No_Ref from db_admission.formulir_number_online_m where FormulirCode = c.FormulirCode limit 1)  ) as No_Ref,
+              if(
+                (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+              ) as CekIntake
               from db_admission.register as a
               join db_admission.school as b
               on a.SchoolID = b.ID
