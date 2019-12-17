@@ -3959,11 +3959,14 @@ class C_api3 extends CI_Controller {
     }
 
     public function getsitasikarya(){
-
         //$Status = $this->input->get('s');
-        $data = $this->db->query('SELECT a.Updated_by, a.Judul_Sitasi, a.jumlah_sitasi, a.year, b.Name
+        //$data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
+        //            FROM db_agregator.sitasi_karya AS a
+        //            LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
+        //            ORDER BY a.ID DESC')->result_array();
+        $data = $this->db->query('SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name
                     FROM db_agregator.sitasi_karya AS a
-                    LEFT JOIN db_employees.employees AS b ON (a.Updated_by = b.NIP)
+                    LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP)
                     ORDER BY a.ID DESC')->result_array();
         return print_r(json_encode($data));
 
