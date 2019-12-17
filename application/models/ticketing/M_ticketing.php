@@ -974,25 +974,25 @@ class M_ticketing extends CI_Model {
                                              )';
                         $AddwhereFor2 = '';
                     }
-
                     if ($dataToken['FilterFor'] == '99') {
-                       $Addwhere3 .= ' and a.DepartmentTicketID = "'.$DepartmentID.'"';
+                       $Addwhere3 .= ' or a.DepartmentTicketID = "'.$DepartmentID.'"';
+                       $AddwhereFor = ' and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
-                        $Addwhere3 .= ' and a.DepartmentTicketID != "'.$DepartmentID.'"';
+                        $AddwhereFor = ' and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0';
+                        $AddwhereFor2 = '';
                     }
                     
                     // $AddwhereFor2 = '';
                 }
-
                 $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
-                                         join db_ticketing.category as b on a.CategoryReceivedID = b.ID
-                                         '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
-                                         where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'" 
-                                         and a.ReceivedStatus = "0" '.$AddwhereFor.'
-                                     )   
-                 ) '.$Addwhere3;
+                                         where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                                         '.$AddwhereFor.'
+                                     ) 
+                        '.$Addwhere3.'  
+                 ) ';
+
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
@@ -1044,16 +1044,15 @@ class M_ticketing extends CI_Model {
                     if ($dataToken['FilterFor'] == '99') {
                        $Addwhere3 .= ' or a.DepartmentTicketID = "'.$DepartmentID.'"';
                        $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
-                           and a.ID in (
-                               select ReceivedID from db_ticketing.received_details limit 1
-                           )
+                           and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""
                        ';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
-                        $Addwhere3 .= ' or a.DepartmentTicketID != "'.$DepartmentID.'"';
+                        // $Addwhere3 .= ' or a.DepartmentTicketID != "'.$DepartmentID.'"';
                         $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
-                            and a.
+                            and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0
                         ';
+                        $AddwhereFor2 = '';
                     }
 
                     // $AddwhereFor2 = '';

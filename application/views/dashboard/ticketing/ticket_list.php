@@ -195,9 +195,13 @@ var App_ticket_tikcet_list = {
                         '/' + EncodeDepartment;
                     setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
                 } else if (data[8] == 2 && data[11] == 'write') {
-                    var hrefActionTicket = base_url_js + 'ticket' + '/set_action_progress/' + data[
-                        1] + '/' + EncodeDepartment
-                    setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
+                    var cekPageAction = (App_ticket_tikcet_list.cekPageAction(jwt_decode(data[9]),SelectDepartmentID));
+                        if (cekPageAction) {
+                            var hrefActionTicket = base_url_js + 'ticket' + '/set_action_progress/' + data[
+                                1] + '/' + EncodeDepartment
+                            setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
+                        }
+                   
                 }
                 htmlAction += '<div class="btn-group">' +
                     '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
@@ -228,10 +232,21 @@ var App_ticket_tikcet_list = {
         oTable = table;
     },
 
+    cekPageAction(data,SelectDepartmentID){
+        var data_received = data.data_received;
+        var bool = false;
+        for (let index = 0; index < data_received.length; index++) {
+            var DataReceived_Details = data_received[index].DataReceived_Details;
+            if (data_received[index].DepartmentReceivedID==SelectDepartmentID && data_received[index].ReceivedStatus == "0") {
+                bool = true;
+                break;
+            }
+        }
+        return bool;
+    },
+
     cekCloseWorker: function(data,SelectDepartmentID) {
         var data_received = data.data_received;
-
-        console.log(data_received);
         var bool = true;
         for (let index = 0; index < data_received.length; index++) {
             var DataReceived_Details = data_received[index].DataReceived_Details;
@@ -240,13 +255,16 @@ var App_ticket_tikcet_list = {
             }
             else
             {
-                for (let j = 0; j < DataReceived_Details.length; j++) {
-                    if (DataReceived_Details[j].Status == "1") {
-                        bool = false;
-                        break;
-                    }
+                if (DataReceived_Details.length > 0 && data_received[index].DepartmentReceivedID==SelectDepartmentID) {
+                    for (let j = 0; j < DataReceived_Details.length; j++) {
+                        if (DataReceived_Details[j].Status == "1") {
+                            bool = false;
+                            break;
+                        }
 
+                    }
                 }
+                
             }
 
             if (!bool) {
