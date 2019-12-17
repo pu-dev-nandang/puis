@@ -56,7 +56,7 @@ class C_transfer_student extends Academic_Controler {
                                 OR ps_b.NameEng LIKE "%'.$search.'%"';
         }
 
-        $queryDefault = 'SELECT ts.ID AS TSID, aut_s_b.Name AS StudentName, ts.Before, ts.After, aut_s_b.Year AS B_Year, aut_s_a.Year AS A_Year,  
+        $queryDefault = 'SELECT ts.ID AS TSID, aut_s_b.Name AS StudentName, ts.Before, ts.After, ts.Note, ts.NotedAt, em.Name AS NotedBY, aut_s_b.Year AS B_Year, aut_s_a.Year AS A_Year,  
                                       ps_b.Name AS B_ProdiName, ps_b.NameEng AS B_ProdiNameEng,
                                       ps_a.Name AS A_ProdiName, ps_a.NameEng AS A_ProdiNameEng
                                       FROM db_academic.transfer_student ts
@@ -64,6 +64,7 @@ class C_transfer_student extends Academic_Controler {
                                       LEFT JOIN db_academic.program_study ps_b ON (ps_b.ID = aut_s_b.ProdiID)
                                       LEFT JOIN db_academic.auth_students aut_s_a ON (aut_s_a.NPM = ts.After)
                                       LEFT JOIN db_academic.program_study ps_a ON (ps_a.ID = aut_s_a.ProdiID)
+                                      LEFT JOIN db_employees.employees em on (em.NIP = ts.NotedBy)
                                       '.$dataSearch.' ORDER BY ts.ID DESC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -85,13 +86,19 @@ class C_transfer_student extends Academic_Controler {
                           </button>
                           <ul class="dropdown-menu">
                             <li><a href="'.base_url('academic/transfer-student/course-conversion/'.$row['TSID']).'">Course Conversion</a></li>
+                            <li><a href="javascript:void(0);" class="showModalNote" data-note="'.$row['Note'].'" data-name="'.$row['StudentName'].'" data-id="'.$row['TSID'].'">Create / Update Note</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="javascript:void(0)" class="btnRemoveData" data-id="'.$row['TSID'].'">Remove</a></li>
                           </ul>
                         </div>';
 
+            $noted = ($row['Note']!='' && $row['Note']!=null)
+                ?
+                '<div><hr style="margin-top: 5px; margin-bottom: 5px;"/><button disabled class="btn btn-sm btn-warning btnNote" data-toggle="popover" data-trigger="focus" data-placement="bottom" title="By : '.$row['NotedBY'].' | '.date('D, d M Y',strtotime($row['NotedAt'])).'" data-content="'.$row['Note'].'"><i class="fa fa-refresh fa-spin fa-fw"></i></button></div>'
+                : '';
+
             $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div>'.$row['StudentName'].'</div>';
+            $nestedData[] = '<div>'.$row['StudentName'].$noted.'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['Before'].'</div>';
             $nestedData[] = '<div style="text-align:center;">'.$row['B_Year'].'</div>';
             $nestedData[] = '<div><b>'.$row['B_ProdiNameEng'].'</b><br/><i>'.$row['B_ProdiName'].'</i></div>';

@@ -18,7 +18,7 @@
                     <!-- <button class="btn btn-default">Check my ticket</button> -->
                 </div>
             </div>
-            <div class="row bg-ticket">
+            <div class="row bg-ticket2">
                 <div class="col-md-3 panel-ticket" id="PanelPendingTicket">
                 </div>
                 <div class="col-md-3 panel-ticket" id="PanelOpenTicket">
@@ -96,6 +96,7 @@ var App_ticket_ticket_today = {
             '        <td>:</td>' +
             '        <td>' +
             '            <input type="file" name = "Files" id = "UploadFile">' +
+            '            <p style = "color:red">(jpg,png) Max 2mb                                                    ' +
             '        </td>' +
             '    </tr>' +
             '    <tr class="hide" id = "tr_ticket_number">' +
@@ -260,7 +261,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="open-ticket">Open Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="open-ticket">Today Open-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -269,14 +270,18 @@ var App_ticket_ticket_today = {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
+                    
+                    // NANDANG
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
+
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                         '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                        '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                         '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                         '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                         '<p>'+nl2br(row.Message)+'</p>'+
@@ -325,7 +330,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="pending-ticket">Pending Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="pending-ticket">Pending-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -334,14 +339,16 @@ var App_ticket_ticket_today = {
                     var row = data[i];
                     var pfiles = (row.Files != null && row.Files != '') ? '<p><a href= "'+row.Files+'" target="_blank">Files Upload<a></p>' : '';
                     var hrefActionTicket = (row.setTicket == 'write') ? base_url_js+'ticket'+'/set_action_first/'+row.NoTicket+'/'+EncodeDepartment : '#';
+
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+row.NameDepartmentDestination+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
@@ -393,7 +400,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="progres-ticket">Progres Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="progres-ticket">Progres-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -408,36 +415,42 @@ var App_ticket_ticket_today = {
                     var Worker = App_ticket_ticket_today.getWorker(data_received);
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
-                    for (var j = 0; j < data_received.length; j++) {
-                        if (data_received[j].SetAction == "1") {
-                            if (department_handle == '') {
-                                department_handle += data_received[j].NameDepartmentDestination;
-                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
-                            }
-                            else
-                            {
-                                var booldepart = true;
-                                for (var k = 0; k < arr_filter_depart.length; k++) {
-                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
-                                       booldepart = false; 
-                                       break;
-                                    }
-                                }
-                                if (booldepart) {
-                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
-                                }
+                    // for (var j = 0; j < data_received.length; j++) {
+                    //     if (data_received[j].SetAction == "1") {
+                    //         if (department_handle == '') {
+                    //             department_handle += data_received[j].NameDepartmentDestination;
+                    //             arr_filter_depart.push(data_received[j].DepartmentReceivedID);
+                    //         }
+                    //         else
+                    //         {
+                    //             var booldepart = true;
+                    //             for (var k = 0; k < arr_filter_depart.length; k++) {
+                    //                 if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                    //                    booldepart = false; 
+                    //                    break;
+                    //                 }
+                    //             }
+                    //             if (booldepart) {
+                    //                 department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                    //             }
                                 
-                            }
-                        }
-                    }
+                    //         }
+                    //     }
+                    // }
+
+                    department_handle = data_received[0].NameDepartmentDestination;
+
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
+
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+department_handle+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
+                                       
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
@@ -504,7 +517,7 @@ var App_ticket_ticket_today = {
             var html = '';
             var count = response.count;
             var data = response.data;
-            html += '<h3 class="close-ticket">Close Ticket <span>'+count+'</span></h3>'+
+            html += '<h3 class="close-ticket">Today Close-Ticket <span>'+count+'</span></h3>'+
                         '<hr/>'+
                         '<div class="timeline-centered">';
             if (data.length >0) {
@@ -519,38 +532,42 @@ var App_ticket_ticket_today = {
                     var Worker = App_ticket_ticket_today.getWorker(data_received,"0");
                     var TransferTo = App_ticket_ticket_today.getTransferTo(data_received);
                     var arr_filter_depart = [];
-                    for (var j = 0; j < data_received.length; j++) {
-                        // console.log(data_received[j]);
-                        if (data_received[j].DataReceived_Details.length > 0) {
-                            if (department_handle == '') {
-                                department_handle += data_received[j].NameDepartmentDestination;
-                                arr_filter_depart.push(data_received[j].DepartmentReceivedID);
-                            }
-                            else
-                            {
-                                var booldepart = true;
-                                for (var k = 0; k < arr_filter_depart.length; k++) {
-                                    if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
-                                       booldepart = false; 
-                                       break;
-                                    }
-                                }
-                                if (booldepart) {
-                                    department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
-                                }
+                    // for (var j = 0; j < data_received.length; j++) {
+                    //     // console.log(data_received[j]);
+                    //     if (data_received[j].DataReceived_Details.length > 0) {
+                    //         if (department_handle == '') {
+                    //             department_handle += data_received[j].NameDepartmentDestination;
+                    //             arr_filter_depart.push(data_received[j].DepartmentReceivedID);
+                    //         }
+                    //         else
+                    //         {
+                    //             var booldepart = true;
+                    //             for (var k = 0; k < arr_filter_depart.length; k++) {
+                    //                 if (arr_filter_depart[k] == data_received[j].DepartmentReceivedID ) {
+                    //                    booldepart = false; 
+                    //                    break;
+                    //                 }
+                    //             }
+                    //             if (booldepart) {
+                    //                 department_handle += '<br/>'+data_received[j].NameDepartmentDestination;
+                    //             }
                                 
-                            }
-                        }
+                    //         }
+                    //     }
                         
-                    }
+                    // }
+
+                    department_handle = data_received[0].NameDepartmentDestination;
+                    var styleAsRequest = (row.RequestedBy == sessionNIP) ? 'background:#ffeb3b52' : '';
+                    
                     html += '<article class="timeline-entry">'+
                                 ' <div class="timeline-entry-inner">'+
                                     '<div class="timeline-icon">'+
                                         '<img data-src="'+row.Photo+'" style="margin-top: -3px;" class="img-circle img-fitter" width="57">'+
+                                        '<div class="ticket-number2">'+row.NoTicket+'</div>'+
                                     '</div>'+
-                                    '<div class="timeline-label">'+
+                                    '<div class="timeline-label" style="'+styleAsRequest+'">'+
                                        '<div class="ticket-division">'+department_handle+'</div>'+
-                                       '<div class="ticket-number">'+row.NoTicket+'</div>'+
                                        '<h2><a href="'+hrefActionTicket+'">'+'<span>'+row.Title+'</span>'+'</a> </h2>'+
                                        '<div class="ticket-submited">'+row.NameRequested+' | '+row.RequestedAt+'</div>'+
                                        '<p>'+nl2br(row.Message)+'</p>'+
@@ -815,10 +832,18 @@ var App_ticket_ticket_today = {
               }
 
               GetWorker += '</table>';
+
+              if (row.Comment != '' && row.Comment != null && row.Comment != undefined ) {
+                GetWorker += '<div class = "form-group" style="margin-top:5px;color:#0066ff;">'+
+                                '<label>Comment from Handler : </label>'+
+                                '<p>'+br2nl(row.Comment)+'</p>'+
+                              '</div>';  
+              }
+
               if (DataRating.length == 0) {
                 GetWorker += '<div class = "thumbnail input_form" tokenData = "'+tokenData+'">'+
                                   '<div class = "form-group">'+
-                                      '<label>Rate</label>'+
+                                      '<label>Giving Rate</label>'+
                                       App_ticket_ticket_today.LoadSelectOptionRate()+
                                   '</div>'+
                                   '<div class = "form-group">'+

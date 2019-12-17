@@ -3,6 +3,18 @@
     #tableData tr th, #tableData tr td {
         text-align: center;
     }
+    .btn-upload {
+        padding: 3px 5px 3px 5px;
+        font-size: 10px !important;
+        /*font-weight: bold;*/
+    }
+
+    #tableData td {
+        vertical-align: middle;
+    }
+    #tableData td:nth-child(1), #tableData td:nth-child(2), #tableData td:nth-child(3){
+        vertical-align: top !important;
+    }
 </style>
 
 <div class="row">
@@ -266,16 +278,16 @@
 
                     $.post(url,{token:token},function (result) {
                         toastr.success('Data saved','Success');
-                        // loadData();
+                        loadData();
 
-                        $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
-                        if(formMentor2!='' && formMentor2!=null){
-                            $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
-                        }
-
-                        var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
-                        var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
-                        $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
+                        // $('#btnAddMentor_'+ID).attr('data-m1',formMentor1);
+                        // if(formMentor2!='' && formMentor2!=null){
+                        //     $('#btnAddMentor_'+ID).attr('data-m2',formMentor2);
+                        // }
+                        //
+                        // var formMentor1name = (formMentor1!='' && formMentor1!=null) ? '<div>'+$('#formMentor1').select2('data').text+'</div>' : '';
+                        // var formMentor2name = (formMentor2!='' && formMentor2!=null) ? '<div>'+$('#formMentor2').select2('data').text+'</div>' : '';
+                        // $('#viewMentor_'+ID).html(formMentor1name+''+formMentor2name);
 
                         setTimeout(function () {
                             $('#GlobalModal').modal('hide');

@@ -157,6 +157,49 @@
 		},
 
 		ActionClosedProject : function(selector){
+			// DataReceivedSelected
+			if (confirm('Are you sure ?')) {
+			    loading_button2(selector);
+			    $('#GlobalModal').find('.CloseModal').prop('disabled',true);
+			    var url = base_url_js+"rest_ticketing/__event_ticketing";
+			    var dataform = {
+			        action : 'close_project',
+			        auth : 's3Cr3T-G4N',
+			        ID : DataReceivedSelected[0].ID,
+			        data : {
+			        	SetAction : "0",
+			        	ReceivedStatus : "1",
+			        	Comment : $('#CommentCloseProject').val(),
+			        }
+			    };
+
+				var token = jwt_encode(dataform,'UAP)(*');
+				AjaxSubmitRestTicketing(url,token).then(function(response){
+				    if (response.status == 1) {
+				    	setInterval(function(){
+				    		toastr.success('Success');
+				    	}, 1000);
+				    	setInterval(function(){
+				    	 window.location.href = base_url_js+'ticket/ticket-today'; 
+				    	}, 3000);
+				        
+				    }
+				    else
+				    {
+				        toastr.error(response.msg);
+				        end_loading_button2(selector,'Submit');
+				        $('#GlobalModal').find('.CloseModal').prop('disabled',false);
+				    }
+				}).fail(function(response){
+				   toastr.error('Connection error,please try again');
+				   end_loading_button2(selector,'Submit');
+				})    
+				
+			}
+
+		},
+
+		ActionShowModalCommment : function(){
 			var arr_worker = DataReceivedSelected[0].DataReceived_Details;
 			var bool = true;
 			if (arr_worker.length > 0) {
@@ -179,44 +222,22 @@
 			}
 			else
 			{
-				// DataReceivedSelected
-				if (confirm('Are you sure ?')) {
-					loadingStart();
-				    loading_button2(selector);
-				    var url = base_url_js+"rest_ticketing/__event_ticketing";
-				    var dataform = {
-				        action : 'close_project',
-				        auth : 's3Cr3T-G4N',
-				        ID : DataReceivedSelected[0].ID,
-				        data : {
-				        	SetAction : "0",
-				        	ReceivedStatus : "1",
-				        }
-				    };
+				var htmlComment = '<div class = "form-group">'+
+									'<label>Comment</label>'+
+									'<textarea class="form-control" rows="4" name="Comment" id = "CommentCloseProject"></textarea>'	+
+								  '</div>';
+				var htmlButton = '<button type="button" class="btn btn-success" id="btnModalCloseProject">Submit</button> ' +
+            '<button type="button" class="btn btn-default CloseModal" data-dismiss="modal">Close</button>'; 
+            	$('#GlobalModal .modal-header').html('' +
+            	    '<h4 class="modal-title">'+''+'</h4>');
+            	$('#GlobalModal .modal-body').html(htmlComment);
 
-					var token = jwt_encode(dataform,'UAP)(*');
-					AjaxSubmitRestTicketing(url,token).then(function(response){
-					    if (response.status == 1) {
-					    	toastr.success('Success');
-					    	setInterval(function(){
-					    	 window.location.href = base_url_js+'ticket/ticket-today'; 
-					    	}, 3000);
-					        
-					    }
-					    else
-					    {
-					        toastr.error(response.msg);
-					        end_loading_button2(selector,'Close Project');
-					    }
-					}).fail(function(response){
-					   toastr.error('Connection error,please try again');
-					   end_loading_button2(selector,'Close Project');
-					   loadingEnd(1000); 
-					})    
-					
-				}
+            	$('#GlobalModal .modal-footer').html(htmlButton);
+            	$('#GlobalModal').modal({
+            	    'show' : true,
+            	    'backdrop' : 'static'
+            	});
 			}
-
 		},
 
 		CategoryChangeEvent  : function(selector,value,type="assign_to"){
@@ -511,6 +532,11 @@
 				    	DepartmentID : DataReceivedSelected[0].DepartmentReceivedID,
 				    	NIP : sessionNIP,
 				    },
+				    notifParams : {
+				    	NoTicket : DataTicket[0].NoTicket,
+				    	DepartmentHandler : DataReceivedSelected[0].DepartmentReceivedID,
+				    	CreatedBy : sessionNIP,
+				    },
 				};
 				// console.log(dataform);return;
 				var token = jwt_encode(dataform,'UAP)(*');
@@ -528,6 +554,7 @@
 				    	toastr.success('Success');
 				    	$('#GlobalModal').modal('hide');
 				    	end_loading_button2(selector);
+
 				    }
 				    else
 				    {
@@ -760,6 +787,7 @@
 					    	toastr.success('Success');
 					    	setInterval(function(){
 					    	 end_loading_button2(selector);
+					    	 App_transfer_to.ActionBTNShowHide();
 					    	 loadingEnd(100); 
 					    	}, 3000);
 					    }
@@ -850,8 +878,12 @@
 
 	$(document).off('click', '.btnCloseReceived').on('click', '.btnCloseReceived',function(e) {
 		var selector = $(this);
-		App_set_action_progress.ActionClosedProject(selector);
+		App_set_action_progress.ActionShowModalCommment();
 	})
 
+	$(document).off('click', '#btnModalCloseProject').on('click', '#btnModalCloseProject',function(e) {
+		var selector = $(this);
+		App_set_action_progress.ActionClosedProject(selector);
+	})
 	
 </script>

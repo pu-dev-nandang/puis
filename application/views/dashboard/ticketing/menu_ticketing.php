@@ -257,6 +257,14 @@
               GetWorker += '</table>';
             }
             
+            if (row.Comment != '' && row.Comment != null && row.Comment != undefined ) {
+              GetWorker += '<div class = "form-group" style="margin-top:5px;color:#0066ff;">'+
+                              '<label>Comment from Handler : </label>'+
+                              '<p>'+br2nl(row.Comment)+'</p>'+
+                            '</div>';  
+            }
+            
+
             var SvgColor = '';
             if (row.Flag == "1") {
               SvgColor = 'style = "color:#d0af0c;" ';

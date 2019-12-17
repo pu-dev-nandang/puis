@@ -188,8 +188,9 @@ class M_ticketing extends CI_Model {
 
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
+                a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -237,8 +238,9 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+                b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
+                a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
@@ -294,9 +296,9 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
+                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -350,15 +352,15 @@ class M_ticketing extends CI_Model {
         }
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
+        $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
-                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus
+                qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
                 from db_ticketing.ticket as a 
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                where a.TicketStatus = 3 and DATE_FORMAT(a.TicketClosedAt,"%Y-%m-%d") = CURDATE()
+                where a.TicketStatus IN(3,4) and DATE_FORMAT(a.TicketClosedAt,"%Y-%m-%d") = CURDATE()
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';
@@ -567,6 +569,40 @@ class M_ticketing extends CI_Model {
         return $query;
     }
 
+    public function UpdateCategoryRequested($data_received){
+        if (array_key_exists('ID', $data_received)) {
+           $ID = $data_received['ID'];
+           $G_dt = $this->m_master->caribasedprimary('db_ticketing.received','ID',$ID);
+           $TicketID = $G_dt[0]['TicketID'];
+           // find this receved isFirst ?
+           $G_received = $this->m_master->caribasedprimary('db_ticketing.received','TicketID',$TicketID);
+           $bool = false;
+           $cek = false;
+           for ($i=0; $i < count($G_received); $i++) {
+               $ReceivedID = $G_received[$i]['ID'];
+               $G_received_details = $this->m_master->caribasedprimary('db_ticketing.received_details','ReceivedID',$ReceivedID);
+               if (count($G_received_details) > 0) {
+                   if (!$cek && $ReceivedID == $ID) {
+                       $bool = true;
+                       $cek = true;
+                       break;
+                   }
+                   $cek = true;
+               }
+           }
+
+           if ($bool) {
+              $CategoryID = $data_received['data']['CategoryReceivedID'];
+              $dataSave = [
+                  'CategoryID' => $CategoryID,
+              ];
+              $this->db->where('ID',$TicketID);
+              $this->db->update('db_ticketing.ticket',$dataSave);
+           }
+        }
+
+    }
+
     public function TableReceivedAction($data_arr){
         if (array_key_exists('action', $data_arr)) {
             $action = $data_arr['action'];
@@ -589,9 +625,12 @@ class M_ticketing extends CI_Model {
                             unset($dataSave['ReceivedBy']);
                         }
                     }
+                  
+                    if (!empty($dataSave)) {
+                        $this->db->where('ID',$ID);
+                        $this->db->update('db_ticketing.received',$dataSave);
+                    }
                     
-                    $this->db->where('ID',$ID);
-                    $this->db->update('db_ticketing.received',$dataSave);
                     break;
                 default:
                     # code...
@@ -601,7 +640,54 @@ class M_ticketing extends CI_Model {
         
     }
 
-    public function TableReceived_DetailsAction($data_arr){
+    private function send_notification_ticketing_worker($arr_pass) {
+        /*
+            $arr_pass = [
+                'To' => 
+                'NoTicket' => 
+                'DepartmentHandler' => 
+                'CreatedBy' => 
+            ];
+
+        */
+
+        $G_emp = $this->m_master->caribasedprimary('db_employees.employees','NIP',$arr_pass['CreatedBy']);
+        $NameRequested = $G_emp[0]['Name'];
+        $NoTicket = $arr_pass['NoTicket'];
+        $DepartmentID = $arr_pass['DepartmentHandler'];
+        $url_action = $this->jwt->encode($DepartmentID,"UAP)(*");
+        $CreatedBy = $arr_pass['CreatedBy'];
+        $To = [$arr_pass['To']];
+
+        $array_send_notification=[
+          'NameRequested' => $NameRequested,
+          'Description' => 'Number Ticket '.$NoTicket,
+          'URLDirect' => 'ticket/set_action_progress/'.$NoTicket.'/'.$url_action,
+          'CreatedBy' => $CreatedBy,
+          'To' => $To,
+          'NeedEmail' => 'No',
+        ];
+        
+        $data = array(
+            'auth' => 's3Cr3T-G4N',
+            'Logging' => array(
+                            'Title' => '<i class="fa fa-check-circle margin-right" style="color:green;"></i>E-ticketing Assign to by '.$array_send_notification['NameRequested'],
+                            'Description' => $array_send_notification['Description'],
+                            'URLDirect' => $array_send_notification['URLDirect'],
+                            'CreatedBy' => $array_send_notification['CreatedBy'],
+                          ),
+            'To' => array(
+                      'NIP' => $array_send_notification['To'],
+                    ),
+            'Email' => $array_send_notification['NeedEmail'], 
+        );
+
+        $url = url_pas.'rest2/__send_notif_browser';
+        $token = $this->jwt->encode($data,"UAP)(*");
+        $this->m_master->apiservertoserver($url,$token);     
+    }
+
+    public function TableReceived_DetailsAction($data_arr,$notifParams=[]){
         if (array_key_exists('action', $data_arr)) {
             $action = $data_arr['action'];
             switch ($action) {
@@ -612,6 +698,10 @@ class M_ticketing extends CI_Model {
                             $dataSave = $data[$i];
                             $dataSave['At'] = date('Y-m-d H:i:s');
                             $this->db->insert('db_ticketing.received_details',$dataSave);
+                            if (!empty($notifParams)) {
+                                $arr_pass =  ['To' => $dataSave['NIP'] ] + $notifParams;
+                                $this->send_notification_ticketing_worker($arr_pass);
+                            }
                         }
                     }
                     else
@@ -619,6 +709,10 @@ class M_ticketing extends CI_Model {
                         $dataSave = $data;
                         $dataSave['At'] = date('Y-m-d H:i:s');
                         $this->db->insert('db_ticketing.received_details',$dataSave);
+                        if (!empty($notifParams)) {
+                            $arr_pass =  ['To' => $dataSave['NIP'] ] + $notifParams;
+                            $this->send_notification_ticketing_worker($arr_pass);
+                        }
                     }
                     break;
                 case 'update':
@@ -821,11 +915,21 @@ class M_ticketing extends CI_Model {
             case '1':
             case 1:
                 $Addwhere = ' and (ca.DepartmentID = "'.$dataToken['DepartmentID'].'" or a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'" )';
+                if (array_key_exists('FilterFor', $dataToken)) {
+                    if ($dataToken['FilterFor'] == '99') {
+                       $Addwhere .= ' and a.RequestedBy = "'.$NIP.'"';
+                    }
+                    elseif ($dataToken['FilterFor'] == '-99') {
+                        $Addwhere .= ' and a.RequestedBy != "'.$NIP.'"';
+                    }
+                }
+
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
-                        b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket
+                        b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket,qdx.NameDepartment as NameDepartmentTicket
                         from db_ticketing.ticket as a 
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
+                        '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
                         where a.TicketStatus = 1
@@ -854,15 +958,36 @@ class M_ticketing extends CI_Model {
                 break;
             case '2':
             case 2:
-                $Addwhere = ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
-                                     or a.ID in (
+                $AddwhereFor = '';
+                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                     or';
+                $Addwhere3 = '';
+                if (array_key_exists('FilterFor', $dataToken) ) {
+                    if ($dataToken['FilterFor'] == '1') {
+                        $AddwhereFor = 'and a.ID in (
+                                                select ReceivedID from db_ticketing.received_details where Status != "-1" AND NIP = "'.$NIP.'"
+                                             )';
+                        $AddwhereFor2 = '';
+                    }
+
+                    if ($dataToken['FilterFor'] == '99') {
+                       $Addwhere3 .= ' and a.RequestedBy = "'.$NIP.'"';
+                    }
+                    elseif ($dataToken['FilterFor'] == '-99') {
+                        $Addwhere3 .= ' and a.RequestedBy != "'.$NIP.'"';
+                    }
+                    
+                    // $AddwhereFor2 = '';
+                }
+
+                $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
                                          join db_ticketing.category as b on a.CategoryReceivedID = b.ID
                                          '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
                                          where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'" 
-                                         and a.ReceivedStatus = "0"
+                                         and a.ReceivedStatus = "0" '.$AddwhereFor.'
                                      )   
-                 )';
+                 ) '.$Addwhere3;
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
@@ -899,14 +1024,36 @@ class M_ticketing extends CI_Model {
             case 3:
             case '4':
             case 4:
-                $Addwhere = ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
-                                     or a.ID in (
+                $AddwhereFor = '';
+                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                                     or';
+                $Addwhere3 = '';
+                if (array_key_exists('FilterFor', $dataToken) ) {
+                    if ($dataToken['FilterFor'] == '1') {
+                        $AddwhereFor = 'and a.ID in (
+                                                select ReceivedID from db_ticketing.received_details where Status != "-1" AND NIP = "'.$NIP.'"
+                                             )';
+                        $AddwhereFor2 = '';
+                    }
+
+                    if ($dataToken['FilterFor'] == '99') {
+                       $Addwhere3 .= ' and a.RequestedBy = "'.$NIP.'"';
+                    }
+                    elseif ($dataToken['FilterFor'] == '-99') {
+                        $Addwhere3 .= ' and a.RequestedBy != "'.$NIP.'"';
+                    }
+
+                    // $AddwhereFor2 = '';
+                }
+
+                $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
                                          join db_ticketing.category as b on a.CategoryReceivedID = b.ID
                                          '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
                                          where qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                         '.$AddwhereFor.'
                                      )   
-                 )';
+                 ) '.$Addwhere3;
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
@@ -916,12 +1063,13 @@ class M_ticketing extends CI_Model {
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                        where a.TicketStatus = 3
+                        where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
                              b.Name LIKE "'.$requestData['search']['value'].'%"
                         )
                         ';
+                // print_r($sql);die();
                 $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $sqlTotalData = 'select count(*) as total from (
                         select a.NoTicket
@@ -930,7 +1078,7 @@ class M_ticketing extends CI_Model {
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID','qdj').'
-                        where a.TicketStatus = 3
+                        where a.TicketStatus = '.$TicketStatus.'
                         '.$Addwhere.'
                         and (
                              b.Name LIKE "'.$requestData['search']['value'].'%"
@@ -964,6 +1112,7 @@ class M_ticketing extends CI_Model {
             $nestedData[] = $row['token'];
             $nestedData[] = $row['Files'];
             $nestedData[] = $row['setTicket'];
+            $nestedData[] = $row['NameDepartmentTicket'];
             $data[] = $nestedData;
             $No++;
         }

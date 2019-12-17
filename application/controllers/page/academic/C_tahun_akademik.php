@@ -152,6 +152,11 @@ class C_tahun_akademik extends Academic_Controler {
         $this->load->view('page/'.$data['department'].'/tahun_akademik_detail_date',$data);
     }
 
+    public function upload_files(){
+
+        $uploadNas = $this->m_master->UploadOneFilesToNas("http://pcam",'test.pdf','userfile',null,'json');
+    }
+
 
     // ==== Modal ====
     public function modal_tahun_akademik(){

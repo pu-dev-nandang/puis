@@ -1384,7 +1384,7 @@ class C_api3 extends CI_Controller {
                     //$Upload = json_encode($Upload);
                     $BuktiUpload = $Upload[0];
                 }
-                
+
                 $dataForm['BuktiPendukungUpload'] = $BuktiUpload;
                 $this->db->insert('db_agregator.rekognisi_dosen',$dataForm);
             }
@@ -2030,7 +2030,7 @@ class C_api3 extends CI_Controller {
             $ID = $data_arr['ID'];
 
             $dataForm = (array) $data_arr['dataForm'];
-            
+
             if($ID!=''){
                 // Update
                 /*ADDED BY FEBRI @ NOV 2019*/
@@ -2079,8 +2079,8 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='viewDataPAM'){
             //UPDATED BY FEBRI @ DEC 2019
             $data = $this->db->query('SELECT a.*,b.Name as categName , (select approvedBy from db_studentlife.student_achievement c where c.approvedBy like "'.$this->session->userdata('NIP').'%" and c.ID = a.ID) as isAbble
-                                      FROM db_studentlife.student_achievement  a 
-                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID 
+                                      FROM db_studentlife.student_achievement  a
+                                      left join db_studentlife.categories_achievement b on b.ID = a.CategID
                                       ORDER BY Year, StartDate DESC')->result_array();
             //END UPDATED BY FEBRI
 
@@ -3959,8 +3959,7 @@ class C_api3 extends CI_Controller {
     }
 
     public function getsitasikarya(){
-
-        $Status = $this->input->get('s');
+        //$Status = $this->input->get('s');
         //$data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
         //            FROM db_agregator.sitasi_karya AS a
         //            LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
@@ -4486,7 +4485,7 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
-                $StudentName = ucwords(strtolower($row['StudentName']));
+                $StudentName = $row['StudentName'];
 
                 // ========== GET TRANSCRIPT =========
 
@@ -4503,18 +4502,18 @@ class C_api3 extends CI_Controller {
 
                 // Ijazah
                 $ijazahBtnD = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
-                    ? '<hr style="margin-top: 7px;margin-bottom: 3px;"/><a href="'.base_url('uploads/document/'.$row['NPM'].'/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
-                    : '<hr style="margin-top: 7px;margin-bottom: 3px;"/> Waiting Upload';
+                    ? '<a href="'.base_url('uploads/document/'.$row['NPM'].'/'.$row['IjazahSMA']).'" target="_blank"><i class="fa fa-download"></i> Download</a>'
+                    : 'Waiting Upload';
                 if($AS!='Prodi' && ($DeptID=='6' || $DeptID==6)){
                     $fileIjazahOld = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='') ? $row['IjazahSMA'] : '';
 
                     $ijazah = '<form id="formupload_files_'.$row['AUTHID'].'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
-                                <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
-                                        <i class="fa fa-upload"></i>
+                                <div class="form-group"><label class="btn btn-sm btn-default btn-upload">
+                                        Upload Ijazah
                                         <input type="file" name="userfile" class="uploadIjazahStudentFile" data-old="'.$fileIjazahOld.'" data-npm="'.$row['NPM'].'" data-id="'.$row['AUTHID'].'" id="upload_files_'.$row['AUTHID'].'" accept="application/pdf" style="display: none;">
                                     </label>
                                 </div>
-                        </form>'.$ijazahBtnD;
+                        </form><hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$ijazahBtnD;
 
                 } else {
                     $ijazah = $ijazahBtnD;
@@ -4524,11 +4523,11 @@ class C_api3 extends CI_Controller {
                 $m1 = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? $row['MentorFP1'] : '';
                 $m2 = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? $row['MentorFP2'] : '';
 
-                $btnCrudPembimbing = ($AS!='Prodi' && ($DeptID=='6' || $DeptID==6))
+                $btnCrudPembimbing = ($AS=='Prodi' || ($DeptID=='6' || $DeptID==6))
                     ? '<div style="margin-bottom: 10px;">
                     <button class="btn btn-sm btn-default btnAddMentor" id="btnAddMentor_'.$row['NPM'].'" data-npm="'.$row['NPM'].'"
-                data-std="'.$row['NPM'].' - '.$row['StudentName'].'"
-                data-m1="'.$m1.'" data-m2="'.$m2.'">Edit Mentor Final Project</button></div>' : '';
+                data-std="'.$row['NPM'].' - '.$row['StudentName'].'" data-id="'.$row['AUTHID'].'"
+                data-m1="'.$m1.'" data-m1-name="'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'" data-m2="'.$m2.'" data-m2-name="'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'">Edit Mentor Final Project</button></div>' : '';
 
 
                 // Academic
@@ -4537,7 +4536,11 @@ class C_api3 extends CI_Controller {
 
                     $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Academic_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Academic">Clearance</button>';
+                        : '<button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Academic">Clearance</button>';
+
+                    $c_Academic = ($row['IjazahSMA']!=null && $row['IjazahSMA']!='')
+                        ? $c_Academic
+                        : '<span style="color:#ff9800; ">Waiting Upload Ijazah</span>';
 
                 } else {
                     $c_Academic = ($row['Cl_Academic']!= null && $row['Cl_Academic']!='' && $row['Cl_Academic']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
@@ -4551,7 +4554,21 @@ class C_api3 extends CI_Controller {
                 if($AS!='Prodi' && ($DeptID=='11' || $DeptID==11)){
                     $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Library">Clearance</button>';
+                        : '<button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Library">Clearance</button>';
+
+                    $CheckDataFile = $this->db->get_where('db_academic.final_project_files',array('NPM' => $row['NPM']))->result_array();
+                    if(count($CheckDataFile)>0){
+                        if($CheckDataFile[0]['Status']=='0'){
+                            $c_Library = '<span style="color: #ff9800;">Not yet sending the final project document</span>';
+                        } else if($CheckDataFile[0]['Status']=='1'){
+                            $c_Library = '<span style="color: blue;">Awaiting action by library staff</span>';
+                        } else if($CheckDataFile[0]['Status']=='-2'){
+                            $c_Library = '<span style="color: darkred;">The final project document rejected</span>';
+                        }
+                    } else {
+                        $c_Library = '<span style="color: #ff9800;">Not yet sending the final project document</span>';
+                    }
+
                 } else {
                     $c_Library = ($row['Cl_Library']!= null && $row['Cl_Library']!='' && $row['Cl_Library']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                         <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Library_Name'].''.$dateTm
@@ -4595,7 +4612,7 @@ class C_api3 extends CI_Controller {
                 if($ProdiID!=''){
                     $c_Kaprodi = ($row['Cl_Kaprodi']!='0') ? '<i class="fa fa-check-circle" style="color: darkgreen;"></i>
                     <hr style="margin-top: 7px;margin-bottom: 3px;"/>'.$row['Cl_Kaprodi_Name'].''.$dateTm
-                        : '<button class="btn btn-sm btn-default btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Clearance</button>';
+                        : '<div style="margin-bottom: 10px;">Register to be a judiciums participant</div><button class="btn btn-sm btn-success btnClearnt" data-npm="'.$row['NPM'].'" data-c="Cl_Kaprodi">Register now</button>';
 
                 }
                 else {
@@ -4647,6 +4664,142 @@ class C_api3 extends CI_Controller {
                 "data"            => $data
             );
             echo json_encode($json_data);
+
+        }
+
+        else if($data_arr['action']=='viewYudisiumSchedule'){
+
+            $requestData= $_REQUEST;
+
+            $SemesterID = $data_arr['SemesterID'];
+
+            $ProdiID = (isset($data_arr['ProdiID']) && $data_arr['ProdiID']!='') ? $data_arr['ProdiID'] : '';
+            $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" )';
+            }
+
+            $queryDefault = 'SELECT ssp.*, ats.Name AS StudentName, mk.MKCode,
+                                        mk.NameEng AS CourseEng, sc.ClassGroup,
+                                        ats.MentorFP1, em4.Name AS MentorFP1Name, ats.MentorFP2, em5.Name AS MentorFP2Name,
+                                        ats.ID AS AUTHID
+                                        FROM db_academic.std_study_planning ssp
+                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = ssp.MKID)
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = ssp.NPM)
+                                        LEFT JOIN db_academic.schedule sc ON (sc.ID = ssp.ScheduleID)
+                                        LEFT JOIN db_employees.employees em4 ON (ats.MentorFP1 = em4.NIP)
+                                        LEFT JOIN db_employees.employees em5 ON (ats.MentorFP2 = em5.NIP)
+                                        WHERE mk.Yudisium = "1" AND ssp.SemesterID = "'.$SemesterID.'" '.$WhereProdi.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+
+                $m1Name = ($row['MentorFP1']!=null && $row['MentorFP1']!='') ? '<div style="color: royalblue;">'.$row['MentorFP1'].' - '.$row['MentorFP1Name'].'</div>' : '';
+                $m2Name = ($row['MentorFP2']!=null && $row['MentorFP2']!='') ? '<div style="color: royalblue;">'.$row['MentorFP2'].' - '.$row['MentorFP2Name'].'</div>' : '';
+
+                $dataSchedule = $this->db->query('SELECT fps.ID, fps.Date, fps.Start, fps.End, cl.Room FROM db_academic.final_project_schedule_student fpss 
+                                                                 LEFT JOIN db_academic.final_project_schedule fps ON (fps.ID = fpss.FPSID)
+                                                                 LEFT JOIN db_academic.classroom cl ON (cl.ID = ClassroomID)
+                                                                 WHERE fpss.NPM = "'.$row['NPM'].'"')->result_array();
+
+                $rowSchedule = '';
+                if(count($dataSchedule)>0){
+                    for($s=0;$s<count($dataSchedule);$s++){
+                        $d = $dataSchedule[$s];
+
+                        // Get Examiner
+                        $dataEx = $this->db->query('SELECT em.Name FROM db_academic.final_project_schedule_lecturer fpsl 
+                                                                            LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
+                                                                            WHERE fpsl.FPSID = '.$d['ID'].' 
+                                                                            ORDER BY fpsl.Type DESC, fpsl.NIP ASC ')->result_array();
+
+                        $ListEx = '';
+                        if(count($dataEx)>0){
+                            foreach ($dataEx AS $key => $item){
+                                $koma = ($key!=0) ? ', ' : '';
+                                $ListEx = $ListEx.''.$koma.$item['Name'];
+                            }
+                        } else {
+                            $ListEx = '<span style="color: darkred;">Not set</span>';
+                        }
+
+                        // Get Participant
+                        $dataPar = $this->db->query('SELECT ats.Name, ats.NPM FROM db_academic.final_project_schedule_student fpss
+                                                                   LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM)
+                                                                   WHERE fpss.FPSID = '.$d['ID'].' AND fpss.NPM != "'.$row['NPM'].'"
+                                                                    ORDER BY fpss.NPM ASC ' )->result_array();
+
+                        $ListPar = '';
+                        if(count($dataPar)>0){
+                            foreach ($dataPar AS $key => $item){
+                                $koma = ($key!=0) ? ', ' : '';
+                                $ListPar = $ListPar.''.$koma.$item['NPM'].' - '.$item['Name'];
+                            }
+                        } else {
+                            $ListPar = '-';
+                        }
+
+                        $date = date('l, d F Y',strtotime($d['Date']));
+                        $time = substr($d['Start'],0,5).' - '.substr($d['End'],0,5);
+                        $tbSch = '<table class="table table-left table-sch">
+                                <tr>
+                                    <td style="width: 20%;">Date</td>
+                                    <td style="width: 5%;">:</td>
+                                    <td>'.$date.' '.$time.'</td>
+                                </tr>
+                                <tr>
+                                    <td>Room</td>
+                                    <td>:</td>
+                                    <td>'.$d['Room'].'</td>
+                                </tr>
+                                <tr>
+                                    <td>Examiner</td>
+                                    <td>:</td>
+                                    <td>'.$ListEx.'</td>
+                                </tr>
+                                <tr>
+                                    <td>Participants</td>
+                                    <td>:</td>
+                                    <td>'.$ListPar.'</td>
+                                </tr>
+                            </table>';
+                        $rowSchedule = $rowSchedule.'<div class="div-sch">'.$tbSch.'</div>';
+                    }
+                }
+
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;"><b>'.$row['StudentName'].'</b><br/>'.$row['NPM'].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$m1Name.''.$m2Name.'</div>';
+                $nestedData[] = '<div style="text-align: left;">'.$rowSchedule.'</div>';
+
+
+                $data[] = $nestedData;
+                $no++;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
 
         }
 
@@ -4727,7 +4880,7 @@ class C_api3 extends CI_Controller {
 
         else if($data_arr['action']=='getJudiciumsYear'){
 
-            $data = $this->db->query('SELECT ats.GraduationYear FROM db_academic.auth_students ats GROUP BY ats.GraduationYear ORDER BY ats.GraduationYear DESC')->result_array();
+            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.ID DESC')->result_array();
 
             return print_r(json_encode($data));
 
@@ -4748,31 +4901,75 @@ class C_api3 extends CI_Controller {
                 $C.'_At' => $this->m_rest->getDateTimeNow()
             );
 
+
+            $lanjutInsert = false;
+            $result = array(
+                'Status' => 0
+            );
+
             if($C == 'Cl_Kaprodi'){
                 $SemesterActive = $this->m_rest->_getSemesterActive();
                 $SemesterID = $SemesterActive['SemesterID'];
                 $arr['SemesterID'] = $SemesterID;
-            }
 
-            // Cek ada apa tidak rownya
-
-            $dataCk = $this->db->get_where('db_academic.final_project_clearance',
-                array(
-                    'NPM' => $NPM
+                // Cek apakah ada Judicium active
+                $checkJudiciums = $this->db->limit(1)->order_by('ID','DESC')->get_where('db_academic.judiciums',array(
+                    'Publish' => '1'
                 ))->result_array();
 
-            if(count($dataCk)>0){
-                $this->db->where('ID', $dataCk[0]['ID']);
-                $this->db->update('db_academic.final_project_clearance',$arr);
+                if(count($checkJudiciums)>0){
+
+                    $d = $checkJudiciums[0];
+                    $result = array(
+                        'Status' => 1
+                    );
+                    $lanjutInsert = true;
+
+                    $this->db->insert('db_academic.judiciums_list',array(
+                        'JID' => $d['ID'],
+                        'NPM' => $NPM
+                    ));
+
+                } else {
+                    $result = array(
+                        'Status' => 0,
+                        'Message' => 'Active Judicium does not exist, please contact academic service'
+                    );
+                }
 
             } else {
-                $this->db->insert('db_academic.final_project_clearance',$arr);
+                $lanjutInsert = true;
+                $result = array(
+                    'Status' => 1
+                );
             }
 
 
+            if($lanjutInsert==true){
+                $dataCk = $this->db->get_where('db_academic.final_project_clearance',
+                    array(
+                        'NPM' => $NPM
+                    ))->result_array();
 
-            return print_r(1);
+                if(count($dataCk)>0){
+                    $this->db->where('ID', $dataCk[0]['ID']);
+                    $this->db->update('db_academic.final_project_clearance',$arr);
 
+                } else {
+                    $this->db->insert('db_academic.final_project_clearance',$arr);
+                }
+
+            }
+
+            return print_r(json_encode($result));
+
+
+
+        }
+
+        else if($data_arr['action']=='loadJudiciumsData'){
+            $data = $this->db->get_where('db_academic.judiciums',array('Publish' => '1'))->result_array();
+            return print_r(json_encode($data));
         }
 
         else if($data_arr['action']=='updateMentorFP'){
@@ -4783,6 +4980,122 @@ class C_api3 extends CI_Controller {
             $this->db->update('db_academic.auth_students',$dataForm);
 
             return print_r(1);
+        }
+
+        else if($data_arr['action']=='updateDataJudiciums'){
+
+            $ID = $data_arr['ID'];
+            $dataForm = (array) $data_arr['dataForm'];
+
+            $Year = $dataForm['Year'];
+
+            if($ID!='' && $ID!=null){
+                $dataForm['UpdatedBy'] = $this->session->userdata('NIP');
+                $dataForm['updatedAt'] = $this->m_rest->getDateTimeNow();
+                // Update
+                $this->db->where('ID', $ID);
+                $this->db->update('db_academic.judiciums',$dataForm);
+            } else {
+                // Insert
+                $dataForm['EntredBy'] = $this->session->userdata('NIP');
+                $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                $this->db->insert('db_academic.judiciums',$dataForm);
+            }
+
+            $result = array(
+                'Status' => 1
+            );
+
+
+            return print_r(json_encode($result));
+
+        }
+
+        else if($data_arr['action']=='readDataJudiciums'){
+            $data = $this->db->query('SELECT j.* FROM db_academic.judiciums j ORDER BY j.ID DESC')->result_array();
+            return print_r(json_encode($data));
+        }
+        else if($data_arr['action']=='updateStatusDataJudiciums'){
+            $ID = $data_arr['ID'];
+            $Publish = $data_arr['Publish'];
+
+            if($Publish=='1'){
+                $this->db->query('UPDATE db_academic.judiciums s SET s.Publish=IF(s.ID="'.$ID.'","1","0")');
+            } else {
+                $this->db->query('UPDATE db_academic.judiciums s SET s.Publish="'.$Publish.'"');
+            }
+            return print_r(1);
+        }
+        else if($data_arr['action']=='loadDataParticipantOfJudiciums'){
+
+            $requestData= $_REQUEST;
+
+            $ProdiID = $data_arr['ProdiID'];
+            $NPM = (isset($data_arr['NPM']) && $data_arr['NPM']!='' && $data_arr['NPM']!=null) ? $data_arr['NPM'] : '';
+
+            $WhereProdi = ($ProdiID!='') ? ' AND ats.ProdiID = "'.$ProdiID.'" ' : '';
+
+            $JID = $data_arr['JID'];
+
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+                $dataSearch = ' AND (  ats.Name LIKE "%'.$search.'%"
+                                OR ats.NPM LIKE "%'.$search.'%" 
+                                OR ps.NameEng LIKE "%'.$search.'%"
+                                OR ps.Name LIKE "%'.$search.'%"
+                                )';
+            }
+
+            $queryDefault = 'SELECT ats.Name, ats.NPM, ps.NameEng AS ProdiEng, fp.TitleInd, fp.TitleEng FROM db_academic.judiciums_list jl
+                                                        LEFT JOIN db_academic.judiciums j ON (j.ID = jl.JID)
+                                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = jl.NPM)
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                        LEFT JOIN db_academic.final_project fp ON (fp.NPM = ats.NPM)
+                                                        WHERE j.ID = "'.$JID.'" '.$WhereProdi.' '.$dataSearch;
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $img = $this->m_api->getPhotoStudent($row['NPM']);
+                $urlImg = $img['URLImage'];
+
+                $btnInvitation = '';
+                if($NPM!='' && $row['NPM']==$NPM){
+                    $btnInvitation = '<a href="'.base_url('images/icon/invitation.png').'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
+                } else if ($NPM=='') {
+                    $btnInvitation = '<a href="'.base_url('images/icon/invitation.png').'" target="_blank" class="btn btn-sm btn-primary">Download</a>';
+                }
+                $nestedData[] = '<div>'.$no.'</div>';
+                $nestedData[] = '<div><img src="'.$urlImg.'" class="img-rounded" style="width: 100%;max-width: 150px;"></div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiEng'].'</div>';
+                $nestedData[] = '<div style="text-align: left;"><b>'.$row['TitleInd'].'</b><br/><i>'.$row['TitleEng'].'</i></div>';
+                $nestedData[] = '<div>'.$btnInvitation.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+
         }
 
     }
@@ -5015,19 +5328,23 @@ class C_api3 extends CI_Controller {
         if($data_arr['action']=='viewFileFinalProject'){
             $requestData= $_REQUEST;
 
+            $WhereStatus = ($data_arr['Status']!='') ? 'WHERE fpf.Status = "'.$data_arr['Status'].'" ' : '';
+
             $dataSearch = '';
             if( !empty($requestData['search']['value']) ) {
 
                 $search = $requestData['search']['value'];
-                $dataSearch = ' WHERE fpf.NPM LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
+                $w = ($data_arr['Status']!='') ? ' AND ' : 'WHERE ';
+                $dataSearch = $w.' (fpf.NPM LIKE "%'.$search.'%" OR ats.Name LIKE "%'.$search.'%"
                                 OR ps.Name LIKE "%'.$search.'%" OR fpf.JudulInd LIKE "%'.$search.'%"
-                                 OR fpf.JudulEng LIKE "%'.$search.'%" ';
+                                 OR fpf.JudulEng LIKE "%'.$search.'%" )';
             }
 
-            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName FROM db_academic.final_project_files fpf
+            $queryDefault = 'SELECT fpf.*, ats.Name, ps.Name AS ProdiName, em.Name AS EmUpdateByName FROM db_academic.final_project_files fpf
                                           LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpf.NPM)
                                           LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
-                                          '.$dataSearch.' ';
+                                          LEFT JOIN db_employees.employees em ON (em.NIP = fpf.EmUpdateBy)
+                                           '.$WhereStatus.$dataSearch.' ORDER BY fpf.UpdatedAt ASC';
 
             $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -5043,19 +5360,25 @@ class C_api3 extends CI_Controller {
                 $nestedData = array();
                 $row = $query[$i];
 
+                $Updated = ($row['EmUpdateBy']!='' && $row['EmUpdateBy']!=null)
+                    ? '<div style="font-size: 10px;">'.$row['EmUpdateByName'].'<br/>'.date('d M Y H:i',strtotime($row['EmUpdateAt'])).'</div>' : '';
+
                 // 0 = Plan, 1 = Send, 2 = Approve, -2 Rejected
-                $Status = 'Plan';
+                $Status = '<span style="color:#b3b2b2;font-size: 11px;">Waiting for sending documents</span>';
                 if($row['Status']==1 || $row['Status']=='1'){
-                    $Status = 'Waiting approval';
+                    $Status = '<span style="color:blue;">Need action</span>';
                 }
                 else if($row['Status']==2 || $row['Status']=='2'){
-                    $Status = 'Approved';
+                    $Status = '<span style="color: green;"><i class="fa fa-check-circle"></i> Approved</span>'.$Updated;
                 }
                 else if($row['Status']==-2 || $row['Status']=='-2'){
-                    $Status = 'Rejected';
+                    $Status = '<span style="color: red;"><i class="fa fa-times-circle"></i> Rejected</span>'.$Updated;
                 }
 
                 $Noted = ($row['Noted']!='' && $row['Noted']!=null) ? $row['Noted'] : '';
+
+
+
 
                 $nestedData[] = '<div>'.$no.'</div>';
                 $nestedData[] = '<div style="text-align:left;"><a href="'.base_url('library/yudisium/final-project/details/'.$row['NPM']).'" target="_blank"><b>'.$row['Name'].'</b></a><br/>'.$row['NPM'].'<br/>'.$row['ProdiName'].'</div>';
@@ -5094,8 +5417,38 @@ class C_api3 extends CI_Controller {
             $NPM = $data_arr['NPM'];
             $dataForm = (array) $data_arr['dataform'];
 
+            $dataForm['EmUpdateBy'] = $this->session->userdata('NIP');
+            $dataForm['EmUpdateAt'] = $this->m_rest->getDateTimeNow();
+
             $this->db->where('NPM', $NPM);
             $this->db->update('db_academic.final_project_files',$dataForm);
+            $this->db->reset_query();
+
+            if($dataForm['Status']==2 || $dataForm['Status']=='2'){
+                // Update juga di final project
+
+                $dataFP = $this->db->get_where('db_academic.final_project_files',array('NPM' => $NPM))->result_array();
+
+                $dataCk = $this->db->get_where('db_academic.final_project',array('NPM' => $NPM))->result_array();
+
+                $dataFP = array(
+                    'NPM' => $NPM,
+                    'TitleInd' => $dataFP[0]['JudulInd'],
+                    'TitleEng' => $dataFP[0]['JudulEng'],
+                    'Status' => '2',
+                    'UpdatedBy' => $this->session->userdata('NIP')
+                );
+
+                if(count($dataCk)>0){
+                    // Update yang data
+                    $this->db->where('ID', $dataCk[0]['ID']);
+                    $this->db->update('db_academic.final_project',$dataFP);
+                } else {
+                    // Insert yang baru
+                    $this->db->insert('db_academic.final_project',$dataFP);
+                }
+
+            }
 
             return print_r(1);
 
@@ -5570,11 +5923,11 @@ class C_api3 extends CI_Controller {
             $now=date("Y-m-d");
 
             $member_id = $data_arr['member_id'];
-            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed 
-                                                    FROM library.loan l 
-                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code) 
+            $data = $dbLib->query('SELECT l.loan_id, l.member_id, l.loan_date, l.due_date, l.is_lent, l.is_return, b.title, b.image, l.renewed
+                                                    FROM library.loan l
+                                                    LEFT JOIN library.item i ON (i.item_code = l.item_code)
                                                     LEFT JOIN library.biblio b ON (b.biblio_id = i.biblio_id)
-                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC, 
+                                                    WHERE l.member_id = "'.$member_id.'" ORDER BY  l.is_return ASC ,l.loan_date DESC,
                                                     l.due_date DESC, b.title ASC')->result_array();
 
             $dataHoliday = $dbLib->query('SELECT holiday_date FROM library.holiday ORDER BY holiday_id DESC')->result_array();

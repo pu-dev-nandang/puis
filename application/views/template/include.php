@@ -652,7 +652,7 @@
             if(jsonResult.length>0){
                 $.each(jsonResult,function (i,v) {
                     var sc = (v.GraduationYear==selected) ? 'selected' : '';
-                    $(element).append('<option value="'+v.GraduationYear+'" '+sc+'>'+v.GraduationYear+'</option>');
+                    $(element).append('<option value="'+v.ID+'" '+sc+'>'+v.Title+'</option>');
 
                 });
             }
@@ -2196,7 +2196,7 @@
       return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, replaceStr);
     }
 
-    function br2nl (str, replaceMode) {
+    function br2nl (str, replaceMode) { // yg biasa digunakan
 
       var replaceStr = (replaceMode) ? "\n" : '';
       // Includes <br>, <BR>, <br />, </br>

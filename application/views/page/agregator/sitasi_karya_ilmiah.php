@@ -11,14 +11,14 @@
     .higligh {
         background: lightyellow;
     }
-    
+
 </style>
 
 <div class="well">
     <div class="row">
         <div class="col-md-12">
             <div style="text-align: right;margin-bottom: 20px;">
-                <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Sitasi Karya Ilmiah</button>
+                <!-- <button class="btn btn-primary form-data-add" id="btnLembagaMitra"><i class="fa fa-plus"></i> Sitasi Karya Ilmiah </button>  -->
                 <button onclick="saveTable2Excel('dataTable2Excel')" class="btn btn-success"><i class="fa fa-file-excel-o margin-right"></i> Excel</button>
             </div>
             <div id="viewTable"></div>
@@ -27,7 +27,7 @@
 </div>
 
 <script>
-    
+
      $('#btnLembagaMitra').click(function () {
 
         $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
@@ -37,7 +37,7 @@
             '    <div class="col-md-12">' +
             '        <div class="well">' +
             '        <div class="form-group">' +
-            '           <label>Nama Dosen Penulis</label>' + 
+            '           <label>Nama Dosen Penulis</label>' +
             '              <select class="full-width-fix" size="5" id="nama_penulis" style="width: 100%;" size="5"><option></option></select>' +
             '        </div>' +
             '            <div class="form-group">' +
@@ -61,7 +61,7 @@
         $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button> <button class="btn btn-success" style="text-align: right;" id="btnSaveSitasi">Save</button>');
 
         // --------------------------------
-        $(function() { 
+        $(function() {
           $('#tahun').datepicker( {
             yearRange: "c-100:c",
             changeMonth: false,
@@ -89,7 +89,7 @@
         // --------------------------------
         loadSelectOptionLecturersSingle('#nama_penulis','');
         $('#nama_penulis').select2({allowClear: true});
-        
+
         $('#GlobalModal').modal({
             'show' : true,
             'backdrop' : 'static'
@@ -130,8 +130,8 @@
 
                 if(result==0 || result=='0'){
                   toastr.error('Maaf, Gagal simpan data !','Error');
-                } 
-                else {  
+                }
+                else {
                     loadAkreditasiProdi();
                     $('#GlobalModal').modal('hide');
                     toastr.success('Data saved','Success');
@@ -148,7 +148,7 @@
         } else {
             toastr.error('Soory, All form required','Error');
       }
-    });    
+    });
 </script>
 
 <script>
@@ -187,21 +187,21 @@
                   var sumx = 0;
 
                 for (var i = 0; i < jsonResult.length; i++) {
-                    var v = jsonResult[i]; 
+                    var v = jsonResult[i];
 
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
                         '   <td style="text-align: left;">'+v.Name+'</td>' +
-                        '   <td style="text-align: left;">'+v.Judul_artikel+'</td>' +
-                        '   <td style="text-align: center;">'+v.Banyak_artikel+'</td>' +
-                        '   <td style="text-align: center;">'+v.Tahun+'</td>' +
+                        '   <td style="text-align: left;">'+v.Judul_Sitasi+'</td>' +
+                        '   <td style="text-align: center;">'+v.jumlah_sitasi+'</td>' +
+                        '   <td style="text-align: center;">'+v.year+'</td>' +
                         '</tr>');
                     var total = parseInt(jsonResult.length);
-                    var sumx = sumx + parseInt(v.Banyak_artikel);
+                    var sumx = sumx + parseInt(v.jumlah_sitasi);
                     //sum += v.Banyak_artikel;
                 }
             }
-                
+
             $('#dataTablesLuaran').dataTable();
 
             $('#listData').append('<tr>' +

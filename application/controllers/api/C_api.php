@@ -8614,7 +8614,7 @@ class C_api extends CI_Controller {
                                                                                 LEFT JOIN db_employees.employees em ON (em.NIP = fpsl.NIP)
                                                                                 WHERE fpsl.FPSID = "'.$data[$i]['ID'].'" ORDER BY fpsl.Type DESC ')->result_array();
 
-                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name FROM db_academic.final_project_schedule_student fpss 
+                        $data[$i]['Student'] = $this->db->query('SELECT ats.NPM, ats.Name, fpss.Notes FROM db_academic.final_project_schedule_student fpss 
                                                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = fpss.NPM) 
                                                                                 WHERE fpss.FPSID = "'.$data[$i]['ID'].'"')->result_array();
 
@@ -8661,7 +8661,7 @@ class C_api extends CI_Controller {
                                                                 WHERE fpf.NPM = "'.$NPM.'"')->result_array();
 
                 if(count($data)<=0){
-                    $this->db->update('db_academic.final_project_files',array('NPM' => $NPM));
+                    $this->db->insert('db_academic.final_project_files',array('NPM' => $NPM));
 
                     $data = $this->db->query('SELECT fpf.*, fp.Status AS StatusFinalProject 
                                                                 FROM db_academic.final_project_files fpf 
@@ -10705,6 +10705,17 @@ class C_api extends CI_Controller {
                     ,array('Year' => $data_arr['ClassOf'] ,'ProdiID' => $data_arr['ProdiID']))->result_array();
 
                 return print_r(json_encode($data));
+            }
+            if($data_arr['action']=='addNoteInTransferStd'){
+
+                $dataUpdate = (array) $data_arr['dataUpdate'];
+                $TSID = $data_arr['TSID'];
+
+                $this->db->where('ID', $TSID);
+                $this->db->update('db_academic.transfer_student',$dataUpdate);
+
+                return print_r(1);
+
             }
             else if($data_arr['action'] == 'readReason'){
                 $data = $this->db->get('db_academic.transfer_type')->result_array();
