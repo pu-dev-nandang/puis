@@ -3178,7 +3178,7 @@ class M_admission extends CI_Model {
     public function getCountDataPersonal_Candidate_to_be_mhs($requestData,$reqTahun,$FormulirType = '%',$StatusPayment = '%')
     {
       $AddWhere = '';
-      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") ';
+      $AddWhere2 = ' chklunas in ("Lunas","Belum Lunas") and CekIntake = "Intake" ';
       if ($FormulirType != '%') {
          $AddWhere .= ' and a.StatusReg = '.$FormulirType.' ';
       }
@@ -3195,7 +3195,10 @@ class M_admission extends CI_Model {
                       "Belum Lunas"
                 ) as chklunas,
               (select count(*) as total from db_finance.payment_pre as aaa where aaa.ID_register_formulir =  e.ID ) as Cicilan
-              ,xx.Name as NameSales,px.No_Ref
+              ,xx.Name as NameSales,px.No_Ref,
+              if(
+                (select count(*) as total from db_finance.payment_pre where `Status` = 1 and ID_register_formulir = e.ID ) > 0,"Intake","Not Intake"
+              ) as CekIntake
               from db_admission.register as a
               LEFT join db_admission.school as b
               on a.SchoolID = b.ID
