@@ -192,12 +192,12 @@
                     $('#listData').append('<tr>' +
                         '   <td style="text-align: center;">'+(i+1)+'</td>' +
                         '   <td style="text-align: left;">'+v.Name+'</td>' +
-                        '   <td style="text-align: left;">'+v.Judul_Sitasi+'</td>' +
-                        '   <td style="text-align: center;">'+v.jumlah_sitasi+'</td>' +
-                        '   <td style="text-align: center;">'+v.year+'</td>' +
+                        '   <td style="text-align: left;">'+v.Title+'</td>' +
+                        '   <td style="text-align: center;">'+v.Citation+'</td>' +
+                        '   <td style="text-align: center;">'+v.Year+'</td>' +
                         '</tr>');
                     var total = parseInt(jsonResult.length);
-                    var sumx = sumx + parseInt(v.jumlah_sitasi);
+                    var sumx = sumx + parseInt(v.Citation);
                     //sum += v.Banyak_artikel;
                 }
             }
