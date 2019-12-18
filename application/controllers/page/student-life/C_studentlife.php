@@ -101,9 +101,4 @@ class C_studentlife extends Student_Life {
         $this->menu_stracert_alumni($page);
     }
 
-
-
-
-
-
 }
