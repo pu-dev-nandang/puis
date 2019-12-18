@@ -98,8 +98,6 @@
                     <span>Ticketing</span>
                 </a>
             </li>
-
-
             <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>

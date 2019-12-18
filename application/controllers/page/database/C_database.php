@@ -117,7 +117,7 @@ class C_database extends Globalclass {
                     unset($getTempEmpyReq->edited);
                     unset($getTempEmpyReq->editedby);
                     unset($getTempEmpyReq->pathPhoto);
-
+                    $getTempEmpyReq->Name = ucwords($getTempEmpyReq->Name);
                     $updateTA = $this->General_model->updateData("db_employees.employees",$getTempEmpyReq,$conditions);
                     if($updateTA){
                         //check if has a different birthdate between old and new
@@ -456,6 +456,7 @@ class C_database extends Globalclass {
                     unset($getTempStudentReq->pathPhoto);
                     unset($getTempStudentReq->ID);
                     unset($getTempStudentReq->NPM);
+                    unset($getTempStudentReq->Name);
                     $KTPNumber = $getTempStudentReq->KTPNumber;
                     $Access_Card_Number = $getTempStudentReq->Access_Card_Number;
                     unset($getTempStudentReq->KTPNumber);
@@ -522,7 +523,7 @@ class C_database extends Globalclass {
                 }
             }else{$message="Student data is not founded.";}
 
-            $json = array("message"=>$message,"finish"=>$isfinish);   
+            $json = array("message"=>$message,"finish"=>$isfinish);
         }
         echo json_encode($json);
     }
