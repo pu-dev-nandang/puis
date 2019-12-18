@@ -1,5 +1,4 @@
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 include_once APPPATH.'vendor/autoload.php';
 class M_doc extends CI_Model {
@@ -8,12 +7,15 @@ class M_doc extends CI_Model {
 	private $INPUT = [];
 	private $GRAB = [];
 	private $TABLE = [];
+	private $TOT_APPROVAL = 0;
 
 	private $KeySET = 'SET';
 	private $KeyUSER = 'USER';
 	private $KeyINPUT = 'INPUT';
 	private $KeyGRAB = 'GRAB';
 	private $KeyTABLE = 'TABLE';
+
+	// private $Path
 
     function __construct()
     {
@@ -39,7 +41,7 @@ class M_doc extends CI_Model {
 
 		foreach ($line as $v) {
 		    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
-		        $str = $matches[1][0];
+		        $str = trim($matches[1][0]);
 		        $ex = explode('.', $str);
 		        if (count($ex) > 0) {
 		        	/*
@@ -50,38 +52,41 @@ class M_doc extends CI_Model {
 		        	*/
 		        	switch ($ex[0]) {
 		        		case $this->KeySET:
-		        			$setStr = $ex[1];
+		        			$setStr = trim(ucwords($ex[1]));
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.$ex[$i];
+		        				if (trim(ucwords($ex[$i])) == 'Signature') {
+		        					$this->TOT_APPROVAL = $this->TOT_APPROVAL + 1;
+		        				}
+		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			
 		        			$this->SET[] = $setStr;
 		        			break;
 		        		case $this->KeyUSER:
-		        			$setStr = $ex[1];
+		        			$setStr = trim(ucwords($ex[1]));
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.$ex[$i];
+		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			$this->USER[] = $setStr;
 		        			break;
 		        		case $this->KeyINPUT:
-		        			$setStr = $ex[1];
+		        			$setStr = trim(ucwords($ex[1]));
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.$ex[$i];
+		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			$this->INPUT[] = $setStr;
 		        			break;
 		        		case $this->KeyGRAB:
-		        			$setStr = $ex[1];
+		        			$setStr = trim(ucwords($ex[1]));
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.$ex[$i];
+		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			$this->GRAB[] = $setStr;
 		        			break;
 		        		case $this->KeyTABLE:
-		        			$setStr = $ex[1];
+		        			$setStr = trim(ucwords($ex[1]));
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.$ex[$i];
+		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			$this->TABLE[] = $setStr;
 		        			break;
@@ -90,16 +95,29 @@ class M_doc extends CI_Model {
 		    }
 		}
 
+		// extract set to function
+		$this->__generator_obj();
+
 		return $data = [
 			'SET' => $this->SET,
 			'USER' => $this->USER,
 			'INPUT' => $this->INPUT,
 			'GRAB' => $this->GRAB,
 			'TABLE' => $this->TABLE,
+			'TOT_APPROVAL' => $this->TOT_APPROVAL,
 		];	
 
     }
 
+    private function __generator_obj(){
+    	$this->__SETGenerate();
+    }
+
+    private function __SETGenerate(){
+    	$this->load->model('document-generator/m_set');
+		$SET = $this->SET;
+		$this->SET = $this->m_set->__generate($SET);
+    }
     
   
 }

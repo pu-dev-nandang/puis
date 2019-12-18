@@ -28,7 +28,7 @@
             </li>
             <li class="<?php if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='document-generator'){echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/document-generator');?>">
-                    <i class="fa fa-book"></i> Document Generator
+                    <i class="fa fa-archive"></i> Document Generator
                 </a>
             </li>
             
