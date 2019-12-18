@@ -98,17 +98,6 @@
                     <span>Ticketing</span>
                 </a>
             </li>
-
-
-            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
-            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='global-informations'){echo 'current';} ?>">
-                <a href="<?php echo base_url('global-informations/students'); ?>" id="btn_announcement">
-                    <i class="fa fa-globe" aria-hidden="true"></i>
-                    <span>Global Information</span>
-                </a>
-            </li>
-
-
             <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>

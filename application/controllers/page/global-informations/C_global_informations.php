@@ -21,6 +21,7 @@ class C_global_informations extends Globalclass {
     public function students(){
     	$data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
     	$data['statusstd'] = $this->General_model->fetchData("db_academic.status_student",array())->result();
+    	$data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
         $page = $this->load->view('dashboard/global-informations/students/index',$data,true);
         $this->menu_global_informations($page);
     }
@@ -158,14 +159,7 @@ class C_global_informations extends Globalclass {
         }        
         if(!empty($data_arr['position'])){
         	$param[] = array("field"=>"em.PositionMain","data"=>" like '14%".$data_arr['position']."' ","filter"=>"AND",);    
-        }/*else{
-        	$param[] = array("field"=>"(em.PositionMain","data"=>" ='14.5' ","filter"=>"AND",);
-	    	$param[] = array("field"=>"em.PositionMain","data"=>" ='14.6' ","filter"=>"OR",);
-	    	$param[] = array("field"=>"em.PositionMain","data"=>" ='14.7' ","filter"=>"OR",);
-	    	$param[] = array("field"=>"em.PositionOther1","data"=>" ='14.5' ","filter"=>"OR",);
-	    	$param[] = array("field"=>"em.PositionOther2","data"=>" ='14.6' ","filter"=>"OR",);
-	    	$param[] = array("field"=>"em.PositionOther3","data"=>" ='14.7') ","filter"=>"OR",);
-        }*/
+        }
         if(!empty($data_arr['study_program'])){
         	$param[] = array("field"=>"em.ProdiID","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    
         }
@@ -295,11 +289,11 @@ class C_global_informations extends Globalclass {
         }
 
         if(!empty($data_arr['lecturer'])){
-        	$param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);    
-        	$param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' ","filter"=>"OR",);    
-        	$param[] = array("field"=>"ps.NameEng","data"=>" like '%".$search."%' ","filter"=>"OR",);    
-        	$param[] = array("field"=>"em.Name","data"=>" like '%".$search."%' )","filter"=>"OR",);    
-        }        
+        	$param[] = array("field"=>"(em.NIP","data"=>" like '%".$data_arr['lecturer']."%' ","filter"=>"AND",);    
+        	$param[] = array("field"=>"em.NIDN","data"=>" like '%".$data_arr['lecturer']."%' ","filter"=>"OR",);    
+        	$param[] = array("field"=>"ps.NameEng","data"=>" like '%".$data_arr['lecturer']."%' ","filter"=>"OR",);    
+        	$param[] = array("field"=>"em.Name","data"=>" like '%".$data_arr['lecturer']."%' )","filter"=>"OR",);    
+        }
         if(!empty($data_arr['division'])){
         	$param[] = array("field"=>"em.PositionMain","data"=>" like '".$data_arr['division'].".%' ","filter"=>"AND",);    
         }
