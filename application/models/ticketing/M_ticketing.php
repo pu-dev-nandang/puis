@@ -980,7 +980,8 @@ class M_ticketing extends CI_Model {
                        $AddwhereFor = ' and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
-                        $AddwhereFor = ' and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0';
+                        // $AddwhereFor = ' and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0';
+                        $AddwhereFor = ' and a.ReceivedStatus = "0" and a.SetAction = "1" ';
                         $AddwhereFor2 = '';
                     }
 
