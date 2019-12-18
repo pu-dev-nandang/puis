@@ -764,6 +764,8 @@ $route['student-life/student-achievement/update-data-achievement'] =  'page/stud
 $route['student-life/tracer-alumni'] =  'page/student-life/c_studentlife/list_alumni';
 $route['student-life/tracer-alumni/form-accreditation'] =  'page/student-life/c_studentlife/form_accreditation';
 
+$route['student-life/student-medical-record'] =  'page/student-life/c_medical_record/student_medical_record';
+
 
 // --- LPMI ----
 $route['lpmi/lecturer-evaluation/list-lecturer'] =  'page/lpmi/c_lpmi/edom_list_lecturer';
@@ -1617,6 +1619,7 @@ $route['api3/__crudTracerAlumni'] = 'api/c_api3/crudTracerAlumni';
 $route['api3/__getLanguagelabels'] = 'api/c_api3/getLanguagelabels';
 
 $route['api3/__crudAlumni'] = 'api/c_api3/crudAlumni';
+$route['api3/__crudMedicalRecord'] = 'api/c_api3/crudMedicalRecord';
 
 
 // Agregator Adhi

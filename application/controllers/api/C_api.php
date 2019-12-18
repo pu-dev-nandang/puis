@@ -10337,12 +10337,14 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( auts.Name LIKE "%'.$search.'%" OR auts.NPM LIKE "%'.$search.'%") ';
         }
 
-        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent
+        $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent,
+                              stdk.Input_At
                               FROM db_academic.mentor_academic ma
                               LEFT JOIN db_academic.auth_students auts ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                               LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
-                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" '.$w_status.' ) '.$dataSearch.' ORDER BY ma.NPM ASC';
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE ( ma.NIP = "'.$data_arr['NIP'].'" '.$w_status.' ) '.$dataSearch.'  GROUP BY auts.NPM ORDER BY stdk.Input_At DESC, ma.NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -10368,9 +10370,11 @@ class C_api extends CI_Controller {
             $Semester = $this->m_api->getSemesterStudentByYear($data_arr['SemesterID'],$row['Year']);
 
             $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM'],'ProdiGroupID' => $row['ProdiGroupID']),'UAP)(*');
-            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default">
+            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3)
+                ? '<button data-url="'.url_sign_in_lecturers.'krs-online/list-student/approved-mentor/'.$token_npm.'" class="btn btn-sm btn-default btnShowKRS">
                         <i class="fa fa-edit"></i>
-                      </a>' : '-';
+                      </button>'
+                : '-';
 
             $dataCourse = $this->db->query('SELECT mk.NameEng AS CourseEng, mk.MKCode, s.ClassGroup, stdk.Status FROM db_academic.std_krs stdk
                                                       LEFT JOIN db_academic.schedule s ON (s.ID = stdk.ScheduleID)
@@ -10450,13 +10454,14 @@ class C_api extends CI_Controller {
         }
 
         $queryDefault = 'SELECT auts.NPM, auts.Name, auts.Year, auts.ProdiGroupID, ps.NameEng AS Prodi, ss.Description AS StatusStudent, em.Name AS MentorName,
-                              ma.NIP AS MentorNIP
+                              ma.NIP AS MentorNIP, stdk.Input_At
                               FROM  db_academic.auth_students auts
                               LEFT JOIN db_academic.program_study ps ON (ps.ID = auts.ProdiID)
                               LEFT JOIN db_academic.status_student ss ON (ss.ID = auts.StatusStudentID)
                               LEFT JOIN db_academic.mentor_academic ma ON (ma.NPM = auts.NPM)
                               LEFT JOIN db_employees.employees em ON (em.NIP = ma.NIP)
-                              WHERE ( auts.ProdiID = "'.$data_arr['ProdiID'].'" '.$w_status.' ) '.$dataSearch.' ORDER BY auts.NPM ASC';
+                              LEFT JOIN db_academic.std_krs stdk ON (stdk.NPM = auts.NPM)
+                              WHERE ( auts.ProdiID = "'.$data_arr['ProdiID'].'" '.$w_status.' ) '.$dataSearch.' GROUP BY auts.NPM ORDER BY stdk.Input_At ASC, auts.NPM ASC';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -10527,9 +10532,11 @@ class C_api extends CI_Controller {
             }
 
             $token_npm = $this->jwt->encode(array('SemesterID' => $data_arr['SemesterID'],'NPM' => $row['NPM'], 'ProdiGroupID' => $row['ProdiGroupID']),'UAP)(*');
-            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3) ? '<a href="'.url_sign_in_lecturers.'krs-online/list-student/approved-kaprodi/'.$token_npm.'" class="btn btn-sm btn-default">
+            $btn = ($data_arr['Status']!='' && $data_arr['Status']==3)
+                ? '<button data-url="'.url_sign_in_lecturers.'krs-online/list-student/approved-kaprodi/'.$token_npm.'" class="btn btn-sm btn-default btnShowKRS">
                         <i class="fa fa-edit"></i>
-                      </a>' : '-';
+                      </button>'
+                : '-';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = '<div  style="text-align:center;"><img data-src="'.$Photo.'" class="img-rounded img-fitter" width="40" height="50"></div>';

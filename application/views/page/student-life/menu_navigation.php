@@ -28,6 +28,12 @@
                     Tracer Alumni
                 </a>
             </li>
+            <li class="<?php if($this->uri->segment(2)=='student-medical-record'){echo"current";}?>">
+                <a href="<?php echo base_url('student-life/student-medical-record');?>">
+                    <i class="fa fa-heartbeat"></i>
+                    Student Medical Record
+                </a>
+            </li>
         </ul>
 
 
