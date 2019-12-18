@@ -201,7 +201,7 @@ var App_ticket_tikcet_list = {
                                 1] + '/' + EncodeDepartment
                             setAction = '<a href="' + hrefActionTicket + '">Set Action</a>';
                         }
-                   
+
                 }
                 htmlAction += '<div class="btn-group">' +
                     '<button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
@@ -264,7 +264,7 @@ var App_ticket_tikcet_list = {
 
                     }
                 }
-                
+
             }
 
             if (!bool) {
@@ -282,11 +282,27 @@ $(document).ready(function() {
     App_ticket_tikcet_list.Loaded();
 })
 
-$(document).off('change', '#SelectDepartmentID,#SelectStatusTicketID,#FilterFor').on('change',
-    '#SelectDepartmentID,#SelectStatusTicketID,#FilterFor',
+$(document).off('change', '#SelectDepartmentID,#FilterFor').on('change',
+    '#SelectDepartmentID,#FilterFor',
     function(e) {
         oTable.ajax.reload(null, false);
-    })
+})
+
+$(document).off('change', '#SelectStatusTicketID').on('change',
+    '#SelectStatusTicketID',
+    function(e) {
+      var v = $('#SelectStatusTicketID option:selected').val();
+      if (v ==1) {
+        $('#FilterFor').find('option[value="1"]').prop('disabled',true);
+        $('#FilterFor').find('option[value="99"]').prop('disabled',true);
+      }
+      else {
+        $('#FilterFor').find('option[value="1"]').prop('disabled',false);
+      $('#FilterFor').find('option[value="99"]').prop('disabled',false);
+      }
+
+        oTable.ajax.reload(null, false);
+})
 
 $(document).off('click', '.ModalReadMore').on('click', '.ModalReadMore', function(e) {
     var token = $(this).attr('token');
