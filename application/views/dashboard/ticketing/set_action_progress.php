@@ -379,6 +379,9 @@
 						'<div style = "text-align:right;">'+
 							'<button class = "btn btn-success '+hide+' btnCloseReceived " data-id = "'+DataReceivedSelected[0].ID+'">Close Project</button>'+
 						'</div>'+
+						// '<div style = "text-align:right;margin-top:10px;" >'+
+						// 	'<button class = "btn btn-danger removeRowassignTo"><i class = "fa fa-trash"></i> Delete</button>'+
+						// '</div>'+
 					'</div>';
 			selector.html(html);
 
@@ -631,6 +634,11 @@
 			}
 			selector.select2({allowClear: true});
 		},
+
+		DomContentRemove : function(selector){
+			var selector_closest = selector.closest('.form-assign-to');
+			selector_closest.remove();
+		}
 	};
 
 	var App_transfer_to = {
@@ -710,38 +718,48 @@
 						Flag : '1',
 					};
 					var received = DataReceivedSelected[0].DataReceived_Details;
-					if (received.length == 0) {
-						var postreceived = {
-							ID : DataReceivedSelected[0].ID,
-							action : 'update',
-							data : {
-								SetAction : '0',
-								ReceivedStatus : "1",
-								ReceivedBy : sessionNIP,
-								DepartmentTransferToID : DepartmentReceivedID,
-								// CategoryReceivedID : CategoryReceivedID,
-							},
-							CreatedBy : sessionNIP,
-							NoTicket : DataTicket[0].NoTicket,
-						}
-
-						transfer_to.push(postreceived);
+					var postreceived = {
+						ID : DataReceivedSelected[0].ID,
+						action : 'update',
+						data : {
+							DepartmentTransferToID : DepartmentReceivedID,
+							// CategoryReceivedID : CategoryReceivedID,
+						},
+						CreatedBy : sessionNIP,
+						NoTicket : DataTicket[0].NoTicket,
 					}
-					else
-					{
-						var postreceived = {
-							ID : DataReceivedSelected[0].ID,
-							action : 'update',
-							data : {
-								DepartmentTransferToID : DepartmentReceivedID,
-								// CategoryReceivedID : CategoryReceivedID,
-							},
-							CreatedBy : sessionNIP,
-							NoTicket : DataTicket[0].NoTicket,
-						}
+					// if (received.length == 0) {
+					// 	var postreceived = {
+					// 		ID : DataReceivedSelected[0].ID,
+					// 		action : 'update',
+					// 		data : {
+					// 			SetAction : '0',
+					// 			ReceivedStatus : "1",
+					// 			ReceivedBy : sessionNIP,
+					// 			DepartmentTransferToID : DepartmentReceivedID,
+					// 			// CategoryReceivedID : CategoryReceivedID,
+					// 		},
+					// 		CreatedBy : sessionNIP,
+					// 		NoTicket : DataTicket[0].NoTicket,
+					// 	}
 
-						transfer_to.push(postreceived);
-					}
+					// 	transfer_to.push(postreceived);
+					// }
+					// else
+					// {
+					// 	var postreceived = {
+					// 		ID : DataReceivedSelected[0].ID,
+					// 		action : 'update',
+					// 		data : {
+					// 			DepartmentTransferToID : DepartmentReceivedID,
+					// 			// CategoryReceivedID : CategoryReceivedID,
+					// 		},
+					// 		CreatedBy : sessionNIP,
+					// 		NoTicket : DataTicket[0].NoTicket,
+					// 	}
+
+					// 	transfer_to.push(postreceived);
+					// }
 
 					var postreceived = {
 						ID : '',
@@ -778,10 +796,10 @@
 		    		    	DataTicket = callback.DataTicket;
 		    		    	DataAll = callback.DataAll;
 		    		    	DataReceivedSelected = callback.DataReceivedSelected;
-		    		    	Authent = callback.Authent;
-		    		    	var Auth = Authent.callback.Detail;
-		    	    		var AdminAuth =Auth.Admin 
-		    	    		var WorkerAuth =Auth.Worker
+		    		    	// Authent = callback.Authent;
+		    		    	// var Auth = Authent.callback.Detail;
+		    	    		// var AdminAuth =Auth.Admin 
+		    	    		// var WorkerAuth =Auth.Worker
 		    	    		App_set_action_progress.Loaded();
 		    	    		$('.form-transfer-to').remove();
 					    	toastr.success('Success');
@@ -884,6 +902,11 @@
 	$(document).off('click', '#btnModalCloseProject').on('click', '#btnModalCloseProject',function(e) {
 		var selector = $(this);
 		App_set_action_progress.ActionClosedProject(selector);
+	})
+
+	$(document).off('click', '.removeRowassignTo').on('click', '.removeRowassignTo',function(e) {
+	   var selector = $(this);
+	   App_AssignTo.DomContentRemove(selector);
 	})
 	
 </script>
