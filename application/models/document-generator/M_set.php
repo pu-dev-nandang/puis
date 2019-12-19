@@ -2,18 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 class M_set extends CI_Model {
 
-	/*	
-		props function 
-			1.PolaNoSurat
-			2.Position array (
-							'value' => {Name Position},
-							'ID' => {ID},
-						)
-			 if key not exist join to employees to get field
-			 ===Special Case== Signature in Position show image height =  & width = 
-		
-	*/
-
 	function __construct()
 	{
 	    parent::__construct();
@@ -30,7 +18,7 @@ class M_set extends CI_Model {
 				die();
 			}
 
-			$rs[$ex[0]] = $this->$ex[0]($value); // call function
+			$rs[][$ex[0]] = $this->$ex[0]($value); // call function
 			
 		}
 
@@ -41,7 +29,12 @@ class M_set extends CI_Model {
 		// example :  041/UAP/R/SKU/X/2019
 		$ex = explode('.', $params);
 		if (count($ex) > 0 && count($ex) == 1 ) {
-			return 'Method1';
+			return array(
+				'value' => 'method1',
+				'setting' => array(
+					'prefix' => '',
+				),
+			);
 		}
 
 	}

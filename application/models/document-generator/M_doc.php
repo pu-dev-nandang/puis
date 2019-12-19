@@ -7,7 +7,7 @@ class M_doc extends CI_Model {
 	private $INPUT = [];
 	private $GRAB = [];
 	private $TABLE = [];
-	private $TOT_APPROVAL = 0;
+	private $APPROVAL = [];
 
 	private $KeySET = 'SET';
 	private $KeyUSER = 'USER';
@@ -53,10 +53,11 @@ class M_doc extends CI_Model {
 		        	switch ($ex[0]) {
 		        		case $this->KeySET:
 		        			$setStr = trim(ucwords($ex[1]));
+		        			// if ($setStr == 'Signature') {
+		        			// 	$this->TOT_APPROVAL = $this->TOT_APPROVAL + 1;
+		        			// }
 		        			for ($i=2; $i < count($ex); $i++) {
-		        				if (trim(ucwords($ex[$i])) == 'Signature') {
-		        					$this->TOT_APPROVAL = $this->TOT_APPROVAL + 1;
-		        				}
+		        				
 		        				$setStr .= '.'.trim(ucwords($ex[$i]));
 		        			}
 		        			
@@ -104,7 +105,7 @@ class M_doc extends CI_Model {
 			'INPUT' => $this->INPUT,
 			'GRAB' => $this->GRAB,
 			'TABLE' => $this->TABLE,
-			'TOT_APPROVAL' => $this->TOT_APPROVAL,
+			'APPROVAL' => $this->APPROVAL,
 		];	
 
     }

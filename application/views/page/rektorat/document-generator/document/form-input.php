@@ -7,17 +7,6 @@ $field = [
     'Input5' => 'Tempat ',
 ];
 
-$PolaSurat = [
-    'method' => [
-            'Usually' => [
-                'Increment' => 'Yes',
-                'Max' => 3,
-            ]
-        ],
-];
-
-
-echo json_encode($PolaSurat);
 echo json_encode($field);
 
 
@@ -45,6 +34,7 @@ echo json_encode($field);
 </div>
 
 <script type="text/javascript">
+    var settingTemplate;
     var App_form_input = {
         UploadChangeFunction : function(selector){
             var ArrUploadFilesSelector = [];
@@ -96,7 +86,40 @@ echo json_encode($field);
 
         DomSetTemplate : function(response_callback){
             console.log(response_callback);
+            var page = $('#FormGenerate');
+            var html = '';
+            
+            for (variable in response_callback){
+                var key = response_callback[variable];
+                switch(variable) {
+                  case "SET":
+                    html += App_form_input.method_SET(key);
+                    break;
+                  case "USER":
+                    text = "I am not a fan of orange.";
+                    break;
+                  case "INPUT":
+                    text = "How you like them apples?";
+                    break;
+                  case "GRAB":
+                    text = "How you like them apples?";
+                    break;
+                  case "TABLE":
+                    text = "How you like them apples?";
+                    break;
+                  case "TABLE":
+                    text = "How you like them apples?";
+                    break;
+                }             
+            }
         },
+
+        method_SET : function(dt){
+            console.log(dt);
+            var html = '';
+            
+            return '';
+        }
     }
 
     $(document).off('change', '#UploadFile').on('change', '#UploadFile',function(e) {

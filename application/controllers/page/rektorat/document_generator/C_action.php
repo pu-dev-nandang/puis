@@ -11,8 +11,10 @@ class C_action extends DocumentGenerator_Controler {
 
     public function upload_template(){
         if (array_key_exists('PathTemplate', $_FILES)) {
+            $rs = ['status' => 1,'msg' => '','callback' => []];
             $read = $this->m_doc->readTemplate();
-            echo json_encode($read);
+            $rs['callback'] = $read;
+            echo json_encode($rs);
         }
     }
 }
