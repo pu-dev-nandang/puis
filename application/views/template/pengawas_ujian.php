@@ -83,7 +83,7 @@
                         ? url_pas.'uploads/employees/'.$this->session->userdata('Photo') :
                         url_pas.'images/icon/no_image.png';
                     $name = (strlen($this->session->userdata('Name'))>15) ? substr($this->session->userdata('Name'),0,14).'_' : $this->session->userdata('Name'); ?>
-                    <img src="<?php echo $imgProfile; ?>" class="img-rounded img-profile">
+                    <img src="<?php echo $imgProfile; ?>" style="width: 100%;max-width: 100px;padding:5px;border:1px solid #CCCCCC;">
                     <h3 style="margin-bottom: 0px;"><b><?php echo $name; ?></b></h3>
                     <h5 style="margin-top: 3px;color: #009688;"><?php echo $this->session->userdata('NIP'); ?></h5>
 
