@@ -3572,7 +3572,7 @@ class C_api3 extends CI_Controller {
     }
 
 
-    public function getLuaran_lainnya(){  //Buku ber-ISBN, Book Chapter
+    public function getLuaran_lainnya(){  // 5.h.4. Buku ber-ISBN, Book Chapter
 
         $statusx = $this->input->get('s');
 
@@ -3585,13 +3585,13 @@ class C_api3 extends CI_Controller {
         $requestData= $_REQUEST;
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 '.$whereStatus.' ')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
@@ -3601,14 +3601,14 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3617,7 +3617,6 @@ class C_api3 extends CI_Controller {
         }
 
         $query = $this->db->query($sql)->result_array();
-
         $no = $requestData['start']+1;
         $data = array();
 
@@ -3625,9 +3624,16 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
 
             $data[] = $nestedData;
@@ -3733,13 +3739,13 @@ class C_api3 extends CI_Controller {
 
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 '.$whereStatus.' ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$whereStatus.'" AND ( ';
 
@@ -3750,14 +3756,14 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3775,9 +3781,16 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
 
             $data[] = $nestedData;
@@ -3813,7 +3826,7 @@ class C_api3 extends CI_Controller {
         $requestData= $_REQUEST;
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 '.$whereStatus.' ';
         $totalData = $this->db->query($squery, array())->result_array();
@@ -3825,9 +3838,9 @@ class C_api3 extends CI_Controller {
 
         if( !empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-                        FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
             $sql.= 'NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
@@ -3836,7 +3849,7 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3844,7 +3857,7 @@ class C_api3 extends CI_Controller {
             }
             else {
 
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3853,7 +3866,6 @@ class C_api3 extends CI_Controller {
         }
 
         $query = $this->db->query($sql)->result_array();
-
         $no = $requestData['start']+1;
         $data = array();
 
@@ -3861,11 +3873,17 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
-
             $data[] = $nestedData;
             $no++;
 
