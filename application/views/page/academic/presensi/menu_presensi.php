@@ -5,16 +5,16 @@
             <a href="<?php echo base_url('academic/attendance'); ?>">Attendance</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-attendace-lecturer') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/attendance/monitoring-attendace-lecturer'); ?>">Monitoring Attd. Lecturer</a>
+            <a href="<?php echo base_url('academic/attendance/monitoring-attendace-lecturer'); ?>">Attd. Lecturer</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-attendace-student') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/attendance/monitoring-attendace-student'); ?>">Monitoring Attd. Student</a>
+            <a href="<?php echo base_url('academic/attendance/monitoring-attendace-student'); ?>">Attd. Student</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-all-student') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/attendance/monitoring-all-student'); ?>">Monitoring All Student</a>
+            <a href="<?php echo base_url('academic/attendance/monitoring-all-student'); ?>">All Student</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='monitoring-schedule-exchange') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('academic/attendance/monitoring-schedule-exchange'); ?>">Monitoring Schedule Exchange</a>
+            <a href="<?php echo base_url('academic/attendance/monitoring-schedule-exchange'); ?>">Schedule Exchange</a>
         </li>
         <li class="<?php if($this->uri->segment(3)=='teach-load') { echo 'active'; } ?>">
             <a href="<?php echo base_url('academic/attendance/teach-load'); ?>">Lecturer Teaching Recap</a>
