@@ -121,6 +121,7 @@ function LoadTableData(filterProdi)
                   var arr = BodyGrouping[i];
                   var NoObj = arr[0];
                   var StrTr = '';
+                  var temp_arr_str = [];
                   if (NoObj["rowspan"] !== undefined) {
                     for (var j = 0; j < arr.length; j++) {
                       var Obj = arr[j];
@@ -128,12 +129,14 @@ function LoadTableData(filterProdi)
                         var wrObj = (Obj[0] !== undefined) ? Obj[0] : '';
                         t+= '<td>'+wrObj+'</td>';
                         if (Obj.length > 1) {
-                          // StrTr+= '<tr>';
+                          var tt_arr = [];
                           for (var y = 1; y < Obj.length; y++) {
                             var wrObj2 = (Obj[y] !== undefined) ? Obj[y] : '';
-                             StrTr+= '<td>'+wrObj2+'</td>';
+                            tt_arr.push(Obj[y]);
+                             // StrTr+= '<td>'+wrObj2+'</td>';
                           }
-                          // StrTr+= '</tr>';
+
+                          temp_arr_str.push(tt_arr);
                         }
                       }
                       else
@@ -151,6 +154,20 @@ function LoadTableData(filterProdi)
                   }
 
                   t += '</tr>';
+                  console.log(temp_arr_str);
+                  if (temp_arr_str.length > 0) {
+                    var countLength = temp_arr_str[0].length;
+                    for (var j = 0; j < countLength; j++) {
+                      var tdValue = '';
+                      for (var col = 0; col < 4; col++) {
+                        tdValue += '<td>'+temp_arr_str[col][j]+'</td>';
+                      }
+                      StrTr += '<tr>'+
+                                  tdValue+
+                               '</tr>';   
+                    }
+                  }
+                  
                   if (StrTr != '') {
                     t += StrTr;
                   }
