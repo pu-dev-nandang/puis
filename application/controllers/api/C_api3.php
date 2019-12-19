@@ -6123,9 +6123,9 @@ class C_api3 extends CI_Controller {
                                     <span class="caret"></span>
                                   </button>
                                   <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'">Edit</a></li>
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnEditMedicalRegord">Edit</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'">Remove</a></li>
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnRemoveMedicalRegord">Remove</a></li>
                                   </ul>
                                 </div>';
 
@@ -6135,7 +6135,7 @@ class C_api3 extends CI_Controller {
                     $nestedData[] = '<div style="text-align: left;">'.$Treated.'<div>'.$duration.'</div>'.$PersonalDoctorName.'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$Allergy.'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$PersonalDoctorName.'</div>';
-                    $nestedData[] = '<div>'.$btnAction.'</div>';
+                    $nestedData[] = '<div>'.$btnAction.'<textarea id="txt_'.$row['ID'].'" class="hide">'.json_encode($row).'</textarea></div>';
 
                     $data[] = $nestedData;
                     $no++;
