@@ -185,9 +185,9 @@
                     <td colspan="3"></td>
                     <td><?= $TotalCreditJadwal; ?></td>
                     <td><?= $TotalCreditAsli; ?></td>
-                    <td><?= $TotalCreditBKD; ?></td>
+                    <td><b><?= $TotalCreditBKD; ?></b></td>
                     <td>-</td>
-                    <td><?= $TotalCreditSelisih; ?></td>
+                    <td><?= $TotalCreditJadwal; ?> - <?= $TotalCreditAsli; ?> = <?= $TotalCreditSelisih; ?></td>
                 </tr>
             </table>
         </div>
