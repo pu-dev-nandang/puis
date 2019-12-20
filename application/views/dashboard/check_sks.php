@@ -96,14 +96,20 @@
                     <th style="width: 1%;">No</th>
                     <th>Lecturer</th>
                     <th>Course</th>
+                    <th style="width: 30%;">Schedule</th>
                     <th style="width: 3%;">Credit MK</th>
                     <th style="width: 3%;">Credit BKD</th>
                     <th style="width: 20%;">Team</th>
-                    <th style="width: 30%;">Schedule</th>
+                    <th style="width: 5%;">Credit Difference</th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
+
+                $TotalCreditAsli = 0;
+                $TotalCreditBKD = 0;
+                $TotalCreditJadwal = 0;
+                $TotalCreditSelisih = 0;
 
                 foreach ($dataLecturer AS $i => $item){
 
@@ -113,8 +119,7 @@
                             <td rowspan="<?= count($item['Course']) + 1; ?>"><?= ($i+1) ?></td>
                             <td style="text-align: left;" rowspan="<?= count($item['Course']) + 1; ?>"><?= $item['Name']; ?></td>
                         </tr>
-                        <?php
-                        for ($i=0;$i<count($item['Course']);$i++){
+                        <?php for ($i=0;$i<count($item['Course']);$i++){
 
                             $d = $item['Course'][$i];
 
@@ -126,9 +131,10 @@
                             }
 
                             $schedule = '';
+                            $totalSKS = 0;
                             if(count($d['Schedule'])>0){
                                 $tr = '';
-                                $totalSKS = 0;
+
                                 foreach ($d['Schedule'] AS $itm){
                                     $tr = $tr.'<tr>
                                                             <td>'.$itm['DayNameEng'].'</td>
@@ -144,24 +150,27 @@
                                                     <tbody>'.$tr.'</tbody><tr style="background: #e0f4ff;font-weight: bold;"><td colspan="3" style="border-right: 1px solid #ccc;">Total Credit</td><td>'.$totalSKS.'</td></tr></table>';
                             }
 
+                            $TotalCreditAsli = $TotalCreditAsli + $d['CreditMK'];
+                            $TotalCreditBKD = $TotalCreditBKD + $d['CreditBKD'];
+                            $TotalCreditJadwal = $TotalCreditJadwal + $totalSKS;
+                            $TotalCreditSelisih = $TotalCreditSelisih + ($totalSKS- $d['CreditMK']);
+
                             ?>
 
                             <tr style="<?= (count($d['DetailTeam'])>0) ? 'background: #ff000017;' : 'background: #fff;' ?>">
                                 <td style="text-align: left;"><b style=""><?= $d['NameEng']; ?></b><br/>Code : <?= $d['MKCode']; ?><br/>Group : <?= $d['ClassGroup']; ?></td>
+                                <td style="text-align: left;font-size: 12px;"><?= $schedule; ?></td>
                                 <td><?= $d['CreditMK']; ?></td>
                                 <td style="background: lightyellow;"><?= $d['CreditBKD']; ?></td>
                                 <td style="text-align: left;font-size: 12px;"><?= $team; ?></td>
-                                <td style="text-align: left;font-size: 12px;"><?= $schedule; ?></td>
+                                <td style="font-size: 12px;"><?= $totalSKS; ?> - <?= $d['CreditMK']; ?> = <?= ($totalSKS- $d['CreditMK']); ?></td>
                             </tr>
 
 
                             <?php
 
 
-                        }
-
-
-                        ?>
+                        } ?>
 
 
 
@@ -171,6 +180,15 @@
 
                 <?php } ?>
                 </tbody>
+
+                <tr>
+                    <td colspan="3"></td>
+                    <td><?= $TotalCreditJadwal; ?></td>
+                    <td><?= $TotalCreditAsli; ?></td>
+                    <td><?= $TotalCreditBKD; ?></td>
+                    <td>-</td>
+                    <td><?= $TotalCreditSelisih; ?></td>
+                </tr>
             </table>
         </div>
     </div>
