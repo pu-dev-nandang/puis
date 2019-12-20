@@ -3572,7 +3572,7 @@ class C_api3 extends CI_Controller {
     }
 
 
-    public function getLuaran_lainnya(){  //Buku ber-ISBN, Book Chapter
+    public function getLuaran_lainnya(){  // 5.h.4. Buku ber-ISBN, Book Chapter
 
         $statusx = $this->input->get('s');
 
@@ -3585,13 +3585,13 @@ class C_api3 extends CI_Controller {
         $requestData= $_REQUEST;
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 '.$whereStatus.' ')->result_array();
 
         if( !empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
@@ -3601,14 +3601,14 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 4 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3617,7 +3617,6 @@ class C_api3 extends CI_Controller {
         }
 
         $query = $this->db->query($sql)->result_array();
-
         $no = $requestData['start']+1;
         $data = array();
 
@@ -3625,9 +3624,16 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
 
             $data[] = $nestedData;
@@ -3733,13 +3739,13 @@ class C_api3 extends CI_Controller {
 
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $totalData = $this->db->query('SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 '.$whereStatus.' ')->result_array();
 
         if(!empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$whereStatus.'" AND ( ';
 
@@ -3750,14 +3756,14 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
 
             }
             else {
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 7 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3775,9 +3781,16 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
 
             $data[] = $nestedData;
@@ -3813,7 +3826,7 @@ class C_api3 extends CI_Controller {
         $requestData= $_REQUEST;
         $whereStatus = ($status!='') ? ' AND YEAR(Tgl_terbit) = "'.$status.'" ' : '';
 
-        $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+        $squery = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 '.$whereStatus.' ';
         $totalData = $this->db->query($squery, array())->result_array();
@@ -3825,9 +3838,9 @@ class C_api3 extends CI_Controller {
 
         if( !empty($requestData['search']['value']) ) {
 
-            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-                        FROM db_research.publikasi
-                        WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
+            $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
+                    FROM db_research.publikasi
+                    WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" AND ( ';
 
             $sql.= 'NamaJudul LIKE "'.$requestData['search']['value'].'%" )';
             $sql.= 'ORDER BY NamaJudul DESC';
@@ -3836,7 +3849,7 @@ class C_api3 extends CI_Controller {
         else {
 
             if($status == "") {
-                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                 $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3844,7 +3857,7 @@ class C_api3 extends CI_Controller {
             }
             else {
 
-                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
+                $sql = 'SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan, Waktu_pelaksanaan AS Tahun_Laks
                     FROM db_research.publikasi
                     WHERE ID_kat_capaian = 3 AND YEAR(Tgl_terbit) = "'.$status.'" ';
                 $sql.= 'ORDER BY NamaJudul DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
@@ -3853,7 +3866,6 @@ class C_api3 extends CI_Controller {
         }
 
         $query = $this->db->query($sql)->result_array();
-
         $no = $requestData['start']+1;
         $data = array();
 
@@ -3861,11 +3873,17 @@ class C_api3 extends CI_Controller {
             $nestedData=array();
             $row = $query[$i];
 
+            if($row['Tahun'] == null) {
+                $year = $row['Tahun_Laks'];
+            }
+            else {
+                $year = $row['Tahun'];
+            }
+
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
             $nestedData[] = $row["NamaJudul"];
-            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($row['Tahun'])).'</div>';
+            $nestedData[] = '<div style="text-align:center;">'.date('Y',strtotime($year)).'</div>';
             $nestedData[] = $row["Keterangan"];
-
             $data[] = $nestedData;
             $no++;
 
@@ -6037,6 +6055,126 @@ class C_api3 extends CI_Controller {
         }
 
         return $dates;
+    }
+
+    public function crudMedicalRecord(){
+
+        $data_arr = $this->getInputToken2();
+
+        if(count($data_arr>0)) {
+
+            if ($data_arr['action'] == 'setDataMedicalRecord') {
+
+                $dataForm = (array) $data_arr['dataForm'];
+
+                $Updated = $data_arr['Updated'];
+
+                if($data_arr['ID']!=''){
+                    $dataForm['Updated'] = $Updated;
+                    $dataForm['UpdatedBy'] = $data_arr['UserID'];
+                    $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID',$data_arr['ID']);
+                    $this->db->update('db_studentlife.medical_record',$dataForm);
+                } else {
+                    $dataForm['CreatedBy'] = $data_arr['UserID'];
+                    $dataForm['CreatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->insert('db_studentlife.medical_record',$dataForm);
+                }
+                return print_r(1);
+            }
+            else if($data_arr['action'] == 'getDataMedicalRecord'){
+
+                $requestData= $_REQUEST;
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = 'WHERE 
+                                mr.DiseaseName LIKE "%'.$search.'%" OR 
+                                mr.TreatedAt LIKE "%'.$search.'%" OR 
+                                mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                mr.Allergy LIKE "%'.$search.'%" OR 
+                                mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" OR 
+                                ats.NPM LIKE "%'.$search.'%" ';
+                }
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, mr.* FROM db_studentlife.medical_record mr 
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = mr.NPM)
+                                                LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                                 '.$dataSearch.' ORDER BY ats.NPM ';
+
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++) {
+
+                    $nestedData = array();
+                    $row = $query[$i];
+
+                    $SickDateStart = ($row['SickDateStart']!='' && $row['SickDateStart']!=null)
+                        ? date('d M Y',strtotime($row['SickDateStart'])) : '';
+
+                    $SickDateEnd = ($row['SickDateEnd']!='' && $row['SickDateEnd']!=null)
+                        ? date('d M Y',strtotime($row['SickDateEnd'])) : '';
+
+                    $duration = '';
+                    if($SickDateStart!='' && $SickDateEnd!=''){
+                        $duration = 'Duration : '.$SickDateStart.' - '.$SickDateEnd;
+                    } else if($SickDateStart=='' && $SickDateEnd!=''){
+                        $duration = ' End : '.$SickDateEnd;
+                    } else if($SickDateStart!='' && $SickDateEnd==''){
+                        $duration = 'Start : '.$SickDateStart;
+                    }
+
+                    $DiseaseName = ($row['DiseaseName']!='' && $row['DiseaseName']!=null) ? $row['DiseaseName'] : '';
+                    $Treated = ($row['TreatedAt']!='' && $row['TreatedAt']!=null) ? $row['TreatedAt'] : '';
+                    $PersonalDoctorName = ($row['PersonalDoctorName']!='' && $row['PersonalDoctorName']!=null) ? '<div>Personal Doctor : '.$row['PersonalDoctorName'].'</div>' : '';
+                    $Allergy = ($row['Allergy']!='' && $row['Allergy']!=null) ? '<div>'.$row['Allergy'].'</div>' : '';
+
+                    $btnAction = '<div class="dropdown">
+                                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="fa fa-edit"></i>
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnEditMedicalRegord">Edit</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnRemoveMedicalRegord">Remove</a></li>
+                                  </ul>
+                                </div>';
+
+                    $nestedData[] = '<div>'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$DiseaseName.'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$Treated.'<div>'.$duration.'</div>'.$PersonalDoctorName.'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$Allergy.'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$PersonalDoctorName.'</div>';
+                    $nestedData[] = '<div>'.$btnAction.'<textarea id="txt_'.$row['ID'].'" class="hide">'.json_encode($row).'</textarea></div>';
+
+                    $data[] = $nestedData;
+                    $no++;
+
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+
+            }
+
+        }
+
     }
 
 }
