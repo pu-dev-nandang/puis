@@ -49,7 +49,7 @@
                         <select class="form-control" id="filterSemester">
                             <option value="17">2020/2021 Ganjil</option>
                             <option value="16">2019/2020 Genap</option>
-                            <option value="15" selected="">2019/2020 Ganjil</option>
+                            <option value="15">2019/2020 Ganjil</option>
                             <option value="14">2018/2019 Genap</option>
                             <option value="13">2018/2019 Ganjil</option>
                             <option value="12">2017/2018 Genap</option>
@@ -177,6 +177,16 @@
 </div>
 
 <script>
+
+    $(document).ready(function(){
+        var SemesterID = "<?= $SemesterID; ?>";
+        var StatusEmployeeID = "<?= $StatusEmployeeID; ?>";
+        var StatusLecturerID = "<?= $StatusLecturerID; ?>";
+
+        $('#filterSemester').val(SemesterID);
+        $('#formStatusEmployee').val(StatusEmployeeID);
+        $('#formStatusLecturer').val(StatusLecturerID);
+    });
 
     $('#btnSubmit').click(function () {
 

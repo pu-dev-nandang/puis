@@ -137,6 +137,10 @@ class C_auth extends Globalclass {
 //        exit;
         $data['dataLecturer'] = $dataLecturer;
 
+        $data['SemesterID'] = $SemesterID;
+        $data['StatusEmployeeID'] = $StatusEmployeeID;
+        $data['StatusLecturerID'] = $StatusLecturerID;
+
         $this->load->view('dashboard/check_sks',$data,false);
 
 
