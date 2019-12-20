@@ -3726,7 +3726,7 @@ class C_api3 extends CI_Controller {
 
     }
 
-    public function getLuaranHkiproduk(){   //HKI (Hak Cipta, Desain Produk Industri, dan lainnya)
+    public function getLuaranHkiproduk(){   // 5.h.2. HKI (Hak Cipta, Desain Produk Industri, dll.)
 
         $statusx = $this->input->get('s');
 
@@ -3964,33 +3964,103 @@ class C_api3 extends CI_Controller {
 
         }
 
-        //$Status = $this->input->get('s');
-        //$data = $this->db->query('
-        //    SELECT Judul AS NamaJudul, Tgl_terbit AS Tahun, Ket AS Keterangan
-        //    FROM db_research.publikasi
-         //   WHERE ID_kat_capaian = 2
-        //    UNION
-         //   SELECT Judul_PKM AS NamaJudul, ID_thn_kegiatan AS Tahun, Ket AS Keterangan
-         //   FROM db_research.pengabdian_masyarakat
-         //   WHERE ID_kat_capaian = 2')->result_array();
-        //return print_r(json_encode($data));
     }
 
     public function getsitasikarya(){
-        //$Status = $this->input->get('s');
-        //$data = $this->db->query('SELECT a.NIP_penulis, a.Judul_artikel, a.Banyak_artikel, a.Tahun, b.Name
-        //            FROM db_agregator.sitasi_karya AS a
-        //            LEFT JOIN db_employees.employees AS b ON (a.NIP_penulis = b.NIP)
-        //            ORDER BY a.ID DESC')->result_array();
-        $data = $this->db->query('SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name
+
+        $statusx = $this->input->get('s');
+
+        if($statusx == "0") {
+            $status = "";
+        } else {
+            $status = $statusx;
+        }
+        $requestData= $_REQUEST;
+
+        $whereStatus = ($status!='') ? ' WHERE a.Year = "'.$status.'" ORDER BY a.ID DESC' : '';
+
+        $totalData = $this->db->query('SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name, a.Server
+                    FROM db_agregator.sitasi_karya AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP) '.$whereStatus.' ')->result_array();
+
+        if(!empty($requestData['search']['value']) ) {
+
+            $sql = 'SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name, a.Server
                     FROM db_agregator.sitasi_karya AS a
                     LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP)
-                    ORDER BY a.ID DESC')->result_array();
-        return print_r(json_encode($data));
+                    WHERE (';
+            $sql.= 'a.Title LIKE "'.$requestData['search']['value'].'%" ';
+            $sql.= 'OR b.Name LIKE "'.$requestData['search']['value'].'%")';
+            $sql.= ' ORDER BY a.ID DESC';
+
+        }
+        else {
+
+            if($status == "") {
+
+                if($requestData['length'] == "-1") {
+                    $sql = 'SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name, a.Server
+                    FROM db_agregator.sitasi_karya AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP)';
+                    $sql.= ' ORDER BY a.ID DESC';
+                } 
+                else {
+                    $sql = 'SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name, a.Server
+                    FROM db_agregator.sitasi_karya AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP)';
+                    $sql.= ' ORDER BY a.ID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+                } 
+            }
+            else {
+                $sql = 'SELECT a.Title, a.Citation, a.Year, a.User_create, b.Name, a.Server
+                    FROM db_agregator.sitasi_karya AS a
+                    LEFT JOIN db_employees.employees AS b ON (a.User_create = b.NIP)
+                    WHERE a.Year = "'.$status.'" ';
+                $sql.= 'ORDER BY a.ID DESC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+
+            }
+
+        }
+
+        $query = $this->db->query($sql)->result_array();
+        //print_r($sql); die();
+
+        $no = $requestData['start']+1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++){
+            $nestedData=array();
+            $row = $query[$i];
+
+            if($row["Server"] == "1") {
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row["Name"].'</div>';
+                $nestedData[] = '<div style="text-align:left;"  class="text-primary">'.$row["Title"].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row["Citation"].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row["Year"].'</div>';
+            } 
+            else {
+                $nestedData[] = '<div style="text-align:center;">'.$no.'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row["Name"].'</div>';
+                $nestedData[] = '<div style="text-align:left;">'.$row["Title"].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row["Citation"].'</div>';
+                $nestedData[] = '<div style="text-align:center;">'.$row["Year"].'</div>';
+            }
+
+            $data[] = $nestedData;
+            $no++;
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($totalData)),
+            "recordsFiltered" => intval(count($totalData) ),
+            "data"            => $data
+        );
+        echo json_encode($json_data);
+
 
     }
-
-
 
     public function getAkreditasiProdi(){
         // get TypeHeader
