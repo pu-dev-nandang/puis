@@ -18,7 +18,15 @@ class M_set extends CI_Model {
 				die();
 			}
 
-			$rs[][$ex[0]] = $this->$ex[0]($value); // call function
+			if ($ex[0] == 'Signature') {
+				$rs[$ex[0]][] = $this->$ex[0]($value);
+			}
+			else
+			{
+				$rs[$ex[0]] = $this->$ex[0]($value);
+			}
+			
+			// $rs[][$ex[0]] = $this->$ex[0]($value); // call function
 			
 		}
 
@@ -30,10 +38,11 @@ class M_set extends CI_Model {
 		$ex = explode('.', $params);
 		if (count($ex) > 0 && count($ex) == 1 ) {
 			return array(
-				'value' => 'method1',
+				'value' => 'method_default',
 				'setting' => array(
 					'prefix' => '',
 				),
+				'sample' => '041/UAP/R/SKU/X/2019',
 			);
 		}
 
@@ -48,10 +57,12 @@ class M_set extends CI_Model {
 				
 				break;
 			case 'Position':
-				$sql = 'select * from db_employees.position where ID in(1,2,3,4,5,6,10,11,12)';
+				$sql = 'select ID,Position as Value from db_employees.position where ID in(1,2,3,4,5,6,10,11,12)';
 				$query = $this->db->query($sql,array())->result_array();
+				$rs['Choose'] = $entity;
 				$rs['select'] = $query;
 				$rs['user'] = '';
+				$rs['verify'] = '';
 				break;
 			default:
 				# code...

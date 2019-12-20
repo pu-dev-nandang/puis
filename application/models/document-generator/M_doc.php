@@ -7,7 +7,7 @@ class M_doc extends CI_Model {
 	private $INPUT = [];
 	private $GRAB = [];
 	private $TABLE = [];
-	private $APPROVAL = [];
+	private $DOCUMENT = [];
 
 	private $KeySET = 'SET';
 	private $KeyUSER = 'USER';
@@ -105,19 +105,26 @@ class M_doc extends CI_Model {
 			'INPUT' => $this->INPUT,
 			'GRAB' => $this->GRAB,
 			'TABLE' => $this->TABLE,
-			'APPROVAL' => $this->APPROVAL,
+			'DOCUMENT' => $this->DOCUMENT,
 		];	
 
     }
 
     private function __generator_obj(){
     	$this->__SETGenerate();
+    	$this->__GRABGenerate();
     }
 
     private function __SETGenerate(){
     	$this->load->model('document-generator/m_set');
 		$SET = $this->SET;
 		$this->SET = $this->m_set->__generate($SET);
+    }
+
+    private function __GRABGenerate(){
+    	$this->load->model('document-generator/m_grab');
+		$GRAB = $this->GRAB;
+		$this->GRAB = $this->m_grab->__generate($GRAB);
     }
     
   
