@@ -117,7 +117,7 @@
 
                         <tr>
                             <td rowspan="<?= count($item['Course']) + 1; ?>"><?= ($i+1) ?></td>
-                            <td style="text-align: left;" rowspan="<?= count($item['Course']) + 1; ?>"><?= $item['Name']; ?></td>
+                            <td style="text-align: left;" rowspan="<?= count($item['Course']) + 1; ?>"><?= $item['Name']; ?><br/><?= $item['NIP']; ?></td>
                         </tr>
                         <?php for ($i=0;$i<count($item['Course']);$i++){
 
@@ -185,9 +185,9 @@
                     <td colspan="3"></td>
                     <td><?= $TotalCreditJadwal; ?></td>
                     <td><?= $TotalCreditAsli; ?></td>
-                    <td><?= $TotalCreditBKD; ?></td>
+                    <td><b><?= $TotalCreditBKD; ?></b></td>
                     <td>-</td>
-                    <td><?= $TotalCreditSelisih; ?></td>
+                    <td><?= $TotalCreditJadwal; ?> - <?= $TotalCreditAsli; ?> = <?= $TotalCreditSelisih; ?></td>
                 </tr>
             </table>
         </div>
