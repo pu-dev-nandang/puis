@@ -117,7 +117,7 @@
 
                         <tr>
                             <td rowspan="<?= count($item['Course']) + 1; ?>"><?= ($i+1) ?></td>
-                            <td style="text-align: left;" rowspan="<?= count($item['Course']) + 1; ?>"><?= $item['Name']; ?></td>
+                            <td style="text-align: left;" rowspan="<?= count($item['Course']) + 1; ?>"><?= $item['Name']; ?><br/><?= $item['NIP']; ?></td>
                         </tr>
                         <?php for ($i=0;$i<count($item['Course']);$i++){
 
