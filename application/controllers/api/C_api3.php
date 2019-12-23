@@ -6156,23 +6156,27 @@ class C_api3 extends CI_Controller {
 
                 $requestData= $_REQUEST;
 
+                $WhereProdiID = ($data_arr['ProdiID']!='') ? ' WHERE ats.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+
                 $dataSearch = '';
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
-                    $dataSearch = 'WHERE 
-                                mr.DiseaseName LIKE "%'.$search.'%" OR 
-                                mr.TreatedAt LIKE "%'.$search.'%" OR 
-                                mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
-                                mr.Allergy LIKE "%'.$search.'%" OR 
-                                mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
-                                ats.Name LIKE "%'.$search.'%" OR 
-                                ats.NPM LIKE "%'.$search.'%" ';
+                    $dataSearch = ($WhereProdiID!='')
+                        ? ' AND ( mr.DiseaseName LIKE "%'.$search.'%" OR 
+                                mr.TreatedAt LIKE "%'.$search.'%" OR mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                mr.Allergy LIKE "%'.$search.'%" OR mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" OR ats.NPM LIKE "%'.$search.'%" )'
+                        : 'WHERE  mr.DiseaseName LIKE "%'.$search.'%" OR 
+                                mr.TreatedAt LIKE "%'.$search.'%" OR mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                mr.Allergy LIKE "%'.$search.'%" OR mr.PersonalDoctorName LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" OR ats.NPM LIKE "%'.$search.'%" ';
                 }
 
-                $queryDefault = 'SELECT ats.Name, ats.NPM, mr.* FROM db_studentlife.medical_record mr 
+                $queryDefault = 'SELECT ats.Name, ats.NPM, mr.*, ps.Name AS ProdiInd FROM db_studentlife.medical_record mr 
                                                 LEFT JOIN db_academic.auth_students ats ON (ats.NPM = mr.NPM)
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
                                                 LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
-                                                 '.$dataSearch.' ORDER BY ats.NPM ';
+                                                 '.$WhereProdiID.$dataSearch.' ORDER BY ats.NPM ';
 
 
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
@@ -6205,7 +6209,7 @@ class C_api3 extends CI_Controller {
 
                     $DiseaseName = ($row['DiseaseName']!='' && $row['DiseaseName']!=null) ? $row['DiseaseName'] : '';
                     $Treated = ($row['TreatedAt']!='' && $row['TreatedAt']!=null) ? $row['TreatedAt'] : '';
-                    $PersonalDoctorName = ($row['PersonalDoctorName']!='' && $row['PersonalDoctorName']!=null) ? '<div>Personal Doctor : '.$row['PersonalDoctorName'].'</div>' : '';
+                    $PersonalDoctorName = ($row['PersonalDoctorName']!='' && $row['PersonalDoctorName']!=null) ? '<div>'.$row['PersonalDoctorName'].'</div>' : '';
                     $Allergy = ($row['Allergy']!='' && $row['Allergy']!=null) ? '<div>'.$row['Allergy'].'</div>' : '';
 
                     $btnAction = '<div class="dropdown">
@@ -6221,11 +6225,119 @@ class C_api3 extends CI_Controller {
                                 </div>';
 
                     $nestedData[] = '<div>'.$no.'</div>';
-                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiInd'].'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$DiseaseName.'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$Treated.'<div>'.$duration.'</div>'.$PersonalDoctorName.'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$Allergy.'</div>';
                     $nestedData[] = '<div style="text-align: left;">'.$PersonalDoctorName.'</div>';
+                    $nestedData[] = '<div>'.$btnAction.'<textarea id="txt_'.$row['ID'].'" class="hide">'.json_encode($row).'</textarea></div>';
+
+                    $data[] = $nestedData;
+                    $no++;
+
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+
+            }
+            else if($data_arr['action']=='getMyDataMedicalRecord'){
+                $UserID = $data_arr['UserID'];
+                $data = $this->db->get_where('db_studentlife.medical_record',array('NPM' => $UserID))->result_array();
+                return print_r(json_encode($data));
+            }
+            else if($data_arr['action']=='removeDataMedicalRecord'){
+                $MedicalRecordID = $data_arr['ID'];
+                $this->db->where('ID', $MedicalRecordID);
+                $this->db->delete('db_studentlife.medical_record');
+                return print_r(1);
+            }
+            else if($data_arr['action']=='removeDataMedicalHistory'){
+                $MedicalRecordID = $data_arr['ID'];
+                $this->db->where('ID', $MedicalRecordID);
+                $this->db->delete('db_studentlife.medical_history');
+                return print_r(1);
+            }
+
+            else if($data_arr['action']=='setDataMedicalHistory'){
+
+                $dataForm = (array) $data_arr['dataForm'];
+
+                if($data_arr['ID']!=''){
+                    $dataForm['UpdatedBy'] = $data_arr['UserID'];
+                    $dataForm['UpdatedAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->where('ID',$data_arr['ID']);
+                    $this->db->update('db_studentlife.medical_history',$dataForm);
+                } else {
+                    $dataForm['EntredBy'] = $data_arr['UserID'];
+                    $dataForm['EntredAt'] = $this->m_rest->getDateTimeNow();
+                    $this->db->insert('db_studentlife.medical_history',$dataForm);
+                }
+                return print_r(1);
+            }
+            else if($data_arr['action']=='getDataMedicalHistory'){
+
+                $requestData= $_REQUEST;
+
+                $WhereProdiID = ($data_arr['ProdiID']!='') ? ' WHERE ats.ProdiID = "'.$data_arr['ProdiID'].'" ' : '';
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = ($WhereProdiID!='')
+                        ? ' AND ( mh.Description LIKE "%'.$search.'%" OR 
+                                mh.Executor LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" OR ats.NPM LIKE "%'.$search.'%" )'
+                        : 'WHERE  mh.Description LIKE "%'.$search.'%" OR 
+                                mh.Executor LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" OR ats.NPM LIKE "%'.$search.'%" ';
+                }
+
+                $queryDefault = 'SELECT ats.Name, ats.NPM, mh.*, ps.Name AS ProdiInd FROM db_studentlife.medical_history mh 
+                                                LEFT JOIN db_academic.auth_students ats ON (ats.NPM = mh.NPM)
+                                                LEFT JOIN db_academic.program_study ps ON (ps.ID = ats.ProdiID)
+                                                LEFT JOIN db_academic.status_student ss ON (ss.ID = ats.StatusStudentID)
+                                                 '.$WhereProdiID.$dataSearch.' ORDER BY ats.NPM ';
+
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++) {
+
+                    $nestedData = array();
+                    $row = $query[$i];
+
+                    $IncidentDate = ($row['IncidentDate']!='' && $row['IncidentDate']!=null)
+                        ? date('d M Y',strtotime($row['IncidentDate'])) : '';
+
+                    $btnAction = '<div class="dropdown">
+                                  <button class="btn btn-sm btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="fa fa-edit"></i>
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnEditMedicalHistory">Edit</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="javascript:void(0);" data-id="'.$row['ID'].'" class="btnRemoveMedicalHistory">Remove</a></li>
+                                  </ul>
+                                </div>';
+
+                    $nestedData[] = '<div>'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align: left;"><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/>'.$row['ProdiInd'].'</div>';
+                    $nestedData[] = '<div>'.$IncidentDate.'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$row['Description'].'</div>';
+                    $nestedData[] = '<div style="text-align: left;">'.$row['Executor'].'</div>';
                     $nestedData[] = '<div>'.$btnAction.'<textarea id="txt_'.$row['ID'].'" class="hide">'.json_encode($row).'</textarea></div>';
 
                     $data[] = $nestedData;

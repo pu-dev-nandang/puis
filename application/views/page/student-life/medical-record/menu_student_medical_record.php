@@ -6,6 +6,9 @@
         <li class="<?php if($this->uri->segment(2)=='student-medical-record' && $this->uri->segment(3)=='') { echo 'active'; } ?>">
             <a href="<?php echo base_url('student-life/student-medical-record'); ?>">Student Medical Record</a>
         </li>
+        <li class="<?php if($this->uri->segment(3)=='medical-history') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('student-life/student-medical-record/medical-history'); ?>">Medical History</a>
+        </li>
     </ul>
     <div style="padding-top: 30px;border-top: 1px solid #cccccc">
 
