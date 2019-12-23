@@ -290,14 +290,14 @@ class C_global extends CI_Controller {
             $fontStyleName
         );
 
-        // $section->addImage('id_emp.png',array(
-        //                     'width'         => 100,
-        //                     'height'        => 100,
-        //                     'marginTop'     => -1,
-        //                     'marginLeft'    => -1,
-        //                     'wrappingStyle' => 'behind'
-        //                                     )       
-        //                     );
+        $section->addImage('id_emp.png',array(
+                            'width'         => 100,
+                            'height'        => 100,
+                            'marginTop'     => -1,
+                            'marginLeft'    => -1,
+                            'wrappingStyle' => 'behind'
+                                            )       
+                            );
 
         // Adding Text element with font customized using explicitly created font style object...
         $fontStyle = new \PhpOffice\PhpWord\Style\Font();

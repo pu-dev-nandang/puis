@@ -188,7 +188,7 @@ echo json_encode($field);
                 var select =  data[i].select;
                 var data_selected_default = 2;
                 var htmlOP = App_form_input.SelectOP(select,data_selected_default);
-                html +=    '<div class = "row">'+
+                html +=    '<div class = "row Approval" keyindex = "'+i+'">'+
                                 '<div class = "col-md-12">'+
                                     '<div style = "padding:15px;">'+
                                         '<h3><u><b>Approval '+(i+1)+' </b></u></h3>'+
@@ -200,6 +200,13 @@ echo json_encode($field);
                                     '<div class = "form-group">'+
                                         '<label>Verify</label>'+
                                         '<select class = "form-control Input" field="Signature" name = "verify" key = "SET">'+
+                                            '<option value = "0">Manual</option>'+
+                                            '<option value = "1">Auto</option>'+
+                                        '</select>'+
+                                    '</div>'+
+                                    '<div class = "form-group">'+
+                                        '<label>CAP</label>'+
+                                        '<select class = "form-control Input" field="Signature" name = "cap" key = "SET">'+
                                             '<option value = "0">Manual</option>'+
                                             '<option value = "1">Auto</option>'+
                                         '</select>'+
@@ -334,26 +341,42 @@ echo json_encode($field);
             var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
             settingTemplate = DataCallback;
             $('.Input').each(function(){
-                var attrname = $(this).attr('name');
-                var attrva = $(this).val();
-                var attrkey = $(this).attr('key');
-                var attrfield = $(this).attr('field');
+                var el = $(this);
+                var attrname = el.attr('name').trim();
+                if (!$(this).is("select")) {
+                    var attrva = el.val();
+                }
+                else
+                {
+                    var attrva = el.find('option:selected').val();
+                }
+                
+                var attrkey = el.attr('key').trim();
+                var attrfield = el.attr('field').trim();
                 for (variable in settingTemplate){
-                    var dtkeyCallback = settingTemplate[variable];
                     switch(variable) {
                       case "SET":
                         if (variable == attrkey) {
-                            settingTemplate[variable] = App_form_input.set_SET(attrname,attrva,attrkey,attrfield,dtkeyCallback);
+                            App_form_input.set_SET(attrname,attrva,attrkey,attrfield,el);
                         }
                         break;
                       case "USER":
-                       
+                        if (variable == attrkey) {
+                            /*
+                                USER get from session by Request
+                            */
+                        }
+                           
                         break;
                       case "INPUT":
-                        
+                        if (variable == attrkey) {
+                            App_form_input.set_INPUT(attrname,attrva,attrkey,attrfield,el);
+                        }
                         break;
                       case "GRAB":
-                        
+                        if (variable == attrkey) {
+                            App_form_input.set_GRAB(attrname,attrva,attrkey,attrfield,el);
+                        }
                         break;
                       case "TABLE":
                         
@@ -366,14 +389,75 @@ echo json_encode($field);
 
 
             })
+            console.log(settingTemplate);
+            var ArrUploadFilesSelector = [];
+            var url = base_url_js+"document-generator-action/__preview_template";
+            var token = jwt_encode(settingTemplate,'UAP)(*');
+            var UploadFile = $('#UploadFile');
+            var valUploadFile = UploadFile.val();
+            if (valUploadFile) { // if upload file
+                 var NameField = UploadFile.attr('name');
+                 var temp = {
+                     NameField : NameField,
+                     Selector : UploadFile,
+                 };
+                 ArrUploadFilesSelector.push(temp);
+            }
+            AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
+                if (response.status == 1) {
+                    
+                }
+                else
+                {
+                    toastr.error(response.msg);
+                }
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+            })
+
         },
 
         // -- //
 
-        set_SET : function(attrname,attrva,attrkey,attrfield,dtkeyCallback){
-            console.log(attrname,attrva,attrkey,attrfield,dtkeyCallback);
+        set_SET : function(attrname,attrva,attrkey,attrfield,el){
+            if (attrname == 'prefix') {
+               settingTemplate[attrkey]['PolaNoSurat']['setting']['prefix'] = attrva;
+            }
+            else if(attrname == 'user'){
+                var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
+                settingTemplate[attrkey]['Signature'][keyindex]['user'] = attrva;
+            }
+            else if(attrname == 'verify'){
+                var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
+                settingTemplate[attrkey]['Signature'][keyindex]['verify'] = attrva;
+            }
+        },
+
+        // -- //
+
+        set_INPUT : function(attrname,attrva,attrkey,attrfield,el){
+            for (var i = 0; i < settingTemplate['INPUT'].length; i++) {
+               if (i==attrname) {
+                settingTemplate['INPUT'][i] = {
+                    field : attrfield,
+                    value : attrva,
+                }
+                break;
+               }
+            }
+        },
+
+        // -- //
+
+        set_GRAB : function(attrname,attrva,attrkey,attrfield,el){
+            for (variable in settingTemplate[attrkey]){
+                if (variable == 'Date') {
+                    settingTemplate[attrkey][variable]['user'] = attrva;
+                }
+            }
             
-        }
+        },
+
 
     }
 

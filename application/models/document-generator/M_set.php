@@ -5,6 +5,7 @@ class M_set extends CI_Model {
 	function __construct()
 	{
 	    parent::__construct();
+	    $this->load->model('master/m_master');
 	}
 
 	public function __generate($Props)
@@ -63,6 +64,7 @@ class M_set extends CI_Model {
 				$rs['select'] = $query;
 				$rs['user'] = '';
 				$rs['verify'] = '';
+				$rs['cap'] = '';
 				break;
 			default:
 				# code...
@@ -71,5 +73,137 @@ class M_set extends CI_Model {
 
 		return $rs;
 		
+	}
+
+	public function preview_template($getObjInput,$ID_document=''){
+		$rs = [];
+		foreach ($getObjInput as $key => $value) {
+			switch ($key) {
+				case 'PolaNoSurat':
+					$obj = $getObjInput[$key];
+					$method = $obj['value'];
+					$setting = $obj['setting'];
+					$PolaNoSurat = $this->__getValuePolaNoSurat($method,$setting,$ID_document);
+					$rs['PolaNoSurat'] = $PolaNoSurat;
+					break;
+				case 'Signature':
+					$obj = $getObjInput[$key];
+					for ($i=0; $i < count($obj); $i++) { 
+						$Choose = $obj[$i]['Choose'];
+						$user = $obj[$i]['user'];
+						$verify = $obj[$i]['verify'];
+						$cap = $obj[$i]['cap'];
+						switch ($Choose) {
+							case 'Position':
+								$sql = "select * from db_employees.employees
+								        where ( 
+								        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+								        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+								        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+								        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+
+								        	)and StatusEmployeeID != -1
+								        limit 1
+								        ";
+								$query=$this->db->query($sql, array())->result_array();
+								$value = '';
+								if (count($query) == 0 ) {
+									echo "Position User not exist";
+									die();
+								}
+								else
+								{
+									$TitleBehind = ($query[0]['TitleBehind'] == '' || $query[0]['TitleBehind'] == null ) ? '' : ', '.$query[0]['TitleBehind'];
+									$value = $query[0]['TitleAhead'].' '.$query[0]['Name'].$TitleBehind;
+									$rs['Signature']['NameEMP'] = $value;
+									$NIP = $query[0]['NIP'];
+									$rs['Signature']['NIPEMP'] = $NIP;
+								}
+
+								// verify
+								$img = '';
+								
+								$valueVerify = $verify;
+								if ($verify == 1) {
+									$img = './uploads/signature/'.$query[0]['Signatures'];
+									
+								}
+
+								$rs['Signature']['verify'] = [
+									'valueVerify' => $valueVerify,
+									'img' => $img,
+								];
+								
+								// cap
+								$img = '';
+								$valueCap = $cap;
+								if ($cap == 1) {
+									$img = './images/cap.png';
+								}
+
+								$rs['Signature']['cap'] = [
+									'valueCap' => $valueVerify,
+									'img' => $img,
+								];
+
+								break;
+							
+							default:
+								# code...
+								break;
+						}
+					}
+					break;
+				default:
+					echo 'Obj SET not exist';
+					die();
+					break;
+			}
+		}
+
+		return $rs;
+	}
+
+	private function __getValuePolaNoSurat($method,$setting,$ID_document){
+		switch ($method) {
+			case 'method_default':
+				// No Surat
+				$Year = date('Y');
+				$sql = 'select NoSuratOnly from db_generatordoc.document_data where ID_document = ?
+						and Year(DateRequest) = "'.$Year.'"
+						order by ID desc limit 1';
+				$query = $this->db->query($sql,array($ID_document))->result_array();
+				$NoSuratOnly = 1;
+				$maxCharacter = 3;
+				if (count($query) > 0 ) {
+					$NoSuratOnly = $query[0]['NoSuratOnly'];
+				}
+
+				$len = strlen($NoSuratOnly);
+				$NoSuratStr = (string) $NoSuratOnly;
+				for ($i=0; $i < $maxCharacter - $len; $i++) { 
+					$NoSuratStr = '0'.$NoSuratStr;
+				}
+
+				// prefix
+				$prefix = $setting['prefix'];
+
+				// Bulan & Tahun
+				$Month = date('m');
+				$MonthRomawi = $this->m_master->romawiNumber($Month);
+				
+
+				$NoSuratStr = $NoSuratStr.'/'.$prefix.'/'.$MonthRomawi.'/'.$Year;
+				return array(
+					'NoSuratStr' => $NoSuratStr,
+					'NoSuratOnly' => $NoSuratOnly,
+				);
+				break;
+			
+			default:
+				echo "Method PolaNoSurat ".$method." not exist";
+				die();
+				break;
+		}
 	}
 }

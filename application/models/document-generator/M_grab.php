@@ -5,6 +5,7 @@ class M_grab extends CI_Model {
 	function __construct()
 	{
 	    parent::__construct();
+	    $this->load->model('master/m_master');
 	}
 
 	public function __generate($Props)
@@ -50,6 +51,37 @@ class M_grab extends CI_Model {
 		}
 
 		return $rs;
+	}
+
+	public function preview_template($getObjInput){
+		$rs = [];
+		foreach ($getObjInput as $key => $value) {
+			switch ($key) {
+				case 'Date':
+					$obj = $getObjInput[$key];
+					$method = $obj['user'];
+					$Date = $this->__getDateMethod($method);
+					$rs['Date'] = ['value' => $Date]; 
+					break;
+				
+				default:
+					echo 'Obj DATE not exist';
+					die();
+					break;
+			}
+		}
+
+		return $rs;
+	}
+
+	private function __getDateMethod($method){
+		$date = date('Y-m-d');
+		if ($method == 'Indonesia') {
+			return $this->m_master->getDateIndonesian($date);
+		}
+		elseif ($method == 'English') {
+			return date('d M Y', strtotime($date));
+		}
 	}
 
 }

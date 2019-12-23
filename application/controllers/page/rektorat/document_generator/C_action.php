@@ -17,4 +17,12 @@ class C_action extends DocumentGenerator_Controler {
             echo json_encode($rs);
         }
     }
+
+    public function preview_template(){
+        if (array_key_exists('PathTemplate', $_FILES)) {
+             $rs = ['status' => 1,'msg' => '','callback' => []];
+             $Input = json_decode(json_encode($this->getInputToken()),true);
+             $this->m_doc->preview_template($Input);
+        }
+    }
 }
