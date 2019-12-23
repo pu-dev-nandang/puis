@@ -21,39 +21,106 @@
 						<h4 class="panel-title"><i class="fa fa-filter"></i> Form Filter</h4>
 					</div>
 					<div class="panel-body">
-						<form id="form-filter" method="post" autocomplete="off" class="form-inline">
-							<div class="form-group">
-								<label>Lecturer</label>								
-								<input type="text" class="form-control" name="lecturer" placeholder="NIP or NIDN or Name">								
-							</div>
-							<div class="form-group">
-								<label>Division</label>								
-								<select class="form-control" name="division">
-									<option value="">-Choose one-</option>
-									<?php foreach ($division as $d) {
-									echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
-									} ?>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Position</label>								
-								<select class="form-control" name="position" disabled>
-									<option value="">-Choose one-</option>
-									<?php foreach ($position as $p) {
-									echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
-									} ?>
-								</select>								
+						<form id="form-filter" method="post" autocomplete="off">
+							<div class="row">
+								<div class="col-sm-2">
+									<div class="form-group">
+										<label>Employee</label>								
+										<input type="text" class="form-control" name="staff" placeholder="NIP or Name">								
+									</div>
+								</div>
+								<div class="col-sm-3">
+									<div class="form-group">
+										<label>Division</label>								
+										<select class="form-control" name="division">
+											<option value="">-Choose one-</option>
+											<?php foreach ($division as $d) {
+											echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+											} ?>
+										</select>
+									</div>
+								</div>
+								<div class="col-sm-3">
+									<div class="form-group">
+										<label>Position</label>								
+										<select class="form-control" name="position" disabled>
+											<option value="">-Choose one-</option>
+											<?php foreach ($position as $p) {
+											echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
+											} ?>
+										</select>								
+									</div>
+								</div>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<label>Status employee</label>								
+										<select class="form-control" name="status">
+											<option value="">-Choose one-</option>
+											<?php foreach ($statusstd as $t) { 
+											echo '<option value="'.$t->IDStatus.'">'.$t->Description.'</option>';
+											} ?>
+										</select>								
+									</div>
+								</div>
+								<div class="col-sm-2">
+									<div class="form-group">
+										<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
+											<span>Advance filter</span> 
+											<i class="fa fa-angle-double-down"></i>
+										</label>
+									</div>
+								</div>
 							</div>
 
-							<div class="form-group">
-								<label>Status</label>								
-								<select class="form-control" name="status">
-									<option value="">-Choose one-</option>
-									<?php foreach ($statusstd as $t) { 
-									echo '<option value="'.$t->IDStatus.'">'.$t->Description.'</option>';
-									} ?>
-								</select>								
+							<div id="advance-filter" class="collapse">
+								<div class="row">
+									<div class="col-sm-2">
+										<div class="form-group">
+											<label>Religion</label>
+											<select class="form-control" name="religion">
+												<option value="">Choose one</option>
+												<?php if(!empty($religion)){ 
+												foreach ($religion as $rg) { ?>
+												<option value="<?=$rg->IDReligion?>"><?=$rg->Religion?></option>
+												<?php } } ?>
+											</select>
+										</div>
+									</div>
+									<div class="col-sm-2">
+										<div class="form-group">
+											<label>Gender</label>
+											<select class="form-control" name="gender">
+												<option value="">Choose one</option>
+												<option value="P">Female</option>
+												<option value="L">Male</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-sm-3">
+										<div class="form-group">
+											<label>Birthdate</label>
+											<div class="input-group">
+												<input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">	
+												<div class="input-group-addon">-</div>
+												<input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date">	
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-2">
+										<div class="form-group">
+											<label>Level Education</label>
+											<select class="form-control" name="level_education">
+												<option value="">Choose one</option>
+												<?php if(!empty($level_education)){ 
+												foreach ($level_education as $le) { ?>
+												<option value="<?=$le->ID?>"><?=$le->Level." - ".$le->Description?></option>
+												<?php } } ?>
+											</select>
+										</div>
+									</div>
+								</div>
 							</div>
+
 							<div class="form-group" style="padding-top:22px">
 								<button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
 								<a class="btn btn-default" href="">Clear Filter</a>
@@ -97,6 +164,7 @@
 
 <script type="text/javascript">
 	function fetchingData() {
+		loading_modal_show();
     	var data = getFormData($("#form-filter"));    	
         var token = jwt_encode(data,'UAP)(*');
     	var dataTable = $('#fetch-data-tables .table').DataTable( {
@@ -124,7 +192,10 @@
 						                'backdrop' : 'static'
 						            });
 				                }
-				            }
+				            },
+				            "initComplete": function(settings, json) {
+							    loading_modal_hide();
+						  	}
 				        });
     }
 
@@ -182,5 +253,29 @@
     			alert("Please fill up field Division");
     		}
     	});
+    	$('#form-filter').on('keyup keypress', function(e) {
+		  var keyCode = e.keyCode || e.which;
+		  if (keyCode === 13) { 
+		    e.preventDefault();
+		    return false;
+		  }
+		});
+		$(".show-more-filter").click(function(){
+			var isOpen = $(this).attr("aria-expanded");
+			if(isOpen == "false"){
+				$(this).attr("aria-expanded",true);
+				$(this).find("span").text("Show less");
+				$(this).find("i.fa").toggleClass("fa-angle-double-down fa-angle-double-up");
+			}else{
+				$(this).attr("aria-expanded",false);
+				$(this).find("span").text("Advance filter");				
+				$(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
+			}
+		});
+		$("#birthdate_start,#birthdate_end").datepicker({
+            dateFormat: 'dd-mm-yy',
+            changeYear: true,
+            changeMonth: true
+        });
     });
 </script>

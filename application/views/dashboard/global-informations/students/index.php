@@ -36,9 +36,10 @@
 										<label>Class of</label>								
 										<select class="form-control" name="class_of">
 											<option value="">-Choose year-</option>
-											<?php for ($i=2014; $i <= date('Y'); $i++) { 
-											echo '<option value="'.$i.'">'.$i.'</option>';
-											} ?>
+											<?php if(!empty($yearIntake)) { 
+											foreach ($yearIntake as $y) {
+											echo '<option value="'.$y->Year.'">'.$y->Year.'</option>';
+											} } ?>
 										</select>								
 									</div>
 								</div>
@@ -174,35 +175,39 @@
 
 <script type="text/javascript">
 	function fetchingData() {
+		loading_modal_show();
     	var data = getFormData($("#form-filter"));    	
         var token = jwt_encode(data,'UAP)(*');
     	var dataTable = $('#fetch-data-tables .table').DataTable( {
-				            destroy: true,
-							retrieve:true,
-				            "processing": true,
-				            "serverSide": true,
-				            "iDisplayLength" : 10,
-				            "ordering" : false,
-				            "language": {
-				                "searchPlaceholder": "NIM, Name, Programme Study"
-				            },
-				            "ajax":{
-				                url : base_url_js+'global-informations/studentsFetch', // json datasource
-				                ordering : false,
-				                data : {token:token},
-				                type: "post",  // method  , by default get
-				                error: function(jqXHR){  // error handling
-				                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-						                '<h4 class="modal-title">Error Fetch Student Data</h4>');
-						            $('#GlobalModal .modal-body').html(jqXHR.responseText);
-						            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
-						            $('#GlobalModal').modal({
-						                'show' : true,
-						                'backdrop' : 'static'
-						            });
-				                }
-				            }
-				        });
+            destroy: true,
+			retrieve:true,
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "NIM, Name, Programme Study"
+            },
+            "ajax":{
+                url : base_url_js+'global-informations/studentsFetch', // json datasource
+                ordering : false,
+                data : {token:token},
+                type: "post",  // method  , by default get
+                error: function(jqXHR){  // error handling
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+		                '<h4 class="modal-title">Error Fetch Student Data</h4>');
+		            $('#GlobalModal .modal-body').html(jqXHR.responseText);
+		            $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+		            $('#GlobalModal').modal({
+		                'show' : true,
+		                'backdrop' : 'static'
+		            });
+                }
+            },
+            "initComplete": function(settings, json) {
+			    loading_modal_hide();
+		  	}
+        });
     }
 
     function getFormData($form){
@@ -247,7 +252,9 @@
     	});
 
     	$("#birthdate_start,#birthdate_end,#graduation_start,#graduation_end").datepicker({
-            dateFormat: 'dd-mm-yy'
+            dateFormat: 'dd-mm-yy',
+            changeYear: true,
+            changeMonth: true
         });
         
         $(".show-more-filter").click(function(){
@@ -261,6 +268,14 @@
 				$(this).find("span").text("Advance filter");				
 				$(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
 			}
+		});
+
+		$('#form-filter').on('keyup keypress', function(e) {
+		  var keyCode = e.keyCode || e.which;
+		  if (keyCode === 13) { 
+		    e.preventDefault();
+		    return false;
+		  }
 		});
     });
 </script>

@@ -10,7 +10,7 @@
       	<div class="row">
       		<div class="col-sm-6 col-md-6">
       			<div class="table-responsive">
-      				<h4>Original Datass</h4>
+      				<h4>Original Data</h4>
       				<?php if(!empty($detail_ori)){ ?>
       				<table class="table table-bordered">
       					<tbody>
@@ -105,7 +105,7 @@
       							<td><?=$detail_req->NPM?></td>
       							<td rowspan="5" align="center">
       								<?php if(!empty($detail_req->Photo)){ ?>
-      								<img class="im-pp" src="<?=$detail_req->pathPhoto.'uploads/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
+      								<img class="im-pp" src="<?=base_url().'/uploads/students/ta_'.$TA.'/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
       								<?php }else{ ?>
                       <img class="im-pp" src="<?=base_url('/uploads/students/ta_'.$TA.'/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
                       <?php } ?>

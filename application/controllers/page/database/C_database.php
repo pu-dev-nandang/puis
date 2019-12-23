@@ -90,24 +90,14 @@ class C_database extends Globalclass {
                 if($data_arr['ACT'] == 1){
                     $getTempEmpyReq = $this->General_model->fetchData("db_employees.tmp_employees",$conditions)->row();
                     $dataAppv = array();
-                    if(empty($getTempEmpyReq->Photo)){
-                        unset($getTempEmpyReq->Photo);
-                    }else{
-                        $imgReq = $getTempEmpyReq->pathPhoto."uploads/profile/".$getTempEmpyReq->Photo;
-                        $ch = curl_init($imgReq);
-                        $fp = fopen('./uploads/employees/'.$getTempEmpyReq->Photo, 'wb');
-                        curl_setopt($ch, CURLOPT_FILE, $fp);
-                        curl_setopt($ch, CURLOPT_HEADER, 0);
-                        curl_exec($ch);
-                        curl_close($ch);
-                        fclose($fp);
-
-                        //remove picture
-                        $tmp_pic = $_SERVER['DOCUMENT_ROOT'].'/lecturer/uploads/profile/'.$getTempEmpyReq->Photo;
-                        unlink($tmp_pic);
-
-                        $dataAppv["Photo"] = null;
+                    $reqpic = "";
+                    if(!empty($getTempEmpyReq->Photo)){
+                        $reqpic = $getTempEmpyReq->Photo;
+                        $changeName = explode("-", $getTempEmpyReq->Photo);
+                        rename("./uploads/employees/".$getTempEmpyReq->Photo, "./uploads/employees/".$changeName[0].".jpg");
+                        $dataAppv['Photo'] = null;
                     }
+                    unset($getTempEmpyReq->Photo);
                     unset($getTempEmpyReq->ID);
                     unset($getTempEmpyReq->NIP);
                     unset($getTempEmpyReq->isApproval);
@@ -432,31 +422,20 @@ class C_database extends Globalclass {
                     if(empty($getTempStudentReq->Photo)){
                         unset($getTempStudentReq->Photo);
                     }else{
-                        $imgReq = $getTempStudentReq->pathPhoto."uploads/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo;
-                        $ch = curl_init($imgReq);
-                        $fp = fopen('./uploads/students/ta_'.$data_arr['TA'].'/'.$getTempStudentReq->Photo, 'wb');
-                        curl_setopt($ch, CURLOPT_FILE, $fp);
-                        curl_setopt($ch, CURLOPT_HEADER, 0);
-                        curl_exec($ch);
-                        curl_close($ch);
-                        fclose($fp);
-
-                        //remove picture
-                        $tmp_pic = $_SERVER['DOCUMENT_ROOT'].'/students/uploads/ta_'.$data_arr['TA'].'/'.$getTempStudentReq->Photo;
-                        unlink($tmp_pic);
-
-                        $dataAppv["Photo"] = null;
+                        $changeName = explode("-", $getTempStudentReq->Photo);
+                        rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$changeName[0].".jpg");
                     }
+
                     unset($getTempStudentReq->isApproval);
                     unset($getTempStudentReq->note);
                     unset($getTempStudentReq->created);
                     unset($getTempStudentReq->createdby);
                     unset($getTempStudentReq->edited);
                     unset($getTempStudentReq->editedby);
-                    unset($getTempStudentReq->pathPhoto);
                     unset($getTempStudentReq->ID);
                     unset($getTempStudentReq->NPM);
                     unset($getTempStudentReq->Name);
+
                     $KTPNumber = $getTempStudentReq->KTPNumber;
                     $Access_Card_Number = $getTempStudentReq->Access_Card_Number;
                     unset($getTempStudentReq->KTPNumber);
