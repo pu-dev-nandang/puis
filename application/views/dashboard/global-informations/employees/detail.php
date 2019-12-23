@@ -61,7 +61,7 @@
 												</div>												
 												<div class="row">
 													<label class="col-sm-3">Birthdate</label>
-													<p class="col-sm-4"><?=$detail->PlaceOfBirth.", ".date("d F Y",strtotime($detail->DateOfBirth))?></p>
+													<p class="col-sm-9"><?=$detail->PlaceOfBirth.", ".date("d F Y",strtotime($detail->DateOfBirth))?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Gender</label>
@@ -77,7 +77,7 @@
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Phone</label>
-													<p class="col-sm-9"><?=(!empty($detail->Phone) ? substr($detail->Phone, 0, -3) . 'xxx' : '-')?></p>
+													<p class="col-sm-9"><?=(!empty($detail->Phone) ? (substr($detail->Phone, 0, -3).'xxx') : '-')?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Mobile Phone</label>
@@ -102,17 +102,8 @@
 													<p class="col-sm-9"><?=$detail->NIP?></p>
 												</div>
 												<div class="row">
-													<label class="col-sm-3">NIDN</label>
-													<p class="col-sm-9"><?=$detail->NIDN?></p>
-												</div>
-												<div class="row">
 													<label class="col-sm-3">Email PU</label>
 													<p class="col-sm-9"><?=$detail->EmailPU?></p>
-												</div>
-
-												<div class="row">
-													<label class="col-sm-3">Study Program</label>
-													<p class="col-sm-9"><?=$detail->ProdiNameEng?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Status</label>
@@ -120,7 +111,7 @@
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Position Main</label>
-													<p class="col-sm-9"><?=$positionMain->Description?></p>
+													<p class="col-sm-9"><?=$divisionMain->Division."-".$positionMain->Description?></p>
 												</div>	
 												<?php if(!empty($detail->PositionOther1)){ ?>											
 												<div class="row">

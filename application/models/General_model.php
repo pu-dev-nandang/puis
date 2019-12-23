@@ -2,14 +2,18 @@
  
 class General_model extends CI_Model{
 
-	public function fetchData($tablename,$data,$idsort="", $sort="", $limit=null) {
+	public function fetchData($tablename,$data,$idsort="", $sort="", $limit=null,$groupBy=null) {
 		$this->db->from($tablename);
 		$this->db->where($data);
+		if(!empty($groupBy)){
+			 $this->db->group_by($groupBy); 
+		}
 		$this->db->order_by($idsort,$sort);
 		$this->db->limit($limit);
 		$query = $this->db->get();
 		return $query;
 	}
+
 
 	public function insertData($tablename,$data){
 		try {
@@ -39,5 +43,11 @@ class General_model extends CI_Model{
             return $e."\n".$this->db->_error_message();;
         }
     }
+
+
+    public function callStoredProcedure($psquery){
+		$query = $this->db->query($psquery);
+		return $query;
+	}
 
 }
