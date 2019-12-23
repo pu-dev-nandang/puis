@@ -95,7 +95,6 @@ class C_database extends Globalclass {
                         $reqpic = $getTempEmpyReq->Photo;
                         $changeName = explode("-", $getTempEmpyReq->Photo);
                         rename("./uploads/employees/".$getTempEmpyReq->Photo, "./uploads/employees/".$changeName[0].".jpg");
-                        $dataAppv['Photo'] = null;
                     }
                     unset($getTempEmpyReq->Photo);
                     unset($getTempEmpyReq->ID);
@@ -148,6 +147,7 @@ class C_database extends Globalclass {
                         $dataAppv['isApproval'] = 2;
                         $dataAppv['note'] = (!empty($data_arr['NOTE']) ? $data_arr['NOTE'] : null);
                         $dataAppv['editedby'] = $myName;
+
                         $updateTempStd = $this->General_model->updateData("db_employees.tmp_employees",$dataAppv,$conditions);
                         $message = (($updateTempStd) ? "Successfully":"Failed")." saved.".(!empty($adMessage) ? "<b>".$adMessage."</b>":"");
                         $isfinish = $updateTempStd;
@@ -419,13 +419,14 @@ class C_database extends Globalclass {
                 if($data_arr['ACT'] == 1){
                     $getTempStudentReq = $this->General_model->fetchData("db_academic.tmp_students",$conditions)->row();
                     $dataAppv = array();
-                    if(empty($getTempStudentReq->Photo)){
-                        unset($getTempStudentReq->Photo);
-                    }else{
+
+                    if(!empty($getTempStudentReq->Photo)){
+                        $reqpic = $getTempStudentReq->Photo;
                         $changeName = explode("-", $getTempStudentReq->Photo);
                         rename("./uploads/students/ta_".$data_arr['TA']."/".$getTempStudentReq->Photo, "./uploads/students/ta_".$data_arr['TA']."/".$changeName[0].".jpg");
                     }
-
+                    
+                    unset($getTempStudentReq->Photo);
                     unset($getTempStudentReq->isApproval);
                     unset($getTempStudentReq->note);
                     unset($getTempStudentReq->created);
