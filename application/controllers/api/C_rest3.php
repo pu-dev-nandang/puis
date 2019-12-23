@@ -296,8 +296,8 @@ class C_rest3 extends CI_Controller {
                                 join db_employees.employees as b on a.NIP = b.NIP
                                 where b.ProdiID = ? and a.Tahun = ? and isApproved = 2
                         UNION
-                        select sk.Updated_by,b.Name,sk.Updated_by from db_agregator.sitasi_karya as sk
-                        join db_employees.employees as b on sk.Updated_by = b.NIP
+                        select sk.User_create,b.Name,sk.User_create from db_agregator.sitasi_karya as sk
+                        join db_employees.employees as b on sk.User_create = b.NIP
                         where b.ProdiID = ? and sk.year = ?
                         ) xx
                         GROUP BY NIP
@@ -308,7 +308,7 @@ class C_rest3 extends CI_Controller {
                   $temp = [];
                     // check rowspan
                     $sql_rekognisi = 'select * from db_agregator.rekognisi_dosen
-                                      where NIP = "'.$query[$i]['NIP'].'" and Tahun = '.$filterTahun.'
+                                      where NIP = "'.$query[$i]['NIP'].'" and Tahun = '.$filterTahun.' and isApproved = 2
                                     ';
                     $queryRekognisi = $this->db->query($sql_rekognisi,array())->result_array();
                     $rowspan = (count($queryRekognisi) == 0) ? 1 : count($queryRekognisi);
@@ -325,6 +325,7 @@ class C_rest3 extends CI_Controller {
 
                     // Rekognisi , BuktiPendukungName , BuktiPendukungUpload
                       $arr_rekog = [];
+                      $Rekognisi =  '';
                       for ($j=0; $j < count($queryRekognisi); $j++) { 
                         $Rekognisi = $queryRekognisi[$j]['Rekognisi'];
                         $BuktiName = $queryRekognisi[$j]['BuktiPendukungName'];
@@ -378,10 +379,10 @@ class C_rest3 extends CI_Controller {
 
                     $temp[] = [
                       'rowspan' => $rowspan,
-                      'value' => $filterTahun,
+                      'value' => ($Rekognisi == '') ? '' : $filterTahun,
                     ];
 
-                    $sql_dt_artikel = 'select * from db_agregator.sitasi_karya where Updated_by = "'.$query[$i]['NIP'].'" and year = '.$filterTahun.' ';
+                    $sql_dt_artikel = 'select * from db_agregator.sitasi_karya where User_create = "'.$query[$i]['NIP'].'" and year = '.$filterTahun.' ';
                     $G_dt_artikel = $this->db->query($sql_dt_artikel,array())->result_array();
 
                     // Judul Artikel
@@ -389,7 +390,7 @@ class C_rest3 extends CI_Controller {
                     if (count($G_dt_artikel) > 0) {
                       $wr = '<ul style = "margin-left:-20px;">';
                       for ($l=0; $l < count($G_dt_artikel); $l++) { 
-                         $wr .= '<li>'.$G_dt_artikel[$l]['judul_sitasi'].'</li>';
+                         $wr .= '<li>'.$G_dt_artikel[$l]['Title'].'</li>';
                       }
                       $wr .= '</ul>';
                     }
@@ -404,7 +405,7 @@ class C_rest3 extends CI_Controller {
                     if (count($G_dt_artikel) > 0) {
                       $wr = '<ul style = "margin-left:-20px;">';
                       for ($l=0; $l < count($G_dt_artikel); $l++) { 
-                         $wr .= '<li>'.$G_dt_artikel[$l]['jumlah_sitasi'].'</li>';
+                         $wr .= '<li>'.$G_dt_artikel[$l]['Citation'].'</li>';
                       }
                       $wr .= '</ul>';
                     }
@@ -955,8 +956,8 @@ class C_rest3 extends CI_Controller {
                           select a.Judul,jp.Nm_jns_pub,Year(a.Tgl_terbit) as Year,a.Ket,d.NIP,d.Name as NameDosen,jp.SKS as Credit
                           from db_research.publikasi as a 
                           join db_research.jenis_publikasi as jp on jp.ID_jns_pub = a.ID_jns_pub
-                          join db_research.publikasi_list_dosen as b on a.ID_publikasi = b.ID_publikasi
-                          join db_research.penulis_dosen as c on b.ID_Penulis_Dosen = c.ID_Penulis_Dosen
+                          join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
+                          join db_research.master_anggota_publikasi as c on b.ID = c.ID
                           join db_employees.employees as d on c.NIP = d.NIP
                            where Year(a.Tgl_terbit) = ? and d.NIP = ?
                            '; 

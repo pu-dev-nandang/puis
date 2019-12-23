@@ -26,7 +26,7 @@ class M_ticketing extends CI_Model {
             $uploadNas = $this->Ticketing_uploadNas($NoTicket);
             $dataSave['Files'] = $uploadNas;
         }
-        
+
         try {
             $dataSave['UpdatedBy'] = $dataSave['RequestedBy'];
             $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
@@ -85,7 +85,7 @@ class M_ticketing extends CI_Model {
             'To' => array(
                       'NIP' => $array['To'],
                     ),
-            'Email' => $array['NeedEmail'], 
+            'Email' => $array['NeedEmail'],
         );
 
         $url = url_pas.'rest2/__send_notif_browser';
@@ -99,7 +99,7 @@ class M_ticketing extends CI_Model {
            Code : IT-19000001
            IT : Abbreviation
            19 : Year
-           0000001 : Increment 
+           0000001 : Increment
         */
         $NIP = $Request;
         $GetAbbrEmployees = $this->m_master->SearchEmployeesByNIP($NIP);
@@ -121,8 +121,8 @@ class M_ticketing extends CI_Model {
                 }
             }
         }
-        
-        
+
+
         $Code = '';
         $Year = date('Y');
         $YearSubStr = substr($Year, 2,2);
@@ -134,13 +134,13 @@ class M_ticketing extends CI_Model {
                 limit 1';
         $query = $this->db->query($sql,array())->result_array();
         if (count($query) == 1) {
-           $LastCode = $query[0]['NoTicket']; 
+           $LastCode = $query[0]['NoTicket'];
            $explode = explode('-', $LastCode);
            $CodeNumber = (int) substr($explode[1], 2,(strlen($explode[1])-2) );
            $CodeNumber = $CodeNumber + 1;
            $strlen = strlen($CodeNumber);
            $strINC = $CodeNumber;
-           for ($i=0; $i < $MaxLengthINC - $strlen; $i++) { 
+           for ($i=0; $i < $MaxLengthINC - $strlen; $i++) {
                $strINC = '0'.$strINC;
            }
            $strINC = $YearSubStr.$strINC;
@@ -151,7 +151,7 @@ class M_ticketing extends CI_Model {
             $CodeNumber = 1;
             $strlen = strlen($CodeNumber);
             $strINC = $CodeNumber;
-            for ($i=0; $i < $MaxLengthINC - $strlen; $i++) { 
+            for ($i=0; $i < $MaxLengthINC - $strlen; $i++) {
                 $strINC = '0'.$strINC;
             }
             $strINC = $YearSubStr.$strINC;
@@ -166,12 +166,12 @@ class M_ticketing extends CI_Model {
     public function getAdminTicketing($CategoryID)
     {
         $rs = [];
-        $sql =  'select a.DepartmentID,b.NIP from db_ticketing.category as a 
+        $sql =  'select a.DepartmentID,b.NIP from db_ticketing.category as a
                  join db_ticketing.admin_register as b on a.DepartmentID = b.DepartmentID
-                 where a.ID = '.$CategoryID.'   
+                 where a.ID = '.$CategoryID.'
                  ';
         $query = $this->db->query($sql,array())->result_array();
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
             $rs[] = $query[$i]['NIP'];
         }
 
@@ -191,18 +191,18 @@ class M_ticketing extends CI_Model {
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
                 a.RequestedBy
-                from db_ticketing.ticket as a 
+                from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 where a.TicketStatus = 1 and DATE_FORMAT(a.RequestedAt,"%Y-%m-%d") = CURDATE()
-                '.$Addwhere.' 
+                '.$Addwhere.'
                 and (select count(*) as total from db_ticketing.received where TicketID = a.ID) = 1
                 order by a.ID asc
                 ';
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
-        for ($i=0; $i < $rs['count']; $i++) { 
+        for ($i=0; $i < $rs['count']; $i++) {
 
             $query[$i]['data_received'] = [];
 
@@ -241,7 +241,7 @@ class M_ticketing extends CI_Model {
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,
                 a.RequestedBy
-                from db_ticketing.ticket as a 
+                from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -252,7 +252,7 @@ class M_ticketing extends CI_Model {
                 ';
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
-        for ($i=0; $i < $rs['count']; $i++) { 
+        for ($i=0; $i < $rs['count']; $i++) {
 
             $query[$i]['data_received'] = [];
 
@@ -284,14 +284,14 @@ class M_ticketing extends CI_Model {
         $rs = [];
         $Addwhere = '';
         if (array_key_exists('DepartmentID', $dataToken)) {
-           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"
                                 or a.ID in (
                                     select a.TicketID from db_ticketing.received as a
                                     join db_ticketing.category as b on a.CategoryReceivedID = b.ID
                                     '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
-                                    where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'" 
+                                    where a.SetAction = "1" and qdp.ID = "'.$dataToken['DepartmentID'].'"
                                     and a.ReceivedStatus = "0"
-                                )   
+                                )
             )';
         }
         $NIP = $dataToken['NIP'];
@@ -299,7 +299,7 @@ class M_ticketing extends CI_Model {
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                 qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
-                from db_ticketing.ticket as a 
+                from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
@@ -308,7 +308,7 @@ class M_ticketing extends CI_Model {
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';
-        
+
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
         for ($i=0; $i < $rs['count']; $i++) {
@@ -341,13 +341,13 @@ class M_ticketing extends CI_Model {
         $rs = [];
         $Addwhere = '';
         if (array_key_exists('DepartmentID', $dataToken)) {
-           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+           $Addwhere .= ' and ( a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"
                                 or a.ID in (
                                     select a.TicketID from db_ticketing.received as a
                                     join db_ticketing.category as b on a.CategoryReceivedID = b.ID
                                     '.$this->m_general->QueryDepartmentJoin('b.DepartmentID','qdp').'
-                                    where qdp.ID = "'.$dataToken['DepartmentID'].'" 
-                                )   
+                                    where qdp.ID = "'.$dataToken['DepartmentID'].'"
+                                )
             )';
         }
         $NIP = $dataToken['NIP'];
@@ -355,7 +355,7 @@ class M_ticketing extends CI_Model {
         $sql = 'select a.DepartmentTicketID,a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                 qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,a.RequestedBy
-                from db_ticketing.ticket as a 
+                from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 join db_employees.employees as b on a.RequestedBy = b.NIP
                 '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
@@ -364,7 +364,7 @@ class M_ticketing extends CI_Model {
                 '.$Addwhere.$customwhere.'
                 order by a.ID asc
                 ';
-        
+
         $query = $this->db->query($sql,array())->result_array();
         $rs['count'] = count($query);
         for ($i=0; $i < $rs['count']; $i++) {
@@ -426,16 +426,16 @@ class M_ticketing extends CI_Model {
             $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
             $strWhere .= $AndOrWhere.'a.'.$key.' = "'.$value.'"';
         }
-        
+
         if ($customwhere != '') {
-           $AndOrWhere = ($strWhere == '') ? 'where ' : ' and '; 
-           $customwhere = $AndOrWhere.' '.$customwhere;        
+           $AndOrWhere = ($strWhere == '') ? 'where ' : ' and ';
+           $customwhere = $AndOrWhere.' '.$customwhere;
        }
 
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
         $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                 b.Photo as PhotoRequested,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.CategoryID,ca.Descriptions as CategoryDescriptions,a.ID
-                from db_ticketing.ticket as a 
+                from db_ticketing.ticket as a
                 join db_ticketing.category as ca on a.CategoryID = ca.ID
                 '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                 join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -443,7 +443,7 @@ class M_ticketing extends CI_Model {
                 order by a.ID desc
                 ';
         $query = $this->db->query($sql,array())->result_array();
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
            $DateRequest = date('d M Y', strtotime($query[$i]['RequestedAt']));
            $TimeRequest = date('H:i', strtotime($query[$i]['RequestedAt']));
            $query[$i]['RequestedAt'] = $DateRequest.' '.$TimeRequest;
@@ -479,15 +479,15 @@ class M_ticketing extends CI_Model {
                     $rs['bool'] = true;
                     $rs['callback'] = $DepartmentIDDestination;
                 }
-                
+
             }
-           
+
         }
         return $rs;
     }
 
     private function auth_action_progress($DataReceived_auth_action,$NIP)
-    {   
+    {
         $rs = [
             'Admin' => false,
             'Worker' => false,
@@ -497,7 +497,7 @@ class M_ticketing extends CI_Model {
         $rs['Admin'] = $this->m_general->auth($DepartmentID,$NIP);
         $DataReceived_Details = $DataReceived_auth_action['Detail']['DataReceived_Details'];
         $bool = false;
-        for ($i=0; $i < count($DataReceived_Details); $i++) { 
+        for ($i=0; $i < count($DataReceived_Details); $i++) {
             if ($NIP == $DataReceived_Details[$i]['NIP']) {
               $bool = true;
               break;
@@ -625,28 +625,28 @@ class M_ticketing extends CI_Model {
                             unset($dataSave['ReceivedBy']);
                         }
                     }
-                  
+
                     if (!empty($dataSave)) {
                         $this->db->where('ID',$ID);
                         $this->db->update('db_ticketing.received',$dataSave);
                     }
-                    
+
                     break;
                 default:
                     # code...
                     break;
             }
         }
-        
+
     }
 
     private function send_notification_ticketing_worker($arr_pass) {
         /*
             $arr_pass = [
-                'To' => 
-                'NoTicket' => 
-                'DepartmentHandler' => 
-                'CreatedBy' => 
+                'To' =>
+                'NoTicket' =>
+                'DepartmentHandler' =>
+                'CreatedBy' =>
             ];
 
         */
@@ -667,7 +667,7 @@ class M_ticketing extends CI_Model {
           'To' => $To,
           'NeedEmail' => 'No',
         ];
-        
+
         $data = array(
             'auth' => 's3Cr3T-G4N',
             'Logging' => array(
@@ -679,12 +679,12 @@ class M_ticketing extends CI_Model {
             'To' => array(
                       'NIP' => $array_send_notification['To'],
                     ),
-            'Email' => $array_send_notification['NeedEmail'], 
+            'Email' => $array_send_notification['NeedEmail'],
         );
 
         $url = url_pas.'rest2/__send_notif_browser';
         $token = $this->jwt->encode($data,"UAP)(*");
-        $this->m_master->apiservertoserver($url,$token);     
+        $this->m_master->apiservertoserver($url,$token);
     }
 
     public function TableReceived_DetailsAction($data_arr,$notifParams=[]){
@@ -694,7 +694,7 @@ class M_ticketing extends CI_Model {
                 case 'insert':
                     $data = $data_arr['data'];
                     if (array_key_exists(0, $data)) {
-                        for ($i=0; $i <count($data) ; $i++) { 
+                        for ($i=0; $i <count($data) ; $i++) {
                             $dataSave = $data[$i];
                             $dataSave['At'] = date('Y-m-d H:i:s');
                             $this->db->insert('db_ticketing.received_details',$dataSave);
@@ -741,7 +741,7 @@ class M_ticketing extends CI_Model {
         $dataToken = ['DepartmentID' => $DepartmentID];
         $get_data  = $this->m_general->getAllUserByDepartment($dataToken);
         $rs = [];
-        for ($i=0; $i < count($get_data); $i++) { 
+        for ($i=0; $i < count($get_data); $i++) {
             $rs[] = $get_data[$i]['NIP'];
         }
         return $rs;
@@ -766,17 +766,17 @@ class M_ticketing extends CI_Model {
            'To' => array(
                      'NIP' => $array_send_notification['To'],
                    ),
-           'Email' => $array_send_notification['NeedEmail'], 
+           'Email' => $array_send_notification['NeedEmail'],
        );
 
        $url = url_pas.'rest2/__send_notif_browser';
        $token = $this->jwt->encode($data,"UAP)(*");
-       $this->m_master->apiservertoserver($url,$token); 
+       $this->m_master->apiservertoserver($url,$token);
     }
 
     public function ProcessTransferTo($data_arr){
         if (count($data_arr) > 0) {
-            for ($i=0; $i < count($data_arr); $i++) { 
+            for ($i=0; $i < count($data_arr); $i++) {
                $data_arr_index =$data_arr[$i];
                $action = $data_arr_index['action'];
                $this->TableReceivedAction($data_arr_index);
@@ -797,7 +797,7 @@ class M_ticketing extends CI_Model {
                 $this->db->where('ID',$ID);
                 $this->db->update('db_ticketing.ticket',$dataSave);
                 break;
-            
+
             default:
                 # code...
                 break;
@@ -806,7 +806,7 @@ class M_ticketing extends CI_Model {
 
     public function getDataReceived_worker($arr){
          $data_received = $this->getDataReceived($arr);
-         for ($i=0; $i < count($data_received); $i++) { 
+         for ($i=0; $i < count($data_received); $i++) {
               $DataReceived_Details = $this->getDataReceived_DetailsBy(['ReceivedID' => $data_received[$i]['ID'] ]);
               $data_received[$i]['DataReceived_Details'] = $DataReceived_Details;
               $data_received[$i]['ReceivedAt'] = $this->__set_tgl_ticket($data_received[$i]['ReceivedAt']);
@@ -814,7 +814,7 @@ class M_ticketing extends CI_Model {
               $data_received[$i]['DataRating'] = $this->m_master->caribasedprimary('db_ticketing.rating','ReceivedID',$data_received[$i]['ID']);
          }
 
-         return $data_received; 
+         return $data_received;
     }
 
     public function getDataReceived_DetailsBy($arr){
@@ -830,7 +830,7 @@ class M_ticketing extends CI_Model {
         ';
 
         $query = $this->db->query($sql,array())->result_array();
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
             $DueDateShow = date('M d, Y', strtotime($query[$i]['DueDate']));
             $query[$i]['DueDateShow'] = $DueDateShow;
         }
@@ -847,7 +847,7 @@ class M_ticketing extends CI_Model {
 
         $DataReceived = $this->getDataReceived_worker($arr_where);
         if (count($DataReceived) == 0) {
-            show_404($log_error = TRUE); 
+            show_404($log_error = TRUE);
             die();
         }
         else
@@ -865,7 +865,7 @@ class M_ticketing extends CI_Model {
           $dataSave = [
             'TicketStatus' => 3,
             'TicketClosedAt' => date('Y-m-d H:i:s'),
-          ];  
+          ];
 
           $this->db->where('ID',$TicketID);
           $this->db->update('db_ticketing.ticket',$dataSave);
@@ -882,7 +882,7 @@ class M_ticketing extends CI_Model {
         $data = array();
         for ($i=0; $i < count($query); $i++) {
             $nestedData = array();
-            $row = $query[$i]; 
+            $row = $query[$i];
             $nestedData[] = $i+1;
             foreach ($row as $key => $value) {
               $nestedData[] = $value;
@@ -908,7 +908,7 @@ class M_ticketing extends CI_Model {
         $DepartmentID = $dataToken['DepartmentID'];
         $NIP = $dataToken['NIP'];
         $pathfolder = ($_SERVER['SERVER_NAME'] == 'pcam.podomorouniversity.ac.id') ? "pcam/ticketing/" : "localhost/ticketing/";
-        
+
         /*
             Outgoing : Ticket keluar dari Department by department request 99
             Incoming : Ticket terima atau handler -99
@@ -919,6 +919,7 @@ class M_ticketing extends CI_Model {
         switch ($TicketStatus) {
             case '1':
             case 1:
+                $Addwhere3 ='';
                 $Addwhere = ' and (ca.DepartmentID = "'.$dataToken['DepartmentID'].'" or a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'" )';
                 if (array_key_exists('FilterFor', $dataToken)) {
                     if ($dataToken['FilterFor'] == '99') {
@@ -931,7 +932,7 @@ class M_ticketing extends CI_Model {
 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.ID,ca.Descriptions as CategoryDescriptions,a.TicketStatus,ts.Status as NameStatusTicket,qdx.NameDepartment as NameDepartmentTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
@@ -948,7 +949,7 @@ class M_ticketing extends CI_Model {
 
                 $sqlTotalData = 'select count(*) as total from (
                         select a.NoTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         '.$this->m_general->QueryDepartmentJoin('ca.DepartmentID').'
                         join db_employees.employees as b on a.RequestedBy = b.NIP
@@ -964,7 +965,7 @@ class M_ticketing extends CI_Model {
             case '2':
             case 2:
                 $AddwhereFor = '';
-                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"
                                      or';
                 $Addwhere3 = '';
                 if (array_key_exists('FilterFor', $dataToken) ) {
@@ -979,24 +980,25 @@ class M_ticketing extends CI_Model {
                        $AddwhereFor = ' and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
-                        $AddwhereFor = ' and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0';
+                        // $AddwhereFor = ' and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0';
+                        $AddwhereFor = ' and a.ReceivedStatus = "0" and a.SetAction = "1" ';
                         $AddwhereFor2 = '';
                     }
-                    
+
                     // $AddwhereFor2 = '';
                 }
                 $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
                                          where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
                                          '.$AddwhereFor.'
-                                     ) 
-                        '.$Addwhere3.'  
+                                     )
+                        '.$Addwhere3.'
                  ) ';
 
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
@@ -1012,7 +1014,7 @@ class M_ticketing extends CI_Model {
 
                 $sqlTotalData = 'select count(*) as total from (
                         select a.NoTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
@@ -1030,12 +1032,12 @@ class M_ticketing extends CI_Model {
             case '4':
             case 4:
                 $AddwhereFor = '';
-                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"  
+                $AddwhereFor2 = 'a.DepartmentTicketID = "'.$dataToken['DepartmentID'].'"
                                      or';
                 $Addwhere3 = '';
                 if (array_key_exists('FilterFor', $dataToken) ) {
                     if ($dataToken['FilterFor'] == '1') {
-                        $AddwhereFor = 'where a.ID in (
+                        $AddwhereFor = 'and a.ID in (
                                                 select ReceivedID from db_ticketing.received_details where Status != "-1" AND NIP = "'.$NIP.'"
                                              )';
                         $AddwhereFor2 = '';
@@ -1043,13 +1045,13 @@ class M_ticketing extends CI_Model {
 
                     if ($dataToken['FilterFor'] == '99') {
                        $Addwhere3 .= ' or a.DepartmentTicketID = "'.$DepartmentID.'"';
-                       $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                       $AddwhereFor = '
                            and a.DepartmentTransferToID IS NOT NULL and a.DepartmentTransferToID != ""
                        ';
                     }
                     elseif ($dataToken['FilterFor'] == '-99') {
                         // $Addwhere3 .= ' or a.DepartmentTicketID != "'.$DepartmentID.'"';
-                        $AddwhereFor = 'where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
+                        $AddwhereFor = '
                             and (select count(*) as total from db_ticketing.received_details where ReceivedID = a.ID) > 0
                         ';
                         $AddwhereFor2 = '';
@@ -1060,15 +1062,15 @@ class M_ticketing extends CI_Model {
 
                 $Addwhere = ' and ( '.$AddwhereFor2.' a.ID in (
                                          select a.TicketID from db_ticketing.received as a
-                                         
+                                         where a.DepartmentReceivedID = "'.$dataToken['DepartmentID'].'"
                                          '.$AddwhereFor.'
-                                     )   
+                                     )
                  '.$Addwhere3.'
                  ) ';
                 $sql = 'select a.NoTicket,a.Title,Message,CONCAT("'.$pathfolder.'",a.Files) as Files,b.Name as NameRequested,a.RequestedAt,
                         b.Photo,a.ID,ca.Descriptions as CategoryDescriptions,a.DepartmentTicketID,qdx.NameDepartment as NameDepartmentTicket,
                         qdj.NameDepartment as NameDepartmentDestination,qdj.ID as DepartmentIDDestination,a.TicketStatus,ts.Status as NameStatusTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         join db_ticketing.ticket_status as ts on ts.ID = a.TicketStatus
@@ -1084,7 +1086,7 @@ class M_ticketing extends CI_Model {
                 $sql.= ' ORDER BY a.ID desc LIMIT '.$requestData['start'].' , '.$requestData['length'].' ';
                 $sqlTotalData = 'select count(*) as total from (
                         select a.NoTicket
-                        from db_ticketing.ticket as a 
+                        from db_ticketing.ticket as a
                         join db_ticketing.category as ca on a.CategoryID = ca.ID
                         join db_employees.employees as b on a.RequestedBy = b.NIP
                         '.$this->m_general->QueryDepartmentJoin('a.DepartmentTicketID','qdx').'
@@ -1108,7 +1110,7 @@ class M_ticketing extends CI_Model {
         $query = $this->__ticket_list_set_data($query,$dataToken);
         $No = $requestData['start'] + 1;
         $data = array();
-        for ($i=0; $i < count($query); $i++) { 
+        for ($i=0; $i < count($query); $i++) {
             $nestedData=array();
             $row = $query[$i];
             $nestedData[] = $No;
@@ -1176,7 +1178,7 @@ class M_ticketing extends CI_Model {
         ];
         $GetTicketData = $this->getDataTicketBy($arr_where);
         if (count($GetTicketData) > 0) {
-            for ($i=0; $i < count($GetTicketData); $i++) { 
+            for ($i=0; $i < count($GetTicketData); $i++) {
                 $data_received = $this->getDataReceived_worker([ 'TicketID' => $GetTicketData[$i]['ID'] ]);
                 $GetTicketData[$i]['data_received'] = $data_received;
                 $rs[] = $GetTicketData[$i];
@@ -1196,7 +1198,7 @@ class M_ticketing extends CI_Model {
     private function trigger_after_create_ticketing($TicketID){
         $data_received = $this->getDataReceived_worker([ 'TicketID' => $TicketID ]);
         $bool = true;
-        for ($i=0; $i < count($data_received); $i++) { 
+        for ($i=0; $i < count($data_received); $i++) {
             $DataRating = $data_received[$i]['DataRating'];
             $DataReceived_Details = $data_received[$i]['DataReceived_Details'];
             if (count($DataRating) == 0 && count($DataReceived_Details) > 0 ) {
@@ -1210,7 +1212,7 @@ class M_ticketing extends CI_Model {
             $dataSave = [
                 'TicketStatus' => 4,
             ];
-            $this->db->update('db_ticketing.ticket',$dataSave);  
+            $this->db->update('db_ticketing.ticket',$dataSave);
         }
     }
 
