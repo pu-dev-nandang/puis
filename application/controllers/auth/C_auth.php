@@ -19,6 +19,134 @@ class C_auth extends Globalclass {
         $this->db = $this->load->database('default', TRUE);
     }
 
+    public function checkSKS($SemesterID,$StatusEmployeeID,$StatusLecturerID){
+
+        $dataLecturer = $this->db->query('SELECT NIP, Name FROM db_employees.employees em
+                                                  WHERE em.StatusEmployeeID = "'.$StatusEmployeeID.'" AND em.StatusLecturerID = "'.$StatusLecturerID.'"
+                                                  ORDER BY em.NIP ASC ')->result_array();
+
+
+        if(count($dataLecturer)>0){
+            for($i=0;$i<count($dataLecturer);$i++){
+                $d = $dataLecturer[$i];
+
+                $dataAllCourse = [];
+
+                $dataSch = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup, mk.MKCode, mk.Name, mk.NameEng, cd.TotalSKS AS CreditMK FROM db_academic.schedule s 
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        WHERE s.SemesterID = "'.$SemesterID.'" 
+                                                        AND s.Coordinator = "'.$d['NIP'].'" 
+                                                        GROUP BY s.ID')->result_array();
+
+                if(count($dataSch)>0){
+                    for($a=0;$a<count($dataSch);$a++){
+                        $dataTeam = $this->db->query('SELECT em.NIP, em.Name, "0" AS IsCoordinator FROM db_academic.schedule_team_teaching stt 
+                                                                LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                                WHERE stt.ScheduleID = "'.$dataSch[$a]['ScheduleID'].'" ')->result_array();
+
+                        $Single = 1;
+                        if(count($dataTeam)>0){
+                            $Single = 0;
+                        }
+                        $dataSch[$a]['Single'] = $Single;
+                        $dataSch[$a]['DetailTeam'] = $dataTeam;
+
+                        array_push($dataAllCourse, $dataSch[$a]);
+                    }
+                }
+
+                $dataSchTeam = $this->db->query('SELECT s.ID AS ScheduleID, s.ClassGroup, mk.MKCode, mk.Name, mk.NameEng, cd.TotalSKS AS CreditMK,  
+                                                        em.NIP AS CoordinatorNIP, em.Name AS CoordinatorName, 0 AS Single
+                                                        FROM db_academic.schedule s
+                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (sdc.ScheduleID = s.ID)
+                                                        LEFT JOIN db_academic.schedule_team_teaching stt ON (stt.ScheduleID = s.ID)
+                                                        LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sdc.CDID)
+                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                        LEFT JOIN db_employees.employees em ON (em.NIP = s.Coordinator)
+                                                        WHERE s.SemesterID = "'.$SemesterID.'" 
+                                                        AND stt.NIP = "'.$d['NIP'].'" 
+                                                        GROUP BY s.ID')->result_array();
+
+
+                if(count($dataSchTeam)>0){
+                    for($a=0;$a<count($dataSchTeam);$a++){
+                        $dataTeamTeaching = $this->db->query('SELECT stt.NIP, em.Name, "0" AS IsCoordinator FROM db_academic.schedule_team_teaching stt 
+                                                                        LEFT JOIN db_employees.employees em ON (em.NIP = stt.NIP)
+                                                                        WHERE stt.ScheduleID = "'.$dataSchTeam[$a]['ScheduleID'].'"
+                                                                        AND stt.NIP != "'.$d['NIP'].'" ' )->result_array();
+
+                        array_push($dataTeamTeaching,array(
+                            'NIP' => $dataSchTeam[$a]['CoordinatorNIP'],
+                            'Name' => $dataSchTeam[$a]['CoordinatorName'],
+                            'IsCoordinator' => '1',
+                        ));
+
+
+                        $arrPush = array(
+                            'ScheduleID' => $dataSchTeam[$a]['ScheduleID'],
+                            'ClassGroup' => $dataSchTeam[$a]['ClassGroup'],
+                            'MKCode' => $dataSchTeam[$a]['MKCode'],
+                            'Name' => $dataSchTeam[$a]['Name'],
+                            'NameEng' => $dataSchTeam[$a]['NameEng'],
+                            'CreditMK' => $dataSchTeam[$a]['CreditMK'],
+                            'Single' => '0',
+                            'DetailTeam' => $dataTeamTeaching
+                        );
+                        array_push($dataAllCourse, $arrPush);
+                    }
+                }
+
+
+
+
+                // ==============================
+                // Mengambil data jadwal
+
+                if(count($dataAllCourse)>0){
+                    for($a=0;$a<count($dataAllCourse);$a++){
+
+                        $TotalTeam = count($dataAllCourse[$a]['DetailTeam']) + 1;
+                        $CreditBKD = ($dataAllCourse[$a]['Single']=='0') ? (integer) $dataAllCourse[$a]['CreditMK'] / $TotalTeam : $dataAllCourse[$a]['CreditMK'];
+
+
+                        $dataAllCourse[$a]['CreditBKD'] = (is_int($CreditBKD)) ? $CreditBKD : round($CreditBKD,2);
+
+                        $dataAllCourse[$a]['Schedule'] = $this->db->query('SELECT sd.Credit, sd.DayID, cl.Room, sd.StartSessions, sd.EndSessions, d.NameEng AS DayNameEng  
+                                                                                    FROM db_academic.schedule_details sd
+                                                                                    LEFT JOIN db_academic.classroom cl ON (cl.ID = sd.ClassroomID)
+                                                                                    LEFT JOIN db_academic.days d ON (d.ID = sd.DayID)
+                                                                                    WHERE sd.ScheduleID = "'.$dataAllCourse[$a]['ScheduleID'].'" ')->result_array();
+
+
+
+                    }
+                }
+
+
+                // ==============================
+
+                $dataLecturer[$i]['Course'] = $dataAllCourse;
+            }
+
+        }
+
+//        print_r($dataLecturer);
+//
+//        exit;
+        $data['dataLecturer'] = $dataLecturer;
+
+        $data['SemesterID'] = $SemesterID;
+        $data['StatusEmployeeID'] = $StatusEmployeeID;
+        $data['StatusLecturerID'] = $StatusLecturerID;
+
+        $this->load->view('dashboard/check_sks',$data,false);
+
+
+
+    }
+
     public function dataSinta(){
 
         $api_key = 'a39e735fd5049ba1f7ff0b4e05c9f207';
