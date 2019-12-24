@@ -45,61 +45,60 @@ class M_doc extends CI_Model {
     public function readTemplate(){
     	$FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
 		$line = $this->__readDoc($FileTemplate);
-
 		foreach ($line as $v) {
 		    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
-		        $str = trim($matches[1][0]);
-		        $ex = explode('.', $str);
-		        if (count($ex) > 0) {
-		        	/*
-						array key 1 : value
-						array key > 1 : get field
-						Max key 2
-	
-		        	*/
-		        	switch ($ex[0]) {
-		        		case $this->KeySET:
-		        			$setStr = trim(ucwords($ex[1]));
-		        			// if ($setStr == 'Signature') {
-		        			// 	$this->TOT_APPROVAL = $this->TOT_APPROVAL + 1;
-		        			// }
-		        			for ($i=2; $i < count($ex); $i++) {
-		        				
-		        				$setStr .= '.'.trim(ucwords($ex[$i]));
-		        			}
-		        			
-		        			$this->SET[] = $setStr;
-		        			break;
-		        		case $this->KeyUSER:
-		        			$setStr = trim(ucwords($ex[1]));
-		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.trim(ucwords($ex[$i]));
-		        			}
-		        			$this->USER[] = $setStr;
-		        			break;
-		        		case $this->KeyINPUT:
-		        			$setStr = trim(ucwords($ex[1]));
-		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.trim(ucwords($ex[$i]));
-		        			}
-		        			$this->INPUT[] = $setStr;
-		        			break;
-		        		case $this->KeyGRAB:
-		        			$setStr = trim(ucwords($ex[1]));
-		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.trim(ucwords($ex[$i]));
-		        			}
-		        			$this->GRAB[] = $setStr;
-		        			break;
-		        		case $this->KeyTABLE:
-		        			$setStr = trim(ucwords($ex[1]));
-		        			for ($i=2; $i < count($ex); $i++) {
-		        				$setStr .= '.'.trim(ucwords($ex[$i]));
-		        			}
-		        			$this->TABLE[] = $setStr;
-		        			break;
-		        	}
-		        }
+		    	for ($z=0; $z < count($matches[1]); $z++) { 
+    		        $str = trim($matches[1][$z]);
+    		        $ex = explode('.', $str);
+    		        if (count($ex) > 0) {
+    		        	/*
+    						array key 1 : value
+    						array key > 1 : get field
+    						Max key 2
+    		
+    		        	*/
+    		        	switch ($ex[0]) {
+    		        		case $this->KeySET:
+    		        			$setStr = trim(ucwords($ex[1]));
+    		        			for ($i=2; $i < count($ex); $i++) {
+    		        				
+    		        				$setStr .= '.'.trim(ucwords($ex[$i]));
+    		        			}
+    		        			
+    		        			$this->SET[] = $setStr;
+    		        			break;
+    		        		case $this->KeyUSER:
+    		        			$setStr = trim(ucwords($ex[1]));
+    		        			for ($i=2; $i < count($ex); $i++) {
+    		        				$setStr .= '.'.trim(ucwords($ex[$i]));
+    		        			}
+    		        			$this->USER[] = $setStr;
+    		        			break;
+    		        		case $this->KeyINPUT:
+    		        			$setStr = trim(ucwords($ex[1]));
+    		        			for ($i=2; $i < count($ex); $i++) {
+    		        				$setStr .= '.'.trim(ucwords($ex[$i]));
+    		        			}
+    		        			$this->INPUT[] = $setStr;
+    		        			break;
+    		        		case $this->KeyGRAB:
+    		        			$setStr = trim(ucwords($ex[1]));
+    		        			for ($i=2; $i < count($ex); $i++) {
+    		        				$setStr .= '.'.trim(ucwords($ex[$i]));
+    		        			}
+    		        			$this->GRAB[] = $setStr;
+    		        			break;
+    		        		case $this->KeyTABLE:
+    		        			$setStr = trim(ucwords($ex[1]));
+    		        			for ($i=2; $i < count($ex); $i++) {
+    		        				$setStr .= '.'.trim(ucwords($ex[$i]));
+    		        			}
+    		        			$this->TABLE[] = $setStr;
+    		        			break;
+    		        	}
+    		        }
+		    	}
+		        
 		    }
 		}
 
@@ -232,63 +231,91 @@ class M_doc extends CI_Model {
 
     	foreach ($line as $v) {
     		if(preg_match_all('/{+(.*?)}/', $v, $matches)){
-    		    $str = trim($matches[1][0]);
-    		    $ex = explode('.', $str);
-    		    $setValue = $str;
-    		    // print_r($str.'<br/>');
-    		    foreach ($rsGET as $keyRS => $valueRS) {
-    		    	switch ($ex[0]) {
-    		    		case $this->KeySET:
-	    		    		if ($this->KeySET == $keyRS) {
-	    		    			$setStr = trim(ucwords($ex[1]));
-	    		    			if ($setStr == 'PolaNoSurat') {
-	    		    				$TemplateProcessor->setValue($setValue,trim($rsGET[$keyRS][$setStr]['NoSuratStr']) );
+    			for ($z=0; $z < count($matches[1]); $z++) { 
+	    		    $str = trim($matches[1][$z]);
+	    		    $ex = explode('.', $str);
+	    		    $setValue = $str;
+	    		    // print_r($str.'<br/>');
+	    		    foreach ($rsGET as $keyRS => $valueRS) {
+	    		    	switch ($ex[0]) {
+	    		    		case $this->KeySET:
+		    		    		if ($this->KeySET == $keyRS) {
+		    		    			$setStr = trim(ucwords($ex[1]));
+		    		    			if ($setStr == 'PolaNoSurat') {
+		    		    				$TemplateProcessor->setValue($setValue,trim($rsGET[$keyRS][$setStr]['NoSuratStr']) );
+		    		    			}
+		    		    			elseif ($setStr == 'Signature') {
+		    		    				$arrKomponen = $matches[1];
+		    		    				$arrValue = $rsGET[$keyRS][$setStr];
+		    		    				$this->__SETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
+		    		    				
+		    		    			}
+		    		    		}
+	    		    			break;
+	    		    		case $this->KeyUSER:
+		    		    		if ($this->KeyUSER == $keyRS) {
+		    		    			$setStr = trim(ucwords($ex[0]));
+		    		    			$obj = $rsGET[$keyRS];
+		    		    			for ($i=0; $i < count($obj); $i++) { 
+		    		    				if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+		    		    					$TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+		    		    					break;
+		    		    				}
+		    		    			}
+		    		    		}
+	    		    			
+	    		    			break;
+	    		    		case $this->KeyINPUT:
+	    		    			if ($this->KeyINPUT == $keyRS) {
+	    		    				$setStr = trim(ucwords($ex[0]));
+	    		    				$obj = $rsGET[$keyRS];
+	    		    				for ($i=0; $i < count($obj); $i++) { 
+	    		    					if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+	    		    						$TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+	    		    						break;
+	    		    					}
+	    		    				}
 	    		    			}
-	    		    			elseif ($setStr == 'Signature') {
-	    		    				// cek verify dan cap
-	    		    				if ($rsGET[$keyRS][$setStr]['verify']['valueVerify'] == 1) {
-	    		    					$img = $rsGET[$keyRS][$setStr]['verify']['img'];
-	    		    					$phpWord = new \PhpOffice\PhpWord\PhpWord();
-	    		    					$section = $phpWord->addSection();
-	    		    					$section->addImage($img,array(
-	    		    					                    'width'         => 100,
-	    		    					                    'height'        => 100,
-	    		    					                    // 'marginTop'     => -1,
-	    		    					                    // 'marginLeft'    => -1,
-	    		    					                    'wrappingStyle' => 'inline'
-	    		    					                                    )       
-	    		    					                    );
-	    		    					$section->addText($rsGET[$keyRS][$setStr]['NameEMP']);
-	    		    					$objWriter =  \PhpOffice\PhpWord\IOFactory::createWriter($phpWord);
-	    		    					$fullXml = $objWriter->getWriterPart('Document')->write();
-	    		    					$TemplateProcessor->setValue($setValue,$this->getBodyBlock($fullXml)  );
-	    		    					// $TemplateProcessor->setImageValue($setValue, array('path' => $img, 'width' => 100, 'height' => 100, 'ratio' => false));
+	    		    			break;
+	    		    		case $this->KeyGRAB:
+	    		    			if ($this->KeyGRAB == $keyRS) {
+	    		    				$setStr = trim(ucwords($ex[0]));
+	    		    				$obj = $rsGET[$keyRS];
+	    		    				foreach ($obj as $Objkey => $objvalue) {
+	    		    					if ($Objkey == 'Date') {
+	    		    						$TemplateProcessor->setValue($setValue,trim($obj[$Objkey]['value']));
+	    		    						break;
+	    		    					}
 	    		    				}
 	    		    				
 	    		    			}
-	    		    		}
-    		    			break;
-    		    		case $this->KeyUSER:
-    		    			
-    		    			break;
-    		    		case $this->KeyINPUT:
-    		    			
-    		    			break;
-    		    		case $this->KeyGRAB:
-    		    			
-    		    			break;
-    		    		case $this->KeyTABLE:
-    		    			
-    		    			break;
-    		    	}
-    		    }
+	    		    			break;
+	    		    		case $this->KeyTABLE:
+	    		    			
+	    		    			break;
+	    		    	}
+	    		    }
+    			}
+    		    
     		    
     		}
     	}
-
+    	// print_r(FCPATH);
     	$NIPExt = $this->session->userdata('NIP').'.docx';
-    	$TemplateProcessor->saveAs('./uploads/document-generator/template/temp/'.$NIPExt);
+    	$pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+    	$pathFile = $pathFolder.$NIPExt; 
+    	$TemplateProcessor->saveAs($pathFile,$pathFolder);
+    	$this->convertToPDF($pathFile,$pathFolder);
 
+    }
+
+    private function convertToPDF($pathFile,$pathFolder)
+    {
+    	$strScript = '"C:\Program Files\LibreOffice\program\soffice.exe" --convert-to pdf '.$pathFile.' --outdir '.$pathFolder.' ';
+        $result = 0;
+        $output = system($strScript, $result);
+    	echo json_encode($output);
+    	// soffice --convert-to pdf C:\test\NPP\MBI_CONVERSION_PRESETS.docx --outdir C:\test\NPP\LOTestOutputs\
     }
 
     public function __getObjInput($Input,$NameObj){
@@ -308,6 +335,99 @@ class M_doc extends CI_Model {
     	}
 
     	return $rs;
+    }
+
+    private function __SETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
+    	// print_r($arrValue);die();
+    	for ($i=0; $i < count($arrValue); $i++) { 
+    		$keyApproval = $i + 1;
+    		if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+    			$img = $arrValue[$i]['verify']['img'];
+    			for ($j=0; $j < count($arrKomponen); $j++) {
+    				$str = $arrKomponen[$j]; 
+    				$ex = explode('.', $str);
+    				if ($ex[0] == 'Signature') {
+    					$key2 = $ex[1];
+    					$exKey2 = explode('#', $key2);
+    					if (count($exKey2)) {
+    						switch ($exKey2[0]) {
+    							case 'Image':
+    								$setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+    								$TemplateProcessor->setImageValue($setValue, 
+    									array('path' => $img, 
+    										// 'width' => 200, 
+    										'height' => 200, 
+    										'ratio' => true,
+
+    									),'behind'
+    								);
+    								break;
+    							
+    							default:
+    								
+    								break;
+    						}
+    					}
+    					else
+    					{
+    						echo 'Approval number not set';
+    						die();
+    					}
+    					
+    				}
+    			}
+    		}
+    		if ($arrValue[$i]['cap']['valueCap'] == 1) {
+    			$img = $arrValue[$i]['cap']['img'];
+
+    			for ($j=0; $j < count($arrKomponen); $j++) {
+    				$str = $arrKomponen[$j]; 
+    				$ex = explode('.', $str);
+    				if ($ex[0] == 'Signature') {
+    					$key2 = $ex[1];
+    					$exKey2 = explode('#', $key2);
+    					if (count($exKey2)) {
+    						switch ($exKey2[0]) {
+    							case 'Cap':
+    								$setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+    								$TemplateProcessor->setImageValue($setValue, array(
+    										'path' => $img, 
+    										// 'width' => 200, 
+    										'height' => 200,
+    										'ratio' => true,
+    									),'behind'
+    							);
+    								break;
+    							
+    							default:
+    								
+    								break;
+    						}
+    					}
+    					else
+    					{
+    						echo 'Approval number not set';
+    						die();
+    					}
+    					
+    				}
+    			}
+    		}
+
+    		// write name di arrKomponen key ke 2
+    		if (array_key_exists(2, $arrKomponen)) {
+    			$setValue = $arrKomponen[2];
+    			$TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+    		}
+
+    		// write name di arrKomponen key ke 3
+    		if (array_key_exists(3, $arrKomponen)) {
+    			$setValue = $arrKomponen[3];
+    			$TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+    		}
+    		
+    	}
+    	
     }
     
   

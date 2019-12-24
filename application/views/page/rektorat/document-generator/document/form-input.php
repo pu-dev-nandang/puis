@@ -431,6 +431,10 @@ echo json_encode($field);
                 var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
                 settingTemplate[attrkey]['Signature'][keyindex]['verify'] = attrva;
             }
+            else if(attrname == 'cap'){
+                var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
+                settingTemplate[attrkey]['Signature'][keyindex]['cap'] = attrva;
+            }
         },
 
         // -- //

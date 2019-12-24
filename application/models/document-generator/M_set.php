@@ -53,24 +53,33 @@ class M_set extends CI_Model {
 		$rs = [];
 		$ex = explode('.', $params);
 		$entity = $ex[1];
-		switch ($entity) {
-			case 'NIP':
-				
-				break;
-			case 'Position':
-				$sql = 'select ID,Position as Value from db_employees.position where ID in(1,2,3,4,5,6,10,11,12)';
-				$query = $this->db->query($sql,array())->result_array();
-				$rs['Choose'] = $entity;
-				$rs['select'] = $query;
-				$rs['user'] = '';
-				$rs['verify'] = '';
-				$rs['cap'] = '';
-				break;
-			default:
-				# code...
-				break;
-		}
+		$exEntity = explode('#', $entity);
+		if (count($exEntity) > 0 ) {
+			switch ($exEntity[0]) {
+				case 'NIP':
+					
+					break;
+				case 'Position':
+					$sql = 'select ID,Position as Value from db_employees.position where ID in(1,2,3,4,5,6,10,11,12)';
+					$query = $this->db->query($sql,array())->result_array();
+					$rs['Choose'] = $exEntity[0];
+					$rs['select'] = $query;
+					$rs['user'] = '';
+					$rs['verify'] = '';
+					$rs['cap'] = '';
+					break;
+				default:
+					# code...
+					break;
+			}
 
+		}
+		else
+		{
+			echo 'Approval number not set';
+			die();
+		}
+		
 		return $rs;
 		
 	}
@@ -115,9 +124,9 @@ class M_set extends CI_Model {
 								{
 									$TitleBehind = ($query[0]['TitleBehind'] == '' || $query[0]['TitleBehind'] == null ) ? '' : ', '.$query[0]['TitleBehind'];
 									$value = $query[0]['TitleAhead'].' '.$query[0]['Name'].$TitleBehind;
-									$rs['Signature']['NameEMP'] = $value;
+									$rs['Signature'][$i]['NameEMP'] = $value;
 									$NIP = $query[0]['NIP'];
-									$rs['Signature']['NIPEMP'] = $NIP;
+									$rs['Signature'][$i]['NIPEMP'] = $NIP;
 								}
 
 								// verify
@@ -129,7 +138,7 @@ class M_set extends CI_Model {
 									
 								}
 
-								$rs['Signature']['verify'] = [
+								$rs['Signature'][$i]['verify'] = [
 									'valueVerify' => $valueVerify,
 									'img' => $img,
 								];
@@ -139,10 +148,11 @@ class M_set extends CI_Model {
 								$valueCap = $cap;
 								if ($cap == 1) {
 									$img = './images/cap.png';
+									// $img = './uploads/signature/'.$query[0]['NIP'].'_cap.png';
 								}
 
-								$rs['Signature']['cap'] = [
-									'valueCap' => $valueVerify,
+								$rs['Signature'][$i]['cap'] = [
+									'valueCap' => $valueCap,
 									'img' => $img,
 								];
 

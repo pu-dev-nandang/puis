@@ -481,7 +481,8 @@ class TemplateProcessor
      * @param mixed $replace Path to image, or array("path" => xx, "width" => yy, "height" => zz)
      * @param int $limit
      */
-    public function setImageValue($search, $replace, $limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
+    // public function setImageValue($search, $replace,$limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
+    public function setImageValue($search, $replace, $wrappingStyle = null,$limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
         // prepare $search_replace
         if (!is_array($search)) {
@@ -513,8 +514,14 @@ class TemplateProcessor
 
         // define templates
         // result can be verified via "Open XML SDK 2.5 Productivity Tool" (http://www.microsoft.com/en-us/download/details.aspx?id=30425)
-        $imgTpl = '<w:pict><v:shape type="#_x0000_t75" style="width:{WIDTH};height:{HEIGHT}"><v:imagedata r:id="{RID}" o:title=""/></v:shape></w:pict>';
-
+        // $imgTpl = '<w:pict><v:shape type="#_x0000_t75" style="width:{WIDTH};height:{HEIGHT}"><v:imagedata r:id="{RID}" o:title=""/></v:shape></w:pict>';
+        if ($wrappingStyle == null) {
+            $imgTpl = '<w:pict><v:shape type="#_x0000_t75" style="width:{WIDTH};height:{HEIGHT}"><v:imagedata r:id="{RID}" o:title=""/></v:shape></w:pict>';
+        }
+        elseif ($wrappingStyle == 'behind') {
+           $imgTpl = '<w:pict><v:shape type="#_x0000_t75" style="position:absolute;left:0;text-align:left;margin-left:.1pt;margin-top:0;width:{WIDTH};height:{HEIGHT};z-index:-251657216;mso-position-horizontal:absolute;mso-position-horizontal-relative:text;mso-position-vertical:inside;mso-position-vertical-relative:text;mso-width-relative:page;mso-height-relative:page"><v:imagedata r:id="{RID}" o:title=""/></v:shape></w:pict>';
+        }
+        
         foreach ($searchParts as $partFileName => &$partContent) {
             $partVariables = $this->getVariablesForPart($partContent);
 
