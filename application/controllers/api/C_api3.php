@@ -6251,6 +6251,11 @@ class C_api3 extends CI_Controller {
                 $data = $this->db->get_where('db_studentlife.medical_record',array('NPM' => $UserID))->result_array();
                 return print_r(json_encode($data));
             }
+            else if($data_arr['action']=='getMyDataMedicalHistory'){
+                $UserID = $data_arr['UserID'];
+                $data = $this->db->get_where('db_studentlife.medical_history',array('NPM' => $UserID))->result_array();
+                return print_r(json_encode($data));
+            }
             else if($data_arr['action']=='removeDataMedicalRecord'){
                 $MedicalRecordID = $data_arr['ID'];
                 $this->db->where('ID', $MedicalRecordID);
