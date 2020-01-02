@@ -28,4 +28,11 @@ class C_medical_record extends Student_Life {
         $this->menu_student_medical_record($page);
     }
 
+
+    public function medical_history(){
+        $data['department'] = parent::__getDepartement();
+        $page = $this->load->view('page/'.$data['department'].'/medical-record/medical_history',$data,true);
+        $this->menu_student_medical_record($page);
+    }
+
 }

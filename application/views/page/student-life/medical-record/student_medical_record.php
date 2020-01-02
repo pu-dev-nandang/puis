@@ -5,10 +5,23 @@
         cursor: pointer;
         color: #333333;
     }
+    #tableData tr td:nth-child(1), #tableData tr td:nth-child(6) {
+        border-right: 1px solid #CCCCCC;
+    }
 </style>
 
-<div class="row">
-    <div class="col-md-3 col-md-offset-9" style="margin-bottom: 15px;">
+<div class="row" style="margin-bottom: 15px;">
+
+    <div class="col-md-4 col-md-offset-4">
+        <div class="well">
+            <select class="form-control filter-table" id="filterBaseProdi">
+                <option value="">--- All Study Program ---</option>
+                <option disabled>------------------</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-4">
         <div style="text-align: right;">
             <button class="btn btn-default" id="btnCrudMedical">Add Medical Record</button>
         </div>
@@ -24,7 +37,12 @@
 <script>
 
     $(document).ready(function () {
-        getData();
+        loadSelectOptionBaseProdi('#filterBaseProdi','');
+        getDataTableMedicalRecord();
+    });
+
+    $('#filterBaseProdi').change(function () {
+        getDataTableMedicalRecord();
     });
 
     $('#btnCrudMedical').click(function () {
@@ -67,9 +85,9 @@
 
     });
     
-    function getData() {
+    function getDataTableMedicalRecord() {
 
-        $('#loadTable').html('<table class="table table-centre table-striped table-bordered" id="tableData">' +
+        $('#loadTable').html('<table class="table table-centre table-striped" id="tableData">' +
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
@@ -84,8 +102,12 @@
             '            <tbody></tbody>' +
             '        </table>');
 
+        var filterBaseProdi = $('#filterBaseProdi').val();
+        var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null) ? filterBaseProdi.split('.')[0] : '';
+
         var data = {
-            action : 'getDataMedicalRecord'
+            action : 'getDataMedicalRecord',
+            ProdiID : ProdiID
         };
 
         var token = jwt_encode(data,'UAP)(*');
@@ -201,9 +223,6 @@
 
         }
 
-
-
-
         $('#GlobalModal .modal-footer').html('' +
             '<button class="btn btn-success" id="btnSaveMedicalRecord">Save</button> ' +
             '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
@@ -243,7 +262,7 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api3/__crudMedicalRecord';
             $.post(url,{token:token},function (jsonResult) {
-
+                getDataTableMedicalRecord();
                 toastr.success('Data saved','Success');
                 setTimeout(function () {
                     $('#GlobalModal').modal('hide');
@@ -257,6 +276,24 @@
     $(document).on('click','.btnEditMedicalRegord',function () {
         var MedicalRecordID = $(this).attr('data-id');
         loadModalMedicalRecord(MedicalRecordID);
+    });
+
+    $(document).on('click','.btnRemoveMedicalRegord',function () {
+        var MedicalRecordID = $(this).attr('data-id');
+        if(confirm('Are you sure?')){
+            var data = {
+                action : 'removeDataMedicalRecord',
+                ID : MedicalRecordID
+            };
+
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'api3/__crudMedicalRecord';
+
+            $.post(url,{token:token},function (result) {
+                toastr.success('Data removed','Success');
+                getDataTableMedicalRecord();
+            });
+        }
     });
 
 </script>
