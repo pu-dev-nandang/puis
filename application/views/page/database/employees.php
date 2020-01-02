@@ -60,17 +60,17 @@
                 </select>               
               </div>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
               <div class="form-group">
-                <label>Status employee</label>                
-                <select class="form-control" name="status">
-                  <option value="">-Choose one-</option>
-                  <?php foreach ($statusstd as $t) { 
-                  echo '<option value="'.$t->IDStatus.'">'.$t->Description.'</option>';
-                  } ?>
-                </select>               
+                <label>Birthdate</label>
+                <div class="input-group">
+                  <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date"> 
+                  <div class="input-group-addon">-</div>
+                  <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
+                </div>
               </div>
             </div>
+            
             <div class="col-sm-2">
               <div class="form-group">
                 <label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
@@ -84,47 +84,81 @@
           <div id="advance-filter" class="collapse">
             <div class="row">
               <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Religion</label>
-                  <select class="form-control" name="religion">
-                    <option value="">Choose one</option>
-                    <?php if(!empty($religion)){ 
-                    foreach ($religion as $rg) { ?>
-                    <option value="<?=$rg->IDReligion?>"><?=$rg->Religion?></option>
-                    <?php } } ?>
-                  </select>
+                <div class="form-groups">
+                  <label>Status employee</label>
                 </div>
+                <?php if(!empty($statusstd)) {
+                foreach ($statusstd as $t) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$t->IDStatus?>" name="statusstd[]"> <?=$t->Description?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-groups">
+                  <label>Religion</label>
+                </div>
+                <?php if(!empty($religion)){ 
+                foreach ($religion as $rg) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$rg->IDReligion?>" name="religion[]"> <?=$rg->Religion?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+
               </div>
               <div class="col-sm-2">
                 <div class="form-group">
                   <label>Gender</label>
-                  <select class="form-control" name="gender">
-                    <option value="">Choose one</option>
-                    <option value="P">Female</option>
-                    <option value="L">Male</option>
-                  </select>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="L" name="gender[]"> Male
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="P" name="gender[]"> Female
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
+              
+              
               <div class="col-sm-3">
                 <div class="form-group">
-                  <label>Birthdate</label>
-                  <div class="input-group">
-                    <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date"> 
-                    <div class="input-group-addon">-</div>
-                    <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-2">
-                <div class="form-group">
                   <label>Level Education</label>
-                  <select class="form-control" name="level_education">
-                    <option value="">Choose one</option>
-                    <?php if(!empty($level_education)){ 
+                  <?php if(!empty($level_education)){ 
                     foreach ($level_education as $le) { ?>
-                    <option value="<?=$le->ID?>"><?=$le->Level." - ".$le->Description?></option>
-                    <?php } } ?>
-                  </select>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox" value="<?=$le->Level?>" name="level_education[]"> <?=$le->Description?>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <?php } } ?>
                 </div>
               </div>
             </div>
@@ -142,6 +176,11 @@
 </div>
 <script type="text/javascript">
   $(document).ready(function(){
+    $("#birthdate_start,#birthdate_end").datepicker({
+        dateFormat: 'dd-mm-yy',
+        changeYear: true,
+        changeMonth: true
+    });
     $('#form-filter').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) { 
@@ -159,6 +198,20 @@
         $(this).attr("aria-expanded",false);
         $(this).find("span").text("Advance filter");        
         $(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
+      }
+    });
+
+    $("#form-filter select[name=division]").change(function(){
+      var value = $(this).val();
+      if($.trim(value) != ''){
+        $("#form-filter select[name=position]").prop("disabled",false);
+      }
+    });
+    $("#form-filter select[name=position]").change(function(){
+      var division = $("#form-filter select[name=division]").val();
+      if($.trim(division) == ''){
+        division.addClass("required");
+        alert("Please fill up field Division");
       }
     });
     
