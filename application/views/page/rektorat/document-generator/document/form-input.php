@@ -1,17 +1,3 @@
-<?php 
-$field = [
-    'Input1' => 'Agenda',
-    'Input2' => 'Hari',
-    'Input3' => 'Tanggal',
-    'Input4' => 'Waktu',
-    'Input5' => 'Tempat ',
-];
-
-echo json_encode($field);
-
-
- ?>
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">Form</h4>
@@ -28,7 +14,6 @@ echo json_encode($field);
                 
             </div>   
         </div>
-
         <div class="row">
             <div class="col-md-4 page" id = "Page_SET">
                 
@@ -62,6 +47,7 @@ echo json_encode($field);
     var col = 12;
     var App_form_input = {
         UploadChangeFunction : function(selector){
+            $('#btnSave').prop('disabled',true);
             var ArrUploadFilesSelector = [];
             var UploadFile = selector;
             var valUploadFile = UploadFile.val();
@@ -134,7 +120,6 @@ echo json_encode($field);
                     break;
                 }             
             }
-
             App_form_input.Dom_FormInput(response_callback);
             $('#Preview').removeClass('hide');
 
@@ -245,7 +230,7 @@ echo json_encode($field);
             for (var i = 0; i < dt.length; i++) {
                 html  +=   '<div class = "form-group">'+
                                 '<label>'+dt[i]+'</label>'+
-                                '<input type = "text" class="form-control Input" name="'+i+'" field= "'+dt[i]+'"  key ="INPUT" value = "Free Text by Request" readonly style = "color:red;" />'+
+                                '<input type = "text" class="form-control Input" name="'+i+'" field= "'+dt[i]+'"  key ="INPUT" value = "Free Text by Request"  style = "color:red;" />'+
                             '</div>';
             }
 
@@ -389,7 +374,7 @@ echo json_encode($field);
 
 
             })
-            console.log(settingTemplate);
+            
             var ArrUploadFilesSelector = [];
             var url = base_url_js+"document-generator-action/__preview_template";
             var token = jwt_encode(settingTemplate,'UAP)(*');
@@ -403,18 +388,61 @@ echo json_encode($field);
                  };
                  ArrUploadFilesSelector.push(temp);
             }
+            loading_button2(selector);
             AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
                 if (response.status == 1) {
-                    
+                    window.open(response.callback, '_blank');
+                    $('#btnSave').prop('disabled',false);
                 }
                 else
                 {
-                    toastr.error(response.msg);
+                    toastr.error('Something error,please try again');
                 }
+                end_loading_button2(selector,'Preview');
             }).fail(function(response){
                toastr.error('Connection error,please try again');
+               end_loading_button2(selector,'Preview');
             })
 
+        },
+
+        SaveTemplate : function(selector){
+            if (typeof settingTemplate !== 'undefined') {
+                var ArrUploadFilesSelector = [];
+                var url = base_url_js+"document-generator-action/__save_template";
+                var data = {
+                    settingTemplate : settingTemplate,
+                    DocumentName : $('.Input[name="DocumentName"]').val() ,
+                    DocumentAlias : $('.Input[name="DocumentAlias"]').val() ,
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                var UploadFile = $('#UploadFile');
+                var valUploadFile = UploadFile.val();
+                if (valUploadFile) { // if upload file
+                     var NameField = UploadFile.attr('name');
+                     var temp = {
+                         NameField : NameField,
+                         Selector : UploadFile,
+                     };
+                     ArrUploadFilesSelector.push(temp);
+                }
+                loading_button2(selector);
+                AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
+                    if (response.status == 1) {
+                       toastr.success('Saved'); 
+                       location.reload();
+                    }
+                    else
+                    {
+                        toastr.error('Something error,please try again');
+                        end_loading_button2(selector,'Save');
+                    }
+                }).fail(function(response){
+                   toastr.error('Connection error,please try again');
+                   end_loading_button2(selector,'Save');
+                })
+
+            }
         },
 
         // -- //
@@ -442,9 +470,11 @@ echo json_encode($field);
         set_INPUT : function(attrname,attrva,attrkey,attrfield,el){
             for (var i = 0; i < settingTemplate['INPUT'].length; i++) {
                if (i==attrname) {
+                var keyInput = i + 1;
                 settingTemplate['INPUT'][i] = {
                     field : attrfield,
                     value : attrva,
+                    mapping : 'Input'+keyInput,
                 }
                 break;
                }
@@ -473,5 +503,11 @@ echo json_encode($field);
     $(document).off('click', '#Preview').on('click', '#Preview',function(e) {
        var itsme = $(this);
        App_form_input.SubmitPreviewPDF(itsme);
+    })
+
+    $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
+       var itsme = $(this);
+       App_form_input.SaveTemplate(itsme);
+
     })
 </script>

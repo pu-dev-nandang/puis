@@ -213,7 +213,7 @@ class M_doc extends CI_Model {
     	    }
     	}
 
-    	$this->__preview_template($rs);
+    	return $this->__preview_template($rs);
     }
 
     private function getBodyBlock($string){
@@ -300,22 +300,161 @@ class M_doc extends CI_Model {
     		    
     		}
     	}
-    	// print_r(FCPATH);
+    	
     	$NIPExt = $this->session->userdata('NIP').'.docx';
+    	$FileName = $NIPExt;
     	$pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
     	$pathFile = $pathFolder.$NIPExt; 
     	$TemplateProcessor->saveAs($pathFile,$pathFolder);
-    	$this->convertToPDF($pathFile,$pathFolder);
+    	$convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName);
+    	return $convert;
 
     }
 
-    private function convertToPDF($pathFile,$pathFolder)
+    private function convertToPDF($pathFile,$pathFolder,$FileName)
     {
-    	$strScript = '"C:\Program Files\LibreOffice\program\soffice.exe" --convert-to pdf '.$pathFile.' --outdir '.$pathFolder.' ';
-        $result = 0;
-        $output = system($strScript, $result);
-    	echo json_encode($output);
+    	// $strScript = '"C:\Program Files\LibreOffice\program\soffice.exe" --convert-to pdf '.$pathFile.' --outdir '.$pathFolder.' ';
+     //    $result = 0;
+     //    $output = system($strScript, $result);
+    	// echo json_encode($output);
+    	// PowerShell
+    		// strScript = 'powershell .\converDocxToPdf.ps1 "C:\Users\alhadi.rahman\Documents\2018018.docx" "C:\Users\alhadi.rahman\Documents\2018018.pdf"';
     	// soffice --convert-to pdf C:\test\NPP\MBI_CONVERSION_PRESETS.docx --outdir C:\test\NPP\LOTestOutputs\
+
+    	$this->ApiConvertDocxToPDF($pathFile,$FileName,$pathFolder);
+    }
+
+    private function ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName){
+    	$rs = array();
+    	$headerOrigin = 'https://pcam.podomorouniversity.ac.id';
+    	// $header[] = 'Content-Type: application/json';
+    	$header[] = "Content-type: multipart/form-data";
+    	$header[] = "Origin: ".$headerOrigin."";
+    	$header[] = "Cache-Control: max-age=0";
+    	$header[] = "Connection: keep-alive";
+    	$header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+    	$data = array(
+    	    'auth' => 's3Cr3T-G4N',
+    	);
+    	$pas = md5('Uap)(*&^%');
+    	$pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+    	$url = url_DocxToPDf.'__uploadFile?apikey='.$pass;
+    	$token = $this->jwt->encode($data,"UAP)(*");
+
+    	$Input = $token;
+    	$ch = curl_init();
+    	$cfile = new CURLFile($pathFile, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', $FileName);
+    	$post = array('token' => $Input,'file_contents[]'=>$cfile);
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    	curl_setopt($ch, CURLOPT_HEADER, false);
+    	curl_setopt($ch, CURLOPT_VERBOSE, false);
+    	curl_setopt($ch, CURLOPT_URL,$url);
+    	curl_setopt($ch, CURLOPT_POST, 1);
+    	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    	$pr = curl_exec($ch);
+    	$rs = (array) json_decode($pr,true);
+    	if ($rs['status'] == 1 || $rs['status'] == '1') {
+    		// download file
+    		$rs = $this->downloadConverter($rs,$pathFolder);
+    	}
+    	
+    	curl_close ($ch);
+    	return $rs;
+    }
+
+    private function downloadConverter($rs,$pathFolder){
+    	$result = ['status' => 0,'callback' => ''];
+    	//The resource that we want to download.
+    	$fileUrl = url_DocxToPDf.'uploads/'.$rs['callback'];
+    	 
+    	//The path & filename to save to.
+    	$saveTo = $pathFolder.$rs['callback'];
+    	 
+    	//Open file handler.
+    	$fp = fopen($saveTo, 'w+');
+    	 
+    	//If $fp is FALSE, something went wrong.
+    	if($fp === false){
+    	    throw new Exception('Could not open: ' . $saveTo);
+    	}
+    	 
+    	//Create a cURL handle.
+    	$ch = curl_init($fileUrl);
+    	 
+    	//Pass our file handle to cURL.
+    	curl_setopt($ch, CURLOPT_FILE, $fp);
+    	 
+    	//Timeout if the file doesn't download after 20 seconds.
+    	curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+    	 
+    	//Execute the request.
+    	curl_exec($ch);
+    	 
+    	//If there was an error, throw an Exception
+    	if(curl_errno($ch)){
+    	    throw new Exception(curl_error($ch));
+    	}
+    	 
+    	//Get the HTTP status code.
+    	$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    	 
+    	//Close the cURL handler.
+    	curl_close($ch);
+    	 
+    	//Close the file handler.
+    	fclose($fp);
+    	 
+    	if($statusCode == 200){
+    		$this->deleteFileConverter();
+    		$result['status'] = 1;
+    		$result['callback'] = base_url().'uploads/document-generator/template/temp/'.$rs['callback'];
+    	}
+    	return $result; 
+    }
+
+    private function deleteFileConverter(){
+    	$array =[$this->session->userdata('NIP').'.docx',$this->session->userdata('NIP').'.pdf'];
+    	$result = [];
+    	$pas = md5('Uap)(*&^%');
+    	$pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
+    	$headerOrigin = 'https://pcam.podomorouniversity.ac.id';
+    	for ($i=0; $i < count($array); $i++) { 
+    		$rs = array();
+    		$header = [];
+    		$header[] = "Content-type: multipart/form-data";
+    		$header[] = "Origin: ".$headerOrigin."";
+    		$header[] = "Cache-Control: max-age=0";
+    		$header[] = "Connection: keep-alive";
+    		$header[] = "Accept-Language: en-US,en;q=0.8,id;q=0.6";
+    		$data = array(
+    		    'auth' => 's3Cr3T-G4N',
+    		    'path' => $array[$i],
+    		);
+    		$url = url_DocxToPDf.'__deleteFile?apikey='.$pass;
+    		$token = $this->jwt->encode($data,"UAP)(*");
+    		$Input = $token;
+    		$ch = curl_init();
+    		$new_post_array  = ['token' => $Input];
+    		$post = $new_post_array;
+    		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    		curl_setopt($ch, CURLOPT_HEADER, false);
+    		curl_setopt($ch, CURLOPT_VERBOSE, false);
+    		curl_setopt($ch, CURLOPT_URL,$url);
+    		curl_setopt($ch, CURLOPT_POST, 1);
+    		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    		$pr = curl_exec($ch);
+    		$rs = (array) json_decode($pr,true);
+    		curl_close ($ch);
+    		$result[] = $rs;
+    	}
+
+    	return $result;
     }
 
     public function __getObjInput($Input,$NameObj){
@@ -341,6 +480,7 @@ class M_doc extends CI_Model {
     	// print_r($arrValue);die();
     	for ($i=0; $i < count($arrValue); $i++) { 
     		$keyApproval = $i + 1;
+    		// show signature image or not
     		if ($arrValue[$i]['verify']['valueVerify'] == 1) {
     			$img = $arrValue[$i]['verify']['img'];
     			for ($j=0; $j < count($arrKomponen); $j++) {
@@ -356,7 +496,7 @@ class M_doc extends CI_Model {
     								$TemplateProcessor->setImageValue($setValue, 
     									array('path' => $img, 
     										// 'width' => 200, 
-    										'height' => 200, 
+    										'height' => 300, 
     										'ratio' => true,
 
     									),'behind'
@@ -377,6 +517,36 @@ class M_doc extends CI_Model {
     				}
     			}
     		}
+    		elseif ($arrValue[$i]['verify']['valueVerify'] == 0) {
+    			for ($j=0; $j < count($arrKomponen); $j++) {
+    				$str = $arrKomponen[$j]; 
+    				$ex = explode('.', $str);
+    				if ($ex[0] == 'Signature') {
+    					$key2 = $ex[1];
+    					$exKey2 = explode('#', $key2);
+    					if (count($exKey2)) {
+    						switch ($exKey2[0]) {
+    							case 'Image':
+    								$setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+    								$TemplateProcessor->setValue($setValue,'');
+    								break;
+    							
+    							default:
+    								
+    								break;
+    						}
+    					}
+    					else
+    					{
+    						echo 'Approval number not set';
+    						die();
+    					}
+    					
+    				}
+    			}
+    		}
+
+    		// show cap image or not
     		if ($arrValue[$i]['cap']['valueCap'] == 1) {
     			$img = $arrValue[$i]['cap']['img'];
 
@@ -393,10 +563,38 @@ class M_doc extends CI_Model {
     								$TemplateProcessor->setImageValue($setValue, array(
     										'path' => $img, 
     										// 'width' => 200, 
-    										'height' => 200,
+    										'height' => 300,
     										'ratio' => true,
     									),'behind'
     							);
+    								break;
+    							
+    							default:
+    								
+    								break;
+    						}
+    					}
+    					else
+    					{
+    						echo 'Approval number not set';
+    						die();
+    					}
+    					
+    				}
+    			}
+    		}
+    		elseif ($arrValue[$i]['cap']['valueCap'] == 0) {
+    			for ($j=0; $j < count($arrKomponen); $j++) {
+    				$str = $arrKomponen[$j]; 
+    				$ex = explode('.', $str);
+    				if ($ex[0] == 'Signature') {
+    					$key2 = $ex[1];
+    					$exKey2 = explode('#', $key2);
+    					if (count($exKey2)) {
+    						switch ($exKey2[0]) {
+    							case 'Cap':
+    								$setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+    								$TemplateProcessor->setValue($setValue,'');
     								break;
     							
     							default:
@@ -428,6 +626,33 @@ class M_doc extends CI_Model {
     		
     	}
     	
+    }
+
+    public function save_template($Input){
+    	$rs = ['status' => 0,'callback' => ''];
+    	$DocumentName = $Input['DocumentName'];
+    	$DocumentAlias = $Input['DocumentAlias'];
+    	$Config = json_encode($Input['settingTemplate']);
+    	// upload file template
+    	$PathTemplate = $this->upload_file_template($DocumentName);
+    	$dataSave = [
+    		'DocumentName' => $DocumentName,
+    		'DocumentAlias' => $DocumentAlias,
+    		'Config' => $Config,
+    		'PathTemplate' => $PathTemplate,
+    		'UpdatedBy' => $this->session->userdata('NIP'),
+    		'UpdatedAt' => date('Y-m-d H:i:s'),
+    	];
+    	$this->db->insert('db_generatordoc.document',$dataSave);
+    	$rs['status'] = 1;
+    	return $rs;
+    }
+
+    private function upload_file_template($DocumentName){
+    	$filename = str_replace(' ', '_', $DocumentName);
+    	$varFiles = 'PathTemplate';
+    	$file = $this->m_master->uploadDokumenMultiple($filename,$varFiles,'./uploads/document-generator/template');
+    	return $file[0];
     }
     
   

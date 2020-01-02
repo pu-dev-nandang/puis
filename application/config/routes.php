@@ -1419,6 +1419,7 @@ $route['rectorat/master_data/crud_credit_type_courses'] = 'page/rektorat/c_credi
 $route['rectorat/document-generator'] = 'page/rektorat/document_generator/c_document/document';
 $route['document-generator-action/__upload_template'] = 'page/rektorat/document_generator/c_action/upload_template';
 $route['document-generator-action/__preview_template'] = 'page/rektorat/document_generator/c_action/preview_template';
+$route['document-generator-action/__save_template'] = 'page/rektorat/document_generator/c_action/save_template';
 
 
 //--End Document Generator--//
