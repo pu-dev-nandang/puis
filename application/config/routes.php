@@ -1930,6 +1930,36 @@ $route['global/purchasing/transaction/ca/list/(:any)'] = 'page/C_globalpage/Info
 $route['purchasing/template_export_supplier'] = 'c_save_to_excel/template_export_supplier';
 $route['purchasing/template_export_catalog'] = 'c_save_to_excel/template_export_catalog';
 
+// Web Prodi
+$query = $db->get('db_prodi.cfg_sub_menu');
+$result = $query->result();
+// print_r($result);die();
+foreach( $result as $row )
+{
+    $Slug = $row->Slug;
+    $Slug = explode('/', $Slug);
+    if (in_array('(:any)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:any)' ] = $row->Controller;
+    }
+    elseif(in_array('(:num)', $Slug)) {
+        $a = count($Slug) - 1;
+        $URI = '';
+        for ($i=0; $i < $a; $i++) {
+            $URI .= $Slug[$i].'/';
+        }
+        $route[ $URI.'(:num)' ] = $row->Controller;
+    }
+    else
+    {
+        $route[ $row->Slug ] = $row->Controller;
+    }
+
+}
 
 // IT
 $query = $db->get('db_it.cfg_sub_menu');
