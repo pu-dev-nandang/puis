@@ -33,4 +33,10 @@ class C_action extends DocumentGenerator_Controler {
              echo json_encode($rs);
         }
     }
+
+    public function loadtableMaster(){
+        $dataToken = $this->getInputToken();
+        $rs = $this->m_doc->loadtableMaster($dataToken);
+        echo json_encode($rs);
+    }
 }

@@ -654,6 +654,40 @@ class M_doc extends CI_Model {
     	$file = $this->m_master->uploadDokumenMultiple($filename,$varFiles,'./uploads/document-generator/template');
     	return $file[0];
     }
+
+    public function loadtableMaster($dataToken=[]){
+       $rs = [];
+       $AddWhere = '';
+       if (array_key_exists('Active', $dataToken)) {
+           $Active = $dataToken['Active'];
+           $AddWhere = ' where a.Active = "'.$Active.'"';
+       }
+       $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
+       		'.$AddWhere.'
+       ';
+       $query = $this->db->query($sql,array())->result_array();
+       $data = array();
+       for ($i=0; $i < count($query); $i++) {
+           $nestedData = array();
+           $row = $query[$i]; 
+           $nestedData[] = $i+1;
+           $nestedData[] = $row['DocumentName'];
+           $nestedData[] = $row['DocumentAlias'];
+           $nestedData[] = base_url().'uploads/document-generator/template/'.$row['PathTemplate'];
+           $nestedData[] = '';
+           $nestedData[] = $row['ID'];
+           $token = $this->jwt->encode($row,"UAP)(*");
+           $nestedData[] = $token;
+           $data[] = $nestedData;
+       }
+       $rs = array(
+           "draw"            => intval( 0 ),
+           "recordsTotal"    => intval(count($query)),
+           "recordsFiltered" => intval( count($query) ),
+           "data"            => $data
+       );
+       return $rs;
+    }
     
   
 }
