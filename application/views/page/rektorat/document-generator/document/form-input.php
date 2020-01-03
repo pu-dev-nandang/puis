@@ -44,7 +44,6 @@
 
 <script type="text/javascript">
     var settingTemplate;
-    var col = 12;
     var App_form_input = {
         UploadChangeFunction : function(selector){
             $('#btnSave').prop('disabled',true);

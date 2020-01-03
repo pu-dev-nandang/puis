@@ -229,8 +229,8 @@
 
                             <!-- Adding for Testing -->
                             <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
-                                 <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='requestdocument-generator'){echo 'active';} ?>">
-                                     <a href="<?php echo base_url('requestdocument-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
+                                 <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
+                                     <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
                                  </li>
                             <!-- End Adding for Testing -->
                     </ul>
