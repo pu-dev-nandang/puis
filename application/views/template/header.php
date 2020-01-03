@@ -303,6 +303,16 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+<!-- Global Modal Large -->
+<div class="modal fade" id="GlobalModalXtraLarge" role="dialog">
+    <div class="modal-dialog" role="document" style="width:1280px;">
+        <div class="modal-content animated jackInTheBox">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <!-- Global Modal Small -->
 <div class="modal fade" id="GlobalModalSmall" role="dialog">
