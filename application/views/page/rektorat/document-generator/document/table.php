@@ -23,7 +23,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <script type="text/javascript">
@@ -78,7 +77,7 @@
                        'orderable': false,
                        'className': 'dt-body-center',
                        'render': function (data, type, full, meta){
-                           var btnAction = '<a href="javascript:void(0);" class="btn btn-danger btnRemove" data-id="'+full[6]+'"><i class="fa fa fa-trash"></i> </a>';
+                           var btnAction = '<a href="javascript:void(0);" class="btn btn-danger btnRemoveDocument" data-id="'+full[5]+'"><i class="fa fa fa-trash"></i> </a>';
                            return btnAction;
                        }
                     },
@@ -110,6 +109,7 @@
                 PathTemplate : PathTemplate,
             };
             var token = jwt_encode(data,'UAP)(*');
+            loading_button2(selector);
             AjaxSubmitTemplate(url,token).then(function(response){
                 if (response.status == 1) {
                     window.open(response.callback, '_blank');
@@ -123,9 +123,34 @@
                toastr.error('Connection error,please try again');
                end_loading_button2(selector,'Preview');
             })
-            console.log(config);
-            console.log(data);
-        }  
+            // console.log(config);
+            // console.log(data);
+        },
+
+        RemoveDocument : function(selector){
+            if (confirm('Are you sure ?')) {
+                var url = base_url_js+"document-generator-action/__RemoveDocumentMaster";
+                var data = {
+                    ID : selector.attr('data-id'),
+                };
+                var token = jwt_encode(data,'UAP)(*');
+                loading_button2(selector);
+                AjaxSubmitTemplate(url,token).then(function(response){
+                    if (response.status == 1) {
+                        oTable.ajax.reload( null, false );
+                    }
+                    else
+                    {
+                        toastr.error('Something error,please try again');
+                    }
+                    end_loading_button2(selector,'<i class="fa fa fa-trash"></i>');
+                }).fail(function(response){
+                   toastr.error('Connection error,please try again');
+                   end_loading_button2(selector,'<i class="fa fa fa-trash"></i>');
+                })
+            }
+
+        },  
 
     };
 
@@ -136,7 +161,11 @@
     $(document).off('click', '.PreviewTable').on('click', '.PreviewTable',function(e) {
        var itsme = $(this);
        App_table_document.PreviewTemplateTable(itsme);
+    })
 
+    $(document).off('click', '.btnRemoveDocument').on('click', '.btnRemoveDocument',function(e) {
+       var itsme = $(this);
+       App_table_document.RemoveDocument(itsme);
     })
     
 </script>

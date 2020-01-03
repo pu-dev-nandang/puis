@@ -25,7 +25,8 @@ class M_doc extends CI_Model {
     }
 
     private function __readDoc($FileTemplate){
-    	$generatedFile    = $_FILES['PathTemplate']['tmp_name'][0];
+    	// $generatedFile    = $_FILES['PathTemplate']['tmp_name'][0];
+    	$generatedFile    = $FileTemplate;
     	$sourceZip = new \ZipArchive();
     	$sourceZip->open($generatedFile);
     	$sourceDocument = $sourceZip->getFromName('word/document.xml');
@@ -213,7 +214,7 @@ class M_doc extends CI_Model {
     	    }
     	}
 
-    	return $this->__preview_template($rs);
+    	return $this->__preview_template($rs,$FileTemplate);
     }
 
     private function getBodyBlock($string){
@@ -224,8 +225,8 @@ class M_doc extends CI_Model {
         }
     }
 
-    private function __preview_template($rsGET){
-    	$FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
+    private function __preview_template($rsGET,$FileTemplate){
+    	// $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
 		$line = $this->__readDoc($FileTemplate);
     	$TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
 
@@ -687,6 +688,104 @@ class M_doc extends CI_Model {
            "data"            => $data
        );
        return $rs;
+    }
+
+    public function preview_template_table($dataToken){
+    	$this->load->model('document-generator/m_set');
+    	$this->load->model('document-generator/m_user');
+    	$this->load->model('document-generator/m_grab');
+    	$rs = [];
+    	 // print_r($dataToken);die();
+    	$FileTemplate    = './uploads/document-generator/template/'.$dataToken['PathTemplate'];
+		$line = $this->__readDoc($FileTemplate);
+    	$Filtering = [];
+    	$Input = $dataToken['config'];
+
+    	foreach ($line as $v) {
+    	    if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+    	        $str = trim($matches[1][0]);
+    	        $ex = explode('.', $str);
+    	        if (count($ex) > 0) {
+    	        	switch ($ex[0]) {
+    	        		case $this->KeySET:
+    	        			
+    	        			if (!in_array($ex[0], $Filtering)){
+    	        				$NameObj = $ex[0];
+    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
+    	        				$callback_data = $this->m_set->preview_template($getObjInput);
+    	        				// print_r($callback_data);
+    	        				$rs[$this->KeySET] = $callback_data;
+    	        			}
+    	        			else
+    	        			{
+    	        				continue;
+    	        			}
+
+    	        			break;
+    	        		case $this->KeyUSER:
+    	        			if (!in_array($ex[0], $Filtering)){
+    	        				$NameObj = $ex[0];
+    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
+    	        				$rs[$this->KeyUSER] = $this->m_user->preview_template($getObjInput);
+    	        			}
+    	        			else
+    	        			{
+    	        				continue;
+    	        			}
+    	        			break;
+    	        		case $this->KeyINPUT:
+    	        			if (!in_array($ex[0], $Filtering)){
+    	        				$NameObj = $ex[0];
+    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
+    	        				$rs[$this->KeyINPUT] = $getObjInput;
+    	        			}
+    	        			else
+    	        			{
+    	        				continue;
+    	        			}
+    	        			break;
+    	        		case $this->KeyGRAB:
+    	        			if (!in_array($ex[0], $Filtering)){
+    	        				$NameObj = $ex[0];
+    	        				$getObjInput = $this->__getObjInput($Input,$NameObj);
+    	        				$rs[$this->KeyGRAB] = $this->m_grab->preview_template($getObjInput);
+    	        			}
+    	        			else
+    	        			{
+    	        				continue;
+    	        			}
+    	        			
+    	        			break;
+    	        		case $this->KeyTABLE:
+    	        			if (!in_array($ex[0], $Filtering)){
+    	        				
+    	        			}
+    	        			else
+    	        			{
+    	        				continue;
+    	        			}
+    	        			break;
+    	        	}
+
+    	        	$Filtering[] = $ex[0];
+    	        }
+    	    }
+    	}
+
+    	return $this->__preview_template($rs,$FileTemplate);
+
+    }
+
+    public function RemoveDocumentMaster($ID){
+    	$rs=['status' => 0,'msg' => ''];
+    	$this->db->where('ID',$ID);
+    	$this->db->update('db_generatordoc.document',array('Active' => 0,
+    													   'UpdatedBy' => $this->session->userdata('NIP'),
+    													   'UpdatedAt' => date('Y-m-d H:i:s'),
+    														)
+    					);
+    	$rs=['status' => 1,'msg' => ''];
+    	return $rs;
     }
     
   

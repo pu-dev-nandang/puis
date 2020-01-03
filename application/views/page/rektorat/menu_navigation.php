@@ -26,7 +26,8 @@
                     <i class="fa fa-book"></i> Surat Mengajar
                 </a>
             </li>
-            <li class="<?php if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='document-generator'){echo"current";}?>">
+            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='rectorat' && $this->uri->segment(2)=='document-generator'){echo"current";}?>">
                 <a href="<?php echo base_url('rectorat/document-generator');?>">
                     <i class="fa fa-archive"></i> Document Generator
                 </a>

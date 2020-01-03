@@ -39,4 +39,18 @@ class C_action extends DocumentGenerator_Controler {
         $rs = $this->m_doc->loadtableMaster($dataToken);
         echo json_encode($rs);
     }
+
+    public function preview_template_table(){
+        $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
+        $rs = $this->m_doc->preview_template_table($dataToken);
+        echo json_encode($rs);
+    }
+
+    public function RemoveDocumentMaster(){
+        $dataToken = $this->getInputToken();
+        $ID = $dataToken['ID'];
+        $rs = $this->m_doc->RemoveDocumentMaster($ID);
+        echo json_encode($rs);
+    }
 }
