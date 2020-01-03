@@ -9344,9 +9344,79 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
-        $dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
+        /*UPDATED BY FEBRI @  JAN 2020*/
+        /*$dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
             'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
-            : '' ;
+            : '' ;*/
+        $dataWhere = "";        
+        if(!empty($data_arr['Filter'])){            
+            $parse = parse_str($data_arr['Filter'],$output);
+            if(!empty($output['staff'])){
+                $dataWhere .= " AND (em.NIP like '%".$output['staff']."%' OR em.Name  like '%".$output['staff']."%' ) ";
+            }
+            if(!empty($output['division'])){
+                $conditionDivPo = " AND (em.PositionMain like '".$output['division'].".%')";
+                if(!empty($output['position'])){
+                    $conditionDivPo = " AND (em.PositionMain = '".$output['division'].".".$output['position']."')";
+                }
+                $dataWhere .= $conditionDivPo;
+            }
+            if(!empty($output['birthdate_start'])){
+                $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."')";
+                if(!empty($output['birthdate_end'])){
+                    $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' AND em.DateOfBirth <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )";
+                }
+                $dataWhere .= $conditionBirthDate;
+            }
+            if(!empty($output['gender'])){
+                $conditionGender = " AND (";
+                $gn = 1;
+                foreach ($output['gender'] as $g) {
+                    $conditionGender .= "Gender = '".$g."' ".(($gn < count($output['gender'])) ? ' OR ':'');
+                    $gn++;
+                }
+                $conditionGender .= ")";
+                $dataWhere .= $conditionGender;
+            }
+            if(!empty($output['level_education'])){
+                $conditionLevelEdu = " AND (";
+                $ln = 1;
+                foreach ($output['level_education'] as $l) {
+                    $conditionLevelEdu .= "LevelEducationID = '".$l."' ".(($ln < count($output['level_education'])) ? ' OR ':'');
+                    $ln++;
+                }
+                $conditionLevelEdu .= ")";
+                $dataWhere .= $conditionLevelEdu;
+            }
+            if(!empty($output['religion'])){
+                $conditionReligion = " AND (";
+                $rn = 1;
+                foreach ($output['religion'] as $r) {
+                    $conditionReligion .= "ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
+                    $rn++;
+                }
+                $conditionReligion .= ")";
+                $dataWhere .= $conditionReligion;
+            }
+            if(!empty($output['statusstd'])){
+                $conditionStatus = " AND (";
+                $sn = 1;
+                foreach ($output['statusstd'] as $s) {
+                    if($s == '-1'){
+                        $conditionStatus .= "(em.StatusEmployeeID = '".$s."' OR em.StatusLecturerID = '".$s."' )".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else if($s == 3 || $s == 4 || $s == 5 || $s== 6){
+                        $conditionStatus .= "em.StatusLecturerID = '".$s."' ".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else{
+                        $conditionStatus .= "em.StatusEmployeeID = '".$s."'".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }
+                    $sn++;
+                }
+                $conditionStatus .= ")";
+                $dataWhere .= $conditionStatus;
+            }
+            
+        }
+        /*END UPDATED BY FEBRI @  JAN 2020*/
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {

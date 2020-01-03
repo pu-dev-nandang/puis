@@ -310,9 +310,10 @@ class C_global_informations extends Globalclass {
         if(!empty($data_arr['status'])){
     		$param[] = array("field"=>"em.StatusEmployeeID","data"=>" =".$data_arr['status']." ","filter"=>"AND",);            		
         }else{
-        	$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" = '-1' ","filter"=>"AND",);    
+        	$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" != '-2') ","filter"=>"AND",);    
+        	/*$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" = '-1' ","filter"=>"AND",);    
 	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '1' ","filter"=>"OR",);    
-	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '2') ","filter"=>"OR",);
+	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '2') ","filter"=>"OR",);*/
         }
 
         if(!empty($data_arr['religion'])){

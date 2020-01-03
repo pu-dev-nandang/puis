@@ -43,7 +43,7 @@
 										</select>								
 									</div>
 								</div>
-								<div class="col-sm-3">
+								<div class="col-sm-2">
 									<div class="form-group">
 										<label>Study Program</label>								
 										<select class="form-control" name="study_program">
@@ -54,17 +54,17 @@
 										</select>								
 									</div>
 								</div>
-								<div class="col-sm-2">
+								<div class="col-sm-3">
 									<div class="form-group">
-										<label>Status</label>								
-										<select class="form-control" name="status">
-											<option value="">-Choose one-</option>
-											<?php foreach ($statusstd as $t) { 
-											echo '<option value="'.$t->CodeStatus.'">'.$t->Description.'</option>';
-											} ?>
-										</select>								
+										<label>Birthdate</label>
+										<div class="input-group">
+											<input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">	
+											<div class="input-group-addon">-</div>
+											<input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date">	
+										</div>
 									</div>
 								</div>
+								
 								<div class="col-sm-2">
 									<div class="form-group">
 										<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
@@ -76,14 +76,15 @@
 							</div>
 							<div class="collapse" id="advance-filter">
 								<div class="row">
-									<div class="col-sm-3">
+									<div class="col-sm-2">
 										<div class="form-group">
-											<label>Birthdate</label>
-											<div class="input-group">
-												<input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">	
-												<div class="input-group-addon">-</div>
-												<input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date">	
-											</div>
+											<label>Status</label>								
+											<select class="form-control" name="status">
+												<option value="">-Choose one-</option>
+												<?php foreach ($statusstd as $t) { 
+												echo '<option value="'.$t->CodeStatus.'">'.$t->Description.'</option>';
+												} ?>
+											</select>								
 										</div>
 									</div>
 

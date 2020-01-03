@@ -7,21 +7,6 @@
     }
 </style>
 
-<div class="row">
-    <div class="col-md-4 col-md-offset-4">
-        <div class="well">
-            <div class="row">
-                <div class="col-xs-12">
-                    <select id="filterStatusEmployees" class="form-control">
-                        <option value="">-- All Status --</option>
-                        <option disabled>------------------------------</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- ADDED BY FEBRI @ DEC 2019 -->
 <div class="row">
   <div class="col-sm-12">
@@ -93,7 +78,7 @@
                   <div class="col-sm-10">
                     <div class="checkbox">
                       <label>
-                        <input type="checkbox" value="<?=$t->IDStatus?>" name="statusstd[]"> <?=$t->Description?>
+                        <input type="checkbox" value="<?=$t->IDStatus?>" name="statusstd[]" > <?=$t->Description?>
                       </label>
                     </div>
                   </div>
@@ -134,7 +119,7 @@
                     <div class="col-sm-10">
                       <div class="form-checkbox">
                         <label>
-                            <input type="checkbox" value="P" name="gender[]"> Female
+                            <input type="checkbox" value="P" name="gender[]" > Female
                         </label>
                       </div>
                     </div>
@@ -148,12 +133,12 @@
                 <div class="form-group">
                   <label>Level Education</label>
                   <?php if(!empty($level_education)){ 
-                    foreach ($level_education as $le) { ?>
+                  foreach ($level_education as $le) { ?>
                   <div class="form-group">
                     <div class="col-sm-12">
                       <div class="checkbox">
                         <label>
-                          <input type="checkbox" value="<?=$le->Level?>" name="level_education[]"> <?=$le->Description?>
+                          <input type="checkbox" value="<?=$le->ID?>" name="level_education[]"> <?=$le->Description?>
                         </label>
                       </div>
                     </div>
@@ -276,10 +261,11 @@
                 '            </tr>' +
                 '            </thead>' +
                 '        </table>');
-
-            var filterStatusEmployees = $('#filterStatusEmployees').val();
-
-            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');
+            /*UPDATED BY FEBRI @ JAN 2020*/
+            /*var filterStatusEmployees = $('#filterStatusEmployees').val();
+            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
+            var token = jwt_encode({Filter : $("#form-filter").serialize()},'UAP)(*');
+            /*END UPDATED BY FEBRI @ JAN 2020*/
 
             var dataTable = $('#tableEmployees').DataTable( {
                 "processing": true,
@@ -294,10 +280,19 @@
                     ordering : false,
                     data : {token:token},
                     type: "post",  // method  , by default get
-                    error: function(){  // error handling
+                    error: function(jqXHR){  // error handling
                         $(".employee-grid-error").html("");
                         $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                         $("#employee-grid_processing").css("display","none");
+
+                        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                            '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                        $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                        $('#GlobalModal').modal({
+                            'show' : true,
+                            'backdrop' : 'static'
+                        });
                     }
                 }
             } );
@@ -720,5 +715,14 @@
         }
 
     });
+
+
+    /*ADDED BY FEBRI @ JAN 2020*/
+    $(document).ready(function(){
+      $(".btn-filter").click(function(){
+        loadDataEmployees();
+      });
+    });
+    /*END ADDED BY FEBRI @ JAN 2020*/
 
 </script>
