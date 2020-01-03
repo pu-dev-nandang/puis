@@ -2,7 +2,7 @@
  
 class Globalinformation_model extends CI_Model{
 
-	public function fetchAllStudent($param='',$start='',$limit=''){
+	/*public function fetchAllStudent($param='',$start='',$limit=''){
     	$where='';
         if(!empty($param)){
             $where = 'WHERE ';
@@ -61,7 +61,7 @@ class Globalinformation_model extends CI_Model{
     	$queryStudents = $combineSql;
     	$result = $this->db->query($queryStudents);
     	return $result;
-    }
+    }*/
 
 
 
@@ -139,7 +139,7 @@ class Globalinformation_model extends CI_Model{
 				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
 				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
 				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
-                   {$where} ORDER BY em.NIP ASC {$lims} ";
+                   {$where} ORDER BY em.ID DESC {$lims} ";
         
         $value  = $this->db->query($string);
      	//var_dump($this->db->last_query());
@@ -175,7 +175,7 @@ class Globalinformation_model extends CI_Model{
 				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
 				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
 				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
-                   {$where} ORDER BY em.NIP ASC {$lims} ";
+                   {$where} ORDER BY em.ID DESC {$lims} ";
         
         $value  = $this->db->query($string);
      	//var_dump($this->db->last_query());

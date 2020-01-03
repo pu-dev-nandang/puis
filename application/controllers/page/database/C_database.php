@@ -174,13 +174,14 @@ class C_database extends Globalclass {
 
     public function employees()
     {
-
+        /*ADDED BY FEBRI @ JAN 2020*/
         $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
         $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
         $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
         $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $content = $this->load->view('page/database/employees',$data,true);
+        /*END ADDED BY FEBRI @ JAN 2020*/
         $this->temp($content);
     }
 

@@ -42,7 +42,7 @@
 								<div class="info">
 									<h2 class="name"><?=$detail->NIP."-".(!empty($detail->TitleAhead) ? $detail->TitleAhead." ":"").$detail->Name.(!empty($detail->TitleBehind) ? " ".$detail->TitleBehind:"")?></h2>
 									<?php if($detail->StatusLecturerID != '-1' || !empty($detail->StatusLecturerID) || !empty($detail->EmpStatus) || $detail->StatusLecturerID != ""){ ?>
-									<h3 class="prodi"><?=$detail->EmpStatus."(".$detail->ProdiNameEng.")"?></h3>
+									<h3 class="prodi"><?=$detail->EmpStatus." (".$detail->ProdiNameEng.")"?></h3>
 									<?php } ?>
 									<p class="email"><?=$detail->EmailPU?></p>
 								</div>

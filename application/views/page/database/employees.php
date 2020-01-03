@@ -1,10 +1,10 @@
 
 <style>
-    #tableEmployees thead tr th {
-        background: #20525a;
-        color: #ffffff;
-        text-align: center;
-    }
+    #tableEmployees thead tr th {background: #20525a;color: #ffffff;text-align: center;}
+    .bg-primary {color: #fff;background-color: #337ab7;}
+    .bg-success {background-color: #dff0d8;}
+    .bg-info {background-color: #d9edf7;}
+    .bg-warning {background-color: #fcf8e3 !important;}
 </style>
 
 <!-- ADDED BY FEBRI @ DEC 2019 -->
@@ -131,7 +131,7 @@
               
               <div class="col-sm-3">
                 <div class="form-group">
-                  <label>Level Education</label>
+                  <label>Last Education</label>
                   <?php if(!empty($level_education)){ 
                   foreach ($level_education as $le) { ?>
                   <div class="form-group">
@@ -250,12 +250,11 @@
                 '            <thead>' +
                 '            <tr>' +
                 '                <th style="width: 1%;">No</th>' +
-                '                <th style="width: 7%;">NIP</th>' +
-                '                <th style="width: 5%;">Photo</th>' +
-                '                <th>Name</th>' +
-                '                <th style="width: 5%;">Gender</th>' +
+                '                <th style="width: 2%;">NIP</th>' +
+                '                <th style="width: 5%;">Employee</th>' +
+                '                <th style="width: 10%;">Birthdate</th>' +
                 '                <th style="width: 15%;">Position</th>' +
-                '                <th style="width: 25%;">Address</th>' +
+                /*'                <th style="width: 25%;">Address</th>' +*/
                 '                <th style="width: 7%;">Action</th>' +
                 '                <th style="width: 7%;">Status</th>' +
                 '            </tr>' +

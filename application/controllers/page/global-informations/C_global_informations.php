@@ -263,6 +263,46 @@ class C_global_informations extends Globalclass {
     }
 
 
+    public function lecturersDetail(){
+    	$data = $this->input->post();
+    	$key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($data['token'],$key);
+        if($data){
+        	$param[] = array("field"=>"em.ID","data"=>" =".$data_arr['ID']." ","filter"=>"AND");    
+        	$isExist = $this->Globalinformation_model->fetchLecturer($param)->row();
+        	if(!empty($isExist)){
+        		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
+        		$url_image = './uploads/employees/'.$isExist->Photo;
+	    		$srcImg =  base_url('images/icon/userfalse.png');
+	            if($isExist->Photo != '' && $isExist->Photo != null){
+	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
+	            }
+	            $data['profilePIC'] = $srcImg;
+        		$data['detail'] = $isExist;
+        		$splitMPosition = explode(".", $isExist->PositionMain);
+    			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
+    			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();
+    			if(!empty($isExist->PositionOther1)){
+	    			$splitOTHPosition1 = explode(".", $isExist->PositionOther1);
+	    			$data['othPositionDiv1'] = $this->General_model->fetchData("db_employees.division",array("ID"=>(!empty($splitOTHPosition1[0]) ? $splitOTHPosition1[0] : null)))->row();
+	    			$data['othPosition1'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition1[1]))->row();
+    			}
+    			if(!empty($isExist->PositionOther2)){
+	    			$splitOTHPosition2 = explode(".", $isExist->PositionOther2);
+	    			$data['othPositionDiv2'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition2[0]))->row();
+	    			$data['othPosition2'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition2[1]))->row();
+    			}
+    			if(!empty($isExist->PositionOther3)){
+	    			$splitOTHPosition3 = explode(".", $isExist->PositionOther3);
+	    			$data['othPositionDiv3'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition3[0]))->row();
+	    			$data['othPosition3'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition3[1]))->row();
+    			}
+        	}
+        	$this->load->view('dashboard/global-informations/lecturers/detail',$data);
+        }else{show_404();}
+    }
+
+
     /*END LECTURER*/
 
 

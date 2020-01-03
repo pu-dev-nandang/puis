@@ -9348,7 +9348,7 @@ class C_api extends CI_Controller {
         /*$dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
             'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
             : '' ;*/
-        $dataWhere = "";        
+        $dataWhere = "";  $dataArrStatus=array(); $dataArrGender=array(); $dataArrReligion=array(); $dataArrLevel=array();
         if(!empty($data_arr['Filter'])){            
             $parse = parse_str($data_arr['Filter'],$output);
             if(!empty($output['staff'])){
@@ -9369,6 +9369,7 @@ class C_api extends CI_Controller {
                 $dataWhere .= $conditionBirthDate;
             }
             if(!empty($output['gender'])){
+                $dataArrGender = $output['gender'];
                 $conditionGender = " AND (";
                 $gn = 1;
                 foreach ($output['gender'] as $g) {
@@ -9379,6 +9380,7 @@ class C_api extends CI_Controller {
                 $dataWhere .= $conditionGender;
             }
             if(!empty($output['level_education'])){
+                $dataArrLevel = $output['level_education'];
                 $conditionLevelEdu = " AND (";
                 $ln = 1;
                 foreach ($output['level_education'] as $l) {
@@ -9389,6 +9391,7 @@ class C_api extends CI_Controller {
                 $dataWhere .= $conditionLevelEdu;
             }
             if(!empty($output['religion'])){
+                $dataArrReligion = $output['religion'];
                 $conditionReligion = " AND (";
                 $rn = 1;
                 foreach ($output['religion'] as $r) {
@@ -9399,6 +9402,7 @@ class C_api extends CI_Controller {
                 $dataWhere .= $conditionReligion;
             }
             if(!empty($output['statusstd'])){
+                $dataArrStatus = $output['statusstd'];
                 $conditionStatus = " AND (";
                 $sn = 1;
                 foreach ($output['statusstd'] as $s) {
@@ -9414,7 +9418,7 @@ class C_api extends CI_Controller {
                 $conditionStatus .= ")";
                 $dataWhere .= $conditionStatus;
             }
-            
+            //echo $dataWhere;die();
         }
         /*END UPDATED BY FEBRI @  JAN 2020*/
 
@@ -9424,9 +9428,12 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
 
-        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em
-                                      LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
-                                      WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.NIP ASC ';
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu 
+                        FROM db_employees.employees em
+                        LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
+                        LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
+                        LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
+                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.ID DESC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
@@ -9495,14 +9502,18 @@ class C_api extends CI_Controller {
                         </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['NIP'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.$Email.'</span></div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$gender.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['NIP'].'</div>';
+            $nestedData[] = '<div style="margin-bottom:10px"><div  style="float:left;margin-right:10px;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>'.
+                            '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.(!empty($Email) ? $Email:'-').'</span></div>'.
+                            '</div><p><span class="'.((in_array($row['Gender'], $dataArrGender))? 'bg-primary':'').'"><i class="fa fa-'.(($row['Gender'] == 'L') ? 'mars':'venus').'"></i> '.$gender.'</span> &nbsp;
+                                <span class="'.((in_array($row['ReligionID'], $dataArrReligion))? 'bg-primary':'').'"><i class="fa fa-star"></i> '.$row['EmpReligion'].'</span> &nbsp; 
+                                <span class="'.((in_array($row['LevelEducationID'], $dataArrLevel))? 'bg-primary':'').'"><i class="fa fa-graduation-cap"></i> '.(!empty($row['EmpEdu']) ? $row['EmpEdu']:'-').'</span> </p>';
+            $nestedData[] = '<div  style="text-align:left;">'.(!empty($row['PlaceOfBirth']) ? $row['PlaceOfBirth'].', ':'').date("d F Y",strtotime($row['DateOfBirth'])).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
-            $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
+            /*$nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';*/
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['StatusEmployees'].'</div>';
+            $statusLect = $this->General_model->fetchData("db_employees.employees_status","IDStatus='".$row['StatusLecturerID']."'")->row();
+            $nestedData[] = '<button type="button"  title="Status Employee" class="btn btn-xs btn-'.(in_array($row['StatusEmployeeID'], $dataArrStatus) ? 'info':'default').'">'.$row['StatusEmployees'].'</button><br><button type="button" title="Status Lecturer" class="btn btn-xs btn-'.(in_array($row['StatusLecturerID'], $dataArrStatus) ? 'info':'default').'">'.(!empty($statusLect) ? $statusLect->Description : '-').'</button></div>';
 
             $no++;
 
