@@ -774,3 +774,65 @@ abstract class Ticket_Controler extends Globalclass{
 
 
 }
+
+abstract class DocumentGenerator_Controler extends Globalclass{ // for rektorat
+    public $data = array();
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('document-generator/m_doc');
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    public function menu_document($page){
+        $department = parent::__getDepartement();
+        $data['page'] = $page;
+        $content = $this->load->view('page/'.$department.'/document-generator/menu_document',$data,true);
+        $this->temp($content);
+    }
+}
+
+abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for services
+    public $data = array();
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('document-generator/m_doc');
+        $this->__setDepartment();
+    }
+
+    public function __setDepartment(){
+        $this->load->model('ticketing/m_general');
+        $this->data['DepartmentID'] = $this->m_general->getDepartmentNow();
+    }
+
+    public function temp($content)
+    {
+        $this->template($content);
+    }
+
+    // overide function
+    public function template($content)
+    {
+        $data['include'] = $this->load->view('template/include','',true);
+        $data['header'] = $this->menu_header();
+        $data['navigation'] = $this->menu_navigation();
+        $data['crumbs'] = $this->crumbs();
+        $data['ClassContainer'] = 'sidebar-closed';
+        $data['content'] = $content;
+        $this->load->view('template/template',$data);
+    }
+
+    public function menu_document($page){
+        $data['page'] = $page;
+        $content = $this->load->view('global/request-document-generator/menu_document',$data,true);
+        $this->temp($content);
+    }
+
+}

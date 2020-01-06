@@ -92,7 +92,7 @@
 								<td><?=$detail_req->NIP?></td>
 								<td rowspan="5" align="center">
 									<?php if(!empty($detail_req->Photo)){ ?>
-      								<img width="100px" height="150px" src="<?=$detail_req->pathPhoto.'uploads/profile/'.$detail_req->Photo?>" alt="<?=$detail_req->Name?>">
+      								<img width="100px" height="150px" src="<?=base_url('uploads/employees/'.$detail_req->Photo)?>" alt="<?=$detail_req->Name?>">
       								<?php }else{ ?>
 			                      	<img width="100px" height="150px" src="<?=base_url('/uploads/employees/'.$detail_ori->Photo)?>" alt="<?=$detail_ori->Name?>">
 			                      	<?php } ?>

@@ -35,26 +35,25 @@
 									<p class="status"><span class="btn btn-<?=($detail->StatusStudentID != 1) ? (($detail->StatusStudentID == 3) ? 'info':'danger'):'primary'?>"><?=$detail->StatusStudent?></span></p>
 									<div class="detail">
 										<h5><?=$detail->Name." ",(($detail->StatusStudentID==1) ? $detail->ProdiTitle:"")?></h5>
-										<p class="text"><i class="fa fa-birthday-cake"></i> <span><?=$detail->detailTA->PlaceOfBirth.", ".date("d F Y",strtotime($detail->detailTA->DateOfBirth))?></span></p>
-										<p class="text"><i class="fa fa-<?=($detail->detailTA->Gender == 'P') ? 'female':'male'?>"></i> <?=($detail->detailTA->Gender == 'P') ? 'Female':'Male'?></p>
-										<?php if(!empty($detail->detailTA->religionName)){ ?>
-										<p class="text"><i class="fa fa-info-circle"></i> <?=$detail->detailTA->religionName?></p>
+										<p class="text"><i class="fa fa-birthday-cake"></i> <span><?=$detail->PlaceOfBirth.", ".date("d F Y",strtotime($detail->DateOfBirth))?></span></p>
+										<p class="text"><i class="fa fa-<?=($detail->Gender == 'P') ? 'female':'male'?>"></i> <?=($detail->Gender == 'P') ? 'Female':'Male'?></p>
+										<?php if(!empty($detail->religionName)){ ?>
+										<p class="text"><i class="fa fa-info-circle"></i> <?=$detail->religionName?></p>
 										<?php } ?>
-										<?php if(!empty($detail->detailTA->nationalityName)){ ?>
-										<p class="text"><i class="fa fa-flag"></i> <?=$detail->detailTA->nationalityName?></p>
+										<?php if(!empty($detail->nationalityName)){ ?>
+										<p class="text"><i class="fa fa-flag"></i> <?=$detail->nationalityName?></p>
 										<?php } ?>
-										<?php if(!empty($detail->detailTA->Address)){ ?>
+										<?php if(!empty($detail->Address)){ ?>
 										<p class="text"><i class="fa fa-map-marker"></i> 
-											<span><?=$detail->detailTA->Address?></span><br>
-											<span><?=$detail->detailTA->ProvinceName?></span>
+											<span><?=$detail->Address?></span>
 										</p>
 										<?php } ?>
-										<?php if(!empty($detail->detailTA->Phone)){ ?>
-										<p class="text"><i class="fa fa-phone"></i> <?=substr($detail->detailTA->Phone, 0, -3) . 'xxx'?></p>
+										<?php if(!empty($detail->Phone)){ ?>
+										<p class="text"><i class="fa fa-phone"></i> <?=(substr($detail->Phone, 0, -3) . 'xxx')?></p>
 										<?php } ?>
-										<p class="text"><i class="fa fa-mobile"></i> <?=substr($detail->detailTA->HP, 0, -3) . 'xxx'?></p>
-										<?php if(!empty($detail->detailTA->Email)){ ?>
-										<p class="text"><i class="fa fa-envelope"></i> <?=$detail->detailTA->Email?></p>
+										<p class="text"><i class="fa fa-mobile"></i> <?=(substr($detail->HP, 0, -3) . 'xxx')?></p>
+										<?php if(!empty($detail->Email)){ ?>
+										<p class="text"><i class="fa fa-envelope"></i> <?=$detail->Email?></p>
 										<?php } ?>
 									</div>
 								</div>
@@ -64,10 +63,10 @@
 						<div class="col-sm-10">
 							<div class="right">
 								<div class="info">
-									<h2 class="name"><span class="nim"><?=$detail->NPM?></span>-<?=$detail->detailTA->Name?></h2>
+									<h2 class="name"><span class="nim"><?=$detail->NPM?></span>-<?=$detail->Name?></h2>
 									<h3 class="graduated"><?=$detail->ProdiDegree." (".$detail->ProdiNameEng.")"?></h3>
 									<?php if($detail->StatusStudentID == 1){ ?>
-									<h3 class="graduate-year">Graduated at <?=$detail->detailTA->GraduationYear?> from Agung Podomoro University</h3>
+									<h3 class="graduate-year">Graduated at <?=$detail->GraduationYear?> from Agung Podomoro University</h3>
 									<?php } ?>
 									<p class="email"><?=$detail->EmailPU?></p>
 								</div>
@@ -80,7 +79,7 @@
 											<div class="content">
 												<div class="row">
 													<label class="col-sm-3">High School</label>
-													<p class="col-sm-9"><?=$detail->detailTA->HighSchool?></p>
+													<p class="col-sm-9"><?=$detail->HighSchool?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Graduation Year</label>
@@ -99,24 +98,24 @@
 													<p><label><i class="fa fa-user"></i> FATHER</label></p>
 													<div class="row">
 														<label class="col-sm-3">Name</label>
-														<p class="col-sm-9"><?=$detail->detailTA->Father?></p>
+														<p class="col-sm-9"><?=$detail->Father?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Occupation</label>
-														<p class="col-sm-9"><?=$detail->detailTA->OccupationFather?></p>
+														<p class="col-sm-9"><?=$detail->OccupationFather?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Education</label>
-														<p class="col-sm-9"><?=$detail->detailTA->EducationFather?></p>
+														<p class="col-sm-9"><?=$detail->EducationFather?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Address</label>
-														<p class="col-sm-9"><?=$detail->detailTA->AddressFather?></p>
+														<p class="col-sm-9"><?=$detail->AddressFather?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Contact</label>
-														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=substr($detail->detailTA->PhoneFather, 0, -3) . 'xxx'?>
-														<?=(!empty($detail->detailTA->EmailFather) ? "<br><i class='fa fa-envelope'></i> ".$detail->detailTA->EmailFather:"")?></p>
+														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=(!empty($detail->PhoneFather) ? (substr($detail->PhoneFather, 0, -3) . 'xxx') : '-')?>
+														<?=(!empty($detail->EmailFather) ? "<br><i class='fa fa-envelope'></i> ".$detail->EmailFather:"")?></p>
 													</div>
 												</div>
 
@@ -124,24 +123,24 @@
 													<p><label><i class="fa fa-user"></i> MOTHER</label></p>
 													<div class="row">
 														<label class="col-sm-3">Name</label>
-														<p class="col-sm-9"><?=$detail->detailTA->Mother?></p>
+														<p class="col-sm-9"><?=$detail->Mother?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Occupation</label>
-														<p class="col-sm-9"><?=$detail->detailTA->OccupationMother?></p>
+														<p class="col-sm-9"><?=$detail->OccupationMother?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Education</label>
-														<p class="col-sm-9"><?=$detail->detailTA->EducationMother?></p>
+														<p class="col-sm-9"><?=$detail->EducationMother?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Address</label>
-														<p class="col-sm-9"><?=$detail->detailTA->AddressMother?></p>
+														<p class="col-sm-9"><?=$detail->AddressMother?></p>
 													</div>
 													<div class="row">
 														<label class="col-sm-3">Contact</label>
-														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=substr($detail->detailTA->PhoneMother, 0, -3) . 'xxx'?>
-														<?=(!empty($detail->detailTA->EmailMother) ? "<br><i class='fa fa-envelope'></i> ".$detail->detailTA->EmailMother:"")?></p>
+														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=(!empty($detail->PhoneMother) ? (substr($detail->PhoneMother, 0, -3) . 'xxx') : "-")?>
+														<?=(!empty($detail->EmailMother) ? "<br><i class='fa fa-envelope'></i> ".$detail->EmailMother:"")?></p>
 													</div>
 												</div>
 											</div>
@@ -163,7 +162,7 @@
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Year Intake</label>
-													<p class="col-sm-4"><?=$detail->Year?></p>
+													<p class="col-sm-4"><?=$detail->ClassOf?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">NIM</label>

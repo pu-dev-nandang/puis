@@ -98,6 +98,17 @@
                     <span>Ticketing</span>
                 </a>
             </li>
+
+
+            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+            <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='global-informations'){echo 'current';} ?>">
+                <a href="<?php echo base_url('global-informations/students'); ?>" id="btn_announcement">
+                    <i class="fa fa-globe" aria-hidden="true"></i>
+                    <span>Global Information</span>
+                </a>
+            </li>
+
+
             <?php $DepartmentNav  = $this->session->userdata('IDdepartementNavigation');
             ?>
             <?php if ($this->session->userdata('prodi_get')): ?>
@@ -216,6 +227,12 @@
                             </li>
                         <?php } ?>
 
+                            <!-- Adding for Testing -->
+                            <?php $sw = ($_SERVER['SERVER_NAME']=='localhost') ? '' : 'hide'; ?>
+                                 <li class="<?php echo $sw.' '; if($this->uri->segment(1)=='request-document-generator'){echo 'active';} ?>">
+                                     <a href="<?php echo base_url('request-document-generator'); ?>"><i class="glyphicon glyphicon-transfer" aria-hidden="true"></i> Request Document Generator</a>
+                                 </li>
+                            <!-- End Adding for Testing -->
                     </ul>
                 </li>
             <?php } ?>
@@ -294,6 +311,16 @@
 <!-- Global Modal Large -->
 <div class="modal fade" id="GlobalModalLarge" role="dialog">
     <div class="modal-dialog" role="document" style="width:900px;">
+        <div class="modal-content animated jackInTheBox">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- Global Modal Large -->
+<div class="modal fade" id="GlobalModalXtraLarge" role="dialog">
+    <div class="modal-dialog" role="document" style="width:1280px;">
         <div class="modal-content animated jackInTheBox">
             <div class="modal-header"></div>
             <div class="modal-body"></div>

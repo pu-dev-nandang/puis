@@ -63,7 +63,7 @@
 												</div>												
 												<div class="row">
 													<label class="col-sm-3">Birthdate</label>
-													<p class="col-sm-4"><?=$detail->PlaceOfBirth.", ".date("d F Y",strtotime($detail->DateOfBirth))?></p>
+													<p class="col-sm-9"><?=$detail->PlaceOfBirth.", ".date("d F Y",strtotime($detail->DateOfBirth))?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Gender</label>
@@ -79,7 +79,7 @@
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Phone</label>
-													<p class="col-sm-9"><?=(!empty($detail->Phone) ? substr($detail->Phone, 0, -3) . 'xxx' : '-')?></p>
+													<p class="col-sm-9"><?=(!empty($detail->Phone) ? (substr($detail->Phone, 0, -3) . 'xxx') : '-')?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Mobile Phone</label>

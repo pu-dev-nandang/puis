@@ -250,363 +250,302 @@ class C_global extends CI_Controller {
         ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
         ini_set('max_execution_time', 0); // for infinite time of execution
 
-        // $sql = 'select * from db_employees.division';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) {
-        //     $sql1 = 'select * from db_employees.rule_service where IDService = 5 and IDDivision = '.$query[$i]['ID'];
-        //     $query1=$this->db->query($sql1, array())->result_array();
-        //     if (count($query1) == 0) {
-        //         $datasave = array(
-        //             'IDDivision' => $query[$i]['ID'],
-        //             'IDService' => 5,
-        //             'Status' => '1',
-        //         );
-        //         $this->db->insert('db_employees.rule_service',$datasave);
-        //     }
-           
-        // }
+        include_once APPPATH.'vendor/autoload.php';
+        // Creating the new document...
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        // Adding an empty Section to the document...
+        $section = $phpWord->addSection();
+        // Adding Text element to the Section having font styled by default...
+        $section->addText(
+            '"Learn from yesterday, live for today, hope for tomorrow. '
+                . 'The important thing is not to stop questioning." '
+                . '(Albert Einstein)'
+        );
 
-        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
-        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
-        //              a.StatusEmployeeID
-        // FROM   db_employees.employees as a
-        // where SPLIT_STR(a.PositionMain, ".", 1) = 12 and a.StatusEmployeeID != -1';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $NIP = $query[$i]['NIP'];
-        //     $IDDivision = 34;
-        //     $sql1 = 'select count(*) as total from db_employees.rule_users where NIP = ? and IDDivision = ?';
-        //     $query1=$this->db->query($sql1, array($NIP,$IDDivision))->result_array();
-        //     $total = $query1[0]['total'];
-        //     if ($total == 0) {
-        //        $dataSave = array(
-        //             'NIP' => $NIP,
-        //             'IDDivision' => $IDDivision,
-        //             'privilege' => 1,
-        //        );
+        /*
+         * Note: it's possible to customize font style of the Text element you add in three ways:
+         * - inline;
+         * - using named font style (new font style object will be implicitly created);
+         * - using explicitly created font style object.
+         */
 
-        //        $this->db->insert('db_employees.rule_users',$dataSave);
-        //     }
-        // }
+        // Adding Text element with font customized inline...
+        $section->addText(
+            '"Great achievement is usually born of great sacrifice, '
+                . 'and is never the result of selfishness." '
+                . '(Napoleon Hill)',
+            array('name' => 'Tahoma', 'size' => 10)
+        );
+
+        // Adding Text element with font customized using named font style...
+        $fontStyleName = 'oneUserDefinedStyle';
+        $phpWord->addFontStyle(
+            $fontStyleName,
+            array('name' => 'Tahoma', 'size' => 10, 'color' => '1B2232', 'bold' => true)
+        );
+        $section->addText(
+            '"The greatest accomplishment is not in never falling, '
+                . 'but in rising again after you fall." '
+                . '(Vince Lombardi)',
+            $fontStyleName
+        );
+
+        $section->addImage('id_emp.png',array(
+                            'width'         => 100,
+                            'height'        => 100,
+                            'marginTop'     => -1,
+                            'marginLeft'    => -1,
+                            'wrappingStyle' => 'behind'
+                                            )       
+                            );
+
+        // Adding Text element with font customized using explicitly created font style object...
+        $fontStyle = new \PhpOffice\PhpWord\Style\Font();
+        $fontStyle->setBold(true);
+        $fontStyle->setName('Tahoma');
+        $fontStyle->setSize(13);
+        $myTextElement = $section->addText('"Believe you can and you\'re halfway there." (Theodor Roosevelt)');
+        $myTextElement->setFontStyle($fontStyle);
 
 
 
-        // $datasave = array(
-        //     'Approver2' => '[{"TypeApprover":"Division","Approver":"8"}]',
-        // );
-        // $this->db->where('Approver2','["8"]');
-        // $this->db->update('db_reservation.category_room',$datasave);
+        // Saving the document as OOXML file...
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('helloWorld.docx');
 
-        // insert auth budgeting
-        // $sql = 'select NIP,PositionMain from db_employees.employees where StatusEmployeeID = 1';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $NIP = $query[$i]['NIP'];
-        //     $PositionMain = $query[$i]['PositionMain'];
-        //     $P = explode('.', $PositionMain);
-        //     if (count($P) > 1) {
-        //         $P = $P[1];
-        //         $array_admin2 = array(13,14,8,21,7);
-        //             $G_user = 3;
-        //         if (in_array($P, $array_admin2) ) {
-        //              $G_user = 4;
-        //         }
+        // Saving the document as ODF file...
+        // $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'ODText');
+        // $objWriter->save('helloWorld.odt');
 
-        //         // find data di previleges_guser db_budgeting
-        //         $G__ = $this->m_master->caribasedprimary('db_budgeting.previleges_guser','NIP',$NIP);
-        //         if (count($G__) == 0) {
-        //             $datasave = array(
-        //                 'NIP' => $NIP,
-        //                 'G_user' => $G_user,    
-        //             );
+        // Saving the document as HTML file...
+        // $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
+        // $objWriter->save('helloWorld.html');
 
-        //             $this->db->insert('db_budgeting.previleges_guser',$datasave);
-        //         }
-        //     }
-            
-        // }
-
-        // insert auth purchasing
-        // $sql = 'SELECT a.NIP,a.Name,SPLIT_STR(a.PositionMain, ".", 1) as PositionMain1,
-        //        SPLIT_STR(a.PositionMain, ".", 2) as PositionMain2,
-        //              a.StatusEmployeeID
-        // FROM   db_employees.employees as a
-        // where (SPLIT_STR(a.PositionMain, ".", 1) = 4 or  SPLIT_STR(a.PositionMain, ".", 1) = 12 ) and a.StatusEmployeeID != -1';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //    if ($query[$i]['PositionMain1'] == 4) {
-        //       $array_admin2 = array(13,14,8,21,7);
-        //        if (in_array($query[$i]['PositionMain2'], $array_admin2) ) {
-        //             $G_user = 4;
-        //         }
-        //         else
-        //         {
-        //             $G_user = 3;
-        //         }
-
-        //    }
-        //    else
-        //    {
-        //     $G_user = 1;
-        //    }
-        //    $NIP = $query[$i]['NIP'];
-        //   $G__ = $this->m_master->caribasedprimary('db_purchasing.previleges_guser','NIP',$NIP);
-        //   if (count($G__) == 0) {
-        //       $datasave = array(
-        //           'NIP' => $NIP,
-        //           'G_user' => $G_user,    
-        //       );
-
-        //       $this->db->insert('db_purchasing.previleges_guser',$datasave);
-        //   }
-        // }
-
-        // inject cfg_rule_g_user purchasing 
-        // $sql = 'select * from db_purchasing.cfg_rule_g_user';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $r = $query[$i];
-        //     unset($r['ID']);
-        //     $r['cfg_group_user'] = 3;
-        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
-        //     $r['cfg_group_user'] = 4;
-        //     $this->db->insert('db_purchasing.cfg_rule_g_user',$r);  
-
-        // }
-
-        // $this->db_server22 = $this->load->database('server22', TRUE);
-        // $sql = 'select *,SUBSTRING(member_id,3,2) as angkatan from library.member where Year(register_date) = 2019 and member_type_id = 2 and SUBSTRING(member_id,3,2) = 19';
-        // $query=$this->db_server22->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) { 
-        //     $G_dt = $this->m_master->caribasedprimary('ta_2019.students','NPM',$query[$i]['member_id']);
-        //     $birth_date = $G_dt[0]['DateOfBirth'];
-        //     $member_address = $G_dt[0]['Address'];
-        //     $member_email = $G_dt[0]['Email'];
-
-        //     $datasave = array(
-        //         'birth_date' => $birth_date,
-        //         'member_address' => $member_address,
-        //         'member_email' => $member_email,
-        //     );
-        //     $this->db_server22->where('member_id',$query[$i]['member_id']);
-        //     $this->db_server22->update('library.member',$datasave);
-        // }
+        /* Note: we skip RTF, because it's not XML-based and requires a different example. */
+        /* Note: we skip PDF, because "HTML-to-PDF" approach is used to create PDF documents. */
 
     }
 
     public function testInject2()
     {
-        // $get = $this->m_master->showData_array('db_admission.sale_formulir_offline');
-        // for ($i=0; $i < count($get); $i++) { 
-        //     $ID = $get[$i]['ID'];
-        //     $FullName = strtolower($get[$i]['FullName']);
-        //     $FullName = ucwords($FullName);
-        //     $dataSave = array(
-        //             'FullName' => ucwords($FullName),
-        //             'Email' => strtolower($get[$i]['Email'])
-        //                     );
-        //     $this->db->where('ID',$ID);
-        //     $this->db->update('db_admission.sale_formulir_offline', $dataSave);
-        // }
+        ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 0); // for infinite time of execution
 
+        include_once APPPATH.'vendor/autoload.php';
 
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+        $table = $section->addTable();
+        for ($r = 1; $r <= 8; $r++) {
+            $table->addRow();
+            for ($c = 1; $c <= 5; $c++) {
+                $table->addCell(1750)->addText("Row {$r}, Cell {$c}");
+            }
+        }
+
+        $objWriter =  \PhpOffice\PhpWord\IOFactory::createWriter($phpWord);
+
+        $fullXml = $objWriter->getWriterPart('Document')->write();
+        $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('Template3.docx');
+        $TemplateProcessor->setValue('adi',$this->getBodyBlock($fullXml));
+
+        // $TemplateProcessor->setImageValue('areaImages', 'id_emp.png');
+        $TemplateProcessor->setImageValue('areaImages', array('path' => 'id_emp.png', 'width' => 100, 'height' => 100, 'ratio' => false));
+
+        $TemplateProcessor->saveAs('MyWordFile_rev.docx');
+
+    }
+
+    // public function testInject2()
+    // {
+    //     ini_set('max_execution_time', 3600); //300 seconds = 5 minutes
+    //     ini_set('max_execution_time', 0); // for infinite time of execution
+
+    //     include_once APPPATH.'vendor/autoload.php';
+
+    //     $phpWord = new \PhpOffice\PhpWord\PhpWord();
+    //     $section = $phpWord->addSection();
+    //     $table = $section->addTable();
+    //     for ($r = 1; $r <= 8; $r++) {
+    //         $table->addRow();
+    //         for ($c = 1; $c <= 5; $c++) {
+    //             $table->addCell(1750)->addText("Row {$r}, Cell {$c}");
+    //         }
+    //     }
+
+    //     $objWriter =  \PhpOffice\PhpWord\IOFactory::createWriter($phpWord);
+
+    //     $fullXml = $objWriter->getWriterPart('Document')->write();
+    //     $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('Template2.docx');
+    //     $TemplateProcessor->setValue('bodytable',$this->getBodyBlock($fullXml));
+
+    //     $TemplateProcessor->saveAs('MyWordFile_rev.docx');
+
+    // }
+
+    protected function getBodyBlock($string){
+        if (preg_match('%(?i)(?<=<w:body>)[\s|\S]*?(?=</w:body>)%', $string, $regs)) {
+            return $regs[0];
+        } else {
+            return '';
+        }
     }
 
     public function testInject3()
     {
-        // $get = $this->m_master->showData_array('db_admission.register');
-        // for ($i=0; $i < count($get); $i++) { 
-        //     $ID = $get[$i]['ID'];
-        //     $FullName = strtolower($get[$i]['Name']);
-        //     $FullName = ucwords($FullName);
-        //     $dataSave = array(
-        //             'Name' => ucwords($FullName),
-        //             'Email' => strtolower($get[$i]['Email'])
-        //                     );
-        //     $this->db->where('ID',$ID);
-        //     $this->db->update('db_admission.register', $dataSave);
+        // $data = array("ini {saya}","dia {dan}","kamu {aku}");
+        // $n=1;
+        // foreach ($data as $v) {
+        //     if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+        //         var_dump($matches[1]);
+        //     }
+        //     $n++;
         // }
 
-        //get all payment dengan PTID 5 & 6
-        $arr = array();
-        $sql = 'select * from db_finance.payment where PTID in (5,6) limit 100';
-        $query=$this->db->query($sql, array())->result_array();
-        for ($i=0; $i < count($query); $i++) {
-            $dt = array(); 
-            $ID_payment = $query[$i]['ID'];
-            $NPM = $query[$i]['NPM'];
-            $Invoice = $query[$i]['Invoice'];
-            $Status = $query[$i]['Status'];
-            $PTID = $query[$i]['PTID'];
-
-            // update Invoice = 0.0 Status = 1 based ID = ID_payment
-            // $arr_upd = array(
-            //     'Invoice' => 0.0,
-            //     'Status' => '1',
-            // );
-            // $this->db->where('ID',$ID_payment);
-            // $this->db->update('db_finance.payment',$arr_upd);
-
-            // cek ke payment_student
-            $sql2 = 'select * from db_finance.payment_students where ID_payment = ?';
-            $query2=$this->db->query($sql2, array($ID_payment))->result_array();
-            for ($k=0; $k < count($query2); $k++) { 
-                $ID_payment_std = $query2[$k]['ID'];
-                $InvoiceBill = $query2[$k]['Invoice'];
-                $StatusBill = $query2[$k]['Status'];
-                $dt[] = array(
-                    'ID_payment_std' => $ID_payment_std,
-                    'InvoiceBill' => $InvoiceBill,
-                    'StatusBill' => $StatusBill
-                );
-
-                // update Status = '1' based ID = ID_payment_std
-                // $arr_upd2 = array(
-                //     'Invoice' => 0.0,
-                //     'Status' => 1,
-                // );
-
-                // $this->db->where('ID',$ID_payment_std);
-                // $this->db->update('db_finance.payment_students',$arr_upd2);
+        // New Word Document
+        include_once APPPATH.'vendor/autoload.php';
+        // Creating the new document...
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+        $header = array('size' => 16, 'bold' => true);
+        // 1. Basic table
+        $rows = 10;
+        $cols = 5;
+        $section->addText(htmlspecialchars('Basic table'), $header);
+        $table = $section->addTable();
+        for ($r = 1; $r <= 8; $r++) {
+            $table->addRow();
+            for ($c = 1; $c <= 5; $c++) {
+                $table->addCell(1750)->addText(htmlspecialchars("Row {$r}, Cell {$c}"));
             }
-
-            $arr[] = array(
-                'ID_payment' => $ID_payment,
-                'NPM' => $NPM,
-                'Invoice' => $Invoice,
-                'Status' => $Status,
-                'PTID' => $PTID,
-                'dt' =>$dt
-            );
         }
+        // 2. Advanced table
+        $section->addTextBreak(1);
+        $section->addText(htmlspecialchars('Fancy table'), $header);
+        $styleTable = array('borderSize' => 6, 'borderColor' => '006699', 'cellMargin' => 80);
+        $styleFirstRow = array('borderBottomSize' => 18, 'borderBottomColor' => '0000FF', 'bgColor' => '66BBFF');
+        $styleCell = array('valign' => 'center');
+        $styleCellBTLR = array('valign' => 'center', 'textDirection' => \PhpOffice\PhpWord\Style\Cell::TEXT_DIR_BTLR);
+        $fontStyle = array('bold' => true, 'align' => 'center');
+        $phpWord->addTableStyle('Fancy Table', $styleTable, $styleFirstRow);
+        $table = $section->addTable('Fancy Table');
+        $table->addRow(900);
+        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Row 1'), $fontStyle);
+        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Row 2'), $fontStyle);
+        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Row 3'), $fontStyle);
+        $table->addCell(2000, $styleCell)->addText(htmlspecialchars('Row 4'), $fontStyle);
+        $table->addCell(500, $styleCellBTLR)->addText(htmlspecialchars('Row 5'), $fontStyle);
+        for ($i = 1; $i <= 8; $i++) {
+            $table->addRow();
+            $table->addCell(2000)->addText(htmlspecialchars("Cell {$i}"));
+            $table->addCell(2000)->addText(htmlspecialchars("Cell {$i}"));
+            $table->addCell(2000)->addText(htmlspecialchars("Cell {$i}"));
+            $table->addCell(2000)->addText(htmlspecialchars("Cell {$i}"));
+            $text = (0== $i % 2) ? 'X' : '';
+            $table->addCell(500)->addText(htmlspecialchars($text));
+        }
+        // 3. colspan (gridSpan) and rowspan (vMerge)
+        $section->addPageBreak();
+        $section->addText(htmlspecialchars('Table with colspan and rowspan'), $header);
+        $styleTable = array('borderSize' => 6, 'borderColor' => '999999');
+        $cellRowSpan = array('vMerge' => 'restart', 'valign' => 'center', 'bgColor' => 'FFFF00');
+        $cellRowContinue = array('vMerge' => 'continue');
+        $cellColSpan = array('gridSpan' => 2, 'valign' => 'center');
+        $cellHCentered = array('align' => 'center');
+        $cellVCentered = array('valign' => 'center');
+        $phpWord->addTableStyle('Colspan Rowspan', $styleTable);
+        $table = $section->addTable('Colspan Rowspan');
+        $table->addRow();
+        $cell1 = $table->addCell(2000, $cellRowSpan);
+        $textrun1 = $cell1->addTextRun($cellHCentered);
+        $textrun1->addText(htmlspecialchars('A'));
+        $textrun1->addFootnote()->addText(htmlspecialchars('Row span'));
+        $cell2 = $table->addCell(4000, $cellColSpan);
+        $textrun2 = $cell2->addTextRun($cellHCentered);
+        $textrun2->addText(htmlspecialchars('B'));
+        $textrun2->addFootnote()->addText(htmlspecialchars('Colspan span'));
+        $table->addCell(2000, $cellRowSpan)->addText(htmlspecialchars('E'), null, $cellHCentered);
+        $table->addRow();
+        $table->addCell(null, $cellRowContinue);
+        $table->addCell(2000, $cellVCentered)->addText(htmlspecialchars('C'), null, $cellHCentered);
+        $table->addCell(2000, $cellVCentered)->addText(htmlspecialchars('D'), null, $cellHCentered);
+        $table->addCell(null, $cellRowContinue);
+        // 4. Nested table
+        $section->addTextBreak(2);
+        $section->addText(htmlspecialchars('Nested table in a centered and 50% width table.'), $header);
+        $table = $section->addTable(array('width' => 50 * 50, 'unit' => 'pct', 'align' => 'center'));
+        $cell = $table->addRow()->addCell();
+        $cell->addText(htmlspecialchars('This cell contains nested table.'));
+        $innerCell = $cell->addTable(array('align' => 'center'))->addRow()->addCell();
+        $innerCell->addText(htmlspecialchars('Inside nested table'));
 
-        print_r($arr);
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('helloWorld.docx');
 
     }
 
+    // public function testInject4()
+    // {
+    //     try
+    //     {
+    //         include_once APPPATH.'vendor/autoload.php';
+
+    //         $phpWord = \PhpOffice\PhpWord\IOFactory::load('MyWordFile.docx');
+    //         // Adding an empty Section to the document...
+
+    //         // $section = $phpWord->addSection();
+    //         // Adding Text element to the Section having font styled by default...
+    //         // $section->addText('<br/>asdsad');
+
+    //         $source = "adi.html";
+
+    //         // Saving the document as HTML file...
+    //         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
+    //         $objWriter->save($source);
+
+    //         $data = file($source) or die('Could not read file!');
+    //         foreach ($data as $line) {
+    //             // echo(strip_tags($line));
+    //             echo nl2br($line);
+    //         };
+            
+    //         die();
+
+
+    //     }catch(Exception $e)
+    //     {
+    //         echo $e->getLine();
+    //         echo "<br>/";
+    //         echo $e->getMessage();
+    //         echo "<br/>";
+    //         echo $e->getFile();
+    //         exit;
+    //     }
+    //     echo "Generated successfully";
+    // }
+
     public function testInject4()
     {
-        // $get = $this->m_master->showData_array('db_admission.formulir_number_offline_m');
-        // for ($i=0; $i < count($get); $i++) { 
-        //     $Link = $get[$i]['Link'];
-        //     $Link = str_replace('http://admission.podomorouniversity.ac.id/', 'http://localhost/registeronline/', $Link);
-        //     $dataSave = array(
-        //             'Link' => $Link,
-        //                     );
-        //     $this->db->where('ID',$get[$i]['ID']);
-        //     $this->db->update('db_admission.formulir_number_offline_m', $dataSave);
-        // }
+        include_once APPPATH.'vendor/autoload.php';
+        $generatedFile    = "MergeResult.docx";
+      
+        $sourceZip = new \ZipArchive();
+        $sourceZip->open($generatedFile);
+        $sourceDocument = $sourceZip->getFromName('word/document.xml');
+        // print_r($sourceDocument);die();
+        $sourceDom      = new DOMDocument();
+        $sourceDom->loadXML($sourceDocument);
+        $sourceXPath = new \DOMXPath($sourceDom);
+        $sourceXPath->registerNamespace("w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
+        // $textNodes = $sourceXPath->query("/w:document/w:body/w:p[1]/w:r[1]/w:t[1]");
+        $sourceNodes = $sourceXPath->query('//w:document/w:body/*[not(self::w:sectPr)]');
+        // print_r($textNodes);
+        foreach ($sourceNodes as $entry) {
+            // echo "node: {$entry->nodeName}," .
+            //  "value: {$entry->nodeValue}\n";
+            print_r($entry->nodeValue.'<br/>');
+        }
 
-        // $sql = 'select ID from db_admission.register_formulir where ID not in (select ID_register_formulir from db_admission.register_document)';
-        // $query=$this->db->query($sql, array())->result_array();
-        // for ($i=0; $i < count($query); $i++) {
-        //     $ID_register_formulir = $query[$i]['ID']; 
-        //     $arrID_reg_doc_checklist = $this->m_master->caribasedprimary('db_admission.reg_doc_checklist','Active',1);
-        //     for ($xy=0; $xy < count($arrID_reg_doc_checklist); $xy++) { 
-        //         $dataSave = array(
-        //                 'ID_register_formulir' => $ID_register_formulir,
-        //                 'ID_reg_doc_checklist' => $arrID_reg_doc_checklist[$xy]['ID'],
-        //                         );
-
-        //         $this->db->insert('db_admission.register_document', $dataSave);
-        //     }
-        // }
-
-        // untuk data yang tidak sesuai dengan beasiswanya dengan nilai value nya pada table payment_admisi compare dengan tuition_fee
-        // $this->load->model('admission/m_admission');
-        // $this->load->model('finance/m_finance');
-        // $arr = array();
-        // // $get = $this->m_master->showData_array('db_finance.payment_admisi');
-        // // $sql = 'select * from db_finance.payment_admisi where ID >= 800 and ID_register_formulir != 302';
-        // // $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302 order by ID asc limit 200,700';
-        // $sql = 'select * from db_finance.payment_admisi where ID_register_formulir != 302';
-        // $get=$this->db->query($sql, array())->result_array();
-        // $Filter_ = array();
-        // for ($i=0; $i < count($get); $i++) {
-        //     $ID =  $get[$i]['ID'];
-        //     $ID_register_formulir = $get[$i]['ID_register_formulir'];
-        //     $dt = $this->m_admission->getDataPersonal($ID_register_formulir);
-        //     // get Years and ProdiID
-        //     $Years = $dt[0]['SetTa'];
-        //     $ProdiID = $dt[0]['ID_program_study'];
-        //     // get PTID
-        //     $PTID = $get[$i]['PTID'];
-        //     // get tuition fee
-        //         $G_tuition_fee = $this->m_finance->getPriceBaseBintang($PTID,$ProdiID,$Years,1);
-        //         $Cost = $G_tuition_fee;
-        //         $Pay_tuition_fee = $get[$i]['Pay_tuition_fee'];
-        //         // persen
-        //         if ($PTID == 3) {
-        //             $ccc = $this->m_master->caribasedprimary('db_academic.program_study','ID',$ProdiID);
-        //             $Credit = $ccc[0]['DefaultCredit'];
-        //             $Cost = $Cost * $Credit;
-        //             $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
-        //             $persen = abs($persen);
-        //         }
-        //         else
-        //         {
-        //             $persen = (($Pay_tuition_fee-$Cost) / $Cost) * 100;
-        //             $persen = abs($persen);
-        //         }
-                
-        //         if ($persen != $get[$i]['Discount']) {
-        //             // get date created and created by
-        //             $G_register_admisi = $this->m_master->caribasedprimary('db_finance.register_admisi','ID_register_formulir',$ID_register_formulir);
-        //             // hitung berapa orang
-        //                 $b = true;
-        //                 for ($j=0; $j < count($Filter_); $j++) { 
-        //                     if ($ID_register_formulir == $Filter_[$j]['ID_register_formulir']) {
-        //                        $b = false;
-        //                     }
-        //                 }
-
-        //                 if ($b) {
-        //                     $Filter_[]= array(
-        //                         'ID_register_formulir' =>$ID_register_formulir,
-        //                         'FormulirCode' => $dt[0]['FormulirCode'],
-        //                         'Name' => $dt[0]['Name'],
-        //                         'CreateAT' => $G_register_admisi[0]['CreateAT'],
-        //                         'CreateBY' => $G_register_admisi[0]['CreateBY'],
-        //                     );
-        //                 }
-
-        //             $temp = array(
-        //                 'ID' => $ID,
-        //                 'ID_register_formulir' => $ID_register_formulir,
-        //                 'FormulirCode' => $dt[0]['FormulirCode'],
-        //                 'Name' => $dt[0]['Name'],
-        //                 'Discount_seharusnya' => $persen,
-        //                 'Discount_db' => $get[$i]['Discount'],
-        //                 'Pay_tuition_fee' => $Pay_tuition_fee,
-        //                 'CostDefault' => $Cost,
-        //                 'CreateAT' => $G_register_admisi[0]['CreateAT'],
-        //                 'CreateBY' => $G_register_admisi[0]['CreateBY'],
-        //             );
-        //             $arr['dt'][] = $temp;
-
-        //             // update data
-        //             // $arr_save_db = array(
-        //             //     'Discount' => $persen,
-        //             // );
-        //             // $this->db->where('ID',$ID);
-        //             // $this->db->update('db_finance.payment_admisi',$arr_save_db);
-        //         }
-
-
-        // }
-        // $arr['Count_person'] = count($Filter_);
-        // $arr['Person'] = $Filter_;
-        // print_r($arr);
-
-        // $G_dt = $this->m_master->showData_array('db_cooperation.kegiatan');
-        // for ($i=0; $i < count($G_dt); $i++) { 
-        //     $KerjasamaID = $G_dt[$i]['KerjasamaID'];
-        //     $ID = $G_dt[$i]['ID'];
-        //     $G = $this->m_master->caribasedprimary('db_cooperation.kerjasama','ID',$KerjasamaID);
-        //     $Kategori_kegiatan = $G[0]['Kategori'];
-        //     $this->db->where('ID',$ID);
-        //     $this->db->update('db_cooperation.kegiatan',array('Kategori_kegiatan' => $Kategori_kegiatan));
-        // }
     }
 
 
