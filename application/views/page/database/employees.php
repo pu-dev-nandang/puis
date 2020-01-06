@@ -250,11 +250,11 @@
                 '            <thead>' +
                 '            <tr>' +
                 '                <th style="width: 1%;">No</th>' +
-                '                <th style="width: 2%;">NIP</th>' +
-                '                <th style="width: 5%;">Employee</th>' +
+                '                <th style="width: 3%;">NIP</th>' +
+                '                <th style="width: 15%;">Employee</th>' +
                 '                <th style="width: 10%;">Birthdate</th>' +
-                '                <th style="width: 15%;">Position</th>' +
-                /*'                <th style="width: 25%;">Address</th>' +*/
+                '                <th style="width: 8%;">Position</th>' +
+                '                <th style="width: 15%;">Address</th>' +
                 '                <th style="width: 7%;">Action</th>' +
                 '                <th style="width: 7%;">Status</th>' +
                 '            </tr>' +
