@@ -514,6 +514,9 @@ class C_api extends CI_Controller {
             }
             //echo $dataWhere;die();
         }
+        if(!empty($data_arr['Approval']) && $data_arr['Approval'] == true){
+            $dataWhere .= ' AND (te.isApproval = 1)';
+        }
         /*END UPDATED BY FEBRI @  JAN 2020*/
 
         $dataSearch = '';
@@ -527,6 +530,7 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
                         LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
                         LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
                         WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.ID DESC ';
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';

@@ -232,7 +232,7 @@
 <div id="fetchRequestDataEmp"></div>
 
 <script type="text/javascript">
-    function loadDataEmployees() {
+    function loadDataEmployees(approval=false) {
         loading_page('#divDataEmployees');
 
         setTimeout(function () {
@@ -252,7 +252,7 @@
             /*UPDATED BY FEBRI @ JAN 2020*/
             /*var filterStatusEmployees = $('#filterStatusEmployees').val();
             var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
-            var token = jwt_encode({Filter : $("#form-filter").serialize()},'UAP)(*');
+            var token = jwt_encode({Filter : $("#form-filter").serialize(),Approval : approval},'UAP)(*');
             /*END UPDATED BY FEBRI @ JAN 2020*/
 
             var dataTable = $('#tableEmployees').DataTable( {
@@ -294,15 +294,14 @@
         //UPDATED BY FEBRI @ NOV 2019
         $("#btn-need-appv").click(function(){
             var status = $(this).data("status");
-            var filterStatus = $('#filterStatusEmployees').val();
             if(status == "close"){
                 $(this).toggleClass("btn-default btn-info");
                 $(this).data("status","open");
-                loadDataEmployees(filterStatus,true);
+                loadDataEmployees(true);
             }else{
                 $(this).toggleClass("btn-info btn-default");
                 $(this).data("status","close");
-                loadDataEmployees();            
+                loadDataEmployees();
             }
         });
 
