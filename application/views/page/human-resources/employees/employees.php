@@ -1,6 +1,6 @@
 <style>
     #tableEmployees thead tr th {background: #20525a;color: #ffffff;text-align: center;}
-    .bg-primary {color: #fff;background-color: #337ab7;}
+    .bg-primary {color: #fff  !important;background-color: #337ab7;}
     .bg-success {background-color: #dff0d8;}
     .bg-info {background-color: #d9edf7;}
     .bg-warning {background-color: #fcf8e3 !important;}
