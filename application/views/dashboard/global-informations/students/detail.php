@@ -154,7 +154,7 @@
 											<div class="content">
 												<div class="row">
 													<label class="col-sm-3">Program</label>
-													<p class="col-sm-4"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
+													<p class="col-sm-9"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Study Program</label>

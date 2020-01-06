@@ -1,14 +1,146 @@
-
 <style>
-    #tableStudent thead tr th {
+    #table-list-data thead tr th {
         background: #20525a;
         color: #ffffff;
         text-align: center;
     }
+    #table-list-data .detail-user > img.std-img{width: 45px;float: left;margin-right: 10px;}
+    #table-list-data .detail-user{cursor: pointer;}
+    #table-list-data .detail-user > img.std-img{width: 45px;float: left;margin-right: 10px;}
+    #table-list-data .detail-user > p{margin:0px;font-weight: bold;color: #4d7496}
+    #table-list-data .detail-user > p.name{text-transform: uppercase;}
+    #table-list-data .detail-user > p.email{font-weight: 100;color: #000}
 </style>
 
+<div id="student-data">
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="filter-form">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title"><i class="fa fa-filter"></i> Form Filter</h4>
+                    </div>
+                    <div class="panel-body">
+                        <form id="form-filter" method="post" autocomplete="off">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Student</label>                              
+                                        <input type="text" class="form-control" name="student" placeholder="NIM or Name or Email">                              
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Class of</label>                             
+                                        <select class="form-control" name="Year">
+                                            <option value="">-Choose year-</option>
+                                            <?php if(!empty($yearIntake)) { 
+                                            foreach ($yearIntake as $y) {
+                                            echo '<option value="'.$y->Year.'">'.$y->Year.'</option>';
+                                            } } ?>
+                                        </select>                               
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Study Program</label>                                
+                                        <select class="form-control" name="ProdiID">
+                                            <option value="">-Choose one-</option>
+                                            <?php foreach ($studyprogram as $s) { 
+                                            echo '<option value="'.$s->ID.'">'.$s->Name.'</option>';
+                                            } ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label>Birthdate</label>
+                                        <div class="input-group">
+                                            <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">   
+                                            <div class="input-group-addon">-</div>
+                                            <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">                               
+                                <div class="col-sm-2">
+                                    <label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter" style="padding-top:0px">
+                                        <span>Advance filter</span> 
+                                        <i class="fa fa-angle-double-down"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="collapse" id="advance-filter">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Status</label>                               
+                                            <select class="form-control" name="status">
+                                                <option value="">-Choose one-</option>
+                                                <?php foreach ($statusstd as $t) { 
+                                                echo '<option value="'.$t->CodeStatus.'">'.$t->Description.'</option>';
+                                                } ?>
+                                            </select>                               
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Religion</label>
+                                            <select class="form-control" name="religion">
+                                                <option value="">Choose one</option>
+                                                <?php if(!empty($religion)){ 
+                                                foreach ($religion as $rg) { ?>
+                                                <option value="<?=$rg->ID?>"><?=$rg->Nama?></option>
+                                                <?php } } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label>Gender</label>
+                                            <select class="form-control" name="gender">
+                                                <option value="">Choose one</option>
+                                                <option value="P">Female</option>
+                                                <option value="L">Male</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Graduation Date</label>
+                                            <div class="input-group">
+                                                <input type="text" name="graduation_start" id="graduation_start" class="form-control" placeholder="Start date"> 
+                                                <div class="input-group-addon">-</div>
+                                                <input type="text" name="graduation_end" id="graduation_end" class="form-control" placeholder="End date">   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group" style="padding-top:22px">
+                                        <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
+                                        <a class="btn btn-default" href="">Clear Filter</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
 <div class="row">
-    <div class="col-md-12">
+    <!-- <div class="col-md-12">
         <div class="well">
             <div class="row">
                 <div class="col-xs-2">
@@ -35,26 +167,27 @@
                         <option disabled>------------------------</option>
                     </select>
                 </div>
+                
+            </div>
+        </div>
+    </div> -->
+    <div class="col-md-12">
+        <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
+        <div class="well">
+            <div class="row">
+                <div class="col-xs-3">
+                    <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Student to Excel</button>
+                </div>
+                <div class="col-xs-3">
+                    <button class="btn btn-block btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> IPS/IPK to Excel</button>
+                </div>
                 <!-- ADDED BY FEBRI @ NOV 2019 -->
                 <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-                <div class="col-xs-3">
+                <div class="col-xs-5">
                     <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
                 </div>
                 <?php } ?>
                 <!-- END ADDED BY FEBRI @ NOV 2019 -->
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-        <div class="well">
-            <div class="row">
-                <div class="col-xs-6">
-                    <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Student to Excel</button>
-                </div>
-                <div class="col-xs-6">
-                    <button class="btn btn-block btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> IPS/IPK to Excel</button>
-                </div>
             </div>
         </div>
         <?php } ?>
@@ -82,16 +215,115 @@
 
 <?php } ?>
 
-<div class="row" style="margin-top: 10px">
-    <div class="col-md-12">
-
-        <hr/>
-        <div id="divDataStudent"></div>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="fetch-data-tables">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="panel-title"><i class="fa fa-bars"></i> List of students</h5>
+                </div>
+                <div class="panel-body">
+                    <div class="table-list">
+                        <table class="table table-bordered table-striped" id="table-list-data">
+                            <thead>
+                                <tr>
+                                    <th width="2%">No</th>
+                                    <th width="15%">Student</th>
+                                    <th width="10%">Birthdate</th>
+                                    <th width="5%">Religion</th>
+                                    <th width="5%">Gender</th>
+                                    <th width="5%">Class of</th>
+                                    <th width="10%">Study Program</th>
+                                    <th width="10%">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-
 <div class="fetchDataRequest"></div>
+
+
+<script type="text/javascript">
+    function fetchingData() {
+        loading_modal_show();
+        var data = getFormData($("#form-filter"));      
+        var token = jwt_encode(data,'UAP)(*');
+        var dataTable = $('#fetch-data-tables .table').DataTable( {
+            destroy: true,
+            retrieve:true,
+            "processing": true,
+            "serverSide": true,
+            "iDisplayLength" : 10,
+            "ordering" : false,
+            "language": {
+                "searchPlaceholder": "NIM, Name, Study Program"
+            },
+            "ajax":{
+                url : base_url_js+'api/database/__getListStudentPS', // json datasource
+                ordering : false,
+                data : {token:token},
+                type: "post",  // method  , by default get
+                error: function(jqXHR){  // error handling
+                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                        '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                    $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                    $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                    $('#GlobalModal').modal({
+                        'show' : true,
+                        'backdrop' : 'static'
+                    });
+                }
+            },
+            "initComplete": function(settings, json) {
+                loading_modal_hide();
+            }
+        });
+    }
+
+    function getFormData($form){
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function(n, i){
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    }
+
+    $(document).ready(function(){
+        fetchingData();
+
+        $("#birthdate_start,#birthdate_end,#graduation_start,#graduation_end").datepicker({
+            dateFormat: 'dd-mm-yy',
+            changeYear: true,
+            changeMonth: true
+        });
+        $("#form-filter .btn-filter").click(function(){
+            $('#fetch-data-tables .table').DataTable().destroy();
+            fetchingData();
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
     var TaSegment = '<?php echo $this->uri->segment(3) ?>';
@@ -143,7 +375,7 @@
                                     }
                                 })
 
-                                console.log(rs);
+                                //console.log(rs);
                                 $('#filterCurriculum').find('option[value="'+rs+'"]').prop('selected',true);
 
                             }
@@ -346,7 +578,7 @@
     
     function loadStudent(approval=null) { //Updated by Febri @ Nov 2019, add param
         loading_page('#divDataStudent');
-        var filterCurriculum = $('#filterCurriculum').val();
+        /*var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterGroupProdi = $('#filterGroupProdi').val();
         var filterStatus = $('#filterStatus').val();
@@ -356,7 +588,7 @@
         var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
             ? filterBaseProdi.split('.')[0] : '';
         var StatusStudents = (filterStatus!='' && filterStatus!=null)
-            ? filterStatus : '';
+            ? filterStatus : '';*/
 
         setTimeout(function () {
             $('#divDataStudent').html('<table class="table table-bordered" id="tableStudent">' +
@@ -376,13 +608,27 @@
                 '                </thead>' +
                 '            </table>');
 
-            var data = {
+            /*var data = {
                 Year : Year,
                 ProdiID : ProdiID,
                 GroupProdiID : filterGroupProdi,
                 StatusStudents : StatusStudents,
                 approvalStudentReq : approval //Updated by Febri @ Nov 2019
+            };*/
+
+            /*ADDED BY FEBRI @ JAN 2020*/
+            var dataPost = $("#form-filter").serializeArray();
+            var dataJson = {};
+            for (var i = 0; i < dataPost.length; i++) {
+                if(dataPost[i].value || dataPost[i].value.trim()){
+                    //console.log(dataPost[i].name+":"+dataPost[i].value);
+                    dataJson[dataPost[i].name]=dataPost[i].value;
+                }
             };
+            dataJson['approvalStudentReq'] = approval;
+            var data = dataJson;
+            /*END ADDED BY FEBRI @ JAN 2020*/
+            console.log(data);
             var token = jwt_encode(data,'UAP)(*');
 
             var dataTable = $('#tableStudent').DataTable( {

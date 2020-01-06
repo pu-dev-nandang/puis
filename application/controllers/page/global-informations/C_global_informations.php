@@ -10,11 +10,17 @@ class C_global_informations extends Globalclass {
     }
 
 
-    public function menu_global_informations($page){
-        $data['page'] = $page;
-        $content = $this->load->view('dashboard/global-informations/menu_global_informations',$data,true);
+    public function index(){
+    	$content = $this->load->view('dashboard/global-informations/index','',true);
         $this->template($content);
     }
+    
+    public function user_tabs_global_informations($page){
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/global-informations/user_tabs_global_informations',$data,true);
+        $this->template($content);
+    }
+
 
     /*STUDENTS*/
 
@@ -24,7 +30,7 @@ class C_global_informations extends Globalclass {
     	$data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
     	$data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
         $page = $this->load->view('dashboard/global-informations/students/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 
@@ -103,9 +109,12 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();
     		$nestedData[] = ($no++);
     		$nestedData[] = $studentBox;
+    		$nestedData[] = "<p class='text-left'>".(!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.", ":"").date("d F Y", strtotime($v->DateOfBirth))."</p>";
+    		$nestedData[] = "<p class='text-center'>".$v->religionName."</p>";
+			$nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
     		$nestedData[] = "<center>".$v->ClassOf."</center>";
     		$nestedData[] = $v->ProdiNameEng;
-    		$nestedData[] = $v->StatusStudent;
+    		$nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
     		$nestedData[] = $v->NPM;
     		$data[] = $nestedData;
     	}
@@ -158,7 +167,7 @@ class C_global_informations extends Globalclass {
     	$data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
     	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $page = $this->load->view('dashboard/global-informations/lecturers/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 
@@ -314,7 +323,7 @@ class C_global_informations extends Globalclass {
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
     	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $page = $this->load->view('dashboard/global-informations/employees/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 

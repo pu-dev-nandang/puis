@@ -43,7 +43,7 @@
 										</select>								
 									</div>
 								</div>
-								<div class="col-sm-2">
+								<div class="col-sm-3">
 									<div class="form-group">
 										<label>Study Program</label>								
 										<select class="form-control" name="study_program">
@@ -64,14 +64,13 @@
 										</div>
 									</div>
 								</div>
-								
+							</div>
+							<div class="row">								
 								<div class="col-sm-2">
-									<div class="form-group">
-										<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
-											<span>Advance filter</span> 
-											<i class="fa fa-angle-double-down"></i>
-										</label>
-									</div>
+									<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter" style="padding-top:0px">
+										<span>Advance filter</span> 
+										<i class="fa fa-angle-double-down"></i>
+									</label>
 								</div>
 							</div>
 							<div class="collapse" id="advance-filter">
@@ -132,10 +131,6 @@
 									</div>
 								</div>
 							</div>
-
-							
-
-							
 						</form>
 					</div>
 				</div>
@@ -156,10 +151,13 @@
 								<thead>
 									<tr>
 										<th width="2%">No</th>
-										<th width="30%">Student</th>
-										<th width="8%">Class of</th>
-										<th>Study Program</th>
-										<th width="20%">Status</th>
+										<th width="15%">Student</th>
+										<th width="10%">Birthdate</th>
+										<th width="5%">Religion</th>
+										<th width="5%">Gender</th>
+										<th width="5%">Class of</th>
+										<th width="10%">Study Program</th>
+										<th width="10%">Status</th>
 									</tr>
 								</thead>
 								<tbody></tbody>
@@ -187,7 +185,7 @@
             "iDisplayLength" : 10,
             "ordering" : false,
             "language": {
-                "searchPlaceholder": "NIM, Name, Programme Study"
+                "searchPlaceholder": "NIM, Name, Study Program"
             },
             "ajax":{
                 url : base_url_js+'global-informations/studentsFetch', // json datasource

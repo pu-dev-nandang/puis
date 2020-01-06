@@ -64,14 +64,13 @@
 										</select>								
 									</div>
 								</div>
-
-								<div class="col-sm-2">
-									<div class="form-group">
-										<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
-											<span>Advance filter</span> 
-											<i class="fa fa-angle-double-down"></i>
-										</label>
-									</div>
+							</div>
+							<div class="row">								
+								<div class="col-sm-12">
+									<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter" style="padding-top:0px">
+										<span>Advance filter</span> 
+										<i class="fa fa-angle-double-down"></i>
+									</label>
 								</div>
 							</div>
 
