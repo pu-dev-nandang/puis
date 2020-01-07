@@ -702,6 +702,14 @@ class C_employees extends HR_Controler {
 
     }
 
+    public function lecturer_fees(){
+
+        $department = parent::__getDepartement();
+        $page = $this->load->view('page/'.$department.'/monitoring/lecturer_fees','',true);
+        $this->tab_menu_report($page);
+
+    }
+
 
 
     /*ADDED BY FEBRI @ NOV 2019*/
