@@ -19,10 +19,13 @@ class C_auth extends Globalclass {
         $this->db = $this->load->database('default', TRUE);
     }
 
-    public function checkSKS($SemesterID,$StatusEmployeeID,$StatusLecturerID){
+    public function checkSKS($SemesterID,$StatusEmployeeID,$StatusLecturerID,$ProdiID){
+
+        $whereProdi = ($ProdiID!='0' && $ProdiID!=0) ? ' AND em.ProdiID = "'.$ProdiID.'" ' : '';
 
         $dataLecturer = $this->db->query('SELECT NIP, Name FROM db_employees.employees em
                                                   WHERE em.StatusEmployeeID = "'.$StatusEmployeeID.'" AND em.StatusLecturerID = "'.$StatusLecturerID.'"
+                                                  '.$whereProdi.'
                                                   ORDER BY em.NIP ASC ')->result_array();
 
 
@@ -138,6 +141,7 @@ class C_auth extends Globalclass {
         $data['dataLecturer'] = $dataLecturer;
 
         $data['SemesterID'] = $SemesterID;
+        $data['ProdiID'] = $ProdiID;
         $data['StatusEmployeeID'] = $StatusEmployeeID;
         $data['StatusLecturerID'] = $StatusLecturerID;
 
