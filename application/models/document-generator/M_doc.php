@@ -407,17 +407,24 @@ class M_doc extends CI_Model {
     	 
     	//Close the file handler.
     	fclose($fp);
-    	 
     	if($statusCode == 200){
-    		$this->deleteFileConverter();
+    		$this->deleteFileConverter($rs['callback']);
     		$result['status'] = 1;
     		$result['callback'] = base_url().'uploads/document-generator/template/temp/'.$rs['callback'];
     	}
     	return $result; 
     }
 
-    private function deleteFileConverter(){
-    	$array =[$this->session->userdata('NIP').'.docx',$this->session->userdata('NIP').'.pdf'];
+    private function deleteFileConverter($filename = ''){
+        if ($filename == '') {
+            $array =[$this->session->userdata('NIP').'.docx',$this->session->userdata('NIP').'.pdf'];
+        }
+        else
+        {
+            $ex = explode('.', $filename);
+            $array =[$ex[0].'.docx',$ex[0].'.pdf'];
+        }
+    	
     	$result = [];
     	$pas = md5('Uap)(*&^%');
     	$pass = sha1('jksdhf832746aiH{}{()&(*&(*'.$pas.'HdfevgyDDw{}{}{;;*766&*&*');
@@ -787,6 +794,574 @@ class M_doc extends CI_Model {
     	$rs=['status' => 1,'msg' => ''];
     	return $rs;
     }
+
+    public function previewbyUserRequest($dataToken){
+        $this->load->model('document-generator/m_set');
+        $this->load->model('document-generator/m_user');
+        $this->load->model('document-generator/m_grab');
+        $rs = [];
+        $ID = $dataToken['ID'];
+        $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
+
+        $FileTemplate    = './uploads/document-generator/template/'.$G_dt[0]['PathTemplate'];
+        $line = $this->__readDoc($FileTemplate);
+        $Filtering = [];
+        $Input = $dataToken['settingTemplate'];
+        $DepartmentID = $dataToken['DepartmentID'];
+        foreach ($line as $v) {
+            if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+                $str = trim($matches[1][0]);
+                $ex = explode('.', $str);
+                if (count($ex) > 0) {
+                    switch ($ex[0]) {
+                        case $this->KeySET:
+                            
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+                                // print_r($callback_data);
+                                $rs[$this->KeySET] = $callback_data;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                            break;
+                        case $this->KeyUSER:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyUSER] = $this->m_user->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case $this->KeyINPUT:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyINPUT] = $getObjInput;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case $this->KeyGRAB:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGRAB] = $this->m_grab->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
+                        case $this->KeyTABLE:
+                            if (!in_array($ex[0], $Filtering)){
+                                
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                    }
+
+                    $Filtering[] = $ex[0];
+                }
+            }
+        }
+
+        return $this->__preview_templatebyUserRequest($rs,$FileTemplate);
+    }
+
+    private function __SETWriteSignatureNoSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
+        // print_r($arrValue);die();
+        for ($i=0; $i < count($arrValue); $i++) { 
+            $keyApproval = $i + 1;
+            // show signature image or not
+            if ($arrValue[$i]['verify']['valueVerify'] == 1) {
+                $img = $arrValue[$i]['verify']['img'];
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j]; 
+                    $ex = explode('.', $str);
+                    if ($ex[0] == 'Signature') {
+                        $key2 = $ex[1];
+                        $exKey2 = explode('#', $key2);
+                        if (count($exKey2)) {
+                            switch ($exKey2[0]) {
+                                case 'Image':
+                                    $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    $TemplateProcessor->setValue($setValue,'');
+                                    break;
+                                
+                                default:
+                                    
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            echo 'Approval number not set';
+                            die();
+                        }
+                        
+                    }
+                }
+            }
+            elseif ($arrValue[$i]['verify']['valueVerify'] == 0) {
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j]; 
+                    $ex = explode('.', $str);
+                    if ($ex[0] == 'Signature') {
+                        $key2 = $ex[1];
+                        $exKey2 = explode('#', $key2);
+                        if (count($exKey2)) {
+                            switch ($exKey2[0]) {
+                                case 'Image':
+                                    $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    $TemplateProcessor->setValue($setValue,'');
+                                    break;
+                                
+                                default:
+                                    
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            echo 'Approval number not set';
+                            die();
+                        }
+                        
+                    }
+                }
+            }
+
+            // show cap image or not
+            if ($arrValue[$i]['cap']['valueCap'] == 1) {
+                $img = $arrValue[$i]['cap']['img'];
+
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j]; 
+                    $ex = explode('.', $str);
+                    if ($ex[0] == 'Signature') {
+                        $key2 = $ex[1];
+                        $exKey2 = explode('#', $key2);
+                        if (count($exKey2)) {
+                            switch ($exKey2[0]) {
+                                case 'Cap':
+                                    $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    $TemplateProcessor->setValue($setValue,'');
+                                    break;
+                                
+                                default:
+                                    
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            echo 'Approval number not set';
+                            die();
+                        }
+                        
+                    }
+                }
+            }
+            elseif ($arrValue[$i]['cap']['valueCap'] == 0) {
+                for ($j=0; $j < count($arrKomponen); $j++) {
+                    $str = $arrKomponen[$j]; 
+                    $ex = explode('.', $str);
+                    if ($ex[0] == 'Signature') {
+                        $key2 = $ex[1];
+                        $exKey2 = explode('#', $key2);
+                        if (count($exKey2)) {
+                            switch ($exKey2[0]) {
+                                case 'Cap':
+                                    $setValue = $ex[0].'.'.$exKey2[0].'#'.$keyApproval;
+                                    $TemplateProcessor->setValue($setValue,'');
+                                    break;
+                                
+                                default:
+                                    
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            echo 'Approval number not set';
+                            die();
+                        }
+                        
+                    }
+                }
+            }
+
+            // write name di arrKomponen key ke 2
+            if (array_key_exists(2, $arrKomponen)) {
+                $setValue = $arrKomponen[2];
+                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NameEMP']);
+            }
+
+            // write name di arrKomponen key ke 3
+            if (array_key_exists(3, $arrKomponen)) {
+                $setValue = $arrKomponen[3];
+                $TemplateProcessor->setValue($setValue,$arrValue[$i]['NIPEMP']);
+            }
+            
+        }
+        
+    }
+
+    private function __preview_templatebyUserRequest($rsGET,$FileTemplate){
+        // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
+        $line = $this->__readDoc($FileTemplate);
+        $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
+
+        foreach ($line as $v) {
+            if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+                for ($z=0; $z < count($matches[1]); $z++) { 
+                    $str = trim($matches[1][$z]);
+                    $ex = explode('.', $str);
+                    $setValue = $str;
+                    // print_r($str.'<br/>');
+                    foreach ($rsGET as $keyRS => $valueRS) {
+                        switch ($ex[0]) {
+                            case $this->KeySET:
+                                if ($this->KeySET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[1]));
+                                    if ($setStr == 'PolaNoSurat') {
+                                        $TemplateProcessor->setValue($setValue,trim($rsGET[$keyRS][$setStr]['NoSuratStr']) );
+                                    }
+                                    elseif ($setStr == 'Signature') {
+                                        $arrKomponen = $matches[1];
+                                        $arrValue = $rsGET[$keyRS][$setStr];
+                                        $this->__SETWriteSignatureNoSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
+                                        
+                                    }
+                                }
+                                break;
+                            case $this->KeyUSER:
+                                if ($this->KeyUSER == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    for ($i=0; $i < count($obj); $i++) { 
+                                        if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                break;
+                            case $this->KeyINPUT:
+                                if ($this->KeyINPUT == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    for ($i=0; $i < count($obj); $i++) { 
+                                        if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            case $this->KeyGRAB:
+                                if ($this->KeyGRAB == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    foreach ($obj as $Objkey => $objvalue) {
+                                        if ($Objkey == 'Date') {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$Objkey]['value']));
+                                            break;
+                                        }
+                                    }
+                                    
+                                }
+                                break;
+                            case $this->KeyTABLE:
+                                
+                                break;
+                        }
+                    }
+                }
+                
+                
+            }
+        }
+        
+        $NIPExt = $this->session->userdata('NIP').'.docx';
+        $FileName = $NIPExt;
+        $pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+        $pathFile = $pathFolder.$NIPExt; 
+        $TemplateProcessor->saveAs($pathFile,$pathFolder);
+        $convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileName);
+        return $convert;
+
+    }
+
+    public function savebyUserRequest($dataToken){
+        $dataSave = [];
+        $this->load->model('document-generator/m_set');
+        $this->load->model('document-generator/m_user');
+        $this->load->model('document-generator/m_grab');
+        $rs = [];
+        $ID = $dataToken['ID'];
+        $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
+        $DocumentName = $G_dt[0]['DocumentName'];
+
+        $FileTemplate    = './uploads/document-generator/template/'.$G_dt[0]['PathTemplate'];
+        $line = $this->__readDoc($FileTemplate);
+        $Filtering = [];
+        $Input = $dataToken['settingTemplate'];
+        $DepartmentID = $dataToken['DepartmentID'];
+        foreach ($line as $v) {
+            if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+                $str = trim($matches[1][0]);
+                $ex = explode('.', $str);
+                if (count($ex) > 0) {
+                    switch ($ex[0]) {
+                        case $this->KeySET:
+                            
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $callback_data = $this->m_set->preview_template($getObjInput,$ID,$DepartmentID);
+                                // print_r($callback_data);
+                                $rs[$this->KeySET] = $callback_data;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                            break;
+                        case $this->KeyUSER:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyUSER] = $this->m_user->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case $this->KeyINPUT:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyINPUT] = $getObjInput;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case $this->KeyGRAB:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGRAB] = $this->m_grab->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
+                        case $this->KeyTABLE:
+                            if (!in_array($ex[0], $Filtering)){
+                                
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                    }
+
+                    $Filtering[] = $ex[0];
+                }
+            }
+        }
+
+        
+        $dataSave['ID_document'] = $ID;
+        $dataSave['NoSuratOnly'] = $rs['SET']['PolaNoSurat']['NoSuratOnly'];
+        $dataSave['NoSuratFull'] = $rs['SET']['PolaNoSurat']['NoSuratStr'];
+        $dataSave['UserNIP'] = $this->session->userdata('NIP');
+        $dataSave['DateRequest'] = date('Y-m-d');
+        $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
+        $dataSave['UpdatedAt'] = date('Y-m-d H:i:s');
+        $dataSave['Status'] = 'Request';
+        $dataSave = $this->__saveApproval($dataSave,$rs['SET']['Signature']);
+        
+        $dataSave = $this->__saveInput($dataSave,$dataToken['settingTemplate']['INPUT']);
+        $getPath = $this->__savebyUserRequest($rs,$FileTemplate,$DocumentName);
+        $dataSave['Path'] = $getPath;
+        $this->__clearTempFile();
+        $this->db->insert('db_generatordoc.document_data',$dataSave);
+        return 1;
+
+    }
+
+    private function __clearTempFile(){
+        $ext = ['.docx','.pdf'];
+        $pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
+        for ($i=0; $i < count($ext); $i++) { 
+            $pathFile = $pathFolder.$this->session->userdata('NIP').$ext[$i];
+            if (file_exists($pathFile)) {
+                unlink($pathFile);
+            }
+        }
+    }
+
+    private function __saveInput($dataSave,$dt){
+        for ($i=0; $i < count($dt); $i++) { 
+            $dataSave[$dt[$i]['mapping']]=$dt[$i]['value'];
+        }
+
+        return $dataSave;
+    }
+
+    private function __savebyUserRequest($rsGET,$FileTemplate,$DocumentName){
+        // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
+        $line = $this->__readDoc($FileTemplate);
+        $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
+
+        foreach ($line as $v) {
+            if(preg_match_all('/{+(.*?)}/', $v, $matches)){
+                for ($z=0; $z < count($matches[1]); $z++) { 
+                    $str = trim($matches[1][$z]);
+                    $ex = explode('.', $str);
+                    $setValue = $str;
+                    // print_r($str.'<br/>');
+                    foreach ($rsGET as $keyRS => $valueRS) {
+                        switch ($ex[0]) {
+                            case $this->KeySET:
+                                if ($this->KeySET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[1]));
+                                    if ($setStr == 'PolaNoSurat') {
+                                        $TemplateProcessor->setValue($setValue,trim($rsGET[$keyRS][$setStr]['NoSuratStr']) );
+                                    }
+                                    elseif ($setStr == 'Signature') {
+                                        $arrKomponen = $matches[1];
+                                        $arrValue = $rsGET[$keyRS][$setStr];
+                                        $this->__SETWriteSignatureNoSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue);
+                                        
+                                    }
+                                }
+                                break;
+                            case $this->KeyUSER:
+                                if ($this->KeyUSER == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    for ($i=0; $i < count($obj); $i++) { 
+                                        if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                break;
+                            case $this->KeyINPUT:
+                                if ($this->KeyINPUT == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    for ($i=0; $i < count($obj); $i++) { 
+                                        if ($setStr.'.'.$obj[$i]['field'] == $setValue) {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$i]['value']));
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            case $this->KeyGRAB:
+                                if ($this->KeyGRAB == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    foreach ($obj as $Objkey => $objvalue) {
+                                        if ($Objkey == 'Date') {
+                                            $TemplateProcessor->setValue($setValue,trim($obj[$Objkey]['value']));
+                                            break;
+                                        }
+                                    }
+                                    
+                                }
+                                break;
+                            case $this->KeyTABLE:
+                                
+                                break;
+                        }
+                    }
+                }
+                
+                
+            }
+        }
+
+        $DocumentName = preg_replace('/\s+/', '_', $DocumentName);
+        
+        $FileName = $DocumentName.'_'.$this->session->userdata('NIP').'_'.uniqid();
+        $FileNameExt = $FileName.'.docx';
+        $pathFolder = FCPATH."uploads\\document-generator\\"; 
+        $pathFile = $pathFolder.$FileNameExt; 
+        $TemplateProcessor->saveAs($pathFile,$pathFolder);
+        $convert = $this->ApiConvertDocxToPDF($pathFile,$pathFolder,$FileNameExt);
+        if (file_exists($pathFile)) {
+            unlink($pathFile);
+        }
+        return $FileName.'.pdf';
+
+    }
+
+
+
+    private function __saveApproval($dataSave,$dt){
+        /*
+            key Field 
+            * Approve1
+            * Approve1Status
+            * Approve1At
+            * TotApproval
+
+        */
+
+        $dataSave['TotApproval'] = count($dt);
+        $key;
+        for ($i=0; $i < count($dt); $i++) { 
+            $key = $i+1;
+            if ($dt[$i]['verify']['valueVerify'] == 1 ) {
+               $dataSave['Approve'.$key] = $dt[$i]['NIPEMP'];
+               $dataSave['Approve'.$key.'Status'] = 0;
+            }
+            else
+            {
+                $dataSave['Approve'.$key] = $dt[$i]['NIPEMP'];
+                $dataSave['Approve'.$key.'Status'] = 1;
+            }
+        }
+
+        $LeftApproval = 3 - $dataSave['TotApproval'];
+        for ($i=0; $i < $LeftApproval ; $i++) { 
+            $key++;
+            $dataSave['Approve'.$key.'Status'] = 1;
+            
+        }
+
+        return $dataSave;   
+    }
+
     
   
 }

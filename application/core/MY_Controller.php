@@ -830,8 +830,8 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
     }
 
     public function menu_document($page){
-        $data['page'] = $page;
-        $content = $this->load->view('global/request-document-generator/menu_document',$data,true);
+        $this->data['page'] = $page;
+        $content = $this->load->view('global/request-document-generator/menu_document',$this->data,true);
         $this->temp($content);
     }
 

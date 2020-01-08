@@ -35,6 +35,7 @@
 			if (typeof msgMasterDocument !== 'undefined') {
 			    $('#pageRequestDocument').html('<p style="color:red;">'+msgMasterDocument+'</p>');
 			    $('#Preview').addClass('hide');
+			    $('#btnSave').prop('disabled',true);
 			    settingTemplate = [];
 			}
 		},
@@ -81,7 +82,7 @@
 			for (var i = 0; i < dt.length; i++) {
 				html  +=   '<div class = "form-group">'+
 				                '<label>'+dt[i].field+'</label>'+
-				                '<input type = "text" class="form-control Input" name="'+dt[i].mapping+'" placeholder = "'+dt[i].value+'" />'+
+				                '<textarea class="form-control Input" name="'+dt[i].mapping+'" placeholder = "'+dt[i].value+'" />'+
 				            '</div>';
 			}
 
@@ -90,7 +91,8 @@
 		},
 
 		DomSetPage_Approval : function(selector,dt){
-			console.log(dt);
+			loading_anytext(selector,'Loading approval');
+			// console.log(dt);
 			var html = '<div class = "thumbnail" style = "margin-top:5px;">'+
 			                '<div class = "row">'+
 			                    '<div class = "col-md-12">'+
@@ -98,10 +100,108 @@
 			                            '<h3><u><b>Approval</b></u></h3>'+
 			                        '</div>';
 			/*  Check Need Approval or Not */
+			var bool = false;
+			for (var i = 0; i < dt.length; i++) {
+				var userChoose = dt[i].user;
+				var selectChoose = dt[i].select;
+				for (var j = 0; j < selectChoose.length; j++) {
+					var ID = selectChoose[j].ID;
+					if (ID == userChoose) {
+						if (i == 0) {
+							bool = true;
+							html += '<ul>';
+						}
+						var textVerify = (dt[i].verify == 1) ? 'Approve by System' : 'Approve manual';
+						html += '<li style = "margin-left : -20px;">Approval '+(i+1)+' : '+'<span style="color:green;">'+selectChoose[j].Value+'</span>'+'<br/>'+'<label>'+textVerify+'</label>'+'</li>';
+						break;
+					}
+				}
+				
+				if (bool) {
+					html += '</ul>';
+				}
+
+			}
+
+			selector.html(html);
+			
+		},
+
+		SubmitPreviewPDF : function(selector){
+			// console.log(settingTemplate.INPUT);
+			for (var i = 0; i < settingTemplate.INPUT.length; i++) {
+				$('.Input').each(function(e){
+					var nameattr= $(this).attr('name');
+					if (settingTemplate.INPUT[i].mapping == nameattr  ) {
+						settingTemplate.INPUT[i].value = $(this).val();
+						return;
+					}
+				})
+			}
+
+			// console.log(settingTemplate);
+			var url = base_url_js+"__request-document-generator/__previewbyUserRequest";
+		    var data = {
+		       settingTemplate : settingTemplate,
+		       ID : $('#MasterSurat option:selected').val(),
+		       DepartmentID : DepartmentID,
+		    }
+		    var token =  jwt_encode(data,'UAP)(*');
+		    loading_button2(selector);
+		    AjaxSubmitTemplate(url,token).then(function(response){
+		    	if (response.status == 1) {
+		    	    window.open(response.callback, '_blank');
+		    	    $('#btnSave').prop('disabled',false);
+		    	}
+		    	else
+		    	{
+		    	    toastr.error('Something error,please try again');
+		    	}
+		    	end_loading_button2(selector,'Preview');
+			}).fail(function(response){
+		        toastr.error('Connection error,please try again');
+		        end_loading_button2(selector,'Preview');
+		    })
+		},
+
+		SaveData : function(selector){
+			var url = base_url_js+"__request-document-generator/__savebyUserRequest";
+		    var data = {
+		       settingTemplate : settingTemplate,
+		       ID : $('#MasterSurat option:selected').val(),
+		       DepartmentID : DepartmentID,
+		    }
+		    var token =  jwt_encode(data,'UAP)(*');
+		    loading_button2(selector);
+		    AjaxSubmitTemplate(url,token).then(function(response){
+		    	if (response == 1) {
+		    		toastr.success('Saved');
+		    	    $('#MasterSurat').trigger('change');
+		    	}
+		    	else
+		    	{
+		    	    toastr.error('Something error,please try again');
+		    	}
+		    	end_loading_button2(selector,'Save');
+			}).fail(function(response){
+		        toastr.error('Connection error,please try again');
+		        end_loading_button2(selector,'Save');
+		    })
 		},
 	};
 
 	$(document).ready(function(){
 		App_input.Loaded();
+	})
+
+	$(document).off('click', '#Preview').on('click', '#Preview',function(e) {
+	   var itsme = $(this);
+	   App_input.SubmitPreviewPDF(itsme);
+	})
+
+	$(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
+	   var itsme = $(this);
+	   App_input.SaveData(itsme);
+
 	})
 </script>

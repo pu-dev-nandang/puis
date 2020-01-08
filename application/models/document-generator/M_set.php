@@ -84,7 +84,7 @@ class M_set extends CI_Model {
 		
 	}
 
-	public function preview_template($getObjInput,$ID_document=''){
+	public function preview_template($getObjInput,$ID_document='',$DepartmentID=''){
 		$rs = [];
 		foreach ($getObjInput as $key => $value) {
 			switch ($key) {
@@ -104,19 +104,92 @@ class M_set extends CI_Model {
 						$cap = $obj[$i]['cap'];
 						switch ($Choose) {
 							case 'Position':
-								$sql = "select * from db_employees.employees
-								        where ( 
-								        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
-								        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
-								        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
-								        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+								if ($DepartmentID != '') {
+									$exDepartment = explode('.', $DepartmentID);
+									$IDDivision = $exDepartment[1];
+									if ($exDepartment[0] == 'NA') {
+										$sql = "select * from db_employees.employees
+										        where ( 
+										        		(
+										        		SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+										        		SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+										        		SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+										        		SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+										        		)
+										        		and 
+										        		(
+										        			SPLIT_STR(PositionMain, '.', 1) = ".$IDDivision." or
+										        			SPLIT_STR(PositionOther1, '.', 1) = ".$IDDivision." or
+										        			SPLIT_STR(PositionOther2, '.', 1) = ".$IDDivision." or
+										        			SPLIT_STR(PositionOther3, '.', 1) = ".$IDDivision." 
+										        		)
+										        	)
 
-								        	)and StatusEmployeeID != -1
-								        limit 1
-								        ";
-								$query=$this->db->query($sql, array())->result_array();
+										        	and StatusEmployeeID != -1
+										        limit 1
+										        ";
+										$query=$this->db->query($sql, array())->result_array();
+									}
+									elseif ($exDepartment[0] == 'AC') {
+										if ($user == 5) { // dekan
+											$ProdiID = $exDepartment[1];
+											$sql = 'select b.NIP from db_academic.program_study as a 
+													join db_academic.faculty as b
+													on a.FacultyID = b.FacultyID
+													where a.ID = '.$ProdiID.'
+													';
+											$_query = $this->db->query($sql, array())->result_array();
+											$NIP = $_query[0]['NIP'];
+
+											$sql = 'select * from db_employees.employees where NIP = "'.$NIP.'" and StatusEmployeeID != -1
+											        limit 1 ';
+											$query=$this->db->query($sql, array())->result_array();
+										}
+										elseif ($user == 6) {
+											$ProdiID = $exDepartment[1];
+											$sql = 'select a.KaprodiID from db_academic.program_study
+													';
+											$_query = $this->db->query($sql, array())->result_array();
+											$NIP = $_query[0]['KaprodiID'];
+
+											$sql = 'select * from db_employees.employees where NIP = "'.$NIP.'" and StatusEmployeeID != -1
+											        limit 1 ';
+											$query=$this->db->query($sql, array())->result_array();
+										}
+										else
+										{
+											$sql = "select * from db_employees.employees
+											        where ( 
+											        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+
+											        	)and StatusEmployeeID != -1
+											        limit 1
+											        ";
+											$query=$this->db->query($sql, array())->result_array();
+										}
+									}
+									
+								}
+								else
+								{
+									$sql = "select * from db_employees.employees
+									        where ( 
+									        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+									        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+									        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+									        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+
+									        	)and StatusEmployeeID != -1
+									        limit 1
+									        ";
+									$query=$this->db->query($sql, array())->result_array();
+								}
+								
 								$value = '';
-								if (count($query) == 0 ) {
+								if (count($query) == 0 && !isset($query) ) {
 									echo "Position User not exist";
 									die();
 								}
@@ -183,10 +256,11 @@ class M_set extends CI_Model {
 						and Year(DateRequest) = "'.$Year.'"
 						order by ID desc limit 1';
 				$query = $this->db->query($sql,array($ID_document))->result_array();
+
 				$NoSuratOnly = 1;
 				$maxCharacter = 3;
 				if (count($query) > 0 ) {
-					$NoSuratOnly = $query[0]['NoSuratOnly'];
+					$NoSuratOnly =(int)$query[0]['NoSuratOnly']+1;
 				}
 
 				$len = strlen($NoSuratOnly);
