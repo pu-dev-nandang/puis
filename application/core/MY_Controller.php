@@ -518,7 +518,13 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         $data = array();
         if ($MenuDepartement == 'NA.15' || $MenuDepartement == 'NA.14') {
-            $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
+            if ($this->session->userdata('prodi_active_id')) {
+                $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
+            }
+            else
+            {
+                $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
+            }
         }
 
         if ($MenuDepartement == 'NA.34') {
