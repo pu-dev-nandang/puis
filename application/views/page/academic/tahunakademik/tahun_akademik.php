@@ -29,7 +29,7 @@
 
 
 <script>
-
+var oTable;
     $(document).ready(function () {
         loadTable();
     });
@@ -268,6 +268,244 @@
 
 <!-- Untuk detail tahun akademik -->
 <script>
+    var AppJQ = {
+        setDefaultInput :function(){
+            $('.input[name="Year"]').val('');
+            $('.input[name="YearName"]').val('');
+            $('#UploadFile').val('');
+            $('#btnSave').attr('action','add');
+            $('#btnSave').attr('data-id','');
+            $('.fileShow').find('li').remove();
+        },
+        loaded : function(){
+            AppJQ.LoadAjaxData();
+
+        },
+        
+        LoadAjaxData : function(){
+                var data = {
+                    action : 'read',
+                    auth : 's3Cr3T-G4N',
+                };
+                 var token = jwt_encode(data,'UAP)(*');
+                 var recordTable = $('#TblCalendar').DataTable({
+                     "processing": true,
+                     "serverSide": false,
+                     "ajax":{
+                         url : base_url_js+"rest3/__crud_calendar", // json datasource
+                         ordering : false,
+                         type: "post",  // method  , by default get
+                         data : {token : token}                                    
+                     },
+                           'columnDefs': [
+                              {
+                                 'targets': 0,
+                                 'searchable': false,
+                                 'orderable': false,
+                                 'className': 'dt-body-center',
+                              },
+                              {
+                                 'targets': 3,
+                                 'searchable': false,
+                                 'orderable': false,
+                                 'className': 'dt-body-center',
+                                 'render': function (data, type, full, meta){
+                                    var FileJson = jQuery.parseJSON(full[3]);
+                                     var fileAhref =(full[3] == '' || full[3] == null || FileJson.length == 0) ? '' : '<a class="btn btn-xs btn-primary" href = "'+base_url_js+'fileGetAny/calendar-'+FileJson[0]+'" target="_blank" class = "Fileexist">  <i class="fa fa-file-pdf-o"></i> View PDF'+'</a>';
+                                     return fileAhref;
+                                 }
+                              },
+                              {
+                                 'targets': 6,
+                                 'searchable': false,
+                                 'orderable': false,
+                                 'className': 'dt-body-center',
+                                 'render': function (data, type, full, meta){
+                                    if (full[6]== 1) {
+                                        return '<span class="label label-danger">Unpublish</span>'
+                                    }
+                                    else {
+                                        return '<span class="label label-success">publish</span>'
+                                    }
+                                 }
+                              },      
+                              {
+                                 'targets': 7,
+                                 'searchable': false,
+                                 'orderable': false,
+                                 'className': 'dt-body-center',
+                                 'render': function (data, type, full, meta){
+                                     var btnAction = '<div class="btn-group">' +
+                                         '  <button type="button" class="btn btn-sm btn-default btn-default-primary  btn-th-action" >' +
+                                         '    <a href="javascript:void(0);" class="btnPublish" data-id="'+full[7]+'" data = "'+full[8]+'"><i class="fa fa-bullhorn" aria-hidden="true"></i> Publish</a>' +
+                                         '  </button>' +
+                                         // '  <ul class="dropdown-menu">' +
+                                         // '    <li><a href="javascript:void(0);" class="btnPublish" data-id="'+full[7]+'" data = "'+full[8]+'"><i class="fa fa-share-square "></i> Publish</a></li>' +
+                                         // '    <li role="separator" class="divider"></li>' +
+                                         // '    <li><a href="javascript:void(0);" class="btnRemove" data-id="'+full[7]+'"><i class="fa fa fa-trash"></i> Remove</a></li>' +
+                                         // '  </ul>' +
+                                         '</div>';
+                                     return btnAction;
+                                 }
+                              },
+                           ],
+                     'createdRow': function( row, data, dataIndex ) {
+                             
+                     },
+                     dom: 'l<"toolbar">frtip',
+                     initComplete: function(){
+                       
+                    }  
+                 });
+
+                 oTable = recordTable;
+        },
+     
+        ActionData : function(selector,action="add",ID=""){
+            var form_data = new FormData();
+            var data = {};
+            $('.input').each(function(){
+                var field = $(this).attr('name');
+                data[field] = $(this).val();
+            })
+            // console.log(data); return
+            data['Entered_by'] = sessionNIP;
+            var dataform = {
+                ID : ID,
+                data : data,
+                action : action,
+                auth : "s3Cr3T-G4N"
+            };
+            var token = jwt_encode(dataform,"UAP)(*");
+            form_data.append('token',token);
+
+
+            if ( $( '#'+'UploadFile').length ) {
+                var UploadFile = $('#'+'UploadFile')[0].files;
+                for(var count = 0; count<UploadFile.length; count++)
+                {
+                 form_data.append("FileUpload[]", UploadFile[count]);
+                }
+            }
+            if (confirm('Are you sure ?')) {
+                loading_button2(selector);
+                var url = base_url_js + "rest3/__crud_calendar";
+                        $.ajax({
+                          type:"POST",
+                          url:url,
+                          data: form_data, // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+                          contentType: false,       // The content type used when sending data to the server.
+                          cache: false,             // To unable request pages to be cached
+                          processData:false,
+                          dataType: "json",
+                          success:function(data)
+                          {
+                            AppJQ.setDefaultInput();
+                            end_loading_button2(selector);
+                            oTable.ajax.reload( null, false );
+                          },
+                          error: function (data) {
+                            toastr.error("Connection Error, Please try again", 'Error!!');
+                            end_loading_button2(selector);
+                            
+                          }
+                        })
+            }
+            
+        },
+        DeleteFile : function(selector,filePath,idtable,fieldwhere,table,field,typefield,delimiter){
+            var li = selector.closest('li');
+            var DeleteDb = {
+                auth : 'Yes',
+                detail : {
+                    idtable : idtable,
+                    fieldwhere : fieldwhere,
+                    table : table,
+                    field : field,
+                    typefield : typefield,
+                    delimiter : delimiter,
+                },
+            }
+
+            if (confirm('Are you sure ?')) {
+                 loading_button2(selector);
+                 var url = base_url_js + 'rest2/__remove_file';
+                 var data = {
+                     filePath : filePath,
+                     auth : 's3Cr3T-G4N',
+                     DeleteDb :DeleteDb,
+                 }
+
+                 var token = jwt_encode(data,"UAP)(*");
+                 $.post(url,{ token:token },function (resultJson) {
+                     if (resultJson == 1) {
+                         li.remove();
+                         oTable.ajax.reload( null, false );
+                     }
+                     else{
+                         toastr.error('', '!!!Failed');
+                     }
+                 }).fail(function() {
+                   toastr.error('The Database connection error, please try again', 'Failed!!');
+                 }).always(function() {
+                     end_loading_button2(selector);
+                 });
+            }
+        },
+        validation_file : function(selector,TheName = ''){
+            var files = selector[0].files;
+            var error = '';
+            var msgStr = '';
+            var max_upload_per_file = 4;
+            if (files.length > max_upload_per_file) {
+              msgStr += TheName +' should not be more than 4 Files<br>';
+
+            }
+            else
+            {
+              for(var count = 0; count<files.length; count++)
+              {
+               var no = parseInt(count) + 1;
+               var name = files[count].name;
+               var extension = name.split('.').pop().toLowerCase();
+               if(jQuery.inArray(extension, ['pdf']) == -1)
+               {
+                // msgStr += TheName +' which file Number '+ no + ' Invalid Type File<br>';
+                msgStr += TheName +' Invalid Type File<br>';
+                //toastr.error("Invalid Image File", 'Failed!!');
+                // return false;
+               }
+
+               var oFReader = new FileReader();
+               oFReader.readAsDataURL(files[count]);
+               var f = files[count];
+               var fsize = f.size||f.fileSize;
+               // console.log(fsize);
+
+               if(fsize > 2000000) // 2mb
+               {
+                // msgStr += TheName + ' which file Number '+ no + ' Image File Size is very big<br>';
+                msgStr += TheName + ' Image File Size is very big<br>';
+                //toastr.error("Image File Size is very big", 'Failed!!');
+                //return false;
+               }
+               
+              }
+            }
+
+            if (msgStr != '') {
+              toastr.error(msgStr, 'Failed!!');
+              return false;
+            }
+            else
+            {
+              return true;
+            }
+        },
+
+    }
+
+
     $(document).on('click','.more_details',function () {
         var head = $(this).attr('data-head');
         var Type = $(this).attr('data-type');
@@ -595,141 +833,114 @@
     });
 
     // ==== Academic Calendar ===
-    $('#btnAcademicCalendar').click(function () {
-        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+    // $('#btnAcademicCalendar').click(function () {
+    $(document).off('click', '#btnAcademicCalendar').on('click', '#btnAcademicCalendar',function(e) {
+        
+        $('#GlobalModalLarge .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
             '<h4 class="modal-title">Academic Calendar</h4>');
 
-        var ck = "<?= $_SERVER['SERVER_NAME']; ?>";
+        // var ck = "<?= $_SERVER['SERVER_NAME']; ?>";
 
 
-        var htmlss = (ck!='localhost')
+        // var htmlss = (ck!='localhost')
+        var htmlss = (ck='')
             ? '<div style="text-align: center;margin-top: 50px;"><h2>This module is being developed by the IT team<br/><small>We made with <i style="color: indianred;" class="fa fa-heart"></i> & <i style="color: cornflowerblue;" class="fa fa-coffee"></i> for  a better system</small></h2></div>'
             : '<div class="row">' +
-            '    <div class="col-md-4" style="border-right: 1px solid #ccc;">' +
+            '    <div class="col-md-3" style="border-right: 1px solid #ccc;">' +
             '        <div class="form-group">' +
             '            <label>Year</label>' +
-            '            <input class="form-control" type="number" id="Year" placeholder="Ex : 2018">' +
+            '            <input class="form-control input" type="number" name="Year" placeholder="Ex : 2018">' +
             '        </div>' +
             '        <div class="form-group">' +
             '            <label>Year Name</label>' +
-            '            <input class="form-control" id="YearName" placeholder="Ex : 2018/2019">' +
+            '            <input class="form-control input" name="YearName" placeholder="Ex : 2018/2019">' +
             '        </div>' +
             '<form id="fileAnnouncement" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">' +
             '    <div class="form-group">' +
-            '            <label>File</label>' +
-            '        <label class="btn btn-sm btn-default btn-upload">' +
-            '            <i class="fa fa-upload margin-right"></i> .pdf | max 2 Mb' +
-            '            <input type="file" id="formFile" name="userfile" class="upload_files"' +
-            '                   style="display: none;" accept="application/pdf">' +
-            '        </label>' +
-            '        <p class="help-block" id="viewNameFile"></p>' +
-            '        <p class="help-block" id="viewZise"></p>' +
+            '            <label><i class="fa fa-upload margin-right"></i> File .pdf | max 2 Mb </label>' +
+            '        <input type="file" id="UploadFile" name="FileUpload" class="form-control" ' +
+            '        <p class="help-block" id="fileShow"></p>' +
+            // '        <p class="help-block" id="viewZise"></p>' +
             '    </div>' +
             '</form>' +
             '        <div class="form-group" style="text-align: right;">' +
-            '            <button class="btn btn-sm btn-success" id="btnSaveAcademicCalendar">Save</button>' +
+            '            <button class="btn btn-sm btn-success" action= "add" id="btnSave">Save</button>' +
             '        </div>' +
             '    </div>' +
-            '    <div class="col-md-8">' +
-            '        <table class="table table-striped">' +
+            '    <div class="col-md-9">' +
+             // '    <div class="table-responsive">' +
+            '        <table class="table table-striped" id = "TblCalendar">' +
             '            <thead>' +
             '            <tr>' +
             '                <th style="width: 1%;">No</th>' +
-            '                <th style="width: 15%;">Year</th>' +
-            '                <th>File</th>' +
-            '                <th style="width: 5%;"><i class="fa fa-cog"></i></th>' +
+            '                <th>Year</th>' +
+            '                <th>Year Name</th>' +
+            '                <th>File Upload</th>' +
+            '                <th>Entered by</th>' +
+            '                <th>Entered at</th>' +
+            '                <th>Status Publish</th>' +
+            '                <th> Action</th>' +
             '            </tr>' +
             '            </thead>' +
             '        </table>' +
             '    </div>' +
+            '    </div>' +
             '</div>';
 
-        $('#GlobalModal .modal-body').html(htmlss);
+        $('#GlobalModalLarge .modal-body').html(htmlss);
+        $('#GlobalModalLarge .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
 
-        $('.upload_files').change(function () {
+                $('#GlobalModalLarge').modal({
+                    'show' : true,
+                    'backdrop' : 'static'
+                });
 
-            var input = $('#formFileAnnc');
-            var file = input[0].files[0];
+        AppJQ.loaded();
 
-            $('#btnSubmitAnnouncement').prop('disabled',true);
+    })
 
-            if(file.type != 'application/pdf'){
-                alert('The file must be PDF');
-            } else {
-                var fileNameOri = file.name;
-                var fileName = fileNameOri.split(' ').join('_');
-                var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
-                $('#viewNameFile').html(fileName);
-                $('#viewZise').html('Size : '+fileSize+' Mb');
-                $('#alertFile').html('');
-                if(fileSize>2){
-                    alert('File lebih dari 2 MB');
-                    $('#alertFile').html('<div class="alert alert-danger" role="alert">File lebih dari 2 MB, jika di submit maka file <b>tidak akan diunggah</b></div>');
-                }
+        $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
+           var selector = $(this);
+           var action = selector.attr('action');
+           var ID = selector.attr('data-id');
+           // cek validation file
+           var S_upload = $('#UploadFile');
+           var cekFile =  AppJQ.validation_file(S_upload,'Upload File');
+           if (cekFile) {
+            AppJQ.ActionData(selector,action,ID);
+           }
+        })
 
-                $('#btnSubmitAnnouncement').prop('disabled',false);
+        $(document).off('click', '.btnPublish').on('click', '.btnPublish',function(e) {
+            var selector = $(this);
+            var ID = $(this).attr('data-id');
+            var Token = $(this).attr('data');
+            var data = jwt_decode(Token);          
+            AppJQ.ActionData(selector,'publishcalendar',ID);
+        })
 
+        $(document).off('click', '.btn-delete-file').on('click', '.btn-delete-file',function(e) {
+            var Sthis = $(this);
+            var filePath = Sthis.attr('filepath');
+            var idtable = Sthis.attr('idtable');
+            var fieldwhere = Sthis.attr('fieldwhere');
+            var table = Sthis.attr('table');
+            var field = Sthis.attr('field');
+            var typefield = Sthis.attr('typefield');
+            var delimiter = Sthis.attr('delimiter');
+            AppJQ.DeleteFile(Sthis,filePath,idtable,fieldwhere,table,field,typefield,delimiter);
+        })
 
-
-
-            }
-
-        });
-
-        $('#btnSaveAcademicCalendar').click(function () {
-
-            var Year = $('#Year').val();
-            var YearName = $('#YearName').val();
-            var input = $('#formFile');
-
-            if(input[0].files.length>0 && Year!='' && Year!=null && YearName!='' && YearName!=null){
-
-                var file = input[0].files[0];
-                // cek apakah file lebih dari 2 mb ?
-                var fileSize = (parseFloat(file.size) / 1000000).toFixed(2);
-
-                if(fileSize<=2){
-
-                    var fileName = sessionNIP+'_'+moment().unix()+'.pdf';
-                    var formData = new FormData( $("#fileAnnouncement")[0]);
-
-                    var url = base_url_js+'announcement/upload_files?IDAnnc='+IDAnnc+'&f='+fileName;
-
-                    $.ajax({
-                        url : url,  // Controller URL
-                        type : 'POST',
-                        data : formData,
-                        async : false,
-                        cache : false,
-                        contentType : false,
-                        processData : false,
-                        success : function(data) {
-                            toastr.success('Announcement Created','Success');
-                            setTimeout(function () {
-                                window.location.href = '';
-                            },500);
-                        }
-                    });
-
-                } else {
-                    toastr.warning('File more then 2 Mb','Warning');
-                }
-
-            } else {
-                toastr.warning('All form are required','Warning');
-            }
-
-        });
-
-        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
-
-        $('#GlobalModal').modal({
-            'show' : true,
-            'backdrop' : 'static'
-        });
-    });
+        $(document).off('click', '.btnRemove').on('click', '.btnRemove',function(e) {
+            var ID = $(this).attr('data-id');
+            var selector = $(this);
+            AppJQ.ActionData(selector,'delete',ID);
+        })
 
 
+            
+       
+   
 
 
 </script>

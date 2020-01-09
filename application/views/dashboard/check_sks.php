@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+    <title>Podomoro University</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -45,7 +45,8 @@
         <div class="col-md-12" style="margin-top: 50px;">
             <div class="well">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <label>Semester</label>
                         <select class="form-control" id="filterSemester">
                             <option value="17">2020/2021 Ganjil</option>
                             <option value="16">2019/2020 Genap</option>
@@ -63,13 +64,31 @@
                         </select>
                     </div>
                     <div class="col-md-3">
+                        <label>Prodi</label>
+                        <select class="form-control" id="selectProdi">
+                            <option value="0">-- All Prodi --</option>
+                            <option value="4">S1 - Accounting</option>
+                            <option value="1">S1 - Architecture</option>
+                            <option value="11">S1 - Product Design</option>
+                            <option value="6">S1 - Business Law</option>
+                            <option value="3">S1 - Entrepreneurship</option>
+                            <option value="9">S1 - Urban Regional Planning</option>
+                            <option value="10">S1 - Environmental Engineering</option>
+                            <option value="5">D4 - Hotel Business</option>
+                            <option value="2">D4 - Construction Engineering and Management</option>
+                            <option value="8">D4 - Structural Engineering</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Status Employees</label>
                         <select class="form-control" id="formStatusEmployee">
                             <option value="2">Contract Employees</option>
                             <option value="1">Permanent Employees</option>
                             <option value="-1" style="color:red;">Non Active</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <label>Status Lecturer</label>
                         <select class="form-control" id="formStatusLecturer">
                             <option value="6">Home Base Lecturer</option>
                             <option value="5">Part Time Lecturer</option>
@@ -79,6 +98,7 @@
                         </select>
                     </div>
                     <div class="col-md-2">
+                        <label>.</label>
                         <button class="btn btn-block btn-success" id="btnSubmit">Submit</button>
                     </div>
                 </div>
@@ -198,10 +218,12 @@
 
     $(document).ready(function(){
         var SemesterID = "<?= $SemesterID; ?>";
+        var ProdiID = "<?= $ProdiID; ?>";
         var StatusEmployeeID = "<?= $StatusEmployeeID; ?>";
         var StatusLecturerID = "<?= $StatusLecturerID; ?>";
 
         $('#filterSemester').val(SemesterID);
+        $('#selectProdi').val(ProdiID);
         $('#formStatusEmployee').val(StatusEmployeeID);
         $('#formStatusLecturer').val(StatusLecturerID);
     });
@@ -209,11 +231,12 @@
     $('#btnSubmit').click(function () {
 
         var filterSemester = $('#filterSemester').val();
+        var selectProdi = $('#selectProdi').val();
         var formStatusEmployee = $('#formStatusEmployee').val();
         var formStatusLecturer = $('#formStatusLecturer').val();
 
         var base_url = "<?= base_url() ?>";
-        var url = base_url+'checkSKS/'+filterSemester+'/'+formStatusEmployee+'/'+formStatusLecturer;
+        var url = base_url+'checkSKS/'+filterSemester+'/'+formStatusEmployee+'/'+formStatusLecturer+'/'+selectProdi;
 
         window.location.href = url;
 
