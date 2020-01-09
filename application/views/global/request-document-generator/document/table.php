@@ -60,7 +60,7 @@
 			var opStatus = App_table.__opStatus("Request");
 			var opFiltering = App_table.__opFiltering("%");
 			var html = '<div class ="row" >'+
-							'<div class = "col-md-4 col-md-offset-4">'+
+							'<div class = "col-md-6 col-md-offset-3">'+
 								'<div class="row" >'+
 									'<div class = "col-md-6">'+
 										'<div class = "form-group">'+
@@ -80,13 +80,117 @@
 						'<div class = "row" style = "margin-top:5px;">'+
 							'<div class = "col-md-12">'+
 								'<div class = "table-responsive" id = "tblList">'+
-
+									'<table class = "table table-striped" id = "TblList" style = "min-width: 650px;">'+
+										'<thead>'+
+											'<tr>'+
+												'<th>Doc & User</th>'+
+												'<th>Date</th>'+
+												'<th>Approval</th>'+
+												'<th>Status</th>'+
+												'<th style ="width:30%;">Action</th>'+
+											'</tr>'+
+										'</thead>'+
+										'<tbody></tbody>'+
+									'</table>'+			
 								'</div>'+
 							'</div>'+
 						'</div>';		
 						;
 			$('#pageTableSurat').html(html);
+			/* Load Action table */
+			App_table.LoadTable();
 
+		},
+
+		LoadTable : function(){
+		   var recordTable = $('#TblList').DataTable({
+		       "processing": true,
+		       "serverSide": false,
+		       "ajax":{
+		           url : base_url_js+"__request-document-generator/__LoadTablebyUserRequest", // json datasource
+		           ordering : false,
+		           type: "post",  // method  , by default get
+		           data : function(token){
+		                 // Read values
+		                  var data = {
+		                         opFilteringStatus : $('#opFilteringStatus option:selected').val(),
+		                         opFilteringData : $('#opFilteringData option:selected').val(),
+		                         IDMasterSurat : $('#MasterSurat option:selected').val(),
+
+		                     };
+		                 // Append to data
+		                 token.token = jwt_encode(data,'UAP)(*');
+		           }                                                                     
+		        },
+		         'columnDefs': [
+		         	
+		         	{
+		         	   'targets': 0,
+		         	   // 'searchable': false,
+		         	   // 'orderable': false,
+		         	   'className': 'dt-body-center',
+		         	   'render': function (data, type, full, meta){
+		         	       var ht = '<span class="badge">'+full[0]+'</span>'+
+		         	       			'<br><label>'+full[1]+'</label>'+
+		         	       			'<br><span class="label label-primary">'+full[2]+'</span>'
+		         	       			;
+		         	       return ht;
+		         	   }
+		         	},
+		         	{
+		         	   'targets': 1,
+		         	   // 'searchable': false,
+		         	   // 'orderable': false,
+		         	   'className': 'dt-body-center',
+		         	   'render': function (data, type, full, meta){
+		         	       var ht = full[3];
+		         	       return ht;
+		         	   }
+		         	},
+		         	{
+		         	   'targets': 3,
+		         	   // 'searchable': false,
+		         	   // 'orderable': false,
+		         	   'className': 'dt-body-center',
+		         	   'render': function (data, type, full, meta){
+		         	       var ht = '<span class="label label-info">'+full[5]+'</span>';
+		         	       return ht;
+		         	   }
+		         	},
+		            {
+		               'targets': 2,
+		               // 'searchable': false,
+		               // 'orderable': false,
+		               'className': 'dt-body-center',
+		               'render': function (data, type, full, meta){
+		                   var ht = full[4];
+		                   return ht;
+		               }
+		            },
+		            {
+		               'targets': 4,
+		               'searchable': false,
+		               'orderable': false,
+		               // 'className': 'dt-body-center',
+		               'render': function (data, type, full, meta){
+		               	   var tokenRow = jwt_decode(full[7]);
+		               	   var link = base_url_js+'uploads/document-generator/'+tokenRow['Path'];
+		                   var ht = '<a class="btn btn-info btnPreviewTable" href="'+link+'" target="_blank">Preview</a> ';
+		                   return ht;
+		               }
+		            },
+		            
+		         ],
+		       'createdRow': function( row, data, dataIndex ) {
+		               
+		       },
+		       dom: 'l<"toolbar">frtip',
+		       initComplete: function(){
+		         
+		      }  
+		   });
+		   
+		   oTable = recordTable;
 		},
 
 		Status : ['Request','Reject','Approve','Batal'],

@@ -1362,6 +1362,97 @@ class M_doc extends CI_Model {
         return $dataSave;   
     }
 
+    public function LoadTablebyUserRequest($dataToken){
+        $NIP = $this->session->userdata('NIP');
+        $AddWhere = '';
+        $opFilteringStatus = $dataToken['opFilteringStatus'];
+        $opFilteringData = $dataToken['opFilteringData'];
+        $IDMasterSurat = $dataToken['IDMasterSurat'];
+        if ($opFilteringStatus != '') {
+           $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+           $AddWhere .= $WhereOrAnd.'a.Status = "'.$opFilteringStatus.'"';
+        }
+
+        if ($opFilteringData == 1) { // for me
+            $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+            $AddWhere .= $WhereOrAnd.' (a.UserNIP = "'.$NIP.'" or a.Approve1 = "'.$NIP.'" or a.Approve2 = "'.$NIP.'" or a.Approve3 = "'.$NIP.'"  )';
+        }
+
+        if ($IDMasterSurat != '') {
+            $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+            $AddWhere .= $WhereOrAnd.' a.ID_document ='.$IDMasterSurat;
+        }
+
+        $sql = 'select a.NoSuratFull,b.DocumentName,a.UserNIP,c.Name as NameEMPRequest,a.DateRequest,a.Approve1,a.Approve2,a.Approve3,a.Status,
+                a.Input1,a.Input2,a.Input3,a.Input4,a.Input5,a.Input6,a.Input7,a.Input8,a.Input9,a.Input10,
+                a.Approve1Status,a.Approve1At,a.Approve2Status,a.Approve2At,a.Approve3Status,a.Approve3At,a.TotApproval,
+                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.ID
+                from db_generatordoc.document_data as a 
+                left join db_generatordoc.document as b on a.ID_document =  b.ID
+                left join db_employees.employees as c on c.NIP = a.UserNIP
+                left join db_employees.employees as d on d.NIP = a.Approve1
+                left join db_employees.employees as e on e.NIP = a.Approve2
+                left join db_employees.employees as f on f.NIP = a.Approve3
+                '.$AddWhere.'
+                order by a.ID asc
+                ';
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) { 
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $row['NoSuratFull'];
+            $nestedData[] = $row['DocumentName'];
+            $nestedData[] = $row['UserNIP'].' - '.$row['NameEMPRequest'];
+            $nestedData[] = $this->m_master->getDateIndonesian($row['DateRequest']);
+            $Appr = '';
+            if ($row['Approve1'] != '' && $row['Approve1'] != NULL ) {
+                if ($Appr == '') {
+                    $Appr .= '<ul style = "margin-left:-25px;">';
+                }
+                $style = ($row['Approve1Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+                $Appr .= '<li><label>Approval 1 : '.$row['NameEMPAppr1'].'</label> | Status : '.$style.'</li>';
+            }
+
+            if ($row['Approve2'] != '' && $row['Approve2'] != NULL ) {
+                if ($Appr == '') {
+                    $Appr .= '<ul style = "margin-left:-25px;">';
+                }
+                $style = ($row['Approve2Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+
+                $Appr .= '<li><label>Approval 2 : '.$row['NameEMPAppr2'].'</label> | Status : '.$style.'</li>';
+            }
+
+            if ($row['Approve3'] != '' && $row['Approve3'] != NULL ) {
+                if ($Appr == '') {
+                    $Appr .= '<ul style = "margin-left:-25px;">';
+                }
+                $style = ($row['Approve3Status'] == 1 ) ? '<span style="color:green;"><i class="fa fa-check-circle"></i> approved</span>' : '<span style="color:red;"><i class="fa fa-minus-circle"></i> not approved</span>';
+
+                $Appr .= '<li><label>Approval 3 : '.$row['NameEMPAppr3'].'</label> | Status : '.$style.'</li>';
+            }
+
+            if ($Appr != '') {
+                $Appr .= '</ul>';
+            }
+            $nestedData[] = $Appr;
+            $nestedData[] = $row['Status'];
+            $nestedData[] = $row['ID'];
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        return $rs;
+
+    }
+
     
   
 }

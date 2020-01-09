@@ -53,4 +53,5 @@ class C_action extends DocumentGenerator_Controler {
         $rs = $this->m_doc->RemoveDocumentMaster($ID);
         echo json_encode($rs);
     }
+    
 }

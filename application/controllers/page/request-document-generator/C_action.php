@@ -26,7 +26,25 @@ class C_action extends ServiceDocumentGenerator_Controler {
 	public function savebyUserRequest(){
 		$dataToken = $this->getInputToken();
 		$dataToken = json_decode(json_encode($dataToken),true);
-		$rs = $this->m_doc->savebyUserRequest($dataToken);
+		$action = $dataToken['action'];
+		switch ($action) {
+			case 'add':
+				$rs = $this->m_doc->savebyUserRequest($dataToken);
+				break;
+			case 'edit':
+				// $rs = $this->m_doc->savebyUserRequest($dataToken);
+				break;
+			default:
+				# code...
+				break;
+		}
+		
 		echo json_encode($rs);
+	}
+
+	public function LoadTablebyUserRequest(){
+	    $dataToken = $this->getInputToken();
+	    $rs = $this->m_doc->LoadTablebyUserRequest($dataToken);
+	    echo json_encode($rs);
 	}
 }

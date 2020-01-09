@@ -108,27 +108,45 @@ class M_set extends CI_Model {
 									$exDepartment = explode('.', $DepartmentID);
 									$IDDivision = $exDepartment[1];
 									if ($exDepartment[0] == 'NA') {
-										$sql = "select * from db_employees.employees
-										        where ( 
-										        		(
-										        		SPLIT_STR(PositionMain, '.', 2) = ".$user." or
-										        		SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
-										        		SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
-										        		SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
-										        		)
-										        		and 
-										        		(
-										        			SPLIT_STR(PositionMain, '.', 1) = ".$IDDivision." or
-										        			SPLIT_STR(PositionOther1, '.', 1) = ".$IDDivision." or
-										        			SPLIT_STR(PositionOther2, '.', 1) = ".$IDDivision." or
-										        			SPLIT_STR(PositionOther3, '.', 1) = ".$IDDivision." 
-										        		)
-										        	)
 
-										        	and StatusEmployeeID != -1
-										        limit 1
-										        ";
-										$query=$this->db->query($sql, array())->result_array();
+										if ($user == 11 || $user == 12) {
+											
+											$sql = "select * from db_employees.employees
+											        where ( 
+											        		(
+											        		SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+											        		SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+											        		SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+											        		SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+											        		)
+											        		and 
+											        		(
+											        			SPLIT_STR(PositionMain, '.', 1) = ".$IDDivision." or
+											        			SPLIT_STR(PositionOther1, '.', 1) = ".$IDDivision." or
+											        			SPLIT_STR(PositionOther2, '.', 1) = ".$IDDivision." or
+											        			SPLIT_STR(PositionOther3, '.', 1) = ".$IDDivision." 
+											        		)
+											        	)
+
+											        	and StatusEmployeeID != -1
+											        limit 1
+											        ";
+											$query=$this->db->query($sql, array())->result_array();
+										}
+										else
+										{
+											$sql = "select * from db_employees.employees
+											        where ( 
+											        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+											        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+
+											        	)and StatusEmployeeID != -1
+											        limit 1
+											        ";
+											$query=$this->db->query($sql, array())->result_array();
+										}
 									}
 									elseif ($exDepartment[0] == 'AC') {
 										if ($user == 5) { // dekan

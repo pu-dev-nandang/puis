@@ -8,7 +8,7 @@
     </div>
     <div class="panel-footer" style="text-align: right;">
         <button class="btn btn-primary hide" id="Preview">Preview</button>
-        <button class="btn btn-success" id="btnSave" disabled>Save</button>
+        <button class="btn btn-success" id="btnSave" action = "add" data-id="">Save</button>
     </div>
 </div>
 <script type="text/javascript">
@@ -36,11 +36,15 @@
 			    $('#pageRequestDocument').html('<p style="color:red;">'+msgMasterDocument+'</p>');
 			    $('#Preview').addClass('hide');
 			    $('#btnSave').prop('disabled',true);
+			    $('#btnSave').attr('action','add');
+			    $('#btnSave').attr('data-id','');
 			    settingTemplate = [];
 			}
 		},
 
 		DomRequestDocument : function(IDMasterSurat,TokenData){
+			$('#btnSave').attr('action','add');
+			$('#btnSave').attr('data-id','');
 			$('#Preview').addClass('hide');
 			var dt = jwt_decode(TokenData);
 			// console.log(dt);
@@ -50,6 +54,7 @@
 			settingTemplate = Config;
 			App_input.DomSetTemplate(DocumentName,DocumentAlias,TokenData);
 			$('#Preview').removeClass('hide');
+
 		},
 
 		DomSetTemplate : function(DocumentName,DocumentAlias){
@@ -164,12 +169,14 @@
 		    })
 		},
 
-		SaveData : function(selector){
+		SaveData : function(selector,action,dataID=""){
 			var url = base_url_js+"__request-document-generator/__savebyUserRequest";
 		    var data = {
 		       settingTemplate : settingTemplate,
 		       ID : $('#MasterSurat option:selected').val(),
 		       DepartmentID : DepartmentID,
+		       action : action,
+		       dataID : dataID,
 		    }
 		    var token =  jwt_encode(data,'UAP)(*');
 		    loading_button2(selector);
@@ -201,7 +208,8 @@
 
 	$(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
 	   var itsme = $(this);
-	   App_input.SaveData(itsme);
-
+	   var action = itsme.attr('action');
+	   var dataID = itsme.attr('data-id');
+	   App_input.SaveData(itsme,action,dataID);
 	})
 </script>
