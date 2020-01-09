@@ -87,7 +87,7 @@
 												'<th>Date</th>'+
 												'<th>Approval</th>'+
 												'<th>Status</th>'+
-												'<th style ="width:30%;">Action</th>'+
+												'<th style ="width:20%;">Action</th>'+
 											'</tr>'+
 										'</thead>'+
 										'<tbody></tbody>'+
@@ -175,7 +175,52 @@
 		               'render': function (data, type, full, meta){
 		               	   var tokenRow = jwt_decode(full[7]);
 		               	   var link = base_url_js+'uploads/document-generator/'+tokenRow['Path'];
-		                   var ht = '<a class="btn btn-info btnPreviewTable" href="'+link+'" target="_blank">Preview</a> ';
+		               	   var btnEdit = '';
+		               	   var btnBatal = '';
+		               	   var btnApprove = '';
+		               	   var btnReject = '';
+		               	   if (tokenRow['Approve1Status'] == 0 && tokenRow['UserNIP'] == sessionNIP ) {
+		               	   		btnEdit = '<li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>';
+		               	   		btnBatal = '<li><a href="javascript:void(0);" class="btnBatal" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-remove"></i> Batal</a></li>';
+		               	   }
+
+		               	   // for approval 1
+		               	   if (tokenRow['Approve1Status'] == 0 && tokenRow['Approve1'] == sessionNIP ) {
+		               	   		btnApprove = '<li><a href="javascript:void(0);" class="btnApprove" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "1"><i class="fa fa-floppy-o"></i> Approve</a></li>';
+		               	   		btnReject = '<li><a href="javascript:void(0);" class="btnReject" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "1"><i class="fa fa-minus-square"></i> Reject</a></li>';
+		               	   }
+
+		               	   // for approval 2
+		               	   if (tokenRow['Approve2Status'] == 0 && tokenRow['Approve2'] == sessionNIP && tokenRow['Approve1Status'] == 1 ) {
+		               	   		btnApprove = '<li><a href="javascript:void(0);" class="btnApprove" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "2"><i class="fa fa-floppy-o"></i> Approve</a></li>';
+		               	   		btnReject = '<li><a href="javascript:void(0);" class="btnReject" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "2"><i class="fa fa-minus-square"></i> Reject</a></li>';
+		               	   }
+
+		               	   // for approval 3
+		               	   if (tokenRow['Approve3Status'] == 0 && tokenRow['Approve3'] == sessionNIP && tokenRow['Approve2Status'] == 1 ) {
+		               	   		btnApprove = '<li><a href="javascript:void(0);" class="btnApprove" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "3"><i class="fa fa-floppy-o"></i> Approve</a></li>';
+		               	   		btnReject = '<li><a href="javascript:void(0);" class="btnReject" data-id="'+full[6]+'" data = "'+full[7]+'" approval_number = "3"><i class="fa fa-minus-square"></i> Reject</a></li>';
+		               	   }
+
+		               	   // console.log(tokenRow);
+		               	   var btnAction = '<div class="btn-group">' +
+		               	       '  <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+		               	       '    <i class="fa fa-pencil"></i> <span class="caret"></span>' +
+		               	       '  </button>' +
+		               	       '  <ul class="dropdown-menu">' +
+		               	       		'<li>'+'<a class="btnPreviewTable" href="'+link+'" target="_blank"><i class="fa fa-print"></i> Preview</a>'+'</li>'+
+		               	      		btnEdit +
+		               	       // '    <li role="separator" class="divider"></li>' +
+		               	       		btnBatal +
+		               	       // '    <li role="separator" class="divider"></li>' +
+		               	       		btnApprove+
+		               	       // '    <li role="separator" class="divider"></li>' +
+		               	       		btnReject+
+		               	       '  </ul>' +
+		               	       '</div>';
+
+		                   // var ht = '<a class="btn btn-info btnPreviewTable" href="'+link+'" target="_blank">Preview</a>  &nbsp'+btnAction;
+		                   var ht = btnAction;
 		                   return ht;
 		               }
 		            },
@@ -208,5 +253,9 @@
 
 	$(document).ready(function(){
 		App_table.Loaded();
+	})
+
+	$(document).off('change', '#opFilteringStatus,#opFilteringData').on('change', '#opFilteringStatus,#opFilteringData',function(e) {
+		oTable.ajax.reload( null, false );
 	})
 </script>
