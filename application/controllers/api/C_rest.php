@@ -782,6 +782,22 @@ class C_rest extends CI_Controller {
                 // Read Comment
                 if(count($dataTopic)>0){
 
+                    $dataSchedule = [];
+
+                    // Jika Forum dalam timetable
+                    if($dataTopic[0]['InviteTo']=='2' && $dataTopic[0]['InviteTo']!='' && $dataTopic[0]['InviteTo']!=null){
+                        $ScheduleID = $dataTopic[0]['ScheduleID'];
+                        $dataSchedule = $this->db->query('SELECT s.ClassGroup, mk.NameEng FROM db_academic.schedule s
+                                                                        LEFT JOIN db_academic.schedule_details_course sdc ON (s.ID = sdc.ScheduleID)
+                                                                        LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sdc.MKID)
+                                                                        WHERE s.ID = "'.$ScheduleID.'" 
+                                                                        GROUP BY s.ID')->result_array();
+
+
+                    }
+
+                    $dataTopic[0]['dataSchedule'] = $dataSchedule;
+
                     $dataComment = $this->db->query('SELECT cc.*, cu.Status, em.Name AS Lecturer, em.Photo AS EmPhoto , auts.Name AS Student, auts.Year FROM db_academic.counseling_comment cc 
                                                                 LEFT JOIN db_academic.counseling_user cu ON (cu.TopicID = cc.TopicID AND cu.UserID = cc.UserID) 
                                                                 LEFT JOIN db_academic.auth_students auts ON (auts.NPM = cc.UserID)
@@ -876,6 +892,52 @@ class C_rest extends CI_Controller {
                 return print_r(1);
 
             }
+            else if($dataToken['action']=='checkSessionsToNewTopic'){
+
+                $ScheduleID = $dataToken['ScheduleID'];
+//                $ScheduleID = 393;
+
+                $data = $this->db->query('SELECT ID,Sessions FROM db_academic.counseling_topic WHERE ScheduleID = "'.$ScheduleID.'" ')->result_array();
+
+
+                $result = [];
+
+                for($i=1;$i<=14;$i++){
+
+                    $Status = 1;
+                    $TotalComment = 0;
+                    $TopicID = 0;
+
+                    if(count($data)>0) {
+                        foreach ($data AS $itm){
+
+
+                            if($i==$itm['Sessions']){
+                                $dataComment = $this->db->select('ID')
+                                    ->get_where('db_academic.counseling_comment',
+                                        array('TopicID' => $itm['ID']))->result_array();
+                                $TopicID = $itm['ID'];
+                                $Status = -1;
+                                $TotalComment = count($dataComment);
+                            }
+
+
+                        }
+                    }
+
+                    $arr = array(
+                        'Sessions' => $i,
+                        'Status' => $Status,
+                        'TopicID' => $TopicID,
+                        'TotalComment' => $TotalComment
+                    );
+                    array_push($result,$arr);
+                }
+
+                return print_r(json_encode($result));
+
+            }
+
         } else {
             $msg = array(
                 'msg' => 'Error'
