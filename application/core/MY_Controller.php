@@ -468,7 +468,7 @@ abstract class Budgeting_Controler extends Globalclass{
         // $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
         $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation'); 
 
-        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
+        if ($this->session->userdata('IDdepartementNavigation') == 15 || $this->session->userdata('IDdepartementNavigation') == 14) {
             $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
 
@@ -518,13 +518,7 @@ abstract class Budgeting_Controler extends Globalclass{
     {
         $data = array();
         if ($MenuDepartement == 'NA.15' || $MenuDepartement == 'NA.14') {
-            if ($this->session->userdata('prodi_active_id')) {
-                $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
-            }
-            else
-            {
-                $MenuDepartement = 'FT.'.$this->session->userdata('faculty_active_id');
-            }
+            $MenuDepartement = 'AC.'.$this->session->userdata('prodi_active_id');
         }
 
         if ($MenuDepartement == 'NA.34') {
