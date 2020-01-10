@@ -974,7 +974,11 @@ class C_rest3 extends CI_Controller {
                         // End Penelitian                        
                         
                         // PKM Note : Convert to sks untuk mendapatkan satu PKM
-                        $sqlPKM = 'select *,1 as Credit from db_research.pengabdian_masyarakat where ID_thn_laks = ? and NIP = ? '; 
+                        // $sqlPKM = 'select *,1 as Credit from db_research.pengabdian_masyarakat where ID_thn_laks = ? and NIP = ? '; 
+                        $sqlPKM = 'select a.*,1 as Credit from db_research.pengabdian_masyarakat as a 
+                                  join db_research.list_anggota_pkm as b on a.ID_PKM = b.ID_PKM
+                                  join db_research.master_anggota_pkm as c on b.ID_anggota = c.ID
+                                  where a.ID_thn_laks = ? and c.NIP = ? '; 
                         $queryPKM =$this->db->query($sqlPKM, array($FilterTahun,$NIP))->result_array();
                         // encode token
                         $tot = count($queryPKM);
