@@ -146,6 +146,33 @@
 						<h5 class="panel-title"><i class="fa fa-bars"></i> List of students</h5>
 					</div>
 					<div class="panel-body">
+						<div id="sorting-data">
+				            <div class="row">
+				              <div class="col-sm-3">
+				                <div class="form-group">
+				                  <label>Sort by</label>
+				                  <div class="input-group">
+				                    <select class="form-control" name="sort_by">
+				                      <option value="">-</option>
+				                      <option value="NPM">NPM</option>
+				                      <option value="Name">Name</option>
+				                      <option value="ClassOf">Class Of</option>
+				                      <option value="DateOfBirth">Birthdate</option>
+				                      <option value="Gender">Gender</option>
+				                      <option value="religionName">Religion</option>
+				                      <option value="ProdiNameEng">Status Employee</option>
+				                      <option value="Status">Status</option>
+				                    </select>
+				                    <div class="input-group-addon"></div>
+				                    <select class="form-control" name="order_by">
+				                      <option value="ASC">ASCENDING</option>
+				                      <option value="DESC">DESCENDING</option>
+				                    </select>
+				                  </div>
+				                </div>
+				              </div>
+				            </div>
+			          	</div>
 						<div class="table-list">
 							<table class="table table-bordered table-striped" id="table-list-data">
 								<thead>
@@ -155,7 +182,7 @@
 										<th width="10%">Birthdate</th>
 										<th width="5%">Religion</th>
 										<th width="5%">Gender</th>
-										<th width="5%">Class of</th>
+										<th width="8%">Class of</th>
 										<th width="10%">Study Program</th>
 										<th width="10%">Status</th>
 									</tr>
@@ -173,13 +200,16 @@
 
 
 <script type="text/javascript">
-	function fetchingData() {
+	function fetchingData(sorted='') {
 		loading_modal_show();
     	var data = getFormData($("#form-filter"));    	
+        if(sorted.trim() || sorted){
+        	data['sorted'] = sorted;
+        }
         var token = jwt_encode(data,'UAP)(*');
     	var dataTable = $('#fetch-data-tables .table').DataTable( {
-            destroy: true,
-			retrieve:true,
+            "destroy": true,
+			"retrieve":true,
             "processing": true,
             "serverSide": true,
             "iDisplayLength" : 10,
@@ -222,6 +252,22 @@
 
     $(document).ready(function(){
     	fetchingData();
+    	
+    	$("#sorting-data").on("change","select[name=sort_by]",function(){
+          
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(value+" "+order);
+        });
+        
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(order+" "+value);
+        });
+
     	$("#form-filter .btn-filter").click(function(){
     		$('#fetch-data-tables .table').DataTable().destroy();
     		fetchingData();

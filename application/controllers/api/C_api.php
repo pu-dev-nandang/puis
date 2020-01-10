@@ -9574,79 +9574,148 @@ class C_api extends CI_Controller {
                 $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"OR",);
                 $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$data_arr['student']."%') ","filter"=>"OR",);
             }        
-            if(!empty($data_arr['class_of'])){
-                $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['class_of']." ","filter"=>"AND",);    
+            if(!empty($data_arr['Year'])){
+                $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['Year']." ","filter"=>"AND",);    
             }
-            if(!empty($data_arr['study_program'])){
-                $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    
+            if(!empty($data_arr['ProdiID'])){
+                $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['ProdiID']." ","filter"=>"AND",);    
             }
             if(!empty($data_arr['status'])){
             $param[] = array("field"=>"ss.`CodeStatus`","data"=>" =".$data_arr['status']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['gender'])){
-            $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$data_arr['gender']."' ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['religion'])){
-            $param[] = array("field"=>"ag.`ID`","data"=>" =".$data_arr['religion']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['graduation_year'])){
-            $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$data_arr['graduation_year']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['graduation_start'])){
-            if(!empty($data_arr['graduation_end'])){
-                $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($data_arr['graduation_end']))."' )","filter"=>"AND",);    
-            }else{
-                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);
             }
-        }        
-        if(!empty($data_arr['birthdate_start'])){
-            if(!empty($data_arr['birthdate_end'])){
-                $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
-            }else{
-                $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
+            if(!empty($data_arr['gender'])){
+                $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$data_arr['gender']."' ","filter"=>"AND",);    
             }
-        }
-
-        $data = array();
-        $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-        $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length']);
-        $no = $reqdata['start'] + 1;
-        foreach ($result as $v) {
-            $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
-            $srcImg =  base_url('images/icon/userfalse.png');
-            if($v->Photo != '' && $v->Photo != null){
-                $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+            if(!empty($data_arr['religion'])){
+                $param[] = array("field"=>"ag.`ID`","data"=>" =".$data_arr['religion']." ","filter"=>"AND",);    
             }
-            $studentBox = '<div class="detail-user" data-user="'.$v->NPM.'"> 
-                            <img class="std-img img-rounded" src="'.$srcImg.'" > 
-                            <p class="npm">'.$v->NPM.'</p>
-                            <p class="name">'.$v->Name.'</p>
-                            <p class="email"><i class="fa fa-envelope-o"></i> '.(!empty($v->EmailPU) ? $v->EmailPU : "-").'</p>
-                           </div>';
-            $nestedData = array();
-            $nestedData[] = ($no++);
-            $nestedData[] = $studentBox;
-            $nestedData[] = "<p class='text-left'>".(!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.", ":"").date("d F Y", strtotime($v->DateOfBirth))."</p>";
-            $nestedData[] = "<p class='text-center'>".$v->religionName."</p>";
-            $nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
-            $nestedData[] = "<center>".$v->ClassOf."</center>";
-            $nestedData[] = $v->ProdiNameEng;
-            $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
-            $nestedData[] = $v->NPM;
-            $data[] = $nestedData;
-        }
+            if(!empty($data_arr['graduation_year'])){
+                $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$data_arr['graduation_year']." ","filter"=>"AND",);    
+            }
+            if(!empty($data_arr['graduation_start'])){
+                if(!empty($data_arr['graduation_end'])){
+                    $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($data_arr['graduation_end']))."' )","filter"=>"AND",);    
+                }else{
+                    $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);
+                }
+            }        
+            if(!empty($data_arr['birthdate_start'])){
+                if(!empty($data_arr['birthdate_end'])){
+                    $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
+                }else{
+                    $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
+                }
+            }
+
+            if(!empty($data_arr['isapprove'])){
+                if($data_arr['isapprove']){
+                    $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
+                }
+            }
 
 
+            $data = array();
+            $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
+            $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length']);
+            $no = $reqdata['start'] + 1;
+            foreach ($result as $v) {
+                $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                $srcImg =  base_url('images/icon/userfalse.png');
+                if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
+                    $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                }
+
+                $dataToken = array(
+                    'Type' => 'std',
+                    'Name' => $v->Name,
+                    'NPM' => $v->NPM,
+                    'Email' => $v->EmailPU
+                );
+
+                $token = $this->jwt->encode($dataToken,'UAP)(*');
+                $nameS = str_replace(' ','-',ucwords(strtolower($v->Name)));
+
+                $disBtnEmail = (!empty($v->EmailPU) ? 'disabled' : '');
+
+                $btnAct = '<div class="btn-group">
+                              <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                                <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit (Coming Soon)</a></li>';
+                
+                $requested = (($v->isApproved ==1) ? '':'disabled');
+                $btnAct .=      '<li class="'.$requested.'"><a  href="javascript:void(0);" class="show-request" data-npm="'.$v->NPM.'" data-ta="'.$v->ClassOf.'">Request Approval</a></li>';
+                $btnAct .=      '<li role="separator" class="divider"></li>
+                                <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$v->EmailPU.'"
+                                data-year="'.$v->ClassOf.'" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'"
+                                data-statusid="'.$v->StatusStudentID.'">Change Status</a>
+                                </li>
+                                <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a></li>
+                              </ul>
+                            </div>';
+
+                $fm = '<input id="formTypeImage'.$v->NPM.'" class="hide" />
+                <form id="fmPhoto'.$v->NPM.'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                    <input id="formPhoto" class="hide" value="" hidden />
+                                    <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                            <i class="fa fa-upload"></i>
+                                            <input type="file" id="filePhoto" name="userfile" data-db="ta_'.$v->ClassOf.'" data-npm="'.$v->NPM.'" class="uploadPhotoEmp"
+                                                   style="display: none;" accept="image/*">
+                                        </label>
+                                    </div>
+                                </form>';
+
+                $gp = (!empty($v->ProdiGroupID)) ? ' - '.$v->ProdiGroup : '';
+
+                // show formulir number
+                $StrFM = (!empty($v->FormulirCode)) ? '<br/><span style="color: #20525a;">'.$v->FormulirCode.' / '.$v->No_Ref.'</span>' : '';
+
+                $IDCard = (!empty($v->Access_Card_Number)) ? $v->Access_Card_Number : '-';
 
 
-        $json_data = array(
-            "draw"            => intval( $reqdata['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
-            "data"            => $data
-        );
+                // Cuma akademik yang bisa edit dan upload foto
+                $DeptID = $this->session->userdata('IDdepartementNavigation');
+                $btnAct = ($DeptID==6 || $DeptID=='6') ? $btnAct : '-';
+                $fm = ($DeptID==6 || $DeptID=='6') ? $fm : '-';
+
+
+                $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+                /*UPDATED BY FEBRI @ NOV 2019*/
+                if($DeptID==6 || $DeptID=='6'){
+                    $needAppv = (($v->isApproved == 1) ? '<span style="width:100%" class="btn btn-sm btn-info show-request" title="Need Accepting Request" data-npm="'.$v->NPM.'" data-ta="'.$v->ClassOf.'" > <i class="fa fa-warning"></i> Need Approval</span>':'');
+                }else{$needAppv="";}
+
+                $studentBox = '<div class="detail-user" data-user="'.$v->NPM.'"> 
+                                <img class="std-img img-rounded" src="'.$srcImg.'" > 
+                                <p class="npm">'.$v->NPM.'</p>
+                                <p class="name">'.$v->Name.'</p>
+                                <p class="email"><i class="fa fa-envelope-o"></i> '.(!empty($v->EmailPU) ? $v->EmailPU : "-").'</p>
+                               </div><div style="margin-top:10px">'.$needAppv.'</div>';
+                $nestedData = array();
+                $nestedData[] = ($no++);
+                $nestedData[] = $studentBox;
+                $nestedData[] = "<p class='text-left'>".(!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.",<br>":"").date("d F Y", strtotime($v->DateOfBirth))."</p>";
+                $nestedData[] = "<p class='text-center'>".$v->religionName."</p>";
+                $nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
+                $nestedData[] = "<center>".$v->ClassOf."</center>";
+                $nestedData[] = $v->ProdiNameEng;
+                $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
+                $nestedData[] = '<div style="text-align:center;">'.$fm.'</div>';
+                $nestedData[] = $btnAct;
+                $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$v->NPM.'">Login Portal</button></div>';
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $reqdata['draw'] ),
+                "recordsTotal"    => intval(count($totalData)),
+                "recordsFiltered" => intval( count($totalData) ),
+                "data"            => $data
+            );
 
         }else{$json_data=null;}
 
@@ -9658,10 +9727,11 @@ class C_api extends CI_Controller {
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
-        /*UPDATED BY FEBRI @  JAN 2020*/
         /*$dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
             'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
-            : '' ;*/
+            : '' ;
+        */
+        /*UPDATED BY FEBRI @  JAN 2020*/
         $dataWhere = "";  $dataArrStatus=array(); $dataArrGender=array(); $dataArrReligion=array(); $dataArrLevel=array();
         if(!empty($data_arr['Filter'])){            
             $parse = parse_str($data_arr['Filter'],$output);
@@ -9742,12 +9812,17 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
 
+        if(!empty($output['sortby']) && !empty($output['orderby'])){
+            $orderBy = $output['sortby']." ".$output['orderby'];
+        }else{
+            $orderBy = "em.ID DESC";
+        }
         $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu 
                         FROM db_employees.employees em
                         LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
                         LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
                         LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
-                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.ID DESC ';
+                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY '.$orderBy;
 
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 

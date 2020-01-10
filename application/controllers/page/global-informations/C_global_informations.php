@@ -88,9 +88,15 @@ class C_global_informations extends Globalclass {
         	}
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " NPM DESC";
+        }
+
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-    	$result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length']);
+    	$result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		//$detailStudent = $this->General_model->fetchData("ta_".$v->ClassOf.".students",array("NPM"=>$v->NPM))->row();
@@ -228,11 +234,17 @@ class C_global_informations extends Globalclass {
 	    	$param[] = array("field"=>"em.StatusLecturerID","data"=>" ='-1') ","filter"=>"OR",);
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " em.ID DESC";
+        }
+
         $param[] = array("field"=>"em.PositionMain","data"=>" like'14.%' ","filter"=>"AND",);
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchLecturer($param)->result();
-    	$result = $this->Globalinformation_model->fetchLecturer($param,$reqdata['start'],$reqdata['length'])->result();
+    	$result = $this->Globalinformation_model->fetchLecturer($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		if(!empty($v->PositionMain)){
@@ -254,6 +266,10 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $lecturerBox;
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth : '').date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = $v->EmpReligion;
+    		$nestedData[] = (!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "");
+    		$nestedData[] = $v->EmpLevelDesc;
     		$nestedData[] = $position->Description;
     		$nestedData[] = $v->ProdiNameEng;
     		$nestedData[] = (!empty($v->StatusLecturerID) ? $v->EmpStatus : "Non Active");
@@ -384,10 +400,16 @@ class C_global_informations extends Globalclass {
         	}
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " em.ID DESC";
+        }
+
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchEmployee($param)->result();
-    	$result = $this->Globalinformation_model->fetchEmployee($param,$reqdata['start'],$reqdata['length'])->result();
+    	$result = $this->Globalinformation_model->fetchEmployee($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
@@ -402,7 +424,7 @@ class C_global_informations extends Globalclass {
                 $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$v->Photo) : base_url('images/icon/userfalse.png') ;
             }
 
-    		$lecturerBox = '<div class="detail-user" data-user="'.$v->ID.'"> 
+    		$empBox = '<div class="detail-user" data-user="'.$v->ID.'"> 
     						<img class="std-img img-rounded" src="'.$srcImg.'">
     						<p class="nip">'.$v->NIP.'</p>
     						<p class="name">'.$v->Name.'</p>
@@ -410,7 +432,11 @@ class C_global_informations extends Globalclass {
     					   </div>';
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
-    		$nestedData[] = $lecturerBox;
+    		$nestedData[] = $empBox;
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = "<center>".$v->EmpReligion.'</center>';
+    		$nestedData[] = "<center>".(!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "").'</center>';
+    		$nestedData[] = $v->EmpLevelEduName;
     		$nestedData[] = "<b>".$division->Division."</b><br>".$position->Description;
     		$nestedData[] = (!empty($v->StatusEmployeeID) ? $v->EmpStatus : "Non Active");
     		$data[] = $nestedData;

@@ -142,14 +142,45 @@
 						<h5 class="panel-title"><i class="fa fa-bars"></i> List of lecturers</h5>
 					</div>
 					<div class="panel-body">
+						<div id="sorting-data">
+				            <div class="row">
+				              <div class="col-sm-3">
+				                <div class="form-group">
+				                  <label>Sort by</label>
+				                  <div class="input-group">
+				                    <select class="form-control" name="sort_by">
+				                      <option value="">-</option>
+				                      <option value="NIP">NIP</option>
+				                      <option value="Name">Name</option>
+				                      <option value="DateOfBirth">Birthdate</option>
+				                      <option value="Gender">Gender</option>
+				                      <option value="r.Religion">Religion</option>
+				                      <option value="le.ID">Level Education</option>
+				                      <option value="ps.NameEng">Position</option>
+				                      <option value="StatusLecturerID">Status Lecturer</option>
+				                    </select>
+				                    <div class="input-group-addon"></div>
+				                    <select class="form-control" name="order_by">
+				                      <option value="ASC">ASCENDING</option>
+				                      <option value="DESC">DESCENDING</option>
+				                    </select>
+				                  </div>
+				                </div>
+				              </div>
+				            </div>
+			          	</div>
 						<div class="table-list">
 							<table class="table table-bordered table-striped" id="table-list-data">
 								<thead>
 									<tr>
 										<th width="2%">No</th>
 										<th width="30%">Lecturer</th>
-										<th width="20%">Position</th>
-										<th>Study Program</th>
+										<th width="20%">Birthdate</th>
+										<th width="8%">Religion</th>
+										<th width="8%">Gender</th>
+										<th width="8%">Last Education</th>
+										<th width="15%">Position</th>
+										<th width="20%">Study Program</th>
 										<th width="20%">Status</th>
 									</tr>
 								</thead>
@@ -166,13 +197,16 @@
 
 
 <script type="text/javascript">
-	function fetchingData() {
+	function fetchingData(sorted='') {
 		loading_modal_show();
     	var data = getFormData($("#form-filter"));    	
+        if(sorted.trim() || sorted){
+        	data['sorted'] = sorted;
+        }
         var token = jwt_encode(data,'UAP)(*');
     	var dataTable = $('#fetch-data-tables .table').DataTable( {
-				            destroy: true,
-							retrieve:true,
+				            "destroy": true,
+							"retrieve":true,
 				            "processing": true,
 				            "serverSide": true,
 				            "iDisplayLength" : 10,
@@ -267,6 +301,18 @@
             changeYear: true,
             changeMonth: true
         });
-
+		$("#sorting-data").on("change","select[name=sort_by]",function(){          
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(value+" "+order);
+        });
+        
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(order+" "+value);
+        });
     });
 </script>

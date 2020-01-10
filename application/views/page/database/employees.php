@@ -224,6 +224,33 @@
           <h4 class="panel-title"><i class="fa fa-bars"></i> List of employee</h4>
         </div>
         <div class="panel-body">
+          <div id="sorting-data">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label>Sort by</label>
+                  <div class="input-group">
+                    <select class="form-control" name="sort_by">
+                      <option value="">-</option>
+                      <option value="NIP">NIP</option>
+                      <option value="Name">Name</option>
+                      <option value="DateOfBirth">Birthdate</option>
+                      <option value="Gender">Gender</option>
+                      <option value="rl.Religion">Religion</option>
+                      <option value="le.ID">Level Education</option>
+                      <option value="StatusEmployeeID">Status Employee</option>
+                      <option value="StatusLecturerID">Status Lecturer</option>
+                    </select>
+                    <div class="input-group-addon"></div>
+                    <select class="form-control" name="order_by">
+                      <option value="ASC">ASCENDING</option>
+                      <option value="DESC">DESCENDING</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="divDataEmployees"></div>
         </div>
       </div>
@@ -236,13 +263,25 @@
     $(document).ready(function () {
         loadSelectOptionStatusEmployee('#filterStatusEmployees','');
         loadDataEmployees();
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          loadDataEmployees(value,order);
+        });
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          loadDataEmployees(order,value);
+        });
+
     });
 
     $('#filterStatusEmployees').change(function () {
-        loadDataEmployees();
+      loadDataEmployees();
     });
 
-    function loadDataEmployees() {
+    function loadDataEmployees(sort=null,order=null) {
         loading_page('#divDataEmployees');
 
         setTimeout(function () {
@@ -263,9 +302,12 @@
             /*UPDATED BY FEBRI @ JAN 2020*/
             /*var filterStatusEmployees = $('#filterStatusEmployees').val();
             var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
-            var token = jwt_encode({Filter : $("#form-filter").serialize()},'UAP)(*');
+            var filtering = $("#form-filter").serialize();
+            if((sort && order) || ( sort !== null && order !== null) ){
+              filtering = filtering+"&sortby="+sort+"&orderby="+order;
+            }
+            var token = jwt_encode({Filter : filtering},'UAP)(*');
             /*END UPDATED BY FEBRI @ JAN 2020*/
-
             var dataTable = $('#tableEmployees').DataTable( {
                 "processing": true,
                 "serverSide": true,

@@ -5,7 +5,6 @@
         text-align: center;
     }
     #table-list-data .detail-user > img.std-img{width: 45px;float: left;margin-right: 10px;}
-    #table-list-data .detail-user{cursor: pointer;}
     #table-list-data .detail-user > img.std-img{width: 45px;float: left;margin-right: 10px;}
     #table-list-data .detail-user > p{margin:0px;font-weight: bold;color: #4d7496}
     #table-list-data .detail-user > p.name{text-transform: uppercase;}
@@ -121,14 +120,23 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group" style="padding-top:22px">
+                            <div class="row" style="padding-top:22px">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
                                         <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
                                         <a class="btn btn-default" href="">Clear Filter</a>
                                     </div>
                                 </div>
+                                <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>                    
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export Students Information to Excel</button>
+                                        <button type="button" class="btn btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export IPS/IPK Students to Excel</button>                                        
+                                    </div>
+                                </div>
+                                <?php } ?>  
                             </div>
+                            
                         </form>
                     </div>
                 </div>
@@ -171,49 +179,32 @@
             </div>
         </div>
     </div> -->
+    <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
     <div class="col-md-12">
-        <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-        <div class="well">
-            <div class="row">
-                <div class="col-xs-3">
-                    <button class="btn btn-block btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Student to Excel</button>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5 class="panel-title"><i class="fa fa-cogs"></i> Action</h5>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-2">
+                        <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card margin-right"></i> Select Student</button>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-2">
+                        <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card margin-right"></i> Print ID Card</button>
+                    </div>
+                    <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
+                        <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
+                    </div>           
+                    <div class="col-xs-12 col-sm-6 col-md-5" style="border-left:1px solid #ddd">
+                        <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
+                    </div>
                 </div>
-                <div class="col-xs-3">
-                    <button class="btn btn-block btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> IPS/IPK to Excel</button>
-                </div>
-                <!-- ADDED BY FEBRI @ NOV 2019 -->
-                <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-                <div class="col-xs-5">
-                    <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
-                </div>
-                <?php } ?>
-                <!-- END ADDED BY FEBRI @ NOV 2019 -->
             </div>
         </div>
-        <?php } ?>
     </div>
+    <?php } ?>
 </div>
-
-<?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="row">
-            <div class="col-md-4">
-                <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card margin-right"></i> Select Student</button>
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card margin-right"></i> Print ID Card</button>
-            </div>
-            <div class="col-md-4" style="border-left: 1px solid #ccc;">
-                <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
-            </div>           
-
-        </div>
-    </div>
-</div>
-
-<?php } ?>
 
 <div class="row">
     <div class="col-sm-12">
@@ -223,18 +214,48 @@
                     <h5 class="panel-title"><i class="fa fa-bars"></i> List of students</h5>
                 </div>
                 <div class="panel-body">
+                    <!-- <div id="sorting-data">
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <div class="form-group">
+                              <label>Sort by</label>
+                              <div class="input-group">
+                                <select class="form-control" name="sort_by">
+                                  <option value="">-</option>
+                                  <option value="NIP">NIP</option>
+                                  <option value="Name">Name</option>
+                                  <option value="DateOfBirth">Birthdate</option>
+                                  <option value="Gender">Gender</option>
+                                  <option value="rl.Religion">Religion</option>
+                                  <option value="le.ID">Level Education</option>
+                                  <option value="StatusEmployeeID">Status Employee</option>
+                                  <option value="StatusLecturerID">Status Lecturer</option>
+                                </select>
+                                <div class="input-group-addon"></div>
+                                <select class="form-control" name="order_by">
+                                  <option value="ASC">ASCENDING</option>
+                                  <option value="DESC">DESCENDING</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div> -->
                     <div class="table-list">
                         <table class="table table-bordered table-striped" id="table-list-data">
                             <thead>
                                 <tr>
                                     <th width="2%">No</th>
-                                    <th width="15%">Student</th>
+                                    <th width="20%">Student</th>
                                     <th width="10%">Birthdate</th>
                                     <th width="5%">Religion</th>
                                     <th width="5%">Gender</th>
                                     <th width="5%">Class of</th>
                                     <th width="10%">Study Program</th>
                                     <th width="10%">Status</th>
+                                    <th width="8%">Upload Photo</th>
+                                    <th width="5%">Action</th>
+                                    <th width="8%">Login Portal</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -250,11 +271,12 @@
 
 
 <script type="text/javascript">
-    function fetchingData() {
+    function fetchingData(isapprove=false) {
         loading_modal_show();
-        var data = getFormData($("#form-filter"));      
+        var data = getFormData($("#form-filter"));   
+        data['isapprove'] = isapprove;
         var token = jwt_encode(data,'UAP)(*');
-        var dataTable = $('#fetch-data-tables .table').DataTable( {
+        var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             destroy: true,
             retrieve:true,
             "processing": true,
@@ -306,9 +328,67 @@
             changeMonth: true
         });
         $("#form-filter .btn-filter").click(function(){
-            $('#fetch-data-tables .table').DataTable().destroy();
+            $('#fetch-data-tables #table-list-data').DataTable().destroy();
             fetchingData();
         });
+
+
+        $("#btnSelect").click(function () {
+            if (!$('.uniform').length) {
+                var get_th = $("#table-list-data thead").find('tr').find('th:eq(0)').text();
+                var checkbox = '<input type="checkbox" name="select_all" value="1" id="example-select-all">';
+                $("#table-list-data thead").find('tr').find('th:eq(0)').html(get_th+'&nbsp'+checkbox);
+                $("#table-list-data tr").each(function(){
+                    var a = $(this);
+                    var No = a.find('td:eq(0)').text();
+                    var G_attr = a.find('td:eq(9)').find('.PrintIDCard');
+                    var type = G_attr.attr('type');
+                    var NPM = G_attr.attr('data-npm');
+                    var Name = G_attr.attr('data-name');
+                    var PathFoto = G_attr.attr('path');
+                    var email = G_attr.attr('email');
+                    var checkbox = '<input type="checkbox" class="uniform" type2 = "student" data-npm="'+NPM+'" data-name="'+Name+'" path = "'+PathFoto+'" email = "'+email+'">';
+                    a.find('td:eq(0)').html(No+'&nbsp'+checkbox);
+                });
+            }
+        });
+
+
+        $("#fetch-data-tables").on("change","#example-select-all",function(){
+            if($(this).is(':checked')){
+                $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",true);
+            }else{
+                $("#fetch-data-tables").find("#table-list-data > tbody input[type=checkbox]").prop("checked",false);                
+            }
+        });
+
+
+        $('#btnStdDownloadtoExcel').click(function () {
+            var data = getFormData($("#form-filter"));
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2excel/student-recap';
+            var Year = $("#form-filter").find("select[name=Year]").val();
+            if(!Year || Year.length == 0){
+                $("#filter-form .panel").animateCss('shake');
+                toastr.warning('Please fill form filter at least fill the field "Class of"','Warning');
+            }else{
+                FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
+            }
+        });
+
+        $("#btnIPSIPKDownloadtoExcel").click(function(){
+            var data = getFormData($("#form-filter"));
+            var token = jwt_encode(data,'UAP)(*');
+            var url = base_url_js+'save2excel/cumulative-recap';
+            var Year = $("#form-filter").find("select[name=Year]").val();
+            if(!Year || Year.length == 0){
+                $("#filter-form .panel").animateCss('shake');
+                toastr.warning('Please fill form filter at least fill the field "Class of"','Warning');
+            }else{
+                FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
+            }
+        });
+
     });
 </script>
 
@@ -323,7 +403,7 @@
 
 
 
-
+ 
 
 <script>
     var TaSegment = '<?php echo $this->uri->segment(3) ?>';
@@ -348,7 +428,7 @@
         }, 100);
       }
     }; 
-    $(document).ready(function () {
+    /*$(document).ready(function () {
         loadingStart(); // start loading
         loadSelectOptionClassOf_ASC('#filterCurriculum','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
@@ -386,7 +466,7 @@
                }
            }
         });
-    });
+    });*/
 
     $(document).on('change','#filterBaseProdi',function () {
         var filterBaseProdi = $('#filterBaseProdi').val();
@@ -401,7 +481,7 @@
     });
 
     // ===== Download PDF =====
-    $('#btnIPSIPKDownloadtoExcel').click(function () {
+    /*$('#btnIPSIPKDownloadtoExcel').click(function () {
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterStatus = $('#filterStatus').val();
@@ -432,9 +512,9 @@
             },5000);
         }
 
-    });
+    });*/
 
-    $('#btnStdDownloadtoExcel').click(function () {
+    /*$('#btnStdDownloadtoExcel').click(function () {
         var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterStatus = $('#filterStatus').val();
@@ -464,7 +544,7 @@
                 $('#filterCurriculum').css('border','1px solid #ccc');
             },5000);
         }
-    });
+    });*/
 
     // === Show Details
     $(document).on('click','.btnDetailStudent',function () {
@@ -558,7 +638,9 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'api/__crudStatusStudents';
             $.post(url,{token:token},function (result) {
-                loadStudent();
+                //loadStudent();
+                $('#fetch-data-tables #table-list-data').DataTable().destroy();
+                fetchingData();
                 toastr.success('Status Changed','Success');
                 setTimeout(function () {
                     $('#NotificationModal').modal('hide');
@@ -576,9 +658,9 @@
 
     });
     
-    function loadStudent(approval=null) { //Updated by Febri @ Nov 2019, add param
+    /*function loadStudent(approval=null) { //Updated by Febri @ Nov 2019, add param
         loading_page('#divDataStudent');
-        /*var filterCurriculum = $('#filterCurriculum').val();
+        var filterCurriculum = $('#filterCurriculum').val();
         var filterBaseProdi = $('#filterBaseProdi').val();
         var filterGroupProdi = $('#filterGroupProdi').val();
         var filterStatus = $('#filterStatus').val();
@@ -588,7 +670,7 @@
         var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
             ? filterBaseProdi.split('.')[0] : '';
         var StatusStudents = (filterStatus!='' && filterStatus!=null)
-            ? filterStatus : '';*/
+            ? filterStatus : '';
 
         setTimeout(function () {
             $('#divDataStudent').html('<table class="table table-bordered" id="tableStudent">' +
@@ -608,15 +690,15 @@
                 '                </thead>' +
                 '            </table>');
 
-            /*var data = {
+            var data = {
                 Year : Year,
                 ProdiID : ProdiID,
                 GroupProdiID : filterGroupProdi,
                 StatusStudents : StatusStudents,
                 approvalStudentReq : approval //Updated by Febri @ Nov 2019
-            };*/
+            };
 
-            /*ADDED BY FEBRI @ JAN 2020*/
+            //ADDED BY FEBRI @ JAN 2020
             var dataPost = $("#form-filter").serializeArray();
             var dataJson = {};
             for (var i = 0; i < dataPost.length; i++) {
@@ -627,7 +709,7 @@
             };
             dataJson['approvalStudentReq'] = approval;
             var data = dataJson;
-            /*END ADDED BY FEBRI @ JAN 2020*/
+            //END ADDED BY FEBRI @ JAN 2020
             console.log(data);
             var token = jwt_encode(data,'UAP)(*');
 
@@ -662,7 +744,7 @@
             TableSess = dataTable;
         },500);
 
-    }
+    } */
 
     // ==== Upload Foto =========
     $(document).on('change','.uploadPhotoEmp',function () {
@@ -771,7 +853,7 @@
         ]);   
     });
     
-    $(document).on('click','#btnSelect',function () {
+    /*$(document).on('click','#btnSelect',function () {
         if (!$('.uniform').length) {
             var get_th = $("#tableStudent thead").find('tr').find('th:eq(0)').text();
             var checkbox = '<input type="checkbox" name="select_all" value="1" id="example-select-all">';
@@ -790,7 +872,7 @@
 
             })
         }
-    });
+    }); */
         
     $(document).on('click','#btnPrintIDCard',function () {
         var html = '';
@@ -894,7 +976,7 @@
     });
 
     // Handle click on "Select all" control
-    $(document).on('click','#example-select-all',function () {    
+    /*$(document).on('click','#example-select-all',function () {    
        // Get all rows with search applied
        var rows = TableSess.rows({ 'search': 'applied' }).nodes();
        // Check/uncheck checkboxes for all rows in the table
@@ -959,24 +1041,14 @@
             }
        })
 
-    });
+    });*/
 
     // Handle click on "Select all" control
-    $(document).on('click','#example-select-all2',function () {    
+    /*$(document).on('click','#example-select-all2',function () {    
       $('input.uniform2').not(this).prop('checked', this.checked);
     });
 
-    $(document).on('click','.pagination',function () {
-        if ($('#example-select-all').length) {
-            $('#example-select-all').remove();
-        }   
-    });
-
-    $(document).on('keyup','input[type="search"]',function () {
-        if ($('#example-select-all').length) {
-            $('#example-select-all').remove();
-        }   
-    });
+    */
 
     $(document).on('click','#ModalbtnSaveForm',function () {
         var data = [];
@@ -1020,7 +1092,19 @@
         }
 
     });
+    
 
+    $(document).on('click','.pagination',function () {
+        if ($('#example-select-all').length) {
+            $('#example-select-all').remove();
+        }   
+    });
+
+    $(document).on('keyup','input[type="search"]',function () {
+        if ($('#example-select-all').length) {
+            $('#example-select-all').remove();
+        }   
+    });
 
 
     /*ADDED BY FEBRI @ NOV 2019*/
@@ -1052,18 +1136,20 @@
             });
         }
     });
-
+    
     $(document).on('click','.btn-approve.unselect',function(){
-        loadStudent("Yes");
-        $(this).toggleClass("btn-block btn-primary");
+        $('#fetch-data-tables #table-list-data').DataTable().destroy();
+        fetchingData(true);
+        $(this).toggleClass("btn-default btn-primary");
         $(this).toggleClass("unselect selected");
     });
     $(document).on('click','.btn-approve.selected',function(){
-        loadStudent();
-        $(this).toggleClass("btn-primary btn-block");
+        $('#fetch-data-tables #table-list-data').DataTable().destroy();
+        fetchingData();
+        $(this).toggleClass("btn-primary btn-default");
         $(this).toggleClass("selected unselect");
     });
 
     /*END ADDED BY FEBRI @ NOV 2019*/
 
-</script>
+</script> 
