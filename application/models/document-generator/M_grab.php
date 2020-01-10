@@ -53,14 +53,14 @@ class M_grab extends CI_Model {
 		return $rs;
 	}
 
-	public function preview_template($getObjInput){
+	public function preview_template($getObjInput,$DateDef= NULL){
 		$rs = [];
 		foreach ($getObjInput as $key => $value) {
 			switch ($key) {
 				case 'Date':
 					$obj = $getObjInput[$key];
 					$method = $obj['user'];
-					$Date = $this->__getDateMethod($method);
+					$Date = $this->__getDateMethod($method,$DateDef);
 					$rs['Date'] = ['value' => $Date]; 
 					break;
 				
@@ -74,8 +74,8 @@ class M_grab extends CI_Model {
 		return $rs;
 	}
 
-	private function __getDateMethod($method){
-		$date = date('Y-m-d');
+	private function __getDateMethod($method,$DateDef=null){
+		$date = ($DateDef == NULL) ? date('Y-m-d') : $DateDef;
 		if ($method == 'Indonesia') {
 			return $this->m_master->getDateIndonesian($date);
 		}

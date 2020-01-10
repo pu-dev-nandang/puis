@@ -8,7 +8,7 @@
     </div>
     <div class="panel-footer" style="text-align: right;">
         <button class="btn btn-primary hide" id="Preview">Preview</button>
-        <button class="btn btn-success" id="btnSave" action = "add" data-id="">Save</button>
+        <button class="btn btn-success" id="btnSave" action = "add" data-id="" disabled>Save</button>
     </div>
 </div>
 <script type="text/javascript">
@@ -35,7 +35,7 @@
 			if (typeof msgMasterDocument !== 'undefined') {
 			    $('#pageRequestDocument').html('<p style="color:red;">'+msgMasterDocument+'</p>');
 			    $('#Preview').addClass('hide');
-			    $('#btnSave').prop('disabled',true);
+			    // $('#btnSave').prop('disabled',true);
 			    $('#btnSave').attr('action','add');
 			    $('#btnSave').attr('data-id','');
 			    settingTemplate = [];
@@ -43,18 +43,17 @@
 		},
 
 		DomRequestDocument : function(IDMasterSurat,TokenData){
-			$('#btnSave').attr('action','add');
-			$('#btnSave').attr('data-id','');
 			$('#Preview').addClass('hide');
 			var dt = jwt_decode(TokenData);
-			// console.log(dt);
 			var DocumentName = dt.DocumentName;
 			var DocumentAlias = dt.DocumentAlias;
 			var Config = jQuery.parseJSON(dt.Config);
 			settingTemplate = Config;
 			App_input.DomSetTemplate(DocumentName,DocumentAlias,TokenData);
 			$('#Preview').removeClass('hide');
-
+			var ev = $('#btnSave').closest('.panel-footer');
+			ev.find('#btnSave').remove();
+			ev.append('<button class="btn btn-success" id="btnSave" action="add" data-id="" disabled="">Save</button>')
 		},
 
 		DomSetTemplate : function(DocumentName,DocumentAlias){
@@ -155,8 +154,8 @@
 		    loading_button2(selector);
 		    AjaxSubmitTemplate(url,token).then(function(response){
 		    	if (response.status == 1) {
+		    		$('#btnSave').prop('disabled',false);
 		    	    window.open(response.callback, '_blank');
-		    	    $('#btnSave').prop('disabled',false);
 		    	}
 		    	else
 		    	{
