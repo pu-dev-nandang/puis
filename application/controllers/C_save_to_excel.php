@@ -2427,12 +2427,7 @@ class C_save_to_excel extends CI_Controller
         $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
         $param = array();
         $Tyear = date('Y');
-
-        if(!empty($data_arr['student'])){
-            $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"AND",);    
-            $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"OR",);
-            $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$data_arr['student']."%') ","filter"=>"OR",);
-        }        
+        
         if(!empty($data_arr['Year'])){
             $Tyear = $data_arr['Year'];
             $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['Year']." ","filter"=>"AND",);    
@@ -2440,40 +2435,7 @@ class C_save_to_excel extends CI_Controller
         if(!empty($data_arr['ProdiID'])){
             $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['ProdiID']." ","filter"=>"AND",);    
         }
-        if(!empty($data_arr['status'])){
-        $param[] = array("field"=>"ss.`CodeStatus`","data"=>" =".$data_arr['status']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['gender'])){
-            $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$data_arr['gender']."' ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['religion'])){
-            $param[] = array("field"=>"ag.`ID`","data"=>" =".$data_arr['religion']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['graduation_year'])){
-            $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$data_arr['graduation_year']." ","filter"=>"AND",);    
-        }
-        if(!empty($data_arr['graduation_start'])){
-            if(!empty($data_arr['graduation_end'])){
-                $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($data_arr['graduation_end']))."' )","filter"=>"AND",);    
-            }else{
-                $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);
-            }
-        }        
-        if(!empty($data_arr['birthdate_start'])){
-            if(!empty($data_arr['birthdate_end'])){
-                $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
-            }else{
-                $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
-            }
-        }
-
-        if(!empty($data_arr['isapprove'])){
-            if($data_arr['isapprove']){
-                $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
-            }
-        }
+        
         $results = $this->Globalinformation_model->fetchStudentsPS(false,$param);
         if(!empty($results)){
             foreach ($results as $v) {

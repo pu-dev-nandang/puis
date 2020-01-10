@@ -196,7 +196,7 @@
                     <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
                         <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
                     </div>           
-                    <div class="col-xs-12 col-sm-6 col-md-5" style="border-left:1px solid #ddd">
+                    <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
                         <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
                     </div>
                 </div>
@@ -381,9 +381,10 @@
             var token = jwt_encode(data,'UAP)(*');
             var url = base_url_js+'save2excel/cumulative-recap';
             var Year = $("#form-filter").find("select[name=Year]").val();
-            if(!Year || Year.length == 0){
+            var ProdiID = $("#form-filter").find("select[name=ProdiID]").val();
+            if((!Year && Year.length == 0) || (!ProdiID && ProdiID.length == 0) ){
                 $("#filter-form .panel").animateCss('shake');
-                toastr.warning('Please fill form filter at least fill the field "Class of"','Warning');
+                toastr.warning('Please fill field "Class of" and "Study Program".','Warning');
             }else{
                 FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
             }
