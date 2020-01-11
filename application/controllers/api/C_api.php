@@ -4033,9 +4033,6 @@ class C_api extends CI_Controller {
     }
 
     public function review_otherfile() {
-        //$NIP = $this->input->get('NIP');
-        //$viewfiles = $this->m_api->views_otherfile($NIP);
-       // echo json_encode($viewfiles);
     //$NIP = $this->session->userdata('NIP');
     $data_arr = $this->getInputToken();
 
@@ -4050,7 +4047,7 @@ class C_api extends CI_Controller {
                 if( !empty($requestData['search']['value']) ) {
                     $search = $requestData['search']['value'];
                     $dataSearch = 'AND ea.NameFiles LIKE "%'.$search.'%"
-                    OR m.NameFiles LIKE "%'.$search.'%" ';
+                    OR m.NameFiles LIKE "%'.$search.'%" ORDER BY ID DESC';
                 }
 
                 $queryDefault = 'SELECT ea.*, m.NameFiles
@@ -4058,11 +4055,8 @@ class C_api extends CI_Controller {
                 LEFT JOIN db_employees.master_files AS m ON (ea.TypeFiles = m.ID) 
                 WHERE ea.NIP = "'.$NIP.'" AND m.Type = "1" AND ea.Active = "1" AND ea.LinkFiles IS NOT NULL '.$dataSearch;
 
-                //$queryDefault = 'SELECT ea.ID, ea.Name_University, ea.Code_University FROM db_research.university ea '.$dataSearch;
-
                 $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
-                //print_r($sql); die();
-
+                
                 $query = $this->db->query($sql)->result_array();
                 $queryDefaultRow = $this->db->query($queryDefault)->result_array();
 
@@ -4112,8 +4106,163 @@ class C_api extends CI_Controller {
                 );
                 echo json_encode($json_data);
             }
-        }
 
+            else if($data_arr['action']=='readlist_university'){
+
+                $requestData= $_REQUEST;
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = 'WHERE Name_University LIKE "%'.$search.'%" ORDER BY ID DESC';
+                }
+
+                $queryDefault = 'SELECT * FROM db_research.university '.$dataSearch;
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+                
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++){
+
+                    $nestedData=array();
+                    $row = $query[$i];
+
+                    $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" typedata="university"><i class="fa fa-trash"></i></button> ';                 
+
+                    $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['Name_University'].'</div>';
+                    $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                    $data[] = $nestedData;
+                    $no++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+            }
+
+            else if($data_arr['action']=='readlist_major'){
+                $requestData= $_REQUEST;
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = 'WHERE Name_MajorProgramstudy LIKE "%'.$search.'%" ORDER BY ID DESC';
+                }
+
+                $queryDefault = 'SELECT * FROM db_employees.major_programstudy_employees'.$dataSearch;
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+                
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++){
+
+                    $nestedData=array();
+                    $row = $query[$i];
+
+                    $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" typedata="major"><i class="fa fa-trash"></i></button>';                 
+
+                    $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['Name_MajorProgramstudy'].'</div>';
+                    $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                    $data[] = $nestedData;
+                    $no++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+            }
+
+            else if($data_arr['action']=='readlist_katotherfiles'){
+                $requestData= $_REQUEST;
+
+                $dataSearch = '';
+                if( !empty($requestData['search']['value']) ) {
+                    $search = $requestData['search']['value'];
+                    $dataSearch = 'WHERE Name_other_files LIKE "%'.$search.'%" ORDER BY ID DESC';
+                }
+
+                $queryDefault = 'SELECT * FROM db_employees.master_other_files '.$dataSearch;
+
+                $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+                
+                $query = $this->db->query($sql)->result_array();
+                $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+                $no = $requestData['start'] + 1;
+                $data = array();
+
+                for($i=0;$i<count($query);$i++){
+
+                    $nestedData=array();
+                    $row = $query[$i];
+
+                    $btnAction = '<button class="btn btn-sm btn-circle btn-danger btndelotherfile" data-toggle="tooltip" data-placement="top" title="Delete File" Idotherfile="'.$row['ID'].'" typedata="other"><i class="fa fa-trash"></i></button> ';                 
+
+                    $nestedData[] = '<div style="text-align:center; color: #000000;">'.$no.'</div>';
+                    $nestedData[] = '<div style="text-align:left; color: #000000;">'.$row['Name_other_files'].'</div>';
+                    $nestedData[] = '<div style="text-align:center;">'.$btnAction.'</div>';
+                    $data[] = $nestedData;
+                    $no++;
+                }
+
+                $json_data = array(
+                    "draw"            => intval( $requestData['draw'] ),
+                    "recordsTotal"    => intval(count($queryDefaultRow)),
+                    "recordsFiltered" => intval( count($queryDefaultRow) ),
+                    "data"            => $data
+                );
+                echo json_encode($json_data);
+            }
+
+            else if($data_arr['action']=='get_katotherfiles') {
+
+                $data = $this->db->query('SELECT ID, Name_other_files FROM db_employees.master_other_files ')->result_array();
+                return print_r(json_encode($data));
+
+            }
+
+            else if($data_arr['action']=='deleteother_master') {
+                $id_otherfile = $data_arr['id_otherfile'];
+                $typedata = $data_arr['typedata'];
+
+                if($typedata == "university") {
+                    $this->db->where('ID',$id_otherfile);
+                    $this->db->delete('db_research.university');
+                    $this->db->reset_query();
+                } 
+                else if($typedata == "major"){
+                    $this->db->where('ID',$id_otherfile);
+                    $this->db->delete('db_employees.major_programstudy_employees');
+                    $this->db->reset_query();
+                }
+                else {
+                    $this->db->where('ID',$id_otherfile);
+                    $this->db->delete('db_employees.master_other_files');
+                    $this->db->reset_query();
+                }
+                return print_r(1);
+            }
+        }
     }
 
     public function review_academics1(){
@@ -6402,12 +6551,14 @@ class C_api extends CI_Controller {
                 $NoDocument = strtoupper($formInsert['NoDocument']);
                 $DateDocument = $formInsert['DateDocument'];
                 $type = $formInsert['type'];
+                $kat_otherfiles = $formInsert['kat_otherfiles'];
                 $DescriptionFile = $formInsert['DescriptionFile'];
                 $fileName = $formInsert['fileName'];
                 $Get_MasterFiles = $this->m_master->MasterfileStatus($type);
                 $dataSave = array(
                     'NIP' => $NIP,
                     'TypeFiles' => $Get_MasterFiles[0]['ID'],
+                    'ID_OtherFiles' => $kat_otherfiles,
                     'No_Document' => $NoDocument,
                     'Date_Files' => $DateDocument,
                     'Description_Files' => $DescriptionFile,
@@ -6417,9 +6568,7 @@ class C_api extends CI_Controller {
                 $this->db->insert('db_employees.files',$dataSave);
                 return print_r(1);
             }
-
         } //end count
-
     }
 
 
@@ -6541,6 +6690,26 @@ class C_api extends CI_Controller {
             }
         }
 
+        else if($data_arr['action']=='update_mster_katother'){
+
+            $master_name_katother = ucwords($data_arr['master_name_katother']);
+            $dataAttdS = $this->db->query('SELECT * FROM db_employees.master_other_files
+                                          WHERE Name_other_files = "'.$master_name_katother.'" ')->result_array();
+
+            if(count($dataAttdS)>0){
+                return print_r(0);
+            } 
+            else {
+                $dataSave = array(
+                    'Name_other_files' => $master_name_katother,
+                    'UserCreate' => $IDuser
+                );
+                $this->db->insert('db_employees.master_other_files',$dataSave);
+                return print_r(1);
+            }
+        }
+
+        
         else if($data_arr['action']=='readmastermajor'){
 
             $requestData= $_REQUEST;
