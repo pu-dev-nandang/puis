@@ -1,11 +1,11 @@
 
 <div class="row">
             <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
-
+                
                     <div class="col-xs-12" id="subsesi">
                         <div class="form-group">
                             <div class="thumbnail" style="padding: 10px;text-align: left;">
-                                <h4>Data Other Files </h4>
+                                <h4><b>Form Data Other Files </b></h4>
                                
                                 <div class="row"> 
                                     <div class="col-xs-5">
@@ -18,33 +18,34 @@
                                                      <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>  
                                                     <?php endif ?>
                                                 <?php endfor ?>
-                                                
                                             </select>
                                         </div>
                                         </div>
                                     </div>
-
                                     <div class="col-xs-6">
+                                        <div class="form-group">
+                                            <label>Kategori Other File</label>
+                                            <select class="form-control" id="JenisFiles"><option id="0" disabled selected></option></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-5">
                                         <div class="form-group">
                                             <label>No. Document</label>
                                             <input class="form-control" id="NoDocument">
                                         </div>
                                     </div>
-
-                                    <div class="col-xs-5">
+                                    <div class="col-xs-4">
                                         <div class="form-group">
                                             <label>Date Document</label>
                                             <input class="form-control frmdatepicker" id="DateDocument">
                                         </div>
                                     </div>
-
                                     <div class="col-xs-11">
                                         <div class="form-group">
                                             <label>Description Files</label>
                                             <textarea rows="3" cols="5" name="DescriptionFile" id="DescriptionFile" class="form-control"></textarea>
                                         </div>
                                     </div>
-
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <label>Upload Document</label>
@@ -57,30 +58,25 @@
                                                 </form> 
                                         </div>
                                     </div>
-
                                     <div class="col-xs-6">
                                         <div class="form-group">
                                             <div id="element1">Review File : </div>
                                         </div>
                                     </div>
-
-                                  
                                 </div>
                                 <div class="row">
                                    <div class="col-md-12" style="text-align: right;">
-                                            <hr/>
-                                            <button class="btn btn-success btn-round btnSaveFiles"> <span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
-                                        </div> 
+                                        <hr/>
+                                        <button class="btn btn-success btn-round btnSaveFiles"> <span class="glyphicon glyphicon-floppy-disk"></span> Save</button>
+                                    </div> 
                                 </div>
                             </div>
 
                         </div>
                     </div>
-                    <!-- <span id="bodyAddSesi"></span> -->
             </div>
         <div id="loadtablefiles" class="col-md-6 table-responsive"></div>  
  </div>
-
 
 <script>
     $(document).ready(function () {
@@ -99,6 +95,33 @@ $('#fileOther').change(function (event) {
         var file = URL.createObjectURL(event.target.files[0]);
         $('#element1').append('<br/><iframe src="' + file + '" style="width:350px; height:100;" frameborder="0"></iframe>' );
     });
+
+
+$('#typefiles').change(function (event) {
+    
+    var filterKategoriJenis = $('#typefiles option:selected').attr('id');
+    $("#JenisFiles").empty();
+
+    if(filterKategoriJenis == "13") {
+
+        var url = base_url_js+'api/__reviewotherfile';
+        var token = jwt_encode({action : 'get_katotherfiles'},'UAP)(*');
+
+        $.post(url,{token:token},function (jsonResult) {
+            $('#JenisFiles').append('<option id="0" disabled selected>Pilih Kategori Other Files</option>');
+                for(var i=0;i<jsonResult.length;i++){
+                        $('#JenisFiles').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name_other_files+' </option>');
+                }
+        });
+            
+    } 
+    else {
+
+        $("#JenisFiles").empty();
+
+    }
+});
+
 </script>
 
 <script>
@@ -129,9 +152,8 @@ $('#fileOther').change(function (event) {
             '                        <th style="width: 5%;text-align: center;">Date Document</th>      '+
             '                        <th style="width: 12%;text-align: center;">Description</th>       '+
             '                        <th style="text-align: center;width: 8%;">Action</th>             '+
-            '                    </tr>' +
-            '                    </thead>' +
-            //'                   <tbody id="listData"></tbody>' +
+            '                    </tr>                                                                 '+
+            '                    </thead>                                                              '+
             '                </table>');
 
         var NIP = '<?php echo $NIP; ?>';
@@ -248,7 +270,7 @@ $('#fileOther').change(function (event) {
                 NIP:NIP
             },'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
-            console.log(resultJson); 
+            //console.log(resultJson); 
             var response = resultJson;
                 if(response.length>0){
                     var no = 1;
@@ -378,9 +400,6 @@ $('#btnSaveEditFiles').click(function () {
             var url = base_url_js+"api/__delistacaemploy";
             $.post(url,{token:token},function (result) {
                 toastr.success('Success Delete File!','Success'); 
-                // console.log(';sdasdsad')
-                //loadFilesDetails();
-                //loadformsotherfiles();
                 setTimeout(function () {
                     $('.menuDetails[data-page="otherfiles"]').trigger('click');
                   //window.location.href = '';

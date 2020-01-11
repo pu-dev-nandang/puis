@@ -670,7 +670,7 @@ class C_employees extends HR_Controler {
     }
 
 
-     public function files_employees(){
+    public function files_employees(){
       $department = parent::__getDepartement();
 
         $logged_in = $this->session->userdata('NIP');
@@ -683,6 +683,14 @@ class C_employees extends HR_Controler {
 
      }
 
+    public function hrd_academic_setting(){
+        $department = parent::__getDepartement();
+        $logged_in = $this->session->userdata('NIP');
+        $data['ProdiArr'] = $this->m_master->caribasedprimary('db_academic.program_study','Status',1);
+        $page = $this->load->view('page/'.$department.'/academic/setting_academic',$data,true);
+        $this->tab_menuacademic($page);
+
+    }
 
     // =============================================
 

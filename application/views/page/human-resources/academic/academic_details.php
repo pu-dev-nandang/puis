@@ -86,6 +86,12 @@
 
         $.post(url,{token:token},function (resultJson) {
 
+            if(resultJson.Gender == "P") {
+                var jenis_kelamin = "Female";
+            } else {
+                var jenis_kelamin = "Male";
+            }
+
             $('#dataImg').html('<img src="'+base_url_img_employee+''+resultJson.Photo+'" class="img-thumbnail">');
 
             $('#dataName').html(resultJson.TitleAhead+' '+resultJson.Name+' '+resultJson.TitleBehind);
@@ -93,8 +99,7 @@
             $('#dataNIP').html(resultJson.NIP);
             $('#dataNIDN').html(resultJson.NIDN);
             $('#dataKTP').html(resultJson.KTP);
-            // $('#dataPasport').html(resultJson.NIP);
-            $('#dataGender').html(resultJson.Gender);
+            $('#dataGender').html(jenis_kelamin);
             $('#dataReligian').html(resultJson.Religion);
             $('#dataPlaceOfBirth').html(resultJson.PlaceOfBirth);
             $('#dataDateOfBirth').html(resultJson.DateOfBirth);
@@ -103,18 +108,10 @@
             $('#dataEmailPU').html(resultJson.EmailPU);
             $('#dataEmail').html(resultJson.Email);
             $('#dataAddress').html(resultJson.Address);
-            // $('#dataPostalCode').html(resultJson.Address);
             $('#dataProvince').html(resultJson.Nameprov);
-            // $('#dataDistricts').html(resultJson.ProvinceID);
-            // $('#dataNationality').html(resultJson.ProvinceID);
-            
 
             });
-
-
-            //alert(linkupdate);
             
-
     }
 </script>
 
