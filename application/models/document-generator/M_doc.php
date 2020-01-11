@@ -94,7 +94,7 @@ class M_doc extends CI_Model {
     		        			for ($i=2; $i < count($ex); $i++) {
     		        				$setStr .= '.'.trim(ucwords($ex[$i]));
     		        			}
-    		        			$this->TABLE[] = $setStr;
+    		        			$this->TABLE['KEY'][] = $setStr;
     		        			break;
     		        	}
     		        }
@@ -119,7 +119,14 @@ class M_doc extends CI_Model {
 
     private function __generator_obj(){
     	$this->__SETGenerate();
-    	$this->__GRABGenerate();
+        $this->__GRABGenerate();
+    	$this->__TABLEGenerate();
+    }
+
+    private function __TABLEGenerate(){
+        $this->load->model('document-generator/m_table');
+        $TABLE = $this->TABLE;
+        $this->TABLE = $this->m_table->__generate($TABLE);
     }
 
     private function __SETGenerate(){
@@ -200,7 +207,7 @@ class M_doc extends CI_Model {
     	        			break;
     	        		case $this->KeyTABLE:
     	        			if (!in_array($ex[0], $Filtering)){
-    	        				
+    	        				// print_r($Input[$this->KeyTABLE]);die();
     	        			}
     	        			else
     	        			{

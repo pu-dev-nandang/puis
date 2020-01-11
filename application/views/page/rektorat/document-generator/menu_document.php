@@ -3,11 +3,11 @@
         <li class="<?php if($this->uri->segment(2)=='document-generator' &&  ( $this->uri->segment(3) == '' ||  $this->uri->segment(3) == null ) ) { echo 'active'; } ?>">
             <a href="<?php echo base_url('rectorat/document-generator'); ?>">Document</a>
         </li>
-
-        <li class="<?php if($this->uri->segment(3)=='setting') { echo 'active'; } ?>">
-            <a href="<?php echo base_url('rectorat/document-generator/setting'); ?>">Setting</a>
-        </li>
-
+        <?php if ($this->session->userdata('PositionMain')['IDDivision'] == 12 && $this->session->userdata('NIP') == '2018018'): ?>
+          <li class="<?php if($this->uri->segment(3)=='setting') { echo 'active'; } ?>">
+              <a href="<?php echo base_url('rectorat/document-generator/setting'); ?>">Setting</a>
+          </li>
+        <?php endif ?>
     </ul>
     <div style="border-top: 1px solid #cccccc">
 

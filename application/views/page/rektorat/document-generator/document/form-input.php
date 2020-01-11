@@ -112,7 +112,7 @@
                     App_form_input.method_GRAB(key);
                     break;
                   case "TABLE":
-                    
+                    App_form_input.method_TABLE(key);
                     break;
                   case "DOCUMENT":
                     
@@ -273,6 +273,125 @@
 
         // -- //
 
+        method_TABLE : function(dt){
+            // console.log(dt);
+            var htmlOP = App_form_input.SelectAPIOP(dt['API']['select']);
+            var html = '<div class="thumbnail" style = "margin-top:5px;">'+
+                            '<div class = "row">'+
+                                '<div class = "col-md-12">'+
+                                    '<div style = "padding:15px;">'+
+                                        '<h3><u><b>SET TABLE </b></u></h3>'+
+                                    '</div>'+
+                                    '<div class = "form-group">'+
+                                        '<label>Choose API</label>'+
+                                        htmlOP+
+                                    '</div>'+
+                                    '<div id = "DOMAPI"></div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>';
+
+            $('#Page_TABLE').append(html);              
+
+        },
+
+        DOMSelectedAPI : function(selector){
+            var html = '';
+            var params = jQuery.parseJSON( jwt_decode(selector.find('option:selected').attr('params')) );
+            if (typeof params !== 'undefined') {
+                var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
+
+                // console.log(DataCallback);
+                var arr_special = ['#SemesterID'];
+                
+                for (var i = 0; i < arr_special.length; i++) {
+                    var bool = false;
+                    for (var j = 0; j < params.length; j++) {
+                        if (arr_special[i] == params[j] ) {
+                            bool = true;
+                            break;
+                        }
+                    }
+                    if (bool) {
+                        var dtRow = DataCallback['TABLE']['API']['paramsChoose'][arr_special[i]];
+                        var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,arr_special[i]);
+                        html += '<div class = "form-group">'+
+                                    '<label>Choose Semester</label>'+
+                                    htmlOP+
+                                '</div>';  
+                    }
+                     
+                }
+
+                if (html != '') {
+                     html +=  '<div style = "text-align:right;padding:10px;">'+
+                                '<button class = "btn btn-default" id = "setTable">Set Table</button>'+
+                              '</div>'+
+                              '<div id = "pageSetTable"></div>';  
+                }
+               
+
+            }
+            
+            $('#DOMAPI').html(html);
+        },
+
+        setTableDesign : function(selector){
+            var selectorPage = $('#pageSetTable');
+            var data = [];
+            var querySQL = jwt_decode($('.Input[field="TABLE"][name="API"] option:selected').attr('query'));
+            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+                var nm = $(this).attr('name');
+                nm = nm.replace("#", "");
+                data[nm] = $(this).find('option:selected').val();
+            })
+            data['querySQL'] = querySQL;
+            data['NIP'] = '3114016';
+            console.log(data);
+            /* Lanjut Besok di db tambahin nma field agar bisa dicocokan langsung dengan yg di word */ 
+        },
+
+        SelectAPIOPByParams : function(data,paramsChoose){
+            var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+            for (var i = 0; i < data.length; i++) {
+               var selected = (data[i].Selected == 1) ? 'selected'  : ''; 
+               html +=  '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Value+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        SelectAPIOP : function(data){
+            var html =  '<select class = "form-control Input" field="TABLE" name="API" key = "TABLE">';
+            html += '<option value = "-" selected disabled>--No Choose API--</option>';
+            // console.log(data);
+            for (var i = 0; i < data.length; i++) {
+
+               html +=  '<option value = "'+data[i].ID+'" '+''+' params = "'+jwt_encode(data[i].Params,'UAP)(*')+'" query= "'+jwt_encode(data[i].Query,'UAP)(*')+'" >'+data[i].ApiNameTable+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        set_TABLE : function(attrname,attrva,attrkey,attrfield,el){
+            // console.log(settingTemplate[attrkey]);
+            // select API Choose
+            settingTemplate[attrkey]['Choose'] = $('.Input[field="TABLE"][name="API"] option:selected').val();
+            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+                var nm = $(this).attr('name');
+                nm = nm.replace("#", "");
+                settingTemplate[attrkey]['paramsUser'] = {};
+                settingTemplate[attrkey]['paramsUser'][nm] =$(this).find('option:selected').val();
+            })
+
+        },
+
+        // -- //
+
         Dom_Date : function(data){
             var html = '<div class = "thumbnail" style = "margin-top:5px;">';
             var select =  data.select;
@@ -363,7 +482,9 @@
                         }
                         break;
                       case "TABLE":
-                        
+                          if (variable == attrkey) {
+                            App_form_input.set_TABLE(attrname,attrva,attrkey,attrfield,el);
+                          }
                         break;
                       case "DOCUMENT":
                         
@@ -373,7 +494,7 @@
 
 
             })
-            
+           
             var ArrUploadFilesSelector = [];
             var url = base_url_js+"document-generator-action/__preview_template";
             var token = jwt_encode(settingTemplate,'UAP)(*');
@@ -509,4 +630,17 @@
        App_form_input.SaveTemplate(itsme);
 
     })
+
+    $(document).off('change', '.Input[field="TABLE"][name="API"]').on('change', '.Input[field="TABLE"][name="API"]',function(e) {
+       var itsme = $(this);
+       App_form_input.DOMSelectedAPI(itsme);
+    })
+
+    $(document).off('click', '#setTable').on('click', '#setTable',function(e) {
+       var itsme = $(this);
+       App_form_input.setTableDesign(itsme);
+
+    })
+
+    
 </script>
