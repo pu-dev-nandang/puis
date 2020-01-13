@@ -6308,6 +6308,14 @@ class C_api3 extends CI_Controller {
             );
 
             $this->db->insert('db_ticketing.ss_report',$arrInsert);
+            $ID = $this->db->insert_id();
+
+
+            $rand = $this->m_api->chekCodeReport();
+
+            $this->db->set('ReportNumber', $rand);
+            $this->db->where('ID', $ID);
+            $this->db->update('db_ticketing.ss_report');
 
             return print_r(1);
 
@@ -6315,15 +6323,22 @@ class C_api3 extends CI_Controller {
         else if($data_arr['action']=='readStudentReport'){
             $NPM = $data_arr['NPM'];
 
-            $data = $this->db->query('SELECT sr.* FROM db_ticketing.ss_report sr  
-                                                    LEFT JOIN db_ticketing.ss_report_last_update srlu ON (srlu.IDReport = sr.ID)
-                                                    WHERE sr.NPM = "'.$NPM.'"  GROUP BY srlu.IDReport ORDER BY srlu.UpdatedAt DESC')->result_array();
+
+            $q = ' SELECT d.*, c.UpdatedAt 
+                            FROM db_ticketing.ss_report_last_update a
+                            LEFT JOIN ( SELECT b.ID, b.IDReport, MAX(b.UpdatedAt) AS UpdatedAt FROM db_ticketing.ss_report_last_update b GROUP BY b.IDReport) c ON c.IDReport = a.IDReport
+                            LEFT JOIN db_ticketing.ss_report d ON a.IDReport = d.ID
+                            WHERE d.NPM = "'.$NPM.'"
+                            GROUP BY d.ID
+                            ORDER BY c.UpdatedAt DESC';
+
+            $data = $this->db->query($q)->result_array();
 
             if(count($data)>0){
                 for($i=0;$i<count($data);$i++){
 
                     // Response
-                    $data[$i]['Response'] = $this->db->query('SELECT srr.*, em.Name AS UpdatedAdmin, ats.Name AS UpdatedUser FROM db_ticketing.ss_report_response srr 
+                    $data[$i]['Response'] = $this->db->query('SELECT srr.*, em.Name AS UpdatedAdmin, ats.Name AS UpdatedUser, em.Photo FROM db_ticketing.ss_report_response srr 
                                                                             LEFT JOIN db_academic.auth_students ats ON (ats.NPM = srr.EnrtedBy)
                                                                             LEFT JOIN db_employees.employees em ON (em.NIP = srr.EnrtedBy)
                                                                             WHERE srr.IDReport = "'.$data[$i]['ID'].'" ')->result_array();
@@ -6340,12 +6355,134 @@ class C_api3 extends CI_Controller {
             return print_r(json_encode($data));
 
         }
+        else if($data_arr['action']=='studentReportClose'){
+
+            $this->db->set('Status', '2');
+            $this->db->where('ID', $data_arr['IDReport']);
+            $this->db->update('db_ticketing.ss_report');
+
+            return print_r(1);
+
+        }
         else if($data_arr['action']=='studentReportInsertRespinse'){
 
             $dataForm = (array) $data_arr['dataForm'];
             $this->db->insert('db_ticketing.ss_report_response',$dataForm);
 
-            return print_r(1);
+            if($dataForm['EntredType']=='1'){
+                $this->db->set('Status', '1');
+                $this->db->where('ID', $dataForm['IDReport']);
+                $this->db->update('db_ticketing.ss_report');
+            }
+
+            return print_r($dataForm['IDReport']);
+
+        }
+        else if($data_arr['action']=='admin_getListReport'){
+
+            $requestData= $_REQUEST;
+
+            $Status = $data_arr['Status'];
+            $WhereSts = ($Status!='') ? 'WHERE sr.Status = "'.$Status.'"' : '';
+            $dataSearch = '';
+            if( !empty($requestData['search']['value']) ) {
+                $search = $requestData['search']['value'];
+
+                $dataSearch = ($WhereSts!='')
+                    ? $WhereSts.' sr.NPM LIKE "%'.$search.'%" OR 
+                                sr.ReportNumber LIKE "%'.$search.'%" OR 
+                                sr.Title LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" '
+                    : 'WHERE sr.NPM LIKE "%'.$search.'%" OR 
+                                sr.ReportNumber LIKE "%'.$search.'%" OR 
+                                sr.Title LIKE "%'.$search.'%" OR 
+                                ats.Name LIKE "%'.$search.'%" ' ;
+
+
+            }
+
+            $queryDefault = 'SELECT sr.*, ats.Name FROM db_ticketing.ss_report sr 
+                                        LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sr.NPM) 
+                                        '.$WhereSts.$dataSearch.' ORDER BY sr.ID DESC';
+
+
+            $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+            $query = $this->db->query($sql)->result_array();
+            $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+
+            $no = $requestData['start'] + 1;
+            $data = array();
+
+            for($i=0;$i<count($query);$i++) {
+
+                $nestedData = array();
+                $row = $query[$i];
+
+                $Sts = 'Open';
+                if($row['Status']=='1'){
+                    $Sts = 'On Process';
+                } else if($row['Status']=='2'){
+                    $Sts = 'Close';
+                }
+
+                $Created = date('d M Y H:i',strtotime($row['EntredAt']));
+
+
+                // Response
+                $Response = $this->db->query('SELECT COUNT(*) AS TotalResponse FROM db_ticketing.ss_report_response srr  WHERE srr.IDReport = "'.$row['ID'].'" ')->result_array();
+
+                // Last Update
+                $LastUpdate = $this->db->query('SELECT srlu.UpdatedAt, em.Name AS UpdatedAdmin, ats.Name AS UpdatedUser FROM db_ticketing.ss_report_last_update srlu 
+                                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = srlu.UpdatedBy)
+                                                                            LEFT JOIN db_employees.employees em ON (em.NIP = srlu.UpdatedBy)
+                                                                            WHERE srlu.IDReport = "'.$row['ID'].'"
+                                                                            ORDER BY srlu.ID DESC LIMIT 1')->result_array();
+
+                $LastUpdateAt = '';
+                $LastUpdateBy = '';
+                if(count($LastUpdate)>0){
+                    $LastUpdateAt = date('d M Y H:i',strtotime($LastUpdate[0]['UpdatedAt']));
+                    $LastUpdateBy = ($LastUpdate[0]['UpdatedAdmin']!='' && $LastUpdate[0]['UpdatedAdmin']!=null) ? $LastUpdate[0]['UpdatedAdmin'] : $LastUpdate[0]['UpdatedUser'];
+                }
+
+                $nestedData[] = '<div style="text-align: center;">'.$no.'</div>';
+                $nestedData[] = '<div><b>'.$row['Name'].'</b><br/>'.$row['NPM'].'<br/><i class="fa fa-hashtag"></i> '.$row['ReportNumber'].'</div>';
+                $nestedData[] = '<div><h4 style="margin-bottom: 3px;margin-top: 0px;">'.$row['Title'].'</h4><div style="margin-bottom: 5px;">Created : '.$Created.'</div><div class="well" style="max-height: 150px;overflow: auto;"><p>'.$row['Description'].'</p></div>
+                                        <a class="btn btn-primary btn-sm showDataResponse" data-id="'.$row['ID'].'"><i class="fa fa-comment margin-right"></i> '.$Response[0]['TotalResponse'].' Response</a> | <span style="font-size: 11px;color: #848484;">Last Updated : '.$LastUpdateAt.' By '.$LastUpdateBy.'</span></div>';
+                $nestedData[] = '<div style="text-align: center;">'.$Sts.'</div>';
+
+                $data[] = $nestedData;
+                $no++;
+
+            }
+
+            $json_data = array(
+                "draw"            => intval( $requestData['draw'] ),
+                "recordsTotal"    => intval(count($queryDefaultRow)),
+                "recordsFiltered" => intval( count($queryDefaultRow) ),
+                "data"            => $data
+            );
+            echo json_encode($json_data);
+
+        }
+        else if($data_arr['action']=='getStudentReportResponse'){
+            $ID = $data_arr['ID'];
+
+            $data = $this->db->query('SELECT sr.*, ats.Name FROM db_ticketing.ss_report sr 
+                                                    LEFT JOIN db_academic.auth_students ats ON (ats.NPM = sr.NPM)
+                                                    WHERE sr.ID = "'.$ID.'" ')->result_array();
+
+            if(count($data)>0){
+                $data[0]['Response'] = $this->db->query('SELECT srr.*, em.Name AS UpdatedAdmin, ats.Name AS UpdatedUser FROM db_ticketing.ss_report_response srr 
+                                                                            LEFT JOIN db_academic.auth_students ats ON (ats.NPM = srr.EnrtedBy)
+                                                                            LEFT JOIN db_employees.employees em ON (em.NIP = srr.EnrtedBy)
+                                                                            WHERE srr.IDReport = "'.$ID.'" ')->result_array();
+            }
+
+
+
+            return print_r(json_encode($data));
 
         }
 
