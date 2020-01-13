@@ -158,7 +158,7 @@
 				}
 				else
 				{
-					Action = '<button type="button" class="btn btn-warning btn-edit btn-edit-postbudget btn-write" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'" budget = "'+dataDB[i].Budget+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button>&nbsp <button type="button" class="btn btn-danger btn-delete btn-delete-postbudget btn-write" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'"> <i class="fa fa-trash" aria-hidden="true"></i> </button>';
+					Action = '<button type="button" class="btn btn-warning btn-edit btn-edit-postbudget btn-write" CodePostBudget="'+CodePostBudget+'" trno = "'+(parseInt(i) + 1)+'" budget = "'+dataDB[i].Budget+'"> <i class="fa fa-pencil-square-o" aria-hidden="true"></i> </button>';
 				}
 
 				var BG = (CodePostBudget == 'Unset') ? 'style="background-color: #eade8e; color: black;"' : 'style="background-color: #8ED6EA; color: black;"';
