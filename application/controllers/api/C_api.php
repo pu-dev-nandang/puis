@@ -433,8 +433,6 @@ class C_api extends CI_Controller {
 
     public function getEmployeesHR()
     {
-
-        /*UPDATED BY FEBRI @ JAN 2020*/
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
@@ -538,7 +536,7 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
                         LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
                         LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
-                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.ID DESC ';
+                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY '.$orderBy;
         //echo $queryDefault;
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 

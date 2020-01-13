@@ -374,12 +374,14 @@
         $("#sorting-data").on("change","select[name=sort_by]",function(){
           var value = $(this).val();
           var order = $("#sorting-data select[name=order_by]").val();
-          loadDataEmployees(value,order);
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          loadDataEmployees(isappv,value,order);
         });
         $("#sorting-data").on("change","select[name=order_by]",function(){
           var order = $("#sorting-data select[name=sort_by]").val();
           var value = $(this).val();
-          loadDataEmployees(order,value);
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          loadDataEmployees(isappv,order,value);
         });
 
     });
