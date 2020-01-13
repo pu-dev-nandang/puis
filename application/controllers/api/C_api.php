@@ -439,9 +439,6 @@ class C_api extends CI_Controller {
         $data_arr = $this->getInputToken();
 
         /*UPDATED BY FEBRI @  JAN 2020*/
-        /*$dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
-            'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
-            : '' ;*/
         $dataWhere = "";  $dataArrStatus=array(); $dataArrGender=array(); $dataArrReligion=array(); $dataArrLevel=array();
         if(!empty($data_arr['Filter'])){            
             $parse = parse_str($data_arr['Filter'],$output);
@@ -462,39 +459,6 @@ class C_api extends CI_Controller {
                 }
                 $dataWhere .= $conditionBirthDate;
             }
-            if(!empty($output['gender'])){
-                $dataArrGender = $output['gender'];
-                $conditionGender = " AND (";
-                $gn = 1;
-                foreach ($output['gender'] as $g) {
-                    $conditionGender .= "Gender = '".$g."' ".(($gn < count($output['gender'])) ? ' OR ':'');
-                    $gn++;
-                }
-                $conditionGender .= ")";
-                $dataWhere .= $conditionGender;
-            }
-            if(!empty($output['level_education'])){
-                $dataArrLevel = $output['level_education'];
-                $conditionLevelEdu = " AND (";
-                $ln = 1;
-                foreach ($output['level_education'] as $l) {
-                    $conditionLevelEdu .= "LevelEducationID = '".$l."' ".(($ln < count($output['level_education'])) ? ' OR ':'');
-                    $ln++;
-                }
-                $conditionLevelEdu .= ")";
-                $dataWhere .= $conditionLevelEdu;
-            }
-            if(!empty($output['religion'])){
-                $dataArrReligion = $output['religion'];
-                $conditionReligion = " AND (";
-                $rn = 1;
-                foreach ($output['religion'] as $r) {
-                    $conditionReligion .= "ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
-                    $rn++;
-                }
-                $conditionReligion .= ")";
-                $dataWhere .= $conditionReligion;
-            }
             if(!empty($output['statusstd'])){
                 $dataArrStatus = $output['statusstd'];
                 $conditionStatus = " AND (";
@@ -512,10 +476,53 @@ class C_api extends CI_Controller {
                 $conditionStatus .= ")";
                 $dataWhere .= $conditionStatus;
             }
-            //echo $dataWhere;die();
-        }
-        if(!empty($data_arr['Approval']) && $data_arr['Approval'] == true){
-            $dataWhere .= ' AND (te.isApproval = 1)';
+            if(!empty($output['religion'])){
+                $dataArrReligion = $output['religion'];
+                $conditionReligion = " AND (";
+                $rn = 1;
+                foreach ($output['religion'] as $r) {
+                    $conditionReligion .= "em.ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
+                    $rn++;
+                }
+                $conditionReligion .= ")";
+                $dataWhere .= $conditionReligion;
+            }
+            if(!empty($output['gender'])){
+                $dataArrGender = $output['gender'];
+                $conditionGender = " AND (";
+                $gn = 1;
+                foreach ($output['gender'] as $g) {
+                    $conditionGender .= "em.Gender = '".$g."' ".(($gn < count($output['gender'])) ? ' OR ':'');
+                    $gn++;
+                }
+                $conditionGender .= ")";
+                $dataWhere .= $conditionGender;
+            }
+            if(!empty($output['level_education'])){
+                $dataArrLevel = $output['level_education'];
+                $conditionLevelEdu = " AND (";
+                $ln = 1;
+                foreach ($output['level_education'] as $l) {
+                    $conditionLevelEdu .= "em.LevelEducationID = '".$l."' ".(($ln < count($output['level_education'])) ? ' OR ':'');
+                    $ln++;
+                }
+                $conditionLevelEdu .= ")";
+                $dataWhere .= $conditionLevelEdu;
+            }
+
+            if(!empty($output['isapprove'])){
+                if($output['isapprove']){
+                    $dataWhere .= "AND (te.isApproval = 1) ";
+                }
+            }
+
+            /*SORTING*/
+            if(!empty($output['sortby']) && !empty($output['orderby'])){
+                $orderBy = $output['sortby']." ".$output['orderby'];
+            }else{
+                $orderBy = "em.ID DESC";
+            }
+            /*END SORTING*/
         }
         /*END UPDATED BY FEBRI @  JAN 2020*/
 
@@ -532,7 +539,7 @@ class C_api extends CI_Controller {
                         LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
                         LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
                         WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.ID DESC ';
-
+        //echo $queryDefault;
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
@@ -9848,12 +9855,14 @@ class C_api extends CI_Controller {
                 $conditionLevelEdu .= ")";
                 $dataWhere .= $conditionLevelEdu;
             }
-            
+
+            /*SORTING*/
             if(!empty($output['sortby']) && !empty($output['orderby'])){
                 $orderBy = $output['sortby']." ".$output['orderby'];
             }else{
                 $orderBy = "em.ID DESC";
             }
+            /*END SORTING*/
         }
         /*END UPDATED BY FEBRI @  JAN 2020*/
 
@@ -9863,13 +9872,13 @@ class C_api extends CI_Controller {
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
         
-        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu 
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu
                         FROM db_employees.employees em
                         LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
                         LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
                         LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
                         WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY '.$orderBy;
-
+        
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
@@ -9937,7 +9946,7 @@ class C_api extends CI_Controller {
                         </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:left;">'.$row['NIP'].'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['NIP'].'Need approval'.'</div>';
             $nestedData[] = '<div style="margin-bottom:10px"><div  style="float:left;margin-right:10px;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>'.
                             '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.(!empty($Email) ? $Email:'-').'</span></div>'.
                             '</div><p><span class="'.((in_array($row['Gender'], $dataArrGender))? 'bg-primary':'').'"><i class="fa fa-'.(($row['Gender'] == 'L') ? 'mars':'venus').'"></i> '.$gender.'</span> &nbsp;

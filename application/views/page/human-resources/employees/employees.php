@@ -224,16 +224,45 @@
           <h4 class="panel-title"><i class="fa fa-bars"></i> List of employee</h4>
         </div>
         <div class="panel-body">
-            <div id="divDataEmployees"></div>
+          <div id="sorting-data">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label>Sort by</label>
+                  <div class="input-group">
+                    <select class="form-control" name="sort_by">
+                      <option value="">-</option>
+                      <option value="NIP">NIP</option>
+                      <option value="Name">Name</option>
+                      <option value="DateOfBirth">Birthdate</option>
+                      <option value="Gender">Gender</option>
+                      <option value="rl.Religion">Religion</option>
+                      <option value="le.ID">Level Education</option>
+                      <option value="StatusEmployeeID">Status Employee</option>
+                      <option value="StatusLecturerID">Status Lecturer</option>
+                    </select>
+                    <div class="input-group-addon"></div>
+                    <select class="form-control" name="order_by">
+                      <option value="ASC">ASCENDING</option>
+                      <option value="DESC">DESCENDING</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="divDataEmployees"></div>
         </div>
       </div>
     </div>
 </div>
+<a href="lala.php#/bakekok">tembak</a>
 <div id="fetchRequestDataEmp"></div>
 
+
 <script type="text/javascript">
-    function loadDataEmployees(approval=false) {
-        loading_page('#divDataEmployees');
+    function loadDataEmployees(isapprove=false,sort=null,order=null) {
+        loading_modal_show();
 
         setTimeout(function () {
             $('#divDataEmployees').html('<table class="table table-bordered table-striped" id="tableEmployees">' +
@@ -241,20 +270,26 @@
                 '            <tr>' +
                 '                <th style="width: 1%;">No</th>' +
                 '                <th style="width: 3%;">NIP</th>' +
-                '                <th style="width: 10%;">Employee</th>' +
+                '                <th style="width: 15%;">Employee</th>' +
                 '                <th style="width: 10%;">Birthdate</th>' +
-                '                <th style="width: 5%;">Position</th>' +
+                '                <th style="width: 8%;">Position</th>' +
                 '                <th style="width: 15%;">Address</th>' +
-                '                <th style="width: 7%;">Status</th>' +
+                '                <th style="width: 7%;">Action</th>' +
                 '            </tr>' +
                 '            </thead>' +
                 '        </table>');
             /*UPDATED BY FEBRI @ JAN 2020*/
             /*var filterStatusEmployees = $('#filterStatusEmployees').val();
             var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
-            var token = jwt_encode({Filter : $("#form-filter").serialize(),Approval : approval},'UAP)(*');
+            var filtering = $("#form-filter").serialize();
+            if(isapprove){
+              filtering = filtering+"&isapprove="+isapprove;
+          }
+            if((sort && order) || ( sort !== null && order !== null) ){
+              filtering = filtering+"&sortby="+sort+"&orderby="+order;
+            }
+            var token = jwt_encode({Filter : filtering},'UAP)(*');
             /*END UPDATED BY FEBRI @ JAN 2020*/
-
             var dataTable = $('#tableEmployees').DataTable( {
                 "processing": true,
                 "serverSide": true,
@@ -282,6 +317,8 @@
                             'backdrop' : 'static'
                         });
                     }
+                },"initComplete": function(settings, json) {
+                  loading_modal_hide();
                 }
             } );
             TableSess = dataTable;
@@ -333,6 +370,17 @@
             });
         });        
         //END UPDATED BY FEBRI @ NOV 2019
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          loadDataEmployees(value,order);
+        });
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          loadDataEmployees(order,value);
+        });
 
     });
 </script>
