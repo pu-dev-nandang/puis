@@ -208,6 +208,7 @@ class M_doc extends CI_Model {
     	        		case $this->KeyTABLE:
     	        			if (!in_array($ex[0], $Filtering)){
     	        				// print_r($Input[$this->KeyTABLE]);die();
+                                $rs[$this->KeyTABLE] = '';
     	        			}
     	        			else
     	        			{
@@ -299,7 +300,13 @@ class M_doc extends CI_Model {
 	    		    			}
 	    		    			break;
 	    		    		case $this->KeyTABLE:
-	    		    			
+                                if ($this->KeyTABLE == $keyRS) {
+                                        $values = [
+                                            [$this->KeyTABLE.'.Number' => 'No', $this->KeyTABLE.'.H1' => 'Mata Kuliah', $this->KeyTABLE.'.H2' => 'SKS',$this->KeyTABLE.'.H3' => 'Sesi'],
+                                            [$this->KeyTABLE.'.Number' => '1', $this->KeyTABLE.'.H1' => 'Batman', $this->KeyTABLE.'.H2' => 'Gotham City',$this->KeyTABLE.'.H3' => '14'],
+                                        ];
+                                        $TemplateProcessor->cloneRowAndSetValues($values );
+                                }
 	    		    			break;
 	    		    	}
 	    		    }
@@ -309,6 +316,8 @@ class M_doc extends CI_Model {
     		}
     	}
     	
+        die();
+
     	$NIPExt = $this->session->userdata('NIP').'.docx';
     	$FileName = $NIPExt;
     	$pathFolder = FCPATH."uploads\\document-generator\\template\\temp\\"; 
@@ -2006,6 +2015,44 @@ class M_doc extends CI_Model {
             
         }
         
+    }
+
+    public function run_set_table($dataToken){
+        $ID_api = $dataToken['ID_api'];
+        $G_dt = $this->m_master->caribasedprimary('db_generatordoc.api_doc','ID',$ID_api);
+        $Params = json_decode($G_dt[0]['Params'],true) ;
+        $querySql = $G_dt[0]['Query'];
+        $VarPassing = [];
+        for ($i=0; $i < count($Params); $i++) { 
+            if (substr($Params[$i], 0,1) == '#') {
+                // get data by passing
+                $str = str_replace('#', '', $Params[$i]);
+                $VarPassing[] = $dataToken[$str];
+            }
+            else if (substr($Params[$i], 0,1) == '$') {
+                $str = str_replace('$', '', $Params[$i]);
+                if ($dataToken['action'] == 'sample') {
+                    $VarPassing[] = $dataToken[$str];
+                }
+                else
+                {
+                    $VarPassing[] = $this->session->userdata($str);
+                }
+            }
+        }
+
+        $query = $this->db->query($querySql,$VarPassing)->result_array();
+        if (count($query) > 0) {
+            return [
+                'status' => 1,
+                'callback' => $query,
+            ];
+        }
+        else
+        {
+            echo "No data result";die();
+        }
+
     }
 
     

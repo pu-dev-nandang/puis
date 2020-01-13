@@ -21,6 +21,14 @@ class M_table extends CI_Model {
 
 		$sqlSMT = 'select ID,Name as Value,Status as Selected from db_academic.semester order by ID DESC';
 		$querySQLSMT = $this->db->query($sqlSMT,array())->result_array();
+		$sqlEmployeesSample = 'SELECT em.NIP, em.Name
+		                            FROM db_employees.employees em 
+		                            LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+		                            LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
+		                            where StatusEmployeeID not in (-1,-2,4,6)
+		                            ';
+		$querySQLEmployees = $this->db->query($sqlEmployeesSample,array())->result_array();
+
 
 		$Props['API'] = [
 			'select' => $query,
@@ -28,6 +36,8 @@ class M_table extends CI_Model {
 			'paramsChoose' => [
 				'#SemesterID' => $querySQLSMT,
 			],
+			'selectEmployees' => $querySQLEmployees,
+			// 'MapTable' => [] => by JS
 		];
 		return $Props;
 	}

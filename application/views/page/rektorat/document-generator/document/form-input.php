@@ -314,10 +314,16 @@
                     }
                     if (bool) {
                         var dtRow = DataCallback['TABLE']['API']['paramsChoose'][arr_special[i]];
+                        var dtRowEmp = DataCallback['TABLE']['API']['selectEmployees'];
                         var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,arr_special[i]);
+                        var htmlOPEMP = App_form_input.SelectAPIOPEMP(dtRowEmp);
                         html += '<div class = "form-group">'+
                                     '<label>Choose Semester</label>'+
                                     htmlOP+
+                                '</div>'+
+                                '<div class = "form-group">'+
+                                    '<label>Choose Employees for Sample</label>'+
+                                    htmlOPEMP+
                                 '</div>';  
                     }
                      
@@ -334,21 +340,87 @@
             }
             
             $('#DOMAPI').html(html);
+
+            $('.Input[field="employees"][tabindex!="-1"]').removeClass('form-control');
+            $('.Input[field="employees"][tabindex!="-1"]').addClass('select2-select-00 full-width-fix');
+            $('.Input[field="employees"][tabindex!="-1"]').select2({
+                //allowClear: true
+            });
         },
 
         setTableDesign : function(selector){
             var selectorPage = $('#pageSetTable');
-            var data = [];
-            var querySQL = jwt_decode($('.Input[field="TABLE"][name="API"] option:selected').attr('query'));
+            var data = {};
+            // var querySQL = jwt_decode($('.Input[field="TABLE"][name="API"] option:selected').attr('query'));
+            var ID_api = $('.Input[field="TABLE"][name="API"] option:selected').val();
             $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
                 var nm = $(this).attr('name');
                 nm = nm.replace("#", "");
                 data[nm] = $(this).find('option:selected').val();
             })
-            data['querySQL'] = querySQL;
-            data['NIP'] = '3114016';
-            console.log(data);
-            /* Lanjut Besok di db tambahin nma field agar bisa dicocokan langsung dengan yg di word */ 
+            // data['querySQL'] = querySQL;
+            data['ID_api'] = ID_api;
+            data['NIP'] = $('.Input[field="employees"] option:selected').val();
+            data['action'] = 'sample';
+            $('#Preview').prop('disabled',true);
+            loading_button2(selector);
+            var url = base_url_js+"document-generator-action/__run_set_table";
+            var token = jwt_encode(data,'UAP)(*');
+            AjaxSubmitTemplate(url,token).then(function(response){
+                if (response.status == 1) {
+                    App_form_input.MapTable(response.callback);
+                    $('#Preview').prop('disabled',false);
+                }
+                end_loading_button2(selector,'Set Table');
+            }).fail(function(response){
+               toastr.error('Connection error,please try again');
+               end_loading_button2(selector,'Set Table');
+            })
+            
+        },
+
+        MapTable : function(dt){
+            var selector = $('#pageSetTable');
+            var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
+            var keyTable = DataCallback['TABLE']['KEY'];
+            var html = '<div class = "row" style="padding:15px;"><h3><u><b>Header</b></u></h3>';
+            for (var i = 0; i < keyTable.length; i++) {
+                html += '<div class = "col-md-3">'+
+                            '<div class = "form-group">'+
+                                '<label>'+keyTable[i]+'</label>'+
+                                '<input type = "text" class = "form-control Input" field="'+keyTable[i]+'" name="MappingTable" parent="header" key = "TABLE" >'+
+                            '</div>'+
+                        '</div>';        
+            }
+
+            html += '</div>'
+
+            html +=  '<div class = "row" style="padding:15px;"><h3><u><b>Value</b></u></h3>';
+
+            for (var i = 0; i < keyTable.length; i++) {
+                var htmlOPChooseField = App_form_input.SelectAPIOPChooseField(dt[0],keyTable[i],i);
+                html += '<div class = "col-md-3">'+
+                            '<div class = "form-group">'+
+                                '<label>'+keyTable[i]+'</label>'+
+                                htmlOPChooseField+
+                            '</div>'+
+                        '</div>';        
+            }
+            selector.html(html);
+        },
+
+        SelectAPIOPChooseField : function(data,keyTable,number){
+            var selected = (number == 0) ? 'selected' : '';
+            var html =  '<select class = "form-control Input" field="'+keyTable+'" name="'+'MappingTable'+'" parent="Value" key = "TABLE">';
+                         html +=  '<option value = "'+'Increment'+'" '+selected+' >'+'Increment'+'</option>';
+            var run = 1 ;
+            for (key in data){
+                selected = (number ==run ) ? 'selected' : '';
+                html +=  '<option value = "'+key+'" '+selected+' >'+key+'</option>';
+                run++;
+            }
+            html  += '</select>';
+            return html;
         },
 
         SelectAPIOPByParams : function(data,paramsChoose){
@@ -356,6 +428,17 @@
             for (var i = 0; i < data.length; i++) {
                var selected = (data[i].Selected == 1) ? 'selected'  : ''; 
                html +=  '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Value+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        SelectAPIOPEMP : function(data){
+            var html =  '<select class = "form-control Input" field="employees" name="employees" key = "TABLE">';
+            for (var i = 0; i < data.length; i++) {
+               html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
             }
 
             html  += '</select>';
@@ -380,13 +463,33 @@
         set_TABLE : function(attrname,attrva,attrkey,attrfield,el){
             // console.log(settingTemplate[attrkey]);
             // select API Choose
-            settingTemplate[attrkey]['Choose'] = $('.Input[field="TABLE"][name="API"] option:selected').val();
+            settingTemplate[attrkey]['API']['Choose'] = $('.Input[field="TABLE"][name="API"] option:selected').val();
             $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
                 var nm = $(this).attr('name');
                 nm = nm.replace("#", "");
                 settingTemplate[attrkey]['paramsUser'] = {};
                 settingTemplate[attrkey]['paramsUser'][nm] =$(this).find('option:selected').val();
             })
+
+            settingTemplate[attrkey]['paramsUser']['NIP'] = $('.Input[field="employees"] option:selected').val();    // only preview for sample
+
+            settingTemplate[attrkey]['MapTable'] = {};
+            settingTemplate[attrkey]['MapTable']['Header'] = {};
+            settingTemplate[attrkey]['MapTable']['Value'] = {};
+            // header
+            $('.Input[key="TABLE"][name="MappingTable"]').each(function(e){
+                var parent = $(this).attr('parent');
+                var field = $(this).attr('field');
+                if (parent == 'header') {
+                    settingTemplate[attrkey]['MapTable']['Header'][field] = $(this).val();
+                }
+
+                if (parent == 'Value') {
+                    settingTemplate[attrkey]['MapTable']['Value'][field] = $(this).find('option:selected').val();
+                }
+
+            });
+
 
         },
 
@@ -443,7 +546,7 @@
             var data = [];
             var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
             settingTemplate = DataCallback;
-            $('.Input').each(function(){
+            $('.Input').not('div').each(function(){
                 var el = $(this);
                 var attrname = el.attr('name').trim();
                 if (!$(this).is("select")) {
@@ -494,7 +597,7 @@
 
 
             })
-           
+
             var ArrUploadFilesSelector = [];
             var url = base_url_js+"document-generator-action/__preview_template";
             var token = jwt_encode(settingTemplate,'UAP)(*');
