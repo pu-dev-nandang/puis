@@ -13,7 +13,7 @@
 							<div class="col-sm-3">
 								<p class="icon"><i class="fa fa-users"></i></p>
 							</div>
-							<div class="col-sm-9">
+							<div class="col-sm-9 col-md-9">
 								<p class="title">PU Users</p>
 								<p class="desc">Get the information about our Student, Lecturer and Employees</p>
 							</div>
@@ -28,7 +28,7 @@
 							<div class="col-sm-3">
 								<p class="icon"><i class="fa fa-envelope"></i></p>
 							</div>
-							<div class="col-sm-9">
+							<div class="col-sm-9 col-md-9">
 								<p class="title">Message Blast</p>
 								<p class="desc">Service that allows you to easily send text messages to a large mail</p>
 							</div>

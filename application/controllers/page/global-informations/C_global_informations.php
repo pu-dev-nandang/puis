@@ -55,6 +55,9 @@ class C_global_informations extends Globalclass {
         }        
         if(!empty($data_arr['class_of'])){
         	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['class_of']." ","filter"=>"AND",);    
+        }else{
+        	$getCurrentSemes = $this->General_model->fetchData("db_academic.semester",array("status"=>1))->row();
+        	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$getCurrentSemes->Year." ","filter"=>"AND",);    
         }
         if(!empty($data_arr['study_program'])){
         	$param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    

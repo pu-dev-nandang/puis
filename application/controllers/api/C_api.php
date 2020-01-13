@@ -9559,7 +9559,100 @@ class C_api extends CI_Controller {
         if($reqdata){
             $key = "UAP)(*";
             $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
-            $param = array();
+            $param = array();$orderBy=" NPM DESC ";
+            if(!empty($data_arr['Filter'])){            
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['student'])){
+                    $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$output['student']."%' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$output['student']."%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$output['student']."%') ","filter"=>"OR",);
+                }        
+                if(!empty($output['Year'])){
+                    $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$output['Year']." ","filter"=>"AND",);    
+                }/*else{
+                    $getCurrentSemes = $this->General_model->fetchData("db_academic.semester",array("status"=>1))->row();
+                    $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$getCurrentSemes->Year." ","filter"=>"AND",);    
+                }*/
+                if(!empty($output['ProdiID'])){
+                    $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$output['ProdiID']." ","filter"=>"AND",);    
+                }
+                if(!empty($output['status'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['status']) == 1){
+                        $param[] = array("field"=>"ss.`CodeStatus`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['status'] as $s) {
+                            $param[] = array("field"=>"ss.`CodeStatus`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"ag.`ID`","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"ag.`ID`","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['graduation_year'])){
+                    $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$output['graduation_year']." ","filter"=>"AND",);    
+                }
+                if(!empty($output['graduation_start'])){
+                    if(!empty($output['graduation_end'])){
+                        $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($output['graduation_start']))."' ","filter"=>"AND",);    
+                        $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($output['graduation_end']))."' )","filter"=>"AND",);    
+                    }else{
+                        $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($output['graduation_start']))."' ","filter"=>"AND",);
+                    }
+                }        
+                if(!empty($output['birthdate_start'])){
+                    if(!empty($output['birthdate_end'])){
+                        $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);    
+                        $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )","filter"=>"AND",);    
+                    }else{
+                        $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);
+                    }
+                }
+
+                /*SORTING*/
+                if(!empty($output['sortby']) && !empty($output['orderby'])){
+                    $orderBy = $output['sortby']." ".$output['orderby'];
+                }
+
+                /*END SORTING*/
+
+                /*NEED APPROVED PROFILE*/
+                if(!empty($output['isapprove'])){
+                    if($output['isapprove']){
+                        $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
+                    }
+                }
+                /*END NEED APPROVED PROFILE*/
+            }
             
             if(!empty($reqdata['search']['value']) ) {
                 $search = $reqdata['search']['value'];
@@ -9567,58 +9660,11 @@ class C_api extends CI_Controller {
                 $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
                 $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
                 $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
-            }
-
-            if(!empty($data_arr['student'])){
-                $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"AND",);    
-                $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$data_arr['student']."%' ","filter"=>"OR",);
-                $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$data_arr['student']."%') ","filter"=>"OR",);
-            }        
-            if(!empty($data_arr['Year'])){
-                $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['Year']." ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['ProdiID'])){
-                $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['ProdiID']." ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['status'])){
-            $param[] = array("field"=>"ss.`CodeStatus`","data"=>" =".$data_arr['status']." ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['gender'])){
-                $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$data_arr['gender']."' ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['religion'])){
-                $param[] = array("field"=>"ag.`ID`","data"=>" =".$data_arr['religion']." ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['graduation_year'])){
-                $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$data_arr['graduation_year']." ","filter"=>"AND",);    
-            }
-            if(!empty($data_arr['graduation_start'])){
-                if(!empty($data_arr['graduation_end'])){
-                    $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);    
-                    $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($data_arr['graduation_end']))."' )","filter"=>"AND",);    
-                }else{
-                    $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($data_arr['graduation_start']))."' ","filter"=>"AND",);
-                }
-            }        
-            if(!empty($data_arr['birthdate_start'])){
-                if(!empty($data_arr['birthdate_end'])){
-                    $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);    
-                    $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($data_arr['birthdate_end']))."' )","filter"=>"AND",);    
-                }else{
-                    $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($data_arr['birthdate_start']))."' ","filter"=>"AND",);
-                }
-            }
-
-            if(!empty($data_arr['isapprove'])){
-                if($data_arr['isapprove']){
-                    $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
-                }
-            }
-
+            }            
 
             $data = array();
             $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-            $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length']);
+            $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
             $no = $reqdata['start'] + 1;
             foreach ($result as $v) {
                 $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
@@ -9752,6 +9798,34 @@ class C_api extends CI_Controller {
                 }
                 $dataWhere .= $conditionBirthDate;
             }
+            if(!empty($output['statusstd'])){
+                $dataArrStatus = $output['statusstd'];
+                $conditionStatus = " AND (";
+                $sn = 1;
+                foreach ($output['statusstd'] as $s) {
+                    if($s == '-1'){
+                        $conditionStatus .= "(em.StatusEmployeeID = '".$s."' OR em.StatusLecturerID = '".$s."' )".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else if($s == 3 || $s == 4 || $s == 5 || $s== 6){
+                        $conditionStatus .= "em.StatusLecturerID = '".$s."' ".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else{
+                        $conditionStatus .= "em.StatusEmployeeID = '".$s."'".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }
+                    $sn++;
+                }
+                $conditionStatus .= ")";
+                $dataWhere .= $conditionStatus;
+            }
+            if(!empty($output['religion'])){
+                $dataArrReligion = $output['religion'];
+                $conditionReligion = " AND (";
+                $rn = 1;
+                foreach ($output['religion'] as $r) {
+                    $conditionReligion .= "ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
+                    $rn++;
+                }
+                $conditionReligion .= ")";
+                $dataWhere .= $conditionReligion;
+            }
             if(!empty($output['gender'])){
                 $dataArrGender = $output['gender'];
                 $conditionGender = " AND (";
@@ -9774,35 +9848,12 @@ class C_api extends CI_Controller {
                 $conditionLevelEdu .= ")";
                 $dataWhere .= $conditionLevelEdu;
             }
-            if(!empty($output['religion'])){
-                $dataArrReligion = $output['religion'];
-                $conditionReligion = " AND (";
-                $rn = 1;
-                foreach ($output['religion'] as $r) {
-                    $conditionReligion .= "ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
-                    $rn++;
-                }
-                $conditionReligion .= ")";
-                $dataWhere .= $conditionReligion;
+            
+            if(!empty($output['sortby']) && !empty($output['orderby'])){
+                $orderBy = $output['sortby']." ".$output['orderby'];
+            }else{
+                $orderBy = "em.ID DESC";
             }
-            if(!empty($output['statusstd'])){
-                $dataArrStatus = $output['statusstd'];
-                $conditionStatus = " AND (";
-                $sn = 1;
-                foreach ($output['statusstd'] as $s) {
-                    if($s == '-1'){
-                        $conditionStatus .= "(em.StatusEmployeeID = '".$s."' OR em.StatusLecturerID = '".$s."' )".(($sn < count($output['statusstd'])) ? ' OR ':'');
-                    }else if($s == 3 || $s == 4 || $s == 5 || $s== 6){
-                        $conditionStatus .= "em.StatusLecturerID = '".$s."' ".(($sn < count($output['statusstd'])) ? ' OR ':'');
-                    }else{
-                        $conditionStatus .= "em.StatusEmployeeID = '".$s."'".(($sn < count($output['statusstd'])) ? ' OR ':'');
-                    }
-                    $sn++;
-                }
-                $conditionStatus .= ")";
-                $dataWhere .= $conditionStatus;
-            }
-            //echo $dataWhere;die();
         }
         /*END UPDATED BY FEBRI @  JAN 2020*/
 
@@ -9811,12 +9862,7 @@ class C_api extends CI_Controller {
             $search = $requestData['search']['value'];
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
-
-        if(!empty($output['sortby']) && !empty($output['orderby'])){
-            $orderBy = $output['sortby']." ".$output['orderby'];
-        }else{
-            $orderBy = "em.ID DESC";
-        }
+        
         $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu 
                         FROM db_employees.employees em
                         LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)

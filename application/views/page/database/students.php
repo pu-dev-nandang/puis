@@ -72,39 +72,61 @@
                             </div>
                             <div class="collapse" id="advance-filter">
                                 <div class="row">
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label>Status</label>                               
-                                            <select class="form-control" name="status">
-                                                <option value="">-Choose one-</option>
-                                                <?php foreach ($statusstd as $t) { 
-                                                echo '<option value="'.$t->CodeStatus.'">'.$t->Description.'</option>';
-                                                } ?>
-                                            </select>                               
+                                    <?php if(!empty($statusstd)){ ?>
+                                    <div class="col-sm-3">
+                                        <div class="form-groups">
+                                            <label>Status</label>                            
                                         </div>
+                                        <div class="row">
+                                            <?php foreach ($statusstd as $t) { ?>
+                                            <div class="col-sm-6">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="status[]" value="<?=$t->CodeStatus?>"> <?=$t->Description?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
+                                        </div>                                        
                                     </div>
+                                    <?php } ?>
 
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
+                                    <?php if(!empty($religion)){ ?>
+                                    <div class="col-sm-1">
+                                        <div class="form-groups">
                                             <label>Religion</label>
-                                            <select class="form-control" name="religion">
-                                                <option value="">Choose one</option>
-                                                <?php if(!empty($religion)){ 
-                                                foreach ($religion as $rg) { ?>
-                                                <option value="<?=$rg->ID?>"><?=$rg->Nama?></option>
-                                                <?php } } ?>
-                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <?php foreach ($religion as $rg) { ?>
+                                            <div class="col-sm-12">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="religion[]" value="<?=$rg->ID?>"> <?=$rg->Nama?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <?php } ?>
                                         </div>
                                     </div>
+                                    <?php } ?>
 
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <div class="form-groups">
                                             <label>Gender</label>
-                                            <select class="form-control" name="gender">
-                                                <option value="">Choose one</option>
-                                                <option value="P">Female</option>
-                                                <option value="L">Male</option>
-                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="gender[]" value="P"> Female
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="gender[]" value="L"> Male
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -121,17 +143,17 @@
                                 </div>
                             </div>
                             <div class="row" style="padding-top:22px">
-                                <div class="col-sm-6">
+                                <div class="col-sm-8">
                                     <div class="form-group">
                                         <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
                                         <a class="btn btn-default" href="">Clear Filter</a>
                                     </div>
                                 </div>
                                 <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>                    
-                                <div class="col-sm-6">
+                                <div class="col-sm-4 text-right">
                                     <div class="form-group">
                                         <button type="button" class="btn btn-default" id="btnStdDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export Students Information to Excel</button>
-                                        <button type="button" class="btn btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export IPS/IPK Students to Excel</button>                                        
+                                        <!-- <button type="button" class="btn btn-default" id="btnIPSIPKDownloadtoExcel"><i class="fa fa-download margin-right"></i> Export IPS/IPK Students to Excel</button>                                         -->
                                     </div>
                                 </div>
                                 <?php } ?>  
@@ -144,66 +166,33 @@
         </div>
     </div>
 
-
-</div>
-
-<div class="row">
-    <!-- <div class="col-md-12">
-        <div class="well">
-            <div class="row">
-                <div class="col-xs-2">
-                    <select class="form-control filter-db-std" id="filterCurriculum">
-                        <option value="">-- All Class Of --</option>
-                        <option disabled>------------------------</option>
-                    </select>
+    <div class="row">
+        <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="panel-title"><i class="fa fa-cogs"></i> Action</h5>
                 </div>
-                <div class="col-xs-3">
-                    <select class="form-control filter-db-std" id="filterBaseProdi">
-                        <option value="">-- All Programme Study --</option>
-                        <option disabled>------------------------</option>
-                    </select>
-                </div>
-                <div class="col-xs-2">
-                    <select class="form-control filter-db-std" id="filterGroupProdi">
-                        <option value="">-- All Group Student --</option>
-                        <option disabled>------------------------</option>
-                    </select>
-                </div>
-                <div class="col-xs-2">
-                    <select class="form-control filter-db-std" id="filterStatus">
-                        <option value="">-- All Status --</option>
-                        <option disabled>------------------------</option>
-                    </select>
-                </div>
-                
-            </div>
-        </div>
-    </div> -->
-    <?php $Dept = $this->session->userdata('IDdepartementNavigation'); if($Dept=='6') { ?>
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h5 class="panel-title"><i class="fa fa-cogs"></i> Action</h5>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-6 col-md-2">
-                        <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card margin-right"></i> Select Student</button>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-2">
-                        <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card margin-right"></i> Print ID Card</button>
-                    </div>
-                    <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
-                        <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
-                    </div>           
-                    <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
-                        <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-2">
+                            <button class="btn btn-block btn-default" id="btnSelect"><i class="fa fa-id-card margin-right"></i> Select Student</button>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-2">
+                            <button class="btn btn-block btn-default" id="btnPrintIDCard"><i class="fa fa-id-card margin-right"></i> Print ID Card</button>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
+                            <a href="<?= base_url('database/students-group'); ?>" class="btn btn-block btn-default"><i class="fa fa-users margin-right"></i> Student Group</a>
+                        </div>           
+                        <div class="col-xs-12 col-sm-6 col-md-3" style="border-left:1px solid #ddd">
+                            <button class="btn btn-block btn-default btn-approve unselect" type="button"><i class="fa fa-warning"></i> Need Approval for Request Biodata</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <?php } ?>
     </div>
-    <?php } ?>
 </div>
 
 <div class="row">
@@ -214,7 +203,7 @@
                     <h5 class="panel-title"><i class="fa fa-bars"></i> List of students</h5>
                 </div>
                 <div class="panel-body">
-                    <!-- <div id="sorting-data">
+                    <div id="sorting-data">
                         <div class="row">
                           <div class="col-sm-3">
                             <div class="form-group">
@@ -222,14 +211,14 @@
                               <div class="input-group">
                                 <select class="form-control" name="sort_by">
                                   <option value="">-</option>
-                                  <option value="NIP">NIP</option>
+                                  <option value="NPM">NPM</option>
                                   <option value="Name">Name</option>
                                   <option value="DateOfBirth">Birthdate</option>
+                                  <option value="ClassOf">Class Of</option>
+                                  <option value="ProdiNameEng">Study Program</option>
                                   <option value="Gender">Gender</option>
-                                  <option value="rl.Religion">Religion</option>
-                                  <option value="le.ID">Level Education</option>
-                                  <option value="StatusEmployeeID">Status Employee</option>
-                                  <option value="StatusLecturerID">Status Lecturer</option>
+                                  <option value="religionName">Religion</option>
+                                  <option value="StatusStudent">Status</option>
                                 </select>
                                 <div class="input-group-addon"></div>
                                 <select class="form-control" name="order_by">
@@ -240,7 +229,7 @@
                             </div>
                           </div>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="table-list">
                         <table class="table table-bordered table-striped" id="table-list-data">
                             <thead>
@@ -271,11 +260,16 @@
 
 
 <script type="text/javascript">
-    function fetchingData(isapprove=false) {
+    function fetchingData(isapprove=false,sort=null,order=null) {
         loading_modal_show();
-        var data = getFormData($("#form-filter"));   
-        data['isapprove'] = isapprove;
-        var token = jwt_encode(data,'UAP)(*');
+        var filtering = $("#form-filter").serialize();
+        if(isapprove){
+            filtering = filtering+"&isapprove="+isapprove;
+        }
+        if((sort && order) || ( sort !== null && order !== null) ){
+          filtering = filtering+"&sortby="+sort+"&orderby="+order;
+        }    
+        var token = jwt_encode({Filter : filtering},'UAP)(*');
         var dataTable = $('#fetch-data-tables #table-list-data').DataTable( {
             destroy: true,
             retrieve:true,
@@ -292,6 +286,7 @@
                 data : {token:token},
                 type: "post",  // method  , by default get
                 error: function(jqXHR){  // error handling
+                    loading_modal_hide();
                     $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
                         '<h4 class="modal-title">Error Fetch Student Data</h4>');
                     $('#GlobalModal .modal-body').html(jqXHR.responseText);
@@ -331,7 +326,6 @@
             $('#fetch-data-tables #table-list-data').DataTable().destroy();
             fetchingData();
         });
-
 
         $("#btnSelect").click(function () {
             if (!$('.uniform').length) {
@@ -388,6 +382,34 @@
             }else{
                 FormSubmitAuto(url, 'POST', [{ name: 'token', value: token },]);
             }
+        });
+
+        $(".show-more-filter").click(function(){
+          var isOpen = $(this).attr("aria-expanded");
+          if(isOpen == "false"){
+            $(this).attr("aria-expanded",true);
+            $(this).find("span").text("Show less");
+            $(this).find("i.fa").toggleClass("fa-angle-double-down fa-angle-double-up");
+          }else{
+            $(this).attr("aria-expanded",false);
+            $(this).find("span").text("Advance filter");        
+            $(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
+          }
+        });
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          $('#fetch-data-tables #table-list-data').DataTable().destroy();
+          fetchingData(isappv,value,order);
+        });
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          $('#fetch-data-tables #table-list-data').DataTable().destroy();
+          fetchingData(isappv,order,value);
         });
 
     });
@@ -659,93 +681,6 @@
 
     });
     
-    /*function loadStudent(approval=null) { //Updated by Febri @ Nov 2019, add param
-        loading_page('#divDataStudent');
-        var filterCurriculum = $('#filterCurriculum').val();
-        var filterBaseProdi = $('#filterBaseProdi').val();
-        var filterGroupProdi = $('#filterGroupProdi').val();
-        var filterStatus = $('#filterStatus').val();
-
-        var Year = (filterCurriculum!='' && filterCurriculum!=null)
-            ? filterCurriculum.split('.')[1] : '';
-        var ProdiID = (filterBaseProdi!='' && filterBaseProdi!=null)
-            ? filterBaseProdi.split('.')[0] : '';
-        var StatusStudents = (filterStatus!='' && filterStatus!=null)
-            ? filterStatus : '';
-
-        setTimeout(function () {
-            $('#divDataStudent').html('<table class="table table-bordered" id="tableStudent">' +
-                '                <thead>' +
-                '                <tr>' +
-                '                    <th style="width: 5%;">No</th>' +
-                '                    <th style="width: 7%;">NIM</th>' +
-                '                    <th style="width: 5%;">Photo</th>' +
-                '                    <th style="">Name,Email & Formulir Number</th>' +
-                '                    <th style="width: 7%;">Class Of</th>' +
-                '                    <th style="width: 15%;">Progamme Study</th>' +
-                '                    <th style="width: 5%;">Upload Photo</th>' +
-                '                    <th style="width: 5%;">Action</th>' +
-                '                    <th style="width: 7%;">Login Portal</th>' +
-                '                    <th style="width: 5%;">Status</th>' +
-                '                </tr>' +
-                '                </thead>' +
-                '            </table>');
-
-            var data = {
-                Year : Year,
-                ProdiID : ProdiID,
-                GroupProdiID : filterGroupProdi,
-                StatusStudents : StatusStudents,
-                approvalStudentReq : approval //Updated by Febri @ Nov 2019
-            };
-
-            //ADDED BY FEBRI @ JAN 2020
-            var dataPost = $("#form-filter").serializeArray();
-            var dataJson = {};
-            for (var i = 0; i < dataPost.length; i++) {
-                if(dataPost[i].value || dataPost[i].value.trim()){
-                    //console.log(dataPost[i].name+":"+dataPost[i].value);
-                    dataJson[dataPost[i].name]=dataPost[i].value;
-                }
-            };
-            dataJson['approvalStudentReq'] = approval;
-            var data = dataJson;
-            //END ADDED BY FEBRI @ JAN 2020
-            console.log(data);
-            var token = jwt_encode(data,'UAP)(*');
-
-            var dataTable = $('#tableStudent').DataTable( {
-                "processing": true,
-                "serverSide": true,
-                "iDisplayLength" : 10,
-                "ordering" : false,
-                "language": {
-                    "searchPlaceholder": "NIM, Name, Programme Study"
-                },
-                "ajax":{
-                    url : base_url_js+'api/database/__getListStudent', // json datasource
-                    ordering : false,
-                    data : {token:token},
-                    type: "post",  // method  , by default get
-                    error: function(){  // error handling
-                        $(".employee-grid-error").html("");
-                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                        $("#employee-grid_processing").css("display","none");
-                    }
-                },
-                "drawCallback": function( settings ) {
-                    // trigger remove button
-                    if (DivSessionID != 12 && DivSessionID != 6) { // selain IT dan Academic
-                        waitForEl(".btnLoginPortalStudents", function() { 
-                          $("#btnSelect,#btnPrintIDCard,.btn-upload,.btn-group").remove();
-                        });
-                    }
-                }
-            } );
-            TableSess = dataTable;
-        },500);
-
-    } */
 
     // ==== Upload Foto =========
     $(document).on('change','.uploadPhotoEmp',function () {

@@ -2437,6 +2437,7 @@ class C_save_to_excel extends CI_Controller
         }
         
         $results = $this->Globalinformation_model->fetchStudentsPS(false,$param);
+        $results = $this->General_model->fetchData("")->result();
         if(!empty($results)){
             foreach ($results as $v) {
                 echo "<h1>Student {$v->NPM}-{$v->Name} </h1>";

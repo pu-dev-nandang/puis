@@ -90,6 +90,7 @@ class Globalinformation_model extends CI_Model{
 
         $psquery = 'call db_academic.fetchStudents("'.$where.'" , "'.$lims.'","'.$sorted.'")';
     	$query = $this->db->query($psquery);
+        //var_dump($this->db->last_query());
     	if($single){
     		$value = $query->row();
     	}else{
