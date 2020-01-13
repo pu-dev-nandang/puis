@@ -974,7 +974,11 @@ class C_rest3 extends CI_Controller {
                         // End Penelitian                        
                         
                         // PKM Note : Convert to sks untuk mendapatkan satu PKM
-                        $sqlPKM = 'select *,1 as Credit from db_research.pengabdian_masyarakat where ID_thn_laks = ? and NIP = ? '; 
+                        // $sqlPKM = 'select *,1 as Credit from db_research.pengabdian_masyarakat where ID_thn_laks = ? and NIP = ? '; 
+                        $sqlPKM = 'select a.*,1 as Credit from db_research.pengabdian_masyarakat as a 
+                                  join db_research.list_anggota_pkm as b on a.ID_PKM = b.ID_PKM
+                                  join db_research.master_anggota_pkm as c on b.ID_anggota = c.ID
+                                  where a.ID_thn_laks = ? and c.NIP = ? '; 
                         $queryPKM =$this->db->query($sqlPKM, array($FilterTahun,$NIP))->result_array();
                         // encode token
                         $tot = count($queryPKM);
@@ -1094,11 +1098,11 @@ class C_rest3 extends CI_Controller {
                           UNION
                           select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,d.NIP,d.Name as NameDosen
                           from db_research.publikasi as a 
-                          join db_research.publikasi_list_dosen as b on a.ID_publikasi = b.ID_publikasi
-                          join db_research.penulis_dosen as c on b.ID_Penulis_Dosen = c.ID_Penulis_Dosen
+                          join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
+                          join db_research.master_anggota_publikasi as c on b.ID_anggota = c.ID
                           join db_employees.employees as d on c.NIP = d.NIP
                            where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
-                           and c.Type_Dosen = "1"
+                           and c.Type_anggota = "DSN"
                          ';
                   $query = $this->db->query($sql,array())->result_array();
                   for ($j=0; $j < count($query); $j++) { 
@@ -1316,19 +1320,19 @@ class C_rest3 extends CI_Controller {
             //         join db_academic.auth_students as d on c.NIM = d.NPM
             //          where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
             //        ';
-            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,c.Nama_Mahasiswa
+            $sql = 'select a.Judul,Year(a.Tgl_terbit) as Year,a.Ket,c.Nama
                     from db_research.publikasi as a 
-                    join db_research.publikasi_list_mahasiswa as b on a.ID_publikasi = b.ID_publikasi
-                    join db_research.penulis_mahasiswa as c on b.ID_Penulis_Mahasiswa = c.ID_Penulis_Mahasiswa
-                    join db_academic.auth_students as d on c.NPM = d.NPM
-                     where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].'
-                   ';
+                    join db_research.list_anggota_publikasi as b on a.ID_publikasi = b.ID_publikasi
+                    join db_research.master_anggota_publikasi as c on b.ID_anggota = c.ID
+                    join db_academic.auth_students as d on c.NIM = d.NPM
+                     where d.ProdiID = '.$ProdiID.' and a.ID_kat_capaian = '.$arr_ID_kat_capaian[$i].' and c.Type_anggota = "MHS"
+                   '; 
             $query = $this->db->query($sql,array())->result_array();
             for ($j=0; $j < count($query); $j++) { 
               $nestedData = array();
               $nestedData[] = ['text' => $j+1 ,'colspan' => 1,'style' => '"text-align:right"'];
               $nestedData[] = ['text' => $query[$j]['Judul'] ,'colspan' => 1,'style' => '""'];
-              $nestedData[] = ['text' => $query[$j]['Nama_Mahasiswa'] ,'colspan' => 1,'style' => '""'];
+              $nestedData[] = ['text' => $query[$j]['Nama'] ,'colspan' => 1,'style' => '""'];
               $nestedData[] = ['text' => $query[$j]['Year'] ,'colspan' => 1,'style' => '""'];
               $nestedData[] = ['text' => $query[$j]['Ket'] ,'colspan' => 1,'style' => '""'];
               $row[] = $nestedData;

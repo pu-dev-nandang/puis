@@ -466,6 +466,14 @@
             '</div>');
     }
 
+    function loading_anytext(element,text) {
+        $(element).html('<div class="row">' +
+            '<div class="col-md-12" style="text-align: center;">' +
+            '<h3 class="animated flipInX"><i class="fa fa-circle-o-notch fa-spin fa-fw"></i> <span>'+text+' . . .</span></h3>' +
+            '</div>' +
+            '</div>');
+    }
+
     function loading_page_simple(element,position) {
         var arrp = ['center','left','right'];
         var p = (typeof position !== 'undefined' && position!='' && position!=null && $.inArray(position,arrp)!=-1)
