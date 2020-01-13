@@ -3,7 +3,6 @@
         <h4 class="panel-title">Request Document</h4>
     </div>
     <div class="panel-body" style="min-height: 100px;" id ="pageRequestDocument">
-        
 
     </div>
     <div class="panel-footer" style="text-align: right;">
@@ -67,13 +66,53 @@
 							'</div>'+
 							'<div class = "col-md-3" id = "Page_Approval">'+
 							'</div>'+
+						'</div>'+
+						'<div class = "row">'+
+							'<div class = "col-md-6" id = "Page_TABLE">'+
+							'</div>'+
 						'</div>';
 			selectorPage.html(html);
 			var selectorPage_INPUT = $('#Page_INPUT');
 			App_input.DomSetPage_INPUT(selectorPage_INPUT,settingTemplate.INPUT);
 
 			var selectorPage_Approval = $('#Page_Approval');
-			App_input.DomSetPage_Approval(selectorPage_Approval,settingTemplate.SET.Signature);		
+			App_input.DomSetPage_Approval(selectorPage_Approval,settingTemplate.SET.Signature);	
+
+			var selectorPage_Table = $('#Page_TABLE');
+			if (settingTemplate['TABLE']['KEY'] != undefined) {
+				App_input.DomSetPage_TABLE(selectorPage_Table,settingTemplate.TABLE);	
+			}
+		},
+
+		DomSetPage_TABLE : function(selector,dt){
+			var html = '<div class = "thumbnail" style = "margin-top:5px;">'+
+			                '<div class = "row">'+
+			                    '<div class = "col-md-12">'+
+			                        '<div style = "padding:15px;">'+
+			                            '<h3><u><b>Parameter for Table</b></u></h3>'+
+			                        '</div>';
+			var paramsChoose = dt['API']['paramsChoose'];
+			for (key in paramsChoose){
+				var htmlOP = App_input.SelectAPIOPByParams(dt['API']['paramsChoose'][key],key);
+				html += '<div class = "form-group">'+
+                            '<label>Choose '+key+'</label>'+
+                            htmlOP+
+                        '</div>';
+			}
+			html  += '</div></div></div>';
+			selector.html(html);
+		},
+
+		SelectAPIOPByParams : function(data,paramsChoose){
+			var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+			for (var i = 0; i < data.length; i++) {
+			   var selected = (data[i].Selected == 1) ? 'selected'  : ''; 
+			   html +=  '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Value+'</option>';
+			}
+
+			html  += '</select>';
+
+			return html;
 		},
 
 		DomSetPage_INPUT : function(selector,dt){
@@ -143,7 +182,14 @@
 				})
 			}
 
-			// console.log(settingTemplate);
+			// special for TABLE
+			$('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+				var nm = $(this).attr('name');
+				nm = nm.replace("#", "");
+				var v = $(this).find('option:selected').val();
+				settingTemplate['TABLE']['paramsUser'][nm] = v;
+			})
+
 			var url = base_url_js+"__request-document-generator/__previewbyUserRequest";
 		    var data = {
 		       settingTemplate : settingTemplate,

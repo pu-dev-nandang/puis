@@ -182,7 +182,7 @@
 		               	   var btnReject = ''; 
 		               	   var stRow = tokenRow['Status'];
 		               	   if (stRow !='Batal' && stRow !='Approve') {
-		               	   	if (tokenRow['Approve1Status'] == 0 && tokenRow['UserNIP'] == sessionNIP ) {
+		               	   	if (tokenRow['Approve1Status'] != 1 && tokenRow['UserNIP'] == sessionNIP ) {
 		               	   			btnEdit = '<li><a href="javascript:void(0);" class="btnEdit" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-edit"></i> Edit</a></li>';
 		               	   			btnBatal = '<li><a href="javascript:void(0);" class="btnBatal" data-id="'+full[6]+'" data = "'+full[7]+'"><i class="fa fa fa-remove"></i> Batal</a></li>';
 		               	   	}
@@ -264,6 +264,20 @@
 				var nm = $(this).attr('name');
 				$(this).val(dt[nm]);
 			})
+
+			// special for table
+			// console.log(dt);
+			var InputJson = dt['InputJson'];
+			if (InputJson != null && InputJson != '') {
+				InputJson =  jQuery.parseJSON( InputJson )
+				for (key in InputJson){
+					$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
+					   //may want to use $.trim in here
+					   return $(this).val() == InputJson[key]; 
+					}).prop("selected", true);
+				}
+				
+			}
 		},
 
 		ApproveOrReject : function(dataID,dt,approval_number,decision,Note=''){
