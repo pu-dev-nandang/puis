@@ -42,4 +42,38 @@ class M_table extends CI_Model {
 		return $Props;
 	}
 
+	public function writeDocument($TemplateProcessor,$dataParams,$RSQuery){
+		// print_r($dataParams);die();
+		$arr_value = [];
+		// fill header
+		$HeaderMap = $dataParams['MapTable']['Header'];
+		$temp = [];
+		foreach ($HeaderMap as $key => $value) {
+			$temp['TBL.'.$key] = $value;
+			
+		}
+		$arr_value[] = $temp;
+		$RSQuery = $RSQuery['callback'];
+		// fill value
+		for ($i=0; $i < count($RSQuery); $i++) { 
+			$temp = [];
+			$ValueMap = $dataParams['MapTable']['Value'];
+			foreach ($ValueMap as $key => $value) {
+				if ($value == 'Increment') {
+					$no =  $i+1;
+					$temp['TBL.'.$key] = $no;
+				}
+				else
+				{
+					$temp['TBL.'.$key] = $RSQuery[$i][$value];
+				}
+			}
+
+			$arr_value[] = $temp;
+		}
+
+		$TemplateProcessor->cloneRowAndSetValues('TBL.'.$dataParams['KEY'][0],$arr_value );
+		
+	}
+
 }

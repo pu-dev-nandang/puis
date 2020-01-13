@@ -13,7 +13,7 @@ class M_doc extends CI_Model {
 	private $KeyUSER = 'USER';
 	private $KeyINPUT = 'INPUT';
 	private $KeyGRAB = 'GRAB';
-	private $KeyTABLE = 'TABLE';
+	private $KeyTABLE = 'TBL';
 
 	// private $Path
 
@@ -126,7 +126,10 @@ class M_doc extends CI_Model {
     private function __TABLEGenerate(){
         $this->load->model('document-generator/m_table');
         $TABLE = $this->TABLE;
-        $this->TABLE = $this->m_table->__generate($TABLE);
+        if (array_key_exists('KEY', $TABLE)) {
+             $this->TABLE = $this->m_table->__generate($TABLE);
+        }
+       
     }
 
     private function __SETGenerate(){
@@ -208,7 +211,8 @@ class M_doc extends CI_Model {
     	        		case $this->KeyTABLE:
     	        			if (!in_array($ex[0], $Filtering)){
     	        				// print_r($Input[$this->KeyTABLE]);die();
-                                $rs[$this->KeyTABLE] = '';
+                                // print_r($Input);die();
+                                $rs[$this->KeyTABLE] = $Input['TABLE'];
     	        			}
     	        			else
     	        			{
@@ -237,7 +241,7 @@ class M_doc extends CI_Model {
     	// $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
 		$line = $this->__readDoc($FileTemplate);
     	$TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
-
+        $BoolTbl = false;
     	foreach ($line as $v) {
     		if(preg_match_all('/{+(.*?)}/', $v, $matches)){
     			for ($z=0; $z < count($matches[1]); $z++) { 
@@ -301,11 +305,23 @@ class M_doc extends CI_Model {
 	    		    			break;
 	    		    		case $this->KeyTABLE:
                                 if ($this->KeyTABLE == $keyRS) {
-                                        $values = [
-                                            [$this->KeyTABLE.'.Number' => 'No', $this->KeyTABLE.'.H1' => 'Mata Kuliah', $this->KeyTABLE.'.H2' => 'SKS',$this->KeyTABLE.'.H3' => 'Sesi'],
-                                            [$this->KeyTABLE.'.Number' => '1', $this->KeyTABLE.'.H1' => 'Batman', $this->KeyTABLE.'.H2' => 'Gotham City',$this->KeyTABLE.'.H3' => '14'],
-                                        ];
-                                        $TemplateProcessor->cloneRowAndSetValues($values );
+                                        if (!$BoolTbl) {
+                                            $this->load->model('document-generator/m_table');
+                                            $dataPass = [
+                                                'ID_api' => $rsGET[$keyRS]['API']['Choose'],
+                                                'action' => 'sample',
+                                            ];
+                                            $dataPass = $dataPass + $rsGET[$keyRS]['paramsUser'];
+                                            $RSQuery = $this->run_set_table($dataPass);
+                                            $this->m_table->writeDocument($TemplateProcessor,$rsGET[$keyRS],$RSQuery);
+                                            // $values = [
+                                            //     [$this->KeyTABLE.'.Number' => 'No', $this->KeyTABLE.'.H1' => 'Mata Kuliah', $this->KeyTABLE.'.H2' => 'SKS',$this->KeyTABLE.'.H3' => 'Sesi'],
+                                            //     [$this->KeyTABLE.'.Number' => '1', $this->KeyTABLE.'.H1' => 'Batman', $this->KeyTABLE.'.H2' => 'Gotham City',$this->KeyTABLE.'.H3' => '14'],
+                                            // ];
+                                            // $TemplateProcessor->cloneRowAndSetValues('TABLE.Number',$values );
+                                            $BoolTbl = true;
+                                        }
+                                        
                                 }
 	    		    			break;
 	    		    	}
@@ -315,8 +331,17 @@ class M_doc extends CI_Model {
     		    
     		}
     	}
-    	
-        die();
+
+    	// $TemplateProcessor->cloneRow('userId', 2);
+        // $this->KeyTABLE = 'TBL';
+        // $values = [
+        //     ['TABLE.Number' => 'No', $this->KeyTABLE.'.H1' => 'Mata Kuliah', $this->KeyTABLE.'.H2' => 'SKS',$this->KeyTABLE.'.H3' => 'Sesi'],
+        //     ['TABLE.Number' => '1', $this->KeyTABLE.'.H1' => 'Batman', $this->KeyTABLE.'.H2' => 'Gotham City',$this->KeyTABLE.'.H3' => '14'],
+        // ];
+        // $TemplateProcessor->cloneRowAndSetValues('TABLE.Number',$values );
+        // $TemplateProcessor->setValue('TABLE.Number','dsadsadsa');
+
+        // die();
 
     	$NIPExt = $this->session->userdata('NIP').'.docx';
     	$FileName = $NIPExt;
@@ -780,7 +805,7 @@ class M_doc extends CI_Model {
     	        			break;
     	        		case $this->KeyTABLE:
     	        			if (!in_array($ex[0], $Filtering)){
-    	        				
+    	        				$rs[$this->KeyTABLE] = $Input['TABLE'];
     	        			}
     	        			else
     	        			{
@@ -882,7 +907,7 @@ class M_doc extends CI_Model {
                             break;
                         case $this->KeyTABLE:
                             if (!in_array($ex[0], $Filtering)){
-                                
+                                $rs[$this->KeyTABLE] = $Input['TABLE'];
                             }
                             else
                             {
@@ -1042,7 +1067,7 @@ class M_doc extends CI_Model {
         // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
         $line = $this->__readDoc($FileTemplate);
         $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
-
+        $BoolTbl = false;
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
@@ -1105,7 +1130,20 @@ class M_doc extends CI_Model {
                                 }
                                 break;
                             case $this->KeyTABLE:
-                                
+                                if ($this->KeyTABLE == $keyRS) {
+                                        if (!$BoolTbl) {
+                                            $this->load->model('document-generator/m_table');
+                                            $dataPass = [
+                                                'ID_api' => $rsGET[$keyRS]['API']['Choose'],
+                                                'action' => 'live',
+                                            ];
+                                            $dataPass = $dataPass + $rsGET[$keyRS]['paramsUser'];
+                                            $RSQuery = $this->run_set_table($dataPass);
+                                            $this->m_table->writeDocument($TemplateProcessor,$rsGET[$keyRS],$RSQuery);
+                                            $BoolTbl = true;
+                                        }
+                                        
+                                }
                                 break;
                         }
                     }
@@ -1197,7 +1235,7 @@ class M_doc extends CI_Model {
                             break;
                         case $this->KeyTABLE:
                             if (!in_array($ex[0], $Filtering)){
-                                
+                                $rs[$this->KeyTABLE] = $Input['TABLE'];
                             }
                             else
                             {
@@ -1210,7 +1248,12 @@ class M_doc extends CI_Model {
                 }
             }
         }
+        
+        if ( array_key_exists('TBL', $rs) && array_key_exists('KEY', $rs['TBL'])  ) {
+            $dataSave = $this->dataSaveForTable($dataSave,$rs['TBL']);
+        }
 
+        // print_r($dataSave);die();
         
         $dataSave['ID_document'] = $ID;
         $dataSave['NoSuratOnly'] = $rs['SET']['PolaNoSurat']['NoSuratOnly'];
@@ -1229,6 +1272,23 @@ class M_doc extends CI_Model {
         $this->db->insert('db_generatordoc.document_data',$dataSave);
         return 1;
 
+    }
+
+    private function dataSaveForTable($dataSave,$dt){
+        $ID_api = $dt['API']['Choose'];
+        $G_dt = $this->m_master->caribasedprimary('db_generatordoc.api_doc','ID',$ID_api);
+        $Params = json_decode($G_dt[0]['Params'],true) ;
+        $arr_json = [];
+        for ($i=0; $i < count($Params); $i++) { 
+            if (substr($Params[$i], 0,1) == '#') {
+                // get data by passing
+                $str = str_replace('#', '', $Params[$i]);
+                $arr_json[$str] = $dt['paramsUser'][$str];  
+            }
+        }
+
+        $dataSave['InputJson'] = json_encode($arr_json);
+        return $dataSave;
     }
 
     private function __clearTempFile(){
@@ -1254,7 +1314,7 @@ class M_doc extends CI_Model {
         // $FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
         $line = $this->__readDoc($FileTemplate);
         $TemplateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($FileTemplate);
-
+        $BoolTbl = false;
         foreach ($line as $v) {
             if(preg_match_all('/{+(.*?)}/', $v, $matches)){
                 for ($z=0; $z < count($matches[1]); $z++) { 
@@ -1317,7 +1377,20 @@ class M_doc extends CI_Model {
                                 }
                                 break;
                             case $this->KeyTABLE:
-                                
+                                if ($this->KeyTABLE == $keyRS) {
+                                        if (!$BoolTbl) {
+                                            $this->load->model('document-generator/m_table');
+                                            $dataPass = [
+                                                'ID_api' => $rsGET[$keyRS]['API']['Choose'],
+                                                'action' => 'live',
+                                            ];
+                                            $dataPass = $dataPass + $rsGET[$keyRS]['paramsUser'];
+                                            $RSQuery = $this->run_set_table($dataPass);
+                                            $this->m_table->writeDocument($TemplateProcessor,$rsGET[$keyRS],$RSQuery);
+                                            $BoolTbl = true;
+                                        }
+                                        
+                                }
                                 break;
                         }
                     }
@@ -1428,7 +1501,7 @@ class M_doc extends CI_Model {
         $sql = 'select a.NoSuratFull,b.DocumentName,a.UserNIP,c.Name as NameEMPRequest,a.DateRequest,a.Approve1,a.Approve2,a.Approve3,a.Status,
                 a.Input1,a.Input2,a.Input3,a.Input4,a.Input5,a.Input6,a.Input7,a.Input8,a.Input9,a.Input10,
                 a.Approve1Status,a.Approve1At,a.Approve2Status,a.Approve2At,a.Approve3Status,a.Approve3At,a.TotApproval,
-                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.ID
+                d.Name as NameEMPAppr1,e.Name as NameEMPAppr2,f.Name as NameEMPAppr3,a.Path,a.InputJson,a.ID
                 from db_generatordoc.document_data as a 
                 left join db_generatordoc.document as b on a.ID_document =  b.ID
                 left join db_employees.employees as c on c.NIP = a.UserNIP
@@ -1576,7 +1649,7 @@ class M_doc extends CI_Model {
                             break;
                         case $this->KeyTABLE:
                             if (!in_array($ex[0], $Filtering)){
-                                
+                                $rs[$this->KeyTABLE] = $Input['TABLE'];
                             }
                             else
                             {
@@ -1588,6 +1661,10 @@ class M_doc extends CI_Model {
                     $Filtering[] = $ex[0];
                 }
             }
+        }
+
+        if ( array_key_exists('TBL', $rs) && array_key_exists('KEY', $rs['TBL'])  ) {
+            $dataSave = $this->dataSaveForTable($dataSave,$rs['TBL']);
         }
 
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
@@ -2040,7 +2117,7 @@ class M_doc extends CI_Model {
                 }
             }
         }
-
+        
         $query = $this->db->query($querySql,$VarPassing)->result_array();
         if (count($query) > 0) {
             return [

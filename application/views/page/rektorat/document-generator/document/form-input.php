@@ -275,23 +275,25 @@
 
         method_TABLE : function(dt){
             // console.log(dt);
-            var htmlOP = App_form_input.SelectAPIOP(dt['API']['select']);
-            var html = '<div class="thumbnail" style = "margin-top:5px;">'+
-                            '<div class = "row">'+
-                                '<div class = "col-md-12">'+
-                                    '<div style = "padding:15px;">'+
-                                        '<h3><u><b>SET TABLE </b></u></h3>'+
+            if (dt['API'] != undefined) {
+                var htmlOP = App_form_input.SelectAPIOP(dt['API']['select']);
+                var html = '<div class="thumbnail" style = "margin-top:5px;">'+
+                                '<div class = "row">'+
+                                    '<div class = "col-md-12">'+
+                                        '<div style = "padding:15px;">'+
+                                            '<h3><u><b>SET TABLE </b></u></h3>'+
+                                        '</div>'+
+                                        '<div class = "form-group">'+
+                                            '<label>Choose API</label>'+
+                                            htmlOP+
+                                        '</div>'+
+                                        '<div id = "DOMAPI"></div>'+
                                     '</div>'+
-                                    '<div class = "form-group">'+
-                                        '<label>Choose API</label>'+
-                                        htmlOP+
-                                    '</div>'+
-                                    '<div id = "DOMAPI"></div>'+
                                 '</div>'+
-                            '</div>'+
-                        '</div>';
+                            '</div>';
 
-            $('#Page_TABLE').append(html);              
+                $('#Page_TABLE').append(html);
+            }
 
         },
 
@@ -318,7 +320,7 @@
                         var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,arr_special[i]);
                         var htmlOPEMP = App_form_input.SelectAPIOPEMP(dtRowEmp);
                         html += '<div class = "form-group">'+
-                                    '<label>Choose Semester</label>'+
+                                    '<label>Choose '+arr_special[i]+'</label>'+
                                     htmlOP+
                                 '</div>'+
                                 '<div class = "form-group">'+
@@ -373,7 +375,7 @@
                 }
                 end_loading_button2(selector,'Set Table');
             }).fail(function(response){
-               toastr.error('Connection error,please try again');
+               toastr.error('No Result Data,please try again');
                end_loading_button2(selector,'Set Table');
             })
             
@@ -633,6 +635,7 @@
             if (typeof settingTemplate !== 'undefined') {
                 var ArrUploadFilesSelector = [];
                 var url = base_url_js+"document-generator-action/__save_template";
+                // console.log(settingTemplate);return;
                 var data = {
                     settingTemplate : settingTemplate,
                     DocumentName : $('.Input[name="DocumentName"]').val() ,
