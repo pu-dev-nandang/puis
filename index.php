@@ -104,7 +104,7 @@
 	$ServerName = $_SERVER['SERVER_NAME'];
 	define("URLAD","http://10.1.30.2:8076/", true);
 	define("url_files","https://"."files.podomorouniversity.ac.id/", true);
-	define("url_DocxToPDf","http://localhost/apidocxtopdf/", true);
+	define("url_DocxToPDf","http://10.1.10.31/apidocxtopdf/", true);
 	
 	switch ($ServerName) {
 		case 'pcam.podomorouniversity.ac.id':

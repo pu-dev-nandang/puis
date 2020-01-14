@@ -112,7 +112,7 @@
                     App_form_input.method_GRAB(key);
                     break;
                   case "TABLE":
-                    
+                    App_form_input.method_TABLE(key);
                     break;
                   case "DOCUMENT":
                     
@@ -273,6 +273,230 @@
 
         // -- //
 
+        method_TABLE : function(dt){
+            // console.log(dt);
+            if (dt['API'] != undefined) {
+                var htmlOP = App_form_input.SelectAPIOP(dt['API']['select']);
+                var html = '<div class="thumbnail" style = "margin-top:5px;">'+
+                                '<div class = "row">'+
+                                    '<div class = "col-md-12">'+
+                                        '<div style = "padding:15px;">'+
+                                            '<h3><u><b>SET TABLE </b></u></h3>'+
+                                        '</div>'+
+                                        '<div class = "form-group">'+
+                                            '<label>Choose API</label>'+
+                                            htmlOP+
+                                        '</div>'+
+                                        '<div id = "DOMAPI"></div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>';
+
+                $('#Page_TABLE').append(html);
+            }
+
+        },
+
+        DOMSelectedAPI : function(selector){
+            var html = '';
+            var params = jQuery.parseJSON( jwt_decode(selector.find('option:selected').attr('params')) );
+            if (typeof params !== 'undefined') {
+                var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
+
+                // console.log(DataCallback);
+                var arr_special = ['#SemesterID'];
+                
+                for (var i = 0; i < arr_special.length; i++) {
+                    var bool = false;
+                    for (var j = 0; j < params.length; j++) {
+                        if (arr_special[i] == params[j] ) {
+                            bool = true;
+                            break;
+                        }
+                    }
+                    if (bool) {
+                        var dtRow = DataCallback['TABLE']['API']['paramsChoose'][arr_special[i]];
+                        var dtRowEmp = DataCallback['TABLE']['API']['selectEmployees'];
+                        var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,arr_special[i]);
+                        var htmlOPEMP = App_form_input.SelectAPIOPEMP(dtRowEmp);
+                        html += '<div class = "form-group">'+
+                                    '<label>Choose '+arr_special[i]+'</label>'+
+                                    htmlOP+
+                                '</div>'+
+                                '<div class = "form-group">'+
+                                    '<label>Choose Employees for Sample</label>'+
+                                    htmlOPEMP+
+                                '</div>';  
+                    }
+                     
+                }
+
+                if (html != '') {
+                     html +=  '<div style = "text-align:right;padding:10px;">'+
+                                '<button class = "btn btn-default" id = "setTable">Set Table</button>'+
+                              '</div>'+
+                              '<div id = "pageSetTable"></div>';  
+                }
+               
+
+            }
+            
+            $('#DOMAPI').html(html);
+
+            $('.Input[field="employees"][tabindex!="-1"]').removeClass('form-control');
+            $('.Input[field="employees"][tabindex!="-1"]').addClass('select2-select-00 full-width-fix');
+            $('.Input[field="employees"][tabindex!="-1"]').select2({
+                //allowClear: true
+            });
+        },
+
+        setTableDesign : function(selector){
+            var selectorPage = $('#pageSetTable');
+            var data = {};
+            // var querySQL = jwt_decode($('.Input[field="TABLE"][name="API"] option:selected').attr('query'));
+            var ID_api = $('.Input[field="TABLE"][name="API"] option:selected').val();
+            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+                var nm = $(this).attr('name');
+                nm = nm.replace("#", "");
+                data[nm] = $(this).find('option:selected').val();
+            })
+            // data['querySQL'] = querySQL;
+            data['ID_api'] = ID_api;
+            data['NIP'] = $('.Input[field="employees"] option:selected').val();
+            data['action'] = 'sample';
+            $('#Preview').prop('disabled',true);
+            loading_button2(selector);
+            var url = base_url_js+"document-generator-action/__run_set_table";
+            var token = jwt_encode(data,'UAP)(*');
+            AjaxSubmitTemplate(url,token).then(function(response){
+                if (response.status == 1) {
+                    App_form_input.MapTable(response.callback);
+                    $('#Preview').prop('disabled',false);
+                }
+                end_loading_button2(selector,'Set Table');
+            }).fail(function(response){
+               toastr.error('No Result Data,please try again');
+               end_loading_button2(selector,'Set Table');
+            })
+            
+        },
+
+        MapTable : function(dt){
+            var selector = $('#pageSetTable');
+            var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
+            var keyTable = DataCallback['TABLE']['KEY'];
+            var html = '<div class = "row" style="padding:15px;"><h3><u><b>Header</b></u></h3>';
+            for (var i = 0; i < keyTable.length; i++) {
+                html += '<div class = "col-md-3">'+
+                            '<div class = "form-group">'+
+                                '<label>'+keyTable[i]+'</label>'+
+                                '<input type = "text" class = "form-control Input" field="'+keyTable[i]+'" name="MappingTable" parent="header" key = "TABLE" >'+
+                            '</div>'+
+                        '</div>';        
+            }
+
+            html += '</div>'
+
+            html +=  '<div class = "row" style="padding:15px;"><h3><u><b>Value</b></u></h3>';
+
+            for (var i = 0; i < keyTable.length; i++) {
+                var htmlOPChooseField = App_form_input.SelectAPIOPChooseField(dt[0],keyTable[i],i);
+                html += '<div class = "col-md-3">'+
+                            '<div class = "form-group">'+
+                                '<label>'+keyTable[i]+'</label>'+
+                                htmlOPChooseField+
+                            '</div>'+
+                        '</div>';        
+            }
+            selector.html(html);
+        },
+
+        SelectAPIOPChooseField : function(data,keyTable,number){
+            var selected = (number == 0) ? 'selected' : '';
+            var html =  '<select class = "form-control Input" field="'+keyTable+'" name="'+'MappingTable'+'" parent="Value" key = "TABLE">';
+                         html +=  '<option value = "'+'Increment'+'" '+selected+' >'+'Increment'+'</option>';
+            var run = 1 ;
+            for (key in data){
+                selected = (number ==run ) ? 'selected' : '';
+                html +=  '<option value = "'+key+'" '+selected+' >'+key+'</option>';
+                run++;
+            }
+            html  += '</select>';
+            return html;
+        },
+
+        SelectAPIOPByParams : function(data,paramsChoose){
+            var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
+            for (var i = 0; i < data.length; i++) {
+               var selected = (data[i].Selected == 1) ? 'selected'  : ''; 
+               html +=  '<option value = "'+data[i].ID+'" '+selected+' >'+data[i].Value+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        SelectAPIOPEMP : function(data){
+            var html =  '<select class = "form-control Input" field="employees" name="employees" key = "TABLE">';
+            for (var i = 0; i < data.length; i++) {
+               html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        SelectAPIOP : function(data){
+            var html =  '<select class = "form-control Input" field="TABLE" name="API" key = "TABLE">';
+            html += '<option value = "-" selected disabled>--No Choose API--</option>';
+            // console.log(data);
+            for (var i = 0; i < data.length; i++) {
+
+               html +=  '<option value = "'+data[i].ID+'" '+''+' params = "'+jwt_encode(data[i].Params,'UAP)(*')+'" query= "'+jwt_encode(data[i].Query,'UAP)(*')+'" >'+data[i].ApiNameTable+'</option>';
+            }
+
+            html  += '</select>';
+
+            return html;
+        },
+
+        set_TABLE : function(attrname,attrva,attrkey,attrfield,el){
+            // console.log(settingTemplate[attrkey]);
+            // select API Choose
+            settingTemplate[attrkey]['API']['Choose'] = $('.Input[field="TABLE"][name="API"] option:selected').val();
+            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+                var nm = $(this).attr('name');
+                nm = nm.replace("#", "");
+                settingTemplate[attrkey]['paramsUser'] = {};
+                settingTemplate[attrkey]['paramsUser'][nm] =$(this).find('option:selected').val();
+            })
+
+            settingTemplate[attrkey]['paramsUser']['NIP'] = $('.Input[field="employees"] option:selected').val();    // only preview for sample
+
+            settingTemplate[attrkey]['MapTable'] = {};
+            settingTemplate[attrkey]['MapTable']['Header'] = {};
+            settingTemplate[attrkey]['MapTable']['Value'] = {};
+            // header
+            $('.Input[key="TABLE"][name="MappingTable"]').each(function(e){
+                var parent = $(this).attr('parent');
+                var field = $(this).attr('field');
+                if (parent == 'header') {
+                    settingTemplate[attrkey]['MapTable']['Header'][field] = $(this).val();
+                }
+
+                if (parent == 'Value') {
+                    settingTemplate[attrkey]['MapTable']['Value'][field] = $(this).find('option:selected').val();
+                }
+
+            });
+
+
+        },
+
+        // -- //
+
         Dom_Date : function(data){
             var html = '<div class = "thumbnail" style = "margin-top:5px;">';
             var select =  data.select;
@@ -324,7 +548,7 @@
             var data = [];
             var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
             settingTemplate = DataCallback;
-            $('.Input').each(function(){
+            $('.Input').not('div').each(function(){
                 var el = $(this);
                 var attrname = el.attr('name').trim();
                 if (!$(this).is("select")) {
@@ -363,7 +587,9 @@
                         }
                         break;
                       case "TABLE":
-                        
+                          if (variable == attrkey) {
+                            App_form_input.set_TABLE(attrname,attrva,attrkey,attrfield,el);
+                          }
                         break;
                       case "DOCUMENT":
                         
@@ -373,7 +599,7 @@
 
 
             })
-            
+
             var ArrUploadFilesSelector = [];
             var url = base_url_js+"document-generator-action/__preview_template";
             var token = jwt_encode(settingTemplate,'UAP)(*');
@@ -409,6 +635,7 @@
             if (typeof settingTemplate !== 'undefined') {
                 var ArrUploadFilesSelector = [];
                 var url = base_url_js+"document-generator-action/__save_template";
+                // console.log(settingTemplate);return;
                 var data = {
                     settingTemplate : settingTemplate,
                     DocumentName : $('.Input[name="DocumentName"]').val() ,
@@ -509,4 +736,17 @@
        App_form_input.SaveTemplate(itsme);
 
     })
+
+    $(document).off('change', '.Input[field="TABLE"][name="API"]').on('change', '.Input[field="TABLE"][name="API"]',function(e) {
+       var itsme = $(this);
+       App_form_input.DOMSelectedAPI(itsme);
+    })
+
+    $(document).off('click', '#setTable').on('click', '#setTable',function(e) {
+       var itsme = $(this);
+       App_form_input.setTableDesign(itsme);
+
+    })
+
+    
 </script>

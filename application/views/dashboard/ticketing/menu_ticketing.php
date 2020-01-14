@@ -18,6 +18,12 @@
             <a href="<?php echo base_url('ticket/setting'); ?>">Setting</a>
         </li>
 
+        <?php if ($this->session->userdata('IDdepartementNavigation')==6) { ?>
+        <li class="<?php if($this->uri->segment(2)=='student-report') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('ticket/student-report'); ?>">Student Report <span class="badge hide"><b>42 open</b></span></a>
+        </li>
+        <?php } ?>
+
     </ul>
     <div style="border-top: 1px solid #cccccc">
 

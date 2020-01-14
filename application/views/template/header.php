@@ -51,6 +51,10 @@
         text-align: center;
     }
 
+    .table-left-body tr td {
+        text-align: left;
+    }
+
 </style>
 
 <!-- Header -->

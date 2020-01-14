@@ -16,6 +16,7 @@
 
 <script type="text/javascript">
   var msgMasterDocument = 'No Selected Document';
+  var DepartmentID = '<?php echo $DepartmentID ?>';
   function file_validation_generator(ev,TheName = '')
   {
       var files = ev[0].files;

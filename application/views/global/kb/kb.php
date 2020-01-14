@@ -356,28 +356,6 @@ $('#saveFormKB').click(function () {
       })
 
 
-      function loadDataKB() {
-
-          var data = {
-              action : 'viewListKB'
-          };
-
-          var token = jwt_encode(data,'UAP)(*');
-          var url = base_url_js+'api3/__crudkb';
-
-          $.post(url,{token:token},function (jsonResult) {
-            console.log(jsonResult);
-
-              $('#listData,#formKBID').empty();
-              if(jsonResult.length>0){
-
-
-              }
-
-          });
-
-      }
-
       $(document).on('click','.btnEdit',function () {
           var ID = $(this).attr('data-id');
           var j = $(this).attr('data-j');
@@ -426,9 +404,6 @@ $('#saveFormKB').click(function () {
   }
 
 
-  $(document).ready(function() {
-      loadDataKB();
-  })
 
   $(document).on('click','.btnActRemove',function () {
      if(confirm('Are you sure?')){
@@ -443,7 +418,7 @@ $('#saveFormKB').click(function () {
          var url = base_url_js+'api3/__crudkb';
          $.post(url,{token:token},function (result) {
              toastr.success('Data removed','Success');
-             loadDataKB();
+             // loadDataKB();
              $('#Division').trigger('change');
          });
 

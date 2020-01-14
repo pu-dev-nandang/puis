@@ -468,7 +468,7 @@ abstract class Budgeting_Controler extends Globalclass{
         // $MenuDepartement= ($this->data['IDdepartment'] == 12) ? 'NA.'.$this->session->userdata('IDdepartementNavigation'):'NA.'.$this->data['IDdepartment']; 
         $MenuDepartement= 'NA.'.$this->session->userdata('IDdepartementNavigation'); 
 
-        if ($this->data['IDdepartment'] == 15 || $this->data['IDdepartment'] == 14) {
+        if ($this->session->userdata('IDdepartementNavigation') == 15 || $this->session->userdata('IDdepartementNavigation') == 14) {
             $MenuDepartement= 'AC.'.$this->session->userdata('prodi_active_id');
         }
 
@@ -830,8 +830,8 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
     }
 
     public function menu_document($page){
-        $data['page'] = $page;
-        $content = $this->load->view('global/request-document-generator/menu_document',$data,true);
+        $this->data['page'] = $page;
+        $content = $this->load->view('global/request-document-generator/menu_document',$this->data,true);
         $this->temp($content);
     }
 
