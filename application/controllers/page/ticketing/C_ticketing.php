@@ -29,4 +29,13 @@ class C_ticketing extends Ticket_Controler {
         $this->menu_ticket($page);
     }
 
+    public function student_report()
+    {
+//        $data['action'] = ($this->m_general->auth()) ? 'write' : '';
+//        $data['department'] = parent::__getDepartement();
+        $data='';
+        $page = $this->load->view('dashboard/ticketing/student_report',$data,true);
+        $this->menu_ticket($page);
+    }
+
 }
