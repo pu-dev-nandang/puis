@@ -195,16 +195,16 @@
 												<?php }else{ ?>
 												<div class="row">
 													<label class="col-sm-3">Current Semester</label>
-													<p class="col-sm-4"><?=$detail->StatusStudent?></p>
+													<p class="col-sm-4 fetch-score semes"><i class="fa fa-circle-o-notch fa-spin"></i></p>
 												</div>
 												<?php } ?>
 												<div class="row">
 													<label class="col-sm-3">IPS</label>
-													<p class="col-sm-4"><?=$detail->StatusStudent?></p>
+													<p class="col-sm-4 fetch-score ips"><i class="fa fa-circle-o-notch fa-spin"></i></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">IPK</label>
-													<p class="col-sm-4"><?=$detail->StatusStudent?></p>
+													<p class="col-sm-4 fetch-score ipk"><i class="fa fa-circle-o-notch fa-spin"></i></p>
 												</div>
 
 												<?php if(!empty($detail->MentorNIP)){ ?>
@@ -223,6 +223,38 @@
 					</div>
 				</div>
 			</div>
+
+			<script type="text/javascript">
+			$(document).ready(function(){
+				function fetchScoreStudent() {
+					var NPM = "<?=$detail->NPM?>";
+					var data = {
+		              NPM : NPM,
+		          	};
+		          	var token = jwt_encode(data,'UAP)(*');
+					$.ajax({
+			            type : 'POST',
+			            url : base_url_js+"global-informations/fetchStudentScore",
+			            data : {token:token},
+			            dataType : 'json',
+			            error : function(jqXHR){
+			                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+			                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+			                $("body #GlobalModal").modal("show");
+			            },success : function(response){
+			            	if(jQuery.isEmptyObject(response)){
+			            		$(".fetch-score").text(0);
+			            	}else{
+				            	$(".fetch-score.semes").text(response.GPA.LastSemester+" Term "+response.GPA.LastTerm);
+				            	$(".fetch-score.ips").text(response.GPA.IPS);
+				            	$(".fetch-score.ipk").text(response.GPA.IPK);
+			            	}
+			            }
+			        });
+				}
+				fetchScoreStudent();
+			});
+			</script>
 			
 		<?php }else{echo "<h1 class='text-center'>Data is not founded.</h1>";} ?>
 		</div>

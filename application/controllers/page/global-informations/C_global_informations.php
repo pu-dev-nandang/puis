@@ -55,10 +55,10 @@ class C_global_informations extends Globalclass {
         }        
         if(!empty($data_arr['class_of'])){
         	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['class_of']." ","filter"=>"AND",);    
-        }else{
+        }/*else{
         	$getCurrentSemes = $this->General_model->fetchData("db_academic.semester",array("status"=>1))->row();
         	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$getCurrentSemes->Year." ","filter"=>"AND",);    
-        }
+        }*/
         if(!empty($data_arr['study_program'])){
         	$param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    
         }
@@ -159,10 +159,81 @@ class C_global_informations extends Globalclass {
 		            }
 		            $data['profilepic'] = $srcImg;
 	            }
-
         	}
         	$this->load->view('dashboard/global-informations/students/detail',$data);
         }else{show_404();}
+    }
+
+
+    public function fetchStudentScore(){
+    	$data = $this->input->post();
+    	$json = array();
+    	$key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($data['token'],$key);
+        if($data){
+        	
+	    	//$NPM = 21140010;
+	    	$transcript = $this->General_model->callStoredProcedure("call db_academic.fetchStudentTranscript(".$data_arr['NPM'].")")->result();
+	    	
+	    	if(!empty($transcript)){
+	    		$semesno = 1;$currTermSession = "";$currTermYear=0;$no=1;
+				$totalCredit=0;$totalGrade=0;$totalPoint=0;
+	    		//get courses by semester has been take
+	    		$termcode="";$termyear=0;
+	    		$coursesByTerm = array();
+				$termName = "";
+	    		foreach ($transcript as $v) {
+	    			if($currTermSession != $v->TermSession){
+	    				$explodeTerm = explode(" - ", $v->Term);
+	    				if(!empty($explodeTerm)){
+	    					$trmName = $explodeTerm[0];
+	    				}else{$trmName=$v->Term;}
+	    				$termName = "Semester ".$semesno;
+	    				$coursesByTerm[$termName] = array();
+	    				$coursesByTerm[$termName] = array("Semester"=>$semesno,"Session"=>$v->TermSession,"Term"=>$v->Term);
+	    				$semesno++;
+	    				$no=1;
+	    			}
+	    			$cno = $no;
+	    			$coursesByTerm[$termName]['courses'][] = $v;
+
+	    			$currTermSession = $v->TermSession;
+	    			$no++;
+	    		}
+
+	    		//calculate GPA
+	    		if(!empty($coursesByTerm)){
+	    			$totalIPS = 0;$IPK=0;$LastTerm="";
+	    			foreach ($coursesByTerm as $key => $value) {
+	    				$parent = $coursesByTerm[$key];
+	    				$LastTerm = $parent['Term'];
+	    				$totalCredit = 0;$totalGrade=0;$IPS=0;$totalPoint=0;
+	    				foreach ($parent['courses'] as $c) {
+							$Score = round($c->Score,2);
+							$GradeValue = round($c->GradeValue,2);
+							$Point = round($c->Point,2);
+						  	$totalCredit = $totalCredit + $c->Credit;
+						  	$totalGrade  = $totalGrade + $GradeValue;
+						  	$totalPoint  = $totalPoint + $Point;
+						  	$IPS  = round($totalPoint / $totalCredit,2);
+						}
+	    				$GPAS = array("TotalGrade"=>$totalGrade,"TotalCredit"=>$totalCredit,"TotalPoint"=>$totalPoint,"IPS"=>$IPS);
+	    				$coursesByTerm[$key]['CalculateSemes'] = $GPAS;
+						$totalIPS = $totalIPS + $IPS;
+						$totalSemester = count($coursesByTerm);
+						$IPK = $totalIPS / $totalSemester;
+	    			}
+					$coursesByTerm['GPA'] = array("IPS"=>round($totalIPS,2),"IPK"=>round($IPK,2),"LastSemester"=>$totalSemester,"LastTerm"=>$LastTerm);
+	    		}
+
+	    		$json = $coursesByTerm;
+	    	}
+
+    	}
+
+    	$response = $json;
+    	echo json_encode($response);
+
     }
 
     /*END STUDENTS*/

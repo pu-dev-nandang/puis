@@ -1452,7 +1452,6 @@ class M_rest extends CI_Model {
             }
 
         }
-
         return $res;
     }
 
