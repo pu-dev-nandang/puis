@@ -24,11 +24,11 @@
                 $TypeMK = '<div><span class="label label-warning"><b>Wajib Univ</b></span></div>';
             }
 
-            $TypeMKFilter = 'Mandiri';
+            $TypeMKFilter = 'Prodi';
             if($item_mk['TypeMK']=='2'){
-                $TypeMKFilter = 'MKDU';
+                $TypeMKFilter = 'Wajin Nasional';
             } else if($item_mk['TypeMK']=='3'){
-                $TypeMKFilter = 'MKU';
+                $TypeMKFilter = 'Wajib Univ';
             }
 
             // $CourseType = 'Teory';
