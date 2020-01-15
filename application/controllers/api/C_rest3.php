@@ -2383,7 +2383,7 @@ class C_rest3 extends CI_Controller {
         elseif ($mode == 'MasaStudiLulusan') {
           $ProdiID = $dataToken['ProdiID'];
           $ex = explode('.', $ProdiID);
-          $ProdiID = $ProdiID[0];
+          $ProdiID = $ex[0];
           $ProdiName = $dataToken['ProdiName'];
           /*  
               Tahun Masuk = ta
@@ -2446,7 +2446,9 @@ class C_rest3 extends CI_Controller {
             $temp[] = $TahunMasuk;
             $JumlahMhsDiterima = 0;
             if ($TahunMasuk >= $YearMin) {
+
               $sql = 'select count(*) as total from ta_'.$TahunMasuk.'.students where ProdiID ='.$ProdiID;
+
               $query =$this->db->query($sql, array())->result_array();
               $JumlahMhsDiterima = $query[0]['total'];
             }
