@@ -16,7 +16,13 @@ class M_table extends CI_Model {
 	}
 
 	public function __generate($Props){
-		$sql = 'select * from db_generatordoc.api_doc where Active = 1 order by ID';
+		$DepartmentID = $this->session->userdata('DepartmentIDDocument');
+		$sql = 'select a.* from db_generatordoc.api_doc  as a
+				join db_generatordoc.api_doc_department as b on b.ID_api_doc = a.ID
+				where a.Active = 1 
+				and b.Department = "'.$DepartmentID.'"
+				group by a.ID
+				order by ID';
 		$query = $this->db->query($sql,array())->result_array();
 
 		$sqlSMT = 'select ID,Name as Value,Status as Selected from db_academic.semester order by ID DESC';

@@ -92,4 +92,10 @@ class C_action extends ServiceDocumentGenerator_Controler {
 		$query = $this->db->query($sql,array())->result_array();
 		echo json_encode($query);
 	}
+
+	public function LoadSessionDepartment(){
+		$dataToken = $this->getInputToken();
+		$this->__setDepartmentSession($dataToken['DepartmentIDChoose']);
+		echo json_encode(1);
+	}
 }

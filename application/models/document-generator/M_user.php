@@ -28,8 +28,13 @@ class M_user extends CI_Model {
 		switch ($ex[0]) {
 			case 'NIP':
 				$NIP = $this->session->userdata('NIP');
-				$sql = 'select a.*,b.Name as ProdiName,b.Name as NameProdiEng from db_employees.employees as a
+				$sql = 'select a.*,b.Name as ProdiName,b.Name as NameProdiEng,
+						SPLIT_STR(a.PositionMain, ".", 1) as DivisionID,c.Division as DepartmentName,
+						SPLIT_STR(a.PositionMain, ".", 2) as PosistionID,d.Position as PositionName
+						from db_employees.employees as a
 						left join db_academic.program_study as b on a.ProdiID = b.ID
+						left join db_employees.division as c on SPLIT_STR(a.PositionMain, ".", 1) = c.ID
+						left join db_employees.position as d on SPLIT_STR(a.PositionMain, ".", 2) = d.ID
 						where a.NIP = "'.$NIP.'"
 				 ';
 

@@ -10,7 +10,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12" id = "Page_form_input">
+            <div class="col-md-6" id = "Page_form_input">
+                
+            </div>
+            <div class="col-md-6" id = "Page_GET">
                 
             </div>   
         </div>
@@ -43,6 +46,7 @@
 </div>
 
 <script type="text/javascript">
+    var S_Table_example_;
     var settingTemplate;
     var App_form_input = {
         UploadChangeFunction : function(selector){
@@ -114,14 +118,99 @@
                   case "TABLE":
                     App_form_input.method_TABLE(key);
                     break;
-                  case "DOCUMENT":
-                    
+                  case "GET":
+                    App_form_input.method_GET(key);
                     break;
                 }             
             }
             App_form_input.Dom_FormInput(response_callback);
             $('#Preview').removeClass('hide');
 
+        },
+
+        method_GET : function(dt){
+            for(key in dt){
+                switch(key) {
+                  case "EMP":
+                    App_form_input.Dom_EMP(dt[key]);
+                    break;
+                  case "MHS":
+                  App_form_input.Dom_MHS(dt[key]);
+                    break;
+
+                }
+            }
+        },
+
+        Dom_MHS : function(dt){
+            var selector = $('#Page_GET');
+            var html = '<div class = "thumbnail" style = "margin-top:5px;">';
+            for (var i = 0; i < dt.length; i++) {
+                var Choose = dt[i].Choose;
+                var keyNumber = dt[i].number;
+                switch(Choose) {
+                  case "NPM":
+                    html += '<div class = "row GET" keyindex = "'+i+'" keynumber="'+keyNumber+'">'+
+                                '<div class = "col-md-12">'+
+                                    '<div style = "padding:5px;">'+
+                                        '<h3><u><b>Students '+keyNumber+' </b></u></h3>'+
+                                    '</div>'+
+                                    '<div class = "form-group">'+
+                                        '<label>Choose Employees</label>'+
+                                        '<div class="input-group">'+
+                                            '<input type="text" class="form-control Input" readonly name="'+key+'" key="GET" field="'+key+'">'+
+                                            '<span class="input-group-btn">'+
+                                                '<button class="btn btn-default SearchNPMSTD" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+                                            '</span>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'        
+
+                                ;
+                    break;
+
+                }
+            }
+
+            html += '</div>';
+            selector.html(html);
+        },
+
+        Dom_EMP : function(dt){
+            var selector = $('#Page_GET');
+            var html = '<div class = "thumbnail" style = "margin-top:5px;">';
+            // console.log(dt);
+            for (var i = 0; i < dt.length; i++) {
+                var Choose = dt[i].Choose;
+                var keyNumber = dt[i].number;
+                switch(Choose) {
+                  case "NIP":
+                    html += '<div class = "row GET" keyindex = "'+i+'" keynumber="'+keyNumber+'" >'+
+                                '<div class = "col-md-12">'+
+                                    '<div style = "padding:5px;">'+
+                                        '<h3><u><b>Employees '+keyNumber+' </b></u></h3>'+
+                                    '</div>'+
+                                    '<div class = "form-group">'+
+                                        '<label>Choose Employees</label>'+
+                                        '<div class="input-group">'+
+                                            '<input type="text" class="form-control Input" readonly name="'+key+'" key="GET" field="'+key+'">'+
+                                            '<span class="input-group-btn">'+
+                                                '<button class="btn btn-default SearchNIPEMP" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+                                            '</span>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'        
+
+                                ;
+                    break;
+
+                }
+            }
+
+            html += '</div>';
+            selector.html(html);
         },
 
         method_SET : function(dt){
@@ -171,11 +260,12 @@
             for (var i = 0; i < data.length; i++) {
                 var select =  data[i].select;
                 var data_selected_default = 2;
+                var keyNumber = data[i].number;
                 var htmlOP = App_form_input.SelectOP(select,data_selected_default);
-                html +=    '<div class = "row Approval" keyindex = "'+i+'">'+
+                html +=    '<div class = "row Approval" keyindex = "'+i+'" keyNumber = "'+keyNumber+'">'+
                                 '<div class = "col-md-12">'+
                                     '<div style = "padding:15px;">'+
-                                        '<h3><u><b>Approval '+(i+1)+' </b></u></h3>'+
+                                        '<h3><u><b>Approval '+keyNumber+' </b></u></h3>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
                                         '<label>Approval</label>'+
@@ -258,6 +348,7 @@
 
             html  += '</div></div></div>';
             $('#Page_USER').append(html);
+            
 
         },
 
@@ -599,7 +690,8 @@
 
 
             })
-
+            // console.log(settingTemplate);
+            // return;
             var ArrUploadFilesSelector = [];
             var url = base_url_js+"document-generator-action/__preview_template";
             var token = jwt_encode(settingTemplate,'UAP)(*');
@@ -671,6 +763,73 @@
             }
         },
 
+        ShowModalDepartment : function(selector,action="add",ID=""){
+                        
+            var html = '';
+            html ='<div class = "row">'+
+                    '<div class = "col-md-12">'+
+                        '<table id="example_budget" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="example-select-all"></th>'+
+                     '<th>Code</th>'+
+                     '<th>Departement</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
+
+            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Department'+'</h4>');
+            $('#GlobalModalLarge .modal-body').html(html);
+            $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success" action ="'+action+'" data-id="'+ID+'">Save</button>');
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+            var url = base_url_js+'api/__getAllDepartementPU';
+            $.get( url, function( dt ) {
+                var table = $('#example_budget').DataTable({
+                      "processing": true,
+                      "serverSide": false,
+                      "data" : dt,
+                      'columnDefs': [
+                          {
+                             'targets': 0,
+                             'searchable': false,
+                             'orderable': false,
+                             'className': 'dt-body-center',
+                             'render': function (data, type, full, meta){
+                                 var checked = '';
+                                 if (full.Code == DepartmentID) {
+                                     checked = 'checked';
+                                 }
+                                 return '<input type="checkbox" name="id[]" value="' + full.Code + '" dt = "'+full.Abbr+'" '+checked+'>';
+                             }
+                          },
+                          {
+                             'targets': 1,
+                             'render': function (data, type, full, meta){
+                                 return full.Abbr;
+                             }
+                          },
+                          {
+                             'targets': 2,
+                             'render': function (data, type, full, meta){
+                                 return full.Name2;
+                             }
+                          },
+                      ],
+                      'createdRow': function( row, data, dataIndex ) {
+                            console.log(data);
+                      },
+                      // 'order': [[1, 'asc']]
+                });
+
+                S_Table_example_ = table;
+            });
+
+        },
+
         // -- //
 
         set_SET : function(attrname,attrva,attrkey,attrfield,el){
@@ -684,6 +843,9 @@
             else if(attrname == 'verify'){
                 var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
                 settingTemplate[attrkey]['Signature'][keyindex]['verify'] = attrva;
+
+                var keyNumber = parseInt(el.closest('.Approval').attr('keynumber'));
+                settingTemplate[attrkey]['Signature'][keyindex]['number'] = keyNumber;
             }
             else if(attrname == 'cap'){
                 var keyindex = parseInt(el.closest('.Approval').attr('keyindex'));
@@ -731,11 +893,23 @@
        App_form_input.SubmitPreviewPDF(itsme);
     })
 
+    // $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
+    //    var itsme = $(this);
+    //    App_form_input.SaveTemplate(itsme);
+    // })
+
     $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
        var itsme = $(this);
-       App_form_input.SaveTemplate(itsme);
-
+       App_form_input.ShowModalDepartment(itsme);
     })
+
+    // Handle click on "Select all" control
+    $(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
+       // Get all rows with search applied
+       var rows = S_Table_example_.rows({ 'search': 'applied' }).nodes();
+       // Check/uncheck checkboxes for all rows in the table
+       $('input[type="checkbox"]', rows).prop('checked', this.checked);
+    });
 
     $(document).off('change', '.Input[field="TABLE"][name="API"]').on('change', '.Input[field="TABLE"][name="API"]',function(e) {
        var itsme = $(this);

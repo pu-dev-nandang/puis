@@ -7,13 +7,15 @@ class M_doc extends CI_Model {
 	private $INPUT = [];
 	private $GRAB = [];
 	private $TABLE = [];
-	private $DOCUMENT = [];
+    private $DOCUMENT = [];
+	private $GET = [];
 
 	private $KeySET = 'SET';
 	private $KeyUSER = 'USER';
 	private $KeyINPUT = 'INPUT';
 	private $KeyGRAB = 'GRAB';
-	private $KeyTABLE = 'TBL';
+    private $KeyTABLE = 'TBL';
+	private $KeyGET = 'GET';
 
 	// private $Path
 
@@ -96,6 +98,13 @@ class M_doc extends CI_Model {
     		        			}
     		        			$this->TABLE['KEY'][] = $setStr;
     		        			break;
+                            case $this->KeyGET:
+                                $setStr = trim(ucwords($ex[1]));
+                                for ($i=2; $i < count($ex); $i++) {
+                                    $setStr .= '.'.trim(ucwords($ex[$i]));
+                                }
+                                $this->GET[] = $setStr;
+                                break;
     		        	}
     		        }
 		    	}
@@ -112,7 +121,8 @@ class M_doc extends CI_Model {
 			'INPUT' => $this->INPUT,
 			'GRAB' => $this->GRAB,
 			'TABLE' => $this->TABLE,
-			'DOCUMENT' => $this->DOCUMENT,
+            'DOCUMENT' => $this->DOCUMENT,
+			'GET' => $this->GET,
 		];	
 
     }
@@ -120,7 +130,16 @@ class M_doc extends CI_Model {
     private function __generator_obj(){
     	$this->__SETGenerate();
         $this->__GRABGenerate();
-    	$this->__TABLEGenerate();
+        $this->__TABLEGenerate();
+    	$this->__GETGenerate();
+    }
+
+    private function __GETGenerate(){
+        $GET = $this->GET;
+        if (count($GET) > 0) {
+            $this->load->model('document-generator/m_get');
+            $this->GET = $this->m_get->__generate($GET);
+        }
     }
 
     private function __TABLEGenerate(){
@@ -527,7 +546,9 @@ class M_doc extends CI_Model {
 
     private function __SETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
     	for ($i=0; $i < count($arrValue); $i++) { 
-    		$keyApproval = $i + 1;
+            // $keyApproval = $i + 1;
+    		$keyApproval = $arrValue[$i]['number'];
+
     		// show signature image or not
     		if ($arrValue[$i]['verify']['valueVerify'] == 1) {
     			$img = $arrValue[$i]['verify']['img'];
@@ -705,13 +726,20 @@ class M_doc extends CI_Model {
 
     public function loadtableMaster($dataToken=[]){
        $rs = [];
+       $DepartmentID = $this->session->userdata('DepartmentIDDocument');
        $AddWhere = '';
        if (array_key_exists('Active', $dataToken)) {
            $Active = $dataToken['Active'];
            $AddWhere = ' where a.Active = "'.$Active.'"';
        }
+
+       $WhereOrAnd = ($AddWhere == '') ? ' Where' : ' And';
+       $AddWhere .= $WhereOrAnd.' c.Department = "'.$DepartmentID.'"';
+
        $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
+              join db_generatordoc.document_access_department as c on c.ID_document = a.ID
        		'.$AddWhere.'
+            group by a.ID
        ';
        $query = $this->db->query($sql,array())->result_array();
        $data = array();
@@ -927,7 +955,8 @@ class M_doc extends CI_Model {
     private function __SETWriteSignatureNoSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
         // print_r($arrValue);die();
         for ($i=0; $i < count($arrValue); $i++) { 
-            $keyApproval = $i + 1;
+            // $keyApproval = $i + 1;
+            $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
             if ($arrValue[$i]['verify']['valueVerify'] == 1) {
                 $img = $arrValue[$i]['verify']['img'];
@@ -1929,7 +1958,8 @@ class M_doc extends CI_Model {
 
     private function __ApproveSETWriteSignature($setStr,$TemplateProcessor,$arrKomponen,$arrValue){
         for ($i=0; $i < count($arrValue); $i++) { 
-            $keyApproval = $i + 1;
+            // $keyApproval = $i + 1;
+            $keyApproval = $arrValue[$i]['number'];
             // show signature image or not
             if ($arrValue[$i]['verify']['valueVerify'] == 1) {
                 $img = $arrValue[$i]['verify']['img'];
