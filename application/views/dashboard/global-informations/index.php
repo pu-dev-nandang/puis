@@ -15,7 +15,7 @@
 							</div>
 							<div class="col-sm-9 col-md-9">
 								<p class="title">PU Users</p>
-								<p class="desc">Get the information about our Student, Lecturer and Employees</p>
+								<p class="desc">Service that allows you to get to know about data information of our Student, Lecturer and Employees.</p>
 							</div>
 						</div>
 					</div>
@@ -30,7 +30,7 @@
 							</div>
 							<div class="col-sm-9 col-md-9">
 								<p class="title">Message Blast</p>
-								<p class="desc">Service that allows you to easily send text messages to a large mail</p>
+								<p class="desc">Service that allows you to easily send messages to multiple email utilizing an automated messaging system.</p>
 							</div>
 						</div>
 					</div>

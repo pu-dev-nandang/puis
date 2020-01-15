@@ -2612,6 +2612,9 @@ class C_save_to_excel extends CI_Controller
         if(!empty($data_arr['ProdiID'])){
             $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['ProdiID']." ","filter"=>"AND",);    
         }
+        if(!empty($output['GroupProdiID'])){
+            $param[] = array("field"=>"ath.`ProdiGroupID`","data"=>" =".$output['GroupProdiID']." ","filter"=>"AND",);
+        }
         if(!empty($data_arr['status'])){
         $param[] = array("field"=>"ss.`CodeStatus`","data"=>" =".$data_arr['status']." ","filter"=>"AND",);    
         }

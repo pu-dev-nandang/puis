@@ -9750,6 +9750,10 @@ class C_api extends CI_Controller {
                 if(!empty($output['ProdiID'])){
                     $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$output['ProdiID']." ","filter"=>"AND",);    
                 }
+                if(!empty($output['GroupProdiID'])){
+                    $param[] = array("field"=>"ath.`ProdiGroupID`","data"=>" =".$output['GroupProdiID']." ","filter"=>"AND",);
+                }
+
                 if(!empty($output['status'])){
                     $sn = 1;
                     $dataArrStatus = array();

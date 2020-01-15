@@ -20,6 +20,13 @@ class C_global_informations extends Globalclass {
         $content = $this->load->view('dashboard/global-informations/user_tabs_global_informations',$data,true);
         $this->template($content);
     }
+    
+    public function blast_global_informations($page){
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/global-informations/blast_global_informations',$data,true);
+        $this->template($content);
+    }
+
 
 
     /*STUDENTS*/
@@ -568,6 +575,14 @@ class C_global_informations extends Globalclass {
     }
     
     /*END EMPLOYEE*/
+
+
+
+    public function messageBlast(){
+    	$data['title'] = "Message Blast";
+    	$page = $this->load->view('dashboard/global-informations/message-blast/index',$data,true);
+        $this->blast_global_informations($page);    	
+    }
 
 
 }
