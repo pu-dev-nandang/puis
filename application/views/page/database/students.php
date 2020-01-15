@@ -324,7 +324,7 @@
     }
 
     $(document).ready(function(){
-        //fetchingData();
+        fetchingData();
 
         $("#birthdate_start,#birthdate_end,#graduation_start,#graduation_end").datepicker({
             dateFormat: 'dd-mm-yy',
