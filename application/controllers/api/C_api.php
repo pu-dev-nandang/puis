@@ -9838,7 +9838,7 @@ class C_api extends CI_Controller {
                 $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
                 $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
                 $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
-            }            
+            }
 
             $data = array();
             $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);

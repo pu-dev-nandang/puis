@@ -583,6 +583,14 @@ class C_global_informations extends Globalclass {
     	$page = $this->load->view('dashboard/global-informations/message-blast/index',$data,true);
         $this->blast_global_informations($page);    	
     }
+    
+
+    public function messageBlastForm(){
+    	$data['title'] = "Create New Message Blast";
+    	$page = $this->load->view('dashboard/global-informations/message-blast/form',$data,true);
+        $this->blast_global_informations($page);    	
+    }
+
 
 
 }
