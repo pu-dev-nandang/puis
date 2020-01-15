@@ -147,6 +147,7 @@
 
             var filterProdi = $('#filterProdi').val();
             var P = filterProdi.split('.');
+
             var ProdiID = P[0];
             var formJPID = $('#formJPID').val();
             var formYear = $('#formYear').val();
@@ -201,6 +202,7 @@
         });
         $('#filterYear').change(function () {
            var filterYear = $('#filterYear').val();
+           var filterProdi = $('#filterProdi').val();
            if(filterYear!='' && filterYear!=null){
                loadPenggunaanDana(filterProdi);
            }
@@ -392,13 +394,13 @@ function loadPenggunaanDana(filterProdi) {
                     $('#loadListDana').append('<tr>' +
                         '<td>'+no+'</td>' +
                         '<td style="text-align: left;">'+v.Jenis+'</td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th3)+'</a></td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th2)+'</a></td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th1)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year2+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th3)+'" data-x="'+parseFloat(v.th6)+'">'+formatRupiah(v.th3)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year1+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th2)+'" data-x="'+parseFloat(v.th5)+'">'+formatRupiah(v.th2)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th1)+'" data-x="'+parseFloat(v.th4)+'">'+formatRupiah(v.th1)+'</a></td>' +
                         '<td style="text-align: right;">'+formatRupiah(rataUPPS)+'</td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year5+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th6)+'">'+formatRupiah(v.th6)+'</a></td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year4+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th5)+'">'+formatRupiah(v.th5)+'</a></td>' +
-                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year3+'" data-jpid="'+v.ID+'" data-v="'+parseFloat(v.th4)+'">'+formatRupiah(v.th4)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year5+'" data-jpid="'+v.ID+'" data-x="'+parseFloat(v.th6)+'" data-v="'+parseFloat(v.th3)+'">'+formatRupiah(v.th6)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year4+'" data-jpid="'+v.ID+'" data-x="'+parseFloat(v.th5)+'" data-v="'+parseFloat(v.th2)+'">'+formatRupiah(v.th5)+'</a></td>' +
+                        '<td style="text-align: right;"><a href="javascript:void(0);" class="editNominal" data-year="'+Year3+'" data-jpid="'+v.ID+'" data-x="'+parseFloat(v.th4)+'" data-v="'+parseFloat(v.th1)+'">'+formatRupiah(v.th4)+'</a></td>' +
                         '<td style="text-align: right;">'+formatRupiah(rataPS)+'</td>' +
                         '</tr>');
                     jml_th3 = jml_th3+ parseFloat(v.th3);
@@ -511,6 +513,22 @@ function loadPenggunaanDana(filterProdi) {
 
 
 }
+$(document).on('click','.editNominal',function () {
+        var year = $(this).attr('data-year');
+        var Dana = $(this).attr('data-v');
+        var Dana1 = $(this).attr('data-x');
+        var JPID = $(this).attr('data-jpid');
+
+
+        $('#formJPID').val(JPID);
+        $('#formYear').val(year);
+        $('#formPriceUPPS').val(Dana);
+        $('#formPricePS').val(Dana1);
+        $('#formPriceUPPS').focus();
+        $('#formPricePS').focus();
+
+
+    });
 function loadJenisDana() {
 
     var data = {
