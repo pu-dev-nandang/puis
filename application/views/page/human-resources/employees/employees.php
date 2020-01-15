@@ -1,79 +1,349 @@
-
 <style>
-    #tableEmployees tr th{
-        text-align: center;
-    }
+    #tableEmployees thead tr th {background: #20525a;color: #ffffff;text-align: center;}
+    .bg-primary {color: #fff  !important;background-color: #337ab7;}
+    .bg-success {background-color: #dff0d8;}
+    .bg-info {background-color: #d9edf7;}
+    .bg-warning {background-color: #fcf8e3 !important;}
+    #divDataEmployees #tableEmployees tbody td > a.card-link{text-decoration: none !important}
+    #divDataEmployees #tableEmployees tbody td > a.card-link .regular{color: #555}
+    #divDataEmployees #tableEmployees tbody td > a.card-link .name{font-weight: bold}
 </style>
 
-<div class="filter-form" style="margin:0 auto;width:45%;text-align:center;margin-bottom:3em;">
-    <div class="row">
-        <div class="col-md-5">
-            <div class="thumbnail">
-                <select class="form-control" id="filterStatusEmployees">
-                    <option value="">--- All Status Employees ---</option>
-                </select>
+<!-- ADDED BY FEBRI @ DEC 2019 -->
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-filter"></i> Form Filter</h4>
+      </div>
+      <div class="panel-body">
+        <form id="form-filter" action="" method="post" autocomplete="off">
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>Employee</label>               
+                <input type="text" class="form-control" name="staff" placeholder="NIP or Name">               
+              </div>
             </div>
-        </div>
-        <div class="col-sm-2 col-md-2" style="padding:5px 0px">
-            <button class="btn btn-default" type="button" id="btn-need-appv" data-status="close"><i class="fa fa-warning"></i> Need approval for request biodata</button>
-        </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Division</label>               
+                <select class="form-control" name="division">
+                  <option value="">-Choose one-</option>
+                  <?php foreach ($division as $d) {
+                  echo '<option value="'.$d->ID.'">'.$d->Division.'</option>';
+                  } ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Position</label>               
+                <select class="form-control" name="position" disabled>
+                  <option value="">-Choose one-</option>
+                  <?php foreach ($position as $p) {
+                  echo '<option value="'.$p->ID.'">'.$p->Description.'</option>';
+                  } ?>
+                </select>               
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Birthdate</label>
+                <div class="input-group">
+                  <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date"> 
+                  <div class="input-group-addon">-</div>
+                  <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
+                  <span>Advance filter</span> 
+                  <i class="fa fa-angle-double-down"></i>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <div id="advance-filter" class="collapse">
+            <div class="row">
+              <div class="col-sm-2">
+                <div class="form-groups">
+                  <label>Status employee</label>
+                </div>
+                <?php if(!empty($statusstd)) {
+                foreach ($statusstd as $t) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$t->IDStatus?>" name="statusstd[]" > <?=$t->Description?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-groups">
+                  <label>Religion</label>
+                </div>
+                <?php if(!empty($religion)){ 
+                foreach ($religion as $rg) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$rg->IDReligion?>" name="religion[]"> <?=$rg->Religion?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <label>Gender</label>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="L" name="gender[]"> Male
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="P" name="gender[]" > Female
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              
+              
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label>Last Education</label>
+                  <?php if(!empty($level_education)){ 
+                  foreach ($level_education as $le) { ?>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox" value="<?=$le->ID?>" name="level_education[]"> <?=$le->Description?>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <?php } } ?>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="padding-top:22px">
+            <button class="btn btn-primary btn-filter" type="button"><i class="fa fa-search"></i> Search</button>
+            <a class="btn btn-default" href="">Clear Filter</a>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#birthdate_start,#birthdate_end").datepicker({
+        dateFormat: 'dd-mm-yy',
+        changeYear: true,
+        changeMonth: true
+    });
+    $('#form-filter').on('keyup keypress', function(e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) { 
+        e.preventDefault();
+        return false;
+      }
+    });
+    $(".show-more-filter").click(function(){
+      var isOpen = $(this).attr("aria-expanded");
+      if(isOpen == "false"){
+        $(this).attr("aria-expanded",true);
+        $(this).find("span").text("Show less");
+        $(this).find("i.fa").toggleClass("fa-angle-double-down fa-angle-double-up");
+      }else{
+        $(this).attr("aria-expanded",false);
+        $(this).find("span").text("Advance filter");        
+        $(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
+      }
+    });
+
+    $("#form-filter select[name=division]").change(function(){
+      var value = $(this).val();
+      if($.trim(value) != ''){
+        $("#form-filter select[name=position]").prop("disabled",false);
+      }
+    });
+    $("#form-filter select[name=position]").change(function(){
+      var division = $("#form-filter select[name=division]").val();
+      if($.trim(division) == ''){
+        division.addClass("required");
+        alert("Please fill up field Division");
+      }
+    });
+    $(".btn-filter").click(function(){
+        loadDataEmployees();
+      });
+    
+  });
+</script>
+<!-- END ADDED BY FEBRI @ DEC 2019 -->
+
+<!-- UPDATED BY FEBRI @ JAN 2019 -->
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-default" type="button" id="btn-need-appv" data-status="close"><i class="fa fa-warning"></i> Need approval for request biodata</button>
     </div>
 </div>
-
-<div class="thumbnail" style="padding: 10px; text-align: right;margin-bottom: 10px;">
-    <span style="color: #4CAF50;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Permanent Employees </span> |
-    <span style="color: #FF9800;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Contract Employees </span> |
-    <span style="color: #03A9F4;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Permanent Lecturer </span> |
-    <span style="color: #9e9e9e;margin-right: 5px;margin-left: 5px;"><i class="fa fa-circle" style="margin-right: 5px;"></i> Contract Lecturer </span> |
-    <span style="color: #F44336;margin-right: 5px;margin-left: 5px;"><i class="fa fa-warning" style="margin-right: 5px;"></i> Non Active </span>
+<div class="row" style="margin-top: 10px">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">            
+          <h4 class="panel-title"><i class="fa fa-bars"></i> List of employee</h4>
+        </div>
+        <div class="panel-body">
+          <div id="sorting-data">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label>Sort by</label>
+                  <div class="input-group">
+                    <select class="form-control" name="sort_by">
+                      <option value="">-</option>
+                      <option value="NIP">NIP</option>
+                      <option value="Name">Name</option>
+                      <option value="DateOfBirth">Birthdate</option>
+                      <option value="Gender">Gender</option>
+                      <option value="rl.Religion">Religion</option>
+                      <option value="le.ID">Level Education</option>
+                      <option value="StatusEmployeeID">Status Employee</option>
+                      <option value="StatusLecturerID">Status Lecturer</option>
+                    </select>
+                    <div class="input-group-addon"></div>
+                    <select class="form-control" name="order_by">
+                      <option value="ASC">ASCENDING</option>
+                      <option value="DESC">DESCENDING</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="divDataEmployees"></div>
+        </div>
+      </div>
+    </div>
 </div>
-<hr/>
-<div class="">
-    <table class="table table-bordered table-striped" id="tableEmployees">
-        <thead>
-        <tr style="background: #20485A;color: #FFFFFF;">
-
-            <th style="width: 5%;">Photo</th>
-            <th style="width: 20%;">Name</th>
-            <th style="width: 15%;">Position Main</th>
-            <th>Address</th>
-            <th style="width: 5%;">Status</th>
-        </tr>
-        </thead>
-    </table>
-</div>
+<a href="lala.php#/bakekok">tembak</a>
 <div id="fetchRequestDataEmp"></div>
-<script>
 
+
+<script type="text/javascript">
+    function loadDataEmployees(isapprove=false,sort=null,order=null) {
+        loading_modal_show();
+
+        setTimeout(function () {
+            $('#divDataEmployees').html('<table class="table table-bordered table-striped" id="tableEmployees">' +
+                '            <thead>' +
+                '            <tr>' +
+                '                <th style="width: 1%;">No</th>' +
+                '                <th style="width: 3%;">NIP</th>' +
+                '                <th style="width: 15%;">Employee</th>' +
+                '                <th style="width: 10%;">Birthdate</th>' +
+                '                <th style="width: 8%;">Position</th>' +
+                '                <th style="width: 15%;">Address</th>' +
+                '                <th style="width: 7%;">Action</th>' +
+                '            </tr>' +
+                '            </thead>' +
+                '        </table>');
+            /*UPDATED BY FEBRI @ JAN 2020*/
+            /*var filterStatusEmployees = $('#filterStatusEmployees').val();
+            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
+            var filtering = $("#form-filter").serialize();
+            if(isapprove){
+              filtering = filtering+"&isapprove="+isapprove;
+          }
+            if((sort && order) || ( sort !== null && order !== null) ){
+              filtering = filtering+"&sortby="+sort+"&orderby="+order;
+            }
+            var token = jwt_encode({Filter : filtering},'UAP)(*');
+            /*END UPDATED BY FEBRI @ JAN 2020*/
+            var dataTable = $('#tableEmployees').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "iDisplayLength" : 10,
+                "ordering" : false,
+                "language": {
+                    "searchPlaceholder": "NIP / NIK, Name"
+                },
+                "ajax":{
+                    url : base_url_js+'api/__getEmployeesHR', // json datasource
+                    ordering : false,
+                    data : {token:token},
+                    type: "post",  // method  , by default get
+                    error: function(jqXHR){  // error handling
+                        $(".employee-grid-error").html("");
+                        $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                        $("#employee-grid_processing").css("display","none");
+
+                        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                            '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                        $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                        $('#GlobalModal').modal({
+                            'show' : true,
+                            'backdrop' : 'static'
+                        });
+                    }
+                },"initComplete": function(settings, json) {
+                  loading_modal_hide();
+                }
+            } );
+            TableSess = dataTable;
+        },500);
+
+    }
     $(document).ready(function () {
-        loadSelectOptionStatusEmployee('#filterStatusEmployees','');
         loadDataEmployees();
 
-        $('#filterStatusEmployees').change(function () {
-            var s = $(this).val();
-            //UPDATED BY FEBRI @ NOV 2019
-            var isAppv = ( ($('#btn-need-appv').data('status') == "close") ? false:true );
-            loadDataEmployees(s,isAppv);
-            //END UPDATED BY FEBRI @ NOV 2019
-        });
-
-    //UPDATED BY FEBRI @ NOV 2019
+        //UPDATED BY FEBRI @ NOV 2019
         $("#btn-need-appv").click(function(){
             var status = $(this).data("status");
-            var filterStatus = $('#filterStatusEmployees').val();
             if(status == "close"){
                 $(this).toggleClass("btn-default btn-info");
                 $(this).data("status","open");
-                loadDataEmployees(filterStatus,true);
+                loadDataEmployees(true);
             }else{
                 $(this).toggleClass("btn-info btn-default");
                 $(this).data("status","close");
-                loadDataEmployees();            
+                loadDataEmployees();
             }
         });
 
 
-        $("body #tableEmployees").on("click",".btn-appv",function(){
+        $("body #divDataEmployees").on("click",".table tbody td .btn-appv",function(){
             var itsme = $(this);
             var NIP = itsme.data("nip");
             var data = {
@@ -98,31 +368,22 @@
                     $("#fetchRequestDataEmp").html(response);
                 }
             });
+        });        
+        //END UPDATED BY FEBRI @ NOV 2019
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          loadDataEmployees(isappv,value,order);
         });
-        
-    //END UPDATED BY FEBRI @ NOV 2019
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
+          loadDataEmployees(isappv,order,value);
+        });
 
     });
-
-
-    function loadDataEmployees(status='',isappv=false) { //UPDATED BY FEBRI @ NOV 2019
-        var dataTable = $('#tableEmployees').DataTable( {
-            "processing": true,
-            "destroy": true,
-            "serverSide": true,
-            "iDisplayLength" : 10,
-            "ordering" : false,
-            "ajax":{
-                url : base_url_js+"api/__getEmployeesHR?s="+status, // json datasource
-                ordering : false,
-                type: "post",  // method  , by default get
-                data: {isappv:isappv},  // UPDATED BY FEBRI @ NOV 2019
-                error: function(){  // error handling
-                    $(".employee-grid-error").html("");
-                    $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                    $("#employee-grid_processing").css("display","none");
-                }
-            }
-        } );
-    }
 </script>
+<!-- END UPDATED BY FEBRI @ JAN 2019 -->

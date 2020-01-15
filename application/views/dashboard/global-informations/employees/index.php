@@ -62,13 +62,13 @@
 										</select>								
 									</div>
 								</div>
-								<div class="col-sm-2">
-									<div class="form-group">
-										<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
-											<span>Advance filter</span> 
-											<i class="fa fa-angle-double-down"></i>
-										</label>
-									</div>
+							</div>
+							<div class="row">									
+								<div class="col-sm-12">
+									<label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter" style="padding-top:0px">
+										<span>Advance filter</span> 
+										<i class="fa fa-angle-double-down"></i>
+									</label>
 								</div>
 							</div>
 
@@ -108,7 +108,7 @@
 									</div>
 									<div class="col-sm-2">
 										<div class="form-group">
-											<label>Level Education</label>
+											<label>Last Education</label>
 											<select class="form-control" name="level_education">
 												<option value="">Choose one</option>
 												<?php if(!empty($level_education)){ 
@@ -140,12 +140,42 @@
 						<h5 class="panel-title"><i class="fa fa-bars"></i> List of employee</h5>
 					</div>
 					<div class="panel-body">
+						<div id="sorting-data">
+				            <div class="row">
+				              <div class="col-sm-3">
+				                <div class="form-group">
+				                  <label>Sort by</label>
+				                  <div class="input-group">
+				                    <select class="form-control" name="sort_by">
+				                      <option value="">-</option>
+				                      <option value="NIP">NIP</option>
+				                      <option value="Name">Name</option>
+				                      <option value="DateOfBirth">Birthdate</option>
+				                      <option value="Gender">Gender</option>
+				                      <option value="r.Religion">Religion</option>
+				                      <option value="le.ID">Level Education</option>
+				                      <option value="StatusEmployeeID">Status Employee</option>
+				                    </select>
+				                    <div class="input-group-addon"></div>
+				                    <select class="form-control" name="order_by">
+				                      <option value="ASC">ASCENDING</option>
+				                      <option value="DESC">DESCENDING</option>
+				                    </select>
+				                  </div>
+				                </div>
+				              </div>
+				            </div>
+			          	</div>
 						<div class="table-list">
 							<table class="table table-bordered table-striped" id="table-list-data">
 								<thead>
 									<tr>
 										<th width="2%">No</th>
-										<th width="30%">Lecturer</th>
+										<th width="25%">Employee</th>
+										<th width="15%">Birthdate</th>
+										<th width="8%">Religion</th>
+										<th width="8%">Gender</th>
+										<th width="10%">Last Education</th>
 										<th width="20%">Position</th>
 										<th width="20%">Status</th>
 									</tr>
@@ -163,9 +193,12 @@
 
 
 <script type="text/javascript">
-	function fetchingData() {
+	function fetchingData(sorted='') {
 		loading_modal_show();
     	var data = getFormData($("#form-filter"));    	
+        if(sorted.trim() || sorted){
+        	data['sorted'] = sorted;
+        }
         var token = jwt_encode(data,'UAP)(*');
     	var dataTable = $('#fetch-data-tables .table').DataTable( {
 				            destroy: true,
@@ -183,6 +216,7 @@
 				                data : {token:token},
 				                type: "post",  // method  , by default get
 				                error: function(jqXHR){  // error handling
+				                    loading_modal_hide();
 				                    $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
 						                '<h4 class="modal-title">Error Fetch Student Data</h4>');
 						            $('#GlobalModal .modal-body').html(jqXHR.responseText);
@@ -277,5 +311,20 @@
             changeYear: true,
             changeMonth: true
         });
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){          
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(value+" "+order);
+        });
+        
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          $('#fetch-data-tables .table').DataTable().destroy();
+          fetchingData(order+" "+value);
+        });
+
     });
 </script>

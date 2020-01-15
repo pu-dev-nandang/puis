@@ -2,7 +2,7 @@
  
 class Globalinformation_model extends CI_Model{
 
-	public function fetchAllStudent($param='',$start='',$limit=''){
+	/*public function fetchAllStudent($param='',$start='',$limit=''){
     	$where='';
         if(!empty($param)){
             $where = 'WHERE ';
@@ -61,11 +61,11 @@ class Globalinformation_model extends CI_Model{
     	$queryStudents = $combineSql;
     	$result = $this->db->query($queryStudents);
     	return $result;
-    }
+    }*/
 
 
 
-    public function fetchStudentsPS($single=false,$param='',$start='',$limit=''){
+    public function fetchStudentsPS($single=false,$param='',$start='',$limit='',$order=''){
     	$where='';
         if(!empty($param)){
             $where = 'WHERE ';
@@ -86,15 +86,21 @@ class Globalinformation_model extends CI_Model{
             $lims = " LIMIT {$start},{$limit}";	
         }
 
-        $psquery = 'call db_academic.fetchStudents("'.$where.'" , "'.$lims.'")';
+        $sorted = " order by ".(!empty($order) ? $order : " NPM desc");
+
+        $psquery = 'call db_academic.fetchStudents("'.$where.'" , "'.$lims.'","'.$sorted.'")';
     	$query = $this->db->query($psquery);
+        //var_dump($this->db->last_query());
     	if($single){
     		$value = $query->row();
     	}else{
     		$value = $query->result();
     	}
-    	mysqli_next_result( $this->db->conn_id );
-		$query->free_result(); 
+    	
+        //limit execute time
+        mysqli_next_result( $this->db->conn_id );
+        $query->free_result(); 
+        //end limit execute time
     	return $value;
     }
 
@@ -111,7 +117,7 @@ class Globalinformation_model extends CI_Model{
     }
 
 
-    public function fetchLecturer($param='',$start='',$limit=''){
+    public function fetchLecturer($param='',$start='',$limit='',$order=''){
         $where='';
         if(!empty($param)){
             $where = 'WHERE ';
@@ -132,6 +138,7 @@ class Globalinformation_model extends CI_Model{
             $lims = " LIMIT {$start},{$limit}";	
         }
 
+        $sorted = " order by ".(!empty($order) ? $order : 'em.ID DESC');
         $string = "SELECT em.*, ps.NameEng AS ProdiNameEng, ps.DegreeEng as ProdiDegree, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName
 				   FROM db_employees.employees em
 				   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
@@ -139,7 +146,7 @@ class Globalinformation_model extends CI_Model{
 				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
 				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
 				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
-                   {$where} ORDER BY em.NIP ASC {$lims} ";
+                   {$where} {$sorted} {$lims} ";
         
         $value  = $this->db->query($string);
      	//var_dump($this->db->last_query());
@@ -147,7 +154,7 @@ class Globalinformation_model extends CI_Model{
     }
 
 
-    public function fetchEmployee($param='',$start='',$limit=''){
+    public function fetchEmployee($param='',$start='',$limit='',$order=''){
         $where='';
         if(!empty($param)){
             $where = 'WHERE ';
@@ -168,6 +175,8 @@ class Globalinformation_model extends CI_Model{
             $lims = " LIMIT {$start},{$limit}";	
         }
 
+        $sorted = " order by ".(!empty($order) ? $order : 'em.ID DESC');
+        
         $string = "SELECT em.*, ps.NameEng AS ProdiNameEng, ps.DegreeEng as ProdiDegree, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName
 				   FROM db_employees.employees em
 				   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
@@ -175,7 +184,7 @@ class Globalinformation_model extends CI_Model{
 				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
 				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
 				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
-                   {$where} ORDER BY em.NIP ASC {$lims} ";
+                   {$where} {$sorted} {$lims} ";
         
         $value  = $this->db->query($string);
      	//var_dump($this->db->last_query());

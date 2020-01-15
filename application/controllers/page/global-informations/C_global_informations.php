@@ -10,11 +10,17 @@ class C_global_informations extends Globalclass {
     }
 
 
-    public function menu_global_informations($page){
-        $data['page'] = $page;
-        $content = $this->load->view('dashboard/global-informations/menu_global_informations',$data,true);
+    public function index(){
+    	$content = $this->load->view('dashboard/global-informations/index','',true);
         $this->template($content);
     }
+    
+    public function user_tabs_global_informations($page){
+        $data['page'] = $page;
+        $content = $this->load->view('dashboard/global-informations/user_tabs_global_informations',$data,true);
+        $this->template($content);
+    }
+
 
     /*STUDENTS*/
 
@@ -24,7 +30,7 @@ class C_global_informations extends Globalclass {
     	$data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
     	$data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
         $page = $this->load->view('dashboard/global-informations/students/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 
@@ -49,7 +55,10 @@ class C_global_informations extends Globalclass {
         }        
         if(!empty($data_arr['class_of'])){
         	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$data_arr['class_of']." ","filter"=>"AND",);    
-        }
+        }/*else{
+        	$getCurrentSemes = $this->General_model->fetchData("db_academic.semester",array("status"=>1))->row();
+        	$param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$getCurrentSemes->Year." ","filter"=>"AND",);    
+        }*/
         if(!empty($data_arr['study_program'])){
         	$param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$data_arr['study_program']." ","filter"=>"AND",);    
         }
@@ -82,9 +91,15 @@ class C_global_informations extends Globalclass {
         	}
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " NPM DESC";
+        }
+
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-    	$result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length']);
+    	$result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		//$detailStudent = $this->General_model->fetchData("ta_".$v->ClassOf.".students",array("NPM"=>$v->NPM))->row();
@@ -103,9 +118,12 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();
     		$nestedData[] = ($no++);
     		$nestedData[] = $studentBox;
+    		$nestedData[] = "<p class='text-left'>".(!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.", ":"").date("d F Y", strtotime($v->DateOfBirth))."</p>";
+    		$nestedData[] = "<p class='text-center'>".$v->religionName."</p>";
+			$nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
     		$nestedData[] = "<center>".$v->ClassOf."</center>";
     		$nestedData[] = $v->ProdiNameEng;
-    		$nestedData[] = $v->StatusStudent;
+    		$nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
     		$nestedData[] = $v->NPM;
     		$data[] = $nestedData;
     	}
@@ -141,10 +159,81 @@ class C_global_informations extends Globalclass {
 		            }
 		            $data['profilepic'] = $srcImg;
 	            }
-
         	}
         	$this->load->view('dashboard/global-informations/students/detail',$data);
         }else{show_404();}
+    }
+
+
+    public function fetchStudentScore(){
+    	$data = $this->input->post();
+    	$json = array();
+    	$key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($data['token'],$key);
+        if($data){
+        	
+	    	//$NPM = 21140010;
+	    	$transcript = $this->General_model->callStoredProcedure("call db_academic.fetchStudentTranscript(".$data_arr['NPM'].")")->result();
+	    	
+	    	if(!empty($transcript)){
+	    		$semesno = 1;$currTermSession = "";$currTermYear=0;$no=1;
+				$totalCredit=0;$totalGrade=0;$totalPoint=0;
+	    		//get courses by semester has been take
+	    		$termcode="";$termyear=0;
+	    		$coursesByTerm = array();
+				$termName = "";
+	    		foreach ($transcript as $v) {
+	    			if($currTermSession != $v->TermSession){
+	    				$explodeTerm = explode(" - ", $v->Term);
+	    				if(!empty($explodeTerm)){
+	    					$trmName = $explodeTerm[0];
+	    				}else{$trmName=$v->Term;}
+	    				$termName = "Semester ".$semesno;
+	    				$coursesByTerm[$termName] = array();
+	    				$coursesByTerm[$termName] = array("Semester"=>$semesno,"Session"=>$v->TermSession,"Term"=>$v->Term);
+	    				$semesno++;
+	    				$no=1;
+	    			}
+	    			$cno = $no;
+	    			$coursesByTerm[$termName]['courses'][] = $v;
+
+	    			$currTermSession = $v->TermSession;
+	    			$no++;
+	    		}
+
+	    		//calculate GPA
+	    		if(!empty($coursesByTerm)){
+	    			$totalIPS = 0;$IPK=0;$LastTerm="";
+	    			foreach ($coursesByTerm as $key => $value) {
+	    				$parent = $coursesByTerm[$key];
+	    				$LastTerm = $parent['Term'];
+	    				$totalCredit = 0;$totalGrade=0;$IPS=0;$totalPoint=0;
+	    				foreach ($parent['courses'] as $c) {
+							$Score = round($c->Score,2);
+							$GradeValue = round($c->GradeValue,2);
+							$Point = round($c->Point,2);
+						  	$totalCredit = $totalCredit + $c->Credit;
+						  	$totalGrade  = $totalGrade + $GradeValue;
+						  	$totalPoint  = $totalPoint + $Point;
+						  	$IPS  = round($totalPoint / $totalCredit,2);
+						}
+	    				$GPAS = array("TotalGrade"=>$totalGrade,"TotalCredit"=>$totalCredit,"TotalPoint"=>$totalPoint,"IPS"=>$IPS);
+	    				$coursesByTerm[$key]['CalculateSemes'] = $GPAS;
+						$totalIPS = $totalIPS + $IPS;
+						$totalSemester = count($coursesByTerm);
+						$IPK = $totalIPS / $totalSemester;
+	    			}
+					$coursesByTerm['GPA'] = array("IPS"=>round($totalIPS,2),"IPK"=>round($IPK,2),"LastSemester"=>$totalSemester,"LastTerm"=>$LastTerm);
+	    		}
+
+	    		$json = $coursesByTerm;
+	    	}
+
+    	}
+
+    	$response = $json;
+    	echo json_encode($response);
+
     }
 
     /*END STUDENTS*/
@@ -158,7 +247,7 @@ class C_global_informations extends Globalclass {
     	$data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
     	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $page = $this->load->view('dashboard/global-informations/lecturers/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 
@@ -219,11 +308,17 @@ class C_global_informations extends Globalclass {
 	    	$param[] = array("field"=>"em.StatusLecturerID","data"=>" ='-1') ","filter"=>"OR",);
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " em.ID DESC";
+        }
+
         $param[] = array("field"=>"em.PositionMain","data"=>" like'14.%' ","filter"=>"AND",);
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchLecturer($param)->result();
-    	$result = $this->Globalinformation_model->fetchLecturer($param,$reqdata['start'],$reqdata['length'])->result();
+    	$result = $this->Globalinformation_model->fetchLecturer($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		if(!empty($v->PositionMain)){
@@ -245,6 +340,10 @@ class C_global_informations extends Globalclass {
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
     		$nestedData[] = $lecturerBox;
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth : '').date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = $v->EmpReligion;
+    		$nestedData[] = (!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "");
+    		$nestedData[] = $v->EmpLevelDesc;
     		$nestedData[] = $position->Description;
     		$nestedData[] = $v->ProdiNameEng;
     		$nestedData[] = (!empty($v->StatusLecturerID) ? $v->EmpStatus : "Non Active");
@@ -263,6 +362,46 @@ class C_global_informations extends Globalclass {
     }
 
 
+    public function lecturersDetail(){
+    	$data = $this->input->post();
+    	$key = "UAP)(*";
+        $data_arr = (array) $this->jwt->decode($data['token'],$key);
+        if($data){
+        	$param[] = array("field"=>"em.ID","data"=>" =".$data_arr['ID']." ","filter"=>"AND");    
+        	$isExist = $this->Globalinformation_model->fetchLecturer($param)->row();
+        	if(!empty($isExist)){
+        		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
+        		$url_image = './uploads/employees/'.$isExist->Photo;
+	    		$srcImg =  base_url('images/icon/userfalse.png');
+	            if($isExist->Photo != '' && $isExist->Photo != null){
+	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
+	            }
+	            $data['profilePIC'] = $srcImg;
+        		$data['detail'] = $isExist;
+        		$splitMPosition = explode(".", $isExist->PositionMain);
+    			$data['divisionMain'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitMPosition[0]))->row();
+    			$data['positionMain'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitMPosition[1]))->row();
+    			if(!empty($isExist->PositionOther1)){
+	    			$splitOTHPosition1 = explode(".", $isExist->PositionOther1);
+	    			$data['othPositionDiv1'] = $this->General_model->fetchData("db_employees.division",array("ID"=>(!empty($splitOTHPosition1[0]) ? $splitOTHPosition1[0] : null)))->row();
+	    			$data['othPosition1'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition1[1]))->row();
+    			}
+    			if(!empty($isExist->PositionOther2)){
+	    			$splitOTHPosition2 = explode(".", $isExist->PositionOther2);
+	    			$data['othPositionDiv2'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition2[0]))->row();
+	    			$data['othPosition2'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition2[1]))->row();
+    			}
+    			if(!empty($isExist->PositionOther3)){
+	    			$splitOTHPosition3 = explode(".", $isExist->PositionOther3);
+	    			$data['othPositionDiv3'] = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitOTHPosition3[0]))->row();
+	    			$data['othPosition3'] = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitOTHPosition3[1]))->row();
+    			}
+        	}
+        	$this->load->view('dashboard/global-informations/lecturers/detail',$data);
+        }else{show_404();}
+    }
+
+
     /*END LECTURER*/
 
 
@@ -274,7 +413,7 @@ class C_global_informations extends Globalclass {
         $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
     	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
         $page = $this->load->view('dashboard/global-informations/employees/index',$data,true);
-        $this->menu_global_informations($page);
+        $this->user_tabs_global_informations($page);
     }
 
 
@@ -310,9 +449,10 @@ class C_global_informations extends Globalclass {
         if(!empty($data_arr['status'])){
     		$param[] = array("field"=>"em.StatusEmployeeID","data"=>" =".$data_arr['status']." ","filter"=>"AND",);            		
         }else{
-        	$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" = '-1' ","filter"=>"AND",);    
+        	$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" != '-2') ","filter"=>"AND",);    
+        	/*$param[] = array("field"=>"(em.StatusEmployeeID","data"=>" = '-1' ","filter"=>"AND",);    
 	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '1' ","filter"=>"OR",);    
-	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '2') ","filter"=>"OR",);
+	    	$param[] = array("field"=>"em.StatusEmployeeID","data"=>" = '2') ","filter"=>"OR",);*/
         }
 
         if(!empty($data_arr['religion'])){
@@ -334,10 +474,16 @@ class C_global_informations extends Globalclass {
         	}
         }
 
+        if(!empty($data_arr['sorted'])){
+            $orderBy = $data_arr['sorted'];
+        }else{
+            $orderBy = " em.ID DESC";
+        }
+
 
     	$data = array();
     	$totalData = $this->Globalinformation_model->fetchEmployee($param)->result();
-    	$result = $this->Globalinformation_model->fetchEmployee($param,$reqdata['start'],$reqdata['length'])->result();
+    	$result = $this->Globalinformation_model->fetchEmployee($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
@@ -352,7 +498,7 @@ class C_global_informations extends Globalclass {
                 $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$v->Photo) : base_url('images/icon/userfalse.png') ;
             }
 
-    		$lecturerBox = '<div class="detail-user" data-user="'.$v->ID.'"> 
+    		$empBox = '<div class="detail-user" data-user="'.$v->ID.'"> 
     						<img class="std-img img-rounded" src="'.$srcImg.'">
     						<p class="nip">'.$v->NIP.'</p>
     						<p class="name">'.$v->Name.'</p>
@@ -360,7 +506,11 @@ class C_global_informations extends Globalclass {
     					   </div>';
     		$nestedData = array();    		
     		$nestedData[] = ($no++);
-    		$nestedData[] = $lecturerBox;
+    		$nestedData[] = $empBox;
+    		$nestedData[] = (!empty($v->PlaceOfBirth) ?$v->PlaceOfBirth.', ':'' ).date("d F Y",strtotime($v->DateOfBirth));
+    		$nestedData[] = "<center>".$v->EmpReligion.'</center>';
+    		$nestedData[] = "<center>".(!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "").'</center>';
+    		$nestedData[] = $v->EmpLevelEduName;
     		$nestedData[] = "<b>".$division->Division."</b><br>".$position->Description;
     		$nestedData[] = (!empty($v->StatusEmployeeID) ? $v->EmpStatus : "Non Active");
     		$data[] = $nestedData;

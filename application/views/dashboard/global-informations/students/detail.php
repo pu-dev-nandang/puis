@@ -28,7 +28,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<div class="row" id="biodata">
-						<div class="col-sm-2">
+						<div class="col-sm-3 col-md-3">
 							<div class="left">
 								<div class="info">
 									<img class="profile-pic" src="<?=$profilepic?>">
@@ -60,7 +60,7 @@
 								<div class="middle"></div>
 							</div>	
 						</div>
-						<div class="col-sm-10">
+						<div class="col-sm-9 col-md-9">
 							<div class="right">
 								<div class="info">
 									<h2 class="name"><span class="nim"><?=$detail->NPM?></span>-<?=$detail->Name?></h2>
@@ -113,9 +113,12 @@
 														<p class="col-sm-9"><?=$detail->AddressFather?></p>
 													</div>
 													<div class="row">
+														<label class="col-sm-3">Email</label>
+														<p class="col-sm-9"><?=(!empty($detail->EmailFather) ? $detail->EmailFather : '-')?></p>
+													</div>													
+													<div class="row">
 														<label class="col-sm-3">Contact</label>
-														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=(!empty($detail->PhoneFather) ? (substr($detail->PhoneFather, 0, -3) . 'xxx') : '-')?>
-														<?=(!empty($detail->EmailFather) ? "<br><i class='fa fa-envelope'></i> ".$detail->EmailFather:"")?></p>
+														<p class="col-sm-9"><?=(!empty($detail->PhoneFather) ? (substr($detail->PhoneFather, 0, -3) . 'xxx') : '-')?>
 													</div>
 												</div>
 
@@ -138,10 +141,14 @@
 														<p class="col-sm-9"><?=$detail->AddressMother?></p>
 													</div>
 													<div class="row">
-														<label class="col-sm-3">Contact</label>
-														<p class="col-sm-9"><i class="fa fa-phone"></i> <?=(!empty($detail->PhoneMother) ? (substr($detail->PhoneMother, 0, -3) . 'xxx') : "-")?>
-														<?=(!empty($detail->EmailMother) ? "<br><i class='fa fa-envelope'></i> ".$detail->EmailMother:"")?></p>
+														<label class="col-sm-3">Email</label>
+														<p class="col-sm-9"><?=(!empty($detail->EmailMother) ? $detail->EmailMother:'-')?></p>
 													</div>
+
+													<div class="row">
+														<label class="col-sm-3">Contact</label>
+														<p class="col-sm-9"><?=(!empty($detail->PhoneMother) ? (substr($detail->PhoneMother, 0, -3) . 'xxx') : "-")?>
+													</div>													
 												</div>
 											</div>
 										</div>
@@ -154,7 +161,7 @@
 											<div class="content">
 												<div class="row">
 													<label class="col-sm-3">Program</label>
-													<p class="col-sm-4"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
+													<p class="col-sm-9"><?=$detail->ProdiEdu."-".$detail->ProdiDegree?></p>
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Study Program</label>
@@ -185,11 +192,25 @@
 													<label class="col-sm-3">Graduation Date</label>
 													<p class="col-sm-4"><?=date("d F Y",strtotime($detail->GraduationDate))?></p>
 												</div>
+												<?php }else{ ?>
+												<div class="row">
+													<label class="col-sm-3">Current Semester</label>
+													<p class="col-sm-4 fetch-score semes"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+												</div>
 												<?php } ?>
+												<div class="row">
+													<label class="col-sm-3">IPS</label>
+													<p class="col-sm-4 fetch-score ips"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+												</div>
+												<div class="row">
+													<label class="col-sm-3">IPK</label>
+													<p class="col-sm-4 fetch-score ipk"><i class="fa fa-circle-o-notch fa-spin"></i></p>
+												</div>
+
 												<?php if(!empty($detail->MentorNIP)){ ?>
 												<div class="row">
 													<label class="col-sm-3">Mentor</label>
-													<p class="col-sm-9"><?='<i class="fa fa-id-card"></i> '.$detail->MentorNIP.'<br><i class="fa fa-user"></i> '.$detail->Mentor.'<br><i class="fa fa-envelope"></i> '.$detail->MentorEmailPU?></p>
+													<p class="col-sm-9"><?='<i class="fa fa-id-card"></i> '.$detail->MentorNIP.'<br><i class="fa fa-user"></i> '.$detail->Mentor.'<br><i class="fa fa-envelope"></i> '.(!empty($detail->MentorEmailPU) ? $detail->MentorEmailPU:'-')?></p>
 												</div>
 												<?php } ?>
 											</div>
@@ -202,6 +223,38 @@
 					</div>
 				</div>
 			</div>
+
+			<script type="text/javascript">
+			$(document).ready(function(){
+				function fetchScoreStudent() {
+					var NPM = "<?=$detail->NPM?>";
+					var data = {
+		              NPM : NPM,
+		          	};
+		          	var token = jwt_encode(data,'UAP)(*');
+					$.ajax({
+			            type : 'POST',
+			            url : base_url_js+"global-informations/fetchStudentScore",
+			            data : {token:token},
+			            dataType : 'json',
+			            error : function(jqXHR){
+			                $("body #GlobalModal .modal-header").html("<h1>Error notification</h1>");
+			                $("body #GlobalModal .modal-body").html(jqXHR.responseText);
+			                $("body #GlobalModal").modal("show");
+			            },success : function(response){
+			            	if(jQuery.isEmptyObject(response)){
+			            		$(".fetch-score").text(0);
+			            	}else{
+				            	$(".fetch-score.semes").text(response.GPA.LastSemester+" Term "+response.GPA.LastTerm);
+				            	$(".fetch-score.ips").text(response.GPA.IPS);
+				            	$(".fetch-score.ipk").text(response.GPA.IPK);
+			            	}
+			            }
+			        });
+				}
+				fetchScoreStudent();
+			});
+			</script>
 			
 		<?php }else{echo "<h1 class='text-center'>Data is not founded.</h1>";} ?>
 		</div>

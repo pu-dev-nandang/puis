@@ -174,8 +174,14 @@ class C_database extends Globalclass {
 
     public function employees()
     {
-
-        $content = $this->load->view('page/database/employees','',true);
+        /*ADDED BY FEBRI @ JAN 2020*/
+        $data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","IDStatus != '-2'","IDStatus","asc")->result();
+        $data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+        $data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+        $data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+        $content = $this->load->view('page/database/employees',$data,true);
+        /*END ADDED BY FEBRI @ JAN 2020*/
         $this->temp($content);
     }
 
@@ -338,7 +344,13 @@ class C_database extends Globalclass {
     // === Students ===
     public function students()
     {
-        $content = $this->load->view('page/database/students','',true);
+        /*UPDATED BY FEBRI @ JAN 2020*/
+        $data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
+        $data['statusstd'] = $this->General_model->fetchData("db_academic.status_student",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
+        $data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
+        $content = $this->load->view('page/database/students',$data,true);
+        /*END UPDATED BY FEBRI @ JAN 2020*/
         $this->temp($content);
     }
 

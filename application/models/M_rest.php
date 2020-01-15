@@ -1452,7 +1452,6 @@ class M_rest extends CI_Model {
             }
 
         }
-
         return $res;
     }
 
@@ -1518,21 +1517,17 @@ class M_rest extends CI_Model {
                                 array_push($arrTranscriptID,$d['MKID']);
                                 array_push($transcript,$arrTr);
                             }
-
                         }
                     }
-
                 }
-
-
             }
 
 
 
             // Cek semester antara
             $dataSemesterAntara = $this->db->query('SELECT say.SASemesterID, say.UpdateTranscript FROM db_academic.semester_antara sa 
-                                                                              LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
-                                                                              WHERE sa.SemesterID = "'.$data[$i]['ID'].'" ')->result_array();
+                                                  LEFT JOIN db_academic.sa_academic_years say ON (say.SASemesterID = sa.ID)
+                                                  WHERE sa.SemesterID = "'.$data[$i]['ID'].'" ')->result_array();
 
 
             if(count($dataSemesterAntara)>0){
@@ -1542,10 +1537,10 @@ class M_rest extends CI_Model {
                 if($dateNow>=$dt['UpdateTranscript']){
                     // Cek apakah ada npmnya atau tidak
                     $dataStd = $this->db->query('SELECT ssd.*,mk.MKCode, mk.Name, mk.NameEng, cd.MKType FROM db_academic.sa_student_details ssd 
-                                                            LEFT JOIN db_academic.sa_student ss ON (ss.ID = ssd.IDSAStudent)
-                                                            LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
-                                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
-                                                            WHERE ss.SASemesterID = "'.$dt['SASemesterID'].'" AND ss.NPM = "'.$NPM.'" ')
+                                                LEFT JOIN db_academic.sa_student ss ON (ss.ID = ssd.IDSAStudent)
+                                                LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = ssd.CDID)
+                                                LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
+                                                WHERE ss.SASemesterID = "'.$dt['SASemesterID'].'" AND ss.NPM = "'.$NPM.'" ')
                         ->result_array();
 
 
