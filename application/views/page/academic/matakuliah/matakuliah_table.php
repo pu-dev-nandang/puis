@@ -17,11 +17,11 @@
         <tbody>
         <?php $no=1; foreach ($data_mk as $item_mk) {
 
-            $TypeMK = '<div><span class="label label-default">Mandiri</span></div>';
+            $TypeMK = '<div><span class="label label-default">Prodi</span></div>';
             if($item_mk['TypeMK']=='2'){
-                $TypeMK = '<div><span class="label label-primary"><b>MKDU</b></span></div>';
+                $TypeMK = '<div><span class="label label-primary"><b>Wajib Nasional</b></span></div>';
             } else if($item_mk['TypeMK']=='3'){
-                $TypeMK = '<div><span class="label label-warning"><b>MKU</b></span></div>';
+                $TypeMK = '<div><span class="label label-warning"><b>Wajib Univ</b></span></div>';
             }
 
             $TypeMKFilter = 'Mandiri';
@@ -122,5 +122,3 @@
         });
     });
 </script>
-
-
