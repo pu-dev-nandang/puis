@@ -43,7 +43,7 @@
                                 <div class="col-sm-3">
                                     <div class="form-group">
                                         <label>Study Program</label>                                
-                                        <select class="form-control" name="ProdiID">
+                                        <select class="form-control" name="ProdiID" id="prodiID">
                                             <option value="">-Choose one-</option>
                                             <?php foreach ($studyprogram as $s) { 
                                             echo '<option value="'.$s->ID.'">'.$s->Name.'</option>';
@@ -51,14 +51,12 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <div class="form-group">
-                                        <label>Birthdate</label>
-                                        <div class="input-group">
-                                            <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">   
-                                            <div class="input-group-addon">-</div>
-                                            <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
-                                        </div>
+                                        <label>Group Student</label>  
+                                        <select class="form-control" name="GroupProdiID" id="filterGroupProdi">
+                                            <option value="">-Choose one-</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -126,6 +124,17 @@
                                                         <input type="checkbox" name="gender[]" value="L"> Male
                                                     </label>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label>Birthdate</label>
+                                            <div class="input-group">
+                                                <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date">   
+                                                <div class="input-group-addon">-</div>
+                                                <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
                                             </div>
                                         </div>
                                     </div>
@@ -315,7 +324,7 @@
     }
 
     $(document).ready(function(){
-        fetchingData();
+        //fetchingData();
 
         $("#birthdate_start,#birthdate_end,#graduation_start,#graduation_end").datepicker({
             dateFormat: 'dd-mm-yy',
@@ -404,12 +413,19 @@
           $('#fetch-data-tables #table-list-data').DataTable().destroy();
           fetchingData(isappv,value,order);
         });
+
         $("#sorting-data").on("change","select[name=order_by]",function(){
           var order = $("#sorting-data select[name=sort_by]").val();
           var value = $(this).val();
           var isappv = ($("#student-data .btn-approve").hasClass("selected")) ? true:false;
           $('#fetch-data-tables #table-list-data').DataTable().destroy();
           fetchingData(isappv,order,value);
+        });
+
+        $("#prodiID").change(function(){
+            var value = $(this).val();
+            $("#filterGroupProdi").html("<option value=''>-Choose one-</option>");
+            load_SO_ProdiGroup(value,'#filterGroupProdi','');
         });
 
     });
