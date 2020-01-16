@@ -723,7 +723,25 @@ class M_doc extends CI_Model {
     	$rs = ['status' => 0,'callback' => ''];
     	$DocumentName = $Input['DocumentName'];
     	$DocumentAlias = $Input['DocumentAlias'];
-    	$Config = json_encode($Input['settingTemplate']);
+    	$Config = $Input['settingTemplate'];
+        
+        /* Set Default array GET */
+        // $GET = $Config['GET'];
+        // if (array_key_exists('EMP', $GET)) {
+        //     $EMP = $GET['EMP'];
+        //     for ($i=0; $i < count($EMP); $i++) { 
+        //        $Config['GET']['EMP'][$i]['user'] = []; 
+        //     }
+        // }
+
+        // if (array_key_exists('MHS', $GET)) {
+        //     $MHS = $GET['MHS'];
+        //     for ($i=0; $i < count($MHS); $i++) { 
+        //        $Config['GET']['MHS'][$i]['user'] = []; 
+        //     }
+        // }
+        /* Set Default array GET */
+        $Config = json_encode($Config);
     	// upload file template
     	$PathTemplate = $this->upload_file_template($DocumentName);
     	$dataSave = [
@@ -733,8 +751,23 @@ class M_doc extends CI_Model {
     		'PathTemplate' => $PathTemplate,
     		'UpdatedBy' => $this->session->userdata('NIP'),
     		'UpdatedAt' => date('Y-m-d H:i:s'),
+            'DepartmentCreated' => $this->session->userdata('DepartmentIDDocument'),
     	];
     	$this->db->insert('db_generatordoc.document',$dataSave);
+        $ID_document = $this->db->insert_id();
+
+        // save department access
+        $DepartmentArr= $Input['DepartmentArr'];
+        for ($i=0; $i < count($DepartmentArr); $i++) { 
+            $Department = $DepartmentArr[$i]['Code'];
+            $dataSave = [
+                'ID_document' => $ID_document,
+                'Department' => $Department,
+            ];
+
+            $this->db->insert('db_generatordoc.document_access_department',$dataSave);
+        }
+
     	$rs['status'] = 1;
     	return $rs;
     }
@@ -756,12 +789,10 @@ class M_doc extends CI_Model {
        }
 
        $WhereOrAnd = ($AddWhere == '') ? ' Where' : ' And';
-       $AddWhere .= $WhereOrAnd.' c.Department = "'.$DepartmentID.'"';
+       $AddWhere .= $WhereOrAnd.' a.DepartmentCreated = "'.$DepartmentID.'"';
 
        $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
-              join db_generatordoc.document_access_department as c on c.ID_document = a.ID
        		'.$AddWhere.'
-            group by a.ID
        ';
        $query = $this->db->query($sql,array())->result_array();
        $data = array();
@@ -774,6 +805,7 @@ class M_doc extends CI_Model {
            $nestedData[] = base_url().'uploads/document-generator/template/'.$row['PathTemplate'];
            $nestedData[] = '';
            $nestedData[] = $row['ID'];
+           $row['document_access_department'] = $this->m_master->caribasedprimary('db_generatordoc.document_access_department','ID_document',$row['ID']);
            $token = $this->jwt->encode($row,"UAP)(*");
            $nestedData[] = $token;
            $data[] = $nestedData;
@@ -787,10 +819,33 @@ class M_doc extends CI_Model {
        return $rs;
     }
 
+    public function save_edit_department_access($Input){
+        $rs = ['status' => 0,'callback' => ''];
+        $ID_document = $Input['ID'];
+        $this->db->where('ID_document',$ID_document);
+        $this->db->delete('db_generatordoc.document_access_department');
+
+        $DepartmentArr= $Input['DepartmentArr'];
+        for ($i=0; $i < count($DepartmentArr); $i++) { 
+            $Department = $DepartmentArr[$i]['Code'];
+            $dataSave = [
+                'ID_document' => $ID_document,
+                'Department' => $Department,
+            ];
+
+            $this->db->insert('db_generatordoc.document_access_department',$dataSave);
+        }
+
+        $rs['status'] = 1;
+        return $rs;
+       
+    }
+
     public function preview_template_table($dataToken){
     	$this->load->model('document-generator/m_set');
     	$this->load->model('document-generator/m_user');
-    	$this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_grab');
+    	$this->load->model('document-generator/m_get');
     	$rs = [];
     	 // print_r($dataToken);die();
     	$FileTemplate    = './uploads/document-generator/template/'.$dataToken['PathTemplate'];
@@ -862,6 +917,18 @@ class M_doc extends CI_Model {
     	        				continue;
     	        			}
     	        			break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
     	        	}
 
     	        	$Filtering[] = $ex[0];
@@ -891,6 +958,7 @@ class M_doc extends CI_Model {
         $this->load->model('document-generator/m_set');
         $this->load->model('document-generator/m_user');
         $this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_get');
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
@@ -963,6 +1031,18 @@ class M_doc extends CI_Model {
                             {
                                 continue;
                             }
+                            break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
                             break;
                     }
 
@@ -1180,6 +1260,15 @@ class M_doc extends CI_Model {
                                     
                                 }
                                 break;
+                            case $this->KeyGET:
+                                if ($this->KeyGET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    $arrKomponen = $matches[1];
+
+                                    $this->__SETWriteGET($TemplateProcessor,$arrKomponen,$obj);
+                                }
+                                break;
                             case $this->KeyTABLE:
                                 if ($this->KeyTABLE == $keyRS) {
                                         if (!$BoolTbl) {
@@ -1219,6 +1308,7 @@ class M_doc extends CI_Model {
         $this->load->model('document-generator/m_set');
         $this->load->model('document-generator/m_user');
         $this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_get');
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
@@ -1293,6 +1383,18 @@ class M_doc extends CI_Model {
                                 continue;
                             }
                             break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
                     }
 
                     $Filtering[] = $ex[0];
@@ -1302,6 +1404,10 @@ class M_doc extends CI_Model {
         
         if ( array_key_exists('TBL', $rs) && array_key_exists('KEY', $rs['TBL'])  ) {
             $dataSave = $this->dataSaveForTable($dataSave,$rs['TBL']);
+        }
+
+        if (array_key_exists('GET', $rs) &&  ( array_key_exists('EMP', $rs['GET']) || array_key_exists('MHS', $rs['GET']) )  ) {
+            $dataSave = $this->dataSaveForGET($dataSave,$rs['GET']);
         }
 
         // print_r($dataSave);die();
@@ -1324,6 +1430,35 @@ class M_doc extends CI_Model {
         return 1;
 
     }
+
+    private function dataSaveForGET($dataSave,$dt){
+        if (array_key_exists('InputJson', $dataSave)) {
+            $dataSave['InputJson'] = json_decode($dataSave['InputJson'],true);
+        }
+        else
+        {
+            $dataSave['InputJson'] = [];
+        }
+        $arr_rs = [];
+        $arr_rs['GET'] = [];
+        foreach ($dt as $key => $value) {
+            $arr = $dt[$key];
+            for ($i=0; $i < count($arr); $i++) { 
+                if ($key == 'EMP') {
+                    $arr_rs['GET'][$key][] = $arr[$i]['user'];
+                }
+
+                if ($key == 'MHS') {
+                   $arr_rs['GET'][$key][] = $arr[$i]['user'];
+                }
+            }
+        }
+
+        $dataSave['InputJson'] = $dataSave['InputJson'] + $arr_rs;
+        // print_r($dataSave);die();
+        $dataSave['InputJson'] = json_encode($dataSave['InputJson']);
+        return $dataSave;
+    } 
 
     private function dataSaveForTable($dataSave,$dt){
         $ID_api = $dt['API']['Choose'];
@@ -1425,6 +1560,15 @@ class M_doc extends CI_Model {
                                         }
                                     }
                                     
+                                }
+                                break;
+                            case $this->KeyGET:
+                                if ($this->KeyGET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    $arrKomponen = $matches[1];
+
+                                    $this->__SETWriteGET($TemplateProcessor,$arrKomponen,$obj);
                                 }
                                 break;
                             case $this->KeyTABLE:
@@ -1530,6 +1674,7 @@ class M_doc extends CI_Model {
 
     public function LoadTablebyUserRequest($dataToken){
         $NIP = $this->session->userdata('NIP');
+        $DepartmentID = $this->session->userdata('DepartmentIDDocument');
         $AddWhere = '';
         $opFilteringStatus = $dataToken['opFilteringStatus'];
         $opFilteringData = $dataToken['opFilteringData'];
@@ -1549,6 +1694,9 @@ class M_doc extends CI_Model {
             $AddWhere .= $WhereOrAnd.' a.ID_document ='.$IDMasterSurat;
         }
 
+        $WhereOrAnd = ($AddWhere == '') ? ' Where ' : ' And ';
+        $AddWhere .= $WhereOrAnd.' g.Department ="'.$DepartmentID.'"';
+
         $sql = 'select a.NoSuratFull,b.DocumentName,a.UserNIP,c.Name as NameEMPRequest,a.DateRequest,a.Approve1,a.Approve2,a.Approve3,a.Status,
                 a.Input1,a.Input2,a.Input3,a.Input4,a.Input5,a.Input6,a.Input7,a.Input8,a.Input9,a.Input10,
                 a.Approve1Status,a.Approve1At,a.Approve2Status,a.Approve2At,a.Approve3Status,a.Approve3At,a.TotApproval,
@@ -1559,7 +1707,9 @@ class M_doc extends CI_Model {
                 left join db_employees.employees as d on d.NIP = a.Approve1
                 left join db_employees.employees as e on e.NIP = a.Approve2
                 left join db_employees.employees as f on f.NIP = a.Approve3
+                join db_generatordoc.document_access_department as g on g.ID_document = b.ID
                 '.$AddWhere.'
+                group by a.ID
                 order by a.ID asc
                 ';
         $query = $this->db->query($sql,array())->result_array();
@@ -1624,6 +1774,7 @@ class M_doc extends CI_Model {
         $this->load->model('document-generator/m_set');
         $this->load->model('document-generator/m_user');
         $this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_get');
         $rs = [];
         $ID = $dataToken['ID'];
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.document','ID',$ID);
@@ -1707,6 +1858,18 @@ class M_doc extends CI_Model {
                                 continue;
                             }
                             break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
                     }
 
                     $Filtering[] = $ex[0];
@@ -1716,6 +1879,10 @@ class M_doc extends CI_Model {
 
         if ( array_key_exists('TBL', $rs) && array_key_exists('KEY', $rs['TBL'])  ) {
             $dataSave = $this->dataSaveForTable($dataSave,$rs['TBL']);
+        }
+
+        if (array_key_exists('GET', $rs) &&  ( array_key_exists('EMP', $rs['GET']) || array_key_exists('MHS', $rs['GET']) )  ) {
+            $dataSave = $this->dataSaveForGET($dataSave,$rs['GET']);
         }
 
         $dataSave['UpdatedBy'] = $this->session->userdata('NIP');
@@ -2233,6 +2400,48 @@ class M_doc extends CI_Model {
 
         // die();
 
+    }
+
+    public function LoadMasterSuratAccess($dataToken=[]){
+        $rs = [];
+        $DepartmentID = $this->session->userdata('DepartmentIDDocument');
+        $AddWhere = '';
+        if (array_key_exists('Active', $dataToken)) {
+            $Active = $dataToken['Active'];
+            $AddWhere = ' where a.Active = "'.$Active.'"';
+        }
+
+        $WhereOrAnd = ($AddWhere == '') ? ' Where' : ' And';
+        $AddWhere .= $WhereOrAnd.' c.Department = "'.$DepartmentID.'"';
+
+        $sql = 'select a.*,b.Name from db_generatordoc.document as a join db_employees.employees as b on a.UpdatedBy = b.NIP
+                join db_generatordoc.document_access_department as c on c.ID_document = a.ID
+                '.$AddWhere.'
+                group by a.ID
+        ';
+        $query = $this->db->query($sql,array())->result_array();
+        $data = array();
+        for ($i=0; $i < count($query); $i++) {
+            $nestedData = array();
+            $row = $query[$i]; 
+            $nestedData[] = $i+1;
+            $nestedData[] = $row['DocumentName'];
+            $nestedData[] = $row['DocumentAlias'];
+            $nestedData[] = base_url().'uploads/document-generator/template/'.$row['PathTemplate'];
+            $nestedData[] = '';
+            $nestedData[] = $row['ID'];
+            $row['document_access_department'] = $this->m_master->caribasedprimary('db_generatordoc.document_access_department','ID_document',$row['ID']);
+            $token = $this->jwt->encode($row,"UAP)(*");
+            $nestedData[] = $token;
+            $data[] = $nestedData;
+        }
+        $rs = array(
+            "draw"            => intval( 0 ),
+            "recordsTotal"    => intval(count($query)),
+            "recordsFiltered" => intval( count($query) ),
+            "data"            => $data
+        );
+        return $rs;
     }
 
     

@@ -2790,6 +2790,8 @@ class C_rest3 extends CI_Controller {
 
     }
 
+   
+
     public function LoadStudents_server_side(){
       $this->load->model("global-informations/Globalinformation_model");
       $requestData = $_REQUEST;
@@ -2801,7 +2803,7 @@ class C_rest3 extends CI_Controller {
           $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
       }
       
-      $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
+      $totalData = $this->Globalinformation_model->fetchTotalDataStudent($param)->Total;
       $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$requestData['start'],$requestData['length'],'');
       $No = (int)$requestData['start'] + 1;
       $data = array();
@@ -2822,8 +2824,8 @@ class C_rest3 extends CI_Controller {
 
       $json_data = array(
           "draw"            => intval( $requestData['draw'] ),
-          "recordsTotal"    => intval(count($totalData) ),
-          "recordsFiltered" => intval( count($totalData) ),
+          "recordsTotal"    => intval($totalData ),
+          "recordsFiltered" => intval( $totalData ),
           "data"            => $data,
       );
 

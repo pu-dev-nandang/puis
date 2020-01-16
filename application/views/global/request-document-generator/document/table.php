@@ -277,8 +277,31 @@
 					   return $(this).val() == InputJson[key]; 
 					}).prop("selected", true);
 				}
+
+				// for GET
+				if (InputJson['GET'] !== 'undefined') {
+					for(key in InputJson['GET']){
+						for (var i = 0; i < InputJson['GET'][key].length; i++) {
+							var get_token = jwt_encode(InputJson['GET'][key][i], "UAP)(*");
+							if (key == 'EMP') {
+								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['NIP'] );
+								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['Name'] );
+							}
+							else
+							{
+								$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').val( InputJson['GET'][key][i]['NPM'] );
+								$('.GET[keyindex="'+i+'"]').find('label[for="Name"]').html( InputJson['GET'][key][i]['Name'] );
+							}
+
+							$('.GET[keyindex="'+i+'"]').find('.Input[key="GET"][name="'+key+'"]').attr( 'datatoken',get_token );
+							
+						}
+					}
+				}
 				
 			}
+
+			
 		},
 
 		ApproveOrReject : function(dataID,dt,approval_number,decision,Note=''){

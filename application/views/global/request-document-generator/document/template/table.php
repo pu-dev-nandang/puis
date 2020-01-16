@@ -26,6 +26,7 @@
     </div>
 </div>
 <script type="text/javascript">
+    var S_Table_example__;
     var App_table_document = {
         LoadTable : function(){
            var recordTable = $('#TblDocument').DataTable({
@@ -77,7 +78,7 @@
                        'orderable': false,
                        'className': 'dt-body-center',
                        'render': function (data, type, full, meta){
-                           var btnAction = '<a href="javascript:void(0);" class="btn btn-danger btnRemoveDocument" data-id="'+full[5]+'"><i class="fa fa fa-trash"></i> </a>';
+                           var btnAction = '<a href="javascript:void(0);" class="btn btn-danger btnRemoveDocument" data-id="'+full[5]+'"><i class="fa fa fa-trash"></i> </a> <a href="javascript:void(0);" class="btn btn-primary btnEditDepartment" data-id="'+full[5]+'" data="'+full[6]+'">Access Department </a>';
                            return btnAction;
                        }
                     },
@@ -150,6 +151,118 @@
                 })
             }
 
+        },
+
+        EditDepartment : function(selector){
+            var html = '';
+            var ID = selector.attr('data-id');
+            var dataToken = jwt_decode(selector.attr('data'));
+            // console.log(dataToken);return;
+            html ='<div class = "row">'+
+                    '<div class = "col-md-12">'+
+                        '<table id="docEdit" class="table table-bordered display select" cellspacing="0" width="100%">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>Select &nbsp <input type="checkbox" name="select_all" value="1" id="docEdit-select-all"></th>'+
+                     '<th>Code</th>'+
+                     '<th>Departement</th>'+
+                  '</tr>'+
+               '</thead>'+
+          '</table></div></div>';
+
+            $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Department'+'</h4>');
+            $('#GlobalModalLarge .modal-body').html(html);
+            $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
+                '<button type="button" id="ModalbtnSaveFormDepartment" class="btn btn-success" data-id = "'+ID+'">Save</button>');
+            $('#GlobalModalLarge').modal({
+                'show' : true,
+                'backdrop' : 'static'
+            });
+            var url = base_url_js+'api/__getAllDepartementPU';
+            $.get( url, function( dt ) {
+                var table = $('#docEdit').DataTable({
+                      "processing": true,
+                      "serverSide": false,
+                      "data" : dt,
+                      'columnDefs': [
+                          {
+                             'targets': 0,
+                             'searchable': false,
+                             // 'orderable': false,
+                             'className': 'dt-body-center',
+                             'render': function (data, type, full, meta){
+                                 var checked = '';
+                                 var document_access_department = dataToken['document_access_department'];
+                                 for (var i = 0; i < document_access_department.length; i++) {
+                                   if (full.Code == document_access_department[i].Department) {
+                                       checked = 'checked';
+                                       break;
+                                   }
+                                 }
+                                 return '<input type="checkbox" name="id[]" value="' + full.Code + '" dt = "'+full.Abbr+'" '+checked+'><div class ="hide">'+checked+'</div>';
+                             }
+                          },
+                          {
+                             'targets': 1,
+                             'render': function (data, type, full, meta){
+                                 return full.Abbr;
+                             }
+                          },
+                          {
+                             'targets': 2,
+                             'render': function (data, type, full, meta){
+                                 return full.Name2;
+                             }
+                          },
+                      ],
+                      'createdRow': function( row, data, dataIndex ) {
+                            // console.log(data);
+                      },
+                      'order': [[0, 'Desc']]
+                });
+
+                S_Table_example__ = table;
+            });
+        },
+
+        SaveEditDepartment : function(selector){
+          var DepartmentArr = [];
+          var ID = selector.attr('data-id');
+          S_Table_example__.$('input[type="checkbox"]:checked').each(function(){
+            var v = $(this).val();
+            var n = $(this).attr('dt');
+            var temp = {
+              Code : v,
+              Name : n,
+            };
+
+            DepartmentArr.push(temp);
+          }); // exit each function
+
+
+          var data = {
+              DepartmentArr : DepartmentArr,
+              ID : ID,
+          };
+          
+          var token = jwt_encode(data,'UAP)(*');
+          loading_button2(selector);
+          var url = base_url_js+"document-generator-action/__save_edit_department_access";
+          AjaxSubmitTemplate(url,token).then(function(response){
+              if (response.status == 1) {
+                 toastr.success('Saved'); 
+                 location.reload();
+              }
+              else
+              {
+                  toastr.error('Something error,please try again');
+                  end_loading_button2(selector,'Save');
+              }
+          }).fail(function(response){
+             toastr.error('Connection error,please try again');
+             end_loading_button2(selector,'Save');
+          })
+
         },  
 
     };
@@ -167,5 +280,23 @@
        var itsme = $(this);
        App_table_document.RemoveDocument(itsme);
     })
+
+    $(document).off('click', '.btnEditDepartment').on('click', '.btnEditDepartment',function(e) {
+       var itsme = $(this);
+       App_table_document.EditDepartment(itsme);
+    })
+
+    $(document).off('click', '#ModalbtnSaveFormDepartment').on('click', '#ModalbtnSaveFormDepartment',function(e) {
+       var itsme = $(this);
+       App_table_document.SaveEditDepartment(itsme);
+    })
+
+    // Handle click on "Select all" control
+    $(document).off('click', '#docEdit-select-all').on('click', '#docEdit-select-all',function(e) {
+       // Get all rows with search applied
+       var rows = S_Table_example__.rows({ 'search': 'applied' }).nodes();
+       // Check/uncheck checkboxes for all rows in the table
+       $('input[type="checkbox"]', rows).prop('checked', this.checked);
+    });
     
 </script>

@@ -913,12 +913,26 @@
             if (typeof settingTemplate !== 'undefined') {
                 var ArrUploadFilesSelector = [];
                 var url = base_url_js+"document-generator-action/__save_template";
-                // console.log(settingTemplate);return;
+                
+                var DepartmentArr = [];
+                S_Table_example_.$('input[type="checkbox"]:checked').each(function(){
+                  var v = $(this).val();
+                  var n = $(this).attr('dt');
+                  var temp = {
+                    Code : v,
+                    Name : n,
+                  };
+
+                  DepartmentArr.push(temp);
+                }); // exit each function
+
                 var data = {
                     settingTemplate : settingTemplate,
                     DocumentName : $('.Input[name="DocumentName"]').val() ,
                     DocumentAlias : $('.Input[name="DocumentAlias"]').val() ,
+                    DepartmentArr : DepartmentArr,
                 };
+                
                 var token = jwt_encode(data,'UAP)(*');
                 var UploadFile = $('#UploadFile');
                 var valUploadFile = UploadFile.val();
@@ -930,6 +944,7 @@
                      };
                      ArrUploadFilesSelector.push(temp);
                 }
+
                 loading_button2(selector);
                 AjaxSubmitTemplate(url,token,ArrUploadFilesSelector).then(function(response){
                     if (response.status == 1) {
@@ -949,7 +964,7 @@
             }
         },
 
-        ShowModalDepartment : function(selector,action="add",ID=""){
+        ShowModalDepartment : function(selector){
                         
             var html = '';
             html ='<div class = "row">'+
@@ -967,7 +982,7 @@
             $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Department'+'</h4>');
             $('#GlobalModalLarge .modal-body').html(html);
             $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>'+
-                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success" action ="'+action+'" data-id="'+ID+'">Save</button>');
+                '<button type="button" id="ModalbtnSaveForm" class="btn btn-success">Save</button>');
             $('#GlobalModalLarge').modal({
                 'show' : true,
                 'backdrop' : 'static'
@@ -1006,7 +1021,7 @@
                           },
                       ],
                       'createdRow': function( row, data, dataIndex ) {
-                            console.log(data);
+                            // console.log(data);
                       },
                       // 'order': [[1, 'asc']]
                 });
@@ -1087,10 +1102,10 @@
        App_form_input.SubmitPreviewPDF(itsme);
     })
 
-    // $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
-    //    var itsme = $(this);
-    //    App_form_input.SaveTemplate(itsme);
-    // })
+    $(document).off('click', '#ModalbtnSaveForm').on('click', '#ModalbtnSaveForm',function(e) {
+       var itsme = $(this);
+       App_form_input.SaveTemplate(itsme);
+    })
 
     $(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
        var itsme = $(this);
