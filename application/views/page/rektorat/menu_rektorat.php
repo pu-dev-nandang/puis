@@ -14,9 +14,9 @@
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/credit_type_courses'); ?>">Credit type Course</a>
                 </li>
-                <li>
+               <!--  <li>
                     <a href="<?php echo base_url('rectorat/master_data/mentor_sks'); ?>">Mentor Type to SKS</a>
-                </li>
+                </li> -->
                 <li>
                     <a href="<?php echo base_url('rectorat/master_data/research_pkm_to_sks'); ?>">Research & PKM to SKS</a>
                 </li>

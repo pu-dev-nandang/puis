@@ -3,13 +3,13 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title">Config Jabatan Per SKS</h4>
+                <h4 class="panel-title">Position to Credit</h4>
             </div>
             <div class="panel-body" style="min-height: 100px;">
 
                 <div class="form-group">
                     <input class="hide" id="formID">
-                    <label>Nama Dosen</label>
+                    <label>Name</label>
 
                     <br>
 
@@ -17,7 +17,7 @@
                 </div>
                 <div class="form-group">
                     <input class="hide" id="formID">
-                    <label>Jabatan / Posisi</label>
+                    <label>Position</label>
                     <br>
                     <select style="width: 100%;" id="formJabatan" ></select>
                 </div>
@@ -28,7 +28,7 @@
                     <select style="width: 100%;" id="formSemester" ></select>
                 </div>
                 <div class="form-group">
-                    <label>SKS</label>
+                    <label>Credit</label>
                     <br>
                     <select style="width: 100%;" id="formSKS" ></select>
                 </div>
@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-md-3 col-md-offset-4">
                 <div class="well">
-                    <label>Tahun Akademik</label>
+                    <label>Academic Year</label>
                     <select class="form-control" id="filterPeriod"></select>
                 </div>
                 <hr/>
@@ -116,10 +116,10 @@
                                 '<thead>'+
                                 '<tr>'+
                                  '   <th style="width: 1%;">No</th>'+
-                                '    <th style="width: 15%;">Nama Dosen</th>'+
-                                '    <th style="width: 15%;">Jabatan/Posisi</th>'+
+                                '    <th style="width: 15%;">Name</th>'+
+                                '    <th style="width: 15%;">Position</th>'+
                                 '    <th style="width: 15%;">Semester</th>'+
-                                '    <th style="width: 10%;">SKS</th>'+
+                                '    <th style="width: 10%;">Credit</th>'+
                                 '    <th style="width: 10%;">Action</th>'+
                                ' </tr>'+
                                ' </thead>'+
