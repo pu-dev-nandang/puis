@@ -2803,28 +2803,27 @@ class C_rest3 extends CI_Controller {
       
       $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
       $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$requestData['start'],$requestData['length'],'');
-      $No = $requestData['start'] + 1;
+      $No = (int)$requestData['start'] + 1;
       $data = array();
-      for ($i=0; $i < count($query); $i++) {
-          $nestedData=array();
-          $row = $query[$i];
-          $nestedData[] = $No;
-          // foreach ($row as $key => $value) {
-          //   $nestedData[] = $value;
-          // }
-          $nestedData[] = $row['NPM'];
-          $nestedData[] = $row['Name'];
-          $nestedData[] = $row['NameEng'];
-          $tokenRow = $this->jwt->encode($row,"UAP)(*");
-          $nestedData['data'] = $tokenRow;
-          $data[] = $nestedData;
-          $No++;
+      // print_r($totalData);die();
+      foreach ($result as $key ) {
+         $nestedData = array();
+         $nestedData[] = $No;
+         $No++;
+         $nestedData[] = $key->NPM;
+         $nestedData[] = $key->Name;
+         $nestedData[] = $key->ProdiName;
+         $arr = (array) json_decode(json_encode($key),true);
+         $tokenRow = $this->jwt->encode($arr,"UAP)(*");
+         $nestedData['data'] = $tokenRow;
+         $data[] = $nestedData;
+
       }
 
       $json_data = array(
           "draw"            => intval( $requestData['draw'] ),
-          "recordsTotal"    => intval($totalData),
-          "recordsFiltered" => intval($totalData ),
+          "recordsTotal"    => intval(count($totalData) ),
+          "recordsFiltered" => intval( count($totalData) ),
           "data"            => $data,
       );
 

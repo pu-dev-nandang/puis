@@ -1,5 +1,5 @@
 <style type="text/css">
-    #example_budget.dataTable tbody tr:hover {
+    #datatable_STD.dataTable tbody tr:hover {
        background-color:#71d1eb !important;
        cursor: pointer;
     }
@@ -386,7 +386,7 @@
               S_Table_example_mhs.on( 'click', 'tr', function (e) {
                   var row = $(this);
                   var datatoken = jwt_decode(row.attr('datatoken'));
-                  selector.closest('.input-group').find('.Input').val(datatoken['NIP']);
+                  selector.closest('.input-group').find('.Input').val(datatoken['NPM']);
                   selector.closest('.input-group').find('.Input').attr('datatoken',row.attr('datatoken'));
                   selector.closest('.form-group').find('label[for="Name"]').html(datatoken['Name']);
                   $('#GlobalModalLarge').modal('hide');
