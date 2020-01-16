@@ -1,10 +1,11 @@
+<style type="text/css">#participants-frm .filter-participant{border-top: 1px solid #ddd;padding-top: 10px}</style>
 <div id="participants-frm">
-	<form id="form-participants" method="post" autocomplete="off">
+	<div id="form-participants">
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title">External Participants</h4>
+						<h4 class="panel-title"><i class="fa fa-external-link-square"></i> External Participants</h4>
 					</div>
 					<div class="panel-body">
 						<div class="row">
@@ -33,7 +34,7 @@
 			<div class="col-sm-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title">Internal Participants</h4>
+						<h4 class="panel-title"><i class="fa fa-external-link"></i> Internal Participants</h4>
 					</div>
 					<div class="panel-body">
 						<div class="participant-ctn">
@@ -56,7 +57,7 @@
 				</div>
 			</div>
 		</div>
-	</form>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -95,8 +96,24 @@
 		}
 
 		$formparticipants.on("change","select[name=type_participant]",function(){
-			var value = $(this).val();
-			alert(value);
+			var TYPE = $(this).val();
+			var data = {
+              TYPE : TYPE,
+          	};
+          	var token = jwt_encode(data,'UAP)(*');
+			$.ajax({
+			    type : 'POST',
+			    url : base_url_js+"global-informations/message-blast/filterForm",
+			    data : {token:token},
+			    dataType : 'html',
+			    beforeSend :function(){
+			    	$formparticipants.find(".filter-participant").html("..fetching data..");
+			    },error : function(jqXHR){
+	            	$formparticipants.find(".filter-participant").html(jqXHR.responseText);
+			    },success : function(response){
+					$formparticipants.find(".filter-participant").html(response);			    	
+			    }
+			});
 		});		
 
 	});

@@ -77,7 +77,7 @@
 	      <div class="modal-body"></div>
 	      <div class="modal-footer">
 	      	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        	<button type="button" class="btn btn-primary">Add participants</button>
+        	<button type="button" class="btn btn-primary btn-add-participants">Add participants</button>
 	      </div>
 	    </div>
 	  </div>
@@ -115,7 +115,8 @@
 
 		$("#form-submit-mail").on("click",".find-participants",function(){
 			var itsme = $(this);
-			var textParent = itsme.parent().prev().clone();
+			var textParent = itsme.parent().prev().attr("name");
+            $("body #modal-participants .modal-footer > .btn-add-participants").attr("data-parent",textParent);
             $("body #modal-participants").modal("show");
             $.ajax({
 			    type : 'POST',
