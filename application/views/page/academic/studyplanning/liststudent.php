@@ -388,8 +388,10 @@
                         var dis ='';
                         if(d.LCID!='' && d.LCID!=null){
                             dis = 'disabled'
+                        } else {
+                            $('#selectLC_Students').append('<option value="'+d.NPM+'" '+dis+'>'+d.NPM+' - '+d.Name+'</option>');
                         }
-                        $('#selectLC_Students').append('<option value="'+d.NPM+'" '+dis+'>'+d.NPM+' - '+d.Name+'</option>');
+
                     }
                     $('#selectLC_Students').select2({allowClear: true});
                 }
