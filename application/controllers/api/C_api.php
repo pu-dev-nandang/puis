@@ -7961,7 +7961,7 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='getStudents'){
 
                 $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s
-                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM)
+                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM AND lc.SemesterID = "'.$data_arr['SemesterID'].'")
                                                       WHERE s.ProdiID = "'.$data_arr['ProdiID'].'"
                                                       ORDER BY s.NPM ASC')->result_array();
 
