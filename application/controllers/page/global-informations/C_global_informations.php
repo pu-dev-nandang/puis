@@ -592,5 +592,11 @@ class C_global_informations extends Globalclass {
     }
 
 
+    public function messageBlastFormParticipants(){
+		$data['t'] = "dsd";
+		echo $this->load->view('dashboard/global-informations/message-blast/formParticipants',$data,true);
+	}
+
+
 
 }

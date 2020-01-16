@@ -94,7 +94,7 @@
 									<div class="col-sm-6">
 										<div class="ctn academic">
 											<div class="heading">
-												<h4><i class="fa fa-bookmark"></i> Lecturer Details</h4>
+												<h4><i class="fa fa-bookmark"></i> Employee Details</h4>
 											</div>
 											<div class="content">
 												<div class="row">

@@ -66,6 +66,18 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="modal-participants" class="modal fade" tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document"style="width:80%">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Add Participants</h4>
+	      </div>
+	      <div class="modal-body"></div>
+	    </div>
+	  </div>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -100,10 +112,19 @@
 		$("#form-submit-mail").on("click",".find-participants",function(){
 			var itsme = $(this);
 			var textParent = itsme.parent().prev().clone();
-			$("body #GlobalModal .modal-header").html("<h1>Find participants</h1>");
-            $("body #GlobalModal .modal-body").html(textParent);
-            $("body #GlobalModal").modal("show");
-
+            $("body #modal-participants").modal("show");
+            $.ajax({
+			    type : 'POST',
+			    url : base_url_js+"global-informations/message-blast/formParticipants",
+			    dataType : 'html',
+			    beforeSend :function(){
+			    	$("body #modal-participants .modal-body").html("<i class='fa fa-circle-o-notch fa-spin'></i> fetching data..");
+			    },error : function(jqXHR){
+	            	$("body #modal-participants .modal-body").html(jqXHR.responseText);
+			    },success : function(response){
+			    	$("body #modal-participants .modal-body").html(response);
+			    }
+			});
 		});
 	});
 </script>
