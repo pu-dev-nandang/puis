@@ -94,5 +94,10 @@
 		    return pattern.test(emailAddress);
 		}
 
+		$formparticipants.on("change","select[name=type_participant]",function(){
+			var value = $(this).val();
+			alert(value);
+		});		
+
 	});
 </script>
