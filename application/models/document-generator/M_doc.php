@@ -166,7 +166,8 @@ class M_doc extends CI_Model {
     public function preview_template($Input){
     	$this->load->model('document-generator/m_set');
     	$this->load->model('document-generator/m_user');
-    	$this->load->model('document-generator/m_grab');
+        $this->load->model('document-generator/m_grab');
+    	$this->load->model('document-generator/m_get');
     	$rs = [];
     	$FileTemplate    = $_FILES['PathTemplate']['tmp_name'][0];
 		$line = $this->__readDoc($FileTemplate);
@@ -238,6 +239,18 @@ class M_doc extends CI_Model {
     	        				continue;
     	        			}
     	        			break;
+                        case $this->KeyGET:
+                            if (!in_array($ex[0], $Filtering)){
+                                $NameObj = $ex[0];
+                                $getObjInput = $this->__getObjInput($Input,$NameObj);
+                                $rs[$this->KeyGET] = $this->m_get->preview_template($getObjInput);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            
+                            break;
     	        	}
 
     	        	$Filtering[] = $ex[0];
@@ -322,6 +335,15 @@ class M_doc extends CI_Model {
 	    		    				
 	    		    			}
 	    		    			break;
+                            case $this->KeyGET:
+                                if ($this->KeyGET == $keyRS) {
+                                    $setStr = trim(ucwords($ex[0]));
+                                    $obj = $rsGET[$keyRS];
+                                    $arrKomponen = $matches[1];
+
+                                    $this->__SETWriteGET($TemplateProcessor,$arrKomponen,$obj);
+                                }
+                                break;
 	    		    		case $this->KeyTABLE:
                                 if ($this->KeyTABLE == $keyRS) {
                                         if (!$BoolTbl) {
@@ -2159,6 +2181,57 @@ class M_doc extends CI_Model {
         {
             echo "No data result";die();
         }
+
+    }
+
+    private function __SETWriteGET($TemplateProcessor,$arrKomponen,$obj){
+        // print_r($arrKomponen);
+        // print_r($obj);die();
+        for ($z=0; $z < count($arrKomponen); $z++) { 
+            $komponen = $arrKomponen[$z];
+            $ex = explode('.', $komponen);
+            // print_r($ex);die();
+            // get Type
+            $keyType = $ex[1];
+
+            // get key field
+            $get_keyField = $ex[2];
+            // get numbering by #
+            $keyFieldArr = explode('#', $get_keyField);
+            $keyField =  $keyFieldArr[0];
+            $keyNumber = $keyFieldArr[1];
+
+            foreach ($obj as $key => $v) {
+               switch ($key) {
+                   case 'EMP':
+                   case 'MHS':
+                       if ($keyType == $key) {
+                           $arr_dt = $obj[$key];
+                           for ($i=0; $i < count($arr_dt); $i++) {
+                                $number = $arr_dt[$i]['number'];
+                                if ($arr_dt[$i]['Choose'] == $keyField && $number == $keyNumber) {
+                                    $arr_get_value = $arr_dt[$i]['user'];
+                                    $TemplateProcessor->setValue($komponen,$arr_get_value[$keyField]);
+                                    foreach ($arr_get_value as $col => $value) {
+                                        $setValue = $keyType.'.'.$col.'#'.$keyNumber;
+                                        $TemplateProcessor->setValue($setValue,$value);
+                                    }
+                                } 
+                               
+                           }
+                       }
+                       
+                       break;
+                   default:
+                       # code...
+                       break;
+               }
+            }
+
+        }
+        
+
+        // die();
 
     }
 

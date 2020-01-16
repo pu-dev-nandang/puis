@@ -1,3 +1,14 @@
+<style type="text/css">
+    #example_budget.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+
+    #datatable_employees.dataTable tbody tr:hover {
+       background-color:#71d1eb !important;
+       cursor: pointer;
+    }
+</style>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">Form</h4>
@@ -47,6 +58,8 @@
 
 <script type="text/javascript">
     var S_Table_example_;
+    var S_Table_example_emp;
+    var S_Table_example_mhs;
     var settingTemplate;
     var App_form_input = {
         UploadChangeFunction : function(selector){
@@ -156,13 +169,14 @@
                                         '<h3><u><b>Students '+keyNumber+' </b></u></h3>'+
                                     '</div>'+
                                     '<div class = "form-group">'+
-                                        '<label>Choose Employees</label>'+
+                                        '<label>Choose Students</label>'+
                                         '<div class="input-group">'+
                                             '<input type="text" class="form-control Input" readonly name="'+key+'" key="GET" field="'+key+'">'+
                                             '<span class="input-group-btn">'+
                                                 '<button class="btn btn-default SearchNPMSTD" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
                                             '</span>'+
                                         '</div>'+
+                                        '<label for="Name"></label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'        
@@ -199,6 +213,7 @@
                                                 '<button class="btn btn-default SearchNIPEMP" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
                                             '</span>'+
                                         '</div>'+
+                                        '<label for="Name"></label>'+
                                     '</div>'+
                                 '</div>'+
                             '</div>'        
@@ -211,6 +226,172 @@
 
             html += '</div>';
             selector.html(html);
+        },
+
+        SearchNIPEMP : function(selector){
+              var html = '';
+              html ='<div class = "row">'+
+                      '<div class = "col-md-12">'+
+                        '<div class="table-responsive">'+
+                          '<table id="datatable_employees" class="table table-bordered display select" cellspacing="0" width="100%">'+
+                 '<thead>'+
+                    '<tr>'+
+                       '<th style = "width:5%;">No</th>'+
+                       '<th>NIP - Name</th>'+
+                       '<th>Division</th>'+
+                       '<th>Position</th>'+
+                    '</tr>'+
+                 '</thead>'+
+                 '<tbody></tbody>'+
+            '</table></div></div></div>';
+
+              $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Employees'+'</h4>');
+              $('#GlobalModalLarge .modal-body').html(html);
+              $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+              $('#GlobalModalLarge').modal({
+                  'show' : true,
+                  'backdrop' : 'static'
+              });
+
+              var table = $('#datatable_employees').DataTable({
+                  "fixedHeader": true,
+                  "processing": true,
+                  "destroy": true,
+                  "serverSide": true,
+                  "lengthMenu": [
+                      [10, 25],
+                      [10, 25]
+                  ],
+                  "iDisplayLength": 10,
+                  "ordering": false,
+                  "language": {
+                      "searchPlaceholder": "Search",
+                  },
+                  "ajax": {
+                      url: base_url_js + "rest3/__LoadEmployees_server_side", // json datasource
+                      ordering: false,
+                      type: "post", // method  , by default get
+                      data: function(token) {
+                          var data = {
+                              auth: 's3Cr3T-G4N',
+                          };
+                          var get_token = jwt_encode(data, "UAP)(*");
+                          token.token = get_token;
+                      },
+                      error: function() { // error handling
+                          $(".datatable_employees-grid-error").html("");
+                          $("#datatable_employees-grid").append(
+                              '<tbody class="datatable_employees-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>'
+                          );
+                          $("#datatable_employees-grid_processing").css("display", "none");
+                      }
+                  },
+                  'createdRow': function(row, data, dataIndex) {
+                      var dt = jwt_decode(data.data);
+                      $(row).attr('datatoken',data.data);
+                      $(row).find('td:eq(1)').html(dt['NIP']+' - '+dt['Name']);
+                      $(row).find('td:eq(2)').html(dt['DepartmentName']);
+                      $(row).find('td:eq(3)').html(dt['PositionName']);
+                  },
+                  dom: 'l<"toolbar">frtip',
+                  "initComplete": function(settings, json) {
+
+                  }
+              });
+
+              S_Table_example_emp = table;
+
+              S_Table_example_emp.on( 'click', 'tr', function (e) {
+                  var row = $(this);
+                  var datatoken = jwt_decode(row.attr('datatoken'));
+                  selector.closest('.input-group').find('.Input').val(datatoken['NIP']);
+                  selector.closest('.input-group').find('.Input').attr('datatoken',row.attr('datatoken'));
+                  selector.closest('.form-group').find('label[for="Name"]').html(datatoken['Name']);
+                  $('#GlobalModalLarge').modal('hide');
+              });
+
+        },
+
+        SearchNPMSTD : function(selector){
+              var html = '';
+              html ='<div class = "row">'+
+                      '<div class = "col-md-12">'+
+                        '<div class="table-responsive">'+
+                          '<table id="datatable_STD" class="table table-bordered display select" cellspacing="0" width="100%">'+
+                 '<thead>'+
+                    '<tr>'+
+                       '<th style = "width:5%;">No</th>'+
+                       '<th>NPM - Name</th>'+
+                       '<th>Prodi</th>'+
+                    '</tr>'+
+                 '</thead>'+
+                 '<tbody></tbody>'+
+            '</table></div></div></div>';
+
+              $('#GlobalModalLarge .modal-header').html('<h4 class="modal-title">'+'Select Students'+'</h4>');
+              $('#GlobalModalLarge .modal-body').html(html);
+              $('#GlobalModalLarge .modal-footer').html('<button type="button" id="ModalbtnCancleForm" data-dismiss="modal" class="btn btn-default">Close</button>');
+              $('#GlobalModalLarge').modal({
+                  'show' : true,
+                  'backdrop' : 'static'
+              });
+
+              var table = $('#datatable_STD').DataTable({
+                  "fixedHeader": true,
+                  "processing": true,
+                  "destroy": true,
+                  "serverSide": true,
+                  "lengthMenu": [
+                      [10, 25],
+                      [10, 25]
+                  ],
+                  "iDisplayLength": 10,
+                  "ordering": false,
+                  "language": {
+                      "searchPlaceholder": "Search",
+                  },
+                  "ajax": {
+                      url: base_url_js + "rest3/__LoadStudents_server_side", // json datasource
+                      ordering: false,
+                      type: "post", // method  , by default get
+                      data: function(token) {
+                          var data = {
+                              auth: 's3Cr3T-G4N',
+                          };
+                          var get_token = jwt_encode(data, "UAP)(*");
+                          token.token = get_token;
+                      },
+                      error: function() { // error handling
+                          $(".datatable_STD-grid-error").html("");
+                          $("#datatable_STD-grid").append(
+                              '<tbody class="datatable_STD-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>'
+                          );
+                          $("#datatable_STD-grid_processing").css("display", "none");
+                      }
+                  },
+                  'createdRow': function(row, data, dataIndex) {
+                      var dt = jwt_decode(data.data);
+                      $(row).attr('datatoken',data.data);
+                      $(row).find('td:eq(1)').html(dt['NPM']+' - '+dt['Name']);
+                      $(row).find('td:eq(2)').html(dt['ProdiName']);
+                  },
+                  dom: 'l<"toolbar">frtip',
+                  "initComplete": function(settings, json) {
+
+                  }
+              });
+
+              S_Table_example_mhs = table;
+
+              S_Table_example_mhs.on( 'click', 'tr', function (e) {
+                  var row = $(this);
+                  var datatoken = jwt_decode(row.attr('datatoken'));
+                  selector.closest('.input-group').find('.Input').val(datatoken['NIP']);
+                  selector.closest('.input-group').find('.Input').attr('datatoken',row.attr('datatoken'));
+                  selector.closest('.form-group').find('label[for="Name"]').html(datatoken['Name']);
+                  $('#GlobalModalLarge').modal('hide');
+              });
+
         },
 
         method_SET : function(dt){
@@ -682,6 +863,11 @@
                             App_form_input.set_TABLE(attrname,attrva,attrkey,attrfield,el);
                           }
                         break;
+                      case "GET":
+                        if (variable == attrkey) {
+                          App_form_input.set_GET(attrname,attrva,attrkey,attrfield,el);
+                        }
+                        break;
                       case "DOCUMENT":
                         
                         break;
@@ -880,6 +1066,14 @@
             
         },
 
+        set_GET : function(attrname,attrva,attrkey,attrfield,el){
+            var keynumber = el.closest('.GET').attr('keynumber');
+            var keyindex = parseInt(el.closest('.GET').attr('keyindex'));
+            var dt = jwt_decode(el.attr('datatoken'));
+            settingTemplate[attrkey][attrname][keyindex]['user'] = {};
+            settingTemplate[attrkey][attrname][keyindex]['user'] = dt;
+        },
+
 
     }
 
@@ -903,6 +1097,16 @@
        App_form_input.ShowModalDepartment(itsme);
     })
 
+    $(document).off('click', '.SearchNIPEMP').on('click', '.SearchNIPEMP',function(e) {
+       var itsme = $(this);
+       App_form_input.SearchNIPEMP(itsme);
+    })
+
+    $(document).off('click', '.SearchNPMSTD').on('click', '.SearchNPMSTD',function(e) {
+       var itsme = $(this);
+       App_form_input.SearchNPMSTD(itsme);
+    })
+
     // Handle click on "Select all" control
     $(document).off('click', '#example-select-all').on('click', '#example-select-all',function(e) {
        // Get all rows with search applied
@@ -921,6 +1125,8 @@
        App_form_input.setTableDesign(itsme);
 
     })
+
+    
 
     
 </script>

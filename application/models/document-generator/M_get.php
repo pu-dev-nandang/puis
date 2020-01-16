@@ -50,4 +50,34 @@ class M_get extends CI_Model {
 		return $rs;
 	}
 
+	public function MHS($params){
+		$rs = [];
+		$ex = explode('.', $params);
+		$entity = $ex[1];
+		$exEntity = explode('#', $entity);
+		if (count($exEntity) > 0 ) {
+			switch ($exEntity[0]) {
+				case 'NPM':
+					$rs['Choose'] = $exEntity[0];
+					$rs['user'] = [];
+					$rs['number'] = $exEntity[1];
+					break;
+				
+				default:
+					# code...
+					break;
+			}
+		}
+		else
+		{
+			echo 'Approval number not set';
+			die();
+		}
+		return $rs;
+	}
+
+	public function preview_template($getObjInput){
+		return $getObjInput;
+	}
+
 }
