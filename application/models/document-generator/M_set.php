@@ -67,6 +67,7 @@ class M_set extends CI_Model {
 					$rs['user'] = '';
 					$rs['verify'] = '';
 					$rs['cap'] = '';
+					$rs['number'] = $exEntity[1];
 					break;
 				default:
 					# code...
@@ -246,7 +247,7 @@ class M_set extends CI_Model {
 									'valueCap' => $valueCap,
 									'img' => $img,
 								];
-
+								$rs['Signature'][$i]['number'] = $obj[$i]['number'];
 								break;
 							
 							default:

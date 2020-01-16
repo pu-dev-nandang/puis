@@ -9,6 +9,7 @@
 <script type="text/javascript">
 	var App_table = {
 		Loaded : function(){
+			$('#rowChooseDocument').removeClass('hide');
 			loading_page('#pageTableSurat');
 			var firstLoad = setInterval(function () {
 	            var SelectMasterSurat = $('#MasterSurat').val();

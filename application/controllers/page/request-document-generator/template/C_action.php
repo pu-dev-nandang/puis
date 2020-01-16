@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_action extends DocumentGenerator_Controler {
+class C_action extends ServiceDocumentGenerator_Controler {
 
     function __construct()
     {
