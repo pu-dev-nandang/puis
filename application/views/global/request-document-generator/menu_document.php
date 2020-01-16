@@ -131,7 +131,7 @@
   }
 
   function LoadMasterSuratOP(selector){
-      var url = base_url_js+"__request-document-generator/__LoadMasterSurat";
+      var url = base_url_js+"__request-document-generator/__LoadMasterSuratAccess";
       var data = {
         Active : 1,
       }
