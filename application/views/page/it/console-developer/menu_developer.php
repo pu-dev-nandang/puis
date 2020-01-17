@@ -10,6 +10,9 @@
                <li class="<?php echo ($this->uri->segment(2) == 'console-developer' &&  $this->uri->segment(3) == 'routes'  ) ? 'active' : '' ?>">
                    <a href="<?php echo base_url('it/console-developer/routes'); ?>">Routes</a>
                </li>
+               <li class="<?php echo ($this->uri->segment(2) == 'console-developer' &&  $this->uri->segment(3) == 'document-generator'  ) ? 'active' : '' ?>">
+                   <a href="<?php echo base_url('it/console-developer/document-generator/privileges'); ?>">Document Generator</a>
+               </li>
            </ul>
             <div style="padding-top: 30px;border-top: 1px solid #cccccc">
                 <?php echo $page; ?>
