@@ -95,11 +95,11 @@
         <div class="col-md-6">
             <div class="widget box">
                 <div class="widget-header">
-                    <h4 class=""><i class="icon-reorder"></i> Kategory Other Files</h4>
+                    <h4 class=""><i class="icon-reorder"></i> Category Other Files</h4>
                     <div class="toolbar no-padding">
                         <div class="">
                             <span class="btn btn-xs btn-primary add_kat_otherfiles">
-                                <i class="icon-plus"></i> Add Kategori Other File
+                                <i class="icon-plus"></i> Add Category Other File
                             </span>
                         </div>
                     </div>
@@ -376,8 +376,8 @@
         $('#tablekatotherfile').html('<table class="table table-bordered table-striped" id="tableDataKatOtherFile">     '+
             '                    <thead>                                                                                '+
             '                    <tr style="background: #20485A;color: #FFFFFF;">                                       '+
-            '                        <th style="width: 5%;text-align: center;">No</th>                                  '+
-            '                        <th style="width: 25%; text-align: center;">Name Kategori Other Files</th>         '+
+            '                        <th style="width: 5%; text-align: center;">No</th>                                  '+
+            '                        <th style="width: 25%; text-align: center;">Name Category Other Files</th>         '+
             '                        <th style="text-align: center;width: 8%;">Action</th>                              '+
             '                    </tr>                                                                                  '+
             '                    </thead>                                                                               '+

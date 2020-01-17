@@ -1,7 +1,6 @@
 
 <div class="row">
-            <div class="col-md-6" style="border-right: 1px solid #afafafb5;">
-                
+            <div class="col-md-5" style="border-right: 1px solid #afafafb5;">
                     <div class="col-xs-12" id="subsesi">
                         <div class="form-group">
                             <div class="thumbnail" style="padding: 10px;text-align: left;">
@@ -24,7 +23,7 @@
                                     </div>
                                     <div class="col-xs-6">
                                         <div class="form-group">
-                                            <label>Kategori Other File</label>
+                                            <label>Category Other File</label>
                                             <select class="form-control" id="JenisFiles"><option id="0" disabled selected></option></select>
                                         </div>
                                     </div>
@@ -75,7 +74,7 @@
                         </div>
                     </div>
             </div>
-        <div id="loadtablefiles" class="col-md-6 table-responsive"></div>  
+        <div id="loadtablefiles" class="col-md-7 table-responsive"></div>  
  </div>
 
 <script>
@@ -113,7 +112,6 @@ $('#typefiles').change(function (event) {
                         $('#JenisFiles').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name_other_files+' </option>');
                 }
         });
-            
     } 
     else {
 
@@ -146,12 +144,13 @@ $('#typefiles').change(function (event) {
         $('#loadtablefiles').html('<table class="table table-bordered table-striped" id="tableDataotherfiles">   '+
             '                    <thead>                                                               '+
             '                    <tr style="background: #20485A;color: #FFFFFF;">                      '+
-            '                        <th style="width: 5%;text-align: center;">No</th>                 '+
+            '                        <th style="width: 3%;text-align: center;">No</th>                 '+
             '                        <th style="width: 5%;text-align: center;">Type Files</th>         '+
+            '                        <th style="width: 5%;text-align: center;">Name Other File</th>        '+
             '                        <th style="width: 5%;text-align: center;">No.Document</th>        '+
             '                        <th style="width: 5%;text-align: center;">Date Document</th>      '+
-            '                        <th style="width: 12%;text-align: center;">Description</th>       '+
-            '                        <th style="text-align: center;width: 8%;">Action</th>             '+
+            '                        <th style="width: 10%;text-align: center;">Description</th>       '+
+            '                        <th style="width: 8%;text-align: center;">Action</th>             '+
             '                    </tr>                                                                 '+
             '                    </thead>                                                              '+
             '                </table>');
@@ -179,6 +178,31 @@ $('#typefiles').change(function (event) {
 
 </script>
 <script>
+
+    $(document).on('change','#e_typefiles', function () {
+        var filterKategoriJenis = $('#e_typefiles option:selected').attr('id');
+        $("#e_JenisFiles").empty();
+
+        if(filterKategoriJenis == "13") {
+
+            var url = base_url_js+'api/__reviewotherfile';
+            var token = jwt_encode({action : 'get_katotherfiles'},'UAP)(*');
+
+            $.post(url,{token:token},function (jsonResult) {
+                $('#e_JenisFiles').append('<option id="0" disabled selected>Pilih Kategori Other Files</option>');
+                    for(var i=0;i<jsonResult.length;i++){
+                            $('#e_JenisFiles').append('<option id="'+jsonResult[i].ID+'"> '+jsonResult[i].Name_other_files+' </option>');
+                    }
+            });
+        } 
+        else {
+
+            $("#e_JenisFiles").empty();
+            $('#e_JenisFiles').append('<option id="0" selected disabled></option>');
+
+        }
+    });
+
     $(document).on('click','.testEditdocument', function () {
 
         var NIP = '<?php echo $NIP; ?>';
@@ -215,7 +239,7 @@ $('#typefiles').change(function (event) {
                         '                </div>  '+
                         '               </div>  '+
                         '           </div>  '+
-                        '   <div class="col-xs-6"> '+
+                        '         <div class="col-xs-6"> '+
                         '                <div class="form-group"> '+ 
                         '                    <label>No. Document</label> '+
                         '                   <input class="form-control" id="NoDocument"> '+
@@ -270,7 +294,7 @@ $('#typefiles').change(function (event) {
                 NIP:NIP
             },'UAP)(*');
             $.post(url,{token:token},function (resultJson) {
-            //console.log(resultJson); 
+            
             var response = resultJson;
                 if(response.length>0){
                     var no = 1;
@@ -285,7 +309,8 @@ $('#typefiles').change(function (event) {
                         '                <div class="form-group">                                           '+
                         '                <label class="control-label">Type File </label>                    '+
                         '                <div>                                                              '+
-                        '                    <select class="form-control" id="typefiles">                   '+
+                        '                    <select class="form-control" id="e_typefiles">                 '+
+                        '                        <option id="'+response[i]['TypeFiles']+'" disabled selected>'+response[i]['NameFiles']+'</option>'+
                         '                        <?php for ($i=0; $i < count($G_TypeFiles); $i++): ?>       '+
                         '                            <?php if ($G_TypeFiles[$i]['Type'] == 1): ?>           '+
                         '                             <option id="<?php echo $G_TypeFiles[$i]['ID'] ?>"><?php echo $G_TypeFiles[$i]['TypeFiles'] ?></option>   '+ 
@@ -295,12 +320,21 @@ $('#typefiles').change(function (event) {
                         '                </div>                                                             '+
                         '               </div>                                                              '+
                         '           </div>                                                                  '+
-                        '   <div class="col-xs-6"> '+
+                        '          <div class="col-xs-6"> '+
+                        '               <div class="form-group"> '+
+                        '                    <label>Kategori Other File</label> '+
+                        '                    <select class="form-control" id="e_JenisFiles"> '+
+                        '                        <option id="'+response[i]['ID_OtherFiles']+'" disabled selected>'+response[i]['Name_other_files']+'</option>'+
+                        '                     </select> '+
+                        '                </div>  '+
+                        '           </div> '+
+                        '         <div class="col-xs-5"> '+
                         '                <div class="form-group"> '+ 
                         '                    <label>No. Document</label> '+
                         '                   <input class="form-control" id="NoDocument" value="'+response[i]['No_Document']+'"> '+
                         '               </div> '+
                         '          </div> '+
+                        
                         '           <div class="col-xs-5"> '+
                         '              <div class="form-group"> '+
                         '                  <label>Date Document</label> '+
@@ -330,8 +364,6 @@ $('#typefiles').change(function (event) {
                         '                    </label>                                                                                                                   '+
                         '                <p style="font-size: 12px;color: #FF0000;">*) Only PDF Files Max Size 5 MB</p>              '+
                         '        </form>                     '+
-
-                        
 
 
                         '    <div class="row"> '+
