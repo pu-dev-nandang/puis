@@ -1,4 +1,4 @@
-<style type="text/css">#participants-frm .filter-participant{border-top: 1px solid #ddd;padding-top: 10px}</style>
+<style type="text/css">#participants-frm .filter-participant{padding-top: 10px}</style>
 <div id="participants-frm">
 	<div id="form-participants">
 		<div class="row">
@@ -51,7 +51,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="filter-participant">-</div>
+							<div class="filter-participant"></div>
 						</div>
 					</div>
 				</div>
@@ -65,11 +65,15 @@
 		$formparticipants = $("#form-participants");
 		$formparticipants.on("keyup","input[name=extmail]",function(){
 			var value = $(this).val();
-			console.log(value);
-			var validasiMail = isValidEmailAddress( value );
-			if( !validasiMail ){
-				$(this).addClass("error");
-				$(this).css({border:'1px solid red'});
+			if(value.length > 0){
+				var validasiMail = isValidEmailAddress( value );
+				if( !validasiMail ){
+					$(this).addClass("error");
+					$(this).css({border:'1px solid red'});
+				}else{
+					$(this).removeAttr("style");
+					$(this).removeClass("error");
+				}
 			}else{
 				$(this).removeAttr("style");
 				$(this).removeClass("error");
