@@ -1,14 +1,40 @@
+<?php $Previleges = ''; ?>
+<?php $DepartmentID = $this->session->userdata('DepartmentIDDocument'); ?>
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <div class="well">
+      <div class="form-group">
+        <label>Choose Department</label>
+        <select class="form-control" id = "DepartmentIDChoose">
+          <?php for ($i=0;$i < count($auth);$i++): ?>
+            <?php $selected = ($auth[$i]['ID'] == $DepartmentID) ? 'selected' : '' ?>
+            <?php 
+              if ($auth[$i]['ID'] == $DepartmentID) {
+                $Previleges = $auth[$i]['Level'];
+              }
+             ?>
+            <option value="<?php echo $auth[$i]['ID'] ?>" <?php echo $selected ?> ><?php echo $auth[$i]['NameDepartment'] ?></option>
+          <?php endfor ?>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="tabbable tabbable-custom tabbable-full-width">
     <ul class="nav nav-tabs">
         <li class="<?php if($this->uri->segment(1)=='request-document-generator' &&  ( $this->uri->segment(2) == '' ||  $this->uri->segment(2) == null ) ) { echo 'active'; } ?>">
             <a href="<?php echo base_url('request-document-generator'); ?>">Document</a>
         </li>
+        <?php if ($Previleges == 'Admin'): ?>
+          <li class="<?php if($this->uri->segment(1)=='request-document-generator' &&  $this->uri->segment(2) == 'Template' ) { echo 'active'; } ?>">
+              <a href="<?php echo base_url('request-document-generator/Template'); ?>">Template</a>
+          </li>
+        <?php endif ?>
     </ul>
     <div style="border-top: 1px solid #cccccc">
-
         <div class="row" style="margin-top: 15px;">
             <div class="col-md-12">
-                <?php echo $page; ?>
+             <?php echo $page; ?>
             </div>
         </div>
     </div>
@@ -16,6 +42,14 @@
 
 <script type="text/javascript">
   var msgMasterDocument = 'No Selected Document';
+  var DepartmentID = '<?php echo $DepartmentID ?>';
+
+  $(document).ready(function(e){
+    $('#DepartmentIDChoose').removeClass('form-control');
+    $('#DepartmentIDChoose').addClass('select2-select-00 full-width-fix');
+    $('#DepartmentIDChoose').select2({});
+  })
+
   function file_validation_generator(ev,TheName = '')
   {
       var files = ev[0].files;
@@ -97,7 +131,7 @@
   }
 
   function LoadMasterSuratOP(selector){
-      var url = base_url_js+"__request-document-generator/__LoadMasterSurat";
+      var url = base_url_js+"__request-document-generator/__LoadMasterSuratAccess";
       var data = {
         Active : 1,
       }
@@ -119,4 +153,21 @@
          toastr.error('Connection error,please try again');
       })
   }
+
+  $(document).off('change', '#DepartmentIDChoose').on('change', '#DepartmentIDChoose',function(e) {
+    var DepartmentIDChoose = $(this).find('option:selected').val();
+    var url = base_url_js+"__request-document-generator/__LoadSessionDepartment";
+    var data = {
+      DepartmentIDChoose : DepartmentIDChoose,
+    }
+    var token =  jwt_encode(data,'UAP)(*');
+    loadingStart();
+    AjaxSubmitTemplate(url,token).then(function(response){
+       setTimeout(function () {
+          location.reload();
+       },1500);
+       loadingEnd(2000);
+    })
+  })
+
 </script>

@@ -6,15 +6,15 @@
     <div class="panel-body" style="min-height: 100px;">
         <div class="form-group">
             <label>Nama Type</label>
-            <input type="text" class="form-control input" name = "NamaType">
+            <input type="text" class="form-control input" name = "NamaType" disabled>
         </div>
         <div class="form-group">
-            <label>SKS Per Menit</label>
+            <label>Credit / Minutes </label>
             <input type="text" class="form-control input" name = "SKSPerMinutes">
         </div>
     </div>
     <div class="panel-footer" style="text-align: right;">
-        <button class="btn btn-success" action= "add" data-id ="" id="btnSave">Save</button>
+        <button class="btn btn-success" action= "edit" data-id ="" id="btnSave">Save</button>
     </div>
 </div>
 <script type="text/javascript">
@@ -23,8 +23,9 @@
             $('.input').val('');
             $('.input[name="SKSPerMinutes"]').maskMoney({thousands:'', decimal:'', precision:0,allowZero: true});
             $('.input[name="SKSPerMinutes"]').maskMoney('mask', '9894'); 
-            $('#btnSave').attr('action','add');
+            $('#btnSave').attr('action','edit');
             $('#btnSave').attr('data-id','');
+            $('#btnSave').prop('disabled',true);
         },
         ActionData : function(selector,action="add",ID=""){
             var data = {};

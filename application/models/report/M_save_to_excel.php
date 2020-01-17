@@ -69,8 +69,10 @@ class M_save_to_excel extends CI_Model {
             $data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
             $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" 
             AND s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
+        
         } else if($data_arr['ProdiID']!='' && $data_arr['ProdiID']!=null){
             $dataWhere = 'WHERE s.ProdiID = "'.$data_arr['ProdiID'].'" ';
+
         } else if($data_arr['StatusStudentID']!='' && $data_arr['StatusStudentID']!=null){
             $dataWhere = 'WHERE s.StatusStudentID = "'.$data_arr['StatusStudentID'].'" ';
         }
@@ -121,6 +123,7 @@ class M_save_to_excel extends CI_Model {
 
                     $Grade = ($dataScore[0]['Grade']!='' && $dataScore[0]['Grade']!=null) ? $dataScore[0]['Grade'] : 'E';
                     $GradeValue = ($dataScore[0]['GradeValue']!='' && $dataScore[0]['GradeValue']!=null) ? $dataScore[0]['GradeValue'] : 0;
+
                     $Point = $d['Credit'] * $GradeValue;
 
                     $data[$i]['Grade'] = $Grade;
@@ -133,8 +136,6 @@ class M_save_to_excel extends CI_Model {
                     array_push($arrDetailCourseID,$d['MKID']);
                     array_push($DetailCourse,$data[$i]);
                 }
-
-
             }
         }
 

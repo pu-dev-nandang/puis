@@ -32,7 +32,7 @@
         <hr/>
     </div>
     <div class="col-md-3" style="text-align: right;">
-        <button class="btn btn-default" id="btnJudiciumsSetting"><i class="fa fa-cog margin-right"></i> Judiciums Setting</button>
+        <button class="btn btn-default" id="btnJudiciumsSetting"><i class="fa fa-cog margin-right"></i> Yudisium Setting</button>
     </div>
 </div>
 
@@ -134,7 +134,7 @@
             '            <input class="form-control" id="formYear" type="number">' +
             '        </div>' +
             '        <div class="form-group">' +
-            '            <label>Judiciums Date</label>' +
+            '            <label>Yudisium Date</label>' +
             '           <input type="text" id="formJudiciumsDate" name="regular" class="form-control" readonly>' +
             '        </div>' +
             '        <div class="form-group">' +
@@ -293,7 +293,7 @@
                         '<td style="border-right: 1px solid #CCC;">'+(i+1)+'</td>' +
                         '<td style="text-align: left;">'+v.Title+'</td>' +
                         '<td>'+v.Year+'</td>' +
-                        '<td style="text-align: left;"><div>Judiciums : '+jd+'</div><div>Graduation : '+gd+'</div></td>' +
+                        '<td style="text-align: left;"><div>Yudisium : '+jd+'</div><div>Graduation : '+gd+'</div></td>' +
                         '<td>'+sts+' '+btnAct+'<textarea id="dataEdit_'+v.ID+'" class="hide">'+JSON.stringify(v)+'</textarea></td>' +
                         '</tr>');
                 });

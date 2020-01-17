@@ -775,28 +775,6 @@ abstract class Ticket_Controler extends Globalclass{
 
 }
 
-abstract class DocumentGenerator_Controler extends Globalclass{ // for rektorat
-    public $data = array();
-    
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('document-generator/m_doc');
-    }
-
-    public function temp($content)
-    {
-        $this->template($content);
-    }
-
-    public function menu_document($page){
-        $department = parent::__getDepartement();
-        $data['page'] = $page;
-        $content = $this->load->view('page/'.$department.'/document-generator/menu_document',$data,true);
-        $this->temp($content);
-    }
-}
-
 abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for services
     public $data = array();
     
@@ -805,11 +783,25 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
         parent::__construct();
         $this->load->model('document-generator/m_doc');
         $this->__setDepartment();
+        // get auth Department
+        $this->__authDepartment();
+    }
+
+    public function __authDepartment(){
+        $this->load->model('document-generator/m_auth');
+        $this->data['auth'] = $this->m_auth->__authDepartment();
     }
 
     public function __setDepartment(){
         $this->load->model('ticketing/m_general');
-        $this->data['DepartmentID'] = $this->m_general->getDepartmentNow();
+        if (!$this->session->userdata('DepartmentIDDocument')) {
+            $DepartmentID= $this->m_general->getDepartmentNow();
+            $this->__setDepartmentSession($DepartmentID);
+        }
+    }
+
+    public function __setDepartmentSession($DepartmentID){
+        $this->session->set_userdata('DepartmentIDDocument',$DepartmentID);
     }
 
     public function temp($content)
@@ -830,8 +822,8 @@ abstract class ServiceDocumentGenerator_Controler extends Globalclass{ // for se
     }
 
     public function menu_document($page){
-        $data['page'] = $page;
-        $content = $this->load->view('global/request-document-generator/menu_document',$data,true);
+        $this->data['page'] = $page;
+        $content = $this->load->view('global/request-document-generator/menu_document',$this->data,true);
         $this->temp($content);
     }
 

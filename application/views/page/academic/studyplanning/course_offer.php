@@ -79,6 +79,9 @@
 
         <div id="dataDraf"></div>
 
+
+        <div id="dataDrafJunk"></div>
+
     </div>
 
     <div class="col-md-6">
@@ -134,7 +137,7 @@
             $('#formDBStudent').val('ta_'+Student.Year);
             $('#formMhswID').val(Student.MhswID);
 
-            $('#dataDraf').html('<table class="table table-bordered table-striped" id="tableCourse">' +
+            $('#dataDraf').html('<table class="table table-bordered" id="tableCourse">' +
                 '            <thead>' +
                 '            <tr>' +
                 // '                <th style="width: 1%;">No</th>' +
@@ -152,6 +155,8 @@
 
             // Course Draf
             if(typeof jsonResult.Course.ScheduleDraf !== 'undefined' && CourseDraf.length>0){
+
+                var ListSKID = [];
 
                 for(var t=0;t<Course.length;t++){
 
@@ -192,11 +197,33 @@
                             '<td><button class="btn btn-sm btn-danger btnCustom btnDelete" data-id="'+CourseDraf[draf].SKID+'"><i class="fa fa-trash"></i></button></td>' +
                             '</tr>');
 
+                        ListSKID.push(CourseDraf[draf].SKID);
+
                         CreditInDraf = CreditInDraf + parseInt(d.Credit);
                     }
 
 
                 }
+
+                // Insert To Junk KRS
+
+                for(var j=0;j<CourseDraf.length;j++){
+                    var dJunk = CourseDraf[j];
+                    if($.inArray(dJunk.SKID,ListSKID)==-1){
+
+                        $('#dataRowDraf').append('<tr style="background: #ffc5c566 !important;">' +
+                            '<td colspan="4" style="vertical-align: middle;color: red;">Need removed !</td>' +
+                            '<td>'+dJunk.TypeSP+'</td>' +
+                            '<td>'+dJunk.Credit+'</td>' +
+                            '<td><button class="btn btn-sm btn-danger btnCustom btnDelete" data-id="'+dJunk.SKID+'"><i class="fa fa-trash"></i></button></td>' +
+                            '</tr>');
+
+                        CreditInDraf = CreditInDraf + parseInt(dJunk.Credit);
+                    }
+                }
+
+
+
             }
             else {
                 $('#dataRowDraf').append('<tr>' +

@@ -1,26 +1,11 @@
 
 <style>
-    #tableEmployees thead tr th {
-        background: #20525a;
-        color: #ffffff;
-        text-align: center;
-    }
+    #tableEmployees thead tr th {background: #20525a;color: #ffffff;text-align: center;}
+    .bg-primary {color: #fff;background-color: #337ab7;}
+    .bg-success {background-color: #dff0d8;}
+    .bg-info {background-color: #d9edf7;}
+    .bg-warning {background-color: #fcf8e3 !important;}
 </style>
-
-<div class="row">
-    <div class="col-md-4 col-md-offset-4">
-        <div class="well">
-            <div class="row">
-                <div class="col-xs-12">
-                    <select id="filterStatusEmployees" class="form-control">
-                        <option value="">-- All Status --</option>
-                        <option disabled>------------------------------</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- ADDED BY FEBRI @ DEC 2019 -->
 <div class="row">
@@ -60,17 +45,17 @@
                 </select>               
               </div>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
               <div class="form-group">
-                <label>Status employee</label>                
-                <select class="form-control" name="status">
-                  <option value="">-Choose one-</option>
-                  <?php foreach ($statusstd as $t) { 
-                  echo '<option value="'.$t->IDStatus.'">'.$t->Description.'</option>';
-                  } ?>
-                </select>               
+                <label>Birthdate</label>
+                <div class="input-group">
+                  <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date"> 
+                  <div class="input-group-addon">-</div>
+                  <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
+                </div>
               </div>
             </div>
+            
             <div class="col-sm-2">
               <div class="form-group">
                 <label class="show-more-filter text-success" data-toggle="collapse" data-target="#advance-filter" aria-expanded="false" aria-controls="advance-filter">
@@ -84,47 +69,81 @@
           <div id="advance-filter" class="collapse">
             <div class="row">
               <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Religion</label>
-                  <select class="form-control" name="religion">
-                    <option value="">Choose one</option>
-                    <?php if(!empty($religion)){ 
-                    foreach ($religion as $rg) { ?>
-                    <option value="<?=$rg->IDReligion?>"><?=$rg->Religion?></option>
-                    <?php } } ?>
-                  </select>
+                <div class="form-groups">
+                  <label>Status employee</label>
                 </div>
+                <?php if(!empty($statusstd)) {
+                foreach ($statusstd as $t) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$t->IDStatus?>" name="statusstd[]" > <?=$t->Description?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-groups">
+                  <label>Religion</label>
+                </div>
+                <?php if(!empty($religion)){ 
+                foreach ($religion as $rg) { ?>
+                <div class="form-group">
+                  <div class="col-sm-10">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" value="<?=$rg->IDReligion?>" name="religion[]"> <?=$rg->Religion?>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <?php } } ?>
+
               </div>
               <div class="col-sm-2">
                 <div class="form-group">
                   <label>Gender</label>
-                  <select class="form-control" name="gender">
-                    <option value="">Choose one</option>
-                    <option value="P">Female</option>
-                    <option value="L">Male</option>
-                  </select>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="L" name="gender[]"> Male
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-10">
+                      <div class="form-checkbox">
+                        <label>
+                            <input type="checkbox" value="P" name="gender[]" > Female
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
+              
+              
               <div class="col-sm-3">
                 <div class="form-group">
-                  <label>Birthdate</label>
-                  <div class="input-group">
-                    <input type="text" name="birthdate_start" id="birthdate_start" class="form-control" placeholder="Start date"> 
-                    <div class="input-group-addon">-</div>
-                    <input type="text" name="birthdate_end" id="birthdate_end" class="form-control" placeholder="End date"> 
+                  <label>Last Education</label>
+                  <?php if(!empty($level_education)){ 
+                  foreach ($level_education as $le) { ?>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <div class="checkbox">
+                        <label>
+                          <input type="checkbox" value="<?=$le->ID?>" name="level_education[]"> <?=$le->Description?>
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div class="col-sm-2">
-                <div class="form-group">
-                  <label>Level Education</label>
-                  <select class="form-control" name="level_education">
-                    <option value="">Choose one</option>
-                    <?php if(!empty($level_education)){ 
-                    foreach ($level_education as $le) { ?>
-                    <option value="<?=$le->ID?>"><?=$le->Level." - ".$le->Description?></option>
-                    <?php } } ?>
-                  </select>
+                  <?php } } ?>
                 </div>
               </div>
             </div>
@@ -142,6 +161,11 @@
 </div>
 <script type="text/javascript">
   $(document).ready(function(){
+    $("#birthdate_start,#birthdate_end").datepicker({
+        dateFormat: 'dd-mm-yy',
+        changeYear: true,
+        changeMonth: true
+    });
     $('#form-filter').on('keyup keypress', function(e) {
       var keyCode = e.keyCode || e.which;
       if (keyCode === 13) { 
@@ -159,6 +183,20 @@
         $(this).attr("aria-expanded",false);
         $(this).find("span").text("Advance filter");        
         $(this).find("i.fa").toggleClass("fa-angle-double-up fa-angle-double-down");
+      }
+    });
+
+    $("#form-filter select[name=division]").change(function(){
+      var value = $(this).val();
+      if($.trim(value) != ''){
+        $("#form-filter select[name=position]").prop("disabled",false);
+      }
+    });
+    $("#form-filter select[name=position]").change(function(){
+      var division = $("#form-filter select[name=division]").val();
+      if($.trim(division) == ''){
+        division.addClass("required");
+        alert("Please fill up field Division");
       }
     });
     
@@ -186,6 +224,33 @@
           <h4 class="panel-title"><i class="fa fa-bars"></i> List of employee</h4>
         </div>
         <div class="panel-body">
+          <div id="sorting-data">
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <label>Sort by</label>
+                  <div class="input-group">
+                    <select class="form-control" name="sort_by">
+                      <option value="">-</option>
+                      <option value="NIP">NIP</option>
+                      <option value="Name">Name</option>
+                      <option value="DateOfBirth">Birthdate</option>
+                      <option value="Gender">Gender</option>
+                      <option value="rl.Religion">Religion</option>
+                      <option value="le.ID">Level Education</option>
+                      <option value="StatusEmployeeID">Status Employee</option>
+                      <option value="StatusLecturerID">Status Lecturer</option>
+                    </select>
+                    <div class="input-group-addon"></div>
+                    <select class="form-control" name="order_by">
+                      <option value="ASC">ASCENDING</option>
+                      <option value="DESC">DESCENDING</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="divDataEmployees"></div>
         </div>
       </div>
@@ -198,13 +263,25 @@
     $(document).ready(function () {
         loadSelectOptionStatusEmployee('#filterStatusEmployees','');
         loadDataEmployees();
+
+        $("#sorting-data").on("change","select[name=sort_by]",function(){
+          var value = $(this).val();
+          var order = $("#sorting-data select[name=order_by]").val();
+          loadDataEmployees(value,order);
+        });
+        $("#sorting-data").on("change","select[name=order_by]",function(){
+          var order = $("#sorting-data select[name=sort_by]").val();
+          var value = $(this).val();
+          loadDataEmployees(order,value);
+        });
+
     });
 
     $('#filterStatusEmployees').change(function () {
-        loadDataEmployees();
+      loadDataEmployees();
     });
 
-    function loadDataEmployees() {
+    function loadDataEmployees(sort=null,order=null) {
         loading_page('#divDataEmployees');
 
         setTimeout(function () {
@@ -212,22 +289,25 @@
                 '            <thead>' +
                 '            <tr>' +
                 '                <th style="width: 1%;">No</th>' +
-                '                <th style="width: 7%;">NIP</th>' +
-                '                <th style="width: 5%;">Photo</th>' +
-                '                <th>Name</th>' +
-                '                <th style="width: 5%;">Gender</th>' +
-                '                <th style="width: 15%;">Position</th>' +
-                '                <th style="width: 25%;">Address</th>' +
+                '                <th style="width: 3%;">NIP</th>' +
+                '                <th style="width: 15%;">Employee</th>' +
+                '                <th style="width: 10%;">Birthdate</th>' +
+                '                <th style="width: 8%;">Position</th>' +
+                '                <th style="width: 15%;">Address</th>' +
                 '                <th style="width: 7%;">Action</th>' +
                 '                <th style="width: 7%;">Status</th>' +
                 '            </tr>' +
                 '            </thead>' +
                 '        </table>');
-
-            var filterStatusEmployees = $('#filterStatusEmployees').val();
-
-            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');
-
+            /*UPDATED BY FEBRI @ JAN 2020*/
+            /*var filterStatusEmployees = $('#filterStatusEmployees').val();
+            var token = jwt_encode({StatusEmployeeID : filterStatusEmployees},'UAP)(*');*/
+            var filtering = $("#form-filter").serialize();
+            if((sort && order) || ( sort !== null && order !== null) ){
+              filtering = filtering+"&sortby="+sort+"&orderby="+order;
+            }
+            var token = jwt_encode({Filter : filtering},'UAP)(*');
+            /*END UPDATED BY FEBRI @ JAN 2020*/
             var dataTable = $('#tableEmployees').DataTable( {
                 "processing": true,
                 "serverSide": true,
@@ -241,10 +321,19 @@
                     ordering : false,
                     data : {token:token},
                     type: "post",  // method  , by default get
-                    error: function(){  // error handling
+                    error: function(jqXHR){  // error handling
                         $(".employee-grid-error").html("");
                         $("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                         $("#employee-grid_processing").css("display","none");
+
+                        $('#GlobalModal .modal-header').html('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                            '<h4 class="modal-title">Error Fetch Student Data</h4>');
+                        $('#GlobalModal .modal-body').html(jqXHR.responseText);
+                        $('#GlobalModal .modal-footer').html('<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>');
+                        $('#GlobalModal').modal({
+                            'show' : true,
+                            'backdrop' : 'static'
+                        });
                     }
                 }
             } );
@@ -667,5 +756,14 @@
         }
 
     });
+
+
+    /*ADDED BY FEBRI @ JAN 2020*/
+    $(document).ready(function(){
+      $(".btn-filter").click(function(){
+        loadDataEmployees();
+      });
+    });
+    /*END ADDED BY FEBRI @ JAN 2020*/
 
 </script>

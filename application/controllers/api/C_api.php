@@ -431,68 +431,282 @@ class C_api extends CI_Controller {
 
     public function getEmployeesHR()
     {
-
-        $status = $this->input->get('s');
         $requestData= $_REQUEST;
+        $data_arr = $this->getInputToken();
 
-        $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
-        //print_r($status);
-
-        //$totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
-
-        
-        /*UPDATED BY FEBRI @ NOV 2019*/
-        $sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
-                ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
-                FROM db_employees.employees em
-                LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-                LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
-                LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
-                WHERE em.StatusEmployeeID != -2 '.$whereStatus;
-        if($requestData['isappv'] === 'true'){
-            $sql .= " AND (te.isApproval = 1) ";
-        }
-
-        if( !empty($requestData['search']['value']) ) {
-            $sql.= ' AND ( em.NIP LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
-            $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
-            $sql.= ') ORDER BY NIP  ASC';
-        }else {
-            $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
-        }
-        /*END UPDATED BY FEBRI @ NOV 2019*/
-
-        $query = $this->db->query($sql)->result_array();
-        $totalData = count($query);
-        $data = array();
-
-        for($i=0;$i<count($query);$i++){
-            $nestedData=array();
-            $row = $query[$i];
-
-            $jb = explode('.',$row["PositionMain"]);
-            $Division = '';
-            $Position = '';
-
-            if(count($jb)>1){
-                $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
-                $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
-                $Division = $dataDivision['Division'];
-                $Position = $dataPosition['Position'];
+        /*UPDATED BY FEBRI @  JAN 2020*/
+        $dataWhere = "";  $dataArrStatus=array(); $dataArrGender=array(); $dataArrReligion=array(); $dataArrLevel=array();
+        if(!empty($data_arr['Filter'])){            
+            $parse = parse_str($data_arr['Filter'],$output);
+            if(!empty($output['staff'])){
+                $dataWhere .= " AND (em.NIP like '%".$output['staff']."%' OR em.Name  like '%".$output['staff']."%' ) ";
+            }
+            if(!empty($output['division'])){
+                $conditionDivPo = " AND (em.PositionMain like '".$output['division'].".%')";
+                if(!empty($output['position'])){
+                    $conditionDivPo = " AND (em.PositionMain = '".$output['division'].".".$output['position']."')";
+                }
+                $dataWhere .= $conditionDivPo;
+            }
+            if(!empty($output['birthdate_start'])){
+                $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."')";
+                if(!empty($output['birthdate_end'])){
+                    $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' AND em.DateOfBirth <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )";
+                }
+                $dataWhere .= $conditionBirthDate;
+            }
+            if(!empty($output['statusstd'])){
+                $dataArrStatus = $output['statusstd'];
+                $conditionStatus = " AND (";
+                $sn = 1;
+                foreach ($output['statusstd'] as $s) {
+                    if($s == '-1'){
+                        $conditionStatus .= "(em.StatusEmployeeID = '".$s."' OR em.StatusLecturerID = '".$s."' )".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else if($s == 3 || $s == 4 || $s == 5 || $s== 6){
+                        $conditionStatus .= "em.StatusLecturerID = '".$s."' ".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else{
+                        $conditionStatus .= "em.StatusEmployeeID = '".$s."'".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }
+                    $sn++;
+                }
+                $conditionStatus .= ")";
+                $dataWhere .= $conditionStatus;
+            }
+            if(!empty($output['religion'])){
+                $dataArrReligion = $output['religion'];
+                $conditionReligion = " AND (";
+                $rn = 1;
+                foreach ($output['religion'] as $r) {
+                    $conditionReligion .= "em.ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
+                    $rn++;
+                }
+                $conditionReligion .= ")";
+                $dataWhere .= $conditionReligion;
+            }
+            if(!empty($output['gender'])){
+                $dataArrGender = $output['gender'];
+                $conditionGender = " AND (";
+                $gn = 1;
+                foreach ($output['gender'] as $g) {
+                    $conditionGender .= "em.Gender = '".$g."' ".(($gn < count($output['gender'])) ? ' OR ':'');
+                    $gn++;
+                }
+                $conditionGender .= ")";
+                $dataWhere .= $conditionGender;
+            }
+            if(!empty($output['level_education'])){
+                $dataArrLevel = $output['level_education'];
+                $conditionLevelEdu = " AND (";
+                $ln = 1;
+                foreach ($output['level_education'] as $l) {
+                    $conditionLevelEdu .= "em.LevelEducationID = '".$l."' ".(($ln < count($output['level_education'])) ? ' OR ':'');
+                    $ln++;
+                }
+                $conditionLevelEdu .= ")";
+                $dataWhere .= $conditionLevelEdu;
             }
 
-            $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
-                ? base_url('uploads/employees/'.$row["Photo"])
-                : base_url('images/icon/userfalse.png');
+            if(!empty($output['isapprove'])){
+                if($output['isapprove']){
+                    $dataWhere .= "AND (te.isApproval = 1) ";
+                }
+            }
 
-            $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+            /*SORTING*/
+            if(!empty($output['sortby']) && !empty($output['orderby'])){
+                $orderBy = $output['sortby']." ".$output['orderby'];
+            }else{
+                $orderBy = "em.ID DESC";
+            }
+            /*END SORTING*/
+        }
+        /*END UPDATED BY FEBRI @  JAN 2020*/
 
-            $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
-            $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
-            
+        $dataSearch = '';
+        if( !empty($requestData['search']['value']) ) {
+            $search = $requestData['search']['value'];
+            $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
+        }
+
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu 
+                        FROM db_employees.employees em
+                        LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
+                        LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
+                        LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
+                        LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY '.$orderBy;
+        //echo $queryDefault;
+        $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
+
+        $query = $this->db->query($sql)->result_array();
+        $queryDefaultRow = $this->db->query($queryDefault)->result_array();
+        $no = $requestData['start'] + 1;
+        $data = array();
+
+        for($i=0;$i<count($query);$i++) {
+            $nestedData = array();
+            $row = $query[$i];
+
+            $division = '-';
+            $position = '-';
+            if($row['PositionMain']!='' && $row['PositionMain']!=null){
+                $PositionMain = explode('.',$row['PositionMain']);
+
+                $dataDivisi = $this->db->select('Division,Description')->get_where('db_employees.division',
+                    array('ID' => $PositionMain[0]),1)->result_array();
+                $division = $dataDivisi[0]['Division'];
+
+                $dataPosition = $this->db->select('Position,Description')->get_where('db_employees.position'
+                    ,array('ID' => $PositionMain[1]),1)->result_array();
+
+                $position = $dataPosition[0]['Position'];
+            }
+
+            $gender = ($row['Gender']=='L') ? 'Male' : 'Female' ;
+
+            $url_image = './uploads/employees/'.$row['Photo'];
+            $srcImg =  base_url('images/icon/userfalse.png');
+            if($row['Photo']!='' && $row['Photo']!=null){
+                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$row['Photo'])
+                    : base_url('images/icon/userfalse.png') ;
+            }
+
+
+            $EmailSelect = ($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') ? $row['Email'] : $row['EmailPU'] ;
+
+            $Email = (($row['StatusEmployeeID']==4 || $row['StatusEmployeeID']=='4') && count(explode(',', $EmailSelect))>1) ? '' : $EmailSelect;
+
+            $disBtnEmail = ($Email=='' || $Email==null) ? 'disabled' : '';
+            $dataToken = array(
+                'Type' => 'emp',
+                'Name' => $row['Name'],
+                'NIP' => $row['NIP'],
+                'Email' => $Email
+            );
+
+            $token = $this->jwt->encode($dataToken,'UAP)(*');
+
+            $DateOfBirth = ($row['DateOfBirth']!='' && $row['DateOfBirth']!=null) ? $row['DateOfBirth'] : '';
+            $disDateOfBirth = ($row['DateOfBirth']!='' && $row['DateOfBirth']!=null) ? '' : 'disabled';
+
+
+            $btnAct = '<div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' id="btnResetPass'.$row['NIP'].'" class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password (Send Email)</a></li>
+                            <li class="'.$disDateOfBirth.'"><a href="javascript:void(0);" '.$disDateOfBirth.' class="resetpassBirthDay '.$disDateOfBirth.'" data-nip="'.$row['NIP'].'" data-day="'.$DateOfBirth.'">Reset Password (DDMMYY)</a></li>
+                            <li><a href="javascript:void(0);" class="btn-update-email" id="btnUpdateEmail'.$row['NIP'].'" data-name="'.$row['Name'].'" data-nip="'.$row['NIP'].'" data-empid="'.$row['StatusEmployeeID'].'" data-email="'.$Email.'">Update Email</a></li>
+                            <li><a class = "PrintIDCard" href="javascript:void(0);" type = "employees" data-npm="'.$row['NIP'].'" data-name="'.ucwords(strtolower($row['Name'])).'" path = '.$srcImg.' email = "'.$row['EmailPU'].'">Print ID Card</a></li>
+                          </ul>
+                        </div>';
 
             $isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
+            $needAppv = "";
+            if(!empty($isRequested)){
+                if($this->session->userdata('IDdepartementNavigation') == 13){
+                    $needAppv = '<p><button class="btn btn-xs btn-info btn-appv" type="button" data-nip="'.$row["NIP"].'" title="Need approving for biodata" ><i class="fa fa-warning"></i> Need Approval</button></p>';
+                }
+            }
+
+            $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+            $nestedData[] = '<div  style="text-align:left;"><a href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'" style="font-weight: bold;">'.$row['NIP'].'</a>'.$needAppv.'</div>';
+            $nestedData[] = '<a class="card-link" href="'.base_url('human-resources/employees/edit-employees/'.$row["NIP"]).'"><div style="margin-bottom:10px"><div  style="float:left;margin-right:10px;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>'.
+                            '<div  style="text-align:left;"><span class="regular name">'.$row['Name'].'</span><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.(!empty($Email) ? $Email:'-').'</span></div>'.
+                            '</div><p><span class="regular '.((in_array($row['Gender'], $dataArrGender))? 'bg-primary':'').'"><i class="fa fa-'.(($row['Gender'] == 'L') ? 'mars':'venus').'"></i> '.$gender.'</span> &nbsp;
+                                <span class="regular '.((in_array($row['ReligionID'], $dataArrReligion))? 'bg-primary':'').'"><i class="fa fa-star"></i> '.$row['EmpReligion'].'</span> &nbsp; 
+                                <span class="regular '.((in_array($row['LevelEducationID'], $dataArrLevel))? 'bg-primary':'').'"><i class="fa fa-graduation-cap"></i> '.(!empty($row['EmpEdu']) ? $row['EmpEdu']:'-').'</span> </p></a>';
+            $nestedData[] = '<div  style="text-align:left;">'.(!empty($row['PlaceOfBirth']) ? $row['PlaceOfBirth'].', ':'').date("d F Y",strtotime($row['DateOfBirth'])).'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
+            /*$nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';*/
+            $statusLect = $this->General_model->fetchData("db_employees.employees_status","IDStatus='".$row['StatusLecturerID']."'")->row();
+            $nestedData[] = '<button type="button"  title="Status Employee" class="btn btn-xs btn-'.(in_array($row['StatusEmployeeID'], $dataArrStatus) ? 'info':'default').'">'.$row['StatusEmployees'].'</button><br><button type="button" title="Status Lecturer" class="btn btn-xs btn-'.(in_array($row['StatusLecturerID'], $dataArrStatus) ? 'info':'default').'">'.(!empty($statusLect) ? $statusLect->Description : '-').'</button></div>';
+
+            $no++;
+
+            $data[] = $nestedData;
+
+        }
+
+        $json_data = array(
+            "draw"            => intval( $requestData['draw'] ),
+            "recordsTotal"    => intval(count($queryDefaultRow)),
+            "recordsFiltered" => intval( count($queryDefaultRow) ),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+        /*END UPDATED BY FEBRI @ JAN 2020*/
+
+
+
+
+
+
+        /*OLD*/
+            /*$status = $this->input->get('s');
+            $requestData= $_REQUEST;
+
+            $whereStatus = ($status!='') ? ' AND StatusEmployeeID = "'.$status.'" ' : '';
+            //print_r($status);
+
+            //$totalData = $this->db->query('SELECT *  FROM db_employees.employees WHERE StatusEmployeeID != -2 '.$whereStatus)->result_array();
+
+            
+            /*UPDATED BY FEBRI @ NOV 2019*/
+            /*$sql = 'SELECT em.NIP, em.NIDN, em.Photo, em.Name, em.Gender, em.PositionMain, em.ProdiID,
+                    ps.NameEng AS ProdiNameEng,em.EmailPU,em.Status, em.Address, ems.Description, em.StatusEmployeeID
+                    FROM db_employees.employees em
+                    LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
+                    LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID)
+                    LEFT JOIN db_employees.tmp_employees te on (te.NIP = em.NIP)
+                    WHERE em.StatusEmployeeID != -2 '.$whereStatus;
+            if($requestData['isappv'] === 'true'){
+                $sql .= " AND (te.isApproval = 1) ";
+            }
+
+            if( !empty($requestData['search']['value']) ) {
+                $sql.= ' AND ( em.NIP LIKE "'.$requestData['search']['value'].'%" ';
+                $sql.= ' OR em.Name LIKE "%'.$requestData['search']['value'].'%" ';
+                $sql.= ' OR ps.NameEng LIKE "'.$requestData['search']['value'].'%" ';
+                $sql.= ') ORDER BY NIP  ASC';
+            }else {
+                $sql.= 'ORDER BY em.StatusEmployeeID, NIP ASC LIMIT '.$requestData['start'].' ,'.$requestData['length'].' ';
+            }*/
+            /*END UPDATED BY FEBRI @ NOV 2019*/
+
+            /*$query = $this->db->query($sql)->result_array();
+            $totalData = count($query);
+            $data = array();
+
+            for($i=0;$i<count($query);$i++){
+                $nestedData=array();
+                $row = $query[$i];
+
+                $jb = explode('.',$row["PositionMain"]);
+                $Division = '';
+                $Position = '';
+
+                if(count($jb)>1){
+                    $dataDivision = $this->db->select('Division')->get_where('db_employees.division',array('ID'=>$jb[0]),1)->result_array()[0];
+                    $dataPosition = $this->db->select('Position')->get_where('db_employees.position',array('ID'=>$jb[1]),1)->result_array()[0];
+                    $Division = $dataDivision['Division'];
+                    $Position = $dataPosition['Position'];
+                }
+
+                $photo = (file_exists('./uploads/employees/'.$row["Photo"]) && $row["Photo"]!='' && $row["Photo"]!=null)
+                    ? base_url('uploads/employees/'.$row["Photo"])
+                    : base_url('images/icon/userfalse.png');
+
+                $nestedData[] = '<div style="text-align: center;"><img src="'.$photo.'" class="img-rounded" width="30" height="30"  style="max-width: 30px;object-fit: scale-down;"></div>';
+
+                $emailPU = ($row["EmailPU"]!='' && $row["EmailPU"]!=null) ? '<br/><span style="color: darkred;">'.$row["EmailPU"].'</span>' : '';
+                $nidn = ($row["NIDN"]!='' && $row["NIDN"]!=null) ? '<br/>NIDN : '.$row["NIDN"] : '';
+                */
+
+            /*$isRequested = $this->General_model->fetchData("db_employees.tmp_employees",array("NIP"=>$row["NIP"],"isApproval"=>1))->row();
             $needAppv = "";
             if(!empty($isRequested)){
                 if($this->session->userdata('IDdepartementNavigation') == 13){
@@ -533,7 +747,10 @@ class C_api extends CI_Controller {
             "recordsFiltered" => intval($totalData),
             "data"            => $data
         );
-        echo json_encode($json_data);
+        echo json_encode($json_data);*/
+        /*END OF OLD*/
+
+
     }
 
     public function getStudents(){
@@ -7899,7 +8116,7 @@ class C_api extends CI_Controller {
             if($data_arr['action']=='getStudents'){
 
                 $dataStd = $this->db->query('SELECT s.NPM,s.Name, lc.ID AS LCID FROM '.$data_arr['DB_Student'].'.students s
-                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM)
+                                                      LEFT JOIN db_academic.limit_credit lc ON (s.NPM=lc.NPM AND lc.SemesterID = "'.$data_arr['SemesterID'].'")
                                                       WHERE s.ProdiID = "'.$data_arr['ProdiID'].'"
                                                       ORDER BY s.NPM ASC')->result_array();
 
@@ -7925,6 +8142,33 @@ class C_api extends CI_Controller {
             else if($data_arr['action']=='addLC'){
                 $dataInsert = (array) $data_arr['dataInsert'];
                 $this->db->insert('db_academic.limit_credit', $dataInsert);
+                return print_r(1);
+            }
+            else if($data_arr['action']=='add_std_krs_exclude'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+
+                $ProdiID = $dataInsert['ProdiID'];
+                $Semester = $dataInsert['Semester'];
+
+                $dataCk = $this->db->get_where('db_academic.std_krs_exclude',array('ProdiID' => $ProdiID, 'Semester' => $Semester))->result_array();
+
+                $result = 0;
+                if(count($dataCk)<=0){
+                    $this->db->insert('db_academic.std_krs_exclude',$dataInsert);
+                    $result = 1;
+                }
+
+                return print_r($result);
+
+            }
+            else if($data_arr['action']=='read_std_krs_exclude'){
+                $result = $this->db->query('SELECT st.*, ps.NameEng AS Prodi FROM db_academic.std_krs_exclude st 
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = st.ProdiID)')->result_array();
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='remove_std_krs_exclude'){
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_academic.std_krs_exclude');
                 return print_r(1);
             }
         }
@@ -9495,14 +9739,13 @@ class C_api extends CI_Controller {
 
         $dataWhere = '';
 
-        if($data_arr['Year']!='' || $data_arr['ProdiID']!='' || $data_arr['GroupProdiID']!='' || $data_arr['StatusStudents']!='' 
-            || !empty($data_arr['approvalStudentReq'])  ){
+        if(!empty($data_arr['Year']) || !empty($data_arr['ProdiID']) || !empty($data_arr['GroupProdiID']) || !empty($data_arr['StatusStudents']) || !empty($data_arr['approvalStudentReq']) ){
+            
             $w_Year = ($data_arr['Year']!='') ?  ' AND aut_s.Year = "'.$data_arr['Year'].'"' : '';
             $w_ProdiID = ($data_arr['ProdiID']!='') ?  ' AND aut_s.ProdiID = "'.$data_arr['ProdiID'].'"' : '';
             $w_GroupProdiID = ($data_arr['GroupProdiID']!='') ?  ' AND aut_s.ProdiGroupID = "'.$data_arr['GroupProdiID'].'"' : '';
             $w_StatusStudents = ($data_arr['StatusStudents']!='') ?  ' AND aut_s.StatusStudentID = "'.$data_arr['StatusStudents'].'"' : '';
             $w_NeedApprovalReq = ($data_arr['approvalStudentReq']!='') ?  ' AND (ts.ID is not null  and ts.isApproval = 1)' : '';
-
 
             $dataWherePlan = 'WHERE ('.$w_Year.''.$w_ProdiID.''.$w_GroupProdiID.''.$w_StatusStudents.''.$w_NeedApprovalReq.')';
 
@@ -9664,24 +9907,331 @@ class C_api extends CI_Controller {
 
     }
 
+
+    /*ADDED BY FEBRI @ JAN 2020*/
+    public function getListStudentPS(){
+        $this->load->model("global-informations/Globalinformation_model");
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" NPM DESC ";
+            if(!empty($data_arr['Filter'])){            
+                $parse = parse_str($data_arr['Filter'],$output);
+                if(!empty($output['student'])){
+                    $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$output['student']."%' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$output['student']."%' ","filter"=>"OR",);
+                    $param[] = array("field"=>"ath.`EmailPU`","data"=>" like '%".$output['student']."%') ","filter"=>"OR",);
+                }        
+                if(!empty($output['Year'])){
+                    $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$output['Year']." ","filter"=>"AND",);    
+                }/*else{
+                    $getCurrentSemes = $this->General_model->fetchData("db_academic.semester",array("status"=>1))->row();
+                    $param[] = array("field"=>"ta.`ClassOf`","data"=>" =".$getCurrentSemes->Year." ","filter"=>"AND",);    
+                }*/
+                if(!empty($output['ProdiID'])){
+                    $param[] = array("field"=>"ta.`ProdiID`","data"=>" =".$output['ProdiID']." ","filter"=>"AND",);    
+                }
+                if(!empty($output['GroupProdiID'])){
+                    $param[] = array("field"=>"ath.`ProdiGroupID`","data"=>" =".$output['GroupProdiID']." ","filter"=>"AND",);
+                }
+
+                if(!empty($output['status'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['status']) == 1){
+                        $param[] = array("field"=>"ss.`CodeStatus`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['status'] as $s) {
+                            $param[] = array("field"=>"ss.`CodeStatus`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"ag.`ID`","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"ag.`ID`","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"ta.`Gender`","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['graduation_year'])){
+                    $param[] = array("field"=>"ath.`GraduationYear`","data"=>" =".$output['graduation_year']." ","filter"=>"AND",);    
+                }
+                if(!empty($output['graduation_start'])){
+                    if(!empty($output['graduation_end'])){
+                        $param[] = array("field"=>"(ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($output['graduation_start']))."' ","filter"=>"AND",);    
+                        $param[] = array("field"=>"ath.`GraduationDate`","data"=>" <= '".date("Y-m-d",strtotime($output['graduation_end']))."' )","filter"=>"AND",);    
+                    }else{
+                        $param[] = array("field"=>"ath.`GraduationDate`","data"=>" >= '".date("Y-m-d",strtotime($output['graduation_start']))."' ","filter"=>"AND",);
+                    }
+                }        
+                if(!empty($output['birthdate_start'])){
+                    if(!empty($output['birthdate_end'])){
+                        $param[] = array("field"=>"(ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);    
+                        $param[] = array("field"=>"ta.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )","filter"=>"AND",);    
+                    }else{
+                        $param[] = array("field"=>"ta.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);
+                    }
+                }
+
+                /*SORTING*/
+                if(!empty($output['sortby']) && !empty($output['orderby'])){
+                    $orderBy = $output['sortby']." ".$output['orderby'];
+                }
+
+                /*END SORTING*/
+
+                /*NEED APPROVED PROFILE*/
+                if(!empty($output['isapprove'])){
+                    if($output['isapprove']){
+                        $param[] = array("field"=>"ts.isApproval","data"=>" = 1 ","filter"=>"AND",);
+                    }
+                }
+                /*END NEED APPROVED PROFILE*/
+            }
+            
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(ta.`Name`","data"=>" like '%".$search."%' ","filter"=>"AND",);    
+                $param[] = array("field"=>"ta.`NPM`","data"=>" like '%".$search."%' ","filter"=>"OR",);    
+                $param[] = array("field"=>"ps.`NameEng`","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+            }
+
+            $data = array();
+            $totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
+            $result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
+            $no = $reqdata['start'] + 1;
+            foreach ($result as $v) {
+                $url_image = 'uploads/students/ta_'.$v->ClassOf.'/'.$v->Photo;
+                $srcImg =  base_url('images/icon/userfalse.png');
+                if($v->Photo != '' || $v->Photo != null || !empty($v->Photo)){
+                    $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
+                }
+
+                $dataToken = array(
+                    'Type' => 'std',
+                    'Name' => $v->Name,
+                    'NPM' => $v->NPM,
+                    'Email' => $v->EmailPU
+                );
+
+                $token = $this->jwt->encode($dataToken,'UAP)(*');
+                $nameS = str_replace(' ','-',ucwords(strtolower($v->Name)));
+
+                $disBtnEmail = (!empty($v->EmailPU) ? 'disabled' : '');
+
+                $btnAct = '<div class="btn-group">
+                              <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-pencil-square-o"></i> <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li class="'.$disBtnEmail.'"><a href="javascript:void(0);" '.$disBtnEmail.' class="btn-reset-password '.$disBtnEmail.'" data-token="'.$token.'">Reset Password</a></li>
+                                <li><a href="'.base_url('database/students/edit-students/ta_'.$v->ClassOf.'/'.$v->NPM.'/'.$nameS).'">Edit (Coming Soon)</a></li>';
+                
+                $requested = (($v->isApproved ==1) ? '':'disabled');
+                $btnAct .=      '<li class="'.$requested.'"><a  href="javascript:void(0);" class="show-request" data-npm="'.$v->NPM.'" data-ta="'.$v->ClassOf.'">Request Approval</a></li>';
+                $btnAct .=      '<li role="separator" class="divider"></li>
+                                <li><a href="javascript:void(0);" class="btn-change-status " data-emailpu="'.$v->EmailPU.'"
+                                data-year="'.$v->ClassOf.'" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'"
+                                data-statusid="'.$v->StatusStudentID.'">Change Status</a>
+                                </li>
+                                <li><a class = "PrintIDCard" href="javascript:void(0);" type = "student" data-npm="'.$v->NPM.'" data-name="'.ucwords(strtolower($v->Name)).'" path = '.$srcImg.' email = "'.$v->EmailPU.'">Print ID Card</a></li>
+                              </ul>
+                            </div>';
+
+                $fm = '<input id="formTypeImage'.$v->NPM.'" class="hide" />
+                <form id="fmPhoto'.$v->NPM.'" enctype="multipart/form-data" accept-charset="utf-8" method="post" action="">
+                                    <input id="formPhoto" class="hide" value="" hidden />
+                                    <div class="form-group"><label class="btn btn-sm btn-default btn-default-warning btn-upload">
+                                            <i class="fa fa-upload"></i>
+                                            <input type="file" id="filePhoto" name="userfile" data-db="ta_'.$v->ClassOf.'" data-npm="'.$v->NPM.'" class="uploadPhotoEmp"
+                                                   style="display: none;" accept="image/*">
+                                        </label>
+                                    </div>
+                                </form>';
+
+                $gp = (!empty($v->ProdiGroupID)) ? ' - '.$v->ProdiGroup : '';
+
+                // show formulir number
+                $StrFM = (!empty($v->FormulirCode)) ? '<br/><span style="color: #20525a;">'.$v->FormulirCode.' / '.$v->No_Ref.'</span>' : '';
+
+                $IDCard = (!empty($v->Access_Card_Number)) ? $v->Access_Card_Number : '-';
+
+
+                // Cuma akademik yang bisa edit dan upload foto
+                $DeptID = $this->session->userdata('IDdepartementNavigation');
+                $btnAct = ($DeptID==6 || $DeptID=='6') ? $btnAct : '-';
+                $fm = ($DeptID==6 || $DeptID=='6') ? $fm : '-';
+
+
+                $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
+                /*UPDATED BY FEBRI @ NOV 2019*/
+                if($DeptID==6 || $DeptID=='6'){
+                    $needAppv = (($v->isApproved == 1) ? '<span style="width:100%" class="btn btn-sm btn-info show-request" title="Need Accepting Request" data-npm="'.$v->NPM.'" data-ta="'.$v->ClassOf.'" > <i class="fa fa-warning"></i> Need Approval</span>':'');
+                }else{$needAppv="";}
+
+                $studentBox = '<div class="detail-user" data-user="'.$v->NPM.'"> 
+                                <img class="std-img img-rounded" src="'.$srcImg.'" > 
+                                <p class="npm">'.$v->NPM.'</p>
+                                <p class="name">'.$v->Name.'</p>
+                                <p class="email"><i class="fa fa-envelope-o"></i> '.(!empty($v->EmailPU) ? $v->EmailPU : "-").'</p>
+                               </div><div style="margin-top:10px">'.$needAppv.'</div>';
+                $nestedData = array();
+                $nestedData[] = ($no++);
+                $nestedData[] = $studentBox;
+                $nestedData[] = "<p class='text-left'>".(!empty($v->PlaceOfBirth) ? $v->PlaceOfBirth.",<br>":"").date("d F Y", strtotime($v->DateOfBirth))."</p>";
+                $nestedData[] = "<p class='text-center'>".$v->religionName."</p>";
+                $nestedData[] = "<p class='text-center'>".(($v->Gender == "L") ? 'Male':'Female')."</p>";
+                $nestedData[] = "<center>".$v->ClassOf."</center>";
+                $nestedData[] = $v->ProdiNameEng;
+                $nestedData[] = (($v->StatusStudentID == 1) ? $v->StatusStudent."<p>Graduated in ".(!empty($v->GraduationYear) ? $v->GraduationYear : date('Y',strtotime($v->GraduationDate))).", <br><small><i class='fa fa-graduation-cap'></i> ".date('D,d F Y',strtotime($v->GraduationDate))."</small></p>" : $v->StatusStudent);
+                $nestedData[] = '<div style="text-align:center;">'.$fm.'</div>';
+                $nestedData[] = $btnAct;
+                $nestedData[] = '<div style="text-align:center;"><button class="btn btn-sm btn-default btn-default-primary btnLoginPortalStudents" data-npm="'.$v->NPM.'">Login Portal</button></div>';
+                $data[] = $nestedData;
+            }
+
+            $json_data = array(
+                "draw"            => intval( $reqdata['draw'] ),
+                "recordsTotal"    => intval(count($totalData)),
+                "recordsFiltered" => intval( count($totalData) ),
+                "data"            => $data
+            );
+
+        }else{$json_data=null;}
+
+        echo json_encode($json_data);
+    }
+    /*END ADDED BY FEBRI @ JAN 2020*/
+
     public function getListEmployees(){
         $requestData= $_REQUEST;
         $data_arr = $this->getInputToken();
 
-        $dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
+        /*$dataWhere = ($data_arr['StatusEmployeeID']!='' && $data_arr['StatusEmployeeID']!=null) ?
             'AND StatusEmployeeID = "'.$data_arr['StatusEmployeeID'].'" '
             : '' ;
+        */
+        /*UPDATED BY FEBRI @  JAN 2020*/
+        $dataWhere = "";  $dataArrStatus=array(); $dataArrGender=array(); $dataArrReligion=array(); $dataArrLevel=array();
+        if(!empty($data_arr['Filter'])){            
+            $parse = parse_str($data_arr['Filter'],$output);
+            if(!empty($output['staff'])){
+                $dataWhere .= " AND (em.NIP like '%".$output['staff']."%' OR em.Name  like '%".$output['staff']."%' ) ";
+            }
+            if(!empty($output['division'])){
+                $conditionDivPo = " AND (em.PositionMain like '".$output['division'].".%')";
+                if(!empty($output['position'])){
+                    $conditionDivPo = " AND (em.PositionMain = '".$output['division'].".".$output['position']."')";
+                }
+                $dataWhere .= $conditionDivPo;
+            }
+            if(!empty($output['birthdate_start'])){
+                $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."')";
+                if(!empty($output['birthdate_end'])){
+                    $conditionBirthDate = " AND (em.DateOfBirth >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' AND em.DateOfBirth <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )";
+                }
+                $dataWhere .= $conditionBirthDate;
+            }
+            if(!empty($output['statusstd'])){
+                $dataArrStatus = $output['statusstd'];
+                $conditionStatus = " AND (";
+                $sn = 1;
+                foreach ($output['statusstd'] as $s) {
+                    if($s == '-1'){
+                        $conditionStatus .= "(em.StatusEmployeeID = '".$s."' OR em.StatusLecturerID = '".$s."' )".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else if($s == 3 || $s == 4 || $s == 5 || $s== 6){
+                        $conditionStatus .= "em.StatusLecturerID = '".$s."' ".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }else{
+                        $conditionStatus .= "em.StatusEmployeeID = '".$s."'".(($sn < count($output['statusstd'])) ? ' OR ':'');
+                    }
+                    $sn++;
+                }
+                $conditionStatus .= ")";
+                $dataWhere .= $conditionStatus;
+            }
+            if(!empty($output['religion'])){
+                $dataArrReligion = $output['religion'];
+                $conditionReligion = " AND (";
+                $rn = 1;
+                foreach ($output['religion'] as $r) {
+                    $conditionReligion .= "ReligionID = '".$r."' ".(($rn < count($output['religion'])) ? ' OR ':'');
+                    $rn++;
+                }
+                $conditionReligion .= ")";
+                $dataWhere .= $conditionReligion;
+            }
+            if(!empty($output['gender'])){
+                $dataArrGender = $output['gender'];
+                $conditionGender = " AND (";
+                $gn = 1;
+                foreach ($output['gender'] as $g) {
+                    $conditionGender .= "Gender = '".$g."' ".(($gn < count($output['gender'])) ? ' OR ':'');
+                    $gn++;
+                }
+                $conditionGender .= ")";
+                $dataWhere .= $conditionGender;
+            }
+            if(!empty($output['level_education'])){
+                $dataArrLevel = $output['level_education'];
+                $conditionLevelEdu = " AND (";
+                $ln = 1;
+                foreach ($output['level_education'] as $l) {
+                    $conditionLevelEdu .= "LevelEducationID = '".$l."' ".(($ln < count($output['level_education'])) ? ' OR ':'');
+                    $ln++;
+                }
+                $conditionLevelEdu .= ")";
+                $dataWhere .= $conditionLevelEdu;
+            }
+
+            /*SORTING*/
+            if(!empty($output['sortby']) && !empty($output['orderby'])){
+                $orderBy = $output['sortby']." ".$output['orderby'];
+            }else{
+                $orderBy = "em.ID DESC";
+            }
+            /*END SORTING*/
+        }
+        /*END UPDATED BY FEBRI @  JAN 2020*/
 
         $dataSearch = '';
         if( !empty($requestData['search']['value']) ) {
             $search = $requestData['search']['value'];
             $dataSearch = ' AND ( em.Name LIKE "%'.$search.'%" OR em.NIP LIKE "%'.$search.'%" )';
         }
-
-        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees FROM db_employees.employees em
-                                      LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
-                                      WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY em.NIP ASC ';
-
+        
+        $queryDefault = 'SELECT em.*, ems.Description AS StatusEmployees, rl.Religion as EmpReligion, le.Level as EmpEdu
+                        FROM db_employees.employees em
+                        LEFT JOIN db_employees.employees_status ems ON (em.StatusEmployeeID = ems.IDStatus)
+                        LEFT JOIN db_employees.religion rl ON (em.ReligionID = rl.IDReligion)
+                        LEFT JOIN db_employees.level_education le ON (em.LevelEducationID = le.ID)
+                        WHERE ( em.StatusEmployeeID != -2  '.$dataWhere.' ) '.$dataSearch.' ORDER BY '.$orderBy;
+        
         $sql = $queryDefault.' LIMIT '.$requestData['start'].','.$requestData['length'].' ';
 
         $query = $this->db->query($sql)->result_array();
@@ -9749,14 +10299,18 @@ class C_api extends CI_Controller {
                         </div>';
 
             $nestedData[] = '<div  style="text-align:center;">'.$no.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['NIP'].'</div>';
-            $nestedData[] = '<div  style="text-align:center;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>';
-            $nestedData[] = '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.$Email.'</span></div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$gender.'</div>';
+            $nestedData[] = '<div  style="text-align:left;">'.$row['NIP'].'Need approval'.'</div>';
+            $nestedData[] = '<div style="margin-bottom:10px"><div  style="float:left;margin-right:10px;"><img src="'.$srcImg.'" style="max-width: 35px;" class="img-rounded"></div>'.
+                            '<div  style="text-align:left;"><b>'.$row['Name'].'</b><br/><span id="viewEmail'.$row['NIP'].'" style="color: #2196f3;">'.(!empty($Email) ? $Email:'-').'</span></div>'.
+                            '</div><p><span class="'.((in_array($row['Gender'], $dataArrGender))? 'bg-primary':'').'"><i class="fa fa-'.(($row['Gender'] == 'L') ? 'mars':'venus').'"></i> '.$gender.'</span> &nbsp;
+                                <span class="'.((in_array($row['ReligionID'], $dataArrReligion))? 'bg-primary':'').'"><i class="fa fa-star"></i> '.$row['EmpReligion'].'</span> &nbsp; 
+                                <span class="'.((in_array($row['LevelEducationID'], $dataArrLevel))? 'bg-primary':'').'"><i class="fa fa-graduation-cap"></i> '.(!empty($row['EmpEdu']) ? $row['EmpEdu']:'-').'</span> </p>';
+            $nestedData[] = '<div  style="text-align:left;">'.(!empty($row['PlaceOfBirth']) ? $row['PlaceOfBirth'].', ':'').date("d F Y",strtotime($row['DateOfBirth'])).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.ucwords(strtolower($division)).'<br/>- '.ucwords(strtolower($position)).'</div>';
             $nestedData[] = '<div  style="text-align:left;">'.$row['Address'].'</div>';
             $nestedData[] = '<div  style="text-align:center;">'.$btnAct.'</div>';
-            $nestedData[] = '<div  style="text-align:center;">'.$row['StatusEmployees'].'</div>';
+            $statusLect = $this->General_model->fetchData("db_employees.employees_status","IDStatus='".$row['StatusLecturerID']."'")->row();
+            $nestedData[] = '<button type="button"  title="Status Employee" class="btn btn-xs btn-'.(in_array($row['StatusEmployeeID'], $dataArrStatus) ? 'info':'default').'">'.$row['StatusEmployees'].'</button><br><button type="button" title="Status Lecturer" class="btn btn-xs btn-'.(in_array($row['StatusLecturerID'], $dataArrStatus) ? 'info':'default').'">'.(!empty($statusLect) ? $statusLect->Description : '-').'</button></div>';
 
             $no++;
 

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class C_action extends DocumentGenerator_Controler {
+class C_action extends ServiceDocumentGenerator_Controler {
 
     function __construct()
     {
@@ -34,9 +34,21 @@ class C_action extends DocumentGenerator_Controler {
         }
     }
 
+    public function save_edit_department_access(){
+        $Input = json_decode(json_encode($this->getInputToken()),true);
+        $rs = $this->m_doc->save_edit_department_access($Input);
+        echo json_encode($rs);
+    }
+
     public function loadtableMaster(){
         $dataToken = $this->getInputToken();
         $rs = $this->m_doc->loadtableMaster($dataToken);
+        echo json_encode($rs);
+    }
+
+    public function LoadMasterSuratAccess(){
+        $dataToken = $this->getInputToken();
+        $rs = $this->m_doc->LoadMasterSuratAccess($dataToken);
         echo json_encode($rs);
     }
 
@@ -53,4 +65,12 @@ class C_action extends DocumentGenerator_Controler {
         $rs = $this->m_doc->RemoveDocumentMaster($ID);
         echo json_encode($rs);
     }
+
+    public function run_set_table(){
+        $dataToken = $this->getInputToken();
+        $dataToken = json_decode(json_encode($dataToken),true);
+        $rs = $this->m_doc->run_set_table($dataToken);
+        echo json_encode($rs);
+    }
+    
 }
