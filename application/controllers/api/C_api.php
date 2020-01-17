@@ -7989,6 +7989,33 @@ class C_api extends CI_Controller {
                 $this->db->insert('db_academic.limit_credit', $dataInsert);
                 return print_r(1);
             }
+            else if($data_arr['action']=='add_std_krs_exclude'){
+                $dataInsert = (array) $data_arr['dataInsert'];
+
+                $ProdiID = $dataInsert['ProdiID'];
+                $Semester = $dataInsert['Semester'];
+
+                $dataCk = $this->db->get_where('db_academic.std_krs_exclude',array('ProdiID' => $ProdiID, 'Semester' => $Semester))->result_array();
+
+                $result = 0;
+                if(count($dataCk)<=0){
+                    $this->db->insert('db_academic.std_krs_exclude',$dataInsert);
+                    $result = 1;
+                }
+
+                return print_r($result);
+
+            }
+            else if($data_arr['action']=='read_std_krs_exclude'){
+                $result = $this->db->query('SELECT st.*, ps.NameEng AS Prodi FROM db_academic.std_krs_exclude st 
+                                                        LEFT JOIN db_academic.program_study ps ON (ps.ID = st.ProdiID)')->result_array();
+                return print_r(json_encode($result));
+            }
+            else if($data_arr['action']=='remove_std_krs_exclude'){
+                $this->db->where('ID', $data_arr['ID']);
+                $this->db->delete('db_academic.std_krs_exclude');
+                return print_r(1);
+            }
         }
 
     }
