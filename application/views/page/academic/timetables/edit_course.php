@@ -30,7 +30,8 @@
     <div class="col-md-8 col-md-offset-2">
         <a href="<?php echo base_url('academic/timetables'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
         <hr/>
-        <table class="table">
+        <div id="showAlertEditingCourse"></div>
+        <table class="table panel-edit-course hide">
             <tr>
                 <td style="width: 20%;">Academic Year</td>
                 <td style="width: 1%;">:</td>
@@ -91,7 +92,7 @@
                 <th rowspan="2" style="width: 7%;">Smt</th>
                 <th rowspan="2" style="width: 7%;">Offer to <br/> <small>(Smt)</small></th>
                 <th colspan="2" style="width: 16%;">Student</th>
-                <th rowspan="2" style="width: 7%;">Action</th>
+                <th class="panel-edit-course hide" rowspan="2" style="width: 7%;">Action</th>
             </tr>
             <tr>
                 <th style="width: 8%;">Plan</th>
@@ -102,7 +103,7 @@
         </table>
 
         <hr/>
-        <table class="table">
+        <table class="table panel-edit-course hide">
             <tr>
                 <td style="width: 20%;">Attendance</td>
                 <td style="width: 1%;">:</td>
@@ -155,10 +156,60 @@
 <script>
     $(document).ready(function () {
         window.SemesterAntara = 0;
+        window.EditTimeTable = null;
+        loading_modal_show();
+        checkAccessToEditTimeTable();
         loadEditCourseSchedule();
-        loadEditCourse();
+
         loadSelectOptionBaseProdi('#formBaseProdi');
     });
+
+    function checkAccessToEditTimeTable(){
+
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+
+        var data = {
+            action : 'getDateKRSOnline',
+            SemesterID : SemesterID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudKurikulum';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                var d = jsonResult[0];
+                if(d.EditTimeTable=='0'){
+                    // $('.panel-edit-course').removeClass('hide');
+                    $('.panel-edit-course').remove();
+
+                    $('#showAlertEditingCourse').html('<div class="alert alert-danger" role="alert" style="text-align: center;">' +
+                        '            <b><i class="fa fa-warning fa-3x"></i>' +
+                        '                <br/>Unable to make changes or delete the current schedule</b>' +
+                        '            <div>' +
+                        '                for more information please contact the <u>IT Development Team</u>' +
+                        '            </div>' +
+                        '        </div>');
+
+                } else {
+                    $('.panel-edit-course').removeClass('hide');
+                }
+
+                window.EditTimeTable = d.EditTimeTable;
+                loadEditCourse();
+
+                setTimeout(function () {
+                    loading_modal_hide();
+                },1000);
+            }
+
+
+
+
+
+        });
+
+    }
 
 
     // ==== Control Edit Course ====
@@ -397,14 +448,16 @@
 
         $.post(url,{token:token},function (jsonResult) {
 
-            console.log(jsonResult);
-
            if(jsonResult.ScheduleDetails.length>0){
                $('#dataRow').empty();
                for(var i=0;i<jsonResult.ScheduleDetails.length;i++){
                    var d = jsonResult.ScheduleDetails[i];
 
                    var c_of = (d.ProdiGroup!=null && d.ProdiGroup!='') ? d.Year+' - <span style="color: #2196f3;"><b>'+d.ProdiGroup+'</b></span>' : d.Year;
+
+                   var btnActCourse = (EditTimeTable=='1')
+                       ? '<td><button class="btn btn-sm btn-default btn-default-danger btnDelEditCourse" data-totalcourse="'+jsonResult.ScheduleDetails.length+'" data-sdc="'+d.SDCID+'"><i class="fa fa-trash"></i></button></td>'
+                       : '';
 
                    $('#dataRow').append('<tr>' +
                        '<td style="text-align: left;"><b>'+d.MKCode+' - '+d.MKNameEng+'</b><br/><i>'+d.MKNameEng+'</i></td>' +
@@ -413,8 +466,8 @@
                        '<td>'+d.Semester+'</td>' +
                        '<td style="background: lightyellow;">'+d.Offerto+'</td>' +
                        '<td>'+d.TotalStd_Plan.length+'</td>' +
-                       '<td>'+d.TotalStd_Approve.length+'</td>' +
-                       '<td><button class="btn btn-sm btn-default btn-default-danger btnDelEditCourse" data-totalcourse="'+jsonResult.ScheduleDetails.length+'" data-sdc="'+d.SDCID+'"><i class="fa fa-trash"></i></button></td>' +
+                       '<td>'+d.TotalStd_Approve.length+'</td>' +btnActCourse+
+
                        '</tr>');
                }
            }

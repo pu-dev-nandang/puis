@@ -23,11 +23,12 @@
     <div class="col-md-12">
         <a href="<?php echo base_url('academic/timetables'); ?>" class="btn btn-warning"><i class="fa fa-arrow-left margin-right"></i> Back to List</a>
         <hr/>
+        <div id="showAlertEditingCourse"></div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-5 panel-edit-course hide">
         <div class="well" style="padding: 15px;">
             <input id="formSDID" class="hide" readonly/>
             <input id="dataMaxCredit" class="hide" readonly/>
@@ -110,7 +111,7 @@
                 <th style="width: 7%;"><small>Time Per Credit</small></th>
                 <th style="width: 17%;">Day, Time</th>
                 <th style="width: 7%;">Room</th>
-                <th style="width: 5%;">Action</th>
+                <th class="panel-edit-course hide" style="width: 5%;">Action</th>
             </tr>
             </thead>
             <tbody id="rwDataSch"></tbody>
@@ -123,6 +124,10 @@
     $(document).ready(function () {
         window.dataSesiArr = [];
         window.dataSesiDb = 1;
+
+        window.EditTimeTable = null;
+        loading_modal_show();
+        checkAccessToEditTimeTable();
 
         loadDataSchedule();
 
@@ -149,6 +154,53 @@
                 checkSchedule();
             });
     });
+
+    function checkAccessToEditTimeTable(){
+
+        var SemesterID = parseInt("<?php echo $SemesterID ?>");
+
+        var data = {
+            action : 'getDateKRSOnline',
+            SemesterID : SemesterID
+        };
+        var token = jwt_encode(data,'UAP)(*');
+        var url = base_url_js+'api/__crudKurikulum';
+
+        $.post(url,{token:token},function (jsonResult) {
+
+            if(jsonResult.length>0){
+                var d = jsonResult[0];
+                if(d.EditTimeTable=='0'){
+                    // $('.panel-edit-course').removeClass('hide');
+                    $('.panel-edit-course').remove();
+
+                    $('#showAlertEditingCourse').html('<div class="alert alert-danger" role="alert" style="text-align: center;">' +
+                        '            <b><i class="fa fa-warning fa-3x"></i>' +
+                        '                <br/>Unable to make changes or delete the current schedule</b>' +
+                        '            <div>' +
+                        '                for more information please contact the <u>IT Development Team</u>' +
+                        '            </div>' +
+                        '        </div>');
+
+                } else {
+                    $('.panel-edit-course').removeClass('hide');
+                }
+
+                window.EditTimeTable = d.EditTimeTable;
+                loadDataScheduleDetails();
+
+                setTimeout(function () {
+                    loading_modal_hide();
+                },1000);
+            }
+
+
+
+
+
+        });
+
+    }
 
     function loadDataScheduleDetails(){
         var SemesterID = parseInt("<?php echo $SemesterID ?>");
@@ -182,16 +234,18 @@
                     var st = d.StartSessions.substr(0,5);
                     var en = d.EndSessions.substr(0,5);
                     var time = st+' - '+en;
+
+                    var btnActCourse = (EditTimeTable=='1')
+                        ? '<td><button class="btn btn-sm btn-default btn-default-primary btnEditAction" data-id="'+d.SDID+'" data-room="'+d.ClassroomID+'" ' +
+                            'data-day="'+d.DayID+'" data-credit="'+d.Credit+'|'+d.TimePerCredit+'" data-time="'+st+'|'+en+'"><i class="fa fa-edit"></i></button> | ' +
+                            '<button class="btn btn-sm btn-default btn-default-danger btnDeleteAction" data-id="'+d.SDID+'" data-totalsubsesi="'+subSesi.length+'"><i class="fa fa-trash"></i></button></td>'
+                        : '';
+
                     $('#rwDataSch').append('<tr>' +
                         '<td>'+d.Credit+'</td>' +
                         '<td>'+d.TimePerCredit+'</td>' +
                         '<td>'+d.DayEng+', '+time+'</td>' +
-                        '<td>'+d.Room+'</td>' +
-                        '<td>' +
-                        '<button class="btn btn-sm btn-default btn-default-primary btnEditAction" data-id="'+d.SDID+'" data-room="'+d.ClassroomID+'" ' +
-                        'data-day="'+d.DayID+'" data-credit="'+d.Credit+'|'+d.TimePerCredit+'" data-time="'+st+'|'+en+'"><i class="fa fa-edit"></i></button> | ' +
-                        '<button class="btn btn-sm btn-default btn-default-danger btnDeleteAction" data-id="'+d.SDID+'" data-totalsubsesi="'+subSesi.length+'"><i class="fa fa-trash"></i></button> ' +
-                        '</td>' +
+                        '<td>'+d.Room+'</td>'+btnActCourse+
                         '</tr>');
 
                 }

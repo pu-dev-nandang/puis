@@ -50,6 +50,7 @@
 
 <script>
     $(document).ready(function () {
+
         loadSelectOptionProgramCampus('#filterProgramCampus','');
         loSelectOptionSemester('#filterSemester','');
         loadSelectOptionBaseProdi('#filterBaseProdi','');
@@ -69,6 +70,8 @@
         },1000);
 
     });
+
+
 
     $('.option-filter').change(function () {
         loadTimetables();
@@ -95,8 +98,23 @@
                 var ap = jsonResult.Approve.length;
                 var pl = jsonResult.Plan.length;
 
+                var btnAct2DeleteCourse = (jsonResult.KRS[0].EditTimeTable=='1')
+                    ?  '<div style="text-align: center;"><div style="background:lightyellow;padding:10px;border:1px solid red;margin-bottom:15px;"><span style="color:red;">*) If you delete this data, then the data student in the study planning will be deleted too</span></div> ' +
+                    '<button type="button" class="btn btn-danger" id="btnActDeleteTimeTables" data-group="'+ClassGroup+'" data-id="'+ScheduleID+'" style="margin-right: 5px;">Yes</button>' +
+                    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>'
+                    : '<div style="text-align: center;"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>';
+
+
+                var showAlertEditingCourse = (jsonResult.KRS[0].EditTimeTable=='1') ? '' : '<div class="alert alert-danger" role="alert" style="text-align: center;">' +
+                    '            <b><i class="fa fa-warning fa-3x"></i>' +
+                    '                <br/>Unable to make changes or delete the current schedule</b>' +
+                    '            <div>' +
+                    '                for more information please contact the <u>IT Development Team</u>' +
+                    '            </div>' +
+                    '        </div>';
+
                 $('#NotificationModal .modal-body').html('<div class="row">' +
-                    '<div class="col-md-12">' +
+                    '<div class="col-md-12"><div id="showAlertEditingCourse">'+showAlertEditingCourse+'</div>' +
                     '<table class="table">' +
                     '<tr>' +
                     '   <td>KRS Approveed</td>' +
@@ -107,11 +125,7 @@
                     '   <td>'+pl+' Students</td>' +
                     '</tr>' +
                     '</table></div>' +
-                    '</div>' +
-                    '<div style="text-align: center;"><div style="background:lightyellow;padding:10px;border:1px solid red;margin-bottom:15px;"><span style="color:red;">*) If you delete this data, then the data student in the study planning will be deleted too</span></div> ' +
-                    '<button type="button" class="btn btn-danger" id="btnActDeleteTimeTables" data-group="'+ClassGroup+'" data-id="'+ScheduleID+'" style="margin-right: 5px;">Yes</button>' +
-                    '<button type="button" class="btn btn-default" data-dismiss="modal">No</button>' +
-                    '</div>');
+                    '</div>' +btnAct2DeleteCourse+'</div>');
 
                 $('#NotificationModal').modal({
                     'backdrop' : 'static',

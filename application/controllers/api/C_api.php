@@ -1422,19 +1422,56 @@ class C_api extends CI_Controller {
             $this->db->insert('db_academic.'.$data_arr['table'],$insert);
             $insert_id = $this->db->insert_id();
             return print_r($insert_id);
-        } else if($data_arr['action']=='edit'){
+        }
+        else if($data_arr['action']=='edit'){
             $dataupdate = (array) $data_arr['data_insert'];
             $this->db->where('ID', $data_arr['ID']);
             $this->db->update('db_academic.'.$data_arr['table'],$dataupdate);
             return print_r(1);
-        } else if($data_arr['action']=='delete'){
+        }
+        else if($data_arr['action']=='delete'){
             $this->db->where('ID', $data_arr['ID']);
             $this->db->delete('db_academic.'.$data_arr['table']);
             return print_r(1);
-        } else if($data_arr['action']=='read'){
+        }
+        else if($data_arr['action']=='read'){
             $data = $this->m_api->__getItemKuriklum($data_arr['table']);
             return print_r(json_encode($data));
         }
+        else if($data_arr['action']='getDateKRSOnline'){
+
+            $data = $this->checkDateKRSOnlineToEditTimetable($data_arr['SemesterID']);
+
+            return print_r(json_encode($data));
+
+        }
+    }
+
+    private function checkDateKRSOnlineToEditTimetable($SemesterID){
+
+
+        $data = $this->db->query('SELECT ay.krsStart, ay.krsEnd, ay.EditTimeTable, s.Status 
+                                            FROM db_academic.academic_years ay 
+                                            LEFT JOIN db_academic.semester s ON (s.ID = ay.SemesterID)  
+                                            WHERE s.ID = "'.$SemesterID.'" ')->result_array();
+
+        if($data[0]['EditTimeTable']=='0'){
+            $dateNow = date('Y-m-d');
+            $data[0]['D'] = $dateNow;
+            if($data[0]['krsStart']<=$dateNow && $data[0]['krsEnd']>=$dateNow){
+                $data[0]['EditTimeTable'] = '0';
+            } else {
+                if($data[0]['Status']==1){
+                    $data[0]['EditTimeTable'] = '1';
+                } else {
+                    $data[0]['EditTimeTable'] = '0';
+                }
+
+            }
+        }
+
+        return $data;
+
     }
 
     public function crudDetailMK(){
@@ -2291,10 +2328,15 @@ class C_api extends CI_Controller {
                 $dataApprove = $this->m_api->__getStudentByScheduleIDApproved($SemesterID,$ScheduleID);
                 $dataPlan = $this->m_api->__getStudentByScheduleIDInStudyPlanning($SemesterID,$ScheduleID);
 
+                $dataKRS = $this->checkDateKRSOnlineToEditTimetable($SemesterID);
+
                 $result = array(
                     'Approve' => $dataApprove,
-                    'Plan' => $dataPlan
+                    'Plan' => $dataPlan,
+                    'KRS' => $dataKRS
                 );
+
+
 
                 return print_r(json_encode($result));
 

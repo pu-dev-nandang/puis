@@ -62,6 +62,15 @@ class C_it extends It_Controler {
 
     }
 
+    public function timetable(){
+
+        $department = parent::__getDepartement();
+        $data = '';
+        $page = $this->load->view('page/'.$department.'/academic/timetable',$data,true);
+        $this->temp($page);
+
+    }
+
     public function agregator_menu(){
 
         $department = parent::__getDepartement();
