@@ -27,9 +27,24 @@
     </ul>
 
     <ul class="crumb-buttons">
+        <li><a href="javascript:void(0);" title=""><span style="color:#607D8B;" id="tdNow"></span></a></li>
         <li><a href="javascript:void(0);" title="">Department :
                 <span style="color:#ff1100;" id = "wrDepartment"><?php echo ucwords(strtolower(str_replace('-',' ',$departement))); ?>
                 </span><span></span></a></li>
     </ul>
 
 </div>
+
+<script>
+    $(document).ready(function () {
+        loadTime();
+    });
+
+    function loadTime() {
+        setInterval(function () {
+            var dt = moment().format('dddd, DD MMM YYYY HH:mm:ss');
+            console.log(dt);
+            $('#tdNow').html(dt);
+        },1000);
+    }
+</script>
