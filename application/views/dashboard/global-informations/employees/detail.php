@@ -111,7 +111,7 @@
 												</div>
 												<div class="row">
 													<label class="col-sm-3">Position Main</label>
-													<p class="col-sm-9"><?=$divisionMain->Division."-".$positionMain->Description?></p>
+													<p class="col-sm-9"><?=$detail->DivisionMain."-".$detail->PositionMain?></p>
 												</div>	
 												<?php if(!empty($detail->PositionOther1)){ ?>											
 												<div class="row">
