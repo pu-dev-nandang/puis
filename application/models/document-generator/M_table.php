@@ -21,6 +21,14 @@ class M_table extends CI_Model {
 		return $querySQLSMT;
 	}
 
+	public function __NIP(){
+		return array();
+	}
+
+	public function __NPM(){
+		return array();
+	}
+
 	public function __generate($Props){
 		$DepartmentID = $this->session->userdata('DepartmentIDDocument');
 		$sql = 'select a.* from db_generatordoc.api_doc  as a
@@ -37,6 +45,7 @@ class M_table extends CI_Model {
 		                            LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
 		                            LEFT JOIN db_employees.employees_status ems ON (ems.IDStatus = em.StatusEmployeeID) 
 		                            where StatusEmployeeID not in (-1,-2,4,6)
+		                            order by em.Name asc
 		                            ';
 		$querySQLEmployees = $this->db->query($sqlEmployeesSample,array())->result_array();
 
@@ -46,6 +55,8 @@ class M_table extends CI_Model {
 			'Choose' => '',
 			'paramsChoose' => [
 				'#SemesterID' => $querySQLSMT,
+				'#NIP' => $this->__NIP(),
+				'#NPM' => $this->__NPM(),
 			],
 			'selectEmployees' => $querySQLEmployees,
 			// 'MapTable' => [] => by JS

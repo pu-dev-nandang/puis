@@ -1462,16 +1462,25 @@ class M_doc extends CI_Model {
 
     private function dataSaveForTable($dataSave,$dt){
         $ID_api = $dt['API']['Choose'];
+        // print_r($dt);die();
         $G_dt = $this->m_master->caribasedprimary('db_generatordoc.api_doc','ID',$ID_api);
         $Params = json_decode($G_dt[0]['Params'],true) ;
         $arr_json = [];
         for ($i=0; $i < count($Params); $i++) { 
             if (substr($Params[$i], 0,1) == '#') {
                 // get data by passing
-                $str = str_replace('#', '', $Params[$i]);
-                $arr_json[$str] = $dt['paramsUser'][$str];  
+                // $str = str_replace('#', '', $Params[$i]);
+                $str = $Params[$i];
+                $arr_json['TABLE'][$i][$str] = $dt['paramsUser'][$i][$str];
+            }
+            elseif (substr($Params[$i], 0,1) == '$') {
+                $str = $Params[$i];
+                $keySess = str_replace('$', '', $Params[$i]);
+                $arr_json['TABLE'][$i][$str] = $this->session->userdata($keySess);
             }
         }
+
+        // print_r($arr_json);die();
 
         $dataSave['InputJson'] = json_encode($arr_json);
         return $dataSave;
@@ -2319,24 +2328,27 @@ class M_doc extends CI_Model {
         $Params = json_decode($G_dt[0]['Params'],true) ;
         $querySql = $G_dt[0]['Query'];
         $VarPassing = [];
+        // print_r($dataToken);die();
         for ($i=0; $i < count($Params); $i++) { 
             if (substr($Params[$i], 0,1) == '#') {
                 // get data by passing
-                $str = str_replace('#', '', $Params[$i]);
-                $VarPassing[] = $dataToken[$str];
+                // $str = str_replace('#', '', $Params[$i]);
+                $str = $Params[$i];
+                $VarPassing[] = $dataToken[$i][$str];
             }
             else if (substr($Params[$i], 0,1) == '$') {
-                $str = str_replace('$', '', $Params[$i]);
+                $keySess = str_replace('$', '', $Params[$i]);
+                $str = $Params[$i];
                 if ($dataToken['action'] == 'sample') {
-                    $VarPassing[] = $dataToken[$str];
+                    $VarPassing[] = $dataToken[$i][$str];
                 }
                 else
                 {
-                    $VarPassing[] = $this->session->userdata($str);
+                    $VarPassing[] = $this->session->userdata($keySess);
                 }
             }
         }
-        
+      
         $query = $this->db->query($querySql,$VarPassing)->result_array();
         if (count($query) > 0) {
             return [

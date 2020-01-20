@@ -19,6 +19,7 @@ class C_action extends ServiceDocumentGenerator_Controler {
 	public function previewbyUserRequest(){
 		$dataToken = $this->getInputToken();
 		$dataToken = json_decode(json_encode($dataToken),true);
+		// print_r($dataToken);die();
 		$rs = $this->m_doc->previewbyUserRequest($dataToken);
 		echo json_encode($rs);
 	}

@@ -80,6 +80,7 @@ class M_action extends CI_Model {
             2 : callback data    
         
         */
+        // print_r($dataToken);die();
         $rs = ['status' => 0,'callback' => [],'data' => [] ];
         $data = $dataToken['data'];
         $querySql = $data['Query'];
@@ -101,14 +102,14 @@ class M_action extends CI_Model {
                }
                else
                {
-                $rs['data']['query'] = $query;
+                $rs['data']['query'] = $query->result_array();
                 $rs['status'] = 1; 
                }
             }
             else
             {
                 $VarPassing = [];
-                if (!array_key_exists('user', $dataToken)) {
+                if (!array_key_exists('user', $data)) {
                     $this->load->model('document-generator/m_table');
                     for ($i=0; $i < count($Params); $i++) { 
                         if (substr($Params[$i], 0,1) == '#') {
@@ -124,19 +125,63 @@ class M_action extends CI_Model {
                             }
                             else
                             {
-                                $rs['data'][$str] = $Obj->$str();
-                                $rs['status'] =2;
+                                if ($Params[$i] == '#NIP') {
+                                    $rs['data'][$i][$str] = $Obj->$str();
+                                    $rs['data'][$i]['name'] = $Params[$i];
+                                }
+                                elseif ($Params[$i] == '#NPM') {
+                                    $rs['data'][$i][$str] = $Obj->$str();
+                                    $rs['data'][$i]['name'] = $Params[$i];
+                                }
+                                else
+                                {
+                                    $rs['data'][$i][$str] = $Obj->$str();
+                                    $rs['data'][$i]['name'] = $Params[$i];
+                                }
+                                
+                                $rs['status'] = 2;
                             }
 
                         }
                         else if (substr($Params[$i], 0,1) == '$') {
-                            $str = str_replace('$', '', $Params[$i]);
-                            if (!$this->session->userdata($str)) {
+                            $keySession = str_replace('$', '', $Params[$i]);
+                            if (!$this->session->userdata($keySession)) {
                                $rs['callback'] = [
                                 'code' => 0,
-                                'message' => 'Session not exist : '.$str,
+                                'message' => 'Session not exist : '.$keySession,
                                ];
                                break; 
+                            }
+                            else
+                            {
+                                // get data by passing
+                                $str = str_replace('$', '__', $Params[$i]);
+                                $Obj = $this->m_table;
+                                if (!method_exists($Obj,$str)) {
+                                    $rs['callback'] = [
+                                     'code' => 0,
+                                     'message' => 'Method not exist : '.$str,
+                                    ];
+                                    break;
+                                }
+                                else
+                                {
+                                    if ($Params[$i] == '$NIP') {
+                                        $rs['data'][$i][$str] = $Obj->$str();
+                                        $rs['data'][$i]['name'] = $Params[$i];
+                                    }
+                                    elseif ($Params[$i] == '$NPM') {
+                                        $rs['data'][$i][$str] = $Obj->$str();
+                                        $rs['data'][$i]['name'] = $Params[$i];
+                                    }
+                                    else
+                                    {
+                                        $rs['data'][$i][$str] = $Obj->$str();
+                                        $rs['data'][$i]['name'] = $Params[$i];
+                                    }
+                                    
+                                    $rs['status'] = 2;
+                                }
                             }
                         }
                         else
@@ -153,7 +198,27 @@ class M_action extends CI_Model {
                 else
                 {
                     // excecute sql
-                    
+                    $paramUser = $data['user'];
+                    $Params = [];
+                    for ($i=0; $i < count($paramUser); $i++) { 
+                        $arr = $paramUser[$i];
+                        foreach ($arr as $key => $value) {
+                            $Params[] = $value;
+                        }
+                    }
+
+                    $this->db->db_debug=false;
+                    $query = $this->db->query($querySql,$Params);
+                    // print_r($this->db->last_query());die(); 
+                    if( !$query )
+                    {
+                       $rs['callback'] = $this->db->error();
+                    }
+                    else
+                    {
+                     $rs['data']['query'] = $query->result_array();
+                     $rs['status'] = 1; 
+                    }
                 }
                 
                 

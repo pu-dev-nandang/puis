@@ -101,6 +101,7 @@ class M_set extends CI_Model {
 					for ($i=0; $i < count($obj); $i++) { 
 						$Choose = $obj[$i]['Choose'];
 						$user = $obj[$i]['user'];
+						// print_r($DepartmentID);die();
 						$verify = $obj[$i]['verify'];
 						$cap = $obj[$i]['cap'];
 						switch ($Choose) {
@@ -189,6 +190,21 @@ class M_set extends CI_Model {
 											        ";
 											$query=$this->db->query($sql, array())->result_array();
 										}
+									}
+									else
+									{
+										// faculty
+										$sql = "select * from db_employees.employees
+										        where ( 
+										        	SPLIT_STR(PositionMain, '.', 2) = ".$user." or
+										        	SPLIT_STR(PositionOther1, '.', 2) = ".$user." or
+										        	SPLIT_STR(PositionOther2, '.', 2) = ".$user." or
+										        	SPLIT_STR(PositionOther3, '.', 2) = ".$user." 
+
+										        	)and StatusEmployeeID != -1
+										        limit 1
+										        ";
+										$query=$this->db->query($sql, array())->result_array();
 									}
 									
 								}

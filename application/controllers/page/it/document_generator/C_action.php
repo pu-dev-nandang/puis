@@ -45,6 +45,9 @@ class C_action extends It_Controler {
 		$checkValidation = $this->m_action->checkValidationQuery($dataToken);
 		if ($checkValidation['status'] == 1) {
 			switch ($action) {
+				case 'run':
+					$rs = $checkValidation;
+					break;
 				case 'add':
 					
 					break;

@@ -573,35 +573,41 @@
             var html = '';
             var params = jQuery.parseJSON( jwt_decode(selector.find('option:selected').attr('params')) );
             if (typeof params !== 'undefined') {
-                var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
-
-                // console.log(DataCallback);
-                var arr_special = ['#SemesterID'];
-                
-                for (var i = 0; i < arr_special.length; i++) {
-                    var bool = false;
-                    for (var j = 0; j < params.length; j++) {
-                        if (arr_special[i] == params[j] ) {
-                            bool = true;
-                            break;
-                        }
-                    }
-                    if (bool) {
-                        var dtRow = DataCallback['TABLE']['API']['paramsChoose'][arr_special[i]];
-                        var dtRowEmp = DataCallback['TABLE']['API']['selectEmployees'];
-                        var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,arr_special[i]);
-                        var htmlOPEMP = App_form_input.SelectAPIOPEMP(dtRowEmp);
-                        html += '<div class = "form-group">'+
-                                    '<label>Choose '+arr_special[i]+'</label>'+
-                                    htmlOP+
-                                '</div>'+
-                                '<div class = "form-group">'+
-                                    '<label>Choose Employees for Sample</label>'+
-                                    htmlOPEMP+
-                                '</div>';  
-                    }
-                     
+              var DataCallback =  jwt_decode($('#FormDocument').attr('datacallback'));
+              for(key in params){
+                if (params[key] == '#NIP' || params[key] == '$NIP') {
+                  var dtRowEmp = DataCallback['TABLE']['API']['selectEmployees'];
+                  var htmlOPEMP = App_form_input.SelectAPIOPEMP(dtRowEmp,params[key]);
+                  html  += '<div class = "form-group">'+
+                              '<label>Choose Parameter '+params[key]+'</label>'+
+                              htmlOPEMP+
+                          '</div>';
                 }
+                else if(params[key] == '#NPM'){
+                  html  += '<div class = "form-group">'+
+                              '<label>Choose Parameter '+params[key]+'</label>'+
+                              '<div class="input-group">'+
+                                  '<input type="text" class="form-control Input" readonly field="PARAMS" name="'+params[key]+'" key="TABLE">'+
+                                  '<span class="input-group-btn">'+
+                                      '<button class="btn btn-default SearchNPMSTD" type="button"><i class="fa fa-search" aria-hidden="true"></i></button>'+
+                                  '</span>'+
+                              '</div>'+
+                              '<label for="Name"></label>'+
+                          '</div>';
+                }
+                else
+                {
+                  var dtRow = DataCallback['TABLE']['API']['paramsChoose'][params[key]];
+                  var htmlOP = App_form_input.SelectAPIOPByParams(dtRow,params[key]);
+                  
+                  html += '<div class = "form-group">'+
+                              '<label>Choose Parameter '+params[key]+'</label>'+
+                              htmlOP+
+                          '</div>';  
+                }
+
+
+              }
 
                 if (html != '') {
                      html +=  '<div style = "text-align:right;padding:10px;">'+
@@ -627,15 +633,23 @@
             var data = {};
             // var querySQL = jwt_decode($('.Input[field="TABLE"][name="API"] option:selected').attr('query'));
             var ID_api = $('.Input[field="TABLE"][name="API"] option:selected').val();
-            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+            var count = 0;
+            $('.Input[key="TABLE"][field="PARAMS"]').not('div').each(function(e){
+                data[count] = {};
                 var nm = $(this).attr('name');
-                nm = nm.replace("#", "");
-                data[nm] = $(this).find('option:selected').val();
+                // nm = nm.replace("#", "");
+                var v = $(this).find('option:selected').val();
+                if (v == undefined) {
+                  v = $(this).val();
+                }
+                data[count][nm] = v;
+                count++;
             })
             // data['querySQL'] = querySQL;
             data['ID_api'] = ID_api;
-            data['NIP'] = $('.Input[field="employees"] option:selected').val();
+            // data['NIP'] = $('.Input[field="employees"] option:selected').val();
             data['action'] = 'sample';
+            // console.log(data);return;
             $('#Preview').prop('disabled',true);
             loading_button2(selector);
             var url = base_url_js+"document-generator-action/__run_set_table";
@@ -709,8 +723,8 @@
             return html;
         },
 
-        SelectAPIOPEMP : function(data){
-            var html =  '<select class = "form-control Input" field="employees" name="employees" key = "TABLE">';
+        SelectAPIOPEMP : function(data,paramsChoose){
+            var html =  '<select class = "form-control Input" field="PARAMS" name="'+paramsChoose+'" key = "TABLE">';
             for (var i = 0; i < data.length; i++) {
                html +=  '<option value = "'+data[i].NIP+'">'+data[i].Name+'</option>';
             }
@@ -738,14 +752,22 @@
             // console.log(settingTemplate[attrkey]);
             // select API Choose
             settingTemplate[attrkey]['API']['Choose'] = $('.Input[field="TABLE"][name="API"] option:selected').val();
-            $('.Input[key="TABLE"][field="PARAMS"]').each(function(e){
+            // var count = 0;
+            var data = {};
+            var count = 0;
+            $('.Input[key="TABLE"][field="PARAMS"]').not('div').each(function(e){
+                data[count] = {};
                 var nm = $(this).attr('name');
-                nm = nm.replace("#", "");
-                settingTemplate[attrkey]['paramsUser'] = {};
-                settingTemplate[attrkey]['paramsUser'][nm] =$(this).find('option:selected').val();
+                // nm = nm.replace("#", "");
+                var v = $(this).find('option:selected').val();
+                if (v == undefined) {
+                  v = $(this).val();
+                }
+                data[count][nm] = v;
+                count++;
             })
-
-            settingTemplate[attrkey]['paramsUser']['NIP'] = $('.Input[field="employees"] option:selected').val();    // only preview for sample
+            settingTemplate[attrkey]['paramsUser'] = data;
+            // settingTemplate[attrkey]['paramsUser']['NIP'] = $('.Input[field="employees"] option:selected').val();    // only preview for sample
 
             settingTemplate[attrkey]['MapTable'] = {};
             settingTemplate[attrkey]['MapTable']['Header'] = {};

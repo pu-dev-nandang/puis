@@ -267,19 +267,45 @@
 			})
 
 			// special for table
-			// console.log(dt);
 			var InputJson = dt['InputJson'];
 			if (InputJson != null && InputJson != '') {
 				InputJson =  jQuery.parseJSON( InputJson )
-				for (key in InputJson){
-					$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
-					   //may want to use $.trim in here
-					   return $(this).val() == InputJson[key]; 
-					}).prop("selected", true);
+				// for (key in InputJson){
+				// 	$('.Input[field="PARAMS"][name="#'+key+'"] option').filter(function() {
+				// 	   //may want to use $.trim in here
+				// 	   return $(this).val() == InputJson[key]; 
+				// 	}).prop("selected", true);
+				// }
+
+				// console.log(InputJson);
+
+				if (InputJson['TABLE'] !== undefined) {
+					var arr = InputJson['TABLE'];
+					for (var i = 0; i < arr.length; i++) {
+						var arrkey = arr[i];
+						// console.log(arrkey);
+						for(key in arrkey){
+							if (key.substring(0, 1) == '#') {
+								var elClosest = $('.form-group[keyindex="'+i+'"]');
+								if ( elClosest.find('select .Input').length ) {
+									elClosest.find('.Input[field="PARAMS"][name="'+key+'"] option').filter(function() {
+									   //may want to use $.trim in here
+									   return $(this).val() == arrkey[key]; 
+									}).prop("selected", true);
+								}
+								else
+								{
+									elClosest.find('.Input').val(arrkey[key]);
+								}
+							}
+						}
+						
+					}
 				}
 
+
 				// for GET
-				if (InputJson['GET'] !== 'undefined') {
+				if (InputJson['GET'] !== undefined) {
 					for(key in InputJson['GET']){
 						for (var i = 0; i < InputJson['GET'][key].length; i++) {
 							var get_token = jwt_encode(InputJson['GET'][key][i], "UAP)(*");
