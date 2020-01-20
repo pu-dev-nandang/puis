@@ -497,11 +497,11 @@ class C_global_informations extends Globalclass {
     	
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
-    		if(!empty($v->PositionMain)){
+    		/*if(!empty($v->PositionMain)){
     			$splitPosition = explode(".", $v->PositionMain);
     			$division = $this->General_model->fetchData("db_employees.division",array("ID"=>$splitPosition[0]))->row();
     			$position = $this->General_model->fetchData("db_employees.position",array("ID"=>$splitPosition[1]))->row();
-    		}
+    		}*/
     		$url_image = './uploads/employees/'.$v->Photo;
     		$srcImg =  base_url('images/icon/userfalse.png');
             if($v->Photo != '' && $v->Photo != null){
@@ -521,7 +521,7 @@ class C_global_informations extends Globalclass {
     		$nestedData[] = "<center>".$v->EmpReligion.'</center>';
     		$nestedData[] = "<center>".(!empty($v->Gender) ? (($v->Gender == "L") ? "Male":"Female") : "").'</center>';
     		$nestedData[] = $v->EmpLevelEduName;
-    		$nestedData[] = "<b>".$division->Division."</b><br>".$position->Description;
+    		$nestedData[] = "<b>".$v->DivisionMain."</b><br>".$v->PositionMain;
     		$nestedData[] = (!empty($v->StatusEmployeeID) ? $v->EmpStatus : "Non Active");
     		$data[] = $nestedData;
     	}
