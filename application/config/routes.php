@@ -1015,6 +1015,8 @@ $route['api/__getLecturerEvaluation'] = 'api/c_api/getLecturerEvaluation';
 $route['api/database/__getListStudent'] = 'api/c_api/getListStudent';
 /*ADDED BY FEBRI @ JAN 2020*/
 $route['api/database/__getListStudentPS'] = 'api/c_api/getListStudentPS';
+$route['api/database/__fetchStudents'] = 'api/c_api/fetchStudentsObj';
+$route['api/database/__fetchEmployees'] = 'api/c_api/fetchEmployeeObj';
 /*END ADDED BY FEBRI @ JAN 2020*/
 $route['api/database/upload_photo_student'] = 'page/academic/c_akademik/upload_photo_student';
 

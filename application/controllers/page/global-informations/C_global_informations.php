@@ -29,7 +29,7 @@ class C_global_informations extends Globalclass {
 
 
 
-    /*STUDENTS*/
+/*STUDENTS*/
 
     public function students(){
     	$data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
@@ -105,8 +105,9 @@ class C_global_informations extends Globalclass {
         }
 
     	$data = array();
-    	$totalData = $this->Globalinformation_model->fetchStudentsPS(false,$param);
-    	$result = $this->Globalinformation_model->fetchStudentsPS(false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
+    	$totalData = $this->Globalinformation_model->fetchStudentsPS(true,false,$param);
+    	$TotalDataPS = (!empty($totalData) ? $totalData->Total : 0);
+    	$result = $this->Globalinformation_model->fetchStudentsPS(false,false,$param,$reqdata['start'],$reqdata['length'],$orderBy);
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		//$detailStudent = $this->General_model->fetchData("ta_".$v->ClassOf.".students",array("NPM"=>$v->NPM))->row();
@@ -138,8 +139,8 @@ class C_global_informations extends Globalclass {
 
     	$json_data = array(
             "draw"            => intval( $reqdata['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
+            "recordsTotal"    => intval($TotalDataPS),
+            "recordsFiltered" => intval($TotalDataPS),
             "data"            => $data
         );
 
@@ -153,7 +154,7 @@ class C_global_informations extends Globalclass {
         $data_arr = (array) $this->jwt->decode($data['token'],$key);
         if($data){
         	$param[] = array("field"=>"ath.NPM","data"=>" =".$data_arr['NPM']." ","filter"=>"AND");    
-        	$isExist = $this->Globalinformation_model->fetchStudentsPS(true,$param);
+        	$isExist = $this->Globalinformation_model->fetchStudentsPS(false,true,$param);
         	if(!empty($isExist)){
         		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
         		$data['detail'] = $isExist;
@@ -165,7 +166,7 @@ class C_global_informations extends Globalclass {
 		                $srcImg = (file_exists($url_image)) ? base_url($url_image) : base_url('images/icon/userfalse.png') ;
 		            }
 		            $data['profilepic'] = $srcImg;
-	            }
+	            }else{$data['profilepic'] = base_url('images/icon/userfalse.png');}
         	}
         	$this->load->view('dashboard/global-informations/students/detail',$data);
         }else{show_404();}
@@ -243,10 +244,10 @@ class C_global_informations extends Globalclass {
 
     }
 
-    /*END STUDENTS*/
+/*END STUDENTS*/
 
 
-    /*LECTURER*/
+/*LECTURER*/
     public function lecturers(){
     	$data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
     	$data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'lec' or IDStatus = '-1'")->result();
@@ -324,8 +325,9 @@ class C_global_informations extends Globalclass {
         $param[] = array("field"=>"em.PositionMain","data"=>" like'14.%' ","filter"=>"AND",);
 
     	$data = array();
-    	$totalData = $this->Globalinformation_model->fetchLecturer($param)->result();
-    	$result = $this->Globalinformation_model->fetchLecturer($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+    	$totalData = $this->Globalinformation_model->fetchLecturer(true,$param)->row();
+    	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
+    	$result = $this->Globalinformation_model->fetchLecturer(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
     		if(!empty($v->PositionMain)){
@@ -360,8 +362,8 @@ class C_global_informations extends Globalclass {
 
     	$json_data = array(
             "draw"            => intval( $reqdata['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
+            "recordsTotal"    => intval($TotalData),
+            "recordsFiltered" => intval($TotalData),
             "data"            => $data
         );
 
@@ -375,12 +377,12 @@ class C_global_informations extends Globalclass {
         $data_arr = (array) $this->jwt->decode($data['token'],$key);
         if($data){
         	$param[] = array("field"=>"em.ID","data"=>" =".$data_arr['ID']." ","filter"=>"AND");    
-        	$isExist = $this->Globalinformation_model->fetchLecturer($param)->row();
+        	$isExist = $this->Globalinformation_model->fetchLecturer(false,$param)->row();
         	if(!empty($isExist)){
         		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
         		$url_image = './uploads/employees/'.$isExist->Photo;
 	    		$srcImg =  base_url('images/icon/userfalse.png');
-	            if($isExist->Photo != '' && $isExist->Photo != null){
+	            if($isExist->Photo != '' || $isExist->Photo != null || !empty($isExist->Photo)){
 	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
 	            }
 	            $data['profilePIC'] = $srcImg;
@@ -409,10 +411,10 @@ class C_global_informations extends Globalclass {
     }
 
 
-    /*END LECTURER*/
+/*END LECTURER*/
 
 
-    /*EMPLOYEE*/
+/*EMPLOYEE*/
     public function employees(){
     	$data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'emp' or IDStatus = '-1' ")->result();
     	$data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
@@ -489,8 +491,9 @@ class C_global_informations extends Globalclass {
 
 
     	$data = array();
-    	$totalData = $this->Globalinformation_model->fetchEmployee($param)->result();
-    	$result = $this->Globalinformation_model->fetchEmployee($param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+    	$totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
+    	$TotalData = (!empty($totalData) ? $totalData->Total : 0);
+    	$result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
     	
     	$no = $reqdata['start'] + 1;
     	foreach ($result as $v) {
@@ -526,8 +529,8 @@ class C_global_informations extends Globalclass {
 
     	$json_data = array(
             "draw"            => intval( $reqdata['draw'] ),
-            "recordsTotal"    => intval(count($totalData)),
-            "recordsFiltered" => intval( count($totalData) ),
+            "recordsTotal"    => intval($TotalData),
+            "recordsFiltered" => intval($TotalData),
             "data"            => $data
         );
 
@@ -541,12 +544,12 @@ class C_global_informations extends Globalclass {
         $data_arr = (array) $this->jwt->decode($data['token'],$key);
         if($data){
         	$param[] = array("field"=>"em.ID","data"=>" =".$data_arr['ID']." ","filter"=>"AND");    
-        	$isExist = $this->Globalinformation_model->fetchEmployee($param)->row();
+        	$isExist = $this->Globalinformation_model->fetchEmployee(false,$param)->row();
         	if(!empty($isExist)){
         		//$isExist->detailTA = $this->Globalinformation_model->detailStudent("ta_".$isExist->Year.".students",array("a.NPM"=>$data_arr['NPM']))->row();
         		$url_image = './uploads/employees/'.$isExist->Photo;
 	    		$srcImg =  base_url('images/icon/userfalse.png');
-	            if($isExist->Photo != '' && $isExist->Photo != null){
+	            if($isExist->Photo != '' && $isExist->Photo != null || !empty($isExist->Photo)){
 	                $srcImg = (file_exists($url_image)) ? base_url('uploads/employees/'.$isExist->Photo) : base_url('images/icon/userfalse.png') ;
 	            }
 	            $data['profilePIC'] = $srcImg;
@@ -574,10 +577,10 @@ class C_global_informations extends Globalclass {
         }else{show_404();}
     }
     
-    /*END EMPLOYEE*/
+/*END EMPLOYEE*/
 
 
-
+/*MESSAGE BLAST*/
     public function messageBlast(){
     	$data['title'] = "Message Blast";
     	$page = $this->load->view('dashboard/global-informations/message-blast/index',$data,true);
@@ -598,5 +601,69 @@ class C_global_informations extends Globalclass {
 	}
 
 
+	public function messageBlastFilterForm(){
+		$data = $this->input->post();
+		if($data){
+			$key = "UAP)(*";
+        	$data_arr = (array) $this->jwt->decode($data['token'],$key);
+        	if(!empty($data_arr['TYPE'])){
+        		switch ($data_arr['TYPE']) {
+        			case 'Student':
+        				$this->filterFormStudents();
+        				break;
+    				case 'Lecturer':
+        				$this->filterFormLecturer();
+        				break;
+    				case 'Employee':
+        				$this->filterFormEmployee();
+        				break;        			
+        			default:
+        				show_404();
+        				break;
+        		}
+        	}else{show_404();}
+        		
+		}else{show_404();}
+	}
+
+
+	private function filterFormStudents(){
+		$data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
+    	$data['statusstd'] = $this->General_model->fetchData("db_academic.status_student",array())->result();
+    	$data['religion'] = $this->General_model->fetchData("db_admission.agama",array())->result();
+    	$data['yearIntake'] = $this->General_model->fetchData("db_academic.semester",array(),null,null,null,"Year")->result();
+		echo $this->load->view("dashboard/global-informations/message-blast/filter/Student",$data,true);
+	}
+
+
+	private function filterFormLecturer(){
+		$data['studyprogram'] = $this->General_model->fetchData("db_academic.program_study",array("Status"=>1))->result();
+    	$data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'lec' or IDStatus = '-1'")->result();
+    	$data['position'] = $this->General_model->fetchData("db_employees.position","ID=5 or ID=6 or ID=7")->result();
+    	$data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+    	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+		echo $this->load->view("dashboard/global-informations/message-blast/filter/Lecturer",$data,true);
+	}
+
+
+	private function filterFormEmployee(){
+		$data['statusstd'] = $this->General_model->fetchData("db_employees.employees_status","Type = 'emp' or IDStatus = '-1' ")->result();
+    	$data['division'] = $this->General_model->fetchData("db_employees.division",array("StatusDiv"=>1))->result();
+    	$data['position'] = $this->General_model->fetchData("db_employees.position",array())->result();
+        $data['religion'] = $this->General_model->fetchData("db_employees.religion",array())->result();
+    	$data['level_education'] = $this->General_model->fetchData("db_employees.level_education",array())->result();
+		echo $this->load->view("dashboard/global-informations/message-blast/filter/Employee",$data,true);
+	}
+
+/*END MESSAGE BLAST*/
+
+
+/*SUBJECT TYPE*/
+    public function subjectType(){
+        $data['title'] = "Subject Type";
+        $page = $this->load->view('dashboard/global-informations/message-blast/subject-type/index',$data,true);
+        $this->blast_global_informations($page);
+    }
+/*END SUBJECT TYPE*/
 
 }

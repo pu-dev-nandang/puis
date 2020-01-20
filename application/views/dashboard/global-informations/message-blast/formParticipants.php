@@ -1,10 +1,11 @@
+<style type="text/css">#participants-frm .filter-participant{padding-top: 10px}</style>
 <div id="participants-frm">
-	<form id="form-participants" method="post" autocomplete="off">
+	<div id="form-participants">
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title">External Participants</h4>
+						<h4 class="panel-title"><i class="fa fa-external-link-square"></i> External Participants</h4>
 					</div>
 					<div class="panel-body">
 						<div class="row">
@@ -33,7 +34,7 @@
 			<div class="col-sm-12">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h4 class="panel-title">Internal Participants</h4>
+						<h4 class="panel-title"><i class="fa fa-external-link"></i> Internal Participants</h4>
 					</div>
 					<div class="panel-body">
 						<div class="participant-ctn">
@@ -50,25 +51,33 @@
 									</div>
 								</div>
 							</div>
-							<div class="filter-participant">-</div>
+							<div class="filter-participant"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</form>
+	</div>
 </div>
 
 <script type="text/javascript">
+	function isValidEmailAddress(emailAddress) {
+	    var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+	    return pattern.test(emailAddress);
+	}
 	$(document).ready(function(){
 		$formparticipants = $("#form-participants");
 		$formparticipants.on("keyup","input[name=extmail]",function(){
 			var value = $(this).val();
-			console.log(value);
-			var validasiMail = isValidEmailAddress( value );
-			if( !validasiMail ){
-				$(this).addClass("error");
-				$(this).css({border:'1px solid red'});
+			if(value.length > 0){
+				var validasiMail = isValidEmailAddress( value );
+				if( !validasiMail ){
+					$(this).addClass("error");
+					$(this).css({border:'1px solid red'});
+				}else{
+					$(this).removeAttr("style");
+					$(this).removeClass("error");
+				}
 			}else{
 				$(this).removeAttr("style");
 				$(this).removeClass("error");
@@ -89,14 +98,29 @@
 			}
 		});
 
-		function isValidEmailAddress(emailAddress) {
-		    var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
-		    return pattern.test(emailAddress);
-		}
-
 		$formparticipants.on("change","select[name=type_participant]",function(){
-			var value = $(this).val();
-			alert(value);
+			var TYPE = $(this).val();
+			if(TYPE.length > 0){
+				var data = {
+	              TYPE : TYPE,
+	          	};
+	          	var token = jwt_encode(data,'UAP)(*');
+				$.ajax({
+				    type : 'POST',
+				    url : base_url_js+"global-informations/message-blast/filterForm",
+				    data : {token:token},
+				    dataType : 'html',
+				    beforeSend :function(){
+				    	$formparticipants.find(".filter-participant").html("..fetching data..");
+				    },error : function(jqXHR){
+		            	$formparticipants.find(".filter-participant").html(jqXHR.responseText);
+				    },success : function(response){
+						$formparticipants.find(".filter-participant").html(response);			    	
+				    }
+				});
+			}else{
+				$formparticipants.find(".filter-participant").html("");
+			}
 		});		
 
 	});
