@@ -2042,6 +2042,7 @@ class M_api extends CI_Model {
                 } else {
 
                     $pembulatanIPS = round($LastIPS,2);
+                    $pembulatanIPS = str_replace(',', '.', $pembulatanIPS);
 
                     $dataMakCredit = $this->db->query('SELECT Credit FROM db_academic.range_credits WHERE
                                                       IPSStart <= '.$pembulatanIPS.'
