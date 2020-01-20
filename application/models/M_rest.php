@@ -1623,6 +1623,21 @@ class M_rest extends CI_Model {
         return $result;
     }
 
+    public function getDetailsCourse($ClassOf,$NPM){
+
+        $db = 'ta_'.$ClassOf;
+
+        $data = $this->db->query('SELECT sp.*, mk.MKCode, mk.Name, mk.NameEng, s.Name AS SemesterName, sspd.NextSemester FROM '.$db.'.study_planning sp 
+                                            LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = sp.MKID)
+                                            LEFT JOIN db_academic.semester s ON (s.ID = sp.SemesterID)
+                                            LEFT JOIN db_academic.std_study_planning_details sspd ON (sspd.ClassOf = "'.$ClassOf.'" AND sspd.SPID = sp.ID)
+                                            WHERE sp.NPM = "'.$NPM.'" 
+                                            ORDER BY sp.SemesterID DESC, mk.MKCode ASC ')->result_array();
+
+        return $data;
+
+    }
+
     public function getIPK4Transcript($dataTranscript)
     {
 
@@ -1672,11 +1687,13 @@ class M_rest extends CI_Model {
 
     public function getDataKHS($db,$NPM,$SemesterID,$Status,$System){
 
-        $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment, cd.MKType 
+        $ClassOf = explode('_',$db)[1];
+        $data = $this->db->query('SELECT sp.*,mk.MKCode, mk.Name, mk.NameEng, s.TotalAssigment, cd.MKType, sspd.NextSemester 
                                         FROM '.$db.'.study_planning sp 
                                         LEFT JOIN db_academic.curriculum_details cd ON (cd.ID = sp.CDID)
                                         LEFT JOIN db_academic.mata_kuliah mk ON (mk.ID = cd.MKID) 
                                         LEFT JOIN db_academic.schedule s ON (s.ID = sp.ScheduleID)
+                                        LEFT JOIN db_academic.std_study_planning_details sspd ON (sspd.ClassOf = "'.$ClassOf.'" AND sspd.SPID = sp.ID)
                                         WHERE sp.NPM = "'.$NPM.'" 
                                         AND sp.SemesterID="'.$SemesterID.'" 
                                         AND sp.CDID IS NOT NULL 
