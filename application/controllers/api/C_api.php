@@ -10095,6 +10095,166 @@ class C_api extends CI_Controller {
         $response = $json_data;
         echo json_encode($response);
     }
+
+
+    public function fetchEmployeeObj(){
+        $this->load->model("global-informations/Globalinformation_model");
+        $reqdata = $this->input->post();
+        if($reqdata){
+            $key = "UAP)(*";
+            $data_arr = (array) $this->jwt->decode($reqdata['token'],$key);
+            $param = array();$orderBy=" em.ID DESC ";
+
+            if(!empty($reqdata['search']['value']) ) {
+                $search = $reqdata['search']['value'];
+
+                $param[] = array("field"=>"(em.NIP","data"=>" like '%".$search."%' ","filter"=>"AND",);    
+                $param[] = array("field"=>"em.NIDN","data"=>" like '%".$search."%' )","filter"=>"OR",);    
+            }
+            if(!empty($data_arr['Filter'])){            
+                $parse = parse_str($data_arr['Filter'],$output);
+
+                //check data emp if lecturers
+                if(!empty($output['isLecturer'])){
+                    $divLect = '14';
+                    $param[] = array("field"=>"em.PositionMain","data"=>" like'".$divLect.".%' ","filter"=>"AND",);
+                    if( !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$divLect.".".$output['position']."' ","filter"=>"AND",);    
+                    }
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusLecturerID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                    if(!empty($output['study_program'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['study_program']) == 1){
+                            $param[] = array("field"=>"em.ProdiID","data"=>" ='".$output['study_program'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['study_program'] as $s) {
+                                $param[] = array("field"=>"em.ProdiID","data"=>" ='".$s."' ".((($sn < count($output['study_program'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                //check data for employee
+                else{
+                    if(!empty($output['division'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" like '".$output['division'].".%' ","filter"=>"AND",);    
+                    }
+                    if( !empty($output['division']) && !empty($output['position'])){
+                        $param[] = array("field"=>"em.PositionMain","data"=>" = '".$output['division'].".".$output['position']."' ","filter"=>"AND",);    
+                    }
+
+                    if(!empty($output['status'])){
+                        $sn = 1;
+                        $dataArrStatus = array();
+                        $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                        if(count($output['status']) == 1){
+                            $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$output['status'][0]."' ","filter"=> "" );
+                        }else{
+                            foreach ($output['status'] as $s) {
+                                $param[] = array("field"=>"em.`StatusEmployeeID`","data"=>" ='".$s."' ".((($sn < count($output['status'])) ? ' OR ':'')) ,"filter"=> null );
+                                $sn++;
+                            }
+                        }
+                        $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                    }
+                }
+                
+
+                if(!empty($output['staff'])){
+                    $param[] = array("field"=>"(em.NIP","data"=>" like '%".$output['staff']."%' ","filter"=>"AND",);    
+                    $param[] = array("field"=>"ps.NameEng","data"=>" like '%".$output['staff']."%' ","filter"=>"OR",);    
+                    $param[] = array("field"=>"em.Name","data"=>" like '%".$output['staff']."%' )","filter"=>"OR",);    
+                }                
+                if(!empty($output['religion'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['religion']) == 1){
+                        $param[] = array("field"=>"em.ReligionID","data"=>" ='".$output['religion'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['religion'] as $s) {
+                            $param[] = array("field"=>"em.ReligionID","data"=>" ='".$s."' ".((($sn < count($output['religion'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['gender'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['gender']) == 1){
+                        $param[] = array("field"=>"em.Gender","data"=>" ='".$output['gender'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['gender'] as $s) {
+                            $param[] = array("field"=>"em.Gender","data"=>" ='".$s."' ".((($sn < count($output['gender'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+                if(!empty($output['level_education'])){
+                    $sn = 1;
+                    $dataArrStatus = array();
+                    $param[] = array("field"=>"(","data"=>null,"filter"=>"AND");
+                    if(count($output['level_education']) == 1){
+                        $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$output['level_education'][0]."' ","filter"=> "" );
+                    }else{
+                        foreach ($output['level_education'] as $s) {
+                            $param[] = array("field"=>"em.LevelEducationID","data"=>" ='".$s."' ".((($sn < count($output['level_education'])) ? ' OR ':'')) ,"filter"=> null );
+                            $sn++;
+                        }
+                    }
+                    $param[] = array("field"=>")","data"=>null,"filter"=>null);
+                }
+
+                if(!empty($output['birthdate_start'])){
+                    if(!empty($output['birthdate_end'])){
+                        $param[] = array("field"=>"(em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);    
+                        $param[] = array("field"=>"em.DateOfBirth","data"=>" <= '".date("Y-m-d",strtotime($output['birthdate_end']))."' )","filter"=>"AND",);    
+                    }else{
+                        $param[] = array("field"=>"em.DateOfBirth","data"=>" >= '".date("Y-m-d",strtotime($output['birthdate_start']))."' ","filter"=>"AND",);
+                    }
+                }
+
+                if(!empty($output['sorted'])){
+                    $orderBy = $output['sorted'];
+                }
+            }
+
+            $totalData = $this->Globalinformation_model->fetchEmployee(true,$param)->row();
+            $TotalData = (!empty($totalData) ? $totalData->Total : 0);
+            $result = $this->Globalinformation_model->fetchEmployee(false,$param,$reqdata['start'],$reqdata['length'],$orderBy)->result();
+
+            $json_data = array(
+                "draw"            => intval( $reqdata['draw'] ),
+                "recordsTotal"    => intval($TotalData),
+                "recordsFiltered" => intval($TotalData),
+                "data"            => (!empty($result) ? $result : null)
+            );
+
+        }else{$json_data=null;}
+        $response = $json_data;
+        echo json_encode($response);
+    }
+
+
     /*END ADDED BY FEBRI @ JAN 2020*/
 
     public function getListEmployees(){

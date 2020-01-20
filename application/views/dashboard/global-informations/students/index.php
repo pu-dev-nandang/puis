@@ -255,17 +255,26 @@
     	
     	$("#sorting-data").on("change","select[name=sort_by]",function(){
           
-          var value = $(this).val();
-          var order = $("#sorting-data select[name=order_by]").val();
-          $('#fetch-data-tables .table').DataTable().destroy();
-          fetchingData(value+" "+order);
+          var value = $.trim($(this).val());
+          var order = $.trim($("#sorting-data select[name=order_by]").val());
+          if(value.length > 0 && order.length > 0){
+	        $('#fetch-data-tables .table').DataTable().destroy();
+	        fetchingData(value+" "+order);
+          }else{
+          	$('#fetch-data-tables .table').DataTable().destroy();
+          	fetchingData();
+          }
         });
         
         $("#sorting-data").on("change","select[name=order_by]",function(){
-          var order = $("#sorting-data select[name=sort_by]").val();
-          var value = $(this).val();
-          $('#fetch-data-tables .table').DataTable().destroy();
-          fetchingData(order+" "+value);
+          var order = $.trim($("#sorting-data select[name=sort_by]").val());
+          var value = $.trim($(this).val());
+          if(value.length > 0 && order.length > 0){
+	        $('#fetch-data-tables .table').DataTable().destroy();
+	        fetchingData(order+" "+value);
+  		  }else{
+  		  	alert("Please select name of Field.");
+  		  }
         });
 
     	$("#form-filter .btn-filter").click(function(){

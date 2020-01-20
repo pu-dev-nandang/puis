@@ -127,17 +127,20 @@ class Globalinformation_model extends CI_Model{
         if($count){
             $select = "count(*) as Total";
         }else{
-            $select = "em.*, ps.NameEng AS ProdiNameEng, ps.DegreeEng as ProdiDegree, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName";
+            $select = "em.*, el.Name as ProdiDegree, el.DescriptionEng as ProdiDegreeEng, ps.NameEng AS ProdiNameEng, es.Description as EmpStatus, r.Religion as EmpReligion, le.Level as EmpLevelEduName, le.Description as EmpLevelDesc, lap.Position as EmpAcaName, d.Division as DivisionMain, p.Position as PositionMain";
         }
         $sorted = " order by ".(!empty($order) ? $order : 'em.ID DESC');
         
         $string = "SELECT {$select}
 				   FROM db_employees.employees em
 				   LEFT JOIN db_academic.program_study ps ON (ps.ID = em.ProdiID)
-				   LEFT JOIN db_employees.employees_status es ON (es.IDStatus = em.StatusEmployeeID)
+                   LEFT JOIN db_academic.education_level el ON (ps.EducationLevelID = el.ID)
+                   LEFT JOIN db_employees.employees_status es ON (es.IDStatus = em.StatusEmployeeID)
 				   LEFT JOIN db_employees.religion r ON (r.IDReligion = em.ReligionID)
 				   LEFT JOIN db_employees.level_education le ON (le.ID = em.LevelEducationID)
 				   LEFT JOIN db_employees.lecturer_academic_position lap ON (lap.ID = em.LecturerAcademicPositionID)
+                   LEFT JOIN db_employees.division d on (d.ID = SUBSTRING_INDEX(em.PositionMain,'.',1) )
+                   LEFT JOIN db_employees.position p on (p.ID = SUBSTRING_INDEX(em.PositionMain,'.',-1) )
                    {$where} {$sorted} {$lims} ";
         
         $value  = $this->db->query($string);

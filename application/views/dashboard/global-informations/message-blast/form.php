@@ -1,7 +1,8 @@
 <style type="text/css">
 .find-participants{cursor: pointer;padding: 5px}
 .box-mail{border:1px solid #ccc;box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;}	
-.box-mail .list-mail,.box-mail .act-find, .box-mail .act-show-list{padding: 5px;height: 35px;width: 100%}
+.box-mail .list-mail,.box-mail .act-find, .box-mail .act-show-list{padding: 5px;}
+.box-mail .list-mail,.box-mail .act-find, .box-mail .act-show-list, .form-control{height: 35px;width: 100%}
 .box-mail .act-find{text-align: center;background: #ddd;border-left: 1px solid #ccc;line-height: 2;}
 .box-mail .list-mail{overflow: auto;}
 .box-mail .act-show-list{text-align: right;background: red}
@@ -19,8 +20,8 @@
 								<h4 class="panel-title"><?=$title?></h4>								
 							</div>
 							<div class="col-sm-6 text-right">
-								<button class="btn btn-xs btn-default btn-draft" title="Save as Draft" type="button"><i class="fa fa-bookmark"></i> Save as draft</button>
-								<button class="btn btn-xs btn-danger btn-remove" type="button"><i class="fa fa-trash"></i> Discard</button>
+								<!-- <button class="btn btn-xs btn-default btn-draft" title="Save as Draft" type="button"><i class="fa fa-bookmark"></i> Save as draft</button> -->
+								<button class="btn btn-xs btn-danger btn-discard" type="button"><i class="fa fa-trash"></i> Discard</button>
 							</div>
 						</div>
 					</div>
@@ -36,10 +37,10 @@
 									<label>To</label>
 									<div class="box-mail receiver" data-target="receiver">
 										<div class="row">
-											<div class="col-sm-9 left">
+											<div class="col-sm-10 col-md-9 left">
 												<div class="list-mail"></div>
 											</div>
-											<div class="col-sm-3 right">
+											<div class="col-sm-2 col-md-3 right">
 												<div class="act-find find-participants">
 													<span><i class="fa fa-search"></i> Find participants</span>																									
 												</div>
@@ -52,16 +53,23 @@
 									<label>CC</label>
 									<div class="box-mail receiver-cc" data-target="receiver-cc">
 										<div class="row">
-											<div class="col-sm-9 left">
+											<div class="col-sm-10 col-md-9 left">
 												<div class="list-mail"></div>
 											</div>
-											<div class="col-sm-3 right">
+											<div class="col-sm-2 col-md-3 right">
 												<div class="act-find find-participants">
 													<span><i class="fa fa-search"></i> Find participants</span>																									
 												</div>
 											</div>
 										</div>
 									</div>
+									<small class="text-danger text-message"></small>
+								</div>
+								<div class="form-group">
+									<label>Type of Subject</label>
+									<select class="form-control" name="typeSubject">
+										<option value="">-Choose one-</option>										
+									</select>
 									<small class="text-danger text-message"></small>
 								</div>
 								<div class="form-group">
@@ -76,7 +84,7 @@
 								</div>
 								<div class="form-group">
 									<button class="btn btn-primary btn-sm btn-submit" type="button"><i class="fa fa-paper-plane-o"></i> Send</button>
-									<button class="btn btn-default btn-sm btn-reset" type="reset">Discard</button>
+									<button class="btn btn-default btn-sm btn-discard" type="reset">Discard</button>
 								</div>
 							</form>
 						</div>
@@ -190,7 +198,12 @@
 
 				console.log(participantMail);
 
+				/*#please do some checking data in list mail by class name (mail)
+				#if(has class email){
+				#alert cannot add this data
+				#}else{*/
 				appendEmailTOReceiver(belongsto,participantMail);
+				/*#}*/
 
 			}
 		});
@@ -205,16 +218,34 @@
 			if(destination.length > 0 && mails.length > 0){
 				var storedData = "";
 				$.each(mails,function(key,value){
-				storedData += '<div class="bg-mail mail-'+destination+'-'+value.email+'">'+
-							      '<input type="hidden" value="'+value.name+'" name="name[]">' +
-								  '<input type="hidden" value="'+value.email+'" name="email[]">'+
-								  '<span class="mail mail-'+key+'" title="'+value.name+'" >'+value.email+'</span> <span class="remove-mail"><i class="fa fa-times"></i></span></div>';
+					var isExist = $("body #message-blast #form-submit-mail .box-mail."+destination+" .list-mail > .bg-mail").hasClass('mail-'+destination+'-'+value.email+'');
+					if(!isExist){
+						storedData += '<div class="bg-mail mail-'+destination+'-'+value.email+'">'+
+								      '<input type="hidden" value="'+value.name+'" name="name[]">' +
+									  '<input type="hidden" value="'+value.email+'" name="email[]">'+
+									  '<span class="mail mail-'+key+'" title="'+value.name+'" >'+value.email+'</span> <span class="remove-mail"><i class="fa fa-times"></i></span></div>';
+					}
 				});
+				
 				$("body #message-blast #form-submit-mail .box-mail."+destination+" .list-mail").append(storedData);
 				var TotalMails = $("body #message-blast #form-submit-mail .box-mail."+destination+" .list-mail .bg-mail").length;
 				$("body #message-blast #form-submit-mail .box-mail."+destination).next().text("Total: "+(TotalMails)+" participant mails");
+				$formParticipants = $("body #form-participants");
+				$extMails = $formParticipants.find(".ext-mailing-list > input[name=extmail]");
+				$extMails.val("");
+				$extMails.not("input[name=extmail]:first").remove();
 				toastr.info('Successfully added to '+destination.toUpperCase());
-			}else{alert("Internal server error. Failed add participants mail.");}
+				
+			}else{
+				alert("Internal server error. Failed add participants mail.");
+				toastr.danger('Internal server error. Failed add participants mail from '+destination.toUpperCase());
+			}
 		}
+
+		$(".btn-discard").click(function(){
+			if(confirm("Are you sure wants to DISCARD this message ?")){
+				$(location).attr("href","<?=site_url('global-informations/message-blast')?>");
+			}
+		});
 	});
 </script>

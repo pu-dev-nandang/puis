@@ -657,4 +657,13 @@ class C_global_informations extends Globalclass {
 
 /*END MESSAGE BLAST*/
 
+
+/*SUBJECT TYPE*/
+    public function subjectType(){
+        $data['title'] = "Subject Type";
+        $page = $this->load->view('dashboard/global-informations/message-blast/subject-type/index',$data,true);
+        $this->blast_global_informations($page);
+    }
+/*END SUBJECT TYPE*/
+
 }

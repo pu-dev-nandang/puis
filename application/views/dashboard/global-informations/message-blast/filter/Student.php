@@ -12,7 +12,8 @@
 					<div id="filter-form">
 		                <div class="panel panel-default">
 		                    <div class="panel-heading please-open-filter" data-toggle="collapse" data-target="#open-filter" aria-expanded="false" aria-controls="open-filter" >
-		                        <h4 class="panel-title"><i class="fa fa-filter"></i> <label>Open Form Filter</label>
+		                        <h4 class="panel-title">
+		                        <i class="fa fa-filter"></i> <label>Open Form Filter</label>
 		                        <span class="pull-right"><i class="fa fa-chevron-down"></i></span>
 		                        </h4>
 		                    </div>

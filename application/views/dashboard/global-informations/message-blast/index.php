@@ -13,8 +13,16 @@
 								<a class="btn btn-sm btn-primary btn-new-msg" href="<?=site_url('global-informations/message-blast/new')?>"><i class="fa fa-edit"></i> Create New Message</a>
 							</div>
 							<div class="col-sm-6">
-								<div class="text-right">
-									<button class="btn btn-default btn-sm" type="button"><i class="fa fa-cog"></i></button>
+								<div class="pull-right">
+									<div class="dropdown">
+									  <button id="drpConfig" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									    <i class="fa fa-cog"></i>
+									  </button>
+									  <ul class="dropdown-menu pull-right" aria-labelledby="drpConfig">
+									    <li><a href="<?=site_url('global-informations/subject-type')?>">Subject Type</a></li>
+									    <li><a href="<?=site_url()?>">Configure Mail</a></li>
+									  </ul>
+									</div>
 								</div>								
 							</div>
 							
