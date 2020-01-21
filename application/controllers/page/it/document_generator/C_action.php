@@ -49,7 +49,7 @@ class C_action extends It_Controler {
 					$rs = $checkValidation;
 					break;
 				case 'add':
-					
+					print_r($dataToken);die();
 					break;
 				
 				default:

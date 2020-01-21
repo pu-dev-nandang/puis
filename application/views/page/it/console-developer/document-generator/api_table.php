@@ -409,8 +409,11 @@
 				var html = '<div class = "well">'+
 								'<div style = "padding:15px;">'+
 									'<label>Query Result</label>'+
-								'</div>';	
-				html += '<table class="table"><thead><tr>';
+								'</div>'+
+									'<div class = "row">'+
+										'<div class = "col-md-12">'+
+											'<div class = "table-responsive">';	
+				html += '<table class="table" id = "TBLResultQuery"><thead><tr>';
 				for (key in arr_header){
 					html += '<th>'+key+'</th>';
 
@@ -434,6 +437,15 @@
 				html += '</tbody>';
 
 				html += '</table>';
+				html += '</div></div></div>';
+				html  += '<div class = "row" style = "margin-top:5px;">'+
+							'<div class = "col-md-12">'+
+								'<div class = "form-group">'+
+									'<label>API Name Table</label>'+
+									'<input type = "text" class = "form-control Input" name = "ApiNameTable" />'+
+								'</div>'+
+							'</div>'+
+						  '</div>';		
 				html += '</div>';
 
 				selector.html(html);
@@ -448,7 +460,6 @@
 			}
 		},
 
-
 	};
 
 	$(document).ready(function(e){
@@ -458,6 +469,11 @@
 	$(document).off('click', '#BtnRun').on('click', '#BtnRun',function(e) {
 	   var itsme = $(this);
 	   App_query.RunQuery(itsme,'run');
+	})
+
+	$(document).off('click', '#btnSave').on('click', '#btnSave',function(e) {
+	   var itsme = $(this);
+	   App_query.RunQuery(itsme,'add');
 	})
 
 	$(document).off('click', '.SearchNIPEMP').on('click', '.SearchNIPEMP',function(e) {
